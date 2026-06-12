@@ -1,0 +1,551 @@
+'use client';
+import { Suspense } from 'react';
+import { useEffect, useState, useCallback } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { useAppStore } from '@/lib/store';
+import { speakAccent } from '@/lib/speech';
+import {
+  saveLearnedWord, incrementTodayCount, addXP, recordStudySession,
+  markLearningComplete, toggleStarred, isStarred, addHardWord,
+  getHardWords, removeHardWord, getSettings, getStreak, getTodayLearnedCount,
+  saveLearnProgress, clearLearnProgress, getLearnProgress,
+} from '@/lib/storage';
+import { createSRSWord } from '@/lib/srs';
+import { addSRSWord as storeSRSWord } from '@/lib/storage';
+import type { Accent } from '@/lib/speech';
+import { checkAchievements } from '@/lib/gamification';
+import type { WordItem, WordCollection } from '@/lib/types';
+import { XP_PER_LEARN } from '@/lib/types';
+import Link from 'next/link';
+import UnitPicker from '@/components/UnitPicker';
+import TiltCard from '@/components/TiltCard';
+
+interface StudyWord extends WordItem {
+  collectionName: string;
+  topic: string;
+  dayNumber: number;
+}
+
+function buildStudyList(
+  collections: WordCollection[],
+  collectionName?: string,
+  dayNumber?: number,
+  hardOnly?: boolean,
+  order: 'random' | 'in-order' = 'random',
+): StudyWord[] {
+  const hardSet = hardOnly ? new Set(getHardWords()) : null;
+  const words: StudyWord[] = [];
+  for (const col of collections) {
+    if (collectionName && col.name !== collectionName) continue;
+    for (const day of col.days) {
+      if (dayNumber !== undefined && day.dayNumber !== dayNumber) continue;
+      for (const word of day.words) {
+        if (hardSet && !hardSet.has(word.word)) continue;
+        words.push({ ...word, collectionName: col.name, topic: day.topic, dayNumber: day.dayNumber });
+      }
+    }
+  }
+  if (order === 'random') {
+    for (let i = words.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [words[i], words[j]] = [words[j], words[i]];
+    }
+  }
+  return words;
+}
+
+export default function LearnPageWrapper() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="text-4xl animate-bounce">📚</div></div>}>
+      <LearnPage />
+    </Suspense>
+  );
+}
+
+function LearnPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const collectionName = searchParams.get('collection') ?? undefined;
+  const dayParam = searchParams.get('day');
+  const dayNumber = dayParam ? parseInt(dayParam) : undefined;
+  const hardOnly = searchParams.get('hard') === 'true';
+  const startIndexParam = searchParams.get('startIndex');
+  const startIndex = startIndexParam ? parseInt(startIndexParam) || 0 : 0;
+  const { collections, collectionsLoaded, pushAchievement, setPendingLevelUp, focusMode, setFocusMode,
+    showPomodoroSetup } = useAppStore();
+
+  const [words, setWords] = useState<StudyWord[]>([]);
+  const [index, setIndex] = useState(0);
+  const [startIndexApplied, setStartIndexApplied] = useState(false);
+  const [revealed, setRevealed] = useState(false);
+  const [showExamples, setShowExamples] = useState(false);
+  const [showHint, setShowHint] = useState(false);
+  const [skipped, setSkipped] = useState<StudyWord[]>([]);
+  const [done, setDone] = useState(false);
+  const [sessionCount, setSessionCount] = useState(0);
+  const [starred, setStarredState] = useState(false);
+  const [defaultAccent, setDefaultAccent] = useState<Accent>('us');
+  const [autoPlayOnReveal, setAutoPlayOnReveal] = useState(true);
+  const [sessionSize, setSessionSize] = useState(20);
+  const [studyOrder, setStudyOrder] = useState<'random' | 'in-order'>('random');
+
+  useEffect(() => {
+    const s = getSettings();
+    setDefaultAccent(s.defaultAccent);
+    setAutoPlayOnReveal(s.autoPlayOnReveal);
+    setSessionSize(s.sessionSize);
+    setStudyOrder(s.studyOrder);
+  }, []);
+
+  // Show Pomodoro widget whenever Learn is entered (collection picker or unit session)
+  useEffect(() => {
+    showPomodoroSetup();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (collectionsLoaded && collections.length > 0) {
+      const list = buildStudyList(collections, collectionName, dayNumber, hardOnly, studyOrder);
+      const sliced = (dayNumber !== undefined || hardOnly) ? list : list.slice(0, sessionSize);
+      setWords(sliced);
+      if (startIndex > 0 && !startIndexApplied) {
+        setIndex(Math.min(startIndex, sliced.length - 1));
+        setStartIndexApplied(true);
+      }
+    }
+  }, [collectionsLoaded, collections, collectionName, dayNumber, hardOnly]);
+
+  const current = words[index];
+
+  useEffect(() => {
+    if (current) {
+      setStarredState(isStarred(current.word));
+      setRevealed(false);
+      setShowExamples(false);
+      setShowHint(false);
+    }
+  }, [current]);
+
+  useEffect(() => {
+    if (revealed && current && autoPlayOnReveal) {
+      speakAccent(current.word, defaultAccent);
+    }
+  }, [revealed]); // intentionally only on revealed change
+
+  const advanceCard = useCallback(() => {
+    if (!current) return;
+    if (hardOnly) removeHardWord(current.word);
+    saveLearnedWord({
+      word: current.word,
+      translation: current.translation,
+      collectionName: current.collectionName,
+      topic: current.topic,
+      dayNumber: current.dayNumber,
+      learnedAt: new Date().toISOString(),
+    });
+    const srsWord = createSRSWord(current, current.collectionName, current.dayNumber, current.topic);
+    storeSRSWord(srsWord);
+    incrementTodayCount();
+    const { leveledUp, newLevel, newXp } = addXP(XP_PER_LEARN);
+    if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
+    recordStudySession();
+    setSessionCount(c => c + 1);
+    checkAchievements().forEach(pushAchievement);
+    if (index + 1 >= words.length) {
+      if (collectionName && words.length > 0) {
+        markLearningComplete(collectionName, words[0].dayNumber);
+        clearLearnProgress(collectionName, words[0].dayNumber);
+      }
+      setDone(true);
+    } else {
+      setIndex(i => i + 1);
+    }
+  }, [current, index, words, collectionName, pushAchievement, setPendingLevelUp, hardOnly]);
+
+  const markTooHard = useCallback(() => {
+    if (!current) return;
+    addHardWord(current.word);
+    setSkipped(s => [...s, current]);
+    if (index + 1 >= words.length) setDone(true);
+    else setIndex(i => i + 1);
+  }, [current, index, words]);
+
+  const handleStar = () => {
+    if (!current) return;
+    setStarredState(toggleStarred(current.word));
+  };
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement) return;
+      switch (e.key) {
+        case 's': case 'S': if (current) speakAccent(current.word, defaultAccent); break;
+        case 'f': case 'F': setFocusMode(!focusMode); break;
+        case 'h': case 'H':
+          if (!revealed) setShowHint(true);
+          else markTooHard();
+          break;
+        case 'ArrowRight': case 'Enter': case ' ':
+          e.preventDefault();
+          if (!done) {
+            if (!revealed) setRevealed(true);
+            else advanceCard();
+          }
+          break;
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [current, done, focusMode, revealed, advanceCard, markTooHard]);
+
+  // No unit selected → show picker
+  if (!collectionName && !hardOnly) return <UnitPicker mode="learn" />;
+
+  if (!collectionsLoaded) return <LoadingState />;
+
+  if (words.length === 0) {
+    return (
+      <div className="p-6 text-center">
+        <div className="text-5xl mb-4">📭</div>
+        <h2 className="font-bold text-xl mb-2">No words found</h2>
+        <Link href="/" className="btn-primary inline-block mt-4">Go Home</Link>
+      </div>
+    );
+  }
+
+  if (done) {
+    const backUrl = hardOnly ? '/hard-words' : collectionName ? `/collections/${encodeURIComponent(collectionName)}` : '/';
+    return (
+      <SessionDone
+        sessionCount={sessionCount}
+        skipped={skipped}
+        backUrl={backUrl}
+        collectionName={collectionName}
+        xpEarned={sessionCount * XP_PER_LEARN}
+        streak={getStreak()}
+        todayCount={getTodayLearnedCount()}
+        onRestart={() => { setIndex(0); setDone(false); setSessionCount(0); setSkipped([]); }}
+      />
+    );
+  }
+
+  if (!current) return null;
+
+  return (
+    <div className={`flex flex-col min-h-screen ${focusMode ? 'focus-container' : ''}`}>
+      {/* Header */}
+      <div className="no-focus flex items-center justify-between p-4 pb-2">
+        <button
+          onClick={() => {
+            if (index > 0 && !done && collectionName && dayNumber !== undefined) {
+              saveLearnProgress(collectionName, dayNumber, index);
+            }
+            router.back();
+          }}
+          className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-lg shrink-0"
+        >←</button>
+        <div className="flex-1 mx-3">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-xs font-medium text-[var(--text-muted)] truncate">
+              {collectionName ? collectionName.split(' ').slice(0, 2).join(' ') : 'All Collections'}
+            </span>
+            <span className="text-xs font-bold text-[var(--primary)] shrink-0 ml-2">
+              {index + 1} <span className="text-[var(--text-muted)] font-normal">/ {words.length}</span>
+            </span>
+          </div>
+          <div className="progress-bar">
+            <div className="progress-bar-fill" style={{ width: `${((index + 1) / words.length) * 100}%` }} />
+          </div>
+        </div>
+        <div className="flex gap-2 shrink-0">
+          <button onClick={handleStar} className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-lg">
+            {starred ? '⭐' : '☆'}
+          </button>
+          <button onClick={() => setFocusMode(!focusMode)} className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-base">
+            {focusMode ? '⊠' : '⛶'}
+          </button>
+        </div>
+      </div>
+
+      <div className="flex-1 p-4 flex flex-col gap-4">
+        {/* Word card */}
+        <TiltCard className="flex-1 animate-slide-up" intensity={5}>
+        <div
+          className={`card h-full transition-all ${!revealed ? 'cursor-pointer hover:border-[var(--primary)]' : ''}`}
+          style={{ minHeight: 300 }}
+          onClick={!revealed ? () => setRevealed(true) : undefined}
+        >
+          {/* Topic + audio */}
+          <div className="flex items-center justify-between mb-3">
+            <span className="badge">{current.topic}</span>
+            <div className="flex gap-1.5">
+              <AccentButton
+                onClick={e => { e.stopPropagation(); speakAccent(current.word, 'us'); }}
+                flag="🇺🇸" label="American (S)"
+                active={defaultAccent === 'us'}
+              />
+              <AccentButton
+                onClick={e => { e.stopPropagation(); speakAccent(current.word, 'uk'); }}
+                flag="🇬🇧" label="British"
+                active={defaultAccent === 'uk'}
+              />
+            </div>
+          </div>
+
+          {/* Word */}
+          <h2 className="text-3xl font-bold text-[var(--text)] mb-1">{current.word}</h2>
+          <p className="text-[var(--text-muted)] text-sm">
+            <span className="italic">{current.partOfSpeech}</span> · {current.pronunciation}
+          </p>
+
+          {!revealed ? (
+            /* ── Front: tap-to-reveal ── */
+            <div className="mt-8 mb-4 flex flex-col items-center gap-3 select-none">
+              <div className="text-5xl">🤔</div>
+              <p className="text-sm font-medium text-[var(--text-muted)]">Do you know this word?</p>
+              <div
+                className="flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold pointer-events-none"
+                style={{ background: 'var(--primary-bg)', color: 'var(--primary)' }}
+              >
+                👆 Tap to reveal · <kbd>Space</kbd>
+              </div>
+            </div>
+          ) : (
+            /* ── Back: translation + definition + examples ── */
+            <div className="mt-4 space-y-3 animate-fade-in">
+              <div className="bg-[var(--primary-bg)] rounded-xl p-3">
+                <p className="text-xs font-semibold text-[var(--primary)] mb-1">🇺🇿 O'zbek tarjimasi</p>
+                <p className="text-xl font-bold text-[var(--primary)]">{current.translation}</p>
+              </div>
+
+              <p className="text-sm text-[var(--text)] leading-relaxed">{current.definition}</p>
+
+              <ExampleWithSituation
+                num={1}
+                example={current.example1}
+                situation={current.example1Situation}
+              />
+
+              {!showExamples ? (
+                <button
+                  onClick={() => setShowExamples(true)}
+                  className="text-sm text-[var(--primary)] font-medium hover:underline"
+                >
+                  + More examples
+                </button>
+              ) : (
+                <div className="space-y-3 animate-fade-in">
+                  <ExampleWithSituation
+                    num={2}
+                    example={current.example2}
+                    situation={current.example2Situation}
+                  />
+                  <ExampleWithSituation
+                    num={3}
+                    example={current.example3}
+                    situation={current.example3Situation}
+                    translation={current.example3Translation}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+        </TiltCard>
+
+        {/* Hint — only before reveal */}
+        {!revealed && (
+          <div className="text-center no-focus">
+            {!showHint ? (
+              <button
+                onClick={() => setShowHint(true)}
+                className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] underline"
+              >
+                💡 Need a hint? (H)
+              </button>
+            ) : (
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 animate-fade-in text-left">
+                <p className="text-xs font-semibold text-amber-600 mb-1">💡 Hint</p>
+                <p className="text-sm text-amber-900">{current.definition.split(' ').slice(0, 8).join(' ')}…</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Action buttons — only after reveal */}
+        {revealed && (
+          <div className="flex gap-3 animate-fade-in no-focus">
+            <button
+              onClick={markTooHard}
+              className="flex-1 py-3.5 rounded-xl border-2 border-[var(--danger)] text-[var(--danger)] font-semibold text-sm hover:bg-red-50 transition-colors press-3d"
+            >
+              😓 Too Hard <kbd className="ml-1 opacity-60 text-xs">H</kbd>
+            </button>
+            <button
+              onClick={advanceCard}
+              className="flex-[2] btn-primary py-3.5 text-center press-3d"
+            >
+              Got it ✓  <kbd className="ml-1 opacity-60 text-xs">Space</kbd>
+            </button>
+          </div>
+        )}
+
+        <div className="no-focus text-center text-xs text-[var(--text-muted)]">
+          {words.length - index - 1} remaining · <kbd>S</kbd> listen · <kbd>H</kbd> {revealed ? 'too hard' : 'hint'}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ExampleWithSituation({
+  num, example, situation, translation,
+}: {
+  num: number; example: string; situation: string; translation?: string;
+}) {
+  return (
+    <div className="rounded-xl overflow-hidden border border-[var(--border)]">
+      <div className="bg-[var(--surface-2)] px-3 pt-3 pb-2">
+        <div className="flex items-start justify-between gap-2 mb-1">
+          <p className="text-xs text-[var(--text-muted)]">💬 Example {num}</p>
+          <div className="flex gap-1 shrink-0">
+            <AccentButton
+              onClick={() => speakAccent(example, 'us')}
+              flag="🇺🇸" label="American"
+              size="sm"
+            />
+            <AccentButton
+              onClick={() => speakAccent(example, 'uk')}
+              flag="🇬🇧" label="British"
+              size="sm"
+            />
+          </div>
+        </div>
+        <p className="text-sm italic text-[var(--text)]">&ldquo;{example}&rdquo;</p>
+        {translation && <p className="text-xs text-[var(--primary)] mt-1">{translation}</p>}
+      </div>
+      <div className="bg-amber-50 px-3 pt-2 pb-3">
+        <p className="text-xs text-amber-600 mb-1">🗺️ Holat {num}</p>
+        <p className="text-sm text-amber-900">{situation}</p>
+      </div>
+    </div>
+  );
+}
+
+function AccentButton({
+  onClick, flag, label, size = 'md', active = false,
+}: {
+  onClick: (e: React.MouseEvent) => void;
+  flag: string;
+  label: string;
+  size?: 'sm' | 'md';
+  active?: boolean;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      title={label}
+      className={`rounded-full flex items-center justify-center transition-colors ${
+        size === 'sm' ? 'w-6 h-6 text-xs' : 'w-8 h-8 text-base'
+      } ${active ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface-2)] hover:bg-[var(--primary-bg)]'}`}
+    >
+      {flag}
+    </button>
+  );
+}
+
+function LoadingState() {
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="text-center">
+        <div className="text-4xl mb-3 animate-bounce">📚</div>
+        <p className="text-[var(--text-muted)]">Loading words…</p>
+      </div>
+    </div>
+  );
+}
+
+function SessionDone({
+  sessionCount, skipped, backUrl, collectionName, xpEarned, streak, todayCount, onRestart,
+}: {
+  sessionCount: number;
+  skipped: StudyWord[];
+  backUrl: string;
+  collectionName?: string;
+  xpEarned: number;
+  streak: number;
+  todayCount: number;
+  onRestart: () => void;
+}) {
+  const hardStudyUrl = collectionName
+    ? `/learn?collection=${encodeURIComponent(collectionName)}&hard=true`
+    : '/learn?hard=true';
+
+  return (
+    <div className="p-6 animate-fade-in flex flex-col items-center min-h-screen">
+      {/* Hero */}
+      <div className="flex flex-col items-center text-center pt-10 pb-6">
+        <div className="text-6xl mb-3 animate-pop">🎉</div>
+        <h2 className="text-2xl font-bold text-[var(--text)]">Session Complete!</h2>
+        <p className="text-sm text-[var(--text-muted)] mt-1">
+          {collectionName ?? 'All Collections'}
+        </p>
+      </div>
+
+      {/* Stats grid */}
+      <div className="grid grid-cols-2 gap-3 w-full mb-4">
+        <StatTile icon="📚" value={sessionCount} label="Words learned" color="#6C63FF" />
+        <StatTile icon="⚡" value={`+${xpEarned}`} label="XP earned" color="#F59E0B" />
+        <StatTile icon="🔥" value={streak} label="Day streak" color="#FF6B35" />
+        <StatTile icon="😓" value={skipped.length} label="Hard words" color={skipped.length > 0 ? '#EF4444' : '#10B981'} />
+      </div>
+
+      {/* Today's progress nudge */}
+      <div className="w-full card mb-4 flex items-center gap-3">
+        <span className="text-2xl">📅</span>
+        <div>
+          <p className="text-sm font-semibold text-[var(--text)]">{todayCount} words today</p>
+          <p className="text-xs text-[var(--text-muted)]">Keep going — every word counts</p>
+        </div>
+      </div>
+
+      {/* Hard words list + shortcut */}
+      {skipped.length > 0 && (
+        <div className="w-full card mb-4">
+          <div className="flex items-center justify-between mb-3">
+            <p className="font-semibold text-sm text-[var(--danger)]">😓 Marked too hard</p>
+            <Link
+              href={hardStudyUrl}
+              className="text-xs font-semibold px-3 py-1 rounded-full bg-[var(--danger)] text-white"
+            >
+              Study now →
+            </Link>
+          </div>
+          <div className="space-y-1">
+            {skipped.map(w => (
+              <div key={w.word} className="text-sm py-1.5 border-b border-[var(--border)] last:border-0 flex justify-between gap-4">
+                <span className="font-medium text-[var(--text)]">{w.word}</span>
+                <span className="text-[var(--text-muted)] truncate">{w.translation}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Actions */}
+      <div className="flex gap-3 w-full mt-auto pt-4">
+        <button onClick={onRestart} className="btn-secondary flex-1">🔁 Again</button>
+        <Link href={backUrl} className="btn-primary flex-1 text-center">← Back</Link>
+      </div>
+    </div>
+  );
+}
+
+function StatTile({ icon, value, label, color }: { icon: string; value: number | string; label: string; color: string }) {
+  return (
+    <div className="card flex flex-col items-center py-4 gap-1">
+      <span className="text-2xl">{icon}</span>
+      <span className="text-2xl font-bold" style={{ color }}>{value}</span>
+      <span className="text-xs text-[var(--text-muted)]">{label}</span>
+    </div>
+  );
+}

@@ -1,65 +1,311 @@
-import Image from "next/image";
+'use client';
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useAppStore } from '@/lib/store';
+import { getWordOfDay } from '@/lib/data';
+import { getStreak, getXP, getTodayXP, getTodayLearnedCount, getDueWords, getLearnedWords, getSettings, isOnboarded, getFreezes, checkAndGrantWeeklyFreeze } from '@/lib/storage';
+import { getLevelInfo } from '@/lib/gamification';
+import { speak } from '@/lib/speech';
+import { getTheme, toggleTheme, type Theme } from '@/lib/theme';
+import type { WordItem, UserSettings } from '@/lib/types';
+import XpModal from '@/components/XpModal';
+import TiltCard from '@/components/TiltCard';
 
-export default function Home() {
+const COLLECTION_META: Record<string, { icon: string; color: string; desc: string }> = {
+  '30 Days of Powerful Words': { icon: '🏆', color: '#6C63FF', desc: 'Essential IELTS vocabulary by topic' },
+  '24 Vocabulary Challenge':   { icon: '💡', color: '#FF6584', desc: 'Idioms and phrases for fluent speakers' },
+  'Word Mastery':              { icon: '🎯', color: '#2ECC71', desc: 'High-level C1 & B2 collocations' },
+};
+
+const LEVELED_NAMES = new Set(['A1', 'A2', 'B1', 'Advanced']);
+
+export default function HomePage() {
+  const router = useRouter();
+  const { collections, collectionsLoaded } = useAppStore();
+  const [wod, setWod] = useState<WordItem | null>(null);
+  const [streak, setStreak] = useState(0);
+  const [xp, setXp] = useState(0);
+  const [todayXp, setTodayXp] = useState(0);
+  const [todayCount, setTodayCount] = useState(0);
+  const [dueCount, setDueCount] = useState(0);
+  const [learnedCount, setLearnedCount] = useState(0);
+  const [settings, setSettings] = useState<UserSettings>({ name: 'Learner', dailyGoal: 10, languageLevel: 'B1', defaultAccent: 'us', autoPlayOnReveal: true, sessionSize: 20, fontSize: 'normal', studyOrder: 'random', quizDirection: 'word-to-uz', reduceMotion: false });
+  const [freezes, setFreezes] = useState(0);
+  const [wodRevealed, setWodRevealed] = useState(false);
+  const [theme, setThemeState] = useState<Theme>('light');
+  const [showXpModal, setShowXpModal] = useState(false);
+
+  useEffect(() => {
+    if (!isOnboarded()) { router.replace('/onboarding'); return; }
+    checkAndGrantWeeklyFreeze();
+    setStreak(getStreak());
+    setFreezes(getFreezes());
+    setXp(getXP());
+    setTodayXp(getTodayXP());
+    setTodayCount(getTodayLearnedCount());
+    setDueCount(getDueWords().length);
+    setLearnedCount(getLearnedWords().length);
+    setSettings(getSettings());
+    setThemeState(getTheme());
+  }, [router]);
+
+  useEffect(() => {
+    if (collectionsLoaded && collections.length > 0) {
+      setWod(getWordOfDay(collections));
+    }
+  }, [collectionsLoaded, collections]);
+
+  const levelInfo = getLevelInfo(xp);
+  const dailyProgress = Math.min((todayCount / settings.dailyGoal) * 100, 100);
+  const mainCollections = collections.filter(c => !LEVELED_NAMES.has(c.name));
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <div className="p-4 space-y-5 animate-fade-in">
+      {/* Header */}
+      <div className="flex items-center justify-between pt-2">
+        <div>
+          <h1 className="text-2xl font-bold text-[var(--text)]">Hi, {settings.name}! 👋</h1>
+          <p className="text-sm text-[var(--text-muted)]">Ready to learn today?</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => { const next = toggleTheme(); setThemeState(next); }}
+            className="w-10 h-10 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-lg hover:bg-[var(--primary-bg)] transition-colors"
+            title="Toggle dark mode"
+          >
+            {theme === 'dark' ? '☀️' : '🌙'}
+          </button>
+          <Link href="/settings" className="w-10 h-10 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-lg">
+            ⚙️
+          </Link>
+        </div>
+      </div>
+
+      {/* ── Collections (most important, lifted to top) ── */}
+      <div>
+        <h2 className="font-semibold text-[var(--text)] text-base mb-3">📚 Collections</h2>
+        <div className="space-y-3">
+          {/* Curated collections first */}
+          {mainCollections.map(col => {
+            const meta = COLLECTION_META[col.name] ?? { icon: '📖', color: '#6C63FF', desc: col.description };
+            const enc = encodeURIComponent(col.name);
+            const wordCount = col.days.reduce((a, d) => a + d.words.length, 0);
+            return (
+              <TiltCard
+                key={col.name}
+                className="card overflow-hidden hover:border-[var(--primary)] transition-colors"
+                style={{ boxShadow: `0 4px 14px ${meta.color}22` }}
+                intensity={6}
+              >
+                <Link href={`/collections/${enc}`} className="flex items-center gap-4" style={{ margin: '-20px', padding: '20px' }}>
+                  <div
+                    className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0 animate-float-icon"
+                    style={{ background: `${meta.color}18` }}
+                  >
+                    {meta.icon}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-bold text-[var(--text)] text-sm truncate">{col.name}</div>
+                    <div className="text-xs text-[var(--text-muted)] mt-0.5 truncate">{meta.desc}</div>
+                    <div className="text-xs text-[var(--text-muted)] mt-1">{col.days.length} units · {wordCount} words</div>
+                  </div>
+                  <span className="flex-shrink-0 text-sm font-semibold" style={{ color: meta.color }}>→</span>
+                </Link>
+              </TiltCard>
+            );
+          })}
+
+          {/* Leveled Words — last */}
+          <TiltCard
+            className="overflow-hidden rounded-2xl border-2 cursor-pointer"
+            style={{ background: 'rgba(46,204,113,0.06)', borderColor: 'rgba(46,204,113,0.35)' }}
+            intensity={5}
+          >
+            <Link href="/leveled-words" className="flex items-center gap-4 p-4 block">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0 animate-float-icon" style={{ background: 'rgba(46,204,113,0.12)' }}>
+                📚
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="font-bold text-sm" style={{ color: '#27AE60' }}>Leveled Words</div>
+                <div className="text-xs mt-0.5" style={{ color: '#2ECC71' }}>A1 → C2 vocabulary by CEFR level</div>
+              </div>
+              <span className="text-sm flex-shrink-0" style={{ color: '#2ECC71' }}>→</span>
+            </Link>
+          </TiltCard>
+        </div>
+      </div>
+
+      {/* Stats row */}
+      <div className="grid grid-cols-3 gap-3">
+        <Link href="/progress?tab=calendar">
+          <StatCard icon="🔥" value={streak} label="Day Streak" color="#FF6B35" />
+        </Link>
+        <button onClick={() => setShowXpModal(true)} className="text-left w-full">
+          <StatCard icon="⚡" value={xp} label="Total XP" color="#6C63FF" glow />
+        </button>
+        <StatCard icon="📚" value={learnedCount} label="Words" color="#10B981" />
+      </div>
+
+      {showXpModal && <XpModal xp={xp} onClose={() => setShowXpModal(false)} />}
+
+      {/* Streak freeze indicator */}
+      {freezes > 0 && (
+        <div
+          className="flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm font-medium"
+          style={{ background: 'rgba(99,179,237,0.12)', border: '1px solid rgba(99,179,237,0.35)', color: '#3B82F6' }}
+        >
+          <span className="text-base">🧊</span>
+          <span>
+            {freezes === 1 ? '1 streak freeze' : `${freezes} streak freezes`} available — your streak is protected if you miss a day
+          </span>
+        </div>
+      )}
+
+      {/* Level progress */}
+      <TiltCard className="card overflow-hidden hover:border-[var(--primary)] transition-colors cursor-pointer animate-glow-pulse" intensity={4}>
+        <button onClick={() => setShowXpModal(true)} className="w-full text-left" style={{ margin: '-20px', padding: '20px' }}>
+          <div className="flex justify-between items-center mb-2">
+            <span className="font-semibold text-[var(--text)]">⭐ {levelInfo.level}</span>
+            <span className="text-sm text-[var(--text-muted)]">{xp} XP {levelInfo.next && `→ ${levelInfo.next}`}</span>
+          </div>
+          <div className="progress-bar">
+            <div className="progress-bar-fill" style={{ width: `${levelInfo.progress}%` }} />
+          </div>
+          {levelInfo.next && (
+            <p className="text-[11px] text-[var(--text-muted)] mt-1.5 text-right">
+              {levelInfo.xpToNext} XP to {levelInfo.next} · tap for details
+            </p>
+          )}
+        </button>
+      </TiltCard>
+
+      {/* Daily goal */}
+      <TiltCard className="card" intensity={3}>
+        <div className="flex justify-between items-center mb-2">
+          <span className="font-semibold text-[var(--text)]">📅 Daily Goal</span>
+          <span className="text-sm text-[var(--text-muted)]">{todayCount} / {settings.dailyGoal} words · {todayXp} XP today</span>
+        </div>
+        <div className="progress-bar">
+          <div className="progress-bar-fill" style={{ width: `${dailyProgress}%` }} />
+        </div>
+        {dailyProgress >= 100 && (
+          <p className="text-xs text-[var(--success)] mt-1 font-medium">🎉 Daily goal reached!</p>
+        )}
+      </TiltCard>
+
+      {/* Quick actions */}
+      <div className="grid grid-cols-2 gap-3">
+        <ActionCard href="/learn"         icon="📖" title="Learn"         subtitle="Study new words"       color="#6C63FF" depthClass="depth-in-1" />
+        <ActionCard href="/flashcards"    icon="🃏" title="Flashcards"    subtitle="Review with cards"     color="#FF6B35" depthClass="depth-in-2" />
+        <ActionCard
+          href="/srs"
+          icon="🔄"
+          title="SRS Review"
+          subtitle={dueCount > 0 ? `${dueCount} words due` : 'All caught up!'}
+          color={dueCount > 0 ? '#EF4444' : '#10B981'}
+          badge={dueCount > 0 ? String(dueCount) : undefined}
+          depthClass="depth-in-3"
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+        <ActionCard href="/quiz"          icon="❓" title="Quiz"          subtitle="Test yourself"         color="#F59E0B" depthClass="depth-in-4" />
+        <ActionCard href="/pronunciation" icon="🎙️" title="Pronunciation" subtitle="Speak & be scored"    color="#8B5CF6" depthClass="depth-in-5" />
+        <ActionCard href="/matching"      icon="🎯" title="Match"         subtitle="Tap matching pairs"    color="#EC4899" depthClass="depth-in-6" />
+        <ActionCard href="/pomodoro"      icon="🍅" title="Pomodoro"      subtitle="Focused study timer"   color="#EF4444" depthClass="depth-in-7" />
+      </div>
+
+      {/* Word of the Day */}
+      {wod && (
+        <TiltCard className="card" intensity={3}>
+          <div className="flex items-center justify-between mb-3">
+            <span className="badge">✨ Word of the Day</span>
+            <button
+              onClick={() => speak(wod.word)}
+              className="w-8 h-8 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-sm hover:bg-[var(--primary)] hover:text-white transition-colors"
+              title="Listen"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+              🔊
+            </button>
+          </div>
+          <h2 className="text-2xl font-bold text-[var(--text)]">{wod.word}</h2>
+          <p className="text-sm text-[var(--text-muted)] mb-1">{wod.partOfSpeech} · {wod.pronunciation}</p>
+          <p className="text-base font-medium text-[var(--primary)]">{wod.translation}</p>
+          {wodRevealed ? (
+            <div className="mt-3 space-y-2 animate-fade-in">
+              <p className="text-sm text-[var(--text)]">{wod.definition}</p>
+              <div className="bg-[var(--primary-bg)] rounded-xl p-3">
+                <p className="text-sm italic text-[var(--text)]">"{wod.example1}"</p>
+              </div>
+            </div>
+          ) : (
+            <button
+              onClick={() => setWodRevealed(true)}
+              className="mt-3 text-sm text-[var(--primary)] font-medium hover:underline"
             >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+              Show definition & examples →
+            </button>
+          )}
+        </TiltCard>
+      )}
+
+      {/* Shortcuts — 2 rows of 3 */}
+      <div className="grid grid-cols-3 gap-2">
+        <ShortcutCard href="/starred"      icon="⭐" label="Starred"  sub="Saved words"   accent="var(--primary)" />
+        <ShortcutCard href="/hard-words"   icon="😓" label="Hard"     sub="Too hard"      accent="var(--danger)"  />
+        <ShortcutCard href="/history"      icon="📖" label="History"  sub="Words learned" accent="var(--primary)" />
+        <ShortcutCard href="/lists"        icon="📋" label="My Lists" sub="Custom sets"   accent="#8B5CF6"        />
+        <ShortcutCard href="/grammar-tips" icon="📚" label="Grammar"  sub="Tips"          accent="#10B981"        />
+      </div>
+
+      <div className="pb-4" />
     </div>
+  );
+}
+
+function StatCard({ icon, value, label, color, glow }: { icon: string; value: number; label: string; color: string; glow?: boolean }) {
+  return (
+    <TiltCard className={`card text-center py-3 px-2${glow ? ' animate-glow-pulse' : ''}`} intensity={5}>
+      <div className="text-2xl mb-1 animate-float-icon">{icon}</div>
+      <div className="text-xl font-bold" style={{ color }}>{value}</div>
+      <div className="text-xs text-[var(--text-muted)]">{label}</div>
+    </TiltCard>
+  );
+}
+
+function ActionCard({
+  href, icon, title, subtitle, color, badge, depthClass
+}: {
+  href: string; icon: string; title: string; subtitle: string; color: string; badge?: string; depthClass?: string;
+}) {
+  return (
+    <div className={`relative${depthClass ? ` ${depthClass}` : ''}`}>
+      {badge && (
+        <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[var(--danger)] text-white text-xs flex items-center justify-center font-bold z-10">
+          {parseInt(badge) > 9 ? '9+' : badge}
+        </div>
+      )}
+      <TiltCard className="card flex items-center gap-3 cursor-pointer" intensity={6}>
+        <Link href={href} className="flex items-center gap-3 w-full" style={{ margin: '-20px', padding: '20px' }}>
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0 animate-float-icon" style={{ background: `${color}20` }}>
+            {icon}
+          </div>
+          <div>
+            <div className="font-semibold text-[var(--text)] text-sm">{title}</div>
+            <div className="text-xs text-[var(--text-muted)]">{subtitle}</div>
+          </div>
+        </Link>
+      </TiltCard>
+    </div>
+  );
+}
+
+function ShortcutCard({ href, icon, label, sub }: { href: string; icon: string; label: string; sub: string; accent: string }) {
+  return (
+    <TiltCard className="card overflow-hidden flex flex-col items-center gap-1.5 py-3 cursor-pointer text-center" intensity={7}>
+      <Link href={href} className="flex flex-col items-center gap-1.5 w-full" style={{ margin: '-20px', padding: '20px' }}>
+        <div className="text-2xl animate-float-icon">{icon}</div>
+        <div className="font-semibold text-[var(--text)] text-xs">{label}</div>
+        <div className="text-xs text-[var(--text-muted)]">{sub}</div>
+      </Link>
+    </TiltCard>
   );
 }

@@ -1,0 +1,504 @@
+'use client';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { getSettings, saveSettings, resetOnboarded } from '@/lib/storage';
+import { getTheme, setTheme, type Theme } from '@/lib/theme';
+import {
+  getNotifSettings, saveNotifSettings, requestNotifPermission,
+  scheduleOrShowNotification, sendTestNotification,
+  getNotifPermission, isNotifSupported, type NotifSettings,
+} from '@/lib/notifications';
+import { exportData, importData } from '@/lib/backup';
+import type { UserSettings } from '@/lib/types';
+
+export default function SettingsPage() {
+  const router = useRouter();
+  const [settings, setSettings] = useState<UserSettings>({ name: '', dailyGoal: 10, languageLevel: 'B1', defaultAccent: 'us', autoPlayOnReveal: true, sessionSize: 20, fontSize: 'normal', studyOrder: 'random', quizDirection: 'word-to-uz', reduceMotion: false });
+  const [saved, setSaved] = useState(false);
+  const [theme, setThemeState] = useState<Theme>('light');
+  const [notif, setNotif] = useState<NotifSettings>({ enabled: false, time: '20:00' });
+  const [permission, setPermission] = useState<string>('default');
+  const [testSent, setTestSent] = useState(false);
+  const [notifSupported, setNotifSupported] = useState(false);
+  const [importState, setImportState] = useState<'idle' | 'confirm' | 'success' | 'error'>('idle');
+  const [importMsg, setImportMsg] = useState('');
+  const [pendingImport, setPendingImport] = useState<string | null>(null);
+
+  useEffect(() => {
+    setSettings(getSettings());
+    setThemeState(getTheme());
+    setNotif(getNotifSettings());
+    setPermission(getNotifPermission());
+    setNotifSupported(isNotifSupported());
+  }, []);
+
+  const handleThemeSelect = (t: Theme) => {
+    setTheme(t);
+    setThemeState(t);
+  };
+
+  const handleFontSize = (size: UserSettings['fontSize']) => {
+    setSettings(s => ({ ...s, fontSize: size }));
+    if (size === 'normal') {
+      delete document.documentElement.dataset.fontSize;
+    } else {
+      document.documentElement.dataset.fontSize = size;
+    }
+  };
+
+  const handleReduceMotion = (value: boolean) => {
+    setSettings(s => ({ ...s, reduceMotion: value }));
+    if (value) {
+      document.documentElement.dataset.reduceMotion = 'true';
+    } else {
+      delete document.documentElement.dataset.reduceMotion;
+    }
+  };
+
+  const handleNotifToggle = async () => {
+    if (!notif.enabled) {
+      const perm = await requestNotifPermission();
+      setPermission(perm);
+      if (perm !== 'granted') return;
+      const next = { ...notif, enabled: true };
+      setNotif(next);
+      saveNotifSettings(next);
+      scheduleOrShowNotification(next);
+    } else {
+      const next = { ...notif, enabled: false };
+      setNotif(next);
+      saveNotifSettings(next);
+    }
+  };
+
+  const handleTimeChange = (time: string) => {
+    const next = { ...notif, time };
+    setNotif(next);
+    saveNotifSettings(next);
+    if (next.enabled && permission === 'granted') scheduleOrShowNotification(next);
+  };
+
+  const handleTest = async () => {
+    await sendTestNotification();
+    setTestSent(true);
+    setTimeout(() => setTestSent(false), 3000);
+  };
+
+  const handleExport = () => exportData();
+
+  const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const text = ev.target?.result as string;
+      // Dry-run to validate before confirming
+      const result = importData(text);
+      if (!result.ok) {
+        setImportState('error');
+        setImportMsg(result.error);
+      } else {
+        setPendingImport(text);
+        setImportMsg(`Found ${result.learnedWords} learned words, ${result.srsWords} SRS words. This will overwrite your current progress.`);
+        setImportState('confirm');
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = ''; // reset so same file can be re-selected
+  };
+
+  const confirmImport = () => {
+    if (!pendingImport) return;
+    const result = importData(pendingImport);
+    if (result.ok) {
+      setImportState('success');
+      setImportMsg(`Restored ${result.learnedWords} learned words and ${result.srsWords} SRS words.`);
+      setTimeout(() => window.location.reload(), 1500);
+    } else {
+      setImportState('error');
+      setImportMsg(result.error);
+    }
+    setPendingImport(null);
+  };
+
+  const handleSave = () => {
+    saveSettings(settings);
+    setSaved(true);
+    setTimeout(() => { setSaved(false); router.back(); }, 1000);
+  };
+
+  return (
+    <div className="p-4 space-y-4 animate-fade-in">
+      <div className="sticky top-0 z-10 -mx-4 px-4 py-3 bg-[var(--background)] border-b border-[var(--border)] flex items-center gap-3">
+        <button onClick={() => router.back()} className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center shrink-0">←</button>
+        <h1 className="text-xl font-bold flex-1">⚙️ Settings</h1>
+        <button
+          onClick={handleSave}
+          className={`px-5 py-2 rounded-xl text-sm font-semibold transition-all ${saved ? 'bg-[var(--success)] text-white' : 'bg-[var(--primary)] text-white hover:bg-[var(--primary-dark)]'}`}
+        >
+          {saved ? '✅ Saved!' : 'Save'}
+        </button>
+      </div>
+
+      <div className="card space-y-4">
+        <h2 className="font-semibold">Profile</h2>
+        <div>
+          <label className="text-sm font-medium text-[var(--text-muted)] block mb-1">Your Name</label>
+          <input
+            type="text"
+            value={settings.name}
+            onChange={e => setSettings(s => ({ ...s, name: e.target.value }))}
+            className="w-full px-4 py-3 rounded-xl bg-[var(--surface-2)] border-2 border-transparent focus:border-[var(--primary)] outline-none transition-colors"
+            placeholder="Enter your name"
+          />
+        </div>
+
+        <div>
+          <label className="text-sm font-medium text-[var(--text-muted)] block mb-1">Daily Goal (words)</label>
+          <input
+            type="number"
+            min={1}
+            max={100}
+            value={settings.dailyGoal}
+            onChange={e => setSettings(s => ({ ...s, dailyGoal: parseInt(e.target.value) || 10 }))}
+            className="w-full px-4 py-3 rounded-xl bg-[var(--surface-2)] border-2 border-transparent focus:border-[var(--primary)] outline-none transition-colors"
+          />
+        </div>
+
+        <div>
+          <label className="text-sm font-medium text-[var(--text-muted)] block mb-2">Session Size</label>
+          <div className="grid grid-cols-5 gap-2">
+            {[5, 10, 15, 20, 30].map(n => (
+              <button
+                key={n}
+                onClick={() => setSettings(s => ({ ...s, sessionSize: n }))}
+                className={`py-2.5 rounded-xl text-sm font-semibold transition-colors ${
+                  settings.sessionSize === n
+                    ? 'bg-[var(--primary)] text-white'
+                    : 'bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--text)]'
+                }`}
+              >
+                {n}
+              </button>
+            ))}
+          </div>
+          <p className="text-xs text-[var(--text-muted)] mt-1.5">Words per learn session</p>
+        </div>
+
+        <div>
+          <label className="text-sm font-medium text-[var(--text-muted)] block mb-2">Language Level</label>
+          <div className="grid grid-cols-3 gap-2">
+            {(['A1', 'A2', 'B1', 'B2', 'C1', 'C2'] as const).map(level => (
+              <button
+                key={level}
+                onClick={() => setSettings(s => ({ ...s, languageLevel: level }))}
+                className={`py-2 rounded-xl text-sm font-medium transition-colors ${settings.languageLevel === level ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface-2)] text-[var(--text-muted)]'}`}
+              >
+                {level}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <button
+          onClick={() => { resetOnboarded(); router.replace('/onboarding'); }}
+          className="w-full py-2.5 rounded-xl border border-[var(--border)] text-sm text-[var(--text-muted)] hover:bg-[var(--surface-2)] transition-colors"
+        >
+          🔄 Start setup again
+        </button>
+      </div>
+
+      {/* Learning preferences */}
+      <div className="card space-y-4">
+        <h2 className="font-semibold">Learning</h2>
+
+        <div>
+          <p className="text-sm font-medium text-[var(--text)] mb-2">Card Study Order</p>
+          <div className="grid grid-cols-2 gap-2">
+            {([
+              { value: 'random',   label: 'Random',   icon: '🔀' },
+              { value: 'in-order', label: 'In order',  icon: '🔢' },
+            ] as const).map(({ value, label, icon }) => (
+              <button
+                key={value}
+                onClick={() => setSettings(s => ({ ...s, studyOrder: value }))}
+                className={`flex items-center justify-center gap-2 py-2.5 rounded-xl border-2 text-sm font-semibold transition-colors ${
+                  settings.studyOrder === value
+                    ? 'border-[var(--primary)] bg-[var(--primary-bg)] text-[var(--primary)]'
+                    : 'border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-muted)]'
+                }`}
+              >
+                {icon} {label}
+              </button>
+            ))}
+          </div>
+          <p className="text-xs text-[var(--text-muted)] mt-1.5">How cards are ordered in Learn sessions</p>
+        </div>
+
+        <div>
+          <p className="text-sm font-medium text-[var(--text)] mb-2">Default Quiz Direction</p>
+          <div className="grid grid-cols-2 gap-2">
+            {([
+              { value: 'word-to-uz', label: 'English → Uzbek' },
+              { value: 'uz-to-word', label: 'Uzbek → English' },
+            ] as const).map(({ value, label }) => (
+              <button
+                key={value}
+                onClick={() => setSettings(s => ({ ...s, quizDirection: value }))}
+                className={`flex items-center justify-center gap-2 py-2.5 rounded-xl border-2 text-sm font-semibold transition-colors ${
+                  settings.quizDirection === value
+                    ? 'border-[var(--primary)] bg-[var(--primary-bg)] text-[var(--primary)]'
+                    : 'border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-muted)]'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          <p className="text-xs text-[var(--text-muted)] mt-1.5">First question type shown in quizzes</p>
+        </div>
+      </div>
+
+      <div className="card space-y-4">
+        <h2 className="font-semibold">Appearance</h2>
+
+        <div>
+          <p className="text-sm font-medium text-[var(--text)] mb-2">Theme</p>
+          <div className="grid grid-cols-3 gap-2">
+            {([
+              { value: 'system', label: 'System', icon: '⚙️' },
+              { value: 'light',  label: 'Light',  icon: '☀️' },
+              { value: 'dark',   label: 'Dark',   icon: '🌙' },
+            ] as const).map(({ value, label, icon }) => (
+              <button
+                key={value}
+                onClick={() => handleThemeSelect(value)}
+                className={`flex flex-col items-center gap-1 py-3 rounded-xl border-2 transition-colors ${
+                  theme === value
+                    ? 'border-[var(--primary)] bg-[var(--primary-bg)]'
+                    : 'border-[var(--border)] bg-[var(--surface-2)] hover:border-[var(--primary)]'
+                }`}
+              >
+                <span className="text-lg">{icon}</span>
+                <span className="text-xs font-semibold" style={{ color: theme === value ? 'var(--primary)' : 'var(--text-muted)' }}>{label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <p className="text-sm font-medium text-[var(--text)] mb-2">Font Size</p>
+          <div className="grid grid-cols-3 gap-2">
+            {([
+              { value: 'compact', label: 'Compact', sample: 'A−' },
+              { value: 'normal',  label: 'Normal',  sample: 'A'  },
+              { value: 'large',   label: 'Large',   sample: 'A+' },
+            ] as const).map(({ value, label, sample }) => (
+              <button
+                key={value}
+                onClick={() => handleFontSize(value)}
+                className={`flex flex-col items-center gap-1 py-3 rounded-xl border-2 transition-colors ${
+                  settings.fontSize === value
+                    ? 'border-[var(--primary)] bg-[var(--primary-bg)]'
+                    : 'border-[var(--border)] bg-[var(--surface-2)] hover:border-[var(--primary)]'
+                }`}
+              >
+                <span className={`font-bold ${value === 'compact' ? 'text-base' : value === 'large' ? 'text-2xl' : 'text-xl'}`} style={{ color: settings.fontSize === value ? 'var(--primary)' : 'var(--text)' }}>
+                  {sample}
+                </span>
+                <span className="text-xs text-[var(--text-muted)]">{label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-[var(--text)]">Reduce Motion</p>
+            <p className="text-xs text-[var(--text-muted)] mt-0.5">Disables slide &amp; fade animations</p>
+          </div>
+          <button
+            onClick={() => handleReduceMotion(!settings.reduceMotion)}
+            className={`relative w-14 h-7 rounded-full transition-colors duration-300 focus:outline-none ${settings.reduceMotion ? 'bg-[var(--primary)]' : 'bg-[var(--surface-2)]'}`}
+            aria-label="Toggle reduce motion"
+          >
+            <span className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-300 ${settings.reduceMotion ? 'translate-x-7' : 'translate-x-0'}`} />
+          </button>
+        </div>
+      </div>
+
+      {/* Pronunciation */}
+      <div className="card space-y-4">
+        <h2 className="font-semibold">Pronunciation</h2>
+
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <p className="text-sm font-medium text-[var(--text)]">Default Accent</p>
+            <p className="text-xs text-[var(--text-muted)] mt-0.5">Used for auto-play and the Hear buttons</p>
+          </div>
+          <div className="flex rounded-xl overflow-hidden border border-[var(--border)] shrink-0">
+            {(['us', 'uk'] as const).map(a => (
+              <button
+                key={a}
+                onClick={() => setSettings(s => ({ ...s, defaultAccent: a }))}
+                className={`px-4 py-2 text-sm font-semibold transition-colors flex items-center gap-1.5 ${
+                  settings.defaultAccent === a
+                    ? 'bg-[var(--primary)] text-white'
+                    : 'text-[var(--text-muted)] hover:text-[var(--text)]'
+                }`}
+              >
+                {a === 'us' ? '🇺🇸' : '🇬🇧'} {a === 'us' ? 'American' : 'British'}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-[var(--text)]">Auto-play on Reveal</p>
+            <p className="text-xs text-[var(--text-muted)] mt-0.5">Speak the word automatically when you flip a card</p>
+          </div>
+          <button
+            onClick={() => setSettings(s => ({ ...s, autoPlayOnReveal: !s.autoPlayOnReveal }))}
+            className={`relative w-14 h-7 rounded-full transition-colors duration-300 focus:outline-none ${settings.autoPlayOnReveal ? 'bg-[var(--primary)]' : 'bg-[var(--surface-2)]'}`}
+            aria-label="Toggle auto-play on reveal"
+          >
+            <span className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-300 ${settings.autoPlayOnReveal ? 'translate-x-7' : 'translate-x-0'}`} />
+          </button>
+        </div>
+      </div>
+
+      {/* Notifications */}
+      {notifSupported ? (
+        <div className="card space-y-4">
+          <h2 className="font-semibold">Daily Reminder</h2>
+
+          {/* Permission warning */}
+          {permission === 'denied' && (
+            <div className="bg-red-50 border border-[var(--danger)] rounded-xl p-3">
+              <p className="text-xs text-[var(--danger)]">
+                Notifications are blocked by your browser. Enable them in your browser's site settings, then come back here.
+              </p>
+            </div>
+          )}
+
+          {/* Enable toggle */}
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-[var(--text)]">Enable Reminder</p>
+              <p className="text-xs text-[var(--text-muted)] mt-0.5">
+                {notif.enabled ? `Scheduled daily at ${notif.time}` : 'Get a daily nudge to study'}
+              </p>
+            </div>
+            <button
+              onClick={handleNotifToggle}
+              disabled={permission === 'denied'}
+              className={`relative w-14 h-7 rounded-full transition-colors duration-300 focus:outline-none disabled:opacity-40 ${notif.enabled ? 'bg-[var(--primary)]' : 'bg-[var(--surface-2)]'}`}
+            >
+              <span className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-300 ${notif.enabled ? 'translate-x-7' : 'translate-x-0'}`} />
+            </button>
+          </div>
+
+          {/* Time picker */}
+          {notif.enabled && permission === 'granted' && (
+            <div>
+              <label className="text-sm font-medium text-[var(--text-muted)] block mb-1">Reminder Time</label>
+              <input
+                type="time"
+                value={notif.time}
+                onChange={e => handleTimeChange(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl bg-[var(--surface-2)] border-2 border-transparent focus:border-[var(--primary)] outline-none transition-colors text-[var(--text)]"
+              />
+            </div>
+          )}
+
+          {/* Test button */}
+          {permission === 'granted' && (
+            <button
+              onClick={handleTest}
+              className="w-full py-2 rounded-xl border border-[var(--border)] text-sm text-[var(--text-muted)] hover:bg-[var(--surface-2)] transition-colors"
+            >
+              {testSent ? '✅ Test notification sent!' : '🔔 Send test notification'}
+            </button>
+          )}
+        </div>
+      ) : (
+        <div className="card">
+          <h2 className="font-semibold mb-1">Daily Reminder</h2>
+          <p className="text-sm text-[var(--text-muted)]">Notifications are not supported in this browser.</p>
+        </div>
+      )}
+
+      {/* Data backup */}
+      <div className="card space-y-4">
+        <div>
+          <h2 className="font-semibold">Data Backup</h2>
+          <p className="text-xs text-[var(--text-muted)] mt-0.5">Export your progress to a file, or restore from a previous backup.</p>
+        </div>
+
+        {/* Export */}
+        <button
+          onClick={handleExport}
+          className="w-full flex items-center gap-3 p-3 rounded-xl bg-[var(--surface-2)] hover:bg-[var(--primary-bg)] transition-colors text-left"
+        >
+          <span className="text-2xl">📤</span>
+          <div>
+            <p className="text-sm font-semibold text-[var(--text)]">Export Progress</p>
+            <p className="text-xs text-[var(--text-muted)]">Download a .json backup of all your data</p>
+          </div>
+        </button>
+
+        {/* Import */}
+        <label className="w-full flex items-center gap-3 p-3 rounded-xl bg-[var(--surface-2)] hover:bg-[var(--primary-bg)] transition-colors cursor-pointer">
+          <span className="text-2xl">📥</span>
+          <div>
+            <p className="text-sm font-semibold text-[var(--text)]">Import Progress</p>
+            <p className="text-xs text-[var(--text-muted)]">Restore from a Lexivo backup file</p>
+          </div>
+          <input type="file" accept=".json" onChange={handleImportFile} className="hidden" />
+        </label>
+
+        {/* Confirm dialog */}
+        {importState === 'confirm' && (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 animate-fade-in space-y-3">
+            <p className="text-sm font-semibold text-amber-800">⚠️ Confirm Import</p>
+            <p className="text-xs text-amber-700">{importMsg}</p>
+            <div className="flex gap-2">
+              <button onClick={() => setImportState('idle')} className="flex-1 py-2 rounded-xl border border-[var(--border)] text-sm text-[var(--text-muted)] hover:bg-[var(--surface-2)] transition-colors">
+                Cancel
+              </button>
+              <button onClick={confirmImport} className="flex-1 py-2 rounded-xl bg-[var(--primary)] text-white text-sm font-semibold hover:bg-[var(--primary-dark)] transition-colors">
+                Yes, overwrite
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Success / Error feedback */}
+        {importState === 'success' && (
+          <div className="bg-green-50 border border-[var(--success)] rounded-xl p-3 animate-fade-in">
+            <p className="text-sm font-semibold text-[var(--success)]">✅ Import successful!</p>
+            <p className="text-xs text-[var(--text-muted)] mt-1">{importMsg} Reloading…</p>
+          </div>
+        )}
+        {importState === 'error' && (
+          <div className="bg-red-50 border border-[var(--danger)] rounded-xl p-3 animate-fade-in">
+            <p className="text-sm font-semibold text-[var(--danger)]">❌ Import failed</p>
+            <p className="text-xs text-[var(--text-muted)] mt-1">{importMsg}</p>
+            <button onClick={() => setImportState('idle')} className="text-xs text-[var(--primary)] mt-2 underline">Dismiss</button>
+          </div>
+        )}
+      </div>
+
+      <div className="card space-y-3">
+        <h2 className="font-semibold">About</h2>
+        <p className="text-sm text-[var(--text-muted)]">
+          Lexivo Web — English vocabulary learning app with Uzbek translations, SRS, quizzes, and offline support.
+        </p>
+        <p className="text-xs text-[var(--text-muted)]">Data is stored locally in your browser.</p>
+      </div>
+
+      <div className="pb-4" />
+    </div>
+  );
+}

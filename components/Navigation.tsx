@@ -1,0 +1,204 @@
+'use client';
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { getSettings, getStreak, getXP, getProfilePic } from '@/lib/storage';
+import { getLevelInfo } from '@/lib/gamification';
+import { useAuth } from '@/lib/auth-context';
+
+const NAV = [
+  { href: '/', label: 'Home', icon: '🏠' },
+  { href: '/learn', label: 'Learn', icon: '📖' },
+  { href: '/srs', label: 'Review', icon: '🔄' },
+  { href: '/search', label: 'Search', icon: '🔍' },
+  { href: '/progress', label: 'Progress', icon: '📊' },
+];
+
+const LEVEL_COLORS: Record<string, string> = {
+  Beginner:             '#2ECC71',
+  Elementary:           '#27AE60',
+  Intermediate:         '#3498DB',
+  'Upper-Intermediate': '#2980B9',
+  Advanced:             '#9B59B6',
+  Master:               '#F39C12',
+};
+
+export default function Navigation() {
+  const pathname  = usePathname();
+  const router    = useRouter();
+  const { user, signOut } = useAuth();
+  const isActive  = (href: string) => href === '/' ? pathname === '/' : pathname.startsWith(href);
+
+  const [name, setName]           = useState('Learner');
+  const [langLevel, setLangLevel] = useState('B1');
+  const [streak, setStreak]       = useState(0);
+  const [xp, setXp]               = useState(0);
+  const [profilePic, setProfilePic] = useState<string | null>(null);
+
+  useEffect(() => {
+    const s = getSettings();
+    setName(s.name);
+    setLangLevel(s.languageLevel);
+    setStreak(getStreak());
+    setXp(getXP());
+    setProfilePic(getProfilePic());
+  }, [pathname]);
+
+  const levelInfo  = getLevelInfo(xp);
+  const initial    = name.charAt(0).toUpperCase();
+  const levelColor = LEVEL_COLORS[levelInfo.level] ?? '#6C63FF';
+
+  const handleSignOut = async () => {
+    await signOut();
+    router.replace('/login');
+  };
+
+  return (
+    <>
+      {/* ── Mobile: fixed bottom tab bar ── */}
+      <nav
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[var(--card)] border-t border-[var(--border)] flex justify-around items-center py-2 px-1 shadow-lg"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      >
+        {NAV.map(({ href, label, icon }) => {
+          const active = isActive(href);
+          return (
+            <Link
+              key={href}
+              href={href}
+              className={`flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl transition-all ${active ? 'text-[var(--primary)]' : 'text-[var(--text-muted)] hover:text-[var(--text)]'}`}
+            >
+              <span className={`text-xl transition-transform ${active ? 'scale-110' : ''}`}>{icon}</span>
+              <span className={`text-xs ${active ? 'font-semibold' : 'font-medium'}`}>{label}</span>
+              {active && <div className="w-1 h-1 rounded-full bg-[var(--primary)]" />}
+            </Link>
+          );
+        })}
+      </nav>
+
+      {/* ── Desktop: persistent left sidebar ── */}
+      <aside className="hidden md:flex flex-col w-52 shrink-0 border-r border-[var(--border)] bg-[var(--card)] sticky top-0 h-screen overflow-y-auto z-30">
+        {/* Brand */}
+        <div className="px-5 pt-6 pb-4">
+          <span className="text-2xl font-black tracking-tight" style={{ color: 'var(--primary)' }}>Lexivo</span>
+          <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>Vocabulary Learning</div>
+        </div>
+
+        {/* Nav links */}
+        <nav className="flex-1 px-3 space-y-0.5">
+          {NAV.map(({ href, label, icon }) => {
+            const active = isActive(href);
+            return (
+              <Link
+                key={href}
+                href={href}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-sm font-medium ${
+                  active
+                    ? 'bg-[var(--primary-bg)] text-[var(--primary)]'
+                    : 'text-[var(--text-muted)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]'
+                }`}
+              >
+                <span className="text-lg">{icon}</span>
+                <span>{label}</span>
+                {active && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[var(--primary)]" />}
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* ── Profile block ── */}
+        <div className="px-3 pb-4 pt-3 border-t border-[var(--border)]">
+          <Link
+            href="/profile"
+            className="block rounded-2xl p-3 transition-colors hover:bg-[var(--surface-2)] group"
+          >
+            {/* Top row: avatar + name + gear */}
+            <div className="flex items-center gap-2.5 mb-3">
+              <div
+                className="w-9 h-9 rounded-full overflow-hidden shrink-0 shadow-sm flex items-center justify-center text-white text-sm font-black"
+                style={{ background: profilePic ? undefined : `linear-gradient(135deg, var(--primary), ${levelColor})` }}
+              >
+                {profilePic
+                  ? <img src={profilePic} alt="Profile" className="w-full h-full object-cover" />
+                  : initial}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold text-[var(--text)] truncate leading-tight">{name}</p>
+                <span
+                  className="inline-block text-[10px] font-bold px-1.5 py-0.5 rounded-full mt-0.5"
+                  style={{ background: `${levelColor}22`, color: levelColor }}
+                >
+                  {langLevel}
+                </span>
+              </div>
+              <span className="text-base text-[var(--text-muted)] group-hover:text-[var(--text)] transition-colors shrink-0">⚙️</span>
+            </div>
+
+            {/* Stats row */}
+            <div className="flex items-center gap-3 mb-2.5">
+              <div className="flex items-center gap-1">
+                <span className="text-sm">🔥</span>
+                <span className="text-xs font-bold text-[var(--text)]">{streak}</span>
+                <span className="text-[10px] text-[var(--text-muted)]">day</span>
+              </div>
+              <div className="w-px h-3 bg-[var(--border)]" />
+              <div className="flex items-center gap-1">
+                <span className="text-sm">⚡</span>
+                <span className="text-xs font-bold text-[var(--text)]">{xp}</span>
+                <span className="text-[10px] text-[var(--text-muted)]">XP</span>
+              </div>
+            </div>
+
+            {/* XP progress bar */}
+            <div>
+              <div className="h-1.5 bg-[var(--border)] rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all"
+                  style={{
+                    width: `${levelInfo.progress}%`,
+                    background: `linear-gradient(90deg, var(--primary), ${levelColor})`,
+                  }}
+                />
+              </div>
+              <div className="flex items-center justify-between mt-1">
+                <span className="text-[10px] font-bold" style={{ color: levelColor }}>
+                  {levelInfo.level}
+                </span>
+                {levelInfo.next && (
+                  <span className="text-[10px] text-[var(--text-muted)]">
+                    {levelInfo.xpToNext} XP → {levelInfo.next}
+                  </span>
+                )}
+              </div>
+            </div>
+          </Link>
+
+          {/* Auth row */}
+          {user ? (
+            <div className="mt-2 space-y-1">
+              <div className="px-3 py-1.5 rounded-xl bg-[var(--surface-2)]">
+                <p className="text-[10px] text-[var(--text-muted)] font-medium">Signed in as</p>
+                <p className="text-xs font-bold text-[var(--text)] truncate">{user.email}</p>
+              </div>
+              <button
+                onClick={handleSignOut}
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-[var(--text-muted)] hover:bg-[var(--surface-2)] hover:text-[var(--danger)] transition-colors"
+              >
+                <span>🚪</span>
+                <span>Sign out</span>
+              </button>
+            </div>
+          ) : (
+            <Link
+              href="/login"
+              className="mt-2 w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-[var(--text-muted)] hover:bg-[var(--primary-bg)] hover:text-[var(--primary)] transition-colors"
+            >
+              <span>🔑</span>
+              <span>Sign in / Create account</span>
+            </Link>
+          )}
+        </div>
+      </aside>
+    </>
+  );
+}
