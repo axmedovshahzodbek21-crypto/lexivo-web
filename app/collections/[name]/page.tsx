@@ -36,6 +36,20 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
     setUnits(rows);
   }, [collectionsLoaded, collections, collectionName]);
 
+  useEffect(() => {
+    const handleSync = () => {
+      if (!collection) return;
+      setUnits(collection.days.map(day => ({
+        dayNumber: day.dayNumber,
+        topic: day.topic || `Unit ${day.dayNumber}`,
+        wordCount: day.words.length,
+        progress: getUnitProgress(collectionName, day.dayNumber),
+      })));
+    };
+    window.addEventListener('lexivo-sync', handleSync);
+    return () => window.removeEventListener('lexivo-sync', handleSync);
+  }, [collection, collectionName]);
+
   if (!collectionsLoaded) {
     return (
       <div className="flex items-center justify-center min-h-screen">

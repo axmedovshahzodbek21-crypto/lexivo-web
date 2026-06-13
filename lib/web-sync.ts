@@ -212,6 +212,9 @@ export async function pullAll(uid: string) {
       }
     } catch (_) {}
 
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('lexivo-sync'));
+    }
   } catch (e) {
     console.error('pullAll error:', e);
   }
@@ -223,7 +226,10 @@ let _syncInterval: ReturnType<typeof setInterval> | null = null;
 
 export function startSync(uid: string) {
   stopSync();
-  _syncInterval = setInterval(() => pushAll(uid), 30_000);
+  _syncInterval = setInterval(async () => {
+    await pushAll(uid);
+    await pullAll(uid);
+  }, 30_000);
 }
 
 export function stopSync() {
