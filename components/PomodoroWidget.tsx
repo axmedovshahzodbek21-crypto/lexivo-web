@@ -104,7 +104,7 @@ export default function PomodoroWidget() {
         return;
       } catch {}
     }
-    const p = { x: Math.round(window.innerWidth / 2 - 120), y: window.innerHeight - 220 };
+    const p = { x: Math.max(8, window.innerWidth - 168), y: 64 };
     posRef.current = p;
     setPos(p);
   }, []);
@@ -324,6 +324,9 @@ export default function PomodoroWidget() {
   }
 
   // ── Running work timer (compact draggable widget) ─────────────────────────
+  const accentColor = isWork ? '#6C63FF' : '#10B981';
+  const timeStr = fmt(pomSecondsLeft);
+
   return (
     <div
       ref={elemRef}
@@ -331,38 +334,85 @@ export default function PomodoroWidget() {
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
       onClick={() => { if (wasDrag.current) { wasDrag.current = false; return; } router.push('/pomodoro'); }}
-      className="fixed z-50 flex items-center gap-2 px-3 py-2 rounded-2xl shadow-xl cursor-move select-none"
+      className="fixed z-50 cursor-move select-none overflow-hidden"
       style={{
         left: pos.x, top: pos.y,
-        background: isWork ? 'rgba(108,99,255,0.97)' : 'rgba(16,185,129,0.97)',
-        backdropFilter: 'blur(12px)',
-        border: '1px solid rgba(255,255,255,0.25)',
+        width: 158,
+        borderRadius: 16,
+        background: 'rgba(8, 8, 18, 0.97)',
+        border: `1px solid ${accentColor}44`,
+        boxShadow: `0 8px 28px rgba(0,0,0,0.5), 0 0 0 1px ${accentColor}18`,
         touchAction: 'none',
       }}
     >
-      <span className="text-white text-xs font-semibold whitespace-nowrap">
-        {isWork ? '🎯' : '☕'}
-      </span>
-      <span className="text-white text-sm font-black tabular-nums">
-        {fmt(pomSecondsLeft)}
-      </span>
-      {pomSessions > 0 && (
-        <span className="text-white/70 text-xs">×{pomSessions}</span>
-      )}
-      <button
-        onPointerDown={e => e.stopPropagation()}
-        onClick={e => { e.stopPropagation(); pomRunning ? pausePomodoro() : resumePomodoro(); }}
-        className="w-7 h-7 rounded-full bg-white/30 hover:bg-white/50 border border-white/40 flex items-center justify-center text-white text-xs font-bold transition-colors flex-shrink-0"
-      >
-        {pomRunning ? '⏸' : '▶'}
-      </button>
-      <button
-        onPointerDown={e => e.stopPropagation()}
-        onClick={e => { e.stopPropagation(); skipPomodoro(); }}
-        className="w-7 h-7 rounded-full bg-white/30 hover:bg-white/50 border border-white/40 flex items-center justify-center text-white text-xs font-bold transition-colors flex-shrink-0"
-      >
-        ⏭
-      </button>
+      {/* Colored top accent stripe */}
+      <div style={{ height: 2, background: accentColor }} />
+
+      <div style={{ padding: '8px 12px 10px' }}>
+        {/* Phase + session count */}
+        <div className="flex items-center justify-between" style={{ marginBottom: 6 }}>
+          <span style={{
+            fontSize: 9, fontWeight: 700, letterSpacing: '0.08em',
+            color: accentColor, textTransform: 'uppercase',
+          }}>
+            {isWork ? '🎯 Focus' : '☕ Break'}
+          </span>
+          {pomSessions > 0 && (
+            <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.3)' }}>×{pomSessions}</span>
+          )}
+        </div>
+
+        {/* Flip countdown digits */}
+        <div className="flex items-center justify-center" style={{ marginBottom: 8, gap: 0 }}>
+          {timeStr.split('').map((char, i) => (
+            <span
+              key={`${i}-${char}`}
+              style={{
+                display: 'inline-block',
+                fontFamily: '"Courier New", "Lucida Console", monospace',
+                fontSize: char === ':' ? 20 : 26,
+                fontWeight: 900,
+                lineHeight: 1,
+                color: char === ':' ? 'rgba(255,255,255,0.35)' : '#ffffff',
+                letterSpacing: '-0.03em',
+                padding: char === ':' ? '0 2px' : '0 1px',
+                textShadow: char !== ':' ? `0 0 14px ${accentColor}80` : 'none',
+                animation: char !== ':' ? 'digit-flip-in 0.28s ease-out' : 'none',
+              }}
+            >
+              {char}
+            </span>
+          ))}
+        </div>
+
+        {/* Controls */}
+        <div style={{ display: 'flex', gap: 6 }}>
+          <button
+            onPointerDown={e => e.stopPropagation()}
+            onClick={e => { e.stopPropagation(); pomRunning ? pausePomodoro() : resumePomodoro(); }}
+            style={{
+              flex: 1, height: 28, borderRadius: 8, border: 'none',
+              background: accentColor, color: 'white',
+              fontSize: 12, fontWeight: 700, cursor: 'pointer',
+            }}
+          >
+            {pomRunning ? '⏸' : '▶'}
+          </button>
+          <button
+            onPointerDown={e => e.stopPropagation()}
+            onClick={e => { e.stopPropagation(); skipPomodoro(); }}
+            style={{
+              flex: 1, height: 28, borderRadius: 8,
+              background: 'rgba(255,255,255,0.08)',
+              border: '1px solid rgba(255,255,255,0.12)',
+              color: 'rgba(255,255,255,0.6)',
+              fontSize: 12, fontWeight: 700, cursor: 'pointer',
+            }}
+          >
+            ⏭
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,7 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
 
 function fmt(secs: number) {
@@ -47,8 +46,6 @@ export default function PomodoroPage() {
   const totalSecs = pomPhase === 'break' ? pomBreakMins * 60 : pomWorkMins * 60;
   const progress = isIdle ? 0 : (totalSecs - pomSecondsLeft) / totalSecs;
   const ringColor = pomPhase === 'break' ? '#10B981' : pomPhase === 'work' ? '#6C63FF' : '#CBD5E1';
-  const phaseBg = pomPhase === 'break' ? 'rgba(16,185,129,0.1)' : 'rgba(108,99,255,0.1)';
-  const phaseText = pomPhase === 'break' ? '#10B981' : '#6C63FF';
 
   const workFraction = pomWorkMins / (pomWorkMins + pomBreakMins);
   const workDash = workFraction * ARC_C;
@@ -88,18 +85,6 @@ export default function PomodoroPage() {
               style={{ background: i < pomSessions ? '#EF4444' : 'var(--border)' }}
             />
           ))}
-        </div>
-
-        {/* Phase label */}
-        <div
-          className="px-5 py-1.5 rounded-full text-sm font-semibold"
-          style={{ background: phaseBg, color: phaseText }}
-        >
-          {isIdle
-            ? 'Ready to focus'
-            : pomPhase === 'work'
-            ? '🎯 Focus Time'
-            : '☕ Break Time'}
         </div>
 
         {/* Circular ring timer */}
@@ -294,15 +279,6 @@ export default function PomodoroPage() {
           </div>
         )}
 
-        {/* After a phase ends, quick-link to learn */}
-        {!pomRunning && !isIdle && (
-          <Link
-            href="/learn"
-            className="btn-primary w-full text-center text-sm py-3"
-          >
-            📖 Start Learning Session →
-          </Link>
-        )}
       </div>
     </div>
   );
