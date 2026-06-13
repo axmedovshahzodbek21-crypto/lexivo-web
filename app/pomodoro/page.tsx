@@ -6,17 +6,26 @@ import { useAppStore } from '@/lib/store';
 const ARC_R = 52;
 const ARC_C = 2 * Math.PI * ARC_R;
 
+const RING_R = 90;
+const RING_C = 2 * Math.PI * RING_R;
+
 const PRESETS = [
   { label: 'Classic',   emoji: '🍅', work: 25, break: 5  },
   { label: 'Deep Work', emoji: '🧠', work: 50, break: 10 },
   { label: 'Quick',     emoji: '⚡', work: 15, break: 3  },
 ];
 
+function fmt(s: number) {
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+}
+
 export default function PomodoroPage() {
   const router = useRouter();
   const {
-    pomPhase, pomWorkMins, pomBreakMins,
-    startPomodoro, resetPomodoro, setPomSettings,
+    pomPhase, pomSecondsLeft, pomRunning, pomWorkMins, pomBreakMins, pomSessions,
+    startPomodoro, pausePomodoro, resumePomodoro, resetPomodoro, skipPomodoro, setPomSettings,
   } = useAppStore();
 
   const [selectedPreset, setSelectedPreset] = useState<number | null>(0);
@@ -33,9 +42,16 @@ export default function PomodoroPage() {
     setPomSettings(PRESETS[i].work, PRESETS[i].break);
   };
 
+  // Setup arc (small, always visible when idle)
   const workFraction = pomWorkMins / (pomWorkMins + pomBreakMins);
   const workDash = workFraction * ARC_C;
   const breakDash = ARC_C - workDash;
+
+  // Running ring (big, shows time remaining in current phase)
+  const phaseTotalSeconds = pomPhase === 'work' ? pomWorkMins * 60 : pomBreakMins * 60;
+  const remainFraction = phaseTotalSeconds > 0 ? pomSecondsLeft / phaseTotalSeconds : 1;
+  const ringColor = pomPhase === 'work' ? '#6C63FF' : '#10B981';
+  const ringDash = remainFraction * RING_C;
 
   return (
     <div className="flex flex-col min-h-screen animate-fade-in">
@@ -53,47 +69,47 @@ export default function PomodoroPage() {
 
       <div className="p-5 flex flex-col items-center gap-5 flex-1">
 
-        {/* Arc visualizer */}
-        <div className="flex flex-col items-center gap-2 mt-2">
-          <div className="relative" style={{ width: 130, height: 130 }}>
-            <svg width="130" height="130">
-              <circle cx="65" cy="65" r={ARC_R} fill="none" stroke="var(--border)" strokeWidth="12" />
-              <circle
-                cx="65" cy="65" r={ARC_R} fill="none" stroke="#6C63FF" strokeWidth="12"
-                strokeDasharray={`${workDash} ${ARC_C - workDash}`}
-                style={{ transformOrigin: '65px 65px', transform: 'rotate(-90deg)', transition: 'stroke-dasharray 0.45s ease-in-out' }}
-              />
-              <circle
-                cx="65" cy="65" r={ARC_R} fill="none" stroke="#10B981" strokeWidth="12"
-                strokeDasharray={`${breakDash} ${ARC_C - breakDash}`}
-                style={{ transformOrigin: '65px 65px', transform: `rotate(${-90 + workFraction * 360}deg)`, transition: 'stroke-dasharray 0.45s ease-in-out, transform 0.45s ease-in-out' }}
-              />
-            </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <div className="font-bold leading-none" style={{ fontSize: 28 }}>
-                <span style={{ color: '#6C63FF' }}>{pomWorkMins}</span>
-                <span style={{ color: '#10B981', fontSize: 18 }}>+{pomBreakMins}</span>
-              </div>
-              <div className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>min cycle</div>
-            </div>
-          </div>
-
-          {/* Legend */}
-          <div className="flex items-center gap-5">
-            <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-full" style={{ background: '#6C63FF' }} />
-              <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Focus</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-full" style={{ background: '#10B981' }} />
-              <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Break</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Preset cards — only when idle */}
-        {isIdle && (
+        {isIdle ? (
           <>
+            {/* Arc visualizer (setup mode) */}
+            <div className="flex flex-col items-center gap-2 mt-2">
+              <div className="relative" style={{ width: 130, height: 130 }}>
+                <svg width="130" height="130">
+                  <circle cx="65" cy="65" r={ARC_R} fill="none" stroke="var(--border)" strokeWidth="12" />
+                  <circle
+                    cx="65" cy="65" r={ARC_R} fill="none" stroke="#6C63FF" strokeWidth="12"
+                    strokeDasharray={`${workDash} ${ARC_C - workDash}`}
+                    style={{ transformOrigin: '65px 65px', transform: 'rotate(-90deg)', transition: 'stroke-dasharray 0.45s ease-in-out' }}
+                  />
+                  <circle
+                    cx="65" cy="65" r={ARC_R} fill="none" stroke="#10B981" strokeWidth="12"
+                    strokeDasharray={`${breakDash} ${ARC_C - breakDash}`}
+                    style={{ transformOrigin: '65px 65px', transform: `rotate(${-90 + workFraction * 360}deg)`, transition: 'stroke-dasharray 0.45s ease-in-out, transform 0.45s ease-in-out' }}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <div className="font-bold leading-none" style={{ fontSize: 28 }}>
+                    <span style={{ color: '#6C63FF' }}>{pomWorkMins}</span>
+                    <span style={{ color: '#10B981', fontSize: 18 }}>+{pomBreakMins}</span>
+                  </div>
+                  <div className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>min cycle</div>
+                </div>
+              </div>
+
+              {/* Legend */}
+              <div className="flex items-center gap-5">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-2 h-2 rounded-full" style={{ background: '#6C63FF' }} />
+                  <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Focus</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-2 h-2 rounded-full" style={{ background: '#10B981' }} />
+                  <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Break</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Preset cards */}
             <div className="flex gap-2 w-full">
               {PRESETS.map((p, i) => {
                 const sel = selectedPreset === i;
@@ -142,30 +158,94 @@ export default function PomodoroPage() {
                   onChange={v => setPomSettings(pomWorkMins, v)} />
               </div>
             )}
-          </>
-        )}
 
-        {/* Action button */}
-        <div className="w-full mt-auto pb-6">
-          {isIdle ? (
-            <button
-              onClick={() => startPomodoro(pomWorkMins, pomBreakMins)}
-              className="w-full py-4 rounded-2xl text-white font-bold text-base transition-all hover:opacity-90 active:scale-95"
-              style={{ background: '#6C63FF' }}
-            >
-              Start Focusing
-            </button>
-          ) : (
-            <div className="space-y-3">
-              <div
-                className="w-full py-3 rounded-2xl text-center text-sm font-semibold"
-                style={{
-                  background: pomPhase === 'work' ? 'rgba(108,99,255,0.1)' : 'rgba(16,185,129,0.1)',
-                  color: pomPhase === 'work' ? '#6C63FF' : '#10B981',
-                }}
+            {/* Start button */}
+            <div className="w-full mt-auto pb-6">
+              <button
+                onClick={() => startPomodoro(pomWorkMins, pomBreakMins)}
+                className="w-full py-4 rounded-2xl text-white font-bold text-base transition-all hover:opacity-90 active:scale-95"
+                style={{ background: '#6C63FF' }}
               >
-                {pomPhase === 'work' ? '🎯 Focus session running' : '☕ Break time running'}
+                Start Focusing
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Big countdown ring */}
+            <div className="flex flex-col items-center gap-3 mt-4">
+              <div className="relative" style={{ width: 220, height: 220 }}>
+                <svg width="220" height="220">
+                  {/* Track */}
+                  <circle cx="110" cy="110" r={RING_R} fill="none"
+                    stroke="var(--border)" strokeWidth="14" />
+                  {/* Progress */}
+                  <circle cx="110" cy="110" r={RING_R} fill="none"
+                    stroke={ringColor} strokeWidth="14" strokeLinecap="round"
+                    strokeDasharray={`${ringDash} ${RING_C - ringDash}`}
+                    style={{ transformOrigin: '110px 110px', transform: 'rotate(-90deg)', transition: 'stroke-dasharray 1s linear' }}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-1">
+                  <div
+                    className="text-[11px] font-semibold uppercase tracking-widest"
+                    style={{ color: ringColor }}
+                  >
+                    {pomPhase === 'work' ? 'Focus' : 'Break'}
+                  </div>
+                  <div
+                    className="font-bold tabular-nums"
+                    style={{ fontSize: 44, color: 'var(--text)', lineHeight: 1 }}
+                  >
+                    {fmt(pomSecondsLeft)}
+                  </div>
+                  <div className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                    {pomRunning ? 'running' : 'paused'}
+                  </div>
+                </div>
               </div>
+
+              {/* Controls: pause/resume + skip */}
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={pomRunning ? pausePomodoro : resumePomodoro}
+                  className="w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold transition-all hover:opacity-80 active:scale-95"
+                  style={{ background: ringColor, color: '#fff' }}
+                >
+                  {pomRunning ? '⏸' : '▶'}
+                </button>
+                <button
+                  onClick={skipPomodoro}
+                  className="w-11 h-11 rounded-full flex items-center justify-center text-lg transition-all hover:opacity-80"
+                  style={{ background: 'var(--surface-2)', color: 'var(--text-muted)' }}
+                >
+                  ⏭
+                </button>
+              </div>
+
+              {/* Session dots */}
+              <div className="flex items-center gap-2 mt-1">
+                {Array.from({ length: Math.max(4, pomSessions + 1) }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="rounded-full transition-all"
+                    style={{
+                      width: i < pomSessions ? 10 : 8,
+                      height: i < pomSessions ? 10 : 8,
+                      background: i < pomSessions ? '#6C63FF' : 'var(--border)',
+                    }}
+                  />
+                ))}
+                {pomSessions > 0 && (
+                  <span className="text-xs ml-1" style={{ color: 'var(--text-muted)' }}>
+                    {pomSessions} done
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Stop button */}
+            <div className="w-full mt-auto pb-6">
               <button
                 onClick={resetPomodoro}
                 className="w-full py-3 rounded-2xl text-sm font-semibold transition-all hover:opacity-80"
@@ -174,8 +254,8 @@ export default function PomodoroPage() {
                 Stop Timer
               </button>
             </div>
-          )}
-        </div>
+          </>
+        )}
       </div>
     </div>
   );
