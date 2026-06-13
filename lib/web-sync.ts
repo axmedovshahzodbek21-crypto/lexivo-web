@@ -123,7 +123,9 @@ export async function pushAll(uid: string) {
         });
       }
       if (upRows.length > 0) {
-        await supabase.from('unit_progress').upsert(upRows, { onConflict: 'user_id,collection_name,day_number' });
+        try {
+          await supabase.from('unit_progress').upsert(upRows, { onConflict: 'user_id,collection_name,day_number' });
+        } catch (_) {}
       }
     }
   } catch (e) {
@@ -188,25 +190,27 @@ export async function pullAll(uid: string) {
     set(K.starred, starredRows?.map(r => r.word) ?? []);
 
     // unit_progress — always overwrite local
-    const { data: upRows } = await supabase.from('unit_progress')
-      .select('collection_name,day_number,learn_done,flashcard_done,quiz_done')
-      .eq('user_id', uid);
-    if (typeof window !== 'undefined') {
-      const toRemove: string[] = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const k = localStorage.key(i);
-        if (k?.startsWith('lexivo_unit_progress_')) toRemove.push(k);
+    try {
+      const { data: upRows } = await supabase.from('unit_progress')
+        .select('collection_name,day_number,learn_done,flashcard_done,quiz_done')
+        .eq('user_id', uid);
+      if (typeof window !== 'undefined') {
+        const toRemove: string[] = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (k?.startsWith('lexivo_unit_progress_')) toRemove.push(k);
+        }
+        toRemove.forEach(k => localStorage.removeItem(k));
+        for (const r of (upRows ?? [])) {
+          const key = `lexivo_unit_progress_${r.collection_name}_${r.day_number}`;
+          localStorage.setItem(key, JSON.stringify({
+            learnDone: r.learn_done ?? false,
+            flashcardDone: r.flashcard_done ?? false,
+            quizDone: r.quiz_done ?? false,
+          }));
+        }
       }
-      toRemove.forEach(k => localStorage.removeItem(k));
-      for (const r of (upRows ?? [])) {
-        const key = `lexivo_unit_progress_${r.collection_name}_${r.day_number}`;
-        localStorage.setItem(key, JSON.stringify({
-          learnDone: r.learn_done ?? false,
-          flashcardDone: r.flashcard_done ?? false,
-          quizDone: r.quiz_done ?? false,
-        }));
-      }
-    }
+    } catch (_) {}
 
   } catch (e) {
     console.error('pullAll error:', e);
