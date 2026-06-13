@@ -96,6 +96,36 @@ export async function pushAll(uid: string) {
     if (starred.length > 0) {
       await supabase.from('starred_words').insert(starred.map(w => ({ user_id: uid, word: w })));
     }
+
+    // unit_progress
+    if (typeof window !== 'undefined') {
+      const upRows: {
+        user_id: string; collection_name: string; day_number: number;
+        learn_done: boolean; flashcard_done: boolean; quiz_done: boolean;
+      }[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (!key?.startsWith('lexivo_unit_progress_')) continue;
+        const suffix = key.slice('lexivo_unit_progress_'.length);
+        const lastUnderscore = suffix.lastIndexOf('_');
+        if (lastUnderscore === -1) continue;
+        const collectionName = suffix.slice(0, lastUnderscore);
+        const dayNumber = parseInt(suffix.slice(lastUnderscore + 1), 10);
+        if (isNaN(dayNumber)) continue;
+        const raw = localStorage.getItem(key);
+        if (!raw) continue;
+        const p = JSON.parse(raw);
+        upRows.push({
+          user_id: uid, collection_name: collectionName, day_number: dayNumber,
+          learn_done: p.learnDone ?? false,
+          flashcard_done: p.flashcardDone ?? false,
+          quiz_done: p.quizDone ?? false,
+        });
+      }
+      if (upRows.length > 0) {
+        await supabase.from('unit_progress').upsert(upRows, { onConflict: 'user_id,collection_name,day_number' });
+      }
+    }
   } catch (e) {
     console.error('pushAll error:', e);
   }
@@ -156,6 +186,27 @@ export async function pullAll(uid: string) {
     // starred_words — always overwrite local
     const { data: starredRows } = await supabase.from('starred_words').select('word').eq('user_id', uid);
     set(K.starred, starredRows?.map(r => r.word) ?? []);
+
+    // unit_progress — always overwrite local
+    const { data: upRows } = await supabase.from('unit_progress')
+      .select('collection_name,day_number,learn_done,flashcard_done,quiz_done')
+      .eq('user_id', uid);
+    if (typeof window !== 'undefined') {
+      const toRemove: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k?.startsWith('lexivo_unit_progress_')) toRemove.push(k);
+      }
+      toRemove.forEach(k => localStorage.removeItem(k));
+      for (const r of (upRows ?? [])) {
+        const key = `lexivo_unit_progress_${r.collection_name}_${r.day_number}`;
+        localStorage.setItem(key, JSON.stringify({
+          learnDone: r.learn_done ?? false,
+          flashcardDone: r.flashcard_done ?? false,
+          quizDone: r.quiz_done ?? false,
+        }));
+      }
+    }
 
   } catch (e) {
     console.error('pullAll error:', e);
