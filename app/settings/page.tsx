@@ -133,6 +133,26 @@ export default function SettingsPage() {
     setResetLoading(true);
     setResetError('');
     try {
+      // Stop push timer first so it can't restore data during reset
+      stopSync();
+
+      // Clear localStorage before touching Supabase so a stale timer push can't sneak in
+      const progressKeys = [
+        'lexivo_learned_words', 'lexivo_srs_words', 'lexivo_starred',
+        'lexivo_xp', 'lexivo_today_xp', 'lexivo_today_xp_date',
+        'lexivo_today_count', 'lexivo_today_count_date',
+        'lexivo_streak', 'lexivo_last_study', 'lexivo_total_study_days',
+        'lexivo_freezes', 'lexivo_last_freeze_week',
+      ];
+      progressKeys.forEach(k => localStorage.removeItem(k));
+      const toRemove: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k?.startsWith('lexivo_unit_progress_')) toRemove.push(k);
+      }
+      toRemove.forEach(k => localStorage.removeItem(k));
+
+      // Now delete from Supabase
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         await supabase.from('srs_words').delete().eq('user_id', user.id);
@@ -142,22 +162,6 @@ export default function SettingsPage() {
         await supabase.from('user_stats').delete().eq('id', user.id);
         await supabase.from('profiles').update({ reset_at: new Date().toISOString() }).eq('id', user.id);
       }
-      // Clear localStorage progress keys
-      const progressKeys = [
-        'lexivo_learned_words', 'lexivo_srs_words', 'lexivo_starred',
-        'lexivo_xp', 'lexivo_today_xp', 'lexivo_today_xp_date',
-        'lexivo_today_count', 'lexivo_today_count_date',
-        'lexivo_streak', 'lexivo_last_study', 'lexivo_total_study_days',
-        'lexivo_freezes', 'lexivo_last_freeze_week',
-      ];
-      progressKeys.forEach(k => localStorage.removeItem(k));
-      // Clear unit_progress keys
-      const toRemove: string[] = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const k = localStorage.key(i);
-        if (k?.startsWith('lexivo_unit_progress_')) toRemove.push(k);
-      }
-      toRemove.forEach(k => localStorage.removeItem(k));
       window.location.replace('/');
     } catch (e) {
       setResetError('Something went wrong. Please try again.');
