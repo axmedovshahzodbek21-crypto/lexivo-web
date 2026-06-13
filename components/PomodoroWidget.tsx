@@ -345,9 +345,6 @@ export default function PomodoroWidget() {
         touchAction: 'none',
       }}
     >
-      {/* Colored top accent stripe */}
-      <div style={{ height: 2, background: accentColor }} />
-
       <div style={{ padding: '8px 12px 10px' }}>
         {/* Phase + session count */}
         <div className="flex items-center justify-between" style={{ marginBottom: 6 }}>
