@@ -2,6 +2,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import type { Session, User } from '@supabase/supabase-js';
 import { supabase } from './supabase';
+import { pullAll, startSync, stopSync } from './web-sync';
 
 interface AuthCtx {
   user: User | null;
@@ -29,32 +30,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(data.session);
       setUser(data.session?.user ?? null);
       setLoading(false);
+      if (data.session?.user) {
+        pullAll(data.session.user.id).then(() => startSync(data.session!.user.id));
+      }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
+      if (event === 'SIGNED_IN' && session?.user) {
+        pullAll(session.user.id).then(() => startSync(session.user.id));
+      }
+      if (event === 'SIGNED_OUT') {
+        stopSync();
+      }
       if (event === 'PASSWORD_RECOVERY' && typeof window !== 'undefined' && !window.location.pathname.includes('update-password')) {
         window.location.replace('/update-password');
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => { subscription.unsubscribe(); stopSync(); };
   }, []);
 
   const signUp = async (email: string, password: string) => {
     const { error } = await supabase.auth.signUp({ email, password });
     if (error) return { error: error.message };
-    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+    if (data.user) { await pullAll(data.user.id); startSync(data.user.id); }
     return { error: signInError?.message ?? null };
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (data.user) { await pullAll(data.user.id); startSync(data.user.id); }
     return { error: error?.message ?? null };
   };
 
   const signOut = async () => {
+    stopSync();
     await supabase.auth.signOut();
   };
 
