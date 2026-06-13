@@ -220,6 +220,35 @@ export async function pullAll(uid: string) {
   }
 }
 
+// ── Reset detection ───────────────────────────────────────────────────────────
+
+async function checkAndHandleReset(uid: string): Promise<boolean> {
+  try {
+    const { data: profile } = await supabase.from('profiles').select('reset_at').eq('id', uid).maybeSingle();
+    const resetAt = profile?.reset_at as string | null;
+    if (!resetAt) return false;
+    const lastSeen = typeof window !== 'undefined' ? localStorage.getItem('lexivo_last_seen_reset_at') : null;
+    if (lastSeen === resetAt) return false;
+
+    // New reset detected — wipe all progress from localStorage
+    if (typeof window !== 'undefined') {
+      const progressKeys = Object.values(K);
+      progressKeys.forEach(k => localStorage.removeItem(k));
+      // Also clear unit_progress_* keys
+      const toRemove: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k?.startsWith('lexivo_unit_progress_')) toRemove.push(k);
+      }
+      toRemove.forEach(k => localStorage.removeItem(k));
+      localStorage.setItem('lexivo_last_seen_reset_at', resetAt);
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 // ── Periodic sync ─────────────────────────────────────────────────────────────
 
 let _syncInterval: ReturnType<typeof setInterval> | null = null;
@@ -227,7 +256,8 @@ let _syncInterval: ReturnType<typeof setInterval> | null = null;
 export function startSync(uid: string) {
   stopSync();
   _syncInterval = setInterval(async () => {
-    await pushAll(uid);
+    const wasReset = await checkAndHandleReset(uid);
+    if (!wasReset) await pushAll(uid);
     await pullAll(uid);
   }, 30_000);
 }
