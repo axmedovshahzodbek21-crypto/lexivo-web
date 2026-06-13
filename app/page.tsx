@@ -144,7 +144,9 @@ export default function HomePage() {
         <button onClick={() => setShowXpModal(true)} className="text-left w-full">
           <StatCard icon="⚡" value={xp} label="Total XP" color="#6C63FF" glow />
         </button>
-        <StatCard icon="📚" value={learnedCount} label="Words" color="#10B981" />
+        <Link href="/history">
+          <StatCard icon="📚" value={learnedCount} label="Words" color="#10B981" />
+        </Link>
       </div>
 
       {showXpModal && <XpModal xp={xp} onClose={() => setShowXpModal(false)} />}
