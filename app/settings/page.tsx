@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getSettings, saveSettings, resetOnboarded } from '@/lib/storage';
 import { getTheme, setTheme, type Theme } from '@/lib/theme';
+import { supabase } from '@/lib/supabase';
+import { stopSync } from '@/lib/web-sync';
 import {
   getNotifSettings, saveNotifSettings, requestNotifPermission,
   scheduleOrShowNotification, sendTestNotification,
@@ -20,6 +22,9 @@ export default function SettingsPage() {
   const [permission, setPermission] = useState<string>('default');
   const [testSent, setTestSent] = useState(false);
   const [notifSupported, setNotifSupported] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError]     = useState('');
   const [importState, setImportState] = useState<'idle' | 'confirm' | 'success' | 'error'>('idle');
   const [importMsg, setImportMsg] = useState('');
   const [pendingImport, setPendingImport] = useState<string | null>(null);
@@ -119,6 +124,20 @@ export default function SettingsPage() {
       setImportMsg(result.error);
     }
     setPendingImport(null);
+  };
+
+  const handleDeleteAccount = async () => {
+    setDeleteLoading(true);
+    setDeleteError('');
+    try {
+      await supabase.rpc('delete_own_account');
+      stopSync();
+      await supabase.auth.signOut();
+      window.location.replace('/login');
+    } catch (e) {
+      setDeleteError('Something went wrong. Please try again.');
+      setDeleteLoading(false);
+    }
   };
 
   const handleSave = () => {
@@ -496,6 +515,58 @@ export default function SettingsPage() {
           Lexivo Web — English vocabulary learning app with Uzbek translations, SRS, quizzes, and offline support.
         </p>
         <p className="text-xs text-[var(--text-muted)]">Data is stored locally in your browser.</p>
+      </div>
+
+      {/* Danger Zone */}
+      <div className="card border-2 border-[var(--danger)] space-y-3" style={{ borderColor: 'rgba(239,68,68,0.3)' }}>
+        <h2 className="font-semibold text-[var(--danger)]">Danger Zone</h2>
+
+        {!deleteConfirm ? (
+          <button
+            onClick={() => setDeleteConfirm(true)}
+            className="w-full flex items-center gap-3 p-3 rounded-xl bg-red-50 hover:bg-red-100 transition-colors text-left"
+          >
+            <span className="text-2xl">🗑️</span>
+            <div>
+              <p className="text-sm font-semibold text-[var(--danger)]">Delete Account</p>
+              <p className="text-xs text-[var(--text-muted)]">Permanently remove your account and all data</p>
+            </div>
+          </button>
+        ) : (
+          <div className="space-y-3 animate-fade-in">
+            <div className="p-3 rounded-xl bg-red-50 border border-red-200 space-y-2">
+              <p className="text-sm font-bold text-[var(--danger)]">⚠️ This will permanently delete:</p>
+              <ul className="text-xs text-[var(--text-muted)] space-y-1">
+                <li>• Your account and login access</li>
+                <li>• All learned words</li>
+                <li>• All SRS review progress</li>
+                <li>• Your XP, streak, and stats</li>
+                <li>• All starred words</li>
+              </ul>
+              <p className="text-xs font-bold text-[var(--danger)] mt-2">This cannot be undone.</p>
+            </div>
+
+            {deleteError && (
+              <p className="text-xs text-[var(--danger)]">{deleteError}</p>
+            )}
+
+            <div className="flex gap-2">
+              <button
+                onClick={() => { setDeleteConfirm(false); setDeleteError(''); }}
+                className="flex-1 py-2.5 rounded-xl border border-[var(--border)] text-sm text-[var(--text-muted)] hover:bg-[var(--surface-2)] transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteAccount}
+                disabled={deleteLoading}
+                className="flex-1 py-2.5 rounded-xl bg-[var(--danger)] text-white text-sm font-bold hover:opacity-90 transition-opacity disabled:opacity-60"
+              >
+                {deleteLoading ? 'Deleting…' : 'Delete Forever'}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="pb-4" />
