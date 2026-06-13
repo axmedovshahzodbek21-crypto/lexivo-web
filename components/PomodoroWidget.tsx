@@ -385,34 +385,11 @@ export default function PomodoroWidget() {
           ))}
         </div>
 
-        {/* Controls */}
-        <div style={{ display: 'flex', gap: 6 }}>
-          <button
-            onPointerDown={e => e.stopPropagation()}
-            onClick={e => { e.stopPropagation(); pomRunning ? pausePomodoro() : resumePomodoro(); }}
-            style={{
-              flex: 1, height: 28, borderRadius: 8, border: 'none',
-              background: accentColor, color: 'white',
-              fontSize: 12, fontWeight: 700, cursor: 'pointer',
-            }}
-          >
-            {pomRunning ? '⏸' : '▶'}
-          </button>
-          {pomRunning && (
-            <button
-              onPointerDown={e => e.stopPropagation()}
-              onClick={e => { e.stopPropagation(); skipPomodoro(); }}
-              style={{
-                flex: 1, height: 28, borderRadius: 8,
-                background: 'rgba(255,255,255,0.08)',
-                border: '1px solid rgba(255,255,255,0.12)',
-                color: 'rgba(255,255,255,0.6)',
-                fontSize: 12, fontWeight: 700, cursor: 'pointer',
-              }}
-            >
-              ⏭
-            </button>
-          )}
+        {/* Tap hint */}
+        <div style={{ textAlign: 'center', marginTop: 2 }}>
+          <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.05em' }}>
+            tap to open
+          </span>
         </div>
       </div>
     </div>
