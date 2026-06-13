@@ -385,12 +385,6 @@ export default function PomodoroWidget() {
           ))}
         </div>
 
-        {/* Tap hint */}
-        <div style={{ textAlign: 'center', marginTop: 2 }}>
-          <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.05em' }}>
-            tap to open
-          </span>
-        </div>
       </div>
     </div>
   );
