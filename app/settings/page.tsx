@@ -22,6 +22,9 @@ export default function SettingsPage() {
   const [permission, setPermission] = useState<string>('default');
   const [testSent, setTestSent] = useState(false);
   const [notifSupported, setNotifSupported] = useState(false);
+  const [resetConfirm, setResetConfirm]   = useState(false);
+  const [resetLoading, setResetLoading]   = useState(false);
+  const [resetError, setResetError]       = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError]     = useState('');
@@ -124,6 +127,41 @@ export default function SettingsPage() {
       setImportMsg(result.error);
     }
     setPendingImport(null);
+  };
+
+  const handleResetProgress = async () => {
+    setResetLoading(true);
+    setResetError('');
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase.from('srs_words').delete().eq('user_id', user.id);
+        await supabase.from('learned_words').delete().eq('user_id', user.id);
+        await supabase.from('starred_words').delete().eq('user_id', user.id);
+        try { await supabase.from('unit_progress').delete().eq('user_id', user.id); } catch (_) {}
+        await supabase.from('user_stats').delete().eq('id', user.id);
+      }
+      // Clear localStorage progress keys
+      const progressKeys = [
+        'lexivo_learned_words', 'lexivo_srs_words', 'lexivo_starred',
+        'lexivo_xp', 'lexivo_today_xp', 'lexivo_today_xp_date',
+        'lexivo_today_count', 'lexivo_today_count_date',
+        'lexivo_streak', 'lexivo_last_study', 'lexivo_total_study_days',
+        'lexivo_freezes', 'lexivo_last_freeze_week',
+      ];
+      progressKeys.forEach(k => localStorage.removeItem(k));
+      // Clear unit_progress keys
+      const toRemove: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k?.startsWith('lexivo_unit_progress_')) toRemove.push(k);
+      }
+      toRemove.forEach(k => localStorage.removeItem(k));
+      window.location.replace('/');
+    } catch (e) {
+      setResetError('Something went wrong. Please try again.');
+      setResetLoading(false);
+    }
   };
 
   const handleDeleteAccount = async () => {
@@ -520,6 +558,53 @@ export default function SettingsPage() {
       {/* Danger Zone */}
       <div className="card border-2 border-[var(--danger)] space-y-3" style={{ borderColor: 'rgba(239,68,68,0.3)' }}>
         <h2 className="font-semibold text-[var(--danger)]">Danger Zone</h2>
+
+        {/* Reset Progress */}
+        {!resetConfirm ? (
+          <button
+            onClick={() => setResetConfirm(true)}
+            className="w-full flex items-center gap-3 p-3 rounded-xl bg-red-50 hover:bg-red-100 transition-colors text-left"
+          >
+            <span className="text-2xl">🔄</span>
+            <div>
+              <p className="text-sm font-semibold text-[var(--danger)]">Reset Progress</p>
+              <p className="text-xs text-[var(--text-muted)]">Clear all learning data, keep your account</p>
+            </div>
+          </button>
+        ) : (
+          <div className="space-y-3 animate-fade-in">
+            <div className="p-3 rounded-xl bg-red-50 border border-red-200 space-y-2">
+              <p className="text-sm font-bold text-[var(--danger)]">⚠️ This will permanently delete:</p>
+              <ul className="text-xs text-[var(--text-muted)] space-y-1">
+                <li>• All learned words</li>
+                <li>• All SRS review progress</li>
+                <li>• Your XP, streak, and stats</li>
+                <li>• All starred words</li>
+                <li>• Unit completion marks</li>
+              </ul>
+              <p className="text-xs text-[var(--text-muted)] mt-1">Your account and settings will be kept.</p>
+              <p className="text-xs font-bold text-[var(--danger)]">This cannot be undone.</p>
+            </div>
+            {resetError && <p className="text-xs text-[var(--danger)]">{resetError}</p>}
+            <div className="flex gap-2">
+              <button
+                onClick={() => { setResetConfirm(false); setResetError(''); }}
+                className="flex-1 py-2.5 rounded-xl border border-[var(--border)] text-sm text-[var(--text-muted)] hover:bg-[var(--surface-2)] transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleResetProgress}
+                disabled={resetLoading}
+                className="flex-1 py-2.5 rounded-xl bg-[var(--danger)] text-white text-sm font-bold hover:opacity-90 transition-opacity disabled:opacity-60"
+              >
+                {resetLoading ? 'Resetting…' : 'Reset Everything'}
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div className="border-t border-[var(--border)]" />
 
         {!deleteConfirm ? (
           <button
