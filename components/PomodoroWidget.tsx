@@ -398,19 +398,21 @@ export default function PomodoroWidget() {
           >
             {pomRunning ? '⏸' : '▶'}
           </button>
-          <button
-            onPointerDown={e => e.stopPropagation()}
-            onClick={e => { e.stopPropagation(); skipPomodoro(); }}
-            style={{
-              flex: 1, height: 28, borderRadius: 8,
-              background: 'rgba(255,255,255,0.08)',
-              border: '1px solid rgba(255,255,255,0.12)',
-              color: 'rgba(255,255,255,0.6)',
-              fontSize: 12, fontWeight: 700, cursor: 'pointer',
-            }}
-          >
-            ⏭
-          </button>
+          {pomRunning && (
+            <button
+              onPointerDown={e => e.stopPropagation()}
+              onClick={e => { e.stopPropagation(); skipPomodoro(); }}
+              style={{
+                flex: 1, height: 28, borderRadius: 8,
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.12)',
+                color: 'rgba(255,255,255,0.6)',
+                fontSize: 12, fontWeight: 700, cursor: 'pointer',
+              }}
+            >
+              ⏭
+            </button>
+          )}
         </div>
       </div>
     </div>
