@@ -367,7 +367,7 @@ export default function PomodoroWidget() {
               style={{
                 display: 'inline-block',
                 fontFamily: '"Courier New", "Lucida Console", monospace',
-                fontSize: char === ':' ? 20 : 26,
+                fontSize: char === ':' ? 28 : 36,
                 fontWeight: 900,
                 lineHeight: 1,
                 color: char === ':' ? 'rgba(255,255,255,0.35)' : '#ffffff',
