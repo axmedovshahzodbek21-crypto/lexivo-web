@@ -140,6 +140,7 @@ export default function SettingsPage() {
         await supabase.from('starred_words').delete().eq('user_id', user.id);
         try { await supabase.from('unit_progress').delete().eq('user_id', user.id); } catch (_) {}
         await supabase.from('user_stats').delete().eq('id', user.id);
+        await supabase.from('profiles').update({ reset_at: new Date().toISOString() }).eq('id', user.id);
       }
       // Clear localStorage progress keys
       const progressKeys = [
