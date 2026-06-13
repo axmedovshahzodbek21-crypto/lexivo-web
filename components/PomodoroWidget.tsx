@@ -268,55 +268,112 @@ export default function PomodoroWidget() {
 
   // ── Setup panel ───────────────────────────────────────────────────────────
   if (isSetup) {
+    const SETUP_PRESETS = [
+      { label: 'Classic', emoji: '🍅', work: 25, brk: 5 },
+      { label: 'Deep',    emoji: '🧠', work: 50, brk: 10 },
+      { label: 'Quick',   emoji: '⚡', work: 15, brk: 3 },
+    ];
+    const isCustom = !SETUP_PRESETS.some(p => p.work === pomWorkMins && p.brk === pomBreakMins);
+
     return (
       <div
         ref={elemRef}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
-        className="fixed z-50 rounded-2xl shadow-xl cursor-move select-none"
+        className="fixed z-50 cursor-move select-none"
         style={{
-          left: pos.x, top: pos.y, width: 240,
-          background: 'rgba(108,99,255,0.97)',
-          backdropFilter: 'blur(12px)',
-          border: '1px solid rgba(255,255,255,0.25)',
+          left: pos.x, top: pos.y, width: 260,
+          borderRadius: 20,
+          background: 'rgba(10, 10, 24, 0.96)',
+          backdropFilter: 'blur(20px)',
+          border: '1px solid rgba(108,99,255,0.35)',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(108,99,255,0.1)',
           touchAction: 'none',
         }}
       >
-        <div className="flex items-center justify-between px-3 pt-3 pb-2">
-          <span className="text-white text-sm font-bold">🍅 Focus Timer</span>
+        {/* Header */}
+        <div style={{ padding: '14px 14px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+            <span style={{ fontSize: 18 }}>🎯</span>
+            <span style={{ color: '#fff', fontWeight: 800, fontSize: 14, letterSpacing: '-0.3px' }}>Focus Mode</span>
+          </div>
           <button
             onPointerDown={e => e.stopPropagation()}
             onClick={e => { e.stopPropagation(); hidePomodoroSetup(); }}
-            className="w-6 h-6 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-white text-xs transition-colors"
+            style={{ width: 24, height: 24, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', border: 'none', color: 'rgba(255,255,255,0.6)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           >✕</button>
         </div>
 
-        <div className="px-3 pb-2 space-y-3">
-          <TimeRow label="Work" value={pomWorkMins} min={5} max={60}
-            onChange={v => setPomSettings(v, pomBreakMins)} />
-          <TimeRow label="Break" value={pomBreakMins} min={1} max={20}
-            onChange={v => setPomSettings(pomWorkMins, v)} />
+        {/* Time display */}
+        <div style={{ padding: '12px 14px 0', textAlign: 'center' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4 }}>
+            <span style={{ fontSize: 36, fontWeight: 900, color: '#6C63FF', lineHeight: 1 }}>{pomWorkMins}</span>
+            <span style={{ fontSize: 20, fontWeight: 700, color: '#10B981', lineHeight: 1 }}>+{pomBreakMins}</span>
+            <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginLeft: 2 }}>min</span>
+          </div>
         </div>
 
-        <div className="px-3 pb-3 space-y-2">
+        {/* Preset cards */}
+        <div style={{ padding: '10px 14px 0', display: 'flex', gap: 6 }}>
+          {SETUP_PRESETS.map(p => {
+            const sel = p.work === pomWorkMins && p.brk === pomBreakMins;
+            return (
+              <button
+                key={p.label}
+                onPointerDown={e => e.stopPropagation()}
+                onClick={e => { e.stopPropagation(); setPomSettings(p.work, p.brk); }}
+                style={{
+                  flex: 1, padding: '8px 4px', borderRadius: 12, border: `1.5px solid ${sel ? '#6C63FF' : 'rgba(255,255,255,0.08)'}`,
+                  background: sel ? 'rgba(108,99,255,0.25)' : 'rgba(255,255,255,0.05)',
+                  cursor: 'pointer', transition: 'all 0.15s',
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
+                }}
+              >
+                <span style={{ fontSize: 16 }}>{p.emoji}</span>
+                <span style={{ fontSize: 9, fontWeight: 700, color: sel ? '#a89fff' : 'rgba(255,255,255,0.4)', letterSpacing: '0.04em' }}>{p.label}</span>
+                <span style={{ fontSize: 10, fontWeight: 800, color: sel ? '#fff' : 'rgba(255,255,255,0.5)' }}>{p.work}+{p.brk}</span>
+              </button>
+            );
+          })}
           <button
             onPointerDown={e => e.stopPropagation()}
-            onClick={e => {
-              e.stopPropagation();
-              requestNotifPermission();
-              startPomodoro(pomWorkMins, pomBreakMins);
+            onClick={e => { e.stopPropagation(); setPomSettings(pomWorkMins, pomBreakMins); }}
+            style={{
+              width: 52, padding: '8px 4px', borderRadius: 12,
+              border: `1.5px solid ${isCustom ? '#6C63FF' : 'rgba(255,255,255,0.08)'}`,
+              background: isCustom ? 'rgba(108,99,255,0.25)' : 'rgba(255,255,255,0.05)',
+              cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
             }}
-            className="w-full py-2 rounded-xl bg-white text-[#6C63FF] text-sm font-black hover:bg-white/90 transition-colors"
           >
-            ▶ Start Timer
+            <span style={{ fontSize: 16 }}>⚙️</span>
+            <span style={{ fontSize: 9, fontWeight: 700, color: isCustom ? '#a89fff' : 'rgba(255,255,255,0.4)' }}>Custom</span>
           </button>
+        </div>
+
+        {/* Custom sliders — only when custom selected */}
+        {isCustom && (
+          <div style={{ padding: '10px 14px 0', display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <MiniSlider label="Focus" value={pomWorkMins} min={5} max={60} color="#6C63FF"
+              onChange={v => setPomSettings(v, pomBreakMins)} />
+            <MiniSlider label="Break" value={pomBreakMins} min={1} max={20} color="#10B981"
+              onChange={v => setPomSettings(pomWorkMins, v)} />
+          </div>
+        )}
+
+        {/* Start button */}
+        <div style={{ padding: '12px 14px 14px' }}>
           <button
             onPointerDown={e => e.stopPropagation()}
-            onClick={e => { e.stopPropagation(); hidePomodoroSetup(); }}
-            className="w-full py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white/80 text-xs font-semibold transition-colors"
+            onClick={e => { e.stopPropagation(); requestNotifPermission(); startPomodoro(pomWorkMins, pomBreakMins); }}
+            style={{
+              width: '100%', padding: '11px 0', borderRadius: 14, border: 'none',
+              background: 'linear-gradient(135deg, #6C63FF, #8b85ff)',
+              color: '#fff', fontWeight: 800, fontSize: 14, cursor: 'pointer',
+              boxShadow: '0 4px 20px rgba(108,99,255,0.4)',
+            }}
           >
-            Discard & close
+            Start Focusing
           </button>
         </div>
       </div>
@@ -387,27 +444,21 @@ export default function PomodoroWidget() {
   );
 }
 
-// ── Slider row ────────────────────────────────────────────────────────────────
+// ── Mini slider ───────────────────────────────────────────────────────────────
 
-function TimeRow({ label, value, min, max, onChange }: {
-  label: string; value: number; min: number; max: number; onChange: (v: number) => void;
+function MiniSlider({ label, value, min, max, color, onChange }: {
+  label: string; value: number; min: number; max: number; color: string; onChange: (v: number) => void;
 }) {
   return (
-    <div className="space-y-1">
-      <div className="flex items-center justify-between">
-        <span className="text-white/80 text-xs font-medium">{label}</span>
-        <span className="text-white text-sm font-black tabular-nums">{value} min</span>
-      </div>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <span style={{ width: 34, fontSize: 10, fontWeight: 700, color, flexShrink: 0 }}>{label}</span>
       <input
         type="range" min={min} max={max} value={value}
-        onChange={e => onChange(parseInt(e.target.value))}
+        onChange={e => onChange(+e.target.value)}
         onPointerDown={e => e.stopPropagation()}
-        className="w-full h-1.5 cursor-pointer accent-white"
+        style={{ flex: 1, accentColor: color, cursor: 'pointer' }}
       />
-      <div className="flex justify-between text-white/40 text-[10px]">
-        <span>{min}m</span>
-        <span>{max}m</span>
-      </div>
+      <span style={{ width: 40, fontSize: 10, fontWeight: 800, color, textAlign: 'right', flexShrink: 0 }}>{value}m</span>
     </div>
   );
 }
