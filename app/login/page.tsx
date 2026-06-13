@@ -8,11 +8,17 @@ import { supabase } from '@/lib/supabase';
 export default function LoginPage() {
   const router = useRouter();
   const { signIn } = useAuth();
-  const [email, setEmail]       = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError]       = useState('');
-  const [loading, setLoading]   = useState(false);
+  const [email, setEmail]             = useState('');
+  const [password, setPassword]       = useState('');
+  const [error, setError]             = useState('');
+  const [loading, setLoading]         = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+
+  const [forgotMode, setForgotMode]   = useState(false);
+  const [resetEmail, setResetEmail]   = useState('');
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetSent, setResetSent]     = useState(false);
+  const [resetError, setResetError]   = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,6 +37,79 @@ export default function LoginPage() {
       options: { redirectTo: `${window.location.origin}/` },
     });
   };
+
+  const handleReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setResetError('');
+    setResetLoading(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail.trim(), {
+      redirectTo: `${window.location.origin}/update-password`,
+    });
+    setResetLoading(false);
+    if (error) { setResetError(error.message); return; }
+    setResetSent(true);
+  };
+
+  if (forgotMode) {
+    return (
+      <div className="fixed inset-0 z-[100] bg-[var(--background)] flex items-center justify-center px-5">
+        <div className="w-full max-w-sm animate-depth-in">
+          <div className="text-center mb-8">
+            <div className="text-5xl mb-3">🔑</div>
+            <h1 className="text-3xl font-black" style={{ color: 'var(--primary)' }}>Reset Password</h1>
+            <p className="text-sm text-[var(--text-muted)] mt-1">We'll send you a link to reset it</p>
+          </div>
+
+          {resetSent ? (
+            <div className="px-4 py-4 rounded-2xl text-center font-semibold" style={{ background: 'rgba(46,204,113,0.1)', color: 'var(--primary)' }}>
+              Check your email for the reset link!
+            </div>
+          ) : (
+            <form onSubmit={handleReset} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-[var(--text-muted)] mb-1.5 uppercase tracking-wide">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  value={resetEmail}
+                  onChange={e => setResetEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  required
+                  autoFocus
+                  className="w-full px-4 py-3.5 rounded-2xl border-2 border-[var(--border)] bg-[var(--surface)] text-[var(--text)] outline-none transition-colors focus:border-[var(--primary)] text-base"
+                />
+              </div>
+
+              {resetError && (
+                <div className="px-4 py-3 rounded-2xl text-sm font-medium" style={{ background: 'rgba(239,68,68,0.1)', color: 'var(--danger)' }}>
+                  {resetError}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={resetLoading}
+                className="btn-primary w-full py-4 text-base font-bold disabled:opacity-60"
+              >
+                {resetLoading ? 'Sending…' : 'Send Reset Link →'}
+              </button>
+            </form>
+          )}
+
+          <p className="text-center text-sm text-[var(--text-muted)] mt-6">
+            <button
+              onClick={() => setForgotMode(false)}
+              className="font-semibold"
+              style={{ color: 'var(--primary)' }}
+            >
+              ← Back to Sign In
+            </button>
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-[100] bg-[var(--background)] flex items-center justify-center px-5">
@@ -82,9 +161,19 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-[var(--text-muted)] mb-1.5 uppercase tracking-wide">
-              Password
-            </label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">
+                Password
+              </label>
+              <button
+                type="button"
+                onClick={() => setForgotMode(true)}
+                className="text-xs font-semibold"
+                style={{ color: 'var(--primary)' }}
+              >
+                Forgot password?
+              </button>
+            </div>
             <input
               type="password"
               value={password}
