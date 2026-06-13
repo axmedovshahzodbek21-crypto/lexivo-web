@@ -90,6 +90,7 @@ export default function PomodoroWidget() {
   const prevPhaseRef = useRef<PomPhase>('idle');
   const [tipIndex, setTipIndex] = useState(0);
   const [mounted, setMounted] = useState(false);
+  const [panelOpen, setPanelOpen] = useState(false);
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -384,13 +385,84 @@ export default function PomodoroWidget() {
   const accentColor = isWork ? '#6C63FF' : '#10B981';
   const timeStr = fmt(pomSecondsLeft);
 
+  const cardStyle = {
+    borderRadius: 20,
+    background: 'rgba(10, 10, 24, 0.96)',
+    backdropFilter: 'blur(20px)',
+    border: `1px solid ${accentColor}55`,
+    boxShadow: `0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px ${accentColor}18`,
+  };
+
   return (
+    <>
+      {/* Expanded panel — shown when widget is tapped */}
+      {panelOpen && createPortal(
+        <div
+          className="fixed z-50"
+          style={{ left: pos?.x ?? 0, top: (pos?.y ?? 0) + 60, width: 260, ...cardStyle }}
+        >
+          {/* Header */}
+          <div style={{ padding: '14px 14px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ color: accentColor, fontWeight: 800, fontSize: 13, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+              {isWork ? '🎯 Focus' : '☕ Break'}
+            </span>
+            <button
+              onClick={() => setPanelOpen(false)}
+              style={{ width: 24, height: 24, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', border: 'none', color: 'rgba(255,255,255,0.6)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            >✕</button>
+          </div>
+
+          {/* Big countdown */}
+          <div style={{ padding: '10px 14px 4px', textAlign: 'center' }}>
+            <div style={{ fontSize: 52, fontWeight: 900, color: '#fff', lineHeight: 1, fontFamily: '"Courier New", monospace', letterSpacing: '-2px', textShadow: `0 0 24px ${accentColor}80` }}>
+              {timeStr}
+            </div>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginTop: 4 }}>
+              {pomRunning ? 'running' : 'paused'}
+            </div>
+          </div>
+
+          {/* Session dots */}
+          {pomSessions > 0 && (
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 6, padding: '6px 0 0' }}>
+              {Array.from({ length: pomSessions }).map((_, i) => (
+                <div key={i} style={{ width: 8, height: 8, borderRadius: '50%', background: accentColor }} />
+              ))}
+              <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', marginLeft: 2 }}>{pomSessions} done</span>
+            </div>
+          )}
+
+          {/* Controls */}
+          <div style={{ padding: '12px 14px 14px', display: 'flex', gap: 8 }}>
+            <button
+              onClick={() => { pomRunning ? pausePomodoro() : resumePomodoro(); }}
+              style={{ flex: 1, padding: '10px 0', borderRadius: 12, border: 'none', background: accentColor, color: '#fff', fontWeight: 800, fontSize: 16, cursor: 'pointer' }}
+            >
+              {pomRunning ? '⏸' : '▶'}
+            </button>
+            <button
+              onClick={skipPomodoro}
+              style={{ flex: 1, padding: '10px 0', borderRadius: 12, border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.6)', fontWeight: 800, fontSize: 16, cursor: 'pointer' }}
+            >
+              ⏭
+            </button>
+            <button
+              onClick={() => { resetPomodoro(); setPanelOpen(false); }}
+              style={{ padding: '10px 12px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.35)', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}
+            >
+              Stop
+            </button>
+          </div>
+        </div>,
+        document.body,
+      )}
+
     <div
       ref={elemRef}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
-      onClick={() => { if (wasDrag.current) { wasDrag.current = false; return; } router.push('/pomodoro'); }}
+      onClick={() => { if (wasDrag.current) { wasDrag.current = false; return; } setPanelOpen(p => !p); }}
       className="fixed z-50 cursor-move select-none overflow-hidden"
       style={{
         left: pos.x, top: pos.y,
@@ -441,6 +513,7 @@ export default function PomodoroWidget() {
 
       </div>
     </div>
+    </>
   );
 }
 
