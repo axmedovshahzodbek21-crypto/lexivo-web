@@ -122,7 +122,7 @@ export async function pullAll(userId: string) {
       studyOrder: profile.study_order,
       quizDirection: profile.quiz_direction,
       reduceMotion: profile.reduce_motion,
-      uiLanguage: profile.ui_language ?? 'en',
+      uiLanguage: getSettings().uiLanguage,
     });
     lsSet('lexivo_onboarded', true);
   }

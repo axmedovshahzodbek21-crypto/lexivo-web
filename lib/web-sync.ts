@@ -159,6 +159,7 @@ export async function pullAll(uid: string) {
     // profiles → settings
     const { data: profile } = await supabase.from('profiles').select().eq('id', uid).maybeSingle();
     if (profile) {
+      const existing = getSettings();
       saveSettings({
         name:            profile.name            ?? 'Learner',
         languageLevel:   profile.language_level  ?? 'B1',
@@ -170,7 +171,7 @@ export async function pullAll(uid: string) {
         studyOrder:      profile.study_order      ?? 'random',
         quizDirection:   profile.quiz_direction   ?? 'word-to-uz',
         reduceMotion:    profile.reduce_motion    ?? false,
-        uiLanguage:      profile.ui_language      ?? 'en',
+        uiLanguage:      existing.uiLanguage,
       });
       setOnboarded();
     }
