@@ -102,6 +102,7 @@ const en = {
     hintShort: 'hint',
     tooHardShort: 'too hard',
     skipShort: 'skip',
+    listenShort: 'listen',
   },
   flashcards: {
     title: 'Flashcards',
@@ -476,6 +477,7 @@ const uz: typeof en = {
     hintShort: 'maslahat',
     tooHardShort: 'juda qiyin',
     skipShort: "o'tkazib",
+    listenShort: 'tinglash',
   },
   flashcards: {
     title: 'Kartochkalar',
