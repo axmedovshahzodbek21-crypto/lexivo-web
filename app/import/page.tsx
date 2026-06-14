@@ -5,6 +5,36 @@ import { useTranslation } from '@/lib/useTranslation';
 import { addImportedWords } from '@/lib/storage';
 import type { ImportedWord } from '@/lib/types';
 
+const TUTORIAL = {
+  en: {
+    title: 'How to Import Words',
+    steps: [
+      { icon: '🌐', title: '1. Choose languages', desc: 'Select the language of your words and the language you want translations in.' },
+      { icon: '🤖', title: '2. Copy a prompt', desc: 'Expand a prompt below, copy it, open Claude or ChatGPT, paste it with your words and send.' },
+      { icon: '📋', title: '3. Paste the response', desc: "Copy the AI's reply and paste it into the box below. Your words will appear instantly." },
+    ],
+    btn: 'Got it!',
+  },
+  uz: {
+    title: "So'zlarni qanday import qilish",
+    steps: [
+      { icon: '🌐', title: '1. Tillarni tanlang', desc: "So'zlaringiz tilini va tarjima tilini tanlang." },
+      { icon: '🤖', title: "2. Promptni nusxalang", desc: "Quyidagi promptni oching, nusxalang, Claude yoki ChatGPT ga o'ting, promptni so'zlaringiz bilan joylashtiring va yuboring." },
+      { icon: '📋', title: '3. Javobni joylashtiring', desc: "Suniy intellekt javobini nusxalab, quyidagi maydonga joylashtiring. So'zlaringiz darhol ko'rinadi." },
+    ],
+    btn: 'Tushunarli!',
+  },
+  ru: {
+    title: 'Как импортировать слова',
+    steps: [
+      { icon: '🌐', title: '1. Выберите языки', desc: 'Выберите язык слов и язык, на который нужен перевод.' },
+      { icon: '🤖', title: '2. Скопируйте запрос', desc: 'Разверните запрос ниже, скопируйте его, откройте Claude или ChatGPT, вставьте слова и отправьте.' },
+      { icon: '📋', title: '3. Вставьте ответ', desc: 'Скопируйте ответ ИИ и вставьте в поле ниже. Слова появятся мгновенно.' },
+    ],
+    btn: 'Понятно!',
+  },
+} as const;
+
 const LANGUAGES = [
   { label: 'English', code: 'en-US' },
   { label: 'Russian', code: 'ru-RU' },
@@ -106,6 +136,7 @@ function ImportPageInner() {
   const [open1, setOpen1] = useState(false);
   const [open2, setOpen2] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
+  const [tutorialLang, setTutorialLang] = useState<'en' | 'uz' | 'ru'>('en');
 
   useEffect(() => {
     if (!localStorage.getItem('import_tutorial_seen')) {
@@ -135,13 +166,18 @@ function ImportPageInner() {
       {showHelp && (
         <div className="fixed inset-0 z-50 flex items-end justify-center p-4 pb-8" style={{ background: 'rgba(0,0,0,0.5)' }} onClick={() => setShowHelp(false)}>
           <div className="w-full max-w-md bg-[var(--surface)] rounded-3xl p-6 space-y-5 animate-slide-up" onClick={e => e.stopPropagation()}>
-            <h2 className="text-lg font-bold text-[var(--text)] text-center">{t.import.tutorialTitle}</h2>
+            <div className="flex items-center gap-2">
+              <h2 className="flex-1 text-lg font-bold text-[var(--text)]">{TUTORIAL[tutorialLang].title}</h2>
+              {(['en', 'uz', 'ru'] as const).map(l => (
+                <button key={l} onClick={() => setTutorialLang(l)}
+                  className="px-2.5 py-1 rounded-lg text-xs font-bold transition-colors"
+                  style={{ background: tutorialLang === l ? 'var(--primary)' : 'var(--primary-bg)', color: tutorialLang === l ? 'white' : 'var(--primary)' }}>
+                  {l.toUpperCase()}
+                </button>
+              ))}
+            </div>
             <div className="space-y-4">
-              {[
-                { icon: '🌐', title: t.import.tutorialStep1Title, desc: t.import.tutorialStep1Desc },
-                { icon: '🤖', title: t.import.tutorialStep2Title, desc: t.import.tutorialStep2Desc },
-                { icon: '📋', title: t.import.tutorialStep3Title, desc: t.import.tutorialStep3Desc },
-              ].map(({ icon, title, desc }) => (
+              {TUTORIAL[tutorialLang].steps.map(({ icon, title, desc }) => (
                 <div key={title} className="flex gap-3">
                   <div className="w-10 h-10 rounded-2xl flex items-center justify-center text-xl flex-shrink-0" style={{ background: 'var(--primary-bg)' }}>{icon}</div>
                   <div>
@@ -152,7 +188,7 @@ function ImportPageInner() {
               ))}
             </div>
             <button onClick={() => setShowHelp(false)} className="w-full py-3 rounded-2xl font-bold text-sm text-white" style={{ background: 'var(--primary)' }}>
-              {t.import.tutorialGotIt}
+              {TUTORIAL[tutorialLang].btn}
             </button>
           </div>
         </div>
