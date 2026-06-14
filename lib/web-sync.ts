@@ -170,6 +170,7 @@ export async function pullAll(uid: string) {
         studyOrder:      profile.study_order      ?? 'random',
         quizDirection:   profile.quiz_direction   ?? 'word-to-uz',
         reduceMotion:    profile.reduce_motion    ?? false,
+        uiLanguage:      profile.ui_language      ?? 'en',
       });
       setOnboarded();
     }
