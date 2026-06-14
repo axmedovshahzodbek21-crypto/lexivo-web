@@ -97,10 +97,10 @@ export async function pushAll(uid: string) {
       await supabase.from('starred_words').insert(starred.map(w => ({ user_id: uid, word: w })));
     }
 
-    // unit_progress
+    // unit_progress — fetch remote first and OR-merge so false never overwrites true
     if (typeof window !== 'undefined') {
-      const upRows: {
-        user_id: string; collection_name: string; day_number: number;
+      const localRows: {
+        collection_name: string; day_number: number;
         learn_done: boolean; flashcard_done: boolean; quiz_done: boolean;
       }[] = [];
       for (let i = 0; i < localStorage.length; i++) {
@@ -115,15 +115,31 @@ export async function pushAll(uid: string) {
         const raw = localStorage.getItem(key);
         if (!raw) continue;
         const p = JSON.parse(raw);
-        upRows.push({
-          user_id: uid, collection_name: collectionName, day_number: dayNumber,
+        localRows.push({
+          collection_name: collectionName, day_number: dayNumber,
           learn_done: p.learnDone ?? false,
           flashcard_done: p.flashcardDone ?? false,
           quiz_done: p.quizDone ?? false,
         });
       }
-      if (upRows.length > 0) {
+      if (localRows.length > 0) {
         try {
+          const { data: remoteRows } = await supabase
+            .from('unit_progress')
+            .select('collection_name,day_number,learn_done,flashcard_done,quiz_done')
+            .eq('user_id', uid);
+          const remoteMap = new Map((remoteRows ?? []).map(r => [`${r.collection_name}_${r.day_number}`, r]));
+          const upRows = localRows.map(r => {
+            const remote = remoteMap.get(`${r.collection_name}_${r.day_number}`);
+            return {
+              user_id: uid,
+              collection_name: r.collection_name,
+              day_number: r.day_number,
+              learn_done: r.learn_done || (remote?.learn_done ?? false),
+              flashcard_done: r.flashcard_done || (remote?.flashcard_done ?? false),
+              quiz_done: r.quiz_done || (remote?.quiz_done ?? false),
+            };
+          });
           await supabase.from('unit_progress').upsert(upRows, { onConflict: 'user_id,collection_name,day_number' });
         } catch (_) {}
       }

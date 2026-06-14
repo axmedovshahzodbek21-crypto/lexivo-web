@@ -185,6 +185,19 @@ function FlashcardsPage() {
           <div className="card text-center"><div className="text-2xl font-bold text-[var(--primary)]">{score}%</div><div className="text-xs text-[var(--text-muted)]">Score</div></div>
         </div>
         <div className="flex flex-col gap-3 w-full">
+          {collectionName && dayNumber !== undefined && (
+            <Link
+              href={`/quiz?collection=${encodeURIComponent(collectionName)}&day=${dayNumber}`}
+              className="w-full flex items-center justify-between px-5 py-4 rounded-2xl text-white"
+              style={{ background: 'linear-gradient(135deg, #F59E0B, #FBBF24)' }}
+            >
+              <div>
+                <div className="font-bold text-sm">❓ Take the Quiz</div>
+                <div className="text-xs opacity-80 mt-0.5">Test how well you remember</div>
+              </div>
+              <span className="text-lg">→</span>
+            </Link>
+          )}
           {unknownWords.length > 0 && (
             <button
               onClick={() => { setDeck(unknownWords); setIndex(0); setSide('front'); setKnown(0); setUnknown(0); setUnknownWords([]); setDone(false); }}

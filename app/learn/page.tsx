@@ -220,6 +220,7 @@ function LearnPage() {
         skipped={skipped}
         backUrl={backUrl}
         collectionName={collectionName}
+        dayNumber={dayNumber}
         xpEarned={sessionCount * XP_PER_LEARN}
         streak={getStreak()}
         todayCount={getTodayLearnedCount()}
@@ -465,12 +466,13 @@ function LoadingState() {
 }
 
 function SessionDone({
-  sessionCount, skipped, backUrl, collectionName, xpEarned, streak, todayCount, onRestart,
+  sessionCount, skipped, backUrl, collectionName, dayNumber, xpEarned, streak, todayCount, onRestart,
 }: {
   sessionCount: number;
   skipped: StudyWord[];
   backUrl: string;
   collectionName?: string;
+  dayNumber?: number;
   xpEarned: number;
   streak: number;
   todayCount: number;
@@ -507,6 +509,21 @@ function SessionDone({
           <p className="text-xs text-[var(--text-muted)]">Keep going — every word counts</p>
         </div>
       </div>
+
+      {/* Next step: Flashcards */}
+      {collectionName && dayNumber !== undefined && (
+        <Link
+          href={`/flashcards?collection=${encodeURIComponent(collectionName)}&day=${dayNumber}`}
+          className="w-full flex items-center justify-between px-5 py-4 rounded-2xl text-white mb-1"
+          style={{ background: 'linear-gradient(135deg, #FF6B35, #FF8C42)' }}
+        >
+          <div>
+            <div className="font-bold text-sm">🃏 Practice with Flashcards</div>
+            <div className="text-xs opacity-80 mt-0.5">Reinforce what you just learned</div>
+          </div>
+          <span className="text-lg">→</span>
+        </Link>
+      )}
 
       {/* Hard words list + shortcut */}
       {skipped.length > 0 && (
