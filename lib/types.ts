@@ -6,8 +6,10 @@ export interface WordItem {
   definition: string;
   example1: string;
   example1Situation: string; // Uzbek situation description
+  example1Translation?: string; // translation of example1 sentence (imported words)
   example2: string;
   example2Situation: string;
+  example2Translation?: string; // translation of example2 sentence (imported words)
   example3: string;
   example3Translation: string; // Uzbek translation of example3
   example3Situation: string;

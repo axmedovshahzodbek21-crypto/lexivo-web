@@ -122,9 +122,11 @@ function LearnPage() {
         translation: w.translation,
         definition: w.definition,
         example1: w.example1,
-        example1Situation: w.example1Translation ?? '',
+        example1Situation: '',
+        example1Translation: w.example1Translation ?? '',
         example2: w.example2,
-        example2Situation: w.example2Translation ?? '',
+        example2Situation: '',
+        example2Translation: w.example2Translation ?? '',
         example3: '',
         example3Translation: '',
         example3Situation: '',
@@ -383,6 +385,7 @@ function LearnPage() {
                 num={1}
                 example={current.example1}
                 situation={current.example1Situation}
+                translation={current.example1Translation}
                 language={current.language}
               />
 
@@ -399,6 +402,7 @@ function LearnPage() {
                     num={2}
                     example={current.example2}
                     situation={current.example2Situation}
+                    translation={current.example2Translation}
                     language={current.language}
                   />}
                   {current.example3 && <ExampleWithSituation

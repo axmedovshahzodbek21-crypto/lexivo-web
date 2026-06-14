@@ -149,8 +149,8 @@ function QuizPage() {
       const allWords: QuizWord[] = imported.map(w => ({
         word: w.word, partOfSpeech: '', pronunciation: '',
         translation: w.translation, definition: w.definition,
-        example1: w.example1, example1Situation: w.example1Translation ?? '',
-        example2: w.example2, example2Situation: w.example2Translation ?? '',
+        example1: w.example1, example1Situation: '', example1Translation: w.example1Translation ?? '',
+        example2: w.example2, example2Situation: '', example2Translation: w.example2Translation ?? '',
         example3: '', example3Translation: '', example3Situation: '',
         language: w.language,
         collectionName: 'my-words', topic: myCollection ?? 'My Words', dayNumber: 0,
