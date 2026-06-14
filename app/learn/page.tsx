@@ -431,7 +431,7 @@ function LearnPage() {
         )}
 
         <div className="no-focus text-center text-xs text-[var(--text-muted)]">
-          {t.learn.remaining(words.length - index - 1)} · <kbd>S</kbd> listen · <kbd>H</kbd> {revealed ? 'too hard' : 'hint'}{!revealed ? <> · <kbd>K</kbd> skip</> : null}
+          {t.learn.remaining(words.length - index - 1)} · <kbd>S</kbd> listen · <kbd>H</kbd> {revealed ? t.learn.tooHardShort : t.learn.hintShort}{!revealed ? <> · <kbd>K</kbd> {t.learn.skipShort}</> : null}
         </div>
       </div>
     </div>

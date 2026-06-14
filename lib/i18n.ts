@@ -99,6 +99,9 @@ const en = {
     skipped: 'Skipped',
     skipTipTitle: 'What is Skip?',
     skipTipBody: 'This word is already part of your active vocabulary — no need to review it on a schedule. It still appears in Flashcards and Quiz.',
+    hintShort: 'hint',
+    tooHardShort: 'too hard',
+    skipShort: 'skip',
   },
   flashcards: {
     title: 'Flashcards',
@@ -470,6 +473,9 @@ const uz: typeof en = {
     skipped: "O'tkazilgan",
     skipTipTitle: "Skip nima?",
     skipTipBody: "Bu so'z allaqachon faol lug'atingizning bir qismi — uni jadval bo'yicha takrorlash shart emas. U Kartochkalar va Testda ko'rinishda qoladi.",
+    hintShort: 'maslahat',
+    tooHardShort: 'juda qiyin',
+    skipShort: "o'tkazib",
   },
   flashcards: {
     title: 'Kartochkalar',
