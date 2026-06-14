@@ -394,19 +394,19 @@ function LearnPage() {
                 </button>
               ) : (
                 <div className="space-y-3 animate-fade-in">
-                  <ExampleWithSituation
+                  {current.example2 && <ExampleWithSituation
                     num={2}
                     example={current.example2}
                     situation={current.example2Situation}
                     language={current.language}
-                  />
-                  <ExampleWithSituation
+                  />}
+                  {current.example3 && <ExampleWithSituation
                     num={3}
                     example={current.example3}
                     situation={current.example3Situation}
                     translation={current.example3Translation}
                     language={current.language}
-                  />
+                  />}
                 </div>
               )}
             </div>
