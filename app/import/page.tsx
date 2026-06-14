@@ -1,5 +1,5 @@
 'use client';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/lib/useTranslation';
 import { addImportedWords } from '@/lib/storage';
@@ -91,6 +91,14 @@ export default function ImportPage() {
   const [added, setAdded] = useState(false);
   const [open1, setOpen1] = useState(false);
   const [open2, setOpen2] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
+
+  useEffect(() => {
+    if (!localStorage.getItem('import_tutorial_seen')) {
+      setShowHelp(true);
+      localStorage.setItem('import_tutorial_seen', '1');
+    }
+  }, []);
 
   const parsed = useMemo(() => parseOutput(pasted, wordLangCode), [pasted, wordLangCode]);
 
@@ -108,9 +116,41 @@ export default function ImportPage() {
 
   return (
     <div className="flex flex-col min-h-screen animate-fade-in pb-24">
+      {/* Tutorial modal */}
+      {showHelp && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center p-4 pb-8" style={{ background: 'rgba(0,0,0,0.5)' }} onClick={() => setShowHelp(false)}>
+          <div className="w-full max-w-md bg-[var(--card)] rounded-3xl p-6 space-y-5 animate-slide-up" onClick={e => e.stopPropagation()}>
+            <h2 className="text-lg font-bold text-[var(--text)] text-center">{t.import.tutorialTitle}</h2>
+            <div className="space-y-4">
+              {[
+                { icon: '🌐', title: t.import.tutorialStep1Title, desc: t.import.tutorialStep1Desc },
+                { icon: '🤖', title: t.import.tutorialStep2Title, desc: t.import.tutorialStep2Desc },
+                { icon: '📋', title: t.import.tutorialStep3Title, desc: t.import.tutorialStep3Desc },
+              ].map(({ icon, title, desc }) => (
+                <div key={title} className="flex gap-3">
+                  <div className="w-10 h-10 rounded-2xl flex items-center justify-center text-xl flex-shrink-0" style={{ background: 'var(--primary-bg)' }}>{icon}</div>
+                  <div>
+                    <p className="font-semibold text-sm text-[var(--text)]">{title}</p>
+                    <p className="text-xs text-[var(--text-muted)] mt-0.5 leading-relaxed">{desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => setShowHelp(false)}
+              className="w-full py-3 rounded-2xl font-bold text-sm text-white"
+              style={{ background: 'var(--primary)' }}
+            >
+              {t.import.tutorialGotIt}
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="flex items-center gap-3 p-4 border-b border-[var(--border)]">
         <button onClick={() => router.back()} className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-lg">←</button>
-        <h1 className="font-bold text-[var(--text)]">{t.import.title}</h1>
+        <h1 className="font-bold text-[var(--text)] flex-1">{t.import.title}</h1>
+        <button onClick={() => setShowHelp(true)} className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-lg">💡</button>
       </div>
 
       <div className="p-4 space-y-4">
