@@ -99,7 +99,7 @@ export default function HomePage() {
 
       {/* ── Download banner ── */}
       <a
-        href="https://github.com/axmedovshahzodbek21-crypto/lexivo-web/releases/download/v1.0.0/app-release.apk"
+        href="https://github.com/axmedovshahzodbek21-crypto/lexivo-web/releases/latest/download/app-release.apk"
         download
         className="flex items-center gap-4 p-4 rounded-2xl border-2 transition-colors"
         style={{ background: 'rgba(61,220,132,0.08)', borderColor: 'rgba(61,220,132,0.35)' }}
