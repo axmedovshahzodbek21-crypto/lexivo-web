@@ -127,6 +127,19 @@ function StepWelcome({ onNext }: { onNext: () => void }) {
       <button onClick={onNext} className="btn-primary w-full max-w-sm py-4 text-base font-bold">
         {t.onboarding.getStarted}
       </button>
+
+      <a
+        href="https://github.com/axmedovshahzodbek21-crypto/lexivo-web/releases/latest/download/app-release.apk"
+        className="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm w-full max-w-sm"
+        style={{ background: 'rgba(61,220,132,0.1)', border: '1.5px solid rgba(61,220,132,0.35)' }}
+      >
+        <span className="text-xl">🤖</span>
+        <div className="flex-1 text-left">
+          <span className="font-semibold block" style={{ color: '#3DDC84' }}>{t.home.downloadApp}</span>
+          <span className="text-xs text-[var(--text-muted)]">{t.home.downloadSub}</span>
+        </div>
+        <span style={{ color: '#3DDC84' }}>↓</span>
+      </a>
     </div>
   );
 }
