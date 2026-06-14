@@ -11,6 +11,7 @@ export interface WordItem {
   example3: string;
   example3Translation: string; // Uzbek translation of example3
   example3Situation: string;
+  language?: string; // BCP-47, only set for imported words
 }
 
 export interface WordDay {

@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 import { useEffect, useState, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
-import { speak } from '@/lib/speech';
+import { speak, speakText } from '@/lib/speech';
 import { addXP, recordStudySession, markFlashcardComplete, getStarredWords, getHardWords, getCustomListWords, getUnitProgress, saveFlashcardProgress, getFlashcardProgress, clearFlashcardProgress, getImportedWords } from '@/lib/storage';
 import { checkAchievements } from '@/lib/gamification';
 import type { WordItem, WordCollection } from '@/lib/types';
@@ -103,6 +103,7 @@ function FlashcardsPage() {
         example1: w.example1, example1Situation: '',
         example2: w.example2, example2Situation: '',
         example3: '', example3Translation: '', example3Situation: '',
+        language: w.language,
         collectionName: 'my-words', topic: 'My Words', dayNumber: 0,
       }));
       for (let i = list.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [list[i], list[j]] = [list[j], list[i]]; }
@@ -142,7 +143,7 @@ function FlashcardsPage() {
         case ' ': case 'Enter': e.preventDefault(); setSide(s => s === 'front' ? 'back' : 'front'); break;
         case 'ArrowRight': case 'k': case 'K': if (side === 'back') markKnown(); break;
         case 'ArrowLeft': case 'j': case 'J': if (side === 'back') markUnknown(); break;
-        case 's': case 'S': if (current) speak(current.word); break;
+        case 's': case 'S': if (current) { current.language ? speakText(current.word, current.language) : speak(current.word); } break;
         case 'f': case 'F': setFocusMode(!focusMode); break;
       }
     };
@@ -270,7 +271,7 @@ function FlashcardsPage() {
               <h2 className="text-3xl font-bold text-[var(--text)] mb-2">{current.word}</h2>
               <p className="text-sm text-[var(--text-muted)]">{current.partOfSpeech} · {current.pronunciation}</p>
               <button
-                onClick={e => { e.stopPropagation(); speak(current.word); }}
+                onClick={e => { e.stopPropagation(); current.language ? speakText(current.word, current.language) : speak(current.word); }}
                 className="mt-4 w-10 h-10 rounded-full bg-[var(--primary-bg)] flex items-center justify-center"
               >
                 🔊

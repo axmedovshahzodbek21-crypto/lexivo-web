@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 import { useEffect, useState, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
-import { speak } from '@/lib/speech';
+import { speak, speakText } from '@/lib/speech';
 import { addXP, recordStudySession, markQuizComplete, unlockAchievement, getStarredWords, getCustomListWords, getSettings, getUnitProgress, getImportedWords } from '@/lib/storage';
 import { fireConfetti } from '@/lib/confetti';
 import { checkAchievements } from '@/lib/gamification';
@@ -151,6 +151,7 @@ function QuizPage() {
         example1: w.example1, example1Situation: '',
         example2: w.example2, example2Situation: '',
         example3: '', example3Translation: '', example3Situation: '',
+        language: w.language,
         collectionName: 'my-words', topic: 'My Words', dayNumber: 0,
       }));
       const words = shuffle(allWords);
@@ -191,7 +192,7 @@ function QuizPage() {
         e.preventDefault();
         next();
       }
-      if (e.key === 's' || e.key === 'S') speak(current.word.word);
+      if (e.key === 's' || e.key === 'S') { current.word.language ? speakText(current.word.word, current.word.language) : speak(current.word.word); }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
@@ -318,7 +319,7 @@ function QuizPage() {
           <div className="flex items-start justify-between gap-2">
             <h2 className="text-xl font-bold text-[var(--text)] flex-1">{current.prompt}</h2>
             <button
-              onClick={() => speak(current.word.word)}
+              onClick={() => current.word.language ? speakText(current.word.word, current.word.language) : speak(current.word.word)}
               className="w-9 h-9 rounded-full bg-[var(--primary-bg)] flex items-center justify-center flex-shrink-0"
             >🔊</button>
           </div>

@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 import { useEffect, useState, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
-import { speakAccent } from '@/lib/speech';
+import { speakAccent, speakText } from '@/lib/speech';
 import {
   saveLearnedWord, incrementTodayCount, addXP, recordStudySession,
   markLearningComplete, toggleStarred, isStarred, addHardWord,
@@ -127,6 +127,7 @@ function LearnPage() {
         example3: '',
         example3Translation: '',
         example3Situation: '',
+        language: w.language,
         collectionName: 'my-words',
         topic: 'My Words',
         dayNumber: 0,
@@ -161,7 +162,8 @@ function LearnPage() {
 
   useEffect(() => {
     if (revealed && current && autoPlayOnReveal) {
-      speakAccent(current.word, defaultAccent);
+      if (current.language) speakText(current.word, current.language);
+      else speakAccent(current.word, defaultAccent);
     }
   }, [revealed]); // intentionally only on revealed change
 
@@ -225,7 +227,7 @@ function LearnPage() {
     const handler = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement) return;
       switch (e.key) {
-        case 's': case 'S': if (current) speakAccent(current.word, defaultAccent); break;
+        case 's': case 'S': if (current) { current.language ? speakText(current.word, current.language) : speakAccent(current.word, defaultAccent); } break;
         case 'f': case 'F': setFocusMode(!focusMode); break;
         case 'k': case 'K': if (!revealed) skipWord(); break;
         case 'h': case 'H':
@@ -246,7 +248,7 @@ function LearnPage() {
   }, [current, done, focusMode, revealed, advanceCard, markTooHard, skipWord, dismissSkipTip]);
 
   // No unit selected → show picker
-  if (!collectionName && !hardOnly) return <UnitPicker mode="learn" />;
+  if (!collectionName && !hardOnly && !sourceMyWords) return <UnitPicker mode="learn" />;
 
   if (!collectionsLoaded) return <LoadingState />;
 
@@ -261,7 +263,7 @@ function LearnPage() {
   }
 
   if (done) {
-    const backUrl = hardOnly ? '/hard-words' : collectionName ? `/collections/${encodeURIComponent(collectionName)}` : '/';
+    const backUrl = hardOnly ? '/hard-words' : sourceMyWords ? '/my-words' : collectionName ? `/collections/${encodeURIComponent(collectionName)}` : '/';
     return (
       <SessionDone
         sessionCount={sessionCount}
@@ -327,18 +329,25 @@ function LearnPage() {
           {/* Topic + audio */}
           <div className="flex items-center justify-between mb-3">
             <span className="badge">{current.topic}</span>
-            <div className="flex gap-1.5">
-              <AccentButton
-                onClick={e => { e.stopPropagation(); speakAccent(current.word, 'us'); }}
-                flag="🇺🇸" label={t.learn.american}
-                active={defaultAccent === 'us'}
-              />
-              <AccentButton
-                onClick={e => { e.stopPropagation(); speakAccent(current.word, 'uk'); }}
-                flag="🇬🇧" label={t.learn.british}
-                active={defaultAccent === 'uk'}
-              />
-            </div>
+            {current.language ? (
+              <button
+                onClick={e => { e.stopPropagation(); speakText(current.word, current.language!); }}
+                className="w-8 h-8 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-base hover:bg-[var(--primary-bg)] transition-colors"
+              >🔊</button>
+            ) : (
+              <div className="flex gap-1.5">
+                <AccentButton
+                  onClick={e => { e.stopPropagation(); speakAccent(current.word, 'us'); }}
+                  flag="🇺🇸" label={t.learn.american}
+                  active={defaultAccent === 'us'}
+                />
+                <AccentButton
+                  onClick={e => { e.stopPropagation(); speakAccent(current.word, 'uk'); }}
+                  flag="🇬🇧" label={t.learn.british}
+                  active={defaultAccent === 'uk'}
+                />
+              </div>
+            )}
           </div>
 
           {/* Word */}
@@ -373,6 +382,7 @@ function LearnPage() {
                 num={1}
                 example={current.example1}
                 situation={current.example1Situation}
+                language={current.language}
               />
 
               {!showExamples ? (
@@ -388,12 +398,14 @@ function LearnPage() {
                     num={2}
                     example={current.example2}
                     situation={current.example2Situation}
+                    language={current.language}
                   />
                   <ExampleWithSituation
                     num={3}
                     example={current.example3}
                     situation={current.example3Situation}
                     translation={current.example3Translation}
+                    language={current.language}
                   />
                 </div>
               )}
@@ -466,9 +478,9 @@ function LearnPage() {
 }
 
 function ExampleWithSituation({
-  num, example, situation, translation,
+  num, example, situation, translation, language,
 }: {
-  num: number; example: string; situation: string; translation?: string;
+  num: number; example: string; situation: string; translation?: string; language?: string;
 }) {
   const t = useTranslation();
   return (
@@ -476,26 +488,27 @@ function ExampleWithSituation({
       <div className="bg-[var(--surface-2)] px-3 pt-3 pb-2">
         <div className="flex items-start justify-between gap-2 mb-1">
           <p className="text-xs text-[var(--text-muted)]">💬 {t.learn.example(num)}</p>
-          <div className="flex gap-1 shrink-0">
-            <AccentButton
-              onClick={() => speakAccent(example, 'us')}
-              flag="🇺🇸" label="American"
-              size="sm"
-            />
-            <AccentButton
-              onClick={() => speakAccent(example, 'uk')}
-              flag="🇬🇧" label="British"
-              size="sm"
-            />
-          </div>
+          {language ? (
+            <button
+              onClick={() => speakText(example, language)}
+              className="w-6 h-6 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-xs hover:bg-[var(--primary-bg)] transition-colors shrink-0"
+            >🔊</button>
+          ) : (
+            <div className="flex gap-1 shrink-0">
+              <AccentButton onClick={() => speakAccent(example, 'us')} flag="🇺🇸" label="American" size="sm" />
+              <AccentButton onClick={() => speakAccent(example, 'uk')} flag="🇬🇧" label="British" size="sm" />
+            </div>
+          )}
         </div>
         <p className="text-sm italic text-[var(--text)]">&ldquo;{example}&rdquo;</p>
         {translation && <p className="text-xs text-[var(--primary)] mt-1">{translation}</p>}
       </div>
-      <div className="bg-amber-50 px-3 pt-2 pb-3">
-        <p className="text-xs text-amber-600 mb-1">🗺️ Holat {num}</p>
-        <p className="text-sm text-amber-900">{situation}</p>
-      </div>
+      {situation && (
+        <div className="bg-amber-50 px-3 pt-2 pb-3">
+          <p className="text-xs text-amber-600 mb-1">🗺️ Holat {num}</p>
+          <p className="text-sm text-amber-900">{situation}</p>
+        </div>
+      )}
     </div>
   );
 }
