@@ -119,7 +119,7 @@ export default function ImportPage() {
       {/* Tutorial modal */}
       {showHelp && (
         <div className="fixed inset-0 z-50 flex items-end justify-center p-4 pb-8" style={{ background: 'rgba(0,0,0,0.5)' }} onClick={() => setShowHelp(false)}>
-          <div className="w-full max-w-md bg-[var(--card)] rounded-3xl p-6 space-y-5 animate-slide-up" onClick={e => e.stopPropagation()}>
+          <div className="w-full max-w-md bg-[var(--surface)] rounded-3xl p-6 space-y-5 animate-slide-up" onClick={e => e.stopPropagation()}>
             <h2 className="text-lg font-bold text-[var(--text)] text-center">{t.import.tutorialTitle}</h2>
             <div className="space-y-4">
               {[
