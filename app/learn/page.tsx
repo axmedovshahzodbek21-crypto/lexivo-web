@@ -82,6 +82,7 @@ function LearnPage() {
   const [showExamples, setShowExamples] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const [skipped, setSkipped] = useState<StudyWord[]>([]);
+  const [pureSkipped, setPureSkipped] = useState<StudyWord[]>([]);
   const [done, setDone] = useState(false);
   const [sessionCount, setSessionCount] = useState(0);
   const [starred, setStarredState] = useState(false);
@@ -89,6 +90,7 @@ function LearnPage() {
   const [autoPlayOnReveal, setAutoPlayOnReveal] = useState(true);
   const [sessionSize, setSessionSize] = useState(20);
   const [studyOrder, setStudyOrder] = useState<'random' | 'in-order'>('random');
+  const [showSkipTip, setShowSkipTip] = useState(false);
   const t = useTranslation();
 
   useEffect(() => {
@@ -97,6 +99,9 @@ function LearnPage() {
     setAutoPlayOnReveal(s.autoPlayOnReveal);
     setSessionSize(s.sessionSize);
     setStudyOrder(s.studyOrder);
+    if (!localStorage.getItem('lexivo_seen_skip_tip')) {
+      setShowSkipTip(true);
+    }
   }, []);
 
   // Show Pomodoro widget whenever Learn is entered (collection picker or unit session)
@@ -171,6 +176,19 @@ function LearnPage() {
     else setIndex(i => i + 1);
   }, [current, index, words]);
 
+  const dismissSkipTip = useCallback(() => {
+    setShowSkipTip(false);
+    localStorage.setItem('lexivo_seen_skip_tip', '1');
+  }, []);
+
+  const skipWord = useCallback(() => {
+    if (!current) return;
+    dismissSkipTip();
+    setPureSkipped(s => [...s, current]);
+    if (index + 1 >= words.length) setDone(true);
+    else setIndex(i => i + 1);
+  }, [current, index, words, dismissSkipTip]);
+
   const handleStar = () => {
     if (!current) return;
     setStarredState(toggleStarred(current.word));
@@ -182,6 +200,7 @@ function LearnPage() {
       switch (e.key) {
         case 's': case 'S': if (current) speakAccent(current.word, defaultAccent); break;
         case 'f': case 'F': setFocusMode(!focusMode); break;
+        case 'k': case 'K': if (!revealed) skipWord(); break;
         case 'h': case 'H':
           if (!revealed) setShowHint(true);
           else markTooHard();
@@ -197,7 +216,7 @@ function LearnPage() {
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [current, done, focusMode, revealed, advanceCard, markTooHard]);
+  }, [current, done, focusMode, revealed, advanceCard, markTooHard, skipWord]);
 
   // No unit selected → show picker
   if (!collectionName && !hardOnly) return <UnitPicker mode="learn" />;
@@ -220,13 +239,14 @@ function LearnPage() {
       <SessionDone
         sessionCount={sessionCount}
         skipped={skipped}
+        pureSkipped={pureSkipped}
         backUrl={backUrl}
         collectionName={collectionName}
         dayNumber={dayNumber}
         xpEarned={sessionCount * XP_PER_LEARN}
         streak={getStreak()}
         todayCount={getTodayLearnedCount()}
-        onRestart={() => { setIndex(0); setDone(false); setSessionCount(0); setSkipped([]); }}
+        onRestart={() => { setIndex(0); setDone(false); setSessionCount(0); setSkipped([]); setPureSkipped([]); }}
       />
     );
   }
@@ -275,7 +295,7 @@ function LearnPage() {
         <div
           className={`card h-full transition-all ${!revealed ? 'cursor-pointer hover:border-[var(--primary)]' : ''}`}
           style={{ minHeight: 300 }}
-          onClick={!revealed ? () => setRevealed(true) : undefined}
+          onClick={!revealed ? () => { setRevealed(true); dismissSkipTip(); } : undefined}
         >
           {/* Topic + audio */}
           <div className="flex items-center justify-between mb-3">
@@ -355,20 +375,38 @@ function LearnPage() {
         </div>
         </TiltCard>
 
-        {/* Hint — only before reveal */}
+        {/* Hint + Skip — only before reveal */}
         {!revealed && (
-          <div className="text-center no-focus">
-            {!showHint ? (
-              <button
-                onClick={() => setShowHint(true)}
-                className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] underline"
-              >
-                {t.learn.needHint}
-              </button>
-            ) : (
-              <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 animate-fade-in text-left">
-                <p className="text-xs font-semibold text-amber-600 mb-1">{t.learn.hint}</p>
-                <p className="text-sm text-amber-900">{current.definition.split(' ').slice(0, 8).join(' ')}…</p>
+          <div className="no-focus space-y-2">
+            <div className="text-center">
+              {!showHint ? (
+                <button
+                  onClick={() => setShowHint(true)}
+                  className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] underline"
+                >
+                  {t.learn.needHint}
+                </button>
+              ) : (
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 animate-fade-in text-left">
+                  <p className="text-xs font-semibold text-amber-600 mb-1">{t.learn.hint}</p>
+                  <p className="text-sm text-amber-900">{current.definition.split(' ').slice(0, 8).join(' ')}…</p>
+                </div>
+              )}
+            </div>
+            <button
+              onClick={skipWord}
+              className="w-full py-3 rounded-xl border-2 border-[var(--border)] text-[var(--text-muted)] font-semibold text-sm hover:border-orange-300 hover:text-orange-500 transition-colors press-3d"
+            >
+              {t.common.skip} <kbd className="ml-1 opacity-60 text-xs">K</kbd>
+            </button>
+            {showSkipTip && (
+              <div className="flex items-start gap-2 bg-orange-50 border border-orange-200 rounded-xl px-3 py-2.5 animate-fade-in">
+                <span className="text-base shrink-0 mt-0.5">⏭️</span>
+                <div className="flex-1">
+                  <p className="text-xs font-semibold text-orange-700">What is Skip?</p>
+                  <p className="text-xs text-orange-600 mt-0.5">Moves to the next word without marking it as learned. Use it when you want to come back later.</p>
+                </div>
+                <button onClick={dismissSkipTip} className="text-orange-400 hover:text-orange-600 text-sm font-bold shrink-0 mt-0.5">✕</button>
               </div>
             )}
           </div>
@@ -393,7 +431,7 @@ function LearnPage() {
         )}
 
         <div className="no-focus text-center text-xs text-[var(--text-muted)]">
-          {t.learn.remaining(words.length - index - 1)} · <kbd>S</kbd> listen · <kbd>H</kbd> {revealed ? 'too hard' : 'hint'}
+          {t.learn.remaining(words.length - index - 1)} · <kbd>S</kbd> listen · <kbd>H</kbd> {revealed ? 'too hard' : 'hint'}{!revealed ? <> · <kbd>K</kbd> skip</> : null}
         </div>
       </div>
     </div>
@@ -470,10 +508,11 @@ function LoadingState() {
 }
 
 function SessionDone({
-  sessionCount, skipped, backUrl, collectionName, dayNumber, xpEarned, streak, todayCount, onRestart,
+  sessionCount, skipped, pureSkipped, backUrl, collectionName, dayNumber, xpEarned, streak, todayCount, onRestart,
 }: {
   sessionCount: number;
   skipped: StudyWord[];
+  pureSkipped: StudyWord[];
   backUrl: string;
   collectionName?: string;
   dayNumber?: number;
@@ -504,6 +543,9 @@ function SessionDone({
         <StatTile icon="⚡" value={`+${xpEarned}`} label={t.learn.xpEarned} color="#F59E0B" />
         <StatTile icon="🔥" value={streak} label={t.learn.dayStreak} color="#FF6B35" />
         <StatTile icon="😓" value={skipped.length} label={t.learn.hardWords} color={skipped.length > 0 ? '#EF4444' : '#10B981'} />
+        {pureSkipped.length > 0 && (
+          <StatTile icon="⏭️" value={pureSkipped.length} label="Skipped" color="#F97316" />
+        )}
       </div>
 
       {/* Today's progress nudge */}
