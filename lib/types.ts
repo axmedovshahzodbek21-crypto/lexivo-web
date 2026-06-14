@@ -85,7 +85,9 @@ export interface ImportedWord {
   translation: string;
   definition: string;
   example1: string;
+  example1Translation?: string;
   example2: string;
+  example2Translation?: string;
   language: string; // BCP-47 e.g. 'en-US', 'ru-RU'
   addedAt: number;
   collectionName?: string; // optional for backward compat; defaults to 'My Words'

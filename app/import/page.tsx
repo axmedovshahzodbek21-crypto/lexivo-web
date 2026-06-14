@@ -20,7 +20,7 @@ const LANGUAGES = [
 ];
 
 function buildPrompt1(wordLang: string, transLang: string): string {
-  return `I have a list of ${wordLang} words I want to learn. For each word, provide the translation in ${transLang}, a short definition in ${wordLang}, and 2 example sentences in ${wordLang}.
+  return `I have a list of ${wordLang} words I want to learn. For each word, provide the translation in ${transLang}, a short definition in ${wordLang}, and 2 example sentences in ${wordLang} with their ${transLang} translations.
 
 Format EXACTLY like this for every word. Use plain text only — no markdown, no bold, no asterisks, no extra formatting:
 
@@ -28,17 +28,19 @@ word: enormous
 translation: ulkan
 definition: extremely large in size or extent
 example1: The enormous building towered above the city.
+example1Translation: Ulkan bino shahar ustida baland turardi.
 example2: She faced an enormous challenge at work.
+example2Translation: U ishda ulkan muammoga duch keldi.
 ---
 
-Important: the example above uses English only to show the format. In your actual response, write the definition and example sentences in ${wordLang}.
+Important: the example above uses English/Uzbek only to show the format. In your actual response, write the definition and examples in ${wordLang}, and the translations in ${transLang}.
 
 Here are my words:
 [PASTE YOUR WORDS HERE, one per line]`;
 }
 
 function buildPrompt2(wordLang: string, transLang: string): string {
-  return `I have ${wordLang}-${transLang} word pairs. For each pair, keep my translation exactly as written. Add a short definition in ${wordLang} and 2 example sentences in ${wordLang}.
+  return `I have ${wordLang}-${transLang} word pairs. For each pair, keep my translation exactly as written. Add a short definition in ${wordLang} and 2 example sentences in ${wordLang} with their ${transLang} translations.
 
 Format EXACTLY like this for every word. Use plain text only — no markdown, no bold, no asterisks, no extra formatting:
 
@@ -46,10 +48,12 @@ word: enormous
 translation: ulkan
 definition: extremely large in size or extent
 example1: The enormous building towered above the city.
+example1Translation: Ulkan bino shahar ustida baland turardi.
 example2: She faced an enormous challenge at work.
+example2Translation: U ishda ulkan muammoga duch keldi.
 ---
 
-Important: the example above uses English only to show the format. In your actual response, write the definition and example sentences in ${wordLang}.
+Important: the example above uses English/Uzbek only to show the format. In your actual response, write the definition and examples in ${wordLang}, and the translations in ${transLang}.
 
 Here are my pairs (word - translation):
 [PASTE YOUR PAIRS HERE, one per line]`;
@@ -74,7 +78,9 @@ function parseOutput(text: string, langCode: string): ImportedWord[] {
       translation: fields.translation,
       definition: fields.definition ?? '',
       example1: fields.example1 ?? '',
+      example1Translation: fields.example1translation ?? '',
       example2: fields.example2 ?? '',
+      example2Translation: fields.example2translation ?? '',
       language: langCode,
       addedAt: Date.now(),
     });
@@ -273,7 +279,9 @@ function ImportPageInner() {
                     </div>
                     {w.definition && <p className="text-xs text-[var(--text-muted)]">{w.definition}</p>}
                     {w.example1 && <p className="text-xs italic text-[var(--text)]">"{w.example1}"</p>}
+                    {w.example1Translation && <p className="text-xs text-[var(--text-muted)] pl-2">↳ {w.example1Translation}</p>}
                     {w.example2 && <p className="text-xs italic text-[var(--text)]">"{w.example2}"</p>}
+                    {w.example2Translation && <p className="text-xs text-[var(--text-muted)] pl-2">↳ {w.example2Translation}</p>}
                   </div>
                 ))}
               </div>

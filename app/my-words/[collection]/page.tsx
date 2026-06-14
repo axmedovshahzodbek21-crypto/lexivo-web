@@ -109,7 +109,9 @@ export default function CollectionDetailPage({ params }: Props) {
                       <p className="text-sm font-medium text-[var(--primary)] mt-0.5">{w.translation}</p>
                       {w.definition && <p className="text-xs text-[var(--text-muted)] mt-1">{w.definition}</p>}
                       {w.example1 && <p className="text-xs italic text-[var(--text)] mt-1">"{w.example1}"</p>}
+                      {w.example1Translation && <p className="text-xs text-[var(--text-muted)] pl-2">↳ {w.example1Translation}</p>}
                       {w.example2 && <p className="text-xs italic text-[var(--text)] mt-0.5">"{w.example2}"</p>}
+                      {w.example2Translation && <p className="text-xs text-[var(--text-muted)] pl-2">↳ {w.example2Translation}</p>}
                     </div>
                     <button
                       onClick={() => handleDelete(w.word)}
