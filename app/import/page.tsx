@@ -285,7 +285,7 @@ function ImportPageInner() {
                 disabled={added}
                 className="w-full py-3 rounded-xl bg-[var(--primary)] text-white font-bold text-sm disabled:opacity-60 transition-opacity hover:opacity-90"
               >
-                {added ? t.import.added(parsed.length) : t.import.addBtn(parsed.length)}
+                {added ? t.import.added(parsed.length) : t.import.addBtn(parsed.length, collectionName.trim() || 'My Words')}
               </button>
             )}
           </div>
