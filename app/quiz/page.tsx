@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { speak } from '@/lib/speech';
-import { addXP, recordStudySession, markQuizComplete, unlockAchievement, getStarredWords, getCustomListWords, getSettings, getUnitProgress } from '@/lib/storage';
+import { addXP, recordStudySession, markQuizComplete, unlockAchievement, getStarredWords, getCustomListWords, getSettings, getUnitProgress, getImportedWords } from '@/lib/storage';
 import { fireConfetti } from '@/lib/confetti';
 import { checkAchievements } from '@/lib/gamification';
 import type { WordItem, WordCollection, QuizType } from '@/lib/types';
@@ -113,6 +113,7 @@ function QuizPage() {
   const dayNumber = dayParam ? parseInt(dayParam) : undefined;
   const starredOnly = searchParams.get('starred') === 'true';
   const listId      = searchParams.get('list') ?? undefined;
+  const sourceMyWords = searchParams.get('source') === 'my-words';
   const { collections, collectionsLoaded, pushAchievement, setPendingLevelUp } = useAppStore();
 
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
@@ -142,10 +143,37 @@ function QuizPage() {
   }, [collectionName, dayNumber, router]);
 
   useEffect(() => {
+    if (sourceMyWords) {
+      const imported = getImportedWords();
+      const allWords: QuizWord[] = imported.map(w => ({
+        word: w.word, partOfSpeech: '', pronunciation: '',
+        translation: w.translation, definition: w.definition,
+        example1: w.example1, example1Situation: '',
+        example2: w.example2, example2Situation: '',
+        example3: '', example3Translation: '', example3Situation: '',
+        collectionName: 'my-words', topic: 'My Words', dayNumber: 0,
+      }));
+      const words = shuffle(allWords);
+      const types: QuizType[] = ['word_to_translation', 'translation_to_word', 'definition_to_word'];
+      const qs: QuizQuestion[] = words.map((word, i): QuizQuestion => {
+        const type = types[i % 3];
+        let prompt = '';
+        let correct = '';
+        if (type === 'word_to_translation') { prompt = word.word; correct = word.translation; }
+        else if (type === 'translation_to_word') { prompt = word.translation; correct = word.word; }
+        else { prompt = word.definition || word.word; correct = word.word; }
+        const pool = allWords.filter(w => w.word !== word.word).map(w => type === 'word_to_translation' ? w.translation : w.word);
+        const wrongs = shuffle([...new Set(pool)]).slice(0, 3);
+        const options = shuffle([correct, ...wrongs]);
+        return { word, type, prompt, correct, options };
+      });
+      setQuestions(qs);
+      return;
+    }
     if (collectionsLoaded && collections.length > 0) {
       setQuestions(buildQuiz(collections, collectionName, dayNumber, starredOnly, listId, quizDirection));
     }
-  }, [collectionsLoaded, collections, collectionName, dayNumber, starredOnly, listId, quizDirection]);
+  }, [collectionsLoaded, collections, collectionName, dayNumber, starredOnly, listId, quizDirection, sourceMyWords]);
 
   const current = questions[index];
 
@@ -210,7 +238,7 @@ function QuizPage() {
     }
   }, [index, questions, correct, selected, current, collectionName, pushAchievement, setPendingLevelUp]);
 
-  if (!collectionName && !starredOnly && !listId) return <UnitPicker mode="quiz" />;
+  if (!collectionName && !starredOnly && !listId && !sourceMyWords) return <UnitPicker mode="quiz" />;
 
   if (!collectionsLoaded) return <Loading />;
   if (questions.length === 0) return (
@@ -223,7 +251,7 @@ function QuizPage() {
 
   if (done) {
     const score = Math.round((correct / questions.length) * 100);
-    const backUrl = starredOnly ? '/starred' : collectionName ? `/collections/${encodeURIComponent(collectionName)}` : '/';
+    const backUrl = starredOnly ? '/starred' : sourceMyWords ? '/my-words' : collectionName ? `/collections/${encodeURIComponent(collectionName)}` : '/';
     return (
       <div className="p-6 text-center flex flex-col items-center justify-center min-h-screen animate-fade-in">
         <div className="text-6xl mb-4">{score === 100 ? '🏆' : score >= 80 ? '🎉' : score >= 50 ? '👍' : '💪'}</div>
@@ -246,7 +274,7 @@ function QuizPage() {
           )}
           <div className="flex gap-3">
             <button
-              onClick={() => { setIndex(0); setSelected(null); setState('idle'); setCorrect(0); setWrongQuestions([]); setDone(false); setQuestions(buildQuiz(collections, collectionName, dayNumber, starredOnly, listId)); }}
+              onClick={() => { setIndex(0); setSelected(null); setState('idle'); setCorrect(0); setWrongQuestions([]); setDone(false); if (!sourceMyWords) setQuestions(buildQuiz(collections, collectionName, dayNumber, starredOnly, listId)); }}
               className="btn-secondary flex-1"
             >{t.common.retry}</button>
             <Link href={backUrl} className="btn-primary flex-1 text-center">{t.common.back}</Link>
