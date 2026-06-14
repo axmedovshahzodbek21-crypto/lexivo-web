@@ -64,9 +64,6 @@ export function getSettings(): UserSettings {
 }
 
 export function saveSettings(s: UserSettings) {
-  if (typeof window !== 'undefined') {
-    console.log('[lang] saveSettings uiLanguage=', s.uiLanguage, new Error().stack?.split('\n').slice(1,3).join(' | '));
-  }
   set(KEYS.settings, s);
 }
 
