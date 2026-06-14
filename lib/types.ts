@@ -69,6 +69,7 @@ export interface UserSettings {
   studyOrder: 'random' | 'in-order';
   quizDirection: 'word-to-uz' | 'uz-to-word';
   reduceMotion: boolean;
+  uiLanguage: 'en' | 'uz';
 }
 
 export interface CustomList {

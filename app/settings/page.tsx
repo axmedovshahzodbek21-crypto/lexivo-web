@@ -15,7 +15,7 @@ import type { UserSettings } from '@/lib/types';
 
 export default function SettingsPage() {
   const router = useRouter();
-  const [settings, setSettings] = useState<UserSettings>({ name: '', dailyGoal: 10, languageLevel: 'B1', defaultAccent: 'us', autoPlayOnReveal: true, sessionSize: 20, fontSize: 'normal', studyOrder: 'random', quizDirection: 'word-to-uz', reduceMotion: false });
+  const [settings, setSettings] = useState<UserSettings>({ name: '', dailyGoal: 10, languageLevel: 'B1', defaultAccent: 'us', autoPlayOnReveal: true, sessionSize: 20, fontSize: 'normal', studyOrder: 'random', quizDirection: 'word-to-uz', reduceMotion: false, uiLanguage: 'en' });
   const [saved, setSaved] = useState(false);
   const [theme, setThemeState] = useState<Theme>('light');
   const [notif, setNotif] = useState<NotifSettings>({ enabled: false, time: '20:00' });
@@ -376,7 +376,25 @@ export default function SettingsPage() {
 
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-[var(--text)]">Reduce Motion</p>
+            <p className="text-sm font-medium text-[var(--text)]">🌐 Interface Language</p>
+            <p className="text-xs text-[var(--text-muted)] mt-0.5">App display language</p>
+          </div>
+          <div className="flex rounded-xl overflow-hidden border border-[var(--border)]">
+            {(['en', 'uz'] as const).map(lang => (
+              <button
+                key={lang}
+                onClick={() => setSettings(s => ({ ...s, uiLanguage: lang }))}
+                className={`px-4 py-2 text-sm font-semibold transition-colors ${settings.uiLanguage === lang ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface)] text-[var(--text-muted)] hover:bg-[var(--surface-2)]'}`}
+              >
+                {lang === 'en' ? '🇬🇧 English' : "🇺🇿 O'zbek"}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div>
+          <p className="text-sm font-medium text-[var(--text)]">Reduce Motion</p>
             <p className="text-xs text-[var(--text-muted)] mt-0.5">Disables slide &amp; fade animations</p>
           </div>
           <button

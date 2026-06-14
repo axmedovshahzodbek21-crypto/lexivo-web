@@ -55,6 +55,7 @@ const SETTINGS_DEFAULTS: UserSettings = {
   studyOrder: 'random',
   quizDirection: 'word-to-uz',
   reduceMotion: false,
+  uiLanguage: 'en',
 };
 
 export function getSettings(): UserSettings {
