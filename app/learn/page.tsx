@@ -16,7 +16,7 @@ import type { Accent } from '@/lib/speech';
 import { checkAchievements } from '@/lib/gamification';
 import type { WordItem, WordCollection } from '@/lib/types';
 import { XP_PER_LEARN } from '@/lib/types';
-import { getImportedWords } from '@/lib/storage';
+import { getImportedWords, getImportedWordsByCollection } from '@/lib/storage';
 import Link from 'next/link';
 import UnitPicker from '@/components/UnitPicker';
 import TiltCard from '@/components/TiltCard';
@@ -68,6 +68,7 @@ function LearnPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const sourceMyWords = searchParams.get('source') === 'my-words';
+  const myCollection = searchParams.get('myCollection') ?? undefined;
   const collectionName = searchParams.get('collection') ?? undefined;
   const dayParam = searchParams.get('day');
   const dayNumber = dayParam ? parseInt(dayParam) : undefined;
@@ -113,7 +114,7 @@ function LearnPage() {
 
   useEffect(() => {
     if (sourceMyWords) {
-      const imported = getImportedWords();
+      const imported = myCollection ? getImportedWordsByCollection(myCollection) : getImportedWords();
       const list: StudyWord[] = imported.map(w => ({
         word: w.word,
         partOfSpeech: '',
@@ -129,7 +130,7 @@ function LearnPage() {
         example3Situation: '',
         language: w.language,
         collectionName: 'my-words',
-        topic: 'My Words',
+        topic: myCollection ?? 'My Words',
         dayNumber: 0,
       }));
       const shuffled = studyOrder === 'random'
@@ -263,7 +264,7 @@ function LearnPage() {
   }
 
   if (done) {
-    const backUrl = hardOnly ? '/hard-words' : sourceMyWords ? '/my-words' : collectionName ? `/collections/${encodeURIComponent(collectionName)}` : '/';
+    const backUrl = hardOnly ? '/hard-words' : sourceMyWords ? (myCollection ? `/my-words/${encodeURIComponent(myCollection)}` : '/my-words') : collectionName ? `/collections/${encodeURIComponent(collectionName)}` : '/';
     return (
       <SessionDone
         sessionCount={sessionCount}

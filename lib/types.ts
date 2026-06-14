@@ -88,6 +88,13 @@ export interface ImportedWord {
   example2: string;
   language: string; // BCP-47 e.g. 'en-US', 'ru-RU'
   addedAt: number;
+  collectionName?: string; // optional for backward compat; defaults to 'My Words'
+}
+
+export interface ImportedCollection {
+  name: string;
+  count: number;
+  addedAt: number;
 }
 
 export type QuizType = 'word_to_translation' | 'translation_to_word' | 'definition_to_word';

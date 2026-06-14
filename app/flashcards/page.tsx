@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { speak, speakText } from '@/lib/speech';
-import { addXP, recordStudySession, markFlashcardComplete, getStarredWords, getHardWords, getCustomListWords, getUnitProgress, saveFlashcardProgress, getFlashcardProgress, clearFlashcardProgress, getImportedWords } from '@/lib/storage';
+import { addXP, recordStudySession, markFlashcardComplete, getStarredWords, getHardWords, getCustomListWords, getUnitProgress, saveFlashcardProgress, getFlashcardProgress, clearFlashcardProgress, getImportedWords, getImportedWordsByCollection } from '@/lib/storage';
 import { checkAchievements } from '@/lib/gamification';
 import type { WordItem, WordCollection } from '@/lib/types';
 import Link from 'next/link';
@@ -74,6 +74,7 @@ function FlashcardsPage() {
   const listId      = searchParams.get('list') ?? undefined;
   const fresh       = searchParams.get('fresh') === 'true';
   const sourceMyWords = searchParams.get('source') === 'my-words';
+  const myCollection = searchParams.get('myCollection') ?? undefined;
   const { collections, collectionsLoaded, pushAchievement, setPendingLevelUp, focusMode, setFocusMode } = useAppStore();
 
   const t = useTranslation();
@@ -96,7 +97,7 @@ function FlashcardsPage() {
 
   useEffect(() => {
     if (sourceMyWords) {
-      const imported = getImportedWords();
+      const imported = myCollection ? getImportedWordsByCollection(myCollection) : getImportedWords();
       const list: StudyWord[] = imported.map(w => ({
         word: w.word, partOfSpeech: '', pronunciation: '',
         translation: w.translation, definition: w.definition,
@@ -104,7 +105,7 @@ function FlashcardsPage() {
         example2: w.example2, example2Situation: '',
         example3: '', example3Translation: '', example3Situation: '',
         language: w.language,
-        collectionName: 'my-words', topic: 'My Words', dayNumber: 0,
+        collectionName: 'my-words', topic: myCollection ?? 'My Words', dayNumber: 0,
       }));
       for (let i = list.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [list[i], list[j]] = [list[j], list[i]]; }
       setDeck(list);
@@ -226,7 +227,7 @@ function FlashcardsPage() {
           )}
           <div className="flex gap-3">
             <button onClick={() => { setIndex(0); setSide('front'); setKnown(0); setUnknown(0); setUnknownWords([]); setDone(false); }} className="btn-secondary flex-1">{t.common.again}</button>
-            <Link href={starredOnly ? '/starred' : hardOnly ? '/hard-words' : sourceMyWords ? '/my-words' : collectionName ? `/collections/${encodeURIComponent(collectionName)}` : '/'} className="btn-primary flex-1 text-center">{t.common.back}</Link>
+            <Link href={starredOnly ? '/starred' : hardOnly ? '/hard-words' : sourceMyWords ? (myCollection ? `/my-words/${encodeURIComponent(myCollection)}` : '/my-words') : collectionName ? `/collections/${encodeURIComponent(collectionName)}` : '/'} className="btn-primary flex-1 text-center">{t.common.back}</Link>
           </div>
         </div>
       </div>

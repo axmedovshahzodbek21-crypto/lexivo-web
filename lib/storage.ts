@@ -1,4 +1,4 @@
-import type { SRSWord, LearnedWord, UnitProgress, UserSettings, Achievement, CustomList, WordItem, WordCollection, ImportedWord } from './types';
+import type { SRSWord, LearnedWord, UnitProgress, UserSettings, Achievement, CustomList, WordItem, WordCollection, ImportedWord, ImportedCollection } from './types';
 import { SRS_INTERVALS, LEVEL_THRESHOLDS } from './types';
 
 function levelForXp(xp: number): string {
@@ -410,20 +410,43 @@ export function deleteCustomList(id: string) {
 // ─── Imported Words ──────────────────────────────────────────────────────────
 
 const IMPORTED_KEY = 'lexivo_imported_words';
+const DEFAULT_COLLECTION = 'My Words';
 
 export function getImportedWords(): ImportedWord[] {
-  return get<ImportedWord[]>(IMPORTED_KEY, []);
+  return get<ImportedWord[]>(IMPORTED_KEY, []).map(w =>
+    w.collectionName ? w : { ...w, collectionName: DEFAULT_COLLECTION }
+  );
 }
 
-export function addImportedWords(words: ImportedWord[]) {
+export function getImportedWordsByCollection(collectionName: string): ImportedWord[] {
+  return getImportedWords().filter(w => w.collectionName === collectionName);
+}
+
+export function getImportedCollections(): ImportedCollection[] {
+  const words = getImportedWords();
+  const map = new Map<string, { count: number; addedAt: number }>();
+  for (const w of words) {
+    const name = w.collectionName!;
+    const entry = map.get(name);
+    if (!entry) map.set(name, { count: 1, addedAt: w.addedAt });
+    else entry.count++;
+  }
+  return Array.from(map.entries())
+    .map(([name, { count, addedAt }]) => ({ name, count, addedAt }))
+    .sort((a, b) => b.addedAt - a.addedAt);
+}
+
+export function addImportedWords(words: ImportedWord[], collectionName: string) {
   const existing = getImportedWords();
   const existingSet = new Set(existing.map(w => w.word.toLowerCase().trim()));
-  const fresh = words.filter(w => !existingSet.has(w.word.toLowerCase().trim()));
+  const fresh = words
+    .filter(w => !existingSet.has(w.word.toLowerCase().trim()))
+    .map(w => ({ ...w, collectionName }));
   set(IMPORTED_KEY, [...existing, ...fresh]);
 }
 
-export function deleteImportedWord(word: string) {
-  set(IMPORTED_KEY, getImportedWords().filter(w => w.word !== word));
+export function deleteImportedWord(word: string, collectionName: string) {
+  set(IMPORTED_KEY, getImportedWords().filter(w => !(w.word === word && w.collectionName === collectionName)));
 }
 
 export function saveImportedWords(words: ImportedWord[]) {

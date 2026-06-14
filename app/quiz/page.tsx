@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { speak, speakText } from '@/lib/speech';
-import { addXP, recordStudySession, markQuizComplete, unlockAchievement, getStarredWords, getCustomListWords, getSettings, getUnitProgress, getImportedWords } from '@/lib/storage';
+import { addXP, recordStudySession, markQuizComplete, unlockAchievement, getStarredWords, getCustomListWords, getSettings, getUnitProgress, getImportedWords, getImportedWordsByCollection } from '@/lib/storage';
 import { fireConfetti } from '@/lib/confetti';
 import { checkAchievements } from '@/lib/gamification';
 import type { WordItem, WordCollection, QuizType } from '@/lib/types';
@@ -114,6 +114,7 @@ function QuizPage() {
   const starredOnly = searchParams.get('starred') === 'true';
   const listId      = searchParams.get('list') ?? undefined;
   const sourceMyWords = searchParams.get('source') === 'my-words';
+  const myCollection = searchParams.get('myCollection') ?? undefined;
   const { collections, collectionsLoaded, pushAchievement, setPendingLevelUp } = useAppStore();
 
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
@@ -144,7 +145,7 @@ function QuizPage() {
 
   useEffect(() => {
     if (sourceMyWords) {
-      const imported = getImportedWords();
+      const imported = myCollection ? getImportedWordsByCollection(myCollection) : getImportedWords();
       const allWords: QuizWord[] = imported.map(w => ({
         word: w.word, partOfSpeech: '', pronunciation: '',
         translation: w.translation, definition: w.definition,
@@ -152,7 +153,7 @@ function QuizPage() {
         example2: w.example2, example2Situation: '',
         example3: '', example3Translation: '', example3Situation: '',
         language: w.language,
-        collectionName: 'my-words', topic: 'My Words', dayNumber: 0,
+        collectionName: 'my-words', topic: myCollection ?? 'My Words', dayNumber: 0,
       }));
       const words = shuffle(allWords);
       const types: QuizType[] = ['word_to_translation', 'translation_to_word', 'definition_to_word'];
@@ -252,7 +253,7 @@ function QuizPage() {
 
   if (done) {
     const score = Math.round((correct / questions.length) * 100);
-    const backUrl = starredOnly ? '/starred' : sourceMyWords ? '/my-words' : collectionName ? `/collections/${encodeURIComponent(collectionName)}` : '/';
+    const backUrl = starredOnly ? '/starred' : sourceMyWords ? (myCollection ? `/my-words/${encodeURIComponent(myCollection)}` : '/my-words') : collectionName ? `/collections/${encodeURIComponent(collectionName)}` : '/';
     return (
       <div className="p-6 text-center flex flex-col items-center justify-center min-h-screen animate-fade-in">
         <div className="text-6xl mb-4">{score === 100 ? '🏆' : score >= 80 ? '🎉' : score >= 50 ? '👍' : '💪'}</div>

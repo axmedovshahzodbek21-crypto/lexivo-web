@@ -1,6 +1,6 @@
 'use client';
-import { useState, useMemo, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useMemo, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslation } from '@/lib/useTranslation';
 import { addImportedWords } from '@/lib/storage';
 import type { ImportedWord } from '@/lib/types';
@@ -82,10 +82,14 @@ function parseOutput(text: string, langCode: string): ImportedWord[] {
   return result;
 }
 
-export default function ImportPage() {
+function ImportPageInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const t = useTranslation();
 
+  const prefilledCollection = searchParams.get('collection') ?? '';
+
+  const [collectionName, setCollectionName] = useState(prefilledCollection);
   const [wordLang, setWordLang] = useState('English');
   const [transLang, setTransLang] = useState('Uzbek');
   const [wordLangCode, setWordLangCode] = useState('en-US');
@@ -113,9 +117,10 @@ export default function ImportPage() {
   }
 
   function handleAdd() {
-    addImportedWords(parsed);
+    const name = collectionName.trim() || 'My Words';
+    addImportedWords(parsed, name);
     setAdded(true);
-    setTimeout(() => router.push('/my-words'), 1200);
+    setTimeout(() => router.push(`/my-words/${encodeURIComponent(name)}`), 1200);
   }
 
   return (
@@ -140,11 +145,7 @@ export default function ImportPage() {
                 </div>
               ))}
             </div>
-            <button
-              onClick={() => setShowHelp(false)}
-              className="w-full py-3 rounded-2xl font-bold text-sm text-white"
-              style={{ background: 'var(--primary)' }}
-            >
+            <button onClick={() => setShowHelp(false)} className="w-full py-3 rounded-2xl font-bold text-sm text-white" style={{ background: 'var(--primary)' }}>
               {t.import.tutorialGotIt}
             </button>
           </div>
@@ -158,6 +159,18 @@ export default function ImportPage() {
       </div>
 
       <div className="p-4 space-y-4">
+
+        {/* Collection name */}
+        <div className="card space-y-2">
+          <label className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide block">Collection name</label>
+          <input
+            type="text"
+            value={collectionName}
+            onChange={e => setCollectionName(e.target.value)}
+            placeholder="e.g. Russian B1, Korean Verbs…"
+            className="w-full px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+          />
+        </div>
 
         {/* Language selectors */}
         <div className="card space-y-3">
@@ -203,10 +216,7 @@ export default function ImportPage() {
               <pre className="text-xs bg-[var(--surface-2)] rounded-xl p-3 whitespace-pre-wrap text-[var(--text)] leading-relaxed overflow-x-auto">
                 {buildPrompt1(wordLang, transLang)}
               </pre>
-              <button
-                onClick={() => copy(buildPrompt1(wordLang, transLang), 1)}
-                className="w-full py-2 rounded-xl bg-[var(--primary)] text-white text-sm font-semibold transition-opacity hover:opacity-90"
-              >
+              <button onClick={() => copy(buildPrompt1(wordLang, transLang), 1)} className="w-full py-2 rounded-xl bg-[var(--primary)] text-white text-sm font-semibold transition-opacity hover:opacity-90">
                 {copied1 ? t.import.copied : t.import.copyPrompt}
               </button>
             </div>
@@ -227,10 +237,7 @@ export default function ImportPage() {
               <pre className="text-xs bg-[var(--surface-2)] rounded-xl p-3 whitespace-pre-wrap text-[var(--text)] leading-relaxed overflow-x-auto">
                 {buildPrompt2(wordLang, transLang)}
               </pre>
-              <button
-                onClick={() => copy(buildPrompt2(wordLang, transLang), 2)}
-                className="w-full py-2 rounded-xl bg-[var(--primary)] text-white text-sm font-semibold transition-opacity hover:opacity-90"
-              >
+              <button onClick={() => copy(buildPrompt2(wordLang, transLang), 2)} className="w-full py-2 rounded-xl bg-[var(--primary)] text-white text-sm font-semibold transition-opacity hover:opacity-90">
                 {copied2 ? t.import.copied : t.import.copyPrompt}
               </button>
             </div>
@@ -286,5 +293,13 @@ export default function ImportPage() {
 
       </div>
     </div>
+  );
+}
+
+export default function ImportPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="text-4xl animate-bounce">✨</div></div>}>
+      <ImportPageInner />
+    </Suspense>
   );
 }
