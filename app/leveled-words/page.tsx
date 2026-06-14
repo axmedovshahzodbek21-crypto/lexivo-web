@@ -30,7 +30,7 @@ export default function LeveledWordsPage() {
         {/* Foundation — A1 · A2 · B1 */}
         <Link
           href="/leveled-words/foundation"
-          className="flex items-center gap-4 p-5 rounded-2xl bg-[var(--card)] border-2 cursor-pointer hover:opacity-90 transition-opacity"
+          className="flex items-center gap-4 p-5 rounded-2xl bg-[var(--surface)] border-2 cursor-pointer hover:opacity-90 transition-opacity"
           style={{
             borderColor: 'rgba(46,204,113,0.35)',
             boxShadow: '0 4px 14px rgba(46,204,113,0.14)',
@@ -53,7 +53,7 @@ export default function LeveledWordsPage() {
         {/* Advanced — B2 · C1 · C2 */}
         <Link
           href="/collections/Advanced"
-          className="flex items-center gap-4 p-5 rounded-2xl bg-[var(--card)] border-2 cursor-pointer hover:opacity-90 transition-opacity"
+          className="flex items-center gap-4 p-5 rounded-2xl bg-[var(--surface)] border-2 cursor-pointer hover:opacity-90 transition-opacity"
           style={{
             borderColor: 'rgba(155,89,182,0.35)',
             boxShadow: '0 4px 14px rgba(155,89,182,0.14)',

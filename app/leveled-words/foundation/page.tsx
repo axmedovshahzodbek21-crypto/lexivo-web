@@ -54,7 +54,7 @@ export default function FoundationPage() {
             <Link
               key={level.name}
               href={`/collections/${encodeURIComponent(level.name)}`}
-              className="flex items-center gap-4 p-5 rounded-2xl bg-[var(--card)] border-2 cursor-pointer hover:opacity-90 transition-opacity"
+              className="flex items-center gap-4 p-5 rounded-2xl bg-[var(--surface)] border-2 cursor-pointer hover:opacity-90 transition-opacity"
               style={{
                 borderColor: `${level.color}50`,
                 boxShadow: `0 4px 14px ${level.color}22`,

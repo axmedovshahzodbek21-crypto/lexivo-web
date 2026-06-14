@@ -173,7 +173,7 @@ function StepName({
           onKeyDown={e => e.key === 'Enter' && onNext()}
           placeholder={t.onboarding.namePlaceholder}
           maxLength={30}
-          className="w-full px-4 py-4 rounded-2xl text-lg font-semibold text-center border-2 border-[var(--border)] bg-[var(--card)] text-[var(--text)] outline-none transition-colors focus:border-[var(--primary)]"
+          className="w-full px-4 py-4 rounded-2xl text-lg font-semibold text-center border-2 border-[var(--border)] bg-[var(--surface)] text-[var(--text)] outline-none transition-colors focus:border-[var(--primary)]"
         />
         {name.trim() && (
           <p className="text-center text-sm mt-3 animate-fade-in" style={{ color: 'var(--primary)' }}>

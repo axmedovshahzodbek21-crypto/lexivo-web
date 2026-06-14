@@ -59,7 +59,7 @@ export default function Navigation() {
     <>
       {/* ── Mobile: fixed bottom tab bar ── */}
       <nav
-        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[var(--card)] border-t border-[var(--border)] flex justify-around items-center py-2 px-1 shadow-lg"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[var(--surface)] border-t border-[var(--border)] flex justify-around items-center py-2 px-1 shadow-lg"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
         {NAV_HREFS.map(({ href, icon, key }) => {
@@ -80,7 +80,7 @@ export default function Navigation() {
       </nav>
 
       {/* ── Desktop: persistent left sidebar ── */}
-      <aside className="hidden md:flex flex-col w-52 shrink-0 border-r border-[var(--border)] bg-[var(--card)] sticky top-0 h-screen overflow-y-auto z-30">
+      <aside className="hidden md:flex flex-col w-52 shrink-0 border-r border-[var(--border)] bg-[var(--surface)] sticky top-0 h-screen overflow-y-auto z-30">
         {/* Brand */}
         <div className="px-5 pt-6 pb-4">
           <span className="text-2xl font-black tracking-tight" style={{ color: 'var(--primary)' }}>Lexivo</span>

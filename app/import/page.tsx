@@ -171,7 +171,7 @@ export default function ImportPage() {
                   setWordLang(e.target.value);
                   if (lang) setWordLangCode(lang.code);
                 }}
-                className="w-full px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--card)] text-[var(--text)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+                className="w-full px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
               >
                 {LANGUAGES.map(l => <option key={l.code}>{l.label}</option>)}
               </select>
@@ -181,7 +181,7 @@ export default function ImportPage() {
               <select
                 value={transLang}
                 onChange={e => setTransLang(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--card)] text-[var(--text)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+                className="w-full px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
               >
                 {LANGUAGES.map(l => <option key={l.code}>{l.label}</option>)}
               </select>
