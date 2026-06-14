@@ -79,6 +79,16 @@ export interface CustomList {
   words: string[];   // word.word values
 }
 
+export interface ImportedWord {
+  word: string;
+  translation: string;
+  definition: string;
+  example1: string;
+  example2: string;
+  language: string; // BCP-47 e.g. 'en-US', 'ru-RU'
+  addedAt: number;
+}
+
 export type QuizType = 'word_to_translation' | 'translation_to_word' | 'definition_to_word';
 export type FlashcardSide = 'word' | 'translation' | 'definition';
 

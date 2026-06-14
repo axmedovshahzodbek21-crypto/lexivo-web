@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/lib/useTranslation';
 import { useAppStore } from '@/lib/store';
 import { getWordOfDay } from '@/lib/data';
-import { getStreak, getXP, getTodayXP, getTodayLearnedCount, getDueWords, getLearnedWords, getSettings, isOnboarded, getFreezes, checkAndGrantWeeklyFreeze } from '@/lib/storage';
+import { getStreak, getXP, getTodayXP, getTodayLearnedCount, getDueWords, getLearnedWords, getSettings, isOnboarded, getFreezes, checkAndGrantWeeklyFreeze, getImportedWords } from '@/lib/storage';
 import { getLevelInfo } from '@/lib/gamification';
 import { speak } from '@/lib/speech';
 import { getTheme, toggleTheme, type Theme } from '@/lib/theme';
@@ -33,6 +33,7 @@ export default function HomePage() {
   const [learnedCount, setLearnedCount] = useState(0);
   const [settings, setSettings] = useState<UserSettings>({ name: 'Learner', dailyGoal: 10, languageLevel: 'B1', defaultAccent: 'us', autoPlayOnReveal: true, sessionSize: 20, fontSize: 'normal', studyOrder: 'random', quizDirection: 'word-to-uz', reduceMotion: false, uiLanguage: 'en' });
   const [freezes, setFreezes] = useState(0);
+  const [importedCount, setImportedCount] = useState(0);
   const [wodRevealed, setWodRevealed] = useState(false);
   const [theme, setThemeState] = useState<Theme>('light');
   const [showXpModal, setShowXpModal] = useState(false);
@@ -49,6 +50,7 @@ export default function HomePage() {
     setLearnedCount(getLearnedWords().length);
     setSettings(getSettings());
     setThemeState(getTheme());
+    setImportedCount(getImportedWords().length);
   }, [router]);
 
   useEffect(() => {
@@ -118,6 +120,23 @@ export default function HomePage() {
       <div>
         <h2 className="font-semibold text-[var(--text)] text-base mb-3">{t.home.collections}</h2>
         <div className="space-y-3">
+          {/* My Words — shown only if user has imported words */}
+          {importedCount > 0 && (
+            <TiltCard className="card overflow-hidden hover:border-[var(--primary)] transition-colors" intensity={6}>
+              <Link href="/my-words" className="flex items-center gap-4" style={{ margin: '-20px', padding: '20px' }}>
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0 animate-float-icon" style={{ background: 'rgba(108,99,255,0.12)' }}>
+                  ✍️
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-bold text-[var(--text)] text-sm">{t.myWords.title}</div>
+                  <div className="text-xs text-[var(--text-muted)] mt-0.5">{t.myWords.subtitle}</div>
+                  <div className="text-xs text-[var(--text-muted)] mt-1">{t.myWords.wordCount(importedCount)}</div>
+                </div>
+                <span className="flex-shrink-0 text-sm font-semibold" style={{ color: 'var(--primary)' }}>→</span>
+              </Link>
+            </TiltCard>
+          )}
+
           {/* Curated collections first */}
           {mainCollections.map(col => {
             const meta = COLLECTION_META[col.name] ?? { icon: '📖', color: '#6C63FF', desc: col.description };

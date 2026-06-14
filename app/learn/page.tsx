@@ -16,6 +16,7 @@ import type { Accent } from '@/lib/speech';
 import { checkAchievements } from '@/lib/gamification';
 import type { WordItem, WordCollection } from '@/lib/types';
 import { XP_PER_LEARN } from '@/lib/types';
+import { getImportedWords } from '@/lib/storage';
 import Link from 'next/link';
 import UnitPicker from '@/components/UnitPicker';
 import TiltCard from '@/components/TiltCard';
@@ -66,6 +67,7 @@ export default function LearnPageWrapper() {
 function LearnPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const sourceMyWords = searchParams.get('source') === 'my-words';
   const collectionName = searchParams.get('collection') ?? undefined;
   const dayParam = searchParams.get('day');
   const dayNumber = dayParam ? parseInt(dayParam) : undefined;
@@ -110,6 +112,31 @@ function LearnPage() {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
+    if (sourceMyWords) {
+      const imported = getImportedWords();
+      const list: StudyWord[] = imported.map(w => ({
+        word: w.word,
+        partOfSpeech: '',
+        pronunciation: '',
+        translation: w.translation,
+        definition: w.definition,
+        example1: w.example1,
+        example1Situation: '',
+        example2: w.example2,
+        example2Situation: '',
+        example3: '',
+        example3Translation: '',
+        example3Situation: '',
+        collectionName: 'my-words',
+        topic: 'My Words',
+        dayNumber: 0,
+      }));
+      const shuffled = studyOrder === 'random'
+        ? [...list].sort(() => Math.random() - 0.5)
+        : list;
+      setWords(shuffled.slice(0, sessionSize));
+      return;
+    }
     if (collectionsLoaded && collections.length > 0) {
       const list = buildStudyList(collections, collectionName, dayNumber, hardOnly, studyOrder);
       const sliced = (dayNumber !== undefined || hardOnly) ? list : list.slice(0, sessionSize);
@@ -119,7 +146,7 @@ function LearnPage() {
         setStartIndexApplied(true);
       }
     }
-  }, [collectionsLoaded, collections, collectionName, dayNumber, hardOnly]);
+  }, [collectionsLoaded, collections, collectionName, dayNumber, hardOnly, sourceMyWords]);
 
   const current = words[index];
 

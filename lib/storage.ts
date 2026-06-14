@@ -1,4 +1,4 @@
-import type { SRSWord, LearnedWord, UnitProgress, UserSettings, Achievement, CustomList, WordItem, WordCollection } from './types';
+import type { SRSWord, LearnedWord, UnitProgress, UserSettings, Achievement, CustomList, WordItem, WordCollection, ImportedWord } from './types';
 import { SRS_INTERVALS, LEVEL_THRESHOLDS } from './types';
 
 function levelForXp(xp: number): string {
@@ -405,6 +405,29 @@ export function saveCustomList(list: CustomList) {
 
 export function deleteCustomList(id: string) {
   set(KEYS.customLists, getCustomLists().filter(l => l.id !== id));
+}
+
+// ─── Imported Words ──────────────────────────────────────────────────────────
+
+const IMPORTED_KEY = 'lexivo_imported_words';
+
+export function getImportedWords(): ImportedWord[] {
+  return get<ImportedWord[]>(IMPORTED_KEY, []);
+}
+
+export function addImportedWords(words: ImportedWord[]) {
+  const existing = getImportedWords();
+  const existingSet = new Set(existing.map(w => w.word.toLowerCase().trim()));
+  const fresh = words.filter(w => !existingSet.has(w.word.toLowerCase().trim()));
+  set(IMPORTED_KEY, [...existing, ...fresh]);
+}
+
+export function deleteImportedWord(word: string) {
+  set(IMPORTED_KEY, getImportedWords().filter(w => w.word !== word));
+}
+
+export function saveImportedWords(words: ImportedWord[]) {
+  set(IMPORTED_KEY, words);
 }
 
 export function addWordToList(listId: string, word: string) {

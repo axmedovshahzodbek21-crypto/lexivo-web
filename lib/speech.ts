@@ -58,3 +58,12 @@ export function stopSpeech() {
 export function isSpeechSupported(): boolean {
   return typeof window !== 'undefined' && 'speechSynthesis' in window;
 }
+
+export function speakText(text: string, langCode: string, rate = 0.9) {
+  if (typeof window === 'undefined' || !window.speechSynthesis) return;
+  if (window.speechSynthesis.getVoices().length > 0) {
+    doSpeak(text, langCode, rate);
+  } else {
+    window.speechSynthesis.addEventListener('voiceschanged', () => doSpeak(text, langCode, rate), { once: true });
+  }
+}
