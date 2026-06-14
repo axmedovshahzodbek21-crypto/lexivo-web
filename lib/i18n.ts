@@ -96,6 +96,9 @@ const en = {
     example: (n: number) => `Example ${n}`,
     wordsToday: (n: number) => `${n} words today`,
     keepGoing: 'Keep going — every word counts',
+    skipped: 'Skipped',
+    skipTipTitle: 'What is Skip?',
+    skipTipBody: 'This word is already part of your active vocabulary — no need to review it on a schedule. It still appears in Flashcards and Quiz.',
   },
   flashcards: {
     title: 'Flashcards',
@@ -464,6 +467,9 @@ const uz: typeof en = {
     example: (n: number) => `Misol ${n}`,
     wordsToday: (n: number) => `Bugun ${n} ta so'z`,
     keepGoing: "Davom eting — har bir so'z muhim",
+    skipped: "O'tkazilgan",
+    skipTipTitle: "Skip nima?",
+    skipTipBody: "Bu so'z allaqachon faol lug'atingizning bir qismi — uni jadval bo'yicha takrorlash shart emas. U Kartochkalar va Testda ko'rinishda qoladi.",
   },
   flashcards: {
     title: 'Kartochkalar',

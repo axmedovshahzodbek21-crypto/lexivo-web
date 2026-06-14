@@ -403,8 +403,8 @@ function LearnPage() {
               <div className="flex items-start gap-2 bg-orange-50 border border-orange-200 rounded-xl px-3 py-2.5 animate-fade-in">
                 <span className="text-base shrink-0 mt-0.5">⏭️</span>
                 <div className="flex-1">
-                  <p className="text-xs font-semibold text-orange-700">What is Skip?</p>
-                  <p className="text-xs text-orange-600 mt-0.5">This word is already part of your active vocabulary — no need to review it on a schedule. It still appears in Flashcards and Quiz.</p>
+                  <p className="text-xs font-semibold text-orange-700">{t.learn.skipTipTitle}</p>
+                  <p className="text-xs text-orange-600 mt-0.5">{t.learn.skipTipBody}</p>
                 </div>
                 <button onClick={dismissSkipTip} className="text-orange-400 hover:text-orange-600 text-sm font-bold shrink-0 mt-0.5">✕</button>
               </div>
@@ -544,7 +544,9 @@ function SessionDone({
         <StatTile icon="🔥" value={streak} label={t.learn.dayStreak} color="#FF6B35" />
         <StatTile icon="😓" value={skipped.length} label={t.learn.hardWords} color={skipped.length > 0 ? '#EF4444' : '#10B981'} />
         {pureSkipped.length > 0 && (
-          <StatTile icon="⏭️" value={pureSkipped.length} label="Skipped" color="#F97316" />
+          <div className="col-span-2">
+            <StatTile icon="⏭️" value={pureSkipped.length} label={t.learn.skipped} color="#F97316" />
+          </div>
         )}
       </div>
 
