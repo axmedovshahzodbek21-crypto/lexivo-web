@@ -16,7 +16,11 @@ import { translations } from '@/lib/i18n';
 
 export default function SettingsPage() {
   const router = useRouter();
-  const [settings, setSettings] = useState<UserSettings>({ name: '', dailyGoal: 10, languageLevel: 'B1', defaultAccent: 'us', autoPlayOnReveal: true, sessionSize: 20, fontSize: 'normal', studyOrder: 'random', quizDirection: 'word-to-uz', reduceMotion: false, uiLanguage: 'en' });
+  const [settings, setSettings] = useState<UserSettings>(() =>
+    typeof window === 'undefined'
+      ? { name: '', dailyGoal: 10, languageLevel: 'B1', defaultAccent: 'us', autoPlayOnReveal: true, sessionSize: 20, fontSize: 'normal', studyOrder: 'random', quizDirection: 'word-to-uz', reduceMotion: false, uiLanguage: 'en' as const }
+      : getSettings()
+  );
   const [saved, setSaved] = useState(false);
   const [theme, setThemeState] = useState<Theme>('light');
   const [notif, setNotif] = useState<NotifSettings>({ enabled: false, time: '20:00' });
@@ -34,7 +38,6 @@ export default function SettingsPage() {
   const [pendingImport, setPendingImport] = useState<string | null>(null);
 
   useEffect(() => {
-    setSettings(getSettings());
     setThemeState(getTheme());
     setNotif(getNotifSettings());
     setPermission(getNotifPermission());
@@ -386,7 +389,14 @@ export default function SettingsPage() {
             {(['en', 'uz'] as const).map(lang => (
               <button
                 key={lang}
-                onClick={() => setSettings(s => ({ ...s, uiLanguage: lang }))}
+                onClick={() => {
+                  const next = { ...settings, uiLanguage: lang };
+                  setSettings(next);
+                  saveSettings(next);
+                  document.cookie = `lexivo_lang=${lang}; path=/; max-age=31536000; SameSite=Lax`;
+                  document.documentElement.dataset.lang = lang;
+                  window.dispatchEvent(new Event('lexivo-lang-change'));
+                }}
                 className={`px-4 py-2 text-sm font-semibold transition-colors ${settings.uiLanguage === lang ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface)] text-[var(--text-muted)] hover:bg-[var(--surface-2)]'}`}
               >
                 {lang === 'en' ? t.settings.langEn : t.settings.langUz}
