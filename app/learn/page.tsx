@@ -208,7 +208,7 @@ function LearnPage() {
         case 'ArrowRight': case 'Enter': case ' ':
           e.preventDefault();
           if (!done) {
-            if (!revealed) setRevealed(true);
+            if (!revealed) { setRevealed(true); dismissSkipTip(); }
             else advanceCard();
           }
           break;
@@ -216,7 +216,7 @@ function LearnPage() {
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [current, done, focusMode, revealed, advanceCard, markTooHard, skipWord]);
+  }, [current, done, focusMode, revealed, advanceCard, markTooHard, skipWord, dismissSkipTip]);
 
   // No unit selected → show picker
   if (!collectionName && !hardOnly) return <UnitPicker mode="learn" />;
