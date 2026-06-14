@@ -20,7 +20,7 @@ const LANGUAGES = [
 ];
 
 function buildPrompt1(wordLang: string, transLang: string): string {
-  return `I have a list of ${wordLang} words I want to learn. For each word, provide the translation in ${transLang}, a short definition in English, and 2 example sentences in ${wordLang}.
+  return `I have a list of ${wordLang} words I want to learn. For each word, provide the translation in ${transLang}, a short definition in ${wordLang}, and 2 example sentences in ${wordLang}.
 
 Format EXACTLY like this for every word. Use plain text only — no markdown, no bold, no asterisks, no extra formatting:
 
@@ -36,7 +36,7 @@ Here are my words:
 }
 
 function buildPrompt2(wordLang: string, transLang: string): string {
-  return `I have ${wordLang}-${transLang} word pairs. For each pair, keep my translation exactly as written. Add a short definition in English and 2 example sentences in ${wordLang}.
+  return `I have ${wordLang}-${transLang} word pairs. For each pair, keep my translation exactly as written. Add a short definition in ${wordLang} and 2 example sentences in ${wordLang}.
 
 Format EXACTLY like this for every word. Use plain text only — no markdown, no bold, no asterisks, no extra formatting:
 
