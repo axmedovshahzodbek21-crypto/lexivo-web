@@ -120,22 +120,24 @@ export default function HomePage() {
       <div>
         <h2 className="font-semibold text-[var(--text)] text-base mb-3">{t.home.collections}</h2>
         <div className="space-y-3">
-          {/* My Words — shown only if user has imported words */}
-          {importedCount > 0 && (
-            <TiltCard className="card overflow-hidden hover:border-[var(--primary)] transition-colors" intensity={6}>
-              <Link href="/my-words" className="flex items-center gap-4" style={{ margin: '-20px', padding: '20px' }}>
-                <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0 animate-float-icon" style={{ background: 'rgba(108,99,255,0.12)' }}>
-                  ✍️
+          {/* My Words — always shown so new users can discover import */}
+          <TiltCard className="card overflow-hidden hover:border-[var(--primary)] transition-colors" intensity={6}>
+            <Link href={importedCount > 0 ? '/my-words' : '/import'} className="flex items-center gap-4" style={{ margin: '-20px', padding: '20px' }}>
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0 animate-float-icon" style={{ background: 'rgba(108,99,255,0.12)' }}>
+                ✍️
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="font-bold text-[var(--text)] text-sm">{t.myWords.title}</div>
+                <div className="text-xs text-[var(--text-muted)] mt-0.5">{t.myWords.subtitle}</div>
+                <div className="text-xs text-[var(--text-muted)] mt-1">
+                  {importedCount > 0 ? t.myWords.wordCount(importedCount) : t.myWords.addWords}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div className="font-bold text-[var(--text)] text-sm">{t.myWords.title}</div>
-                  <div className="text-xs text-[var(--text-muted)] mt-0.5">{t.myWords.subtitle}</div>
-                  <div className="text-xs text-[var(--text-muted)] mt-1">{t.myWords.wordCount(importedCount)}</div>
-                </div>
-                <span className="flex-shrink-0 text-sm font-semibold" style={{ color: 'var(--primary)' }}>→</span>
-              </Link>
-            </TiltCard>
-          )}
+              </div>
+              <span className="flex-shrink-0 text-sm font-semibold" style={{ color: 'var(--primary)' }}>
+                {importedCount > 0 ? '→' : '+'}
+              </span>
+            </Link>
+          </TiltCard>
 
           {/* Curated collections first */}
           {mainCollections.map(col => {
