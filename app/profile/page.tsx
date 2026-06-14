@@ -56,7 +56,7 @@ export default function ProfilePage() {
   const [settings, setSettings] = useState<UserSettings>({
     name: 'Learner', dailyGoal: 10, languageLevel: 'B1', defaultAccent: 'us',
     autoPlayOnReveal: true, sessionSize: 20, fontSize: 'normal',
-    studyOrder: 'random', quizDirection: 'word-to-uz', reduceMotion: false,
+    studyOrder: 'random', quizDirection: 'word-to-uz', reduceMotion: false, uiLanguage: 'en',
   });
   const [streak, setStreak]           = useState(0);
   const [xp, setXp]                   = useState(0);

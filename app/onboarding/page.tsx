@@ -51,7 +51,7 @@ export default function OnboardingPage() {
 
   const finish = () => {
     setFinishing(true);
-    saveSettings({ name: name.trim() || 'Learner', dailyGoal: goal, languageLevel: level, defaultAccent: 'us', autoPlayOnReveal: true, sessionSize: 20, fontSize: 'normal', studyOrder: 'random', quizDirection: 'word-to-uz', reduceMotion: false });
+    saveSettings({ name: name.trim() || 'Learner', dailyGoal: goal, languageLevel: level, defaultAccent: 'us', autoPlayOnReveal: true, sessionSize: 20, fontSize: 'normal', studyOrder: 'random', quizDirection: 'word-to-uz', reduceMotion: false, uiLanguage: 'en' });
     setOnboarded();
     setTimeout(() => router.replace('/'), 1200);
   };
