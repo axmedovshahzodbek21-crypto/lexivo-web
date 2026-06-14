@@ -31,6 +31,8 @@ example1: The enormous building towered above the city.
 example2: She faced an enormous challenge at work.
 ---
 
+Important: the example above uses English only to show the format. In your actual response, write the definition and example sentences in ${wordLang}.
+
 Here are my words:
 [PASTE YOUR WORDS HERE, one per line]`;
 }
@@ -46,6 +48,8 @@ definition: extremely large in size or extent
 example1: The enormous building towered above the city.
 example2: She faced an enormous challenge at work.
 ---
+
+Important: the example above uses English only to show the format. In your actual response, write the definition and example sentences in ${wordLang}.
 
 Here are my pairs (word - translation):
 [PASTE YOUR PAIRS HERE, one per line]`;
