@@ -148,7 +148,7 @@ function LearnPage() {
         setStartIndexApplied(true);
       }
     }
-  }, [collectionsLoaded, collections, collectionName, dayNumber, hardOnly, sourceMyWords]);
+  }, [collectionsLoaded, collections, collectionName, dayNumber, hardOnly, sourceMyWords, myCollection]);
 
   const current = words[index];
 

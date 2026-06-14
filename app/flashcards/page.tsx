@@ -132,7 +132,7 @@ function FlashcardsPage() {
         setDeck(fullDeck);
       }
     }
-  }, [collectionsLoaded, collections, collectionName, dayNumber, starredOnly, hardOnly, listId, fresh, sourceMyWords]);
+  }, [collectionsLoaded, collections, collectionName, dayNumber, starredOnly, hardOnly, listId, fresh, sourceMyWords, myCollection]);
 
   const current = deck[index];
 

@@ -175,7 +175,7 @@ function QuizPage() {
     if (collectionsLoaded && collections.length > 0) {
       setQuestions(buildQuiz(collections, collectionName, dayNumber, starredOnly, listId, quizDirection));
     }
-  }, [collectionsLoaded, collections, collectionName, dayNumber, starredOnly, listId, quizDirection, sourceMyWords]);
+  }, [collectionsLoaded, collections, collectionName, dayNumber, starredOnly, listId, quizDirection, sourceMyWords, myCollection]);
 
   const current = questions[index];
 
