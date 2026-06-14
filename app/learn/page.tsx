@@ -404,7 +404,7 @@ function LearnPage() {
                 <span className="text-base shrink-0 mt-0.5">⏭️</span>
                 <div className="flex-1">
                   <p className="text-xs font-semibold text-orange-700">What is Skip?</p>
-                  <p className="text-xs text-orange-600 mt-0.5">Moves to the next word without marking it as learned. Use it when you want to come back later.</p>
+                  <p className="text-xs text-orange-600 mt-0.5">This word is already part of your active vocabulary — no need to review it on a schedule. It still appears in Flashcards and Quiz.</p>
                 </div>
                 <button onClick={dismissSkipTip} className="text-orange-400 hover:text-orange-600 text-sm font-bold shrink-0 mt-0.5">✕</button>
               </div>
