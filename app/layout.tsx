@@ -14,6 +14,7 @@ import NotificationScheduler from '@/components/NotificationScheduler';
 import PomodoroWidget from '@/components/PomodoroWidget';
 import { AuthProvider } from '@/lib/auth-context';
 import SyncProvider from '@/components/SyncProvider';
+import OneSignalProvider from '@/components/OneSignalProvider';
 
 export const metadata: Metadata = {
   title: 'Lexivo – Vocabulary Learning',
@@ -50,6 +51,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
         </div>
         <PomodoroWidget />
+        <OneSignalProvider />
         <AchievementToast />
         <LevelUpOverlay />
         <KeyboardHelp />
