@@ -60,8 +60,8 @@ function parseOutput(text: string, langCode: string): ImportedWord[] {
     for (const line of lines) {
       const colon = line.indexOf(':');
       if (colon === -1) continue;
-      const key = line.slice(0, colon).trim().toLowerCase();
-      const val = line.slice(colon + 1).trim();
+      const key = line.slice(0, colon).trim().toLowerCase().replace(/[*_`#]/g, '');
+      const val = line.slice(colon + 1).trim().replace(/[*_`]/g, '');
       fields[key] = val;
     }
     if (!fields.word || !fields.translation) continue;
