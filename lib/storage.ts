@@ -449,6 +449,10 @@ export function deleteImportedWord(word: string, collectionName: string) {
   set(IMPORTED_KEY, getImportedWords().filter(w => !(w.word === word && w.collectionName === collectionName)));
 }
 
+export function deleteImportedCollection(collectionName: string) {
+  set(IMPORTED_KEY, getImportedWords().filter(w => w.collectionName !== collectionName));
+}
+
 export function saveImportedWords(words: ImportedWord[]) {
   set(IMPORTED_KEY, words);
 }

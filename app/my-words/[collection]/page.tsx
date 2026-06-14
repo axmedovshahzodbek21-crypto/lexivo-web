@@ -3,7 +3,7 @@ import { useEffect, useState, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/lib/useTranslation';
-import { getImportedWordsByCollection, deleteImportedWord } from '@/lib/storage';
+import { getImportedWordsByCollection, deleteImportedWord, deleteImportedCollection } from '@/lib/storage';
 import { speakText } from '@/lib/speech';
 import type { ImportedWord } from '@/lib/types';
 
@@ -28,6 +28,12 @@ export default function CollectionDetailPage({ params }: Props) {
     setWords(getImportedWordsByCollection(name));
   }
 
+  function handleDeleteCollection() {
+    if (!confirm(`Delete the entire "${name}" collection and all its words?`)) return;
+    deleteImportedCollection(name);
+    router.push('/my-words');
+  }
+
   const studyParam = `source=my-words&myCollection=${encodeURIComponent(name)}`;
 
   return (
@@ -38,6 +44,11 @@ export default function CollectionDetailPage({ params }: Props) {
           <h1 className="font-bold text-[var(--text)] truncate">{name}</h1>
           <p className="text-xs text-[var(--text-muted)]">{t.myWords.wordCount(words.length)}</p>
         </div>
+        <button
+          onClick={handleDeleteCollection}
+          className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-base text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors"
+          title="Delete collection"
+        >🗑️</button>
         <Link
           href={`/import?collection=${encodeURIComponent(name)}`}
           className="w-9 h-9 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-lg font-bold text-[var(--primary)]"
