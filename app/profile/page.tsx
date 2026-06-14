@@ -14,6 +14,8 @@ import { useRef } from 'react';
 import XpModal from '@/components/XpModal';
 import TiltCard from '@/components/TiltCard';
 import { useTranslation } from '@/lib/useTranslation';
+import { useAuth } from '@/lib/auth-context';
+import { supabase } from '@/lib/supabase';
 
 async function compressImage(file: File, maxSize = 200): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -53,6 +55,7 @@ const CEFR_LABELS: Record<string, string> = {
 export default function ProfilePage() {
   const router = useRouter();
   const { collections, collectionsLoaded } = useAppStore();
+  const { user, signOut } = useAuth();
 
   const [settings, setSettings] = useState<UserSettings>({
     name: 'Learner', dailyGoal: 10, languageLevel: 'B1', defaultAccent: 'us',
@@ -69,6 +72,11 @@ export default function ProfilePage() {
   const [unlockedIds, setUnlockedIds] = useState<string[]>([]);
   const [profilePic, setProfilePic]   = useState<string | null>(null);
   const [showXpModal, setShowXpModal] = useState(false);
+  const [passwordSent, setPasswordSent] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -97,6 +105,31 @@ export default function ProfilePage() {
   function handleRemovePhoto() {
     removeProfilePic();
     setProfilePic(null);
+  }
+
+  async function handleSignOut() {
+    await signOut();
+    router.replace('/login');
+  }
+
+  async function handleChangePassword() {
+    if (!user?.email) return;
+    await supabase.auth.resetPasswordForEmail(user.email);
+    setPasswordSent(true);
+    setTimeout(() => setPasswordSent(false), 6000);
+  }
+
+  async function handleDeleteAccount() {
+    setDeleting(true);
+    setDeleteError(null);
+    const { error } = await supabase.rpc('delete_user');
+    if (error) {
+      setDeleteError(error.message);
+      setDeleting(false);
+      return;
+    }
+    await signOut();
+    router.replace('/');
   }
 
   const t = useTranslation();
@@ -362,6 +395,97 @@ export default function ProfilePage() {
             </Link>
           </TiltCard>
         </div>
+
+        {/* ── Account ── */}
+        {user ? (
+          <div className="card space-y-2">
+            <h3 className="font-bold text-[var(--text)] text-sm mb-3">{t.profile.account}</h3>
+
+            {/* Email */}
+            <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-[var(--surface-2)]">
+              <span className="text-base shrink-0">✉️</span>
+              <div className="min-w-0">
+                <p className="text-[10px] text-[var(--text-muted)] font-medium">{t.profile.signedInAs}</p>
+                <p className="text-sm font-semibold text-[var(--text)] truncate">{user.email}</p>
+              </div>
+            </div>
+
+            {/* Change password */}
+            <button
+              onClick={handleChangePassword}
+              disabled={passwordSent}
+              className="w-full flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium border border-[var(--border)] hover:bg-[var(--surface-2)] transition-colors text-[var(--text)] disabled:opacity-70"
+            >
+              <span>🔑</span>
+              <span>{passwordSent ? t.profile.changePasswordSent : t.profile.changePassword}</span>
+            </button>
+
+            {/* Sign out */}
+            <button
+              onClick={handleSignOut}
+              className="w-full flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-[var(--danger)] border border-[var(--danger)]/30 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
+            >
+              <span>🚪</span>
+              <span>{t.profile.signOut}</span>
+            </button>
+          </div>
+        ) : (
+          <Link
+            href="/login"
+            className="card flex items-center gap-3 px-4 py-3 hover:border-[var(--primary)] transition-colors"
+          >
+            <span className="text-xl">🔑</span>
+            <div>
+              <p className="text-sm font-semibold text-[var(--text)]">{t.profile.notSignedIn}</p>
+              <p className="text-xs text-[var(--primary)]">{t.sidebar.signIn}</p>
+            </div>
+          </Link>
+        )}
+
+        {/* ── Danger Zone ── */}
+        {user && (
+          <div className="card border-red-200 dark:border-red-800/40 space-y-3">
+            <h3 className="font-bold text-red-500 text-sm">{t.profile.dangerZone}</h3>
+            <p className="text-xs text-[var(--text-muted)] leading-relaxed">{t.profile.deleteAccountWarning}</p>
+
+            {!showDeleteConfirm ? (
+              <button
+                onClick={() => setShowDeleteConfirm(true)}
+                className="w-full flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-red-500 border border-red-200 dark:border-red-800/50 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
+              >
+                <span>🗑️</span>
+                <span>{t.profile.deleteAccount}</span>
+              </button>
+            ) : (
+              <div className="space-y-2">
+                <label className="text-xs font-medium text-[var(--text-muted)]">{t.profile.deleteConfirmLabel}</label>
+                <input
+                  type="text"
+                  value={deleteConfirmText}
+                  onChange={e => setDeleteConfirmText(e.target.value)}
+                  placeholder={t.profile.deleteConfirmPlaceholder}
+                  className="w-full px-3 py-2 rounded-xl border border-red-300 dark:border-red-700 bg-transparent text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-red-400"
+                />
+                {deleteError && <p className="text-xs text-red-500">{deleteError}</p>}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => { setShowDeleteConfirm(false); setDeleteConfirmText(''); setDeleteError(null); }}
+                    className="flex-1 py-2.5 rounded-xl border border-[var(--border)] text-sm font-medium text-[var(--text-muted)] hover:bg-[var(--surface-2)] transition-colors"
+                  >
+                    {t.common.cancel}
+                  </button>
+                  <button
+                    onClick={handleDeleteAccount}
+                    disabled={deleteConfirmText !== 'DELETE' || deleting}
+                    className="flex-1 py-2.5 rounded-xl bg-red-500 text-white text-sm font-bold disabled:opacity-40 hover:bg-red-600 transition-colors"
+                  >
+                    {deleting ? '…' : t.profile.deleteConfirmBtn}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
       </div>
     </div>
