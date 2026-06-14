@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { getSettings, saveSettings, resetOnboarded } from '@/lib/storage';
+import { getSettings, saveSettings, setUILanguage, resetOnboarded } from '@/lib/storage';
 import { getTheme, setTheme, type Theme } from '@/lib/theme';
 import { supabase } from '@/lib/supabase';
 import { stopSync } from '@/lib/web-sync';
@@ -392,6 +392,7 @@ export default function SettingsPage() {
                 onClick={() => {
                   const next = { ...settings, uiLanguage: lang };
                   setSettings(next);
+                  setUILanguage(lang);
                   saveSettings(next);
                   document.cookie = `lexivo_lang=${lang}; path=/; max-age=31536000; SameSite=Lax`;
                   document.documentElement.dataset.lang = lang;

@@ -22,6 +22,7 @@ const KEYS = {
   starred: 'lexivo_starred',
   achievements: 'lexivo_achievements',
   settings: 'lexivo_settings',
+  uiLang: 'lexivo_ui_lang',
   onboarded: 'lexivo_onboarded',
   freezes: 'lexivo_freezes',
   lastFreezeWeek: 'lexivo_last_freeze_week',
@@ -58,12 +59,34 @@ const SETTINGS_DEFAULTS: UserSettings = {
   uiLanguage: 'en',
 };
 
+// uiLanguage lives in its own key so pullAll's saveSettings call never overwrites it
+export function getUILanguage(): 'en' | 'uz' {
+  if (typeof window === 'undefined') return 'en';
+  const v = localStorage.getItem(KEYS.uiLang);
+  if (v === 'uz' || v === 'en') return v;
+  // Migrate: fall back to value inside the settings object
+  try {
+    const raw = localStorage.getItem(KEYS.settings);
+    if (raw) {
+      const parsed = JSON.parse(raw) as Partial<UserSettings>;
+      if (parsed.uiLanguage === 'uz' || parsed.uiLanguage === 'en') return parsed.uiLanguage;
+    }
+  } catch { /* ignore */ }
+  return 'en';
+}
+
+export function setUILanguage(lang: 'en' | 'uz') {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(KEYS.uiLang, lang);
+}
+
 export function getSettings(): UserSettings {
   const stored = get<Partial<UserSettings>>(KEYS.settings, {});
-  return { ...SETTINGS_DEFAULTS, ...stored };
+  return { ...SETTINGS_DEFAULTS, ...stored, uiLanguage: getUILanguage() };
 }
 
 export function saveSettings(s: UserSettings) {
+  setUILanguage(s.uiLanguage);
   set(KEYS.settings, s);
 }
 

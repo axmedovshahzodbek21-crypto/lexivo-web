@@ -1,10 +1,10 @@
 'use client';
 import { useState, useLayoutEffect } from 'react';
-import { getSettings } from './storage';
+import { getUILanguage } from './storage';
 import { translations, type Translations } from './i18n';
 
 function getLang(): 'en' | 'uz' {
-  return (getSettings().uiLanguage as 'en' | 'uz') ?? 'en';
+  return getUILanguage();
 }
 
 export function useTranslation(): Translations {
