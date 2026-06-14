@@ -2,7 +2,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
-import { speak } from '@/lib/speech';
+import { speak, speakText } from '@/lib/speech';
 import { getDueWords, updateSRSWord, addXP, recordStudySession, unlockAchievement } from '@/lib/storage';
 import { stageLabel, stageColor } from '@/lib/srs';
 import { checkAchievements } from '@/lib/gamification';
@@ -33,7 +33,7 @@ export default function SRSReviewPage() {
 
   useEffect(() => {
     setRevealed(false);
-    if (current) speak(current.word);
+    if (current) { current.language ? speakText(current.word, current.language) : speak(current.word); }
   }, [current]);
 
   // Keyboard shortcuts
@@ -45,7 +45,7 @@ export default function SRSReviewPage() {
         case ' ': case 'Enter': e.preventDefault(); if (!revealed) setRevealed(true); break;
         case 'ArrowRight': case 'k': case 'K': if (revealed) grade(true); break;
         case 'ArrowLeft': case 'j': case 'J': if (revealed) grade(false); break;
-        case 's': case 'S': speak(current.word); break;
+        case 's': case 'S': current.language ? speakText(current.word, current.language) : speak(current.word); break;
       }
     };
     window.addEventListener('keydown', handler);
@@ -138,7 +138,7 @@ export default function SRSReviewPage() {
           <div className="flex items-center justify-between">
             <span className="badge text-xs">{current.topic}</span>
             <button
-              onClick={() => speak(current.word)}
+              onClick={() => current.language ? speakText(current.word, current.language) : speak(current.word)}
               className="w-8 h-8 rounded-full bg-[var(--primary-bg)] flex items-center justify-center hover:bg-[var(--primary)] hover:text-white transition-colors"
             >🔊</button>
           </div>
