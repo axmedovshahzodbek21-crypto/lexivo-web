@@ -9,6 +9,7 @@ import { checkAchievements } from '@/lib/gamification';
 import type { WordItem, WordCollection } from '@/lib/types';
 import Link from 'next/link';
 import UnitPicker from '@/components/UnitPicker';
+import { useTranslation } from '@/lib/useTranslation';
 
 interface StudyWord extends WordItem {
   collectionName: string;
@@ -74,6 +75,7 @@ function FlashcardsPage() {
   const fresh       = searchParams.get('fresh') === 'true';
   const { collections, collectionsLoaded, pushAchievement, setPendingLevelUp, focusMode, setFocusMode } = useAppStore();
 
+  const t = useTranslation();
   const [deck, setDeck] = useState<StudyWord[]>([]);
   const [index, setIndex] = useState(0);
   const [side, setSide] = useState<CardSide>('front');
@@ -167,8 +169,8 @@ function FlashcardsPage() {
   if (deck.length === 0) return (
     <div className="p-6 text-center">
       <div className="text-5xl mb-4">📭</div>
-      <h2 className="font-bold text-xl mb-2">No words found</h2>
-      <Link href="/" className="btn-primary inline-block mt-4">Go Home</Link>
+      <h2 className="font-bold text-xl mb-2">{t.common.noWordsFound}</h2>
+      <Link href="/" className="btn-primary inline-block mt-4">{t.common.goHome}</Link>
     </div>
   );
 
@@ -177,12 +179,12 @@ function FlashcardsPage() {
     return (
       <div className="p-6 text-center flex flex-col items-center justify-center min-h-screen animate-fade-in">
         <div className="text-6xl mb-4">{score >= 80 ? '🎉' : score >= 50 ? '👍' : '💪'}</div>
-        <h2 className="text-2xl font-bold mb-2">Flashcards Done!</h2>
-        <p className="text-[var(--text-muted)] mb-6">{known} known · {unknown} to review · {score}% score</p>
+        <h2 className="text-2xl font-bold mb-2">{t.flashcards.done}</h2>
+        <p className="text-[var(--text-muted)] mb-6">{known} {t.flashcards.known} · {unknown} {t.flashcards.review} · {score}% {t.flashcards.score}</p>
         <div className="grid grid-cols-3 gap-3 w-full mb-6">
-          <div className="card text-center"><div className="text-2xl font-bold text-[var(--success)]">{known}</div><div className="text-xs text-[var(--text-muted)]">Known</div></div>
-          <div className="card text-center"><div className="text-2xl font-bold text-[var(--danger)]">{unknown}</div><div className="text-xs text-[var(--text-muted)]">Review</div></div>
-          <div className="card text-center"><div className="text-2xl font-bold text-[var(--primary)]">{score}%</div><div className="text-xs text-[var(--text-muted)]">Score</div></div>
+          <div className="card text-center"><div className="text-2xl font-bold text-[var(--success)]">{known}</div><div className="text-xs text-[var(--text-muted)]">{t.flashcards.known}</div></div>
+          <div className="card text-center"><div className="text-2xl font-bold text-[var(--danger)]">{unknown}</div><div className="text-xs text-[var(--text-muted)]">{t.flashcards.review}</div></div>
+          <div className="card text-center"><div className="text-2xl font-bold text-[var(--primary)]">{score}%</div><div className="text-xs text-[var(--text-muted)]">{t.flashcards.score}</div></div>
         </div>
         <div className="flex flex-col gap-3 w-full">
           {collectionName && dayNumber !== undefined && (
@@ -192,8 +194,8 @@ function FlashcardsPage() {
               style={{ background: 'linear-gradient(135deg, #F59E0B, #FBBF24)' }}
             >
               <div>
-                <div className="font-bold text-sm">❓ Take the Quiz</div>
-                <div className="text-xs opacity-80 mt-0.5">Test how well you remember</div>
+                <div className="font-bold text-sm">{t.flashcards.takeQuiz}</div>
+                <div className="text-xs opacity-80 mt-0.5">{t.flashcards.testMemory}</div>
               </div>
               <span className="text-lg">→</span>
             </Link>
@@ -203,12 +205,12 @@ function FlashcardsPage() {
               onClick={() => { setDeck(unknownWords); setIndex(0); setSide('front'); setKnown(0); setUnknown(0); setUnknownWords([]); setDone(false); }}
               className="w-full py-3 rounded-xl border-2 border-[var(--danger)] text-[var(--danger)] font-bold text-sm hover:bg-red-50 transition-colors"
             >
-              ✗ Study Wrong Again ({unknownWords.length} cards)
+              {t.flashcards.studyWrong(unknownWords.length)}
             </button>
           )}
           <div className="flex gap-3">
-            <button onClick={() => { setIndex(0); setSide('front'); setKnown(0); setUnknown(0); setUnknownWords([]); setDone(false); }} className="btn-secondary flex-1">🔁 Again</button>
-            <Link href={starredOnly ? '/starred' : hardOnly ? '/hard-words' : collectionName ? `/collections/${encodeURIComponent(collectionName)}` : '/'} className="btn-primary flex-1 text-center">← Back</Link>
+            <button onClick={() => { setIndex(0); setSide('front'); setKnown(0); setUnknown(0); setUnknownWords([]); setDone(false); }} className="btn-secondary flex-1">{t.common.again}</button>
+            <Link href={starredOnly ? '/starred' : hardOnly ? '/hard-words' : collectionName ? `/collections/${encodeURIComponent(collectionName)}` : '/'} className="btn-primary flex-1 text-center">{t.common.back}</Link>
           </div>
         </div>
       </div>
@@ -223,7 +225,7 @@ function FlashcardsPage() {
       <div className="flex items-center justify-between p-4">
         <button onClick={() => router.back()} className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center">←</button>
         <div className="text-center">
-          <div className="font-semibold text-sm">Flashcards</div>
+          <div className="font-semibold text-sm">{t.flashcards.title}</div>
           <div className="text-xs text-[var(--text-muted)]">{index + 1} / {deck.length}</div>
         </div>
         <div className="flex gap-2">
@@ -258,7 +260,7 @@ function FlashcardsPage() {
               >
                 🔊
               </button>
-              <p className="text-xs text-[var(--text-muted)] mt-4">Tap to reveal · <kbd>Space</kbd></p>
+              <p className="text-xs text-[var(--text-muted)] mt-4">{t.flashcards.tapToReveal}</p>
             </div>
 
             {/* Back */}
@@ -280,18 +282,18 @@ function FlashcardsPage() {
               onClick={markUnknown}
               className="flex-1 py-4 rounded-xl border-2 border-[var(--danger)] text-[var(--danger)] font-bold text-lg hover:bg-red-50 transition-colors press-3d"
             >
-              ✗ <span className="text-sm">Again</span> <kbd>←</kbd>
+              {t.flashcards.again}
             </button>
             <button
               onClick={markKnown}
               className="flex-1 py-4 rounded-xl border-2 border-[var(--success)] text-[var(--success)] font-bold text-lg hover:bg-green-50 transition-colors press-3d"
             >
-              ✓ <span className="text-sm">Know it</span> <kbd>→</kbd>
+              {t.flashcards.knowIt}
             </button>
           </div>
         ) : (
           <div className="text-center text-sm text-[var(--text-muted)]">
-            Tap the card or press <kbd>Space</kbd> to see the answer
+            {t.flashcards.tapToReveal}
           </div>
         )}
       </div>
@@ -300,11 +302,12 @@ function FlashcardsPage() {
 }
 
 function Loading() {
+  const t = useTranslation();
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="text-center">
         <div className="text-4xl mb-3 animate-bounce">🃏</div>
-        <p className="text-[var(--text-muted)]">Loading flashcards…</p>
+        <p className="text-[var(--text-muted)]">{t.flashcards.loading}</p>
       </div>
     </div>
   );

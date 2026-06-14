@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from '@/lib/useTranslation';
 import { useAppStore } from '@/lib/store';
 import { getWordOfDay } from '@/lib/data';
 import { getStreak, getXP, getTodayXP, getTodayLearnedCount, getDueWords, getLearnedWords, getSettings, isOnboarded, getFreezes, checkAndGrantWeeklyFreeze } from '@/lib/storage';
@@ -69,6 +70,7 @@ export default function HomePage() {
     return () => window.removeEventListener('lexivo-sync', handleSync);
   }, []);
 
+  const t = useTranslation();
   const levelInfo = getLevelInfo(xp);
   const dailyProgress = Math.min((todayCount / settings.dailyGoal) * 100, 100);
   const mainCollections = collections.filter(c => !LEVELED_NAMES.has(c.name));
@@ -79,13 +81,13 @@ export default function HomePage() {
       <div className="flex items-center justify-between pt-2">
         <div>
           <h1 className="text-2xl font-bold text-[var(--text)]">Hi, {settings.name}! 👋</h1>
-          <p className="text-sm text-[var(--text-muted)]">Ready to learn today?</p>
+          <p className="text-sm text-[var(--text-muted)]">{t.home.readyToLearn}</p>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => { const next = toggleTheme(); setThemeState(next); }}
             className="w-10 h-10 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-lg hover:bg-[var(--primary-bg)] transition-colors"
-            title="Toggle dark mode"
+            title={t.home.toggleDark}
           >
             {theme === 'dark' ? '☀️' : '🌙'}
           </button>
@@ -97,7 +99,7 @@ export default function HomePage() {
 
       {/* ── Collections (most important, lifted to top) ── */}
       <div>
-        <h2 className="font-semibold text-[var(--text)] text-base mb-3">📚 Collections</h2>
+        <h2 className="font-semibold text-[var(--text)] text-base mb-3">{t.home.collections}</h2>
         <div className="space-y-3">
           {/* Curated collections first */}
           {mainCollections.map(col => {
@@ -140,7 +142,7 @@ export default function HomePage() {
                 📚
               </div>
               <div className="flex-1 min-w-0">
-                <div className="font-bold text-sm" style={{ color: '#27AE60' }}>Leveled Words</div>
+                <div className="font-bold text-sm" style={{ color: '#27AE60' }}>{t.home.leveledWords}</div>
                 <div className="text-xs mt-0.5" style={{ color: '#2ECC71' }}>A1 → C2 vocabulary by CEFR level</div>
               </div>
               <span className="text-sm flex-shrink-0" style={{ color: '#2ECC71' }}>→</span>
@@ -152,13 +154,13 @@ export default function HomePage() {
       {/* Stats row */}
       <div className="grid grid-cols-3 gap-3">
         <Link href="/progress?tab=calendar">
-          <StatCard icon="🔥" value={streak} label="Day Streak" color="#FF6B35" />
+          <StatCard icon="🔥" value={streak} label={t.home.dayStreak} color="#FF6B35" />
         </Link>
         <button onClick={() => setShowXpModal(true)} className="text-left w-full">
-          <StatCard icon="⚡" value={xp} label="Total XP" color="#6C63FF" glow />
+          <StatCard icon="⚡" value={xp} label={t.home.totalXp} color="#6C63FF" glow />
         </button>
         <Link href="/history">
-          <StatCard icon="📚" value={learnedCount} label="Words" color="#10B981" />
+          <StatCard icon="📚" value={learnedCount} label={t.home.words} color="#10B981" />
         </Link>
       </div>
 
@@ -172,7 +174,7 @@ export default function HomePage() {
         >
           <span className="text-base">🧊</span>
           <span>
-            {freezes === 1 ? '1 streak freeze' : `${freezes} streak freezes`} available — your streak is protected if you miss a day
+            {freezes === 1 ? t.home.freezeSingle : t.home.freezeMulti(freezes)}
           </span>
         </div>
       )}
@@ -198,45 +200,45 @@ export default function HomePage() {
       {/* Daily goal */}
       <TiltCard className="card" intensity={3}>
         <div className="flex justify-between items-center mb-2">
-          <span className="font-semibold text-[var(--text)]">📅 Daily Goal</span>
-          <span className="text-sm text-[var(--text-muted)]">{todayCount} / {settings.dailyGoal} words · {todayXp} XP today</span>
+          <span className="font-semibold text-[var(--text)]">{t.home.dailyGoal}</span>
+          <span className="text-sm text-[var(--text-muted)]">{t.home.wordsToday(todayCount, settings.dailyGoal)} · {todayXp} XP today</span>
         </div>
         <div className="progress-bar">
           <div className="progress-bar-fill" style={{ width: `${dailyProgress}%` }} />
         </div>
         {dailyProgress >= 100 && (
-          <p className="text-xs text-[var(--success)] mt-1 font-medium">🎉 Daily goal reached!</p>
+          <p className="text-xs text-[var(--success)] mt-1 font-medium">{t.home.goalReached}</p>
         )}
       </TiltCard>
 
       {/* Quick actions */}
       <div className="grid grid-cols-2 gap-3">
-        <ActionCard href="/learn"         icon="📖" title="Learn"         subtitle="Study new words"       color="#6C63FF" depthClass="depth-in-1" />
-        <ActionCard href="/flashcards"    icon="🃏" title="Flashcards"    subtitle="Review with cards"     color="#FF6B35" depthClass="depth-in-2" />
+        <ActionCard href="/learn"         icon="📖" title={t.home.learnTitle}     subtitle={t.home.learnSub}          color="#6C63FF" depthClass="depth-in-1" />
+        <ActionCard href="/flashcards"    icon="🃏" title={t.home.flashcardsTitle} subtitle={t.home.flashcardsSub}     color="#FF6B35" depthClass="depth-in-2" />
         <ActionCard
           href="/srs"
           icon="🔄"
-          title="SRS Review"
-          subtitle={dueCount > 0 ? `${dueCount} words due` : 'All caught up!'}
+          title={t.home.srsTitle}
+          subtitle={dueCount > 0 ? t.home.srsDue(dueCount) : t.home.srsAllCaughtUp}
           color={dueCount > 0 ? '#EF4444' : '#10B981'}
           badge={dueCount > 0 ? String(dueCount) : undefined}
           depthClass="depth-in-3"
         />
-        <ActionCard href="/quiz"          icon="❓" title="Quiz"          subtitle="Test yourself"         color="#F59E0B" depthClass="depth-in-4" />
-        <ActionCard href="/pronunciation" icon="🎙️" title="Pronunciation" subtitle="Speak & be scored"    color="#8B5CF6" depthClass="depth-in-5" />
-        <ActionCard href="/matching"      icon="🎯" title="Match"         subtitle="Tap matching pairs"    color="#EC4899" depthClass="depth-in-6" />
-        <ActionCard href="/pomodoro"      icon="🍅" title="Pomodoro"      subtitle="Focused study timer"   color="#EF4444" depthClass="depth-in-7" />
+        <ActionCard href="/quiz"          icon="❓" title={t.home.quizTitle}       subtitle={t.home.quizSub}           color="#F59E0B" depthClass="depth-in-4" />
+        <ActionCard href="/pronunciation" icon="🎙️" title={t.home.pronounceTitle}  subtitle={t.home.pronounceSub}      color="#8B5CF6" depthClass="depth-in-5" />
+        <ActionCard href="/matching"      icon="🎯" title={t.home.matchTitle}       subtitle={t.home.matchSub}          color="#EC4899" depthClass="depth-in-6" />
+        <ActionCard href="/pomodoro"      icon="🍅" title={t.home.pomodoroTitle}    subtitle={t.home.pomodoroSub}       color="#EF4444" depthClass="depth-in-7" />
       </div>
 
       {/* Word of the Day */}
       {wod && (
         <TiltCard className="card" intensity={3}>
           <div className="flex items-center justify-between mb-3">
-            <span className="badge">✨ Word of the Day</span>
+            <span className="badge">{t.home.wordOfDay}</span>
             <button
               onClick={() => speak(wod.word)}
               className="w-8 h-8 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-sm hover:bg-[var(--primary)] hover:text-white transition-colors"
-              title="Listen"
+              title={t.home.listen}
             >
               🔊
             </button>
@@ -256,7 +258,7 @@ export default function HomePage() {
               onClick={() => setWodRevealed(true)}
               className="mt-3 text-sm text-[var(--primary)] font-medium hover:underline"
             >
-              Show definition & examples →
+              {t.home.showDefinition}
             </button>
           )}
         </TiltCard>
@@ -264,11 +266,11 @@ export default function HomePage() {
 
       {/* Shortcuts — 2 rows of 3 */}
       <div className="grid grid-cols-3 gap-2">
-        <ShortcutCard href="/starred"      icon="⭐" label="Starred"  sub="Saved words"   accent="var(--primary)" />
-        <ShortcutCard href="/hard-words"   icon="😓" label="Hard"     sub="Too hard"      accent="var(--danger)"  />
-        <ShortcutCard href="/history"      icon="📖" label="History"  sub="Words learned" accent="var(--primary)" />
-        <ShortcutCard href="/lists"        icon="📋" label="My Lists" sub="Custom sets"   accent="#8B5CF6"        />
-        <ShortcutCard href="/grammar-tips" icon="📚" label="Grammar"  sub="Tips"          accent="#10B981"        />
+        <ShortcutCard href="/starred"      icon="⭐" label={t.home.starredTitle}  sub={t.home.starredSub}  accent="var(--primary)" />
+        <ShortcutCard href="/hard-words"   icon="😓" label={t.home.hardTitle}    sub={t.home.hardSub}     accent="var(--danger)"  />
+        <ShortcutCard href="/history"      icon="📖" label={t.home.historyTitle} sub={t.home.historySub}  accent="var(--primary)" />
+        <ShortcutCard href="/lists"        icon="📋" label={t.home.listsTitle}   sub={t.home.listsSub}    accent="#8B5CF6"        />
+        <ShortcutCard href="/grammar-tips" icon="📚" label={t.home.grammarTitle} sub={t.home.grammarSub}  accent="#10B981"        />
       </div>
 
       <div className="pb-4" />

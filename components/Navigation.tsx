@@ -5,14 +5,15 @@ import { usePathname, useRouter } from 'next/navigation';
 import { getSettings, getStreak, getXP, getProfilePic } from '@/lib/storage';
 import { getLevelInfo } from '@/lib/gamification';
 import { useAuth } from '@/lib/auth-context';
+import { useTranslation } from '@/lib/useTranslation';
 
-const NAV = [
-  { href: '/', label: 'Home', icon: '🏠' },
-  { href: '/learn', label: 'Learn', icon: '📖' },
-  { href: '/srs', label: 'Review', icon: '🔄' },
-  { href: '/search', label: 'Search', icon: '🔍' },
-  { href: '/progress', label: 'Progress', icon: '📊' },
-];
+const NAV_HREFS = [
+  { href: '/',        icon: '🏠', key: 'home'     },
+  { href: '/learn',   icon: '📖', key: 'learn'    },
+  { href: '/srs',     icon: '🔄', key: 'review'   },
+  { href: '/search',  icon: '🔍', key: 'search'   },
+  { href: '/progress',icon: '📊', key: 'progress' },
+] as const;
 
 const LEVEL_COLORS: Record<string, string> = {
   Beginner:             '#2ECC71',
@@ -27,6 +28,7 @@ export default function Navigation() {
   const pathname  = usePathname();
   const router    = useRouter();
   const { user, signOut } = useAuth();
+  const t = useTranslation();
   const isActive  = (href: string) => href === '/' ? pathname === '/' : pathname.startsWith(href);
 
   const [name, setName]           = useState('Learner');
@@ -60,8 +62,9 @@ export default function Navigation() {
         className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[var(--card)] border-t border-[var(--border)] flex justify-around items-center py-2 px-1 shadow-lg"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
-        {NAV.map(({ href, label, icon }) => {
+        {NAV_HREFS.map(({ href, icon, key }) => {
           const active = isActive(href);
+          const label = t.nav[key];
           return (
             <Link
               key={href}
@@ -81,13 +84,14 @@ export default function Navigation() {
         {/* Brand */}
         <div className="px-5 pt-6 pb-4">
           <span className="text-2xl font-black tracking-tight" style={{ color: 'var(--primary)' }}>Lexivo</span>
-          <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>Vocabulary Learning</div>
+          <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{t.sidebar.tagline}</div>
         </div>
 
         {/* Nav links */}
         <nav className="flex-1 px-3 space-y-0.5">
-          {NAV.map(({ href, label, icon }) => {
+          {NAV_HREFS.map(({ href, icon, key }) => {
             const active = isActive(href);
+            const label = t.nav[key];
             return (
               <Link
                 key={href}
@@ -139,7 +143,7 @@ export default function Navigation() {
               <div className="flex items-center gap-1">
                 <span className="text-sm">🔥</span>
                 <span className="text-xs font-bold text-[var(--text)]">{streak}</span>
-                <span className="text-[10px] text-[var(--text-muted)]">day</span>
+                <span className="text-[10px] text-[var(--text-muted)]">{t.sidebar.day}</span>
               </div>
               <div className="w-px h-3 bg-[var(--border)]" />
               <div className="flex items-center gap-1">
@@ -177,7 +181,7 @@ export default function Navigation() {
           {user ? (
             <div className="mt-2 space-y-1">
               <div className="px-3 py-1.5 rounded-xl bg-[var(--surface-2)]">
-                <p className="text-[10px] text-[var(--text-muted)] font-medium">Signed in as</p>
+                <p className="text-[10px] text-[var(--text-muted)] font-medium">{t.sidebar.signedInAs}</p>
                 <p className="text-xs font-bold text-[var(--text)] truncate">{user.email}</p>
               </div>
               <button
@@ -185,7 +189,7 @@ export default function Navigation() {
                 className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-[var(--text-muted)] hover:bg-[var(--surface-2)] hover:text-[var(--danger)] transition-colors"
               >
                 <span>🚪</span>
-                <span>Sign out</span>
+                <span>{t.sidebar.signOut}</span>
               </button>
             </div>
           ) : (
@@ -194,7 +198,7 @@ export default function Navigation() {
               className="mt-2 w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-[var(--text-muted)] hover:bg-[var(--primary-bg)] hover:text-[var(--primary)] transition-colors"
             >
               <span>🔑</span>
-              <span>Sign in / Create account</span>
+              <span>{t.sidebar.signIn}</span>
             </Link>
           )}
         </div>

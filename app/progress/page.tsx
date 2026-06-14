@@ -12,6 +12,7 @@ import { getLevelInfo, ALL_ACHIEVEMENTS } from '@/lib/gamification';
 import { getUnlockedAchievements } from '@/lib/storage';
 import { stageLabel, stageColor } from '@/lib/srs';
 import type { SRSWord } from '@/lib/types';
+import { useTranslation } from '@/lib/useTranslation';
 
 export default function ProgressPageWrapper() {
   return (
@@ -53,6 +54,7 @@ function ProgressPage() {
     setStudyHistory(getStudyHistory());
   }, []);
 
+  const t = useTranslation();
   const levelInfo = getLevelInfo(xp);
   const masteredCount = srsWords.filter(w => w.reviewStage >= 4).length;
   const stageGroups = [0, 1, 2, 3, 4].map(stage => ({
@@ -63,17 +65,17 @@ function ProgressPage() {
   return (
     <div className="flex flex-col min-h-screen">
       <div className="p-4">
-        <h1 className="text-2xl font-bold mb-4">📊 Progress</h1>
+        <h1 className="text-2xl font-bold mb-4">{t.progress.title}</h1>
 
         {/* Tabs */}
         <div className="flex gap-2 mb-4 overflow-x-auto pb-1">
-          {(['overview', 'calendar', 'srs', 'achievements'] as const).map(t => (
+          {(['overview', 'calendar', 'srs', 'achievements'] as const).map(tabKey => (
             <button
-              key={t}
-              onClick={() => setTab(t)}
-              className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors whitespace-nowrap ${tab === t ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface-2)] text-[var(--text-muted)]'}`}
+              key={tabKey}
+              onClick={() => setTab(tabKey)}
+              className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors whitespace-nowrap ${tab === tabKey ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface-2)] text-[var(--text-muted)]'}`}
             >
-              {t === 'overview' ? '📈 Overview' : t === 'calendar' ? '📅 Calendar' : t === 'srs' ? '🔄 SRS' : '🏆 Badges'}
+              {tabKey === 'overview' ? t.progress.tabOverview : tabKey === 'calendar' ? t.progress.tabCalendar : tabKey === 'srs' ? t.progress.tabSRS : t.progress.tabBadges}
             </button>
           ))}
         </div>
@@ -94,20 +96,20 @@ function ProgressPage() {
 
             {/* Stats grid */}
             <div className="grid grid-cols-2 gap-3">
-              <StatBlock icon="🔥" label="Current Streak" value={`${streak} days`} color="#FF6B35" />
-              <StatBlock icon="📅" label="Study Days" value={`${totalDays} days`} color="#6C63FF" />
-              <StatBlock icon="📚" label="Words Learned" value={learnedCount} color="#10B981" />
-              <StatBlock icon="🧠" label="SRS Mastered" value={masteredCount} color="#8B5CF6" />
-              <StatBlock icon="⚡" label="Today's XP" value={`+${todayXp}`} color="#F59E0B" />
-              <StatBlock icon="🎯" label="Today's Words" value={todayCount} color="#EC4899" />
+              <StatBlock icon="🔥" label={t.progress.currentStreak} value={`${streak} ${t.progress.days}`} color="#FF6B35" />
+              <StatBlock icon="📅" label={t.progress.studyDays} value={`${totalDays} ${t.progress.days}`} color="#6C63FF" />
+              <StatBlock icon="📚" label={t.progress.wordsLearned} value={learnedCount} color="#10B981" />
+              <StatBlock icon="🧠" label={t.progress.srsMastered} value={masteredCount} color="#8B5CF6" />
+              <StatBlock icon="⚡" label={t.progress.todayXp} value={`+${todayXp}`} color="#F59E0B" />
+              <StatBlock icon="🎯" label={t.progress.todayWords} value={todayCount} color="#EC4899" />
             </div>
 
             {/* Due reviews */}
             {dueCount > 0 && (
               <Link href="/srs" className="card bg-red-50 border-[var(--danger)] flex items-center justify-between hover:bg-red-100 transition-colors">
                 <div>
-                  <p className="font-semibold text-[var(--danger)]">🔄 SRS Reviews Due</p>
-                  <p className="text-sm text-[var(--text-muted)]">{dueCount} words waiting</p>
+                  <p className="font-semibold text-[var(--danger)]">{t.progress.srsReviewDue}</p>
+                  <p className="text-sm text-[var(--text-muted)]">{t.progress.waiting(dueCount)}</p>
                 </div>
                 <span className="text-[var(--danger)] font-bold">→</span>
               </Link>
@@ -115,14 +117,14 @@ function ProgressPage() {
 
             {/* Other stats */}
             <div className="card">
-              <h3 className="font-semibold mb-3">📌 Word Lists</h3>
+              <h3 className="font-semibold mb-3">{t.progress.wordLists}</h3>
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-[var(--text-muted)]">⭐ Starred words</span>
+                  <span className="text-[var(--text-muted)]">{t.progress.starred}</span>
                   <span className="font-medium">{starredCount}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-[var(--text-muted)]">😓 Hard words</span>
+                  <span className="text-[var(--text-muted)]">{t.progress.hard}</span>
                   <span className="font-medium">{hardCount}</span>
                 </div>
               </div>
@@ -136,8 +138,8 @@ function ProgressPage() {
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-[var(--primary-bg)] flex items-center justify-center text-xl">📖</div>
                 <div>
-                  <p className="font-semibold text-sm text-[var(--text)]">Learning History</p>
-                  <p className="text-xs text-[var(--text-muted)]">Browse every word you've learned</p>
+                  <p className="font-semibold text-sm text-[var(--text)]">{t.progress.learningHistory}</p>
+                  <p className="text-xs text-[var(--text-muted)]">{t.progress.browseWords}</p>
                 </div>
               </div>
               <span className="text-[var(--primary)]">→</span>
@@ -154,7 +156,7 @@ function ProgressPage() {
         {tab === 'srs' && (
           <div className="space-y-4 animate-fade-in">
             <div className="card">
-              <h3 className="font-semibold mb-3">SRS Stage Distribution</h3>
+              <h3 className="font-semibold mb-3">{t.progress.srsDistribution}</h3>
               {stageGroups.map(({ stage, count }) => (
                 <div key={stage} className="mb-3">
                   <div className="flex justify-between text-sm mb-1">
@@ -174,20 +176,20 @@ function ProgressPage() {
               ))}
               {srsWords.length === 0 && (
                 <p className="text-[var(--text-muted)] text-sm text-center py-4">
-                  Learn some words to start SRS tracking.
+                  {t.progress.learnForSRS}
                 </p>
               )}
             </div>
 
             <div className="card">
-              <h3 className="font-semibold mb-1">Total in SRS</h3>
+              <h3 className="font-semibold mb-1">{t.progress.totalInSRS}</h3>
               <p className="text-3xl font-bold text-[var(--primary)]">{srsWords.length}</p>
-              <p className="text-sm text-[var(--text-muted)]">{masteredCount} mastered · {dueCount} due today</p>
+              <p className="text-sm text-[var(--text-muted)]">{t.progress.masteredDue(masteredCount, dueCount)}</p>
             </div>
 
             {dueCount > 0 && (
               <Link href="/srs" className="btn-primary block text-center">
-                🔄 Review {dueCount} Due Words
+                {t.progress.reviewDue(dueCount)}
               </Link>
             )}
           </div>
@@ -195,7 +197,7 @@ function ProgressPage() {
 
         {tab === 'achievements' && (
           <div className="space-y-3 animate-fade-in">
-            <p className="text-sm text-[var(--text-muted)]">{unlockedIds.length} / {ALL_ACHIEVEMENTS.length} unlocked</p>
+            <p className="text-sm text-[var(--text-muted)]">{t.progress.unlockedOf(unlockedIds.length, ALL_ACHIEVEMENTS.length)}</p>
             <div className="grid grid-cols-1 gap-2">
               {ALL_ACHIEVEMENTS.map(a => {
                 const unlocked = unlockedIds.includes(a.id);
@@ -310,6 +312,7 @@ function StudyCalendar({
   streak: number;
   totalDays: number;
 }) {
+  const t = useTranslation();
   const [tooltip, setTooltip] = useState<{ date: string; count: number } | null>(null);
   const { weeks, gridStart } = buildGrid(history);
   const monthLabels = buildMonthLabels(weeks);
@@ -323,21 +326,21 @@ function StudyCalendar({
       <div className="grid grid-cols-3 gap-3">
         <div className="card text-center py-3">
           <div className="text-2xl font-bold text-[var(--danger)]">🔥 {streak}</div>
-          <div className="text-xs text-[var(--text-muted)] mt-1">Current streak</div>
+          <div className="text-xs text-[var(--text-muted)] mt-1">{t.progress.currentStreak}</div>
         </div>
         <div className="card text-center py-3">
           <div className="text-2xl font-bold text-[var(--primary)]">{longestStreak}</div>
-          <div className="text-xs text-[var(--text-muted)] mt-1">Longest streak</div>
+          <div className="text-xs text-[var(--text-muted)] mt-1">{t.progress.longestStreak}</div>
         </div>
         <div className="card text-center py-3">
           <div className="text-2xl font-bold text-[var(--success)]">{activeDays}</div>
-          <div className="text-xs text-[var(--text-muted)] mt-1">Active days</div>
+          <div className="text-xs text-[var(--text-muted)] mt-1">{t.progress.activeDays}</div>
         </div>
       </div>
 
       {/* Heatmap */}
       <div className="card overflow-x-auto">
-        <h3 className="font-semibold mb-3 text-sm">Last {WEEK_COUNT} weeks</h3>
+        <h3 className="font-semibold mb-3 text-sm">{t.progress.lastWeeks(WEEK_COUNT)}</h3>
 
         {/* Month labels */}
         <div className="flex gap-[3px] mb-1 pl-8">
@@ -391,11 +394,11 @@ function StudyCalendar({
 
         {/* Legend */}
         <div className="flex items-center gap-2 mt-3">
-          <span className="text-[9px] text-[var(--text-muted)]">Less</span>
+          <span className="text-[9px] text-[var(--text-muted)]">{t.progress.less}</span>
           {[0, 2, 6, 12, 22].map(n => (
             <div key={n} className="w-[14px] h-[14px] rounded-[3px]" style={{ background: cellColor(n) }} />
           ))}
-          <span className="text-[9px] text-[var(--text-muted)]">More</span>
+          <span className="text-[9px] text-[var(--text-muted)]">{t.progress.more}</span>
         </div>
       </div>
 
@@ -406,6 +409,7 @@ function StudyCalendar({
 }
 
 function MonthlyBreakdown({ history }: { history: Record<string, number> }) {
+  const t = useTranslation();
   const months: { label: string; words: number; days: number }[] = [];
   const seen = new Set<string>();
 
@@ -426,7 +430,7 @@ function MonthlyBreakdown({ history }: { history: Record<string, number> }) {
 
   return (
     <div className="card">
-      <h3 className="font-semibold mb-3 text-sm">Monthly Summary</h3>
+      <h3 className="font-semibold mb-3 text-sm">{t.progress.monthlySummary}</h3>
       <div className="space-y-3">
         {months.map(m => (
           <div key={m.label}>

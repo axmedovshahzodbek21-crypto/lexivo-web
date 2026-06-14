@@ -2,8 +2,10 @@
 import { useEffect, useState } from 'react';
 import { ALL_ACHIEVEMENTS } from '@/lib/gamification';
 import { getUnlockedAchievements } from '@/lib/storage';
+import { useTranslation } from '@/lib/useTranslation';
 
 export default function AchievementsPage() {
+  const t = useTranslation();
   const [unlockedIds, setUnlockedIds] = useState<string[]>([]);
 
   useEffect(() => {
@@ -15,8 +17,8 @@ export default function AchievementsPage() {
 
   return (
     <div className="p-4 space-y-4 animate-fade-in">
-      <h1 className="text-2xl font-bold">🏆 Achievements</h1>
-      <p className="text-sm text-[var(--text-muted)]">{unlocked.length} / {ALL_ACHIEVEMENTS.length} unlocked</p>
+      <h1 className="text-2xl font-bold">{t.achievements.title}</h1>
+      <p className="text-sm text-[var(--text-muted)]">{t.achievements.unlockedOf(unlocked.length, ALL_ACHIEVEMENTS.length)}</p>
 
       <div className="progress-bar">
         <div className="progress-bar-fill" style={{ width: `${(unlocked.length / ALL_ACHIEVEMENTS.length) * 100}%` }} />
@@ -24,7 +26,7 @@ export default function AchievementsPage() {
 
       {unlocked.length > 0 && (
         <div>
-          <h2 className="font-semibold text-sm text-[var(--success)] mb-2">✅ Unlocked</h2>
+          <h2 className="font-semibold text-sm text-[var(--success)] mb-2">{t.achievements.unlocked}</h2>
           <div className="space-y-2">
             {unlocked.map(a => (
               <div key={a.id} className="card flex items-center gap-4 border-[var(--success)] bg-green-50 animate-pop">
@@ -42,7 +44,7 @@ export default function AchievementsPage() {
 
       {locked.length > 0 && (
         <div>
-          <h2 className="font-semibold text-sm text-[var(--text-muted)] mb-2">🔒 Locked</h2>
+          <h2 className="font-semibold text-sm text-[var(--text-muted)] mb-2">{t.achievements.locked}</h2>
           <div className="space-y-2">
             {locked.map(a => (
               <div key={a.id} className="card flex items-center gap-4 opacity-50">

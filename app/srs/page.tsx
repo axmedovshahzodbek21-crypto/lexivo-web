@@ -9,9 +9,11 @@ import { checkAchievements } from '@/lib/gamification';
 import { XP_PER_SRS } from '@/lib/types';
 import type { SRSWord } from '@/lib/types';
 import Link from 'next/link';
+import { useTranslation } from '@/lib/useTranslation';
 
 export default function SRSReviewPage() {
   const router = useRouter();
+  const t = useTranslation();
   const { pushAchievement, setPendingLevelUp } = useAppStore();
   const [queue, setQueue] = useState<SRSWord[]>([]);
   const [index, setIndex] = useState(0);
@@ -74,9 +76,9 @@ export default function SRSReviewPage() {
     return (
       <div className="p-6 text-center flex flex-col items-center justify-center min-h-screen animate-fade-in">
         <div className="text-6xl mb-4">✅</div>
-        <h2 className="text-2xl font-bold mb-2">All Caught Up!</h2>
-        <p className="text-[var(--text-muted)] mb-6">No words due for review today. Come back tomorrow!</p>
-        <Link href="/" className="btn-primary">🏠 Go Home</Link>
+        <h2 className="text-2xl font-bold mb-2">{t.srs.allCaughtUp}</h2>
+        <p className="text-[var(--text-muted)] mb-6">{t.srs.noDueWords}</p>
+        <Link href="/" className="btn-primary">{t.srs.goHome}</Link>
       </div>
     );
   }
@@ -87,16 +89,16 @@ export default function SRSReviewPage() {
     return (
       <div className="p-6 text-center flex flex-col items-center justify-center min-h-screen animate-fade-in">
         <div className="text-6xl mb-4">{score >= 80 ? '🧠' : '💪'}</div>
-        <h2 className="text-2xl font-bold mb-2">Review Complete!</h2>
+        <h2 className="text-2xl font-bold mb-2">{t.srs.reviewComplete}</h2>
         <p className="text-[var(--text-muted)] mb-6">{correctCount}/{results.length} correct · +{correctCount * XP_PER_SRS} XP</p>
         <div className="grid grid-cols-3 gap-3 w-full mb-6">
-          <div className="card text-center"><div className="text-xl font-bold text-[var(--success)]">{correctCount}</div><div className="text-xs text-[var(--text-muted)]">Correct</div></div>
-          <div className="card text-center"><div className="text-xl font-bold text-[var(--danger)]">{results.length - correctCount}</div><div className="text-xs text-[var(--text-muted)]">Incorrect</div></div>
-          <div className="card text-center"><div className="text-xl font-bold text-[var(--primary)]">{score}%</div><div className="text-xs text-[var(--text-muted)]">Score</div></div>
+          <div className="card text-center"><div className="text-xl font-bold text-[var(--success)]">{correctCount}</div><div className="text-xs text-[var(--text-muted)]">{t.srs.correct}</div></div>
+          <div className="card text-center"><div className="text-xl font-bold text-[var(--danger)]">{results.length - correctCount}</div><div className="text-xs text-[var(--text-muted)]">{t.srs.incorrect}</div></div>
+          <div className="card text-center"><div className="text-xl font-bold text-[var(--primary)]">{score}%</div><div className="text-xs text-[var(--text-muted)]">{t.srs.score}</div></div>
         </div>
         <div className="flex gap-3 w-full">
-          <button onClick={() => { setIndex(0); setRevealed(false); setResults([]); setDone(false); }} className="btn-secondary flex-1">🔁 Redo</button>
-          <Link href="/" className="btn-primary flex-1 text-center">🏠 Home</Link>
+          <button onClick={() => { setIndex(0); setRevealed(false); setResults([]); setDone(false); }} className="btn-secondary flex-1">{t.common.redo}</button>
+          <Link href="/" className="btn-primary flex-1 text-center">{t.srs.goHome}</Link>
         </div>
       </div>
     );
@@ -112,7 +114,7 @@ export default function SRSReviewPage() {
       <div className="flex items-center justify-between p-4">
         <button onClick={() => router.back()} className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center">←</button>
         <div className="text-center">
-          <div className="font-semibold text-sm">SRS Review</div>
+          <div className="font-semibold text-sm">{t.srs.title}</div>
           <div className="text-xs text-[var(--text-muted)]">{index + 1} / {queue.length}</div>
         </div>
         <div
@@ -147,7 +149,7 @@ export default function SRSReviewPage() {
           {revealed ? (
             <div className="space-y-3 animate-fade-in">
               <div className="bg-[var(--primary-bg)] rounded-xl p-3">
-                <p className="text-xs font-semibold text-[var(--primary)] mb-1">🇺🇿 Tarjima</p>
+                <p className="text-xs font-semibold text-[var(--primary)] mb-1">{t.srs.translation}</p>
                 <p className="text-lg font-semibold text-[var(--primary)]">{current.translation}</p>
               </div>
               <p className="text-sm text-[var(--text)]">{current.definition}</p>
@@ -158,7 +160,7 @@ export default function SRSReviewPage() {
                 href={`/word/${encodeURIComponent(current.word)}`}
                 className="text-xs text-[var(--primary)] font-medium hover:underline text-right block"
               >
-                Full details →
+                {t.srs.fullDetails}
               </Link>
             </div>
           ) : (
@@ -166,7 +168,7 @@ export default function SRSReviewPage() {
               onClick={() => setRevealed(true)}
               className="mt-4 btn-secondary w-full"
             >
-              Reveal Answer · <kbd>Space</kbd>
+              {t.srs.reveal}
             </button>
           )}
         </div>
@@ -179,21 +181,21 @@ export default function SRSReviewPage() {
               className="flex-1 py-4 rounded-xl border-2 border-[var(--danger)] text-[var(--danger)] font-bold text-base hover:bg-red-50 transition-colors flex flex-col items-center gap-1"
             >
               <span>✗</span>
-              <span className="text-xs font-normal">Forgot <kbd>←</kbd></span>
+              <span className="text-xs font-normal">{t.srs.forgot}</span>
             </button>
             <button
               onClick={() => grade(true)}
               className="flex-1 py-4 rounded-xl border-2 border-[var(--success)] text-[var(--success)] font-bold text-base hover:bg-green-50 transition-colors flex flex-col items-center gap-1"
             >
               <span>✓</span>
-              <span className="text-xs font-normal">Knew it <kbd>→</kbd></span>
+              <span className="text-xs font-normal">{t.srs.knewIt}</span>
             </button>
           </div>
         )}
 
         {/* SRS progress info */}
         <div className="card p-3 flex justify-between text-xs text-[var(--text-muted)]">
-          <span>Collection: {current.collectionName}</span>
+          <span>{t.srs.collection} {current.collectionName}</span>
           <span>Next review: after {current.reviewStage < 4 ? `${[1,3,7,14][current.reviewStage]} days` : 'mastered!'}</span>
         </div>
       </div>

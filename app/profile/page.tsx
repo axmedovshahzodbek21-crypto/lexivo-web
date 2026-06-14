@@ -13,6 +13,7 @@ import type { UserSettings } from '@/lib/types';
 import { useRef } from 'react';
 import XpModal from '@/components/XpModal';
 import TiltCard from '@/components/TiltCard';
+import { useTranslation } from '@/lib/useTranslation';
 
 async function compressImage(file: File, maxSize = 200): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -98,6 +99,7 @@ export default function ProfilePage() {
     setProfilePic(null);
   }
 
+  const t = useTranslation();
   const levelInfo  = getLevelInfo(xp);
   const levelColor = LEVEL_COLORS[levelInfo.level] ?? '#6C63FF';
   const initial    = settings.name.charAt(0).toUpperCase();
@@ -127,7 +129,7 @@ export default function ProfilePage() {
           onClick={() => router.back()}
           className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-lg"
         >←</button>
-        <h1 className="font-bold text-[var(--text)]">My Profile</h1>
+        <h1 className="font-bold text-[var(--text)]">{t.profile.title}</h1>
         <Link
           href="/settings"
           className="w-9 h-9 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-lg"
@@ -155,7 +157,7 @@ export default function ProfilePage() {
           <button
             onClick={() => fileInputRef.current?.click()}
             className="relative mb-3 group"
-            title="Change profile photo"
+            title={t.profile.changePhoto}
           >
             <div className="w-20 h-20 rounded-full border-4 border-white/40 overflow-hidden shadow-lg">
               {profilePic ? (
@@ -179,7 +181,7 @@ export default function ProfilePage() {
               onClick={handleRemovePhoto}
               className="text-white/60 text-xs mb-1 hover:text-white transition-colors"
             >
-              Remove photo
+              {t.profile.removePhoto}
             </button>
           )}
           <h2 className="text-white text-2xl font-black">{settings.name}</h2>
@@ -192,17 +194,17 @@ export default function ProfilePage() {
           <div className="flex items-center gap-4 mt-4 text-white/90 text-sm">
             <div className="text-center">
               <div className="text-xl font-black">{todayCount}</div>
-              <div className="text-[11px] text-white/70">today</div>
+              <div className="text-[11px] text-white/70">{t.profile.today}</div>
             </div>
             <div className="w-px h-6 bg-white/30" />
             <div className="text-center">
               <div className="text-xl font-black">+{todayXp}</div>
-              <div className="text-[11px] text-white/70">XP today</div>
+              <div className="text-[11px] text-white/70">{t.profile.xpToday}</div>
             </div>
             <div className="w-px h-6 bg-white/30" />
             <div className="text-center">
               <div className="text-xl font-black">🔥 {streak}</div>
-              <div className="text-[11px] text-white/70">streak</div>
+              <div className="text-[11px] text-white/70">{t.profile.streak}</div>
             </div>
           </div>
         </TiltCard>
@@ -212,11 +214,11 @@ export default function ProfilePage() {
           <button onClick={() => setShowXpModal(true)} className="w-full text-left" style={{ margin: '-20px', padding: '20px' }}>
             <div className="flex items-center justify-between mb-3">
               <div>
-                <p className="text-xs text-[var(--text-muted)] font-medium uppercase tracking-wider">Current Level</p>
+                <p className="text-xs text-[var(--text-muted)] font-medium uppercase tracking-wider">{t.profile.currentLevel}</p>
                 <p className="text-xl font-black text-[var(--text)] mt-0.5">⭐ {levelInfo.level}</p>
               </div>
               <div className="text-right">
-                <p className="text-xs text-[var(--text-muted)]">Total XP</p>
+                <p className="text-xs text-[var(--text-muted)]">{t.profile.totalXp}</p>
                 <p className="text-2xl font-black" style={{ color: 'var(--primary)' }}>{xp}</p>
               </div>
             </div>
@@ -233,7 +235,7 @@ export default function ProfilePage() {
               <span>{levelInfo.level}</span>
               {levelInfo.next
                 ? <span><strong style={{ color: levelColor }}>{levelInfo.xpToNext} XP</strong> to {levelInfo.next} · tap for details</span>
-                : <span className="text-[var(--success)] font-semibold">Max level reached 🏆</span>
+                : <span className="text-[var(--success)] font-semibold">{t.profile.maxLevel}</span>
               }
             </div>
           </button>
@@ -243,22 +245,22 @@ export default function ProfilePage() {
 
         {/* ── Stats grid ── */}
         <div className="grid grid-cols-2 gap-3">
-          <StatTile icon="📚" value={learnedCount} label="Words Learned" color="#6C63FF" />
-          <StatTile icon="🔄" value={srsCount}     label="In SRS"        color="#3498DB" />
+          <StatTile icon="📚" value={learnedCount} label={t.profile.wordsLearned} color="#6C63FF" />
+          <StatTile icon="🔄" value={srsCount}     label={t.profile.inSrs}        color="#3498DB" />
           <StatTile
             icon="⏳"
             value={dueCount}
-            label="Due for Review"
+            label={t.profile.dueReview}
             color={dueCount > 0 ? '#EF4444' : '#10B981'}
             href="/srs"
           />
-          <StatTile icon="🎯" value={settings.dailyGoal} label="Daily Goal" color="#F59E0B" />
+          <StatTile icon="🎯" value={settings.dailyGoal} label={t.profile.dailyGoal} color="#F59E0B" />
         </div>
 
         {/* ── Collections progress ── */}
         {collectionStats.length > 0 && (
           <div className="card space-y-4">
-            <h3 className="font-bold text-[var(--text)] text-sm">📚 Collection Progress</h3>
+            <h3 className="font-bold text-[var(--text)] text-sm">{t.profile.collectionProgress}</h3>
             {collectionStats.map(col => {
               const pct = col.total ? Math.round((col.fullyDone / col.total) * 100) : 0;
               return (
@@ -266,7 +268,7 @@ export default function ProfilePage() {
                   <div className="flex items-center justify-between mb-1">
                     <p className="text-sm font-semibold text-[var(--text)] truncate">{col.name}</p>
                     <span className="text-xs text-[var(--text-muted)] shrink-0 ml-2">
-                      {col.fullyDone}/{col.total} complete
+                      {t.profile.complete(col.fullyDone, col.total)}
                     </span>
                   </div>
                   <div className="h-2 bg-[var(--border)] rounded-full overflow-hidden">
@@ -279,7 +281,7 @@ export default function ProfilePage() {
                     />
                   </div>
                   <div className="flex justify-between mt-0.5 text-[10px] text-[var(--text-muted)]">
-                    <span>{col.learnDone} units started</span>
+                    <span>{t.profile.unitsStarted(col.learnDone)}</span>
                     <span>{pct}%</span>
                   </div>
                 </div>
@@ -291,7 +293,7 @@ export default function ProfilePage() {
         {/* ── Achievements ── */}
         <div className="card">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="font-bold text-[var(--text)] text-sm">🏅 Achievements</h3>
+            <h3 className="font-bold text-[var(--text)] text-sm">{t.profile.achievements}</h3>
             <span className="text-xs font-semibold text-[var(--primary)]">
               {unlockedCount} / {ALL_ACHIEVEMENTS.length}
             </span>
@@ -354,7 +356,7 @@ export default function ProfilePage() {
               <div>
                 <p className="text-sm font-semibold text-[var(--text)]">SRS Review</p>
                 <p className={`text-xs font-medium ${dueCount > 0 ? 'text-[var(--danger)]' : 'text-[var(--text-muted)]'}`}>
-                  {dueCount > 0 ? `${dueCount} words due` : 'All caught up!'}
+                  {dueCount > 0 ? t.profile.dueCount(dueCount) : t.profile.allCaughtUp}
                 </p>
               </div>
             </Link>

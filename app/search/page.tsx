@@ -6,6 +6,7 @@ import { speak } from '@/lib/speech';
 import { toggleStarred, isStarred } from '@/lib/storage';
 import Link from 'next/link';
 import type { WordItem } from '@/lib/types';
+import { useTranslation } from '@/lib/useTranslation';
 
 interface SearchResult extends WordItem {
   collectionName: string;
@@ -13,6 +14,7 @@ interface SearchResult extends WordItem {
 }
 
 export default function SearchPage() {
+  const t = useTranslation();
   const { collections } = useAppStore();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
@@ -46,7 +48,7 @@ export default function SearchPage() {
     <div className="flex flex-col min-h-screen">
       {/* Search header */}
       <div className="sticky top-0 bg-[var(--background)] p-4 z-10 border-b border-[var(--border)]">
-        <h1 className="font-bold text-xl mb-3">🔍 Search</h1>
+        <h1 className="font-bold text-xl mb-3">{t.search.title}</h1>
         <div className="relative">
           <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)]">🔍</span>
           <input
@@ -54,7 +56,7 @@ export default function SearchPage() {
             type="text"
             value={query}
             onChange={e => setQuery(e.target.value)}
-            placeholder="Search words, Uzbek, definitions…"
+            placeholder={t.search.placeholder}
             className="w-full pl-11 pr-4 py-3 rounded-xl bg-[var(--surface-2)] border-2 border-transparent focus:border-[var(--primary)] outline-none text-[var(--text)] transition-colors"
           />
           {query && (
@@ -67,7 +69,7 @@ export default function SearchPage() {
           )}
         </div>
         {results.length > 0 && (
-          <p className="text-xs text-[var(--text-muted)] mt-2">{results.length} results</p>
+          <p className="text-xs text-[var(--text-muted)] mt-2">{t.search.results(results.length)}</p>
         )}
       </div>
 
@@ -76,15 +78,15 @@ export default function SearchPage() {
         {query.length === 0 && (
           <div className="text-center py-16">
             <div className="text-5xl mb-3">🔎</div>
-            <p className="text-[var(--text-muted)]">Search across 2,500+ words</p>
-            <p className="text-xs text-[var(--text-muted)] mt-1">Try searching in English or Uzbek</p>
+            <p className="text-[var(--text-muted)]">{t.search.emptyTitle}</p>
+            <p className="text-xs text-[var(--text-muted)] mt-1">{t.search.emptyHelper}</p>
           </div>
         )}
 
         {query.length > 0 && results.length === 0 && (
           <div className="text-center py-16">
             <div className="text-5xl mb-3">😕</div>
-            <p className="text-[var(--text-muted)]">No results for "{query}"</p>
+            <p className="text-[var(--text-muted)]">{t.search.noResults(query)}</p>
           </div>
         )}
 

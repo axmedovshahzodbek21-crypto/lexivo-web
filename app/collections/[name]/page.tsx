@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
 import { getUnitProgress, getLearnProgress, getHardWordCount, getFlashcardProgress } from '@/lib/storage';
 import type { WordCollection, UnitProgress } from '@/lib/types';
+import { useTranslation } from '@/lib/useTranslation';
 
 interface UnitRow {
   dayNumber: number;
@@ -17,6 +18,7 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
   const { name: encodedName } = use(params);
   const collectionName = decodeURIComponent(encodedName);
   const router = useRouter();
+  const t = useTranslation();
   const { collections, collectionsLoaded } = useAppStore();
 
   const [collection, setCollection] = useState<WordCollection | null>(null);
@@ -61,8 +63,8 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
   if (!collection) {
     return (
       <div className="p-6 text-center">
-        <p className="text-[var(--text-muted)]">Collection not found.</p>
-        <Link href="/" className="btn-primary inline-block mt-4">← Home</Link>
+        <p className="text-[var(--text-muted)]">{t.collections.notFound}</p>
+        <Link href="/" className="btn-primary inline-block mt-4">{t.collections.back}</Link>
       </div>
     );
   }
@@ -78,16 +80,16 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
           onClick={() => router.back()}
           className="flex items-center gap-2 text-sm text-[var(--text-muted)] mb-3 hover:text-[var(--text)] transition-colors"
         >
-          ← Back
+          {t.collections.back}
         </button>
         <h1 className="text-xl font-bold text-[var(--text)]">{collection.name}</h1>
         {collection.description && (
           <p className="text-sm text-[var(--text-muted)] mt-1">{collection.description}</p>
         )}
         <div className="flex gap-3 mt-3 text-sm text-[var(--text-muted)]">
-          <span>📚 {units.length} units</span>
-          <span>📝 {totalWords} words</span>
-          <span>✅ {completedUnits}/{units.length} done</span>
+          <span>{t.collections.unitsCount(units.length)}</span>
+          <span>{t.collections.wordsCount(totalWords)}</span>
+          <span>{t.collections.completed(completedUnits, units.length)}</span>
         </div>
 
         {/* Overall progress bar */}
@@ -118,6 +120,7 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
 }
 
 function UnitCard({ unit, collectionName }: { unit: UnitRow; collectionName: string }) {
+  const t = useTranslation();
   const { learnDone, flashcardDone, quizDone } = unit.progress;
   const stagesComplete = [learnDone, flashcardDone, quizDone].filter(Boolean).length;
   const isComplete = stagesComplete === 3;
@@ -149,11 +152,11 @@ function UnitCard({ unit, collectionName }: { unit: UnitRow; collectionName: str
       {/* Unit header */}
       <div className="mb-2">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold text-[var(--text-muted)]">Unit {unit.dayNumber}</span>
+          <span className="text-xs font-semibold text-[var(--text-muted)]">{t.collections.unit(unit.dayNumber)}</span>
           <button
             onClick={() => setShowInfo(true)}
             className="text-sm leading-none opacity-60 hover:opacity-100 transition-opacity"
-            title="How marking works"
+            title={t.collections.howMarking}
           >🕯️</button>
         </div>
         <h3 className="font-semibold text-sm text-[var(--text)] truncate mt-0.5">{unit.topic}</h3>
@@ -175,11 +178,11 @@ function UnitCard({ unit, collectionName }: { unit: UnitRow; collectionName: str
       {/* Resume learn banner */}
       {!learnDone && resumeUrl && (
         <div className="flex items-center justify-between gap-2 mb-2 px-3 py-2 rounded-xl bg-[var(--primary-bg)] border border-[var(--primary)] border-opacity-30">
-          <span className="text-xs text-[var(--primary)]">📖 Saved at word {(learnProgress ?? 0) + 1}</span>
+          <span className="text-xs text-[var(--primary)]">{t.collections.savedAtWord((learnProgress ?? 0) + 1)}</span>
           <div className="flex gap-2">
-            <Link href={resumeUrl} className="text-xs font-semibold text-[var(--primary)] hover:underline">Continue →</Link>
+            <Link href={resumeUrl} className="text-xs font-semibold text-[var(--primary)] hover:underline">{t.collections.continueBtn}</Link>
             <span className="text-[var(--text-muted)]">·</span>
-            <Link href={learnUrl} className="text-xs text-[var(--text-muted)] hover:underline">Restart</Link>
+            <Link href={learnUrl} className="text-xs text-[var(--text-muted)] hover:underline">{t.collections.restart}</Link>
           </div>
         </div>
       )}
@@ -187,11 +190,11 @@ function UnitCard({ unit, collectionName }: { unit: UnitRow; collectionName: str
       {/* Resume flashcard banner */}
       {!flashcardDone && flashcardProgress > 0 && (
         <div className="flex items-center justify-between gap-2 mb-2 px-3 py-2 rounded-xl bg-purple-50 border border-purple-200">
-          <span className="text-xs text-purple-600">🃏 {flashcardProgress} cards remaining</span>
+          <span className="text-xs text-purple-600">{t.collections.cardsRemaining(flashcardProgress)}</span>
           <div className="flex gap-2">
-            <Link href={flashUrl} className="text-xs font-semibold text-purple-600 hover:underline">Continue →</Link>
+            <Link href={flashUrl} className="text-xs font-semibold text-purple-600 hover:underline">{t.collections.continueBtn}</Link>
             <span className="text-[var(--text-muted)]">·</span>
-            <Link href={`${flashUrl}&fresh=true`} className="text-xs text-[var(--text-muted)] hover:underline">Restart</Link>
+            <Link href={`${flashUrl}&fresh=true`} className="text-xs text-[var(--text-muted)] hover:underline">{t.collections.restart}</Link>
           </div>
         </div>
       )}
@@ -201,13 +204,13 @@ function UnitCard({ unit, collectionName }: { unit: UnitRow; collectionName: str
         <ModeButton href={learnUrl} icon="📖" label="Learn" done={learnDone} color="#6C63FF" />
         <ModeButton
           href={flashUrl} icon="🃏" label={hardCount > 0 ? `Cards (${hardCount})` : 'Cards'} done={flashcardDone} color="#FF6B35"
-          locked={!learnDone} lockReason="Complete Learn first"
+          locked={!learnDone} lockReason={t.collections.completeLearnFirst}
         />
         <ModeButton
           href={quizUrl} icon="❓" label="Quiz" done={quizDone} color="#F59E0B"
-          locked={!learnDone} lockReason="Complete Learn first"
+          locked={!learnDone} lockReason={t.collections.completeLearnFirst}
           softLocked={learnDone && !flashcardDone}
-          softLockReason="Cards not fully done — hard words may remain"
+          softLockReason={t.collections.hardWordsRemain}
         />
       </div>
 
@@ -227,13 +230,13 @@ function UnitCard({ unit, collectionName }: { unit: UnitRow; collectionName: str
             className="card max-w-sm w-full animate-slide-up"
             onClick={e => e.stopPropagation()}
           >
-            <h3 className="font-bold text-lg mb-4 text-center">🕯️ How Units Get Marked</h3>
+            <h3 className="font-bold text-lg mb-4 text-center">{t.collections.markingModal}</h3>
             <div className="space-y-3">
               {[
-                { icon: '📖', label: 'Learn', desc: 'Marked ✓ when you finish going through all the words.' },
-                { icon: '🃏', label: 'Flashcards', desc: 'Marked ✓ only when there are zero hard words left at the end.' },
-                { icon: '❓', label: 'Quiz', desc: 'Marked ✓ after one full run — even if some answers were wrong.' },
-                { icon: '🏆', label: 'Unit Complete', desc: 'All three sections must be ✓ for the unit to be fully done.' },
+                { icon: '📖', label: 'Learn', desc: t.collections.markingLearn },
+                { icon: '🃏', label: 'Flashcards', desc: t.collections.markingFlash },
+                { icon: '❓', label: 'Quiz', desc: t.collections.markingQuiz },
+                { icon: '🏆', label: 'Unit Complete', desc: t.collections.markingUnit },
               ].map(({ icon, label, desc }) => (
                 <div key={label} className="flex gap-3 items-start">
                   <span className="text-xl shrink-0">{icon}</span>
@@ -247,7 +250,7 @@ function UnitCard({ unit, collectionName }: { unit: UnitRow; collectionName: str
             <button
               onClick={() => setShowInfo(false)}
               className="btn-primary w-full mt-4"
-            >Got it</button>
+            >{t.common.gotIt}</button>
           </div>
         </div>
       )}

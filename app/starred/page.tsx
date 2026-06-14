@@ -6,6 +6,7 @@ import { useAppStore } from '@/lib/store';
 import { getStarredWords, toggleStarred } from '@/lib/storage';
 import { speak } from '@/lib/speech';
 import type { WordItem, WordCollection } from '@/lib/types';
+import { useTranslation } from '@/lib/useTranslation';
 
 interface StarredWord extends WordItem {
   collectionName: string;
@@ -32,6 +33,7 @@ function findStarredWords(collections: WordCollection[], starredList: string[]):
 
 export default function StarredPage() {
   const router = useRouter();
+  const t = useTranslation();
   const { collections, collectionsLoaded } = useAppStore();
 
   const [starredList, setStarredList] = useState<string[]>([]);
@@ -86,17 +88,17 @@ export default function StarredPage() {
           onClick={() => router.back()}
           className="flex items-center gap-2 text-sm text-[var(--text-muted)] mb-3 hover:text-[var(--text)] transition-colors"
         >
-          ← Back
+          {t.common.back}
         </button>
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold text-[var(--text)]">⭐ Starred Words</h1>
-            <p className="text-sm text-[var(--text-muted)] mt-0.5">{starredList.length} saved</p>
+            <h1 className="text-xl font-bold text-[var(--text)]">{t.starred.title}</h1>
+            <p className="text-sm text-[var(--text-muted)] mt-0.5">{starredList.length} {t.starred.saved}</p>
           </div>
           {starredList.length > 0 && (
             <div className="flex gap-2 flex-wrap">
-              <Link href="/flashcards?starred=true" className="btn-secondary text-sm px-3 py-1.5">🃏 Cards</Link>
-              <Link href="/quiz?starred=true" className="btn-secondary text-sm px-3 py-1.5">❓ Quiz</Link>
+              <Link href="/flashcards?starred=true" className="btn-secondary text-sm px-3 py-1.5">{t.starred.cards}</Link>
+              <Link href="/quiz?starred=true" className="btn-secondary text-sm px-3 py-1.5">{t.starred.quiz}</Link>
             </div>
           )}
         </div>
@@ -106,7 +108,7 @@ export default function StarredPage() {
           <div className="mt-3">
             <input
               type="text"
-              placeholder="Filter starred words…"
+              placeholder={t.starred.filterPlaceholder}
               value={search}
               onChange={e => setSearch(e.target.value)}
               className="w-full px-4 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]"
@@ -120,14 +122,14 @@ export default function StarredPage() {
         {starredList.length === 0 ? (
           <div className="text-center py-16">
             <div className="text-6xl mb-4">☆</div>
-            <h2 className="text-xl font-bold text-[var(--text)] mb-2">No starred words yet</h2>
+            <h2 className="text-xl font-bold text-[var(--text)] mb-2">{t.starred.empty}</h2>
             <p className="text-[var(--text-muted)] text-sm mb-6">
-              Tap ☆ on any word while learning to save it here.
+              {t.starred.emptyHelper}
             </p>
-            <Link href="/learn" className="btn-primary inline-block">Start Learning</Link>
+            <Link href="/learn" className="btn-primary inline-block">{t.starred.startLearning}</Link>
           </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-8 text-[var(--text-muted)]">No matches for "{search}"</div>
+          <div className="text-center py-8 text-[var(--text-muted)]">{t.starred.noResults(search)}</div>
         ) : (
           <div className="space-y-3">
             {filtered.map(w => (
@@ -154,6 +156,7 @@ function WordCard({
   onToggle: () => void;
   onUnstar: () => void;
 }) {
+  const t = useTranslation();
   return (
     <div className="card transition-all">
       {/* Top row */}
@@ -186,13 +189,13 @@ function WordCard({
         onClick={onToggle}
         className="text-xs text-[var(--primary)] font-medium hover:underline"
       >
-        {expanded ? '▲ Less' : '▼ Definition & examples'}
+        {expanded ? t.starred.showLess : t.starred.showMore}
       </button>
       <Link
         href={`/word/${encodeURIComponent(word.word)}`}
         className="mt-2 text-xs text-[var(--text-muted)] hover:text-[var(--primary)] transition-colors block text-right"
       >
-        Full details →
+        {t.starred.fullDetails}
       </Link>
 
       {/* Expanded content */}
@@ -203,7 +206,7 @@ function WordCard({
           <div className="space-y-2">
             {[word.example1, word.example2, word.example3].filter(Boolean).map((ex, i) => (
               <div key={i} className="bg-[var(--surface-2)] rounded-xl p-3">
-                <p className="text-xs text-[var(--text-muted)] mb-1">Example {i + 1}</p>
+                <p className="text-xs text-[var(--text-muted)] mb-1">{t.starred.example(i + 1)}</p>
                 <p className="text-sm italic text-[var(--text)]">"{ex}"</p>
                 {i === 2 && word.example3Translation && (
                   <p className="text-xs text-[var(--primary)] mt-1">{word.example3Translation}</p>
@@ -213,7 +216,7 @@ function WordCard({
           </div>
 
           <div className="text-xs text-[var(--text-muted)]">
-            From: {word.collectionName} · Unit {word.dayNumber}
+            {t.starred.from(word.collectionName, word.dayNumber)}
           </div>
         </div>
       )}

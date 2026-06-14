@@ -12,6 +12,7 @@ import {
 } from '@/lib/notifications';
 import { exportData, importData } from '@/lib/backup';
 import type { UserSettings } from '@/lib/types';
+import { translations } from '@/lib/i18n';
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -189,34 +190,36 @@ export default function SettingsPage() {
     setTimeout(() => { setSaved(false); router.back(); }, 1000);
   };
 
+  const t = translations[settings.uiLanguage] ?? translations.en;
+
   return (
     <div className="p-4 space-y-4 animate-fade-in">
       <div className="sticky top-0 z-10 -mx-4 px-4 py-3 bg-[var(--background)] border-b border-[var(--border)] flex items-center gap-3">
         <button onClick={() => router.back()} className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center shrink-0">←</button>
-        <h1 className="text-xl font-bold flex-1">⚙️ Settings</h1>
+        <h1 className="text-xl font-bold flex-1">{t.settings.title}</h1>
         <button
           onClick={handleSave}
           className={`px-5 py-2 rounded-xl text-sm font-semibold transition-all ${saved ? 'bg-[var(--success)] text-white' : 'bg-[var(--primary)] text-white hover:bg-[var(--primary-dark)]'}`}
         >
-          {saved ? '✅ Saved!' : 'Save'}
+          {saved ? t.settings.saved : t.settings.save}
         </button>
       </div>
 
       <div className="card space-y-4">
-        <h2 className="font-semibold">Profile</h2>
+        <h2 className="font-semibold">{t.settings.profile}</h2>
         <div>
-          <label className="text-sm font-medium text-[var(--text-muted)] block mb-1">Your Name</label>
+          <label className="text-sm font-medium text-[var(--text-muted)] block mb-1">{t.settings.yourName}</label>
           <input
             type="text"
             value={settings.name}
             onChange={e => setSettings(s => ({ ...s, name: e.target.value }))}
             className="w-full px-4 py-3 rounded-xl bg-[var(--surface-2)] border-2 border-transparent focus:border-[var(--primary)] outline-none transition-colors"
-            placeholder="Enter your name"
+            placeholder={t.settings.namePlaceholder}
           />
         </div>
 
         <div>
-          <label className="text-sm font-medium text-[var(--text-muted)] block mb-1">Daily Goal (words)</label>
+          <label className="text-sm font-medium text-[var(--text-muted)] block mb-1">{t.settings.dailyGoal}</label>
           <input
             type="number"
             min={1}
@@ -228,7 +231,7 @@ export default function SettingsPage() {
         </div>
 
         <div>
-          <label className="text-sm font-medium text-[var(--text-muted)] block mb-2">Session Size</label>
+          <label className="text-sm font-medium text-[var(--text-muted)] block mb-2">{t.settings.sessionSize}</label>
           <div className="grid grid-cols-5 gap-2">
             {[5, 10, 15, 20, 30].map(n => (
               <button
@@ -244,11 +247,11 @@ export default function SettingsPage() {
               </button>
             ))}
           </div>
-          <p className="text-xs text-[var(--text-muted)] mt-1.5">Words per learn session</p>
+          <p className="text-xs text-[var(--text-muted)] mt-1.5">{t.settings.sessionSizeHelper}</p>
         </div>
 
         <div>
-          <label className="text-sm font-medium text-[var(--text-muted)] block mb-2">Language Level</label>
+          <label className="text-sm font-medium text-[var(--text-muted)] block mb-2">{t.settings.languageLevel}</label>
           <div className="grid grid-cols-3 gap-2">
             {(['A1', 'A2', 'B1', 'B2', 'C1', 'C2'] as const).map(level => (
               <button
@@ -266,20 +269,20 @@ export default function SettingsPage() {
           onClick={() => { resetOnboarded(); router.replace('/onboarding'); }}
           className="w-full py-2.5 rounded-xl border border-[var(--border)] text-sm text-[var(--text-muted)] hover:bg-[var(--surface-2)] transition-colors"
         >
-          🔄 Start setup again
+          {t.settings.startSetupAgain}
         </button>
       </div>
 
       {/* Learning preferences */}
       <div className="card space-y-4">
-        <h2 className="font-semibold">Learning</h2>
+        <h2 className="font-semibold">{t.settings.learning}</h2>
 
         <div>
-          <p className="text-sm font-medium text-[var(--text)] mb-2">Card Study Order</p>
+          <p className="text-sm font-medium text-[var(--text)] mb-2">{t.settings.cardOrder}</p>
           <div className="grid grid-cols-2 gap-2">
             {([
-              { value: 'random',   label: 'Random',   icon: '🔀' },
-              { value: 'in-order', label: 'In order',  icon: '🔢' },
+              { value: 'random',   label: t.settings.random,   icon: '🔀' },
+              { value: 'in-order', label: t.settings.inOrder,  icon: '🔢' },
             ] as const).map(({ value, label, icon }) => (
               <button
                 key={value}
@@ -294,15 +297,15 @@ export default function SettingsPage() {
               </button>
             ))}
           </div>
-          <p className="text-xs text-[var(--text-muted)] mt-1.5">How cards are ordered in Learn sessions</p>
+          <p className="text-xs text-[var(--text-muted)] mt-1.5">{t.settings.cardOrderHelper}</p>
         </div>
 
         <div>
-          <p className="text-sm font-medium text-[var(--text)] mb-2">Default Quiz Direction</p>
+          <p className="text-sm font-medium text-[var(--text)] mb-2">{t.settings.quizDirection}</p>
           <div className="grid grid-cols-2 gap-2">
             {([
-              { value: 'word-to-uz', label: 'English → Uzbek' },
-              { value: 'uz-to-word', label: 'Uzbek → English' },
+              { value: 'word-to-uz', label: t.settings.engToUz },
+              { value: 'uz-to-word', label: t.settings.uzToEng },
             ] as const).map(({ value, label }) => (
               <button
                 key={value}
@@ -317,20 +320,20 @@ export default function SettingsPage() {
               </button>
             ))}
           </div>
-          <p className="text-xs text-[var(--text-muted)] mt-1.5">First question type shown in quizzes</p>
+          <p className="text-xs text-[var(--text-muted)] mt-1.5">{t.settings.quizDirectionHelper}</p>
         </div>
       </div>
 
       <div className="card space-y-4">
-        <h2 className="font-semibold">Appearance</h2>
+        <h2 className="font-semibold">{t.settings.appearance}</h2>
 
         <div>
-          <p className="text-sm font-medium text-[var(--text)] mb-2">Theme</p>
+          <p className="text-sm font-medium text-[var(--text)] mb-2">{t.settings.theme}</p>
           <div className="grid grid-cols-3 gap-2">
             {([
-              { value: 'system', label: 'System', icon: '⚙️' },
-              { value: 'light',  label: 'Light',  icon: '☀️' },
-              { value: 'dark',   label: 'Dark',   icon: '🌙' },
+              { value: 'system', label: t.settings.themeSystem, icon: '⚙️' },
+              { value: 'light',  label: t.settings.themeLight,  icon: '☀️' },
+              { value: 'dark',   label: t.settings.themeDark,   icon: '🌙' },
             ] as const).map(({ value, label, icon }) => (
               <button
                 key={value}
@@ -349,12 +352,12 @@ export default function SettingsPage() {
         </div>
 
         <div>
-          <p className="text-sm font-medium text-[var(--text)] mb-2">Font Size</p>
+          <p className="text-sm font-medium text-[var(--text)] mb-2">{t.settings.fontSize}</p>
           <div className="grid grid-cols-3 gap-2">
             {([
-              { value: 'compact', label: 'Compact', sample: 'A−' },
-              { value: 'normal',  label: 'Normal',  sample: 'A'  },
-              { value: 'large',   label: 'Large',   sample: 'A+' },
+              { value: 'compact', label: t.settings.fontCompact, sample: 'A−' },
+              { value: 'normal',  label: t.settings.fontNormal,  sample: 'A'  },
+              { value: 'large',   label: t.settings.fontLarge,   sample: 'A+' },
             ] as const).map(({ value, label, sample }) => (
               <button
                 key={value}
@@ -376,8 +379,8 @@ export default function SettingsPage() {
 
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-[var(--text)]">🌐 Interface Language</p>
-            <p className="text-xs text-[var(--text-muted)] mt-0.5">App display language</p>
+            <p className="text-sm font-medium text-[var(--text)]">{t.settings.interfaceLang}</p>
+            <p className="text-xs text-[var(--text-muted)] mt-0.5">{t.settings.interfaceLangHelper}</p>
           </div>
           <div className="flex rounded-xl overflow-hidden border border-[var(--border)]">
             {(['en', 'uz'] as const).map(lang => (
@@ -386,7 +389,7 @@ export default function SettingsPage() {
                 onClick={() => setSettings(s => ({ ...s, uiLanguage: lang }))}
                 className={`px-4 py-2 text-sm font-semibold transition-colors ${settings.uiLanguage === lang ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface)] text-[var(--text-muted)] hover:bg-[var(--surface-2)]'}`}
               >
-                {lang === 'en' ? '🇬🇧 English' : "🇺🇿 O'zbek"}
+                {lang === 'en' ? t.settings.langEn : t.settings.langUz}
               </button>
             ))}
           </div>
@@ -394,8 +397,8 @@ export default function SettingsPage() {
 
         <div className="flex items-center justify-between">
           <div>
-          <p className="text-sm font-medium text-[var(--text)]">Reduce Motion</p>
-            <p className="text-xs text-[var(--text-muted)] mt-0.5">Disables slide &amp; fade animations</p>
+          <p className="text-sm font-medium text-[var(--text)]">{t.settings.reduceMotion}</p>
+            <p className="text-xs text-[var(--text-muted)] mt-0.5">{t.settings.reduceMotionHelper}</p>
           </div>
           <button
             onClick={() => handleReduceMotion(!settings.reduceMotion)}
@@ -409,12 +412,12 @@ export default function SettingsPage() {
 
       {/* Pronunciation */}
       <div className="card space-y-4">
-        <h2 className="font-semibold">Pronunciation</h2>
+        <h2 className="font-semibold">{t.settings.pronunciation}</h2>
 
         <div className="flex items-center justify-between gap-4">
           <div>
-            <p className="text-sm font-medium text-[var(--text)]">Default Accent</p>
-            <p className="text-xs text-[var(--text-muted)] mt-0.5">Used for auto-play and the Hear buttons</p>
+            <p className="text-sm font-medium text-[var(--text)]">{t.settings.defaultAccent}</p>
+            <p className="text-xs text-[var(--text-muted)] mt-0.5">{t.settings.accentHelper}</p>
           </div>
           <div className="flex rounded-xl overflow-hidden border border-[var(--border)] shrink-0">
             {(['us', 'uk'] as const).map(a => (
@@ -427,7 +430,7 @@ export default function SettingsPage() {
                     : 'text-[var(--text-muted)] hover:text-[var(--text)]'
                 }`}
               >
-                {a === 'us' ? '🇺🇸' : '🇬🇧'} {a === 'us' ? 'American' : 'British'}
+                {a === 'us' ? t.settings.american : t.settings.british}
               </button>
             ))}
           </div>
@@ -435,8 +438,8 @@ export default function SettingsPage() {
 
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-[var(--text)]">Auto-play on Reveal</p>
-            <p className="text-xs text-[var(--text-muted)] mt-0.5">Speak the word automatically when you flip a card</p>
+            <p className="text-sm font-medium text-[var(--text)]">{t.settings.autoPlay}</p>
+            <p className="text-xs text-[var(--text-muted)] mt-0.5">{t.settings.autoPlayHelper}</p>
           </div>
           <button
             onClick={() => setSettings(s => ({ ...s, autoPlayOnReveal: !s.autoPlayOnReveal }))}
@@ -451,13 +454,13 @@ export default function SettingsPage() {
       {/* Notifications */}
       {notifSupported ? (
         <div className="card space-y-4">
-          <h2 className="font-semibold">Daily Reminder</h2>
+          <h2 className="font-semibold">{t.settings.dailyReminder}</h2>
 
           {/* Permission warning */}
           {permission === 'denied' && (
             <div className="bg-red-50 border border-[var(--danger)] rounded-xl p-3">
               <p className="text-xs text-[var(--danger)]">
-                Notifications are blocked by your browser. Enable them in your browser's site settings, then come back here.
+                {t.settings.notifBlocked}
               </p>
             </div>
           )}
@@ -465,9 +468,9 @@ export default function SettingsPage() {
           {/* Enable toggle */}
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-[var(--text)]">Enable Reminder</p>
+              <p className="text-sm font-medium text-[var(--text)]">{t.settings.enableReminder}</p>
               <p className="text-xs text-[var(--text-muted)] mt-0.5">
-                {notif.enabled ? `Scheduled daily at ${notif.time}` : 'Get a daily nudge to study'}
+                {notif.enabled ? t.settings.reminderOn(notif.time) : t.settings.reminderOff}
               </p>
             </div>
             <button
@@ -482,7 +485,7 @@ export default function SettingsPage() {
           {/* Time picker */}
           {notif.enabled && permission === 'granted' && (
             <div>
-              <label className="text-sm font-medium text-[var(--text-muted)] block mb-1">Reminder Time</label>
+              <label className="text-sm font-medium text-[var(--text-muted)] block mb-1">{t.settings.reminderTime}</label>
               <input
                 type="time"
                 value={notif.time}
@@ -498,22 +501,22 @@ export default function SettingsPage() {
               onClick={handleTest}
               className="w-full py-2 rounded-xl border border-[var(--border)] text-sm text-[var(--text-muted)] hover:bg-[var(--surface-2)] transition-colors"
             >
-              {testSent ? '✅ Test notification sent!' : '🔔 Send test notification'}
+              {testSent ? t.settings.testNotifSent : t.settings.testNotif}
             </button>
           )}
         </div>
       ) : (
         <div className="card">
-          <h2 className="font-semibold mb-1">Daily Reminder</h2>
-          <p className="text-sm text-[var(--text-muted)]">Notifications are not supported in this browser.</p>
+          <h2 className="font-semibold mb-1">{t.settings.dailyReminder}</h2>
+          <p className="text-sm text-[var(--text-muted)]">{t.settings.notifNotSupported}</p>
         </div>
       )}
 
       {/* Data backup */}
       <div className="card space-y-4">
         <div>
-          <h2 className="font-semibold">Data Backup</h2>
-          <p className="text-xs text-[var(--text-muted)] mt-0.5">Export your progress to a file, or restore from a previous backup.</p>
+          <h2 className="font-semibold">{t.settings.dataBackup}</h2>
+          <p className="text-xs text-[var(--text-muted)] mt-0.5">{t.settings.dataBackupHelper}</p>
         </div>
 
         {/* Export */}
@@ -523,8 +526,8 @@ export default function SettingsPage() {
         >
           <span className="text-2xl">📤</span>
           <div>
-            <p className="text-sm font-semibold text-[var(--text)]">Export Progress</p>
-            <p className="text-xs text-[var(--text-muted)]">Download a .json backup of all your data</p>
+            <p className="text-sm font-semibold text-[var(--text)]">{t.settings.exportProgress}</p>
+            <p className="text-xs text-[var(--text-muted)]">{t.settings.exportHelper}</p>
           </div>
         </button>
 
@@ -532,8 +535,8 @@ export default function SettingsPage() {
         <label className="w-full flex items-center gap-3 p-3 rounded-xl bg-[var(--surface-2)] hover:bg-[var(--primary-bg)] transition-colors cursor-pointer">
           <span className="text-2xl">📥</span>
           <div>
-            <p className="text-sm font-semibold text-[var(--text)]">Import Progress</p>
-            <p className="text-xs text-[var(--text-muted)]">Restore from a Lexivo backup file</p>
+            <p className="text-sm font-semibold text-[var(--text)]">{t.settings.importProgress}</p>
+            <p className="text-xs text-[var(--text-muted)]">{t.settings.importHelper}</p>
           </div>
           <input type="file" accept=".json" onChange={handleImportFile} className="hidden" />
         </label>
@@ -541,14 +544,14 @@ export default function SettingsPage() {
         {/* Confirm dialog */}
         {importState === 'confirm' && (
           <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 animate-fade-in space-y-3">
-            <p className="text-sm font-semibold text-amber-800">⚠️ Confirm Import</p>
+            <p className="text-sm font-semibold text-amber-800">{t.settings.confirmImport}</p>
             <p className="text-xs text-amber-700">{importMsg}</p>
             <div className="flex gap-2">
               <button onClick={() => setImportState('idle')} className="flex-1 py-2 rounded-xl border border-[var(--border)] text-sm text-[var(--text-muted)] hover:bg-[var(--surface-2)] transition-colors">
-                Cancel
+                {t.settings.dismiss}
               </button>
               <button onClick={confirmImport} className="flex-1 py-2 rounded-xl bg-[var(--primary)] text-white text-sm font-semibold hover:bg-[var(--primary-dark)] transition-colors">
-                Yes, overwrite
+                {t.settings.yesOverwrite}
               </button>
             </div>
           </div>
@@ -557,30 +560,30 @@ export default function SettingsPage() {
         {/* Success / Error feedback */}
         {importState === 'success' && (
           <div className="bg-green-50 border border-[var(--success)] rounded-xl p-3 animate-fade-in">
-            <p className="text-sm font-semibold text-[var(--success)]">✅ Import successful!</p>
-            <p className="text-xs text-[var(--text-muted)] mt-1">{importMsg} Reloading…</p>
+            <p className="text-sm font-semibold text-[var(--success)]">{t.settings.importSuccess}</p>
+            <p className="text-xs text-[var(--text-muted)] mt-1">{importMsg} {t.settings.reloading}</p>
           </div>
         )}
         {importState === 'error' && (
           <div className="bg-red-50 border border-[var(--danger)] rounded-xl p-3 animate-fade-in">
-            <p className="text-sm font-semibold text-[var(--danger)]">❌ Import failed</p>
+            <p className="text-sm font-semibold text-[var(--danger)]">{t.settings.importFailed}</p>
             <p className="text-xs text-[var(--text-muted)] mt-1">{importMsg}</p>
-            <button onClick={() => setImportState('idle')} className="text-xs text-[var(--primary)] mt-2 underline">Dismiss</button>
+            <button onClick={() => setImportState('idle')} className="text-xs text-[var(--primary)] mt-2 underline">{t.settings.dismiss}</button>
           </div>
         )}
       </div>
 
       <div className="card space-y-3">
-        <h2 className="font-semibold">About</h2>
+        <h2 className="font-semibold">{t.settings.about}</h2>
         <p className="text-sm text-[var(--text-muted)]">
-          Lexivo Web — English vocabulary learning app with Uzbek translations, SRS, quizzes, and offline support.
+          {t.settings.aboutText}
         </p>
-        <p className="text-xs text-[var(--text-muted)]">Data is stored locally in your browser.</p>
+        <p className="text-xs text-[var(--text-muted)]">{t.settings.aboutStorage}</p>
       </div>
 
       {/* Danger Zone */}
       <div className="card border-2 border-[var(--danger)] space-y-3" style={{ borderColor: 'rgba(239,68,68,0.3)' }}>
-        <h2 className="font-semibold text-[var(--danger)]">Danger Zone</h2>
+        <h2 className="font-semibold text-[var(--danger)]">{t.settings.dangerZone}</h2>
 
         {/* Reset Progress */}
         {!resetConfirm ? (
@@ -590,23 +593,23 @@ export default function SettingsPage() {
           >
             <span className="text-2xl">🔄</span>
             <div>
-              <p className="text-sm font-semibold text-[var(--danger)]">Reset Progress</p>
-              <p className="text-xs text-[var(--text-muted)]">Clear all learning data, keep your account</p>
+              <p className="text-sm font-semibold text-[var(--danger)]">{t.settings.resetProgress}</p>
+              <p className="text-xs text-[var(--text-muted)]">{t.settings.resetSub}</p>
             </div>
           </button>
         ) : (
           <div className="space-y-3 animate-fade-in">
             <div className="p-3 rounded-xl bg-red-50 border border-red-200 space-y-2">
-              <p className="text-sm font-bold text-[var(--danger)]">⚠️ This will permanently delete:</p>
+              <p className="text-sm font-bold text-[var(--danger)]">{t.settings.resetWarning}</p>
               <ul className="text-xs text-[var(--text-muted)] space-y-1">
-                <li>• All learned words</li>
-                <li>• All SRS review progress</li>
-                <li>• Your XP, streak, and stats</li>
-                <li>• All starred words</li>
-                <li>• Unit completion marks</li>
+                <li>• {t.settings.resetItem1}</li>
+                <li>• {t.settings.resetItem2}</li>
+                <li>• {t.settings.resetItem3}</li>
+                <li>• {t.settings.resetItem4}</li>
+                <li>• {t.settings.resetItem5}</li>
               </ul>
-              <p className="text-xs text-[var(--text-muted)] mt-1">Your account and settings will be kept.</p>
-              <p className="text-xs font-bold text-[var(--danger)]">This cannot be undone.</p>
+              <p className="text-xs text-[var(--text-muted)] mt-1">{t.settings.resetKeep}</p>
+              <p className="text-xs font-bold text-[var(--danger)]">{t.settings.cannotUndo}</p>
             </div>
             {resetError && <p className="text-xs text-[var(--danger)]">{resetError}</p>}
             <div className="flex gap-2">
@@ -614,14 +617,14 @@ export default function SettingsPage() {
                 onClick={() => { setResetConfirm(false); setResetError(''); }}
                 className="flex-1 py-2.5 rounded-xl border border-[var(--border)] text-sm text-[var(--text-muted)] hover:bg-[var(--surface-2)] transition-colors"
               >
-                Cancel
+                {t.settings.dismiss}
               </button>
               <button
                 onClick={handleResetProgress}
                 disabled={resetLoading}
                 className="flex-1 py-2.5 rounded-xl bg-[var(--danger)] text-white text-sm font-bold hover:opacity-90 transition-opacity disabled:opacity-60"
               >
-                {resetLoading ? 'Resetting…' : 'Reset Everything'}
+                {resetLoading ? t.settings.resetting : t.settings.resetBtn}
               </button>
             </div>
           </div>
@@ -636,22 +639,22 @@ export default function SettingsPage() {
           >
             <span className="text-2xl">🗑️</span>
             <div>
-              <p className="text-sm font-semibold text-[var(--danger)]">Delete Account</p>
-              <p className="text-xs text-[var(--text-muted)]">Permanently remove your account and all data</p>
+              <p className="text-sm font-semibold text-[var(--danger)]">{t.settings.deleteAccount}</p>
+              <p className="text-xs text-[var(--text-muted)]">{t.settings.deleteSub}</p>
             </div>
           </button>
         ) : (
           <div className="space-y-3 animate-fade-in">
             <div className="p-3 rounded-xl bg-red-50 border border-red-200 space-y-2">
-              <p className="text-sm font-bold text-[var(--danger)]">⚠️ This will permanently delete:</p>
+              <p className="text-sm font-bold text-[var(--danger)]">{t.settings.resetWarning}</p>
               <ul className="text-xs text-[var(--text-muted)] space-y-1">
-                <li>• Your account and login access</li>
-                <li>• All learned words</li>
-                <li>• All SRS review progress</li>
-                <li>• Your XP, streak, and stats</li>
-                <li>• All starred words</li>
+                <li>• {t.settings.deleteItem1}</li>
+                <li>• {t.settings.resetItem1}</li>
+                <li>• {t.settings.resetItem2}</li>
+                <li>• {t.settings.resetItem3}</li>
+                <li>• {t.settings.resetItem4}</li>
               </ul>
-              <p className="text-xs font-bold text-[var(--danger)] mt-2">This cannot be undone.</p>
+              <p className="text-xs font-bold text-[var(--danger)] mt-2">{t.settings.cannotUndo}</p>
             </div>
 
             {deleteError && (
@@ -663,14 +666,14 @@ export default function SettingsPage() {
                 onClick={() => { setDeleteConfirm(false); setDeleteError(''); }}
                 className="flex-1 py-2.5 rounded-xl border border-[var(--border)] text-sm text-[var(--text-muted)] hover:bg-[var(--surface-2)] transition-colors"
               >
-                Cancel
+                {t.settings.dismiss}
               </button>
               <button
                 onClick={handleDeleteAccount}
                 disabled={deleteLoading}
                 className="flex-1 py-2.5 rounded-xl bg-[var(--danger)] text-white text-sm font-bold hover:opacity-90 transition-opacity disabled:opacity-60"
               >
-                {deleteLoading ? 'Deleting…' : 'Delete Forever'}
+                {deleteLoading ? t.settings.deleting : t.settings.deleteForever}
               </button>
             </div>
           </div>

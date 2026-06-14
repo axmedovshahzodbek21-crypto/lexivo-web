@@ -12,6 +12,7 @@ import { XP_PER_QUIZ } from '@/lib/types';
 import Link from 'next/link';
 import UnitPicker from '@/components/UnitPicker';
 import TiltCard from '@/components/TiltCard';
+import { useTranslation } from '@/lib/useTranslation';
 
 interface QuizWord extends WordItem {
   collectionName: string;
@@ -121,6 +122,7 @@ function QuizPage() {
   const [correct, setCorrect] = useState(0);
   const [done, setDone] = useState(false);
   const [wrongQuestions, setWrongQuestions] = useState<QuizQuestion[]>([]);
+  const t = useTranslation();
   const [quizDirection, setQuizDirection] = useState<'word-to-uz' | 'uz-to-word'>('word-to-uz');
 
   useEffect(() => {
@@ -214,8 +216,8 @@ function QuizPage() {
   if (questions.length === 0) return (
     <div className="p-6 text-center">
       <div className="text-5xl mb-4">📭</div>
-      <h2 className="font-bold text-xl mb-2">No words found</h2>
-      <Link href="/" className="btn-primary inline-block mt-4">Go Home</Link>
+      <h2 className="font-bold text-xl mb-2">{t.common.noWordsFound}</h2>
+      <Link href="/" className="btn-primary inline-block mt-4">{t.common.goHome}</Link>
     </div>
   );
 
@@ -225,7 +227,7 @@ function QuizPage() {
     return (
       <div className="p-6 text-center flex flex-col items-center justify-center min-h-screen animate-fade-in">
         <div className="text-6xl mb-4">{score === 100 ? '🏆' : score >= 80 ? '🎉' : score >= 50 ? '👍' : '💪'}</div>
-        <h2 className="text-2xl font-bold mb-2">Quiz Complete!</h2>
+        <h2 className="text-2xl font-bold mb-2">{t.quiz.done}</h2>
         <p className="text-[var(--text-muted)] mb-6">{correct} / {questions.length} correct · {score}%</p>
         <div className="w-full card mb-6">
           <div className="progress-bar" style={{ height: 12 }}>
@@ -239,15 +241,15 @@ function QuizPage() {
               onClick={() => { setQuestions(wrongQuestions); setIndex(0); setSelected(null); setState('idle'); setCorrect(0); setWrongQuestions([]); setDone(false); }}
               className="w-full py-3 rounded-xl border-2 border-[var(--danger)] text-[var(--danger)] font-bold text-sm hover:bg-red-50 transition-colors"
             >
-              ✗ Retry Wrong Answers ({wrongQuestions.length})
+              {t.quiz.retryWrong(wrongQuestions.length)}
             </button>
           )}
           <div className="flex gap-3">
             <button
               onClick={() => { setIndex(0); setSelected(null); setState('idle'); setCorrect(0); setWrongQuestions([]); setDone(false); setQuestions(buildQuiz(collections, collectionName, dayNumber, starredOnly, listId)); }}
               className="btn-secondary flex-1"
-            >🔁 Retry</button>
-            <Link href={backUrl} className="btn-primary flex-1 text-center">← Back</Link>
+            >{t.common.retry}</button>
+            <Link href={backUrl} className="btn-primary flex-1 text-center">{t.common.back}</Link>
           </div>
         </div>
       </div>
@@ -257,9 +259,9 @@ function QuizPage() {
   if (!current) return null;
 
   const typeLabel: Record<QuizType, string> = {
-    word_to_translation: '🇺🇿 Translate the word',
-    translation_to_word: '🔤 What is this word?',
-    definition_to_word: '📖 Match the definition',
+    word_to_translation: t.quiz.translateWord,
+    translation_to_word: t.quiz.whatIsWord,
+    definition_to_word: t.quiz.matchDef,
   };
 
   return (
@@ -268,7 +270,7 @@ function QuizPage() {
       <div className="flex items-center justify-between p-4">
         <button onClick={() => router.back()} className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center">←</button>
         <div className="text-center">
-          <div className="font-semibold text-sm">Quiz</div>
+          <div className="font-semibold text-sm">{t.quiz.title}</div>
           <div className="text-xs text-[var(--text-muted)]">{index + 1} / {questions.length}</div>
         </div>
         <div className="badge">{correct} ✓</div>
@@ -293,7 +295,7 @@ function QuizPage() {
             >🔊</button>
           </div>
           {current.type === 'definition_to_word' && (
-            <p className="text-xs text-[var(--text-muted)] mt-1 italic">(Select the matching English word)</p>
+            <p className="text-xs text-[var(--text-muted)] mt-1 italic">{t.quiz.selectMatch}</p>
           )}
         </TiltCard>
 
@@ -326,10 +328,10 @@ function QuizPage() {
         {state === 'answered' && (
           <div className={`card animate-fade-in ${selected === current.correct ? 'bg-green-50 border-[var(--success)]' : 'bg-red-50 border-[var(--danger)]'}`}>
             <p className="font-semibold mb-1">
-              {selected === current.correct ? '✅ Correct!' : '❌ Incorrect'}
+              {selected === current.correct ? t.quiz.correct : t.quiz.incorrect}
             </p>
             {selected !== current.correct && (
-              <p className="text-sm">Correct answer: <strong>{current.correct}</strong></p>
+              <p className="text-sm">{t.quiz.correctAnswer(current.correct)}</p>
             )}
             <p className="text-xs text-[var(--text-muted)] mt-1">{current.word.definition}</p>
           </div>
@@ -337,12 +339,12 @@ function QuizPage() {
 
         {state === 'answered' && (
           <button onClick={next} className="btn-primary w-full py-4">
-            {index + 1 >= questions.length ? 'See Results 🏆' : 'Next Question →'}
+            {index + 1 >= questions.length ? t.quiz.seeResults : t.quiz.nextQuestion}
           </button>
         )}
 
         <div className="text-center text-xs text-[var(--text-muted)]">
-          Press <kbd>1</kbd>–<kbd>4</kbd> to select an answer
+          {t.quiz.pressKeys}
         </div>
       </div>
     </div>
@@ -350,11 +352,12 @@ function QuizPage() {
 }
 
 function Loading() {
+  const t = useTranslation();
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="text-center">
         <div className="text-4xl mb-3 animate-bounce">❓</div>
-        <p className="text-[var(--text-muted)]">Loading quiz…</p>
+        <p className="text-[var(--text-muted)]">{t.quiz.loading}</p>
       </div>
     </div>
   );

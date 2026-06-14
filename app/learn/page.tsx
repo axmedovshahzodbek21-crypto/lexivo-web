@@ -19,6 +19,7 @@ import { XP_PER_LEARN } from '@/lib/types';
 import Link from 'next/link';
 import UnitPicker from '@/components/UnitPicker';
 import TiltCard from '@/components/TiltCard';
+import { useTranslation } from '@/lib/useTranslation';
 
 interface StudyWord extends WordItem {
   collectionName: string;
@@ -88,6 +89,7 @@ function LearnPage() {
   const [autoPlayOnReveal, setAutoPlayOnReveal] = useState(true);
   const [sessionSize, setSessionSize] = useState(20);
   const [studyOrder, setStudyOrder] = useState<'random' | 'in-order'>('random');
+  const t = useTranslation();
 
   useEffect(() => {
     const s = getSettings();
@@ -206,8 +208,8 @@ function LearnPage() {
     return (
       <div className="p-6 text-center">
         <div className="text-5xl mb-4">📭</div>
-        <h2 className="font-bold text-xl mb-2">No words found</h2>
-        <Link href="/" className="btn-primary inline-block mt-4">Go Home</Link>
+        <h2 className="font-bold text-xl mb-2">{t.common.noWordsFound}</h2>
+        <Link href="/" className="btn-primary inline-block mt-4">{t.common.goHome}</Link>
       </div>
     );
   }
@@ -281,12 +283,12 @@ function LearnPage() {
             <div className="flex gap-1.5">
               <AccentButton
                 onClick={e => { e.stopPropagation(); speakAccent(current.word, 'us'); }}
-                flag="🇺🇸" label="American (S)"
+                flag="🇺🇸" label={t.learn.american}
                 active={defaultAccent === 'us'}
               />
               <AccentButton
                 onClick={e => { e.stopPropagation(); speakAccent(current.word, 'uk'); }}
-                flag="🇬🇧" label="British"
+                flag="🇬🇧" label={t.learn.british}
                 active={defaultAccent === 'uk'}
               />
             </div>
@@ -302,12 +304,12 @@ function LearnPage() {
             /* ── Front: tap-to-reveal ── */
             <div className="mt-8 mb-4 flex flex-col items-center gap-3 select-none">
               <div className="text-5xl">🤔</div>
-              <p className="text-sm font-medium text-[var(--text-muted)]">Do you know this word?</p>
+              <p className="text-sm font-medium text-[var(--text-muted)]">{t.learn.doYouKnow}</p>
               <div
                 className="flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold pointer-events-none"
                 style={{ background: 'var(--primary-bg)', color: 'var(--primary)' }}
               >
-                👆 Tap to reveal · <kbd>Space</kbd>
+                {t.learn.tapToReveal}
               </div>
             </div>
           ) : (
@@ -331,7 +333,7 @@ function LearnPage() {
                   onClick={() => setShowExamples(true)}
                   className="text-sm text-[var(--primary)] font-medium hover:underline"
                 >
-                  + More examples
+                  {t.learn.moreExamples}
                 </button>
               ) : (
                 <div className="space-y-3 animate-fade-in">
@@ -361,11 +363,11 @@ function LearnPage() {
                 onClick={() => setShowHint(true)}
                 className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] underline"
               >
-                💡 Need a hint? (H)
+                {t.learn.needHint}
               </button>
             ) : (
               <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 animate-fade-in text-left">
-                <p className="text-xs font-semibold text-amber-600 mb-1">💡 Hint</p>
+                <p className="text-xs font-semibold text-amber-600 mb-1">{t.learn.hint}</p>
                 <p className="text-sm text-amber-900">{current.definition.split(' ').slice(0, 8).join(' ')}…</p>
               </div>
             )}
@@ -379,19 +381,19 @@ function LearnPage() {
               onClick={markTooHard}
               className="flex-1 py-3.5 rounded-xl border-2 border-[var(--danger)] text-[var(--danger)] font-semibold text-sm hover:bg-red-50 transition-colors press-3d"
             >
-              😓 Too Hard <kbd className="ml-1 opacity-60 text-xs">H</kbd>
+              {t.learn.tooHard} <kbd className="ml-1 opacity-60 text-xs">H</kbd>
             </button>
             <button
               onClick={advanceCard}
               className="flex-[2] btn-primary py-3.5 text-center press-3d"
             >
-              Got it ✓  <kbd className="ml-1 opacity-60 text-xs">Space</kbd>
+              {t.learn.gotIt} <kbd className="ml-1 opacity-60 text-xs">Space</kbd>
             </button>
           </div>
         )}
 
         <div className="no-focus text-center text-xs text-[var(--text-muted)]">
-          {words.length - index - 1} remaining · <kbd>S</kbd> listen · <kbd>H</kbd> {revealed ? 'too hard' : 'hint'}
+          {t.learn.remaining(words.length - index - 1)} · <kbd>S</kbd> listen · <kbd>H</kbd> {revealed ? 'too hard' : 'hint'}
         </div>
       </div>
     </div>
@@ -403,11 +405,12 @@ function ExampleWithSituation({
 }: {
   num: number; example: string; situation: string; translation?: string;
 }) {
+  const t = useTranslation();
   return (
     <div className="rounded-xl overflow-hidden border border-[var(--border)]">
       <div className="bg-[var(--surface-2)] px-3 pt-3 pb-2">
         <div className="flex items-start justify-between gap-2 mb-1">
-          <p className="text-xs text-[var(--text-muted)]">💬 Example {num}</p>
+          <p className="text-xs text-[var(--text-muted)]">💬 {t.learn.example(num)}</p>
           <div className="flex gap-1 shrink-0">
             <AccentButton
               onClick={() => speakAccent(example, 'us')}
@@ -455,11 +458,12 @@ function AccentButton({
 }
 
 function LoadingState() {
+  const t = useTranslation();
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="text-center">
         <div className="text-4xl mb-3 animate-bounce">📚</div>
-        <p className="text-[var(--text-muted)]">Loading words…</p>
+        <p className="text-[var(--text-muted)]">{t.learn.loading}</p>
       </div>
     </div>
   );
@@ -478,6 +482,7 @@ function SessionDone({
   todayCount: number;
   onRestart: () => void;
 }) {
+  const t = useTranslation();
   const hardStudyUrl = collectionName
     ? `/learn?collection=${encodeURIComponent(collectionName)}&hard=true`
     : '/learn?hard=true';
@@ -487,7 +492,7 @@ function SessionDone({
       {/* Hero */}
       <div className="flex flex-col items-center text-center pt-10 pb-6">
         <div className="text-6xl mb-3 animate-pop">🎉</div>
-        <h2 className="text-2xl font-bold text-[var(--text)]">Session Complete!</h2>
+        <h2 className="text-2xl font-bold text-[var(--text)]">{t.learn.sessionComplete}</h2>
         <p className="text-sm text-[var(--text-muted)] mt-1">
           {collectionName ?? 'All Collections'}
         </p>
@@ -495,18 +500,18 @@ function SessionDone({
 
       {/* Stats grid */}
       <div className="grid grid-cols-2 gap-3 w-full mb-4">
-        <StatTile icon="📚" value={sessionCount} label="Words learned" color="#6C63FF" />
-        <StatTile icon="⚡" value={`+${xpEarned}`} label="XP earned" color="#F59E0B" />
-        <StatTile icon="🔥" value={streak} label="Day streak" color="#FF6B35" />
-        <StatTile icon="😓" value={skipped.length} label="Hard words" color={skipped.length > 0 ? '#EF4444' : '#10B981'} />
+        <StatTile icon="📚" value={sessionCount} label={t.learn.wordsLearned} color="#6C63FF" />
+        <StatTile icon="⚡" value={`+${xpEarned}`} label={t.learn.xpEarned} color="#F59E0B" />
+        <StatTile icon="🔥" value={streak} label={t.learn.dayStreak} color="#FF6B35" />
+        <StatTile icon="😓" value={skipped.length} label={t.learn.hardWords} color={skipped.length > 0 ? '#EF4444' : '#10B981'} />
       </div>
 
       {/* Today's progress nudge */}
       <div className="w-full card mb-4 flex items-center gap-3">
         <span className="text-2xl">📅</span>
         <div>
-          <p className="text-sm font-semibold text-[var(--text)]">{todayCount} words today</p>
-          <p className="text-xs text-[var(--text-muted)]">Keep going — every word counts</p>
+          <p className="text-sm font-semibold text-[var(--text)]">{t.learn.wordsToday(todayCount)}</p>
+          <p className="text-xs text-[var(--text-muted)]">{t.learn.keepGoing}</p>
         </div>
       </div>
 
@@ -518,8 +523,8 @@ function SessionDone({
           style={{ background: 'linear-gradient(135deg, #FF6B35, #FF8C42)' }}
         >
           <div>
-            <div className="font-bold text-sm">🃏 Practice with Flashcards</div>
-            <div className="text-xs opacity-80 mt-0.5">Reinforce what you just learned</div>
+            <div className="font-bold text-sm">{t.learn.practiceFlashcards}</div>
+            <div className="text-xs opacity-80 mt-0.5">{t.learn.reinforceSub}</div>
           </div>
           <span className="text-lg">→</span>
         </Link>
@@ -529,12 +534,12 @@ function SessionDone({
       {skipped.length > 0 && (
         <div className="w-full card mb-4">
           <div className="flex items-center justify-between mb-3">
-            <p className="font-semibold text-sm text-[var(--danger)]">😓 Marked too hard</p>
+            <p className="font-semibold text-sm text-[var(--danger)]">{t.learn.markedTooHard}</p>
             <Link
               href={hardStudyUrl}
               className="text-xs font-semibold px-3 py-1 rounded-full bg-[var(--danger)] text-white"
             >
-              Study now →
+              {t.learn.studyNow}
             </Link>
           </div>
           <div className="space-y-1">
@@ -550,8 +555,8 @@ function SessionDone({
 
       {/* Actions */}
       <div className="flex gap-3 w-full mt-auto pt-4">
-        <button onClick={onRestart} className="btn-secondary flex-1">🔁 Again</button>
-        <Link href={backUrl} className="btn-primary flex-1 text-center">← Back</Link>
+        <button onClick={onRestart} className="btn-secondary flex-1">{t.common.again}</button>
+        <Link href={backUrl} className="btn-primary flex-1 text-center">{t.common.back}</Link>
       </div>
     </div>
   );

@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { saveSettings, setOnboarded, isOnboarded } from '@/lib/storage';
 import type { UserSettings } from '@/lib/types';
+import { useTranslation } from '@/lib/useTranslation';
 
 // ── Data ────────────────────────────────────────────────────────────────────
 
@@ -91,25 +92,26 @@ export default function OnboardingPage() {
 // ── Step 0: Welcome ──────────────────────────────────────────────────────────
 
 function StepWelcome({ onNext }: { onNext: () => void }) {
+  const t = useTranslation();
   return (
     <div className="flex flex-col items-center justify-center min-h-full px-8 py-12 text-center gap-8">
       <div className="text-7xl animate-bounce">📖</div>
 
       <div>
         <h1 className="text-4xl font-black text-[var(--text)] mb-3">
-          Welcome to <span style={{ color: 'var(--primary)' }}>Lexivo</span>
+          {t.onboarding.welcome} <span style={{ color: 'var(--primary)' }}>Lexivo</span>
         </h1>
         <p className="text-[var(--text-muted)] text-base leading-relaxed">
-          Your personal English vocabulary coach.<br />
-          Learn smarter. Remember longer.
+          {t.onboarding.tagline}<br />
+          {t.onboarding.tagline2}
         </p>
       </div>
 
       <div className="w-full max-w-sm space-y-3">
         {[
-          { icon: '🃏', text: 'Flashcards + spaced repetition' },
-          { icon: '🎯', text: 'Quizzes & pronunciation' },
-          { icon: '🇺🇿', text: 'Uzbek translations built in' },
+          { icon: '🃏', text: t.onboarding.feature1 },
+          { icon: '🎯', text: t.onboarding.feature2 },
+          { icon: '🇺🇿', text: t.onboarding.feature3 },
         ].map(({ icon, text }) => (
           <div
             key={text}
@@ -123,7 +125,7 @@ function StepWelcome({ onNext }: { onNext: () => void }) {
       </div>
 
       <button onClick={onNext} className="btn-primary w-full max-w-sm py-4 text-base font-bold">
-        Get Started →
+        {t.onboarding.getStarted}
       </button>
     </div>
   );
@@ -139,13 +141,14 @@ function StepName({
   onNext: () => void;
   inputRef: React.RefObject<HTMLInputElement | null>;
 }) {
+  const t = useTranslation();
   return (
     <div className="flex flex-col items-center justify-center min-h-full px-8 py-12 gap-8">
       <div className="text-6xl">👋</div>
 
       <div className="text-center">
-        <h2 className="text-2xl font-black text-[var(--text)] mb-2">What&apos;s your name?</h2>
-        <p className="text-sm text-[var(--text-muted)]">We&apos;ll personalise your experience.</p>
+        <h2 className="text-2xl font-black text-[var(--text)] mb-2">{t.onboarding.nameQuestion}</h2>
+        <p className="text-sm text-[var(--text-muted)]">{t.onboarding.nameHelper}</p>
       </div>
 
       <div className="w-full max-w-sm">
@@ -155,19 +158,19 @@ function StepName({
           value={name}
           onChange={e => onChange(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && onNext()}
-          placeholder="Your first name"
+          placeholder={t.onboarding.namePlaceholder}
           maxLength={30}
           className="w-full px-4 py-4 rounded-2xl text-lg font-semibold text-center border-2 border-[var(--border)] bg-[var(--card)] text-[var(--text)] outline-none transition-colors focus:border-[var(--primary)]"
         />
         {name.trim() && (
           <p className="text-center text-sm mt-3 animate-fade-in" style={{ color: 'var(--primary)' }}>
-            Nice to meet you, <strong>{name.trim()}</strong>! 🙌
+            {t.onboarding.niceMeet(name.trim())}
           </p>
         )}
       </div>
 
       <button onClick={onNext} className="btn-primary w-full max-w-sm py-4 text-base font-bold">
-        {name.trim() ? 'Continue →' : 'Skip →'}
+        {name.trim() ? t.common.continueBtn : t.common.skip}
       </button>
     </div>
   );
@@ -182,12 +185,13 @@ function StepLevel({
   onChange: (v: UserSettings['languageLevel']) => void;
   onNext: () => void;
 }) {
+  const t = useTranslation();
   return (
     <div className="flex flex-col items-center px-5 py-10 gap-6">
       <div className="text-center">
         <div className="text-5xl mb-3">📊</div>
-        <h2 className="text-2xl font-black text-[var(--text)] mb-1">Your English level?</h2>
-        <p className="text-sm text-[var(--text-muted)]">We&apos;ll recommend the right collections.</p>
+        <h2 className="text-2xl font-black text-[var(--text)] mb-1">{t.onboarding.levelQuestion}</h2>
+        <p className="text-sm text-[var(--text-muted)]">{t.onboarding.levelHelper}</p>
       </div>
 
       <div className="grid grid-cols-2 gap-3 w-full max-w-sm">
@@ -220,7 +224,7 @@ function StepLevel({
       </div>
 
       <button onClick={onNext} className="btn-primary w-full max-w-sm py-4 text-base font-bold">
-        Continue →
+        {t.common.continueBtn}
       </button>
     </div>
   );
@@ -236,15 +240,16 @@ function StepGoal({
   name: string;
   onFinish: () => void;
 }) {
+  const t = useTranslation();
   const displayName = name.trim() || 'there';
   return (
     <div className="flex flex-col items-center px-5 py-10 gap-6">
       <div className="text-center">
         <div className="text-5xl mb-3">🎯</div>
         <h2 className="text-2xl font-black text-[var(--text)] mb-1">
-          Daily goal, {displayName}?
+          {t.onboarding.goalQuestion(displayName)}
         </h2>
-        <p className="text-sm text-[var(--text-muted)]">You can change this any time in Settings.</p>
+        <p className="text-sm text-[var(--text-muted)]">{t.onboarding.goalHelper}</p>
       </div>
 
       <div className="grid grid-cols-2 gap-3 w-full max-w-sm">
@@ -272,7 +277,7 @@ function StepGoal({
       </div>
 
       <button onClick={onFinish} className="btn-primary w-full max-w-sm py-4 text-base font-bold">
-        Let&apos;s Go! 🚀
+        {t.onboarding.letsGo}
       </button>
     </div>
   );
@@ -289,6 +294,7 @@ function StepDone({
   finishing: boolean;
   onFinish: () => void;
 }) {
+  const t = useTranslation();
   const lvl = LEVELS.find(l => l.code === level)!;
   const g = GOALS.find(g => g.value === goal)!;
   const displayName = name.trim() || 'Learner';
@@ -298,14 +304,14 @@ function StepDone({
       <div className="text-7xl animate-bounce">🎉</div>
 
       <div>
-        <h2 className="text-3xl font-black text-[var(--text)] mb-2">You&apos;re all set!</h2>
-        <p className="text-[var(--text-muted)]">Here&apos;s your learning profile, {displayName}.</p>
+        <h2 className="text-3xl font-black text-[var(--text)] mb-2">{t.onboarding.allSet}</h2>
+        <p className="text-[var(--text-muted)]">{t.onboarding.profileReady(displayName)}</p>
       </div>
 
       <div className="w-full max-w-sm space-y-2 text-left">
-        <SummaryRow icon="👤" label="Name"        value={displayName} />
-        <SummaryRow icon="📊" label="Level"       value={`${lvl.code} · ${lvl.name}`} color={lvl.color} />
-        <SummaryRow icon={g.emoji} label="Daily goal" value={`${goal} words · ${g.sub}`} />
+        <SummaryRow icon="👤" label={t.onboarding.labelName}  value={displayName} />
+        <SummaryRow icon="📊" label={t.onboarding.labelLevel} value={`${lvl.code} · ${lvl.name}`} color={lvl.color} />
+        <SummaryRow icon={g.emoji} label={t.onboarding.labelGoal} value={`${goal} words · ${g.sub}`} />
       </div>
 
       <button
@@ -313,7 +319,7 @@ function StepDone({
         disabled={finishing}
         className="btn-primary w-full max-w-sm py-4 text-base font-bold disabled:opacity-70"
       >
-        {finishing ? 'Loading…' : 'Start Learning →'}
+        {finishing ? t.onboarding.loadingText : t.onboarding.startLearning}
       </button>
     </div>
   );
