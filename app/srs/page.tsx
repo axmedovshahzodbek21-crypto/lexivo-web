@@ -156,12 +156,14 @@ export default function SRSReviewPage() {
               <div className="bg-[var(--surface-2)] rounded-xl p-3">
                 <p className="text-xs italic text-[var(--text-muted)]">"{current.example1}"</p>
               </div>
-              <Link
-                href={`/word/${encodeURIComponent(current.word)}`}
-                className="text-xs text-[var(--primary)] font-medium hover:underline text-right block"
-              >
-                {t.srs.fullDetails}
-              </Link>
+              {current.collectionName !== 'my-words' && (
+                <Link
+                  href={`/word/${encodeURIComponent(current.word)}`}
+                  className="text-xs text-[var(--primary)] font-medium hover:underline text-right block"
+                >
+                  {t.srs.fullDetails}
+                </Link>
+              )}
             </div>
           ) : (
             <button
