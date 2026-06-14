@@ -97,6 +97,23 @@ export default function HomePage() {
         </div>
       </div>
 
+      {/* ── Download banner ── */}
+      <a
+        href="https://github.com/axmedovshahzodbek21-crypto/lexivo-web/releases/download/v1.0.0/app-release.apk"
+        download
+        className="flex items-center gap-4 p-4 rounded-2xl border-2 transition-colors"
+        style={{ background: 'rgba(61,220,132,0.08)', borderColor: 'rgba(61,220,132,0.35)' }}
+      >
+        <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0" style={{ background: 'rgba(61,220,132,0.15)' }}>
+          🤖
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="font-bold text-sm" style={{ color: '#3DDC84' }}>{t.home.downloadApp}</div>
+          <div className="text-xs mt-0.5 text-[var(--text-muted)]">{t.home.downloadSub}</div>
+        </div>
+        <span className="text-sm font-bold flex-shrink-0" style={{ color: '#3DDC84' }}>↓</span>
+      </a>
+
       {/* ── Collections (most important, lifted to top) ── */}
       <div>
         <h2 className="font-semibold text-[var(--text)] text-base mb-3">{t.home.collections}</h2>

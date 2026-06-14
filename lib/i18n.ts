@@ -71,6 +71,8 @@ const en = {
     leveledWords: 'Leveled Words',
     toggleDark: 'Toggle dark mode',
     wordsToday: (n: number, goal: number) => `${n} / ${goal} words`,
+    downloadApp: 'Download for Android',
+    downloadSub: 'Install the app on your phone',
   },
   learn: {
     doYouKnow: 'Do you know this word?',
@@ -446,6 +448,8 @@ const uz: typeof en = {
     leveledWords: "Darajali so'zlar",
     toggleDark: "Qorong'i rejimni almashtirish",
     wordsToday: (n: number, goal: number) => `${n} / ${goal} ta so'z`,
+    downloadApp: 'Android uchun yuklab olish',
+    downloadSub: 'Ilovani telefoningizga o\'rnating',
   },
   learn: {
     doYouKnow: "Bu so'zni bilasizmi?",
