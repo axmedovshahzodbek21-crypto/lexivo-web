@@ -232,62 +232,7 @@ function StatBlock({ icon, label, value, color }: { icon: string; label: string;
 
 // ─── Study Calendar ───────────────────────────────────────────────────────────
 
-const WEEK_COUNT = 16;
-const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-
-function cellColor(count: number): string {
-  if (count === 0) return 'var(--surface-2)';
-  if (count <= 4)  return 'rgba(108,99,255,0.30)';
-  if (count <= 9)  return 'rgba(108,99,255,0.55)';
-  if (count <= 19) return 'rgba(108,99,255,0.80)';
-  return 'var(--primary)';
-}
-
-function buildGrid(history: Record<string, number>) {
-  const today = new Date();
-  // Anchor to the Sunday that ends the current week so the grid fills to today
-  const dayOfWeek = today.getDay(); // 0=Sun
-  const mondayOffset = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-  const gridEnd = new Date(today);
-  gridEnd.setDate(today.getDate() + (6 - mondayOffset)); // end on Sunday
-
-  const totalDays = WEEK_COUNT * 7;
-  const gridStart = new Date(gridEnd);
-  gridStart.setDate(gridEnd.getDate() - totalDays + 1);
-
-  const weeks: { date: string; count: number; isToday: boolean; isFuture: boolean }[][] = [];
-  const todayStr = today.toISOString().split('T')[0];
-
-  for (let w = 0; w < WEEK_COUNT; w++) {
-    const week: { date: string; count: number; isToday: boolean; isFuture: boolean }[] = [];
-    for (let d = 0; d < 7; d++) {
-      const day = new Date(gridStart);
-      day.setDate(gridStart.getDate() + w * 7 + d);
-      const dateStr = day.toISOString().split('T')[0];
-      week.push({
-        date: dateStr,
-        count: history[dateStr] ?? 0,
-        isToday: dateStr === todayStr,
-        isFuture: dateStr > todayStr,
-      });
-    }
-    weeks.push(week);
-  }
-  return { weeks, gridStart };
-}
-
-function buildMonthLabels(weeks: ReturnType<typeof buildGrid>['weeks']) {
-  const labels: { label: string; col: number }[] = [];
-  let lastMonth = -1;
-  weeks.forEach((week, col) => {
-    const month = new Date(week[0].date).getMonth();
-    if (month !== lastMonth) {
-      labels.push({ label: new Date(week[0].date).toLocaleString('default', { month: 'short' }), col });
-      lastMonth = month;
-    }
-  });
-  return labels;
-}
+const MONTH_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 function calcLongestStreak(history: Record<string, number>): number {
   const dates = Object.keys(history).filter(d => history[d] > 0).sort();
@@ -305,20 +250,53 @@ function calcLongestStreak(history: Record<string, number>): number {
   return longest;
 }
 
+function buildMonthGrid(year: number, month: number) {
+  const firstDay = new Date(year, month, 1);
+  // Monday = 0 offset
+  const startOffset = (firstDay.getDay() + 6) % 7;
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const cells: (number | null)[] = [
+    ...Array(startOffset).fill(null),
+    ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
+  ];
+  // Pad to complete last row
+  while (cells.length % 7 !== 0) cells.push(null);
+  return cells;
+}
+
 function StudyCalendar({
-  history, streak, totalDays,
+  history, streak,
 }: {
   history: Record<string, number>;
   streak: number;
   totalDays: number;
 }) {
   const t = useTranslation();
-  const [tooltip, setTooltip] = useState<{ date: string; count: number } | null>(null);
-  const { weeks, gridStart } = buildGrid(history);
-  const monthLabels = buildMonthLabels(weeks);
+  const now = new Date();
+  const [viewYear, setViewYear] = useState(now.getFullYear());
+  const [viewMonth, setViewMonth] = useState(now.getMonth());
+  const [selected, setSelected] = useState<string | null>(null);
+
+  const todayStr = now.toISOString().split('T')[0];
   const longestStreak = calcLongestStreak(history);
   const activeDays = Object.values(history).filter(c => c > 0).length;
-  const totalWords = Object.values(history).reduce((a, c) => a + c, 0);
+
+  const cells = buildMonthGrid(viewYear, viewMonth);
+  const monthName = new Date(viewYear, viewMonth, 1).toLocaleString('default', { month: 'long', year: 'numeric' });
+
+  const canGoNext = viewYear < now.getFullYear() || (viewYear === now.getFullYear() && viewMonth < now.getMonth());
+
+  function prevMonth() {
+    if (viewMonth === 0) { setViewYear(y => y - 1); setViewMonth(11); }
+    else setViewMonth(m => m - 1);
+    setSelected(null);
+  }
+  function nextMonth() {
+    if (!canGoNext) return;
+    if (viewMonth === 11) { setViewYear(y => y + 1); setViewMonth(0); }
+    else setViewMonth(m => m + 1);
+    setSelected(null);
+  }
 
   return (
     <div className="space-y-4">
@@ -338,67 +316,73 @@ function StudyCalendar({
         </div>
       </div>
 
-      {/* Heatmap */}
-      <div className="card overflow-x-auto">
-        <h3 className="font-semibold mb-3 text-sm">{t.progress.lastWeeks(WEEK_COUNT)}</h3>
+      {/* Calendar */}
+      <div className="card">
+        {/* Month navigation */}
+        <div className="flex items-center justify-between mb-4">
+          <button onClick={prevMonth} className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[var(--surface-2)] transition-colors text-[var(--text)]">‹</button>
+          <span className="font-semibold text-sm text-[var(--text)]">{monthName}</span>
+          <button onClick={nextMonth} disabled={!canGoNext} className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[var(--surface-2)] transition-colors text-[var(--text)] disabled:opacity-30">›</button>
+        </div>
 
-        {/* Month labels */}
-        <div className="flex gap-[3px] mb-1 pl-8">
-          {weeks.map((_, col) => {
-            const label = monthLabels.find(l => l.col === col);
+        {/* Day headers */}
+        <div className="grid grid-cols-7 mb-2">
+          {MONTH_DAYS.map(d => (
+            <div key={d} className="text-center text-[10px] font-semibold text-[var(--text-muted)] py-1">{d}</div>
+          ))}
+        </div>
+
+        {/* Day cells */}
+        <div className="grid grid-cols-7 gap-y-1">
+          {cells.map((day, i) => {
+            if (!day) return <div key={i} />;
+            const mm = String(viewMonth + 1).padStart(2, '0');
+            const dd = String(day).padStart(2, '0');
+            const dateStr = `${viewYear}-${mm}-${dd}`;
+            const count = history[dateStr] ?? 0;
+            const isToday = dateStr === todayStr;
+            const isFuture = dateStr > todayStr;
+            const isSelected = selected === dateStr;
+            const studied = count > 0;
+
             return (
-              <div key={col} className="w-[14px] flex-shrink-0 text-[9px] text-[var(--text-muted)]">
-                {label ? label.label : ''}
-              </div>
+              <button
+                key={dateStr}
+                onClick={() => setSelected(isSelected ? null : dateStr)}
+                disabled={isFuture}
+                className="flex flex-col items-center justify-center aspect-square rounded-xl transition-all disabled:opacity-25"
+                style={{
+                  background: studied ? 'var(--primary)' : isToday ? 'var(--surface-2)' : 'transparent',
+                  border: isToday && !studied ? '2px solid var(--primary)' : isSelected ? '2px solid var(--primary)' : '2px solid transparent',
+                  transform: isSelected ? 'scale(1.1)' : 'scale(1)',
+                }}
+              >
+                <span className="text-xs font-semibold" style={{ color: studied ? '#fff' : 'var(--text)' }}>{day}</span>
+                {studied && <span className="text-[8px] mt-0.5" style={{ color: 'rgba(255,255,255,0.8)' }}>{count}</span>}
+              </button>
             );
           })}
         </div>
 
-        {/* Grid: rows = days of week, cols = weeks */}
-        <div className="flex gap-1">
-          {/* Day labels */}
-          <div className="flex flex-col gap-[3px] mr-1">
-            {DAY_LABELS.map((d, i) => (
-              <div key={d} className="h-[14px] text-[9px] text-[var(--text-muted)] flex items-center">
-                {i % 2 === 0 ? d : ''}
-              </div>
-            ))}
-          </div>
-
-          {/* Cells */}
-          {weeks.map((week, col) => (
-            <div key={col} className="flex flex-col gap-[3px]">
-              {week.map((day, row) => (
-                <div
-                  key={day.date}
-                  title={`${day.date}: ${day.count} word${day.count !== 1 ? 's' : ''}`}
-                  onClick={() => setTooltip(tooltip?.date === day.date ? null : { date: day.date, count: day.count })}
-                  className="w-[14px] h-[14px] rounded-[3px] cursor-pointer transition-transform hover:scale-125"
-                  style={{
-                    background: day.isFuture ? 'transparent' : cellColor(day.count),
-                    border: day.isToday ? '1.5px solid var(--primary)' : day.isFuture ? '1px dashed var(--border)' : 'none',
-                    opacity: day.isFuture ? 0.3 : 1,
-                  }}
-                />
-              ))}
-            </div>
-          ))}
-        </div>
-
-        {/* Tooltip */}
-        {tooltip && (
-          <div className="mt-3 text-xs text-[var(--text-muted)] animate-fade-in">
-            📅 {tooltip.date} — {tooltip.count > 0 ? `${tooltip.count} word${tooltip.count !== 1 ? 's' : ''} learned` : 'No activity'}
+        {/* Selected day info */}
+        {selected && (
+          <div className="mt-4 pt-3 border-t border-[var(--border)] text-sm animate-fade-in">
+            {(() => {
+              const count = history[selected] ?? 0;
+              const dateLabel = new Date(selected).toLocaleDateString('default', { weekday: 'long', month: 'long', day: 'numeric' });
+              return count > 0
+                ? <p className="text-[var(--text)]">📅 <strong>{dateLabel}</strong> — {count} word{count !== 1 ? 's' : ''} learned</p>
+                : <p className="text-[var(--text-muted)]">📅 <strong>{dateLabel}</strong> — No activity</p>;
+            })()}
           </div>
         )}
 
         {/* Legend */}
-        <div className="flex items-center gap-2 mt-3">
-          <span className="text-[9px] text-[var(--text-muted)]">{t.progress.less}</span>
-          {[0, 2, 6, 12, 22].map(n => (
-            <div key={n} className="w-[14px] h-[14px] rounded-[3px]" style={{ background: cellColor(n) }} />
-          ))}
-          <span className="text-[9px] text-[var(--text-muted)]">{t.progress.more}</span>
+        <div className="flex items-center gap-2 mt-4 pt-3 border-t border-[var(--border)]">
+          <div className="w-5 h-5 rounded-md bg-[var(--surface-2)] border-2 border-[var(--primary)]" />
+          <span className="text-[11px] text-[var(--text-muted)] mr-3">Today</span>
+          <div className="w-5 h-5 rounded-md" style={{ background: 'var(--primary)' }} />
+          <span className="text-[11px] text-[var(--text-muted)]">Studied</span>
         </div>
       </div>
 
