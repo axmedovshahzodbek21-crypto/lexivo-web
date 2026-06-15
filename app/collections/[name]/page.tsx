@@ -1,5 +1,5 @@
 'use client';
-import { use, useEffect, useRef, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
@@ -24,14 +24,16 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
   const [collection, setCollection] = useState<WordCollection | null>(null);
   const [units, setUnits] = useState<UnitRow[]>([]);
   const [cols, setCols] = useState(2);
-  const gridRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const MIN_CARD = 160; // px — minimum card width before adding another column
+    // Use window.innerWidth (not element clientWidth) so Ctrl+zoom actually changes columns.
+    // Content is constrained by max-w-2xl so element width doesn't change with zoom.
+    const MIN_CARD = 320;
     const GAP = 8;
     const calculate = () => {
-      if (!gridRef.current) return;
-      const available = gridRef.current.clientWidth;
+      const sidebarOpen = localStorage.getItem('lexivo_sidebar_open') !== 'false';
+      const sidebarW = window.innerWidth >= 768 && sidebarOpen ? 208 : 0;
+      const available = window.innerWidth - sidebarW - 32;
       setCols(Math.max(1, Math.floor((available + GAP) / (MIN_CARD + GAP))));
     };
     calculate();
@@ -120,9 +122,8 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
         )}
       </div>
 
-      {/* Units list — columns auto-calculated from available width so Ctrl+zoom adjusts density */}
+      {/* Units list — columns driven by window.innerWidth so Ctrl+zoom adjusts density */}
       <div
-        ref={gridRef}
         className="flex-1 p-3 grid gap-2"
         style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
       >
