@@ -1,8 +1,6 @@
 'use client';
-export const dynamic = 'force-dynamic';
-import dynamicImport from 'next/dynamic';
 import { useEffect, useState, useCallback } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { speak, speakText } from '@/lib/speech';
 import { addXP, recordStudySession, markQuizComplete, unlockAchievement, getStarredWords, getCustomListWords, getSettings, getUnitProgress, getImportedWords, getImportedWordsByCollection } from '@/lib/storage';
@@ -98,25 +96,17 @@ function buildQuiz(
 
 type QuizState = 'idle' | 'answered';
 
-const QuizPageClient = dynamicImport(
-  () => Promise.resolve({ default: QuizPage }),
-  { ssr: false, loading: () => <div className="flex items-center justify-center min-h-screen"><div className="text-4xl animate-bounce">❓</div></div> }
-);
-
-export default function QuizPageWrapper() {
-  return <QuizPageClient />;
-}
-
-function QuizPage() {
-  const searchParams = useSearchParams();
+export default function QuizPage() {
   const router = useRouter();
-  const collectionName = searchParams.get('collection') ?? undefined;
-  const dayParam = searchParams.get('day');
+  const [sp, setSp] = useState<URLSearchParams>(() => new URLSearchParams());
+  useEffect(() => { setSp(new URLSearchParams(window.location.search)); }, []);
+  const collectionName = sp.get('collection') ?? undefined;
+  const dayParam = sp.get('day');
   const dayNumber = dayParam ? parseInt(dayParam) : undefined;
-  const starredOnly = searchParams.get('starred') === 'true';
-  const listId      = searchParams.get('list') ?? undefined;
-  const sourceMyWords = searchParams.get('source') === 'my-words';
-  const myCollection = searchParams.get('myCollection') ?? undefined;
+  const starredOnly = sp.get('starred') === 'true';
+  const listId      = sp.get('list') ?? undefined;
+  const sourceMyWords = sp.get('source') === 'my-words';
+  const myCollection = sp.get('myCollection') ?? undefined;
   const { collections, collectionsLoaded, pushAchievement, setPendingLevelUp } = useAppStore();
 
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);

@@ -1,8 +1,6 @@
 'use client';
-export const dynamic = 'force-dynamic';
-import dynamicImport from 'next/dynamic';
 import { useEffect, useState, useCallback } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { speakAccent, speakText } from '@/lib/speech';
 import {
@@ -57,25 +55,17 @@ function buildStudyList(
   return words;
 }
 
-const LearnPageClient = dynamicImport(
-  () => Promise.resolve({ default: LearnPage }),
-  { ssr: false, loading: () => <div className="flex items-center justify-center min-h-screen"><div className="text-4xl animate-bounce">📚</div></div> }
-);
-
-export default function LearnPageWrapper() {
-  return <LearnPageClient />;
-}
-
-function LearnPage() {
-  const searchParams = useSearchParams();
+export default function LearnPage() {
   const router = useRouter();
-  const sourceMyWords = searchParams.get('source') === 'my-words';
-  const myCollection = searchParams.get('myCollection') ?? undefined;
-  const collectionName = searchParams.get('collection') ?? undefined;
-  const dayParam = searchParams.get('day');
+  const [sp, setSp] = useState<URLSearchParams>(() => new URLSearchParams());
+  useEffect(() => { setSp(new URLSearchParams(window.location.search)); }, []);
+  const sourceMyWords = sp.get('source') === 'my-words';
+  const myCollection = sp.get('myCollection') ?? undefined;
+  const collectionName = sp.get('collection') ?? undefined;
+  const dayParam = sp.get('day');
   const dayNumber = dayParam ? parseInt(dayParam) : undefined;
-  const hardOnly = searchParams.get('hard') === 'true';
-  const startIndexParam = searchParams.get('startIndex');
+  const hardOnly = sp.get('hard') === 'true';
+  const startIndexParam = sp.get('startIndex');
   const startIndex = startIndexParam ? parseInt(startIndexParam) || 0 : 0;
   const { collections, collectionsLoaded, pushAchievement, setPendingLevelUp, focusMode, setFocusMode,
     showPomodoroSetup } = useAppStore();

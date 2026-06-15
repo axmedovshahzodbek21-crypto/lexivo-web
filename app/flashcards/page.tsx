@@ -1,8 +1,6 @@
 'use client';
-export const dynamic = 'force-dynamic';
-import dynamicImport from 'next/dynamic';
 import { useEffect, useState, useCallback } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { speak, speakText } from '@/lib/speech';
 import { addXP, recordStudySession, markFlashcardComplete, getStarredWords, getHardWords, getCustomListWords, getUnitProgress, saveFlashcardProgress, getFlashcardProgress, clearFlashcardProgress, getImportedWords, getImportedWordsByCollection } from '@/lib/storage';
@@ -56,27 +54,19 @@ function buildDeck(
 
 type CardSide = 'front' | 'back';
 
-const FlashcardsPageClient = dynamicImport(
-  () => Promise.resolve({ default: FlashcardsPage }),
-  { ssr: false, loading: () => <div className="flex items-center justify-center min-h-screen"><div className="text-4xl animate-bounce">🃏</div></div> }
-);
-
-export default function FlashcardsPageWrapper() {
-  return <FlashcardsPageClient />;
-}
-
-function FlashcardsPage() {
-  const searchParams = useSearchParams();
+export default function FlashcardsPage() {
   const router = useRouter();
-  const collectionName = searchParams.get('collection') ?? undefined;
-  const dayParam = searchParams.get('day');
+  const [sp, setSp] = useState<URLSearchParams>(() => new URLSearchParams());
+  useEffect(() => { setSp(new URLSearchParams(window.location.search)); }, []);
+  const collectionName = sp.get('collection') ?? undefined;
+  const dayParam = sp.get('day');
   const dayNumber = dayParam ? parseInt(dayParam) : undefined;
-  const starredOnly = searchParams.get('starred') === 'true';
-  const hardOnly    = searchParams.get('hard') === 'true';
-  const listId      = searchParams.get('list') ?? undefined;
-  const fresh       = searchParams.get('fresh') === 'true';
-  const sourceMyWords = searchParams.get('source') === 'my-words';
-  const myCollection = searchParams.get('myCollection') ?? undefined;
+  const starredOnly = sp.get('starred') === 'true';
+  const hardOnly    = sp.get('hard') === 'true';
+  const listId      = sp.get('list') ?? undefined;
+  const fresh       = sp.get('fresh') === 'true';
+  const sourceMyWords = sp.get('source') === 'my-words';
+  const myCollection = sp.get('myCollection') ?? undefined;
   const { collections, collectionsLoaded, pushAchievement, setPendingLevelUp, focusMode, setFocusMode } = useAppStore();
 
   const t = useTranslation();
