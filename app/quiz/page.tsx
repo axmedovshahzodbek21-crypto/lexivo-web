@@ -1,5 +1,5 @@
 'use client';
-import { Suspense } from 'react';
+export const dynamic = 'force-dynamic';
 import { useEffect, useState, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
@@ -97,15 +97,7 @@ function buildQuiz(
 
 type QuizState = 'idle' | 'answered';
 
-export default function QuizPageWrapper() {
-  return (
-    <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="text-4xl animate-bounce">❓</div></div>}>
-      <QuizPage />
-    </Suspense>
-  );
-}
-
-function QuizPage() {
+export default function QuizPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const collectionName = searchParams.get('collection') ?? undefined;

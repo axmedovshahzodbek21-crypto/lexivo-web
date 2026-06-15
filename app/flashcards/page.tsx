@@ -1,5 +1,5 @@
 'use client';
-import { Suspense } from 'react';
+export const dynamic = 'force-dynamic';
 import { useEffect, useState, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
@@ -55,15 +55,7 @@ function buildDeck(
 
 type CardSide = 'front' | 'back';
 
-export default function FlashcardsPageWrapper() {
-  return (
-    <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="text-4xl animate-bounce">🃏</div></div>}>
-      <FlashcardsPage />
-    </Suspense>
-  );
-}
-
-function FlashcardsPage() {
+export default function FlashcardsPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const collectionName = searchParams.get('collection') ?? undefined;
