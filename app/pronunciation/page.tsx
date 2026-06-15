@@ -164,15 +164,31 @@ function PronunciationInner() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentText, phase]);
 
-  const startListening = useCallback(() => {
+  const startListening = useCallback(async () => {
     if (!currentText) return;
     setMicError('');
     setHeardText('');
-    // Phase switches to 'listening' only when SpeechRecognition fires onstart.
-    // This avoids the getUserMedia → release → recognition race condition.
+
+    // Get mic permission explicitly and keep stream alive during recognition.
+    // Releasing before start caused race conditions on some devices.
+    let stream: MediaStream | null = null;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch (e: unknown) {
+      const name = e instanceof DOMException ? e.name : String(e);
+      setMicError(
+        name === 'NotAllowedError' || name === 'PermissionDeniedError'
+          ? 'blocked'
+          : `Microphone error: ${name}`,
+      );
+      return;
+    }
+
+    const stopStream = () => stream?.getTracks().forEach(t => t.stop());
 
     const rec = createRecognizer(
       (transcripts) => {
+        stopStream();
         const best = transcripts[0] ?? '';
         setHeardText(best);
         const s = mode === 'sentences'
@@ -182,9 +198,15 @@ function PronunciationInner() {
         setDiff(best ? diffWords(best, currentText) : []);
         setPhase('result');
       },
-      () => { setPhase(prev => prev === 'listening' ? 'result' : prev); },
+      () => { stopStream(); setPhase(prev => prev === 'listening' ? 'result' : prev); },
       (err) => {
-        setMicError(err === 'not-allowed' ? 'blocked' : `Microphone error: ${err}`);
+        stopStream();
+        // 'not-allowed' after getUserMedia succeeded = service blocked, not mic permission
+        setMicError(
+          err === 'not-allowed' || err === 'service-not-allowed'
+            ? 'service-blocked'
+            : `Speech error: ${err}`,
+        );
         setPhase('ready');
       },
       () => { setPhase('listening'); },
@@ -402,7 +424,7 @@ function PronunciationInner() {
           </div>
         )}
 
-        {/* Mic blocked card */}
+        {/* Mic blocked — browser permission denied */}
         {micError === 'blocked' && phase === 'ready' && (
           <div className="w-full max-w-sm card border border-[var(--danger)] bg-red-50 space-y-3 text-center animate-fade-in">
             <div className="text-4xl">🎙️🚫</div>
@@ -413,17 +435,24 @@ function PronunciationInner() {
               <li>Find <strong>Microphone</strong> → set to <strong>Allow</strong></li>
               <li>Refresh the page, then tap the mic again</li>
             </ol>
-            <button
-              onClick={() => window.location.reload()}
-              className="btn-primary w-full"
-            >
-              Refresh page
-            </button>
+            <button onClick={() => window.location.reload()} className="btn-primary w-full">Refresh page</button>
+          </div>
+        )}
+
+        {/* Mic blocked — speech service rejected (mic is allowed, service-level block) */}
+        {micError === 'service-blocked' && phase === 'ready' && (
+          <div className="w-full max-w-sm card border border-amber-400 bg-amber-50 space-y-2 text-center animate-fade-in">
+            <div className="text-4xl">🌐</div>
+            <p className="font-bold text-amber-700">Speech Service Unavailable</p>
+            <p className="text-sm text-[var(--text-muted)]">
+              Your microphone is working, but Chrome&apos;s speech recognition service could not be reached. This can happen due to network restrictions or regional blocks on Google services.
+            </p>
+            <button onClick={() => setMicError('')} className="btn-primary w-full">Try again</button>
           </div>
         )}
 
         {/* Mic button */}
-        {(phase === 'ready' || phase === 'listening') && micError !== 'blocked' && (
+        {(phase === 'ready' || phase === 'listening') && micError !== 'blocked' && micError !== 'service-blocked' && (
           <div className="flex flex-col items-center gap-3">
             {attempt === 1 && phase === 'ready' && (
               <p className="text-xs text-amber-600 font-medium">Retry — try once more!</p>
