@@ -4,20 +4,20 @@
   --primary: #6C63FF;
   --primary-dark: #5a52d5;
   --primary-light: #8b85ff;
-  --primary-bg: #f0efff;
-  --background: #f3f4f6;
-  --surface: #ffffff;
-  --surface-2: #f3f4f6;
-  --text: #1a1a2e;
-  --text-muted: #6b7280;
-  --border: #d1d5db;
+  --primary-bg: #f0eeff;
+  --background: #f7f3ee;
+  --surface: #fffdf9;
+  --surface-2: #f0ebe3;
+  --text: #1c1810;
+  --text-muted: #6b6355;
+  --border: #ddd0bc;
   --success: #10B981;
   --warning: #F59E0B;
   --danger: #EF4444;
   --radius: 16px;
   --radius-sm: 8px;
-  --shadow: 0 4px 20px rgba(108, 99, 255, 0.12);
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.07), 0 4px 14px rgba(0,0,0,0.09);
+  --shadow: 0 4px 20px rgba(108, 99, 255, 0.10);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 4px 14px rgba(120,100,60,0.10);
 }
 
 [data-theme="dark"] {
