@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { getSettings, getStreak, getXP, getProfilePic } from '@/lib/storage';
+import { getSettings, getStreak, getXP, getProfilePic, getProfilePicUrl } from '@/lib/storage';
 import { getLevelInfo } from '@/lib/gamification';
 import { useAuth } from '@/lib/auth-context';
 import { useTranslation } from '@/lib/useTranslation';
@@ -36,14 +36,31 @@ export default function Navigation() {
   const [streak, setStreak]       = useState(0);
   const [xp, setXp]               = useState(0);
   const [profilePic, setProfilePic] = useState<string | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   useEffect(() => {
-    const s = getSettings();
-    setName(s.name);
-    setLangLevel(s.languageLevel);
-    setStreak(getStreak());
-    setXp(getXP());
-    setProfilePic(getProfilePic());
+    const stored = localStorage.getItem('lexivo_sidebar_open');
+    if (stored === 'false') setSidebarOpen(false);
+  }, []);
+
+  const toggleSidebar = () => {
+    const next = !sidebarOpen;
+    setSidebarOpen(next);
+    localStorage.setItem('lexivo_sidebar_open', String(next));
+  };
+
+  useEffect(() => {
+    const refresh = () => {
+      const s = getSettings();
+      setName(s.name);
+      setLangLevel(s.languageLevel);
+      setStreak(getStreak());
+      setXp(getXP());
+      setProfilePic(getProfilePicUrl() ?? getProfilePic());
+    };
+    refresh();
+    window.addEventListener('lexivo-sync', refresh);
+    return () => window.removeEventListener('lexivo-sync', refresh);
   }, [pathname]);
 
   const levelInfo  = getLevelInfo(xp);
@@ -79,12 +96,31 @@ export default function Navigation() {
         })}
       </nav>
 
+      {/* ── Desktop: floating expand button (visible only when sidebar is hidden) ── */}
+      <button
+        onClick={toggleSidebar}
+        title="Show sidebar"
+        tabIndex={sidebarOpen ? -1 : 0}
+        className={`hidden md:flex fixed top-4 left-2 z-50 w-7 h-7 items-center justify-center rounded-lg bg-[var(--surface)] border border-[var(--border)] shadow-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-opacity duration-300 ${sidebarOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+      >
+        ›
+      </button>
+
       {/* ── Desktop: persistent left sidebar ── */}
-      <aside className="hidden md:flex flex-col w-52 shrink-0 border-r border-[var(--border)] bg-[var(--surface)] sticky top-0 h-screen overflow-y-auto z-30">
-        {/* Brand */}
-        <div className="px-5 pt-6 pb-4">
-          <span className="text-2xl font-black tracking-tight" style={{ color: 'var(--primary)' }}>Lexivo</span>
-          <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{t.sidebar.tagline}</div>
+      <aside className={`hidden md:flex flex-col shrink-0 bg-[var(--surface)] sticky top-0 h-screen z-30 transition-[width] duration-300 ${sidebarOpen ? 'w-52 border-r border-[var(--border)] overflow-y-auto' : 'w-0 overflow-hidden'}`}>
+        {/* Brand + collapse button */}
+        <div className="px-5 pt-6 pb-4 flex items-start justify-between gap-2">
+          <div className="min-w-0">
+            <span className="text-2xl font-black tracking-tight" style={{ color: 'var(--primary)' }}>Lexivo</span>
+            <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{t.sidebar.tagline}</div>
+          </div>
+          <button
+            onClick={toggleSidebar}
+            title="Hide sidebar"
+            className="mt-1 shrink-0 w-6 h-6 rounded-md flex items-center justify-center text-xs text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--surface-2)] border border-[var(--border)] transition-colors"
+          >
+            ‹
+          </button>
         </div>
 
         {/* Nav links */}

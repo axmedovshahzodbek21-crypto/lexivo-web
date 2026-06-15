@@ -5,6 +5,9 @@ import {
   getLearnedWords, getSRSWords, getStarredWords,
   getUnlockedAchievements, getCustomLists,
   getHardWords,
+  getProfilePicUrl, saveProfilePicUrl,
+  getNameUpdatedAt, saveNameUpdatedAt,
+  getLevelUpdatedAt, saveLevelUpdatedAt,
 } from './storage';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -26,11 +29,17 @@ function lsSet(key: string, value: unknown) {
 export async function pushAll(userId: string) {
   const s = getSettings();
 
+  const avatarUrl = getProfilePicUrl();
+  const nameUpdatedAt = getNameUpdatedAt();
+  const levelUpdatedAt = getLevelUpdatedAt();
+
   // Profile / settings
   await supabase.from('profiles').upsert({
     id: userId,
     name: s.name,
+    name_updated_at: nameUpdatedAt,
     language_level: s.languageLevel,
+    language_level_updated_at: levelUpdatedAt,
     daily_goal: s.dailyGoal,
     default_accent: s.defaultAccent,
     auto_play_on_reveal: s.autoPlayOnReveal,
@@ -39,6 +48,7 @@ export async function pushAll(userId: string) {
     study_order: s.studyOrder,
     quiz_direction: s.quizDirection,
     reduce_motion: s.reduceMotion,
+    ...(avatarUrl !== null && { avatar_url: avatarUrl }),
   });
 
   // Stats
@@ -111,20 +121,32 @@ export async function pullAll(userId: string) {
   // Settings / profile
   const { data: profile } = await supabase.from('profiles').select('*').eq('id', userId).single();
   if (profile) {
+    const existing = getSettings();
+    const remoteNameTs = profile.name_updated_at as string | null;
+    const localNameTs  = getNameUpdatedAt();
+    const useRemoteName = remoteNameTs !== null && (localNameTs === null || remoteNameTs > localNameTs);
+
+    const remoteLevelTs = profile.language_level_updated_at as string | null;
+    const localLevelTs  = getLevelUpdatedAt();
+    const useRemoteLevel = remoteLevelTs !== null && (localLevelTs === null || remoteLevelTs > localLevelTs);
+
     saveSettings({
-      name: profile.name,
-      languageLevel: profile.language_level,
-      dailyGoal: profile.daily_goal,
-      defaultAccent: profile.default_accent,
-      autoPlayOnReveal: profile.auto_play_on_reveal,
-      sessionSize: profile.session_size,
-      fontSize: profile.font_size,
-      studyOrder: profile.study_order,
-      quizDirection: profile.quiz_direction,
-      reduceMotion: profile.reduce_motion,
-      uiLanguage: getSettings().uiLanguage,
+      name:             useRemoteName  ? (profile.name           ?? 'Learner') : existing.name,
+      languageLevel:    useRemoteLevel ? (profile.language_level ?? 'B1')      : existing.languageLevel,
+      dailyGoal:        profile.daily_goal        ?? 10,
+      defaultAccent:    profile.default_accent    ?? 'us',
+      autoPlayOnReveal: profile.auto_play_on_reveal ?? true,
+      sessionSize:      profile.session_size      ?? 20,
+      fontSize:         profile.font_size         ?? 'normal',
+      studyOrder:       profile.study_order       ?? 'random',
+      quizDirection:    profile.quiz_direction    ?? 'word-to-uz',
+      reduceMotion:     profile.reduce_motion     ?? false,
+      uiLanguage:       existing.uiLanguage,
     });
     lsSet('lexivo_onboarded', true);
+    if (useRemoteName && remoteNameTs) saveNameUpdatedAt(remoteNameTs);
+    if (useRemoteLevel && remoteLevelTs) saveLevelUpdatedAt(remoteLevelTs);
+    if (profile.avatar_url) saveProfilePicUrl(profile.avatar_url);
   }
 
   // Stats

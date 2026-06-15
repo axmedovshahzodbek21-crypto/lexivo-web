@@ -5,6 +5,7 @@ import {
   getXP, getTodayXP, getStreak, getFreezes, getTotalStudyDays,
   getProfilePicUrl, saveProfilePicUrl,
   getNameUpdatedAt, saveNameUpdatedAt,
+  getLevelUpdatedAt, saveLevelUpdatedAt,
 } from './storage';
 
 // localStorage key constants (mirrors KEYS in storage.ts)
@@ -37,11 +38,13 @@ export async function pushAll(uid: string) {
 
     const avatarUrl = getProfilePicUrl();
     const nameUpdatedAt = getNameUpdatedAt();
+    const levelUpdatedAt = getLevelUpdatedAt();
     await supabase.from('profiles').upsert({
       id: uid,
       name: settings.name,
       name_updated_at: nameUpdatedAt,
       language_level: settings.languageLevel,
+      language_level_updated_at: levelUpdatedAt,
       daily_goal: settings.dailyGoal,
       default_accent: settings.defaultAccent,
       auto_play_on_reveal: settings.autoPlayOnReveal,
@@ -168,11 +171,15 @@ export async function pullAll(uid: string) {
       const existing = getSettings();
       const remoteNameTs = profile.name_updated_at as string | null;
       const localNameTs  = getNameUpdatedAt();
-      // Only accept remote name when it's from a more recent explicit save
       const useRemoteName = remoteNameTs !== null && (localNameTs === null || remoteNameTs > localNameTs);
+
+      const remoteLevelTs = profile.language_level_updated_at as string | null;
+      const localLevelTs  = getLevelUpdatedAt();
+      const useRemoteLevel = remoteLevelTs !== null && (localLevelTs === null || remoteLevelTs > localLevelTs);
+
       saveSettings({
-        name:            useRemoteName ? (profile.name ?? 'Learner') : existing.name,
-        languageLevel:   profile.language_level  ?? 'B1',
+        name:            useRemoteName  ? (profile.name           ?? 'Learner') : existing.name,
+        languageLevel:   useRemoteLevel ? (profile.language_level ?? 'B1')      : existing.languageLevel,
         dailyGoal:       profile.daily_goal       ?? 10,
         defaultAccent:   profile.default_accent   ?? 'us',
         autoPlayOnReveal:profile.auto_play_on_reveal ?? true,
@@ -185,6 +192,7 @@ export async function pullAll(uid: string) {
       });
       setOnboarded();
       if (useRemoteName && remoteNameTs) saveNameUpdatedAt(remoteNameTs);
+      if (useRemoteLevel && remoteLevelTs) saveLevelUpdatedAt(remoteLevelTs);
       if (profile.avatar_url) saveProfilePicUrl(profile.avatar_url);
     }
 

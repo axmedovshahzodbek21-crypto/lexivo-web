@@ -9,6 +9,7 @@ const KEYS = {
   profilePic: 'lexivo_profile_pic',
   profilePicUrl: 'lexivo_profile_pic_url',
   nameUpdatedAt: 'lexivo_name_updated_at',
+  levelUpdatedAt: 'lexivo_level_updated_at',
   customLists: 'lexivo_custom_lists',
   learned: 'lexivo_learned_words',
   srs: 'lexivo_srs_words',
@@ -138,6 +139,16 @@ export function getNameUpdatedAt(): string | null {
 export function saveNameUpdatedAt(ts: string) {
   if (typeof window === 'undefined') return;
   localStorage.setItem(KEYS.nameUpdatedAt, ts);
+}
+
+export function getLevelUpdatedAt(): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem(KEYS.levelUpdatedAt) ?? null;
+}
+
+export function saveLevelUpdatedAt(ts: string) {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(KEYS.levelUpdatedAt, ts);
 }
 
 // ─── Learned words ───────────────────────────────────────────────────────────

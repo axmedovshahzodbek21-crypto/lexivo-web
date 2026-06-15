@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { getSettings, saveSettings, setUILanguage, resetOnboarded, saveNameUpdatedAt } from '@/lib/storage';
+import { getSettings, saveSettings, setUILanguage, resetOnboarded, saveNameUpdatedAt, saveLevelUpdatedAt } from '@/lib/storage';
 import { getTheme, setTheme, type Theme } from '@/lib/theme';
 import { supabase } from '@/lib/supabase';
 import { stopSync } from '@/lib/web-sync';
@@ -190,6 +190,7 @@ export default function SettingsPage() {
   const handleSave = () => {
     saveSettings(settings);
     saveNameUpdatedAt(new Date().toISOString());
+    saveLevelUpdatedAt(new Date().toISOString());
     setSaved(true);
     setTimeout(() => { setSaved(false); router.back(); }, 1000);
   };
