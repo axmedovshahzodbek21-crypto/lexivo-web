@@ -1,5 +1,5 @@
 'use client';
-import { useState, useLayoutEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { getUILanguage } from './storage';
 import { translations, type Translations } from './i18n';
 
@@ -10,7 +10,7 @@ function getLang(): 'en' | 'uz' {
 export function useTranslation(): Translations {
   const [t, setT] = useState<Translations>(translations.en);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const update = () => setT(translations[getLang()] ?? translations.en);
     update();
     window.addEventListener('lexivo-lang-change', update);
