@@ -201,7 +201,11 @@ export default function ProfilePage() {
         {/* ── Hero card ── */}
         <TiltCard
           className="rounded-3xl p-5 overflow-hidden flex flex-col items-center text-center"
-          style={{ background: `linear-gradient(135deg, var(--primary) 0%, ${levelColor} 100%)` }}
+          style={{
+            background: 'var(--surface)',
+            border: `1px solid ${levelColor}40`,
+            boxShadow: `0 4px 32px ${levelColor}18`,
+          }}
           intensity={3}
           glare={false}
         >
@@ -218,52 +222,58 @@ export default function ProfilePage() {
             className="relative mb-3 group"
             title={t.profile.changePhoto}
           >
-            <div className="w-20 h-20 rounded-full border-4 border-white/40 overflow-hidden shadow-lg">
+            <div
+              className="w-20 h-20 rounded-full overflow-hidden shadow-lg border-4"
+              style={{ borderColor: `${levelColor}50` }}
+            >
               {profilePic ? (
                 <img src={profilePic} alt="Profile" className="w-full h-full object-cover" />
               ) : (
                 <div
                   className="w-full h-full flex items-center justify-center text-white text-4xl font-black"
-                  style={{ background: 'rgba(255,255,255,0.2)' }}
+                  style={{ background: `linear-gradient(135deg, var(--primary), ${levelColor})` }}
                 >
                   {initial}
                 </div>
               )}
             </div>
             {/* Camera overlay */}
-            <div className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-white flex items-center justify-center shadow-md text-sm group-hover:scale-110 transition-transform">
+            <div className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-[var(--surface-2)] border border-[var(--border)] flex items-center justify-center shadow-md text-sm group-hover:scale-110 transition-transform">
               📷
             </div>
           </button>
           {profilePic && (
             <button
               onClick={handleRemovePhoto}
-              className="text-white/60 text-xs mb-1 hover:text-white transition-colors"
+              className="text-[var(--text-muted)] text-xs mb-1 hover:text-[var(--danger)] transition-colors"
             >
               {t.profile.removePhoto}
             </button>
           )}
-          <h2 className="text-white text-2xl font-black">{settings.name}</h2>
+          <h2 className="text-[var(--text)] text-2xl font-black">{settings.name}</h2>
           <div className="flex items-center gap-2 mt-1.5">
-            <span className="bg-white/20 text-white text-xs font-bold px-2.5 py-1 rounded-full">
+            <span
+              className="text-xs font-bold px-2.5 py-1 rounded-full"
+              style={{ background: `${levelColor}20`, color: levelColor }}
+            >
               {settings.languageLevel} · {CEFR_LABELS[settings.languageLevel] ?? ''}
             </span>
           </div>
           {/* Today's quick stats */}
-          <div className="flex items-center gap-4 mt-4 text-white/90 text-sm">
+          <div className="flex items-center gap-4 mt-4 text-sm">
             <div className="text-center">
-              <div className="text-xl font-black">{todayCount}</div>
-              <div className="text-[11px] text-white/70">{t.profile.today}</div>
+              <div className="text-xl font-black text-[var(--text)]">{todayCount}</div>
+              <div className="text-[11px] text-[var(--text-muted)]">{t.profile.today}</div>
             </div>
-            <div className="w-px h-6 bg-white/30" />
+            <div className="w-px h-6 bg-[var(--border)]" />
             <div className="text-center">
-              <div className="text-xl font-black">+{todayXp}</div>
-              <div className="text-[11px] text-white/70">{t.profile.xpToday}</div>
+              <div className="text-xl font-black text-[var(--text)]">+{todayXp}</div>
+              <div className="text-[11px] text-[var(--text-muted)]">{t.profile.xpToday}</div>
             </div>
-            <div className="w-px h-6 bg-white/30" />
+            <div className="w-px h-6 bg-[var(--border)]" />
             <div className="text-center">
-              <div className="text-xl font-black">🔥 {streak}</div>
-              <div className="text-[11px] text-white/70">{t.profile.streak}</div>
+              <div className="text-xl font-black text-[var(--text)]">🔥 {streak}</div>
+              <div className="text-[11px] text-[var(--text-muted)]">{t.profile.streak}</div>
             </div>
           </div>
         </TiltCard>
