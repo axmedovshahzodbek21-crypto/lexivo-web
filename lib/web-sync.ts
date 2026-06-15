@@ -3,6 +3,7 @@ import {
   getSettings, saveSettings, setOnboarded,
   getLearnedWords, getSRSWords, getStarredWords,
   getXP, getTodayXP, getStreak, getFreezes, getTotalStudyDays,
+  getProfilePicUrl, saveProfilePicUrl,
 } from './storage';
 
 // localStorage key constants (mirrors KEYS in storage.ts)
@@ -33,6 +34,7 @@ export async function pushAll(uid: string) {
   try {
     const settings = getSettings();
 
+    const avatarUrl = getProfilePicUrl();
     await supabase.from('profiles').upsert({
       id: uid,
       name: settings.name,
@@ -45,6 +47,7 @@ export async function pushAll(uid: string) {
       study_order: settings.studyOrder,
       quiz_direction: settings.quizDirection,
       reduce_motion: settings.reduceMotion,
+      ...(avatarUrl !== null && { avatar_url: avatarUrl }),
     });
 
     await supabase.from('user_stats').upsert({
@@ -174,6 +177,7 @@ export async function pullAll(uid: string) {
         uiLanguage:      existing.uiLanguage,
       });
       setOnboarded();
+      if (profile.avatar_url) saveProfilePicUrl(profile.avatar_url);
     }
 
     // user_stats

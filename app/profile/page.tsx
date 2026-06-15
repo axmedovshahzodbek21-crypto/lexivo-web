@@ -7,6 +7,7 @@ import {
   getSettings, getStreak, getXP, getTodayXP, getTodayLearnedCount,
   getLearnedWords, getSRSWords, getDueWords, getUnlockedAchievements,
   getUnitProgress, getProfilePic, saveProfilePic, removeProfilePic,
+  getProfilePicUrl, saveProfilePicUrl, removeProfilePicUrl,
 } from '@/lib/storage';
 import { getLevelInfo, ALL_ACHIEVEMENTS } from '@/lib/gamification';
 import type { UserSettings } from '@/lib/types';
@@ -90,20 +91,45 @@ export default function ProfilePage() {
     setSrsCount(getSRSWords().length);
     setDueCount(getDueWords().length);
     setUnlockedIds(getUnlockedAchievements());
-    setProfilePic(getProfilePic());
+    setProfilePic(getProfilePicUrl() ?? getProfilePic());
   }, []);
 
   async function handlePickPhoto(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // Keep base64 locally as offline fallback
     const base64 = await compressImage(file);
     saveProfilePic(base64);
-    setProfilePic(base64);
+
+    if (user) {
+      const { error } = await supabase.storage
+        .from('avatars')
+        .upload(`${user.id}/avatar.jpg`, file, { upsert: true, contentType: file.type });
+      if (!error) {
+        const { data: { publicUrl } } = supabase.storage
+          .from('avatars')
+          .getPublicUrl(`${user.id}/avatar.jpg`);
+        const url = `${publicUrl}?t=${Date.now()}`;
+        saveProfilePicUrl(url);
+        await supabase.from('profiles').upsert({ id: user.id, avatar_url: url });
+        setProfilePic(url);
+      } else {
+        setProfilePic(base64);
+      }
+    } else {
+      setProfilePic(base64);
+    }
     e.target.value = '';
   }
 
-  function handleRemovePhoto() {
+  async function handleRemovePhoto() {
     removeProfilePic();
+    removeProfilePicUrl();
+    if (user) {
+      await supabase.storage.from('avatars').remove([`${user.id}/avatar.jpg`]);
+      await supabase.from('profiles').upsert({ id: user.id, avatar_url: null });
+    }
     setProfilePic(null);
   }
 

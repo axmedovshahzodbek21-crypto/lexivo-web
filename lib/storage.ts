@@ -7,6 +7,7 @@ function levelForXp(xp: number): string {
 
 const KEYS = {
   profilePic: 'lexivo_profile_pic',
+  profilePicUrl: 'lexivo_profile_pic_url',
   customLists: 'lexivo_custom_lists',
   learned: 'lexivo_learned_words',
   srs: 'lexivo_srs_words',
@@ -112,6 +113,20 @@ export function saveProfilePic(base64: string) {
 
 export function removeProfilePic() {
   if (typeof window !== 'undefined') localStorage.removeItem(KEYS.profilePic);
+}
+
+export function getProfilePicUrl(): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem(KEYS.profilePicUrl) ?? null;
+}
+
+export function saveProfilePicUrl(url: string) {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(KEYS.profilePicUrl, url);
+}
+
+export function removeProfilePicUrl() {
+  if (typeof window !== 'undefined') localStorage.removeItem(KEYS.profilePicUrl);
 }
 
 // ─── Learned words ───────────────────────────────────────────────────────────
