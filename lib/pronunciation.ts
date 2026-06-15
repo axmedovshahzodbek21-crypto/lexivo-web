@@ -85,6 +85,7 @@ export function createRecognizer(
   onResult: (transcripts: string[]) => void,
   onEnd: () => void,
   onError: (err: string) => void,
+  onStart: () => void,
   lang = 'en-US',
 ): Recognizer | null {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -97,6 +98,8 @@ export function createRecognizer(
   r.continuous = false;
   r.interimResults = false;
   r.maxAlternatives = 5;
+
+  r.onstart = onStart;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   r.onresult = (event: any) => {

@@ -164,27 +164,12 @@ function PronunciationInner() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentText, phase]);
 
-  const startListening = useCallback(async () => {
+  const startListening = useCallback(() => {
     if (!currentText) return;
     setMicError('');
-    setPhase('listening');
     setHeardText('');
-
-    // getUserMedia triggers the browser's mic permission dialog.
-    // SpeechRecognition alone often fires 'not-allowed' without prompting.
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      stream.getTracks().forEach(t => t.stop());
-    } catch (e: unknown) {
-      const name = e instanceof DOMException ? e.name : '';
-      setMicError(
-        name === 'NotAllowedError' || name === 'PermissionDeniedError'
-          ? 'blocked'
-          : 'Could not access microphone. Make sure one is connected and try again.',
-      );
-      setPhase('ready');
-      return;
-    }
+    // Phase switches to 'listening' only when SpeechRecognition fires onstart.
+    // This avoids the getUserMedia → release → recognition race condition.
 
     const rec = createRecognizer(
       (transcripts) => {
@@ -202,6 +187,7 @@ function PronunciationInner() {
         setMicError(err === 'not-allowed' ? 'blocked' : `Microphone error: ${err}`);
         setPhase('ready');
       },
+      () => { setPhase('listening'); },
       accent === 'uk' ? 'en-GB' : 'en-US',
     );
 
