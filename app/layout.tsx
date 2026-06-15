@@ -3,7 +3,6 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
-import dynamic from 'next/dynamic';
 import Navigation from '@/components/Navigation';
 import AchievementToast from '@/components/AchievementToast';
 import LevelUpOverlay from '@/components/LevelUpOverlay';
@@ -12,13 +11,10 @@ import DataLoader from '@/components/DataLoader';
 import GlobalKeyboardHandler from '@/components/GlobalKeyboardHandler';
 import ThemeProvider from '@/components/ThemeProvider';
 import NotificationScheduler from '@/components/NotificationScheduler';
+import PomodoroWidget from '@/components/PomodoroWidget';
 import { AuthProvider } from '@/lib/auth-context';
 import SyncProvider from '@/components/SyncProvider';
 import OneSignalProvider from '@/components/OneSignalProvider';
-
-// PomodoroWidget uses createPortal (browser-only API) — never SSR it
-// This also prevents it from being in a hydrating Suspense boundary, avoiding React Error #310
-const PomodoroWidget = dynamic(() => import('@/components/PomodoroWidget'), { ssr: false });
 
 export const metadata: Metadata = {
   title: 'Lexivo – Vocabulary Learning',
