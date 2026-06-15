@@ -10,6 +10,8 @@ const withPWA = withPWAInit({
     disableDevLogs: true,
     skipWaiting: true,
     clientsClaim: true,
+    cleanupOutdatedCaches: true,
+    cacheId: "lexivo-v2",
   },
 });
 
