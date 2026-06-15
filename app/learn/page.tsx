@@ -1,5 +1,6 @@
 'use client';
 export const dynamic = 'force-dynamic';
+import dynamicImport from 'next/dynamic';
 import { useEffect, useState, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
@@ -56,7 +57,16 @@ function buildStudyList(
   return words;
 }
 
-export default function LearnPage() {
+const LearnPageClient = dynamicImport(
+  () => Promise.resolve({ default: LearnPage }),
+  { ssr: false, loading: () => <div className="flex items-center justify-center min-h-screen"><div className="text-4xl animate-bounce">📚</div></div> }
+);
+
+export default function LearnPageWrapper() {
+  return <LearnPageClient />;
+}
+
+function LearnPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const sourceMyWords = searchParams.get('source') === 'my-words';
