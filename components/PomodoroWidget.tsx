@@ -191,12 +191,15 @@ export default function PomodoroWidget() {
     drag.current = null;
   }
 
-  // Initialise panel position when it opens
+  // Initialise panel position when it opens, clear when it closes
   useEffect(() => {
     if (panelOpen && pos) {
       const p = { x: pos.x, y: pos.y + 60 };
       panelPosRef.current = p;
       setPanelPos(p);
+    } else if (!panelOpen) {
+      panelPosRef.current = null;
+      setPanelPos(null);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [panelOpen]);
