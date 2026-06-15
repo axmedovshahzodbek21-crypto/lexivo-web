@@ -4,6 +4,7 @@ import {
   getLearnedWords, getSRSWords, getStarredWords,
   getXP, getTodayXP, getStreak, getFreezes, getTotalStudyDays,
   getProfilePicUrl, saveProfilePicUrl,
+  getNameUpdatedAt, saveNameUpdatedAt,
 } from './storage';
 
 // localStorage key constants (mirrors KEYS in storage.ts)
@@ -35,9 +36,11 @@ export async function pushAll(uid: string) {
     const settings = getSettings();
 
     const avatarUrl = getProfilePicUrl();
+    const nameUpdatedAt = getNameUpdatedAt();
     await supabase.from('profiles').upsert({
       id: uid,
       name: settings.name,
+      name_updated_at: nameUpdatedAt,
       language_level: settings.languageLevel,
       daily_goal: settings.dailyGoal,
       default_accent: settings.defaultAccent,
@@ -163,8 +166,12 @@ export async function pullAll(uid: string) {
     const { data: profile } = await supabase.from('profiles').select().eq('id', uid).maybeSingle();
     if (profile) {
       const existing = getSettings();
+      const remoteNameTs = profile.name_updated_at as string | null;
+      const localNameTs  = getNameUpdatedAt();
+      // Only accept remote name when it's from a more recent explicit save
+      const useRemoteName = remoteNameTs !== null && (localNameTs === null || remoteNameTs > localNameTs);
       saveSettings({
-        name:            profile.name            ?? 'Learner',
+        name:            useRemoteName ? (profile.name ?? 'Learner') : existing.name,
         languageLevel:   profile.language_level  ?? 'B1',
         dailyGoal:       profile.daily_goal       ?? 10,
         defaultAccent:   profile.default_accent   ?? 'us',
@@ -177,6 +184,7 @@ export async function pullAll(uid: string) {
         uiLanguage:      existing.uiLanguage,
       });
       setOnboarded();
+      if (useRemoteName && remoteNameTs) saveNameUpdatedAt(remoteNameTs);
       if (profile.avatar_url) saveProfilePicUrl(profile.avatar_url);
     }
 
