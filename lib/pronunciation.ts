@@ -128,3 +128,79 @@ export const XP_BY_SCORE: Record<MatchScore, number> = {
   close: 2,
   wrong: 0,
 };
+
+// ── Whisper-based recognizer (works in all regions, no Google dependency) ──────
+
+export function isRecordingSupported(): boolean {
+  return (
+    typeof window !== 'undefined' &&
+    'MediaRecorder' in window &&
+    !!navigator.mediaDevices?.getUserMedia
+  );
+}
+
+export function createWhisperRecognizer(
+  onResult: (transcripts: string[]) => void,
+  onEnd: () => void,
+  onError: (err: string) => void,
+  onStart: () => void,
+  onProcessing: () => void,
+): Recognizer {
+  let recorder: MediaRecorder | null = null;
+  const chunks: Blob[] = [];
+  let aborted = false;
+
+  return {
+    start: async () => {
+      aborted = false;
+      chunks.length = 0;
+
+      let stream: MediaStream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      } catch (e: unknown) {
+        const name = e instanceof DOMException ? e.name : '';
+        onError(name === 'NotAllowedError' || name === 'PermissionDeniedError' ? 'not-allowed' : 'audio-capture');
+        onEnd();
+        return;
+      }
+
+      const mime = ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg', 'audio/mp4']
+        .find(t => MediaRecorder.isTypeSupported(t)) ?? '';
+
+      recorder = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined);
+      recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+
+      recorder.onstop = async () => {
+        stream.getTracks().forEach(t => t.stop());
+        if (aborted) { onEnd(); return; }
+
+        const blob = new Blob(chunks, { type: recorder?.mimeType ?? 'audio/webm' });
+        if (blob.size < 500) { onResult([]); onEnd(); return; }
+
+        onProcessing();
+
+        try {
+          const form = new FormData();
+          form.append('audio', blob, 'audio.webm');
+          const res = await fetch('/api/transcribe', { method: 'POST', body: form });
+          if (!res.ok) {
+            onError(res.status === 503 ? 'no-api-key' : 'network');
+            onEnd();
+            return;
+          }
+          const { text } = await res.json() as { text?: string };
+          onResult(text ? [text] : []);
+        } catch {
+          onError('network');
+        }
+        onEnd();
+      };
+
+      recorder.start();
+      onStart();
+    },
+    stop:  () => { try { recorder?.stop();  } catch { /* already stopped */ } },
+    abort: () => { aborted = true; try { recorder?.stop(); } catch { /* */ } },
+  };
+}

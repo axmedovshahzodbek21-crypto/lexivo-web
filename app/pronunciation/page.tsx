@@ -8,8 +8,8 @@ import { speakAccent, type Accent } from '@/lib/speech';
 import { addXP, getHardWords, getStarredWords, getCustomListWords, getSettings } from '@/lib/storage';
 import { checkAchievements } from '@/lib/gamification';
 import {
-  isRecognitionSupported,
-  createRecognizer,
+  isRecordingSupported,
+  createWhisperRecognizer,
   scoreMatch,
   scoreSentenceMatch,
   diffWords,
@@ -35,7 +35,7 @@ interface SentenceItem {
 }
 
 type PracticeMode = 'words' | 'sentences';
-type Phase = 'ready' | 'listening' | 'result' | 'done';
+type Phase = 'ready' | 'listening' | 'processing' | 'result' | 'done';
 
 interface WordResult {
   text: string;
@@ -111,7 +111,7 @@ function PronunciationInner() {
   const hardParam       = searchParams.get('hard') === 'true';
   const listId          = searchParams.get('list') ?? undefined;
 
-  const [supported]  = useState(() => isRecognitionSupported());
+  const [supported]  = useState(() => isRecordingSupported());
   const [mode, setMode]             = useState<PracticeMode>('words');
   const [accent, setAccent]         = useState<Accent>(() => getSettings().defaultAccent);
   const [autoPlay, setAutoPlay]     = useState(true);
@@ -164,31 +164,13 @@ function PronunciationInner() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentText, phase]);
 
-  const startListening = useCallback(async () => {
+  const startListening = useCallback(() => {
     if (!currentText) return;
     setMicError('');
     setHeardText('');
 
-    // Get mic permission explicitly and keep stream alive during recognition.
-    // Releasing before start caused race conditions on some devices.
-    let stream: MediaStream | null = null;
-    try {
-      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    } catch (e: unknown) {
-      const name = e instanceof DOMException ? e.name : String(e);
-      setMicError(
-        name === 'NotAllowedError' || name === 'PermissionDeniedError'
-          ? 'blocked'
-          : `Microphone error: ${name}`,
-      );
-      return;
-    }
-
-    const stopStream = () => stream?.getTracks().forEach(t => t.stop());
-
-    const rec = createRecognizer(
+    const rec = createWhisperRecognizer(
       (transcripts) => {
-        stopStream();
         const best = transcripts[0] ?? '';
         setHeardText(best);
         const s = mode === 'sentences'
@@ -198,23 +180,22 @@ function PronunciationInner() {
         setDiff(best ? diffWords(best, currentText) : []);
         setPhase('result');
       },
-      () => { stopStream(); setPhase(prev => prev === 'listening' ? 'result' : prev); },
+      () => { setPhase(prev => prev === 'listening' ? 'result' : prev); },
       (err) => {
-        stopStream();
-        // 'not-allowed' after getUserMedia succeeded = service blocked, not mic permission
         setMicError(
-          err === 'not-allowed' || err === 'service-not-allowed'
-            ? 'service-blocked'
-            : `Speech error: ${err}`,
+          err === 'not-allowed' ? 'blocked'
+          : err === 'no-api-key' ? 'no-api-key'
+          : err === 'network'   ? 'network'
+          : `Mic error: ${err}`,
         );
         setPhase('ready');
       },
       () => { setPhase('listening'); },
-      accent === 'uk' ? 'en-GB' : 'en-US',
+      () => { setPhase('processing'); },
     );
 
     recognizerRef.current = rec;
-    rec?.start();
+    rec.start();
   }, [currentText, mode, accent]);
 
   const stopListening = useCallback(() => {
@@ -241,9 +222,9 @@ function PronunciationInner() {
     return (
       <div className="p-6 text-center space-y-4 animate-fade-in">
         <div className="text-6xl">🎙️</div>
-        <h2 className="text-xl font-bold text-[var(--text)]">Not supported in this browser</h2>
+        <h2 className="text-xl font-bold text-[var(--text)]">Microphone not supported</h2>
         <p className="text-sm text-[var(--text-muted)] max-w-xs mx-auto leading-relaxed">
-          Requires <strong>Chrome</strong> or <strong>Edge</strong> on desktop or Android.
+          Try opening this page in <strong>Chrome</strong>, <strong>Firefox</strong>, or <strong>Safari</strong> on a modern device.
         </p>
         <button onClick={() => router.back()} className="btn-secondary">← Go back</button>
       </div>
@@ -424,35 +405,63 @@ function PronunciationInner() {
           </div>
         )}
 
-        {/* Mic blocked — browser permission denied */}
+        {/* Mic permission denied */}
         {micError === 'blocked' && phase === 'ready' && (
           <div className="w-full max-w-sm card border border-[var(--danger)] bg-red-50 space-y-3 text-center animate-fade-in">
             <div className="text-4xl">🎙️🚫</div>
             <p className="font-bold text-[var(--danger)]">Microphone Blocked</p>
-            <p className="text-sm text-[var(--text-muted)]">Your browser blocked mic access for this site. To fix it:</p>
+            <p className="text-sm text-[var(--text-muted)]">Allow microphone access and try again:</p>
             <ol className="text-sm text-[var(--text)] text-left space-y-1 list-decimal list-inside">
               <li>Click the <strong>🔒 lock icon</strong> in the address bar</li>
               <li>Find <strong>Microphone</strong> → set to <strong>Allow</strong></li>
-              <li>Refresh the page, then tap the mic again</li>
+              <li>Refresh, then tap the mic again</li>
             </ol>
             <button onClick={() => window.location.reload()} className="btn-primary w-full">Refresh page</button>
           </div>
         )}
 
-        {/* Mic blocked — speech service rejected (mic is allowed, service-level block) */}
-        {micError === 'service-blocked' && phase === 'ready' && (
+        {/* API key not configured */}
+        {micError === 'no-api-key' && phase === 'ready' && (
           <div className="w-full max-w-sm card border border-amber-400 bg-amber-50 space-y-2 text-center animate-fade-in">
-            <div className="text-4xl">🌐</div>
-            <p className="font-bold text-amber-700">Speech Service Unavailable</p>
+            <div className="text-4xl">🔑</div>
+            <p className="font-bold text-amber-700">Speech service not set up</p>
             <p className="text-sm text-[var(--text-muted)]">
-              Your microphone is working, but Chrome&apos;s speech recognition service could not be reached. This can happen due to network restrictions or regional blocks on Google services.
+              Add <code className="bg-amber-100 px-1 rounded text-xs">OPENAI_API_KEY</code> to your Vercel environment variables to enable pronunciation checking.
             </p>
+            <button onClick={() => setMicError('')} className="btn-secondary w-full">Dismiss</button>
+          </div>
+        )}
+
+        {/* Network error */}
+        {micError === 'network' && phase === 'ready' && (
+          <div className="w-full max-w-sm card border border-[var(--border)] space-y-2 text-center animate-fade-in">
+            <div className="text-4xl">📡</div>
+            <p className="font-bold text-[var(--text)]">Connection error</p>
+            <p className="text-sm text-[var(--text-muted)]">Could not reach the speech service. Check your internet and try again.</p>
             <button onClick={() => setMicError('')} className="btn-primary w-full">Try again</button>
           </div>
         )}
 
+        {/* Other errors */}
+        {micError && !['blocked','no-api-key','network'].includes(micError) && phase === 'ready' && (
+          <div className="flex flex-col items-center gap-2">
+            <p className="text-xs text-[var(--danger)] text-center max-w-xs">{micError}</p>
+            <button onClick={() => setMicError('')} className="text-xs text-[var(--primary)] underline">Try again</button>
+          </div>
+        )}
+
+        {/* Processing indicator */}
+        {phase === 'processing' && (
+          <div className="flex flex-col items-center gap-3 animate-fade-in">
+            <div className="w-16 h-16 rounded-full bg-[var(--primary-bg)] flex items-center justify-center">
+              <div className="w-8 h-8 border-4 border-[var(--primary)] border-t-transparent rounded-full animate-spin" />
+            </div>
+            <p className="text-sm text-[var(--text-muted)]">Analysing your pronunciation…</p>
+          </div>
+        )}
+
         {/* Mic button */}
-        {(phase === 'ready' || phase === 'listening') && micError !== 'blocked' && micError !== 'service-blocked' && (
+        {(phase === 'ready' || phase === 'listening') && !micError && (
           <div className="flex flex-col items-center gap-3">
             {attempt === 1 && phase === 'ready' && (
               <p className="text-xs text-amber-600 font-medium">Retry — try once more!</p>
@@ -470,7 +479,6 @@ function PronunciationInner() {
             <p className="text-sm text-[var(--text-muted)]">
               {phase === 'listening' ? 'Listening… tap to stop' : 'Tap to speak'}
             </p>
-            {micError && <p className="text-xs text-[var(--danger)] text-center max-w-xs">{micError}</p>}
           </div>
         )}
 
