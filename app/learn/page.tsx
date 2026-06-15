@@ -100,8 +100,10 @@ export default function LearnPage() {
   }, []);
 
   // Show Pomodoro widget whenever Learn is entered (collection picker or unit session)
+  // setTimeout defers past the hydration window to avoid React Error #310
   useEffect(() => {
-    showPomodoroSetup();
+    const t = setTimeout(() => showPomodoroSetup(), 0);
+    return () => clearTimeout(t);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
