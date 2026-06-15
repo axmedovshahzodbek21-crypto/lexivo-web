@@ -87,6 +87,14 @@ export default function PomodoroWidget() {
   } | null>(null);
   const wasDrag = useRef(false);
   const elemRef = useRef<HTMLDivElement>(null);
+
+  const [panelPos, setPanelPos] = useState<{ x: number; y: number } | null>(null);
+  const panelPosRef = useRef<{ x: number; y: number } | null>(null);
+  const panelDrag = useRef<{
+    startCX: number; startCY: number;
+    startEX: number; startEY: number;
+    moved: boolean;
+  } | null>(null);
   const prevPhaseRef = useRef<PomPhase>('idle');
   const [tipIndex, setTipIndex] = useState(0);
   const [mounted, setMounted] = useState(false);
@@ -181,6 +189,45 @@ export default function PomodoroWidget() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(posRef.current));
     }
     drag.current = null;
+  }
+
+  // Initialise panel position when it opens
+  useEffect(() => {
+    if (panelOpen && pos) {
+      const p = { x: pos.x, y: pos.y + 60 };
+      panelPosRef.current = p;
+      setPanelPos(p);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [panelOpen]);
+
+  function onPanelPointerDown(e: React.PointerEvent<HTMLDivElement>) {
+    if (!panelPosRef.current) return;
+    panelDrag.current = {
+      startCX: e.clientX, startCY: e.clientY,
+      startEX: panelPosRef.current.x, startEY: panelPosRef.current.y,
+      moved: false,
+    };
+    e.currentTarget.setPointerCapture(e.pointerId);
+  }
+
+  function onPanelPointerMove(e: React.PointerEvent<HTMLDivElement>) {
+    if (!panelDrag.current) return;
+    const dx = e.clientX - panelDrag.current.startCX;
+    const dy = e.clientY - panelDrag.current.startCY;
+    if (!panelDrag.current.moved && Math.hypot(dx, dy) <= 4) return;
+    panelDrag.current.moved = true;
+    const w = e.currentTarget.offsetWidth;
+    const h = e.currentTarget.offsetHeight;
+    const nx = Math.max(8, Math.min(window.innerWidth - w - 8, panelDrag.current.startEX + dx));
+    const ny = Math.max(8, Math.min(window.innerHeight - h - 8, panelDrag.current.startEY + dy));
+    const p = { x: nx, y: ny };
+    panelPosRef.current = p;
+    setPanelPos(p);
+  }
+
+  function onPanelPointerUp() {
+    panelDrag.current = null;
   }
 
   // ── Break overlay (portal, full-screen) ───────────────────────────────────
@@ -398,8 +445,11 @@ export default function PomodoroWidget() {
       {/* Expanded panel — shown when widget is tapped */}
       {panelOpen && createPortal(
         <div
-          className="fixed z-50"
-          style={{ left: pos?.x ?? 0, top: (pos?.y ?? 0) + 60, width: 260, ...cardStyle }}
+          onPointerDown={onPanelPointerDown}
+          onPointerMove={onPanelPointerMove}
+          onPointerUp={onPanelPointerUp}
+          className="fixed z-50 cursor-move select-none"
+          style={{ left: panelPos?.x ?? pos?.x ?? 0, top: panelPos?.y ?? (pos?.y ?? 0) + 60, width: 260, touchAction: 'none', ...cardStyle }}
         >
           {/* Header */}
           <div style={{ padding: '14px 14px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -407,6 +457,7 @@ export default function PomodoroWidget() {
               {isWork ? '🎯 Focus' : '☕ Break'}
             </span>
             <button
+              onPointerDown={e => e.stopPropagation()}
               onClick={() => setPanelOpen(false)}
               style={{ width: 24, height: 24, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', border: 'none', color: 'rgba(255,255,255,0.6)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >✕</button>
@@ -435,18 +486,21 @@ export default function PomodoroWidget() {
           {/* Controls */}
           <div style={{ padding: '12px 14px 14px', display: 'flex', gap: 8 }}>
             <button
+              onPointerDown={e => e.stopPropagation()}
               onClick={() => { pomRunning ? pausePomodoro() : resumePomodoro(); }}
               style={{ flex: 1, padding: '10px 0', borderRadius: 12, border: 'none', background: accentColor, color: '#fff', fontWeight: 800, fontSize: 16, cursor: 'pointer' }}
             >
               {pomRunning ? '⏸' : '▶'}
             </button>
             <button
+              onPointerDown={e => e.stopPropagation()}
               onClick={skipPomodoro}
               style={{ flex: 1, padding: '10px 0', borderRadius: 12, border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.6)', fontWeight: 800, fontSize: 16, cursor: 'pointer' }}
             >
               ⏭
             </button>
             <button
+              onPointerDown={e => e.stopPropagation()}
               onClick={() => { resetPomodoro(); setPanelOpen(false); }}
               style={{ padding: '10px 12px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.35)', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}
             >
