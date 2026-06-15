@@ -23,6 +23,20 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
 
   const [collection, setCollection] = useState<WordCollection | null>(null);
   const [units, setUnits] = useState<UnitRow[]>([]);
+  const [cols, setCols] = useState(2);
+
+  useEffect(() => {
+    const stored = localStorage.getItem('lexivo_unit_cols');
+    if (stored) setCols(Number(stored));
+  }, []);
+
+  const zoom = (delta: number) => {
+    setCols(prev => {
+      const next = Math.min(3, Math.max(1, prev + delta));
+      localStorage.setItem('lexivo_unit_cols', String(next));
+      return next;
+    });
+  };
 
   useEffect(() => {
     if (!collectionsLoaded) return;
@@ -86,10 +100,27 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
         {collection.description && (
           <p className="text-sm text-[var(--text-muted)] mt-1">{collection.description}</p>
         )}
-        <div className="flex gap-3 mt-3 text-sm text-[var(--text-muted)]">
-          <span>{t.collections.unitsCount(units.length)}</span>
-          <span>{t.collections.wordsCount(totalWords)}</span>
-          <span>{t.collections.completed(completedUnits, units.length)}</span>
+        <div className="flex items-center justify-between mt-3">
+          <div className="flex gap-3 text-sm text-[var(--text-muted)]">
+            <span>{t.collections.unitsCount(units.length)}</span>
+            <span>{t.collections.wordsCount(totalWords)}</span>
+            <span>{t.collections.completed(completedUnits, units.length)}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => zoom(1)}
+              disabled={cols === 1}
+              className="w-7 h-7 rounded-lg border border-[var(--border)] flex items-center justify-center text-sm text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--surface-2)] disabled:opacity-30 transition-colors"
+              title="Zoom in"
+            >−</button>
+            <span className="text-xs text-[var(--text-muted)] w-4 text-center">{cols}</span>
+            <button
+              onClick={() => zoom(-1)}
+              disabled={cols === 3}
+              className="w-7 h-7 rounded-lg border border-[var(--border)] flex items-center justify-center text-sm text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--surface-2)] disabled:opacity-30 transition-colors"
+              title="Zoom out"
+            >+</button>
+          </div>
         </div>
 
         {/* Overall progress bar */}
@@ -106,7 +137,7 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
       </div>
 
       {/* Units list */}
-      <div className="flex-1 p-3 grid grid-cols-2 gap-2">
+      <div className={`flex-1 p-3 gap-2 grid transition-all ${cols === 1 ? 'grid-cols-1' : cols === 3 ? 'grid-cols-3' : 'grid-cols-2'}`}>
         {units.map((unit) => (
           <UnitCard
             key={unit.dayNumber}
