@@ -179,7 +179,7 @@ function PronunciationInner() {
       const name = e instanceof DOMException ? e.name : '';
       setMicError(
         name === 'NotAllowedError' || name === 'PermissionDeniedError'
-          ? 'Microphone access denied. Tap the lock icon in your browser address bar and allow microphone, then try again.'
+          ? 'blocked'
           : 'Could not access microphone. Make sure one is connected and try again.',
       );
       setPhase('ready');
@@ -199,9 +199,7 @@ function PronunciationInner() {
       },
       () => { setPhase(prev => prev === 'listening' ? 'result' : prev); },
       (err) => {
-        setMicError(err === 'not-allowed'
-          ? 'Microphone permission denied. Tap the lock icon in your browser address bar and allow microphone.'
-          : `Microphone error: ${err}`);
+        setMicError(err === 'not-allowed' ? 'blocked' : `Microphone error: ${err}`);
         setPhase('ready');
       },
       accent === 'uk' ? 'en-GB' : 'en-US',
@@ -418,8 +416,28 @@ function PronunciationInner() {
           </div>
         )}
 
+        {/* Mic blocked card */}
+        {micError === 'blocked' && phase === 'ready' && (
+          <div className="w-full max-w-sm card border border-[var(--danger)] bg-red-50 space-y-3 text-center animate-fade-in">
+            <div className="text-4xl">🎙️🚫</div>
+            <p className="font-bold text-[var(--danger)]">Microphone Blocked</p>
+            <p className="text-sm text-[var(--text-muted)]">Your browser blocked mic access for this site. To fix it:</p>
+            <ol className="text-sm text-[var(--text)] text-left space-y-1 list-decimal list-inside">
+              <li>Click the <strong>🔒 lock icon</strong> in the address bar</li>
+              <li>Find <strong>Microphone</strong> → set to <strong>Allow</strong></li>
+              <li>Refresh the page, then tap the mic again</li>
+            </ol>
+            <button
+              onClick={() => window.location.reload()}
+              className="btn-primary w-full"
+            >
+              Refresh page
+            </button>
+          </div>
+        )}
+
         {/* Mic button */}
-        {(phase === 'ready' || phase === 'listening') && (
+        {(phase === 'ready' || phase === 'listening') && micError !== 'blocked' && (
           <div className="flex flex-col items-center gap-3">
             {attempt === 1 && phase === 'ready' && (
               <p className="text-xs text-amber-600 font-medium">Retry — try once more!</p>
