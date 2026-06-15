@@ -37,6 +37,7 @@ export default function HomePage() {
   const [wodRevealed, setWodRevealed] = useState(false);
   const [theme, setThemeState] = useState<Theme>('light');
   const [showXpModal, setShowXpModal] = useState(false);
+  const [showBanner, setShowBanner] = useState(false);
 
   useEffect(() => {
     if (!isOnboarded()) { router.replace('/onboarding'); return; }
@@ -51,6 +52,10 @@ export default function HomePage() {
     setSettings(getSettings());
     setThemeState(getTheme());
     setImportedCount(getImportedWords().length);
+    if (!localStorage.getItem('android_banner_seen')) {
+      localStorage.setItem('android_banner_seen', '1');
+      setShowBanner(true);
+    }
   }, [router]);
 
   useEffect(() => {
@@ -99,22 +104,24 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* ── Download banner ── */}
-      <a
-        href="https://github.com/axmedovshahzodbek21-crypto/lexivo-web/releases/latest/download/app-release.apk"
-        download
-        className="flex items-center gap-4 p-4 rounded-2xl border-2 transition-colors"
-        style={{ background: 'rgba(61,220,132,0.08)', borderColor: 'rgba(61,220,132,0.35)' }}
-      >
-        <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0" style={{ background: 'rgba(61,220,132,0.15)' }}>
-          🤖
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="font-bold text-sm" style={{ color: '#3DDC84' }}>{t.home.downloadApp}</div>
-          <div className="text-xs mt-0.5 text-[var(--text-muted)]">{t.home.downloadSub}</div>
-        </div>
-        <span className="text-sm font-bold flex-shrink-0" style={{ color: '#3DDC84' }}>↓</span>
-      </a>
+      {/* ── Download banner (shown once) ── */}
+      {showBanner && (
+        <a
+          href="https://github.com/axmedovshahzodbek21-crypto/lexivo-web/releases/latest/download/app-release.apk"
+          download
+          className="flex items-center gap-4 p-4 rounded-2xl border-2 transition-colors"
+          style={{ background: 'rgba(61,220,132,0.08)', borderColor: 'rgba(61,220,132,0.35)' }}
+        >
+          <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0" style={{ background: 'rgba(61,220,132,0.15)' }}>
+            🤖
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="font-bold text-sm" style={{ color: '#3DDC84' }}>{t.home.downloadApp}</div>
+            <div className="text-xs mt-0.5 text-[var(--text-muted)]">{t.home.downloadSub}</div>
+          </div>
+          <span className="text-sm font-bold flex-shrink-0" style={{ color: '#3DDC84' }}>↓</span>
+        </a>
+      )}
 
       {/* ── Collections (most important, lifted to top) ── */}
       <div>

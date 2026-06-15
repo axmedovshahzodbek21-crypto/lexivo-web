@@ -93,6 +93,13 @@ export default function OnboardingPage() {
 
 function StepWelcome({ onNext }: { onNext: () => void }) {
   const t = useTranslation();
+  const [showBanner, setShowBanner] = useState(false);
+  useEffect(() => {
+    if (!localStorage.getItem('android_banner_seen')) {
+      localStorage.setItem('android_banner_seen', '1');
+      setShowBanner(true);
+    }
+  }, []);
   return (
     <div className="flex flex-col items-center justify-center min-h-full px-8 py-12 text-center gap-8">
       <div className="text-7xl animate-bounce">📖</div>
@@ -128,18 +135,20 @@ function StepWelcome({ onNext }: { onNext: () => void }) {
         {t.onboarding.getStarted}
       </button>
 
-      <a
-        href="https://github.com/axmedovshahzodbek21-crypto/lexivo-web/releases/latest/download/app-release.apk"
-        className="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm w-full max-w-sm"
-        style={{ background: 'rgba(61,220,132,0.1)', border: '1.5px solid rgba(61,220,132,0.35)' }}
-      >
-        <span className="text-xl">🤖</span>
-        <div className="flex-1 text-left">
-          <span className="font-semibold block" style={{ color: '#3DDC84' }}>{t.home.downloadApp}</span>
-          <span className="text-xs text-[var(--text-muted)]">{t.home.downloadSub}</span>
-        </div>
-        <span style={{ color: '#3DDC84' }}>↓</span>
-      </a>
+      {showBanner && (
+        <a
+          href="https://github.com/axmedovshahzodbek21-crypto/lexivo-web/releases/latest/download/app-release.apk"
+          className="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm w-full max-w-sm"
+          style={{ background: 'rgba(61,220,132,0.1)', border: '1.5px solid rgba(61,220,132,0.35)' }}
+        >
+          <span className="text-xl">🤖</span>
+          <div className="flex-1 text-left">
+            <span className="font-semibold block" style={{ color: '#3DDC84' }}>{t.home.downloadApp}</span>
+            <span className="text-xs text-[var(--text-muted)]">{t.home.downloadSub}</span>
+          </div>
+          <span style={{ color: '#3DDC84' }}>↓</span>
+        </a>
+      )}
     </div>
   );
 }

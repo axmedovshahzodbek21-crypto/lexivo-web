@@ -590,6 +590,19 @@ export default function SettingsPage() {
           {t.settings.aboutText}
         </p>
         <p className="text-xs text-[var(--text-muted)]">{t.settings.aboutStorage}</p>
+        <a
+          href="https://github.com/axmedovshahzodbek21-crypto/lexivo-web/releases/latest/download/app-release.apk"
+          download
+          className="flex items-center gap-3 p-3 rounded-2xl w-full"
+          style={{ background: 'rgba(61,220,132,0.08)', border: '1.5px solid rgba(61,220,132,0.35)' }}
+        >
+          <span className="text-xl">🤖</span>
+          <div className="flex-1 text-left">
+            <span className="font-semibold text-sm block" style={{ color: '#3DDC84' }}>{t.home.downloadApp}</span>
+            <span className="text-xs text-[var(--text-muted)]">{t.home.downloadSub}</span>
+          </div>
+          <span className="text-sm font-bold" style={{ color: '#3DDC84' }}>↓</span>
+        </a>
       </div>
 
       {/* Danger Zone */}
