@@ -1,7 +1,9 @@
-import { localDateStr } from './storage';
+import { localDateStr, getStreak, getSettings } from './storage';
 
 const SETTINGS_KEY = 'lexivo_notif_settings';
-const LAST_NOTIF_KEY = 'lexivo_last_notif';
+const MORNING_KEY  = 'lexivo_last_notif_morning';
+const STREAK_KEY   = 'lexivo_last_notif_streak';
+const CUSTOM_KEY   = 'lexivo_last_notif_custom';
 
 export interface NotifSettings {
   enabled: boolean;
@@ -35,84 +37,118 @@ export async function requestNotifPermission(): Promise<NotificationPermission> 
   return Notification.requestPermission();
 }
 
-// Calculate ms until next occurrence of HH:MM (today or tomorrow)
-function msUntil(timeStr: string): number {
-  const [h, m] = timeStr.split(':').map(Number);
-  const now = new Date();
-  const target = new Date();
-  target.setHours(h, m, 0, 0);
-  if (target.getTime() <= now.getTime()) {
-    target.setDate(target.getDate() + 1);
-  }
-  return target.getTime() - now.getTime();
-}
-
 function todayStr(): string {
   return localDateStr();
 }
 
-function alreadyNotifiedToday(): boolean {
-  return localStorage.getItem(LAST_NOTIF_KEY) === todayStr();
+function notifiedToday(key: string): boolean {
+  return localStorage.getItem(key) === todayStr();
 }
 
-function markNotifiedToday() {
-  localStorage.setItem(LAST_NOTIF_KEY, todayStr());
+function markNotified(key: string) {
+  localStorage.setItem(key, todayStr());
 }
 
-async function showReminder(reg: ServiceWorkerRegistration) {
-  const streak = (() => {
-    try { return Number(localStorage.getItem('lexivo_streak') ?? 0); } catch { return 0; }
-  })();
-
-  const title = streak > 0 ? `🔥 ${streak}-day streak — keep it going!` : '📚 Time to study!';
-  const body = 'Your daily Lexivo session is waiting. A few minutes = a few new words.';
-
+async function showNotif(
+  reg: ServiceWorkerRegistration,
+  title: string,
+  body: string,
+  key: string,
+  tag: string,
+) {
   await reg.showNotification(title, {
     body,
     icon: '/icon-192.png',
     badge: '/icon-192.png',
-    tag: 'lexivo-daily',
+    tag,
     requireInteraction: false,
     data: { url: '/' },
   });
-
-  markNotifiedToday();
+  markNotified(key);
 }
 
-let scheduledTimer: ReturnType<typeof setTimeout> | null = null;
+let scheduledTimers: ReturnType<typeof setTimeout>[] = [];
 
-export async function scheduleOrShowNotification(settings: NotifSettings): Promise<void> {
-  if (!settings.enabled) return;
-  if (Notification.permission !== 'granted') return;
-  if (alreadyNotifiedToday()) return;
+function scheduleAt(
+  h: number,
+  m: number,
+  key: string,
+  showFn: (reg: ServiceWorkerRegistration) => Promise<void>,
+) {
+  if (notifiedToday(key)) return;
 
-  const reg = await navigator.serviceWorker.ready;
-
-  const [h, m] = settings.time.split(':').map(Number);
   const now = new Date();
   const target = new Date();
   target.setHours(h, m, 0, 0);
 
   if (target.getTime() <= now.getTime()) {
-    // Reminder time already passed today and not yet notified — show now
-    await showReminder(reg);
+    // Time already passed today — show immediately
+    navigator.serviceWorker.ready.then(reg => showFn(reg));
   } else {
-    // Schedule for later today
-    if (scheduledTimer !== null) clearTimeout(scheduledTimer);
-    scheduledTimer = setTimeout(async () => {
-      if (!alreadyNotifiedToday()) {
+    const timer = setTimeout(async () => {
+      if (!notifiedToday(key)) {
         const r = await navigator.serviceWorker.ready;
-        await showReminder(r);
+        await showFn(r);
       }
-    }, msUntil(settings.time));
+    }, target.getTime() - now.getTime());
+    scheduledTimers.push(timer);
   }
+}
+
+export async function scheduleOrShowNotification(settings: NotifSettings): Promise<void> {
+  if (!settings.enabled) return;
+  if (Notification.permission !== 'granted') return;
+
+  // Clear any previously scheduled timers
+  scheduledTimers.forEach(t => clearTimeout(t));
+  scheduledTimers = [];
+
+  const streak = getStreak();
+  const name = (getSettings().name ?? '').trim() || 'Learner';
+
+  // 1. Morning Motivation — fixed 8:00 AM
+  scheduleAt(8, 0, MORNING_KEY, reg =>
+    showNotif(
+      reg,
+      '📚 Good morning!',
+      'Start your day with a few words. A small session now builds big vocabulary later.',
+      MORNING_KEY,
+      'lexivo-morning',
+    ),
+  );
+
+  // 2. Streak at Risk — fixed 9:00 PM
+  const streakTitle = streak > 0
+    ? `🔥 Don't break your ${streak}-day streak!`
+    : '🔥 Start your streak today!';
+  scheduleAt(21, 0, STREAK_KEY, reg =>
+    showNotif(
+      reg,
+      streakTitle,
+      "You haven't studied yet today. 5 minutes is all it takes.",
+      STREAK_KEY,
+      'lexivo-streak',
+    ),
+  );
+
+  // 3. Custom Reminder — user-chosen time
+  const [h, m] = settings.time.split(':').map(Number);
+  scheduleAt(h, m, CUSTOM_KEY, reg =>
+    showNotif(
+      reg,
+      `📖 Time to study, ${name}!`,
+      'Your daily Lexivo session is waiting. A few minutes = a few new words.',
+      CUSTOM_KEY,
+      'lexivo-custom',
+    ),
+  );
 }
 
 export async function sendTestNotification(): Promise<void> {
   if (Notification.permission !== 'granted') return;
   const reg = await navigator.serviceWorker.ready;
   await reg.showNotification('📚 Lexivo test notification', {
-    body: 'Notifications are working! You\'ll be reminded at your chosen time.',
+    body: "Notifications are working! You'll be reminded at your chosen time.",
     icon: '/icon-192.png',
     tag: 'lexivo-test',
   });
