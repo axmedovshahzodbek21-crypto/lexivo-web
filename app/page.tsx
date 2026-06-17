@@ -344,6 +344,7 @@ export default function HomePage() {
         <ActionCard href="/pronunciation" icon="🎙️" title={t.home.pronounceTitle}  subtitle={t.home.pronounceSub}      color="#8B5CF6" depthClass="depth-in-5" />
         <ActionCard href="/matching"      icon="🎯" title={t.home.matchTitle}       subtitle={t.home.matchSub}          color="#EC4899" depthClass="depth-in-6" />
         <ActionCard href="/pomodoro"      icon="🍅" title={t.home.pomodoroTitle}    subtitle={t.home.pomodoroSub}       color="#EF4444" depthClass="depth-in-7" />
+        <ActionCard href="/leaderboard"   icon="🏆" title="Leaderboard"             subtitle="See top learners"          color="#F59E0B" depthClass="depth-in-8" />
       </div>
 
       {/* Word of the Day */}

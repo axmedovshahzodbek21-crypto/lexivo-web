@@ -73,6 +73,7 @@ export interface UserSettings {
   quizDirection: 'word-to-uz' | 'uz-to-word';
   reduceMotion: boolean;
   uiLanguage: 'en' | 'uz';
+  showOnLeaderboard: boolean;
 }
 
 export interface CustomList {

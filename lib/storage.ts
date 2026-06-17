@@ -60,6 +60,7 @@ const SETTINGS_DEFAULTS: UserSettings = {
   quizDirection: 'word-to-uz',
   reduceMotion: false,
   uiLanguage: 'en',
+  showOnLeaderboard: true,
 };
 
 // uiLanguage lives in its own key so pullAll's saveSettings call never overwrites it

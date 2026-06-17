@@ -48,6 +48,7 @@ export async function pushAll(userId: string) {
     study_order: s.studyOrder,
     quiz_direction: s.quizDirection,
     reduce_motion: s.reduceMotion,
+    show_on_leaderboard: s.showOnLeaderboard ?? true,
     ...(avatarUrl !== null && { avatar_url: avatarUrl }),
   });
 
@@ -140,8 +141,9 @@ export async function pullAll(userId: string) {
       fontSize:         profile.font_size         ?? 'normal',
       studyOrder:       profile.study_order       ?? 'random',
       quizDirection:    profile.quiz_direction    ?? 'word-to-uz',
-      reduceMotion:     profile.reduce_motion     ?? false,
-      uiLanguage:       existing.uiLanguage,
+      reduceMotion:        profile.reduce_motion      ?? false,
+      showOnLeaderboard:   profile.show_on_leaderboard ?? true,
+      uiLanguage:          existing.uiLanguage,
     });
     lsSet('lexivo_onboarded', true);
     if (useRemoteName && remoteNameTs) saveNameUpdatedAt(remoteNameTs);

@@ -18,7 +18,7 @@ export default function SettingsPage() {
   const router = useRouter();
   const [settings, setSettings] = useState<UserSettings>(() =>
     typeof window === 'undefined'
-      ? { name: '', dailyGoal: 10, languageLevel: 'B1', defaultAccent: 'us', autoPlayOnReveal: true, sessionSize: 20, fontSize: 'normal', studyOrder: 'random', quizDirection: 'word-to-uz', reduceMotion: false, uiLanguage: 'en' as const }
+      ? { name: '', dailyGoal: 10, languageLevel: 'B1', defaultAccent: 'us', autoPlayOnReveal: true, sessionSize: 20, fontSize: 'normal', studyOrder: 'random', quizDirection: 'word-to-uz', reduceMotion: false, uiLanguage: 'en' as const, showOnLeaderboard: true }
       : getSettings()
   );
   const [saved, setSaved] = useState(false);
@@ -419,6 +419,20 @@ export default function SettingsPage() {
             aria-label="Toggle reduce motion"
           >
             <span className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-300 ${settings.reduceMotion ? 'translate-x-7' : 'translate-x-0'}`} />
+          </button>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-[var(--text)]">Show on leaderboard</p>
+            <p className="text-xs text-[var(--text-muted)] mt-0.5">Display your name and XP in the public leaderboard</p>
+          </div>
+          <button
+            onClick={() => setSettings(s => ({ ...s, showOnLeaderboard: !s.showOnLeaderboard }))}
+            className={`relative w-14 h-7 rounded-full transition-colors duration-300 focus:outline-none ${settings.showOnLeaderboard ?? true ? 'bg-[var(--primary)]' : 'bg-[var(--surface-2)]'}`}
+            aria-label="Toggle leaderboard visibility"
+          >
+            <span className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-300 ${settings.showOnLeaderboard ?? true ? 'translate-x-7' : 'translate-x-0'}`} />
           </button>
         </div>
       </div>
