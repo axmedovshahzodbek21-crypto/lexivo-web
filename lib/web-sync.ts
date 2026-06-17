@@ -41,10 +41,10 @@ export async function pushAll(uid: string) {
     const levelUpdatedAt = getLevelUpdatedAt();
     await supabase.from('profiles').upsert({
       id: uid,
-      name: settings.name,
-      name_updated_at: nameUpdatedAt,
-      language_level: settings.languageLevel,
-      language_level_updated_at: levelUpdatedAt,
+      // Only push name/level when we have a timestamp — prevents overwriting a newer
+      // value from another device that already set the timestamp
+      ...(nameUpdatedAt  !== null && { name: settings.name, name_updated_at: nameUpdatedAt }),
+      ...(levelUpdatedAt !== null && { language_level: settings.languageLevel, language_level_updated_at: levelUpdatedAt }),
       daily_goal: settings.dailyGoal,
       default_accent: settings.defaultAccent,
       auto_play_on_reveal: settings.autoPlayOnReveal,
@@ -168,6 +168,10 @@ export async function pullAll(uid: string) {
     // profiles → settings
     const { data: profile } = await supabase.from('profiles').select().eq('id', uid).maybeSingle();
     if (profile) {
+      // Record reset_at so checkAndHandleReset won't re-fire on fresh browser sessions
+      const resetAt = profile.reset_at as string | null;
+      if (resetAt && typeof window !== 'undefined') localStorage.setItem('lexivo_last_seen_reset_at', resetAt);
+
       const existing = getSettings();
       const remoteNameTs = profile.name_updated_at as string | null;
       const localNameTs  = getNameUpdatedAt();
