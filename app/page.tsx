@@ -93,6 +93,7 @@ export default function HomePage() {
       setTodayCount(getTodayLearnedCount());
       setDueCount(getDueWords().length);
       setLearnedCount(getLearnedWords().length);
+      setSettings(getSettings());
     };
     window.addEventListener('lexivo-sync', handleSync);
     return () => window.removeEventListener('lexivo-sync', handleSync);

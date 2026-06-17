@@ -12,7 +12,10 @@ export default function MyWordsPage() {
   const [collections, setCollections] = useState<ImportedCollection[]>([]);
 
   useEffect(() => {
-    setCollections(getImportedCollections());
+    const load = () => setCollections(getImportedCollections());
+    load();
+    window.addEventListener('lexivo-sync', load);
+    return () => window.removeEventListener('lexivo-sync', load);
   }, []);
 
   return (

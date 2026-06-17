@@ -40,18 +40,23 @@ function ProgressPage() {
   const [tab, setTab] = useState<'overview' | 'srs' | 'achievements' | 'calendar'>(tabParam ?? 'overview');
 
   useEffect(() => {
-    setLearnedCount(getLearnedWords().length);
-    setSrsWords(getSRSWords());
-    setStreak(getStreak());
-    setXp(getXP());
-    setTotalDays(getTotalStudyDays());
-    setTodayXp(getTodayXP());
-    setTodayCount(getTodayLearnedCount());
-    setDueCount(getDueWords().length);
-    setStarredCount(getStarredWords().length);
-    setHardCount(getHardWords().length);
-    setUnlockedIds(getUnlockedAchievements());
-    setStudyHistory(getStudyHistory());
+    const load = () => {
+      setLearnedCount(getLearnedWords().length);
+      setSrsWords(getSRSWords());
+      setStreak(getStreak());
+      setXp(getXP());
+      setTotalDays(getTotalStudyDays());
+      setTodayXp(getTodayXP());
+      setTodayCount(getTodayLearnedCount());
+      setDueCount(getDueWords().length);
+      setStarredCount(getStarredWords().length);
+      setHardCount(getHardWords().length);
+      setUnlockedIds(getUnlockedAchievements());
+      setStudyHistory(getStudyHistory());
+    };
+    load();
+    window.addEventListener('lexivo-sync', load);
+    return () => window.removeEventListener('lexivo-sync', load);
   }, []);
 
   const t = useTranslation();

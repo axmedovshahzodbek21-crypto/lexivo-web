@@ -255,6 +255,20 @@ export async function pullAll(uid: string) {
       }
     } catch (_) {}
 
+    // achievements — merge with local
+    const { data: achievementRows } = await supabase.from('achievements').select('achievement_id').eq('user_id', uid);
+    if (achievementRows && achievementRows.length > 0 && typeof window !== 'undefined') {
+      const local: string[] = JSON.parse(localStorage.getItem('lexivo_achievements') || '[]');
+      const merged = Array.from(new Set([...local, ...achievementRows.map(r => r.achievement_id as string)]));
+      set('lexivo_achievements', merged);
+    }
+
+    // custom_lists — replace local with cloud
+    const { data: listRows } = await supabase.from('custom_lists').select('*').eq('user_id', uid);
+    if (listRows && listRows.length > 0) {
+      set('lexivo_custom_lists', listRows.map(l => ({ id: l.id, name: l.name, words: l.words })));
+    }
+
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new Event('lexivo-sync'));
     }

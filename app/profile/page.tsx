@@ -81,17 +81,22 @@ export default function ProfilePage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const s = getSettings();
-    setSettings(s);
-    setStreak(getStreak());
-    setXp(getXP());
-    setTodayXp(getTodayXP());
-    setTodayCount(getTodayLearnedCount());
-    setLearnedCount(getLearnedWords().length);
-    setSrsCount(getSRSWords().length);
-    setDueCount(getDueWords().length);
-    setUnlockedIds(getUnlockedAchievements());
-    setProfilePic(getProfilePicUrl() ?? getProfilePic());
+    const load = () => {
+      const s = getSettings();
+      setSettings(s);
+      setStreak(getStreak());
+      setXp(getXP());
+      setTodayXp(getTodayXP());
+      setTodayCount(getTodayLearnedCount());
+      setLearnedCount(getLearnedWords().length);
+      setSrsCount(getSRSWords().length);
+      setDueCount(getDueWords().length);
+      setUnlockedIds(getUnlockedAchievements());
+      setProfilePic(getProfilePicUrl() ?? getProfilePic());
+    };
+    load();
+    window.addEventListener('lexivo-sync', load);
+    return () => window.removeEventListener('lexivo-sync', load);
   }, []);
 
   async function handlePickPhoto(e: React.ChangeEvent<HTMLInputElement>) {

@@ -39,14 +39,13 @@ export default function SyncProvider() {
   // Push on page hide (tab close / navigate away)
   useEffect(() => {
     if (!user) return;
-    const handler = () => pushAll(user.id);
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'hidden') handler();
-    });
-    window.addEventListener('beforeunload', handler);
+    const visHandler = () => { if (document.visibilityState === 'hidden') pushAll(user.id); };
+    const unloadHandler = () => pushAll(user.id);
+    document.addEventListener('visibilitychange', visHandler);
+    window.addEventListener('beforeunload', unloadHandler);
     return () => {
-      document.removeEventListener('visibilitychange', handler);
-      window.removeEventListener('beforeunload', handler);
+      document.removeEventListener('visibilitychange', visHandler);
+      window.removeEventListener('beforeunload', unloadHandler);
     };
   }, [user]);
 

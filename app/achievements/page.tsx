@@ -44,13 +44,18 @@ export default function AchievementsPage() {
   const [stats, setStats] = useState<Stats>({ learnedCount: 0, streak: 0, xp: 0, masteredCount: 0 });
 
   useEffect(() => {
-    setUnlockedIds(getUnlockedAchievements());
-    setStats({
-      learnedCount: getLearnedWords().length,
-      streak: getStreak(),
-      xp: getXP(),
-      masteredCount: getSRSWords().filter(w => w.reviewStage >= 4).length,
-    });
+    const load = () => {
+      setUnlockedIds(getUnlockedAchievements());
+      setStats({
+        learnedCount: getLearnedWords().length,
+        streak: getStreak(),
+        xp: getXP(),
+        masteredCount: getSRSWords().filter(w => w.reviewStage >= 4).length,
+      });
+    };
+    load();
+    window.addEventListener('lexivo-sync', load);
+    return () => window.removeEventListener('lexivo-sync', load);
   }, []);
 
   const unlocked = ALL_ACHIEVEMENTS.filter(a => unlockedIds.includes(a.id));
