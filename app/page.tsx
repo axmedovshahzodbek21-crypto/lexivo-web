@@ -232,6 +232,47 @@ export default function HomePage() {
 
       {showXpModal && <XpModal xp={xp} onClose={() => setShowXpModal(false)} />}
 
+      {/* Daily goal — prominent */}
+      <TiltCard className="card" intensity={3}>
+        <div className="flex items-center gap-4">
+          {/* Ring */}
+          <div className="relative shrink-0" style={{ width: 64, height: 64 }}>
+            <svg width="64" height="64" style={{ transform: 'rotate(-90deg)' }}>
+              <circle cx="32" cy="32" r="26" fill="none" stroke="var(--border)" strokeWidth="6" />
+              <circle
+                cx="32" cy="32" r="26" fill="none"
+                stroke={dailyProgress >= 100 ? '#10B981' : '#6C63FF'}
+                strokeWidth="6"
+                strokeLinecap="round"
+                strokeDasharray={`${Math.min(dailyProgress, 100) / 100 * 163.4} 163.4`}
+                style={{ transition: 'stroke-dasharray 0.5s ease' }}
+              />
+            </svg>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-lg font-black" style={{ color: dailyProgress >= 100 ? '#10B981' : '#6C63FF' }}>
+                {dailyProgress >= 100 ? '✓' : todayCount}
+              </span>
+            </div>
+          </div>
+          {/* Text */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-2xl font-black text-[var(--text)]">{todayCount}</span>
+              <span className="text-sm text-[var(--text-muted)] font-medium">/ {settings.dailyGoal} {t.home.dailyGoal.toLowerCase()}</span>
+            </div>
+            <div className="mt-1.5 h-2 rounded-full bg-[var(--border)] overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all duration-500"
+                style={{ width: `${Math.min(dailyProgress, 100)}%`, background: dailyProgress >= 100 ? '#10B981' : '#6C63FF' }}
+              />
+            </div>
+            <p className="text-xs mt-1" style={{ color: dailyProgress >= 100 ? '#10B981' : 'var(--text-muted)' }}>
+              {dailyProgress >= 100 ? `${t.home.goalReached} · ${todayXp} XP today` : `${todayXp} XP today · ${Math.max(0, settings.dailyGoal - todayCount)} words to go`}
+            </p>
+          </div>
+        </div>
+      </TiltCard>
+
       {/* Streak at risk warning */}
       {streakRisk === 'freeze-saves' && (
         <div className="flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm font-medium"
@@ -284,20 +325,6 @@ export default function HomePage() {
             </p>
           )}
         </button>
-      </TiltCard>
-
-      {/* Daily goal */}
-      <TiltCard className="card" intensity={3}>
-        <div className="flex justify-between items-center mb-2">
-          <span className="font-semibold text-[var(--text)]">{t.home.dailyGoal}</span>
-          <span className="text-sm text-[var(--text-muted)]">{t.home.wordsToday(todayCount, settings.dailyGoal)} · {todayXp} XP today</span>
-        </div>
-        <div className="progress-bar">
-          <div className="progress-bar-fill" style={{ width: `${dailyProgress}%` }} />
-        </div>
-        {dailyProgress >= 100 && (
-          <p className="text-xs text-[var(--success)] mt-1 font-medium">{t.home.goalReached}</p>
-        )}
       </TiltCard>
 
       {/* Quick actions */}
