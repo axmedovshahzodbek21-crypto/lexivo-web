@@ -206,7 +206,8 @@ export function addSRSWord(word: SRSWord) {
 }
 
 export function localDateStr(d = new Date()): string {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const shifted = new Date(d.getTime() - 2 * 60 * 60 * 1000);
+  return `${shifted.getFullYear()}-${String(shifted.getMonth() + 1).padStart(2, '0')}-${String(shifted.getDate()).padStart(2, '0')}`;
 }
 
 export function getDueWords(): SRSWord[] {
