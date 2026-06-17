@@ -317,14 +317,16 @@ export default function PomodoroWidget() {
     );
   }
 
+  const SETUP_PRESETS = [
+    { label: 'Classic', emoji: '🍅', work: 25, brk: 5 },
+    { label: 'Deep',    emoji: '🧠', work: 50, brk: 10 },
+    { label: 'Quick',   emoji: '⚡', work: 15, brk: 3 },
+  ];
+  const [customMode, setCustomMode] = useState(false);
+
   // ── Setup panel ───────────────────────────────────────────────────────────
   if (isSetup) {
-    const SETUP_PRESETS = [
-      { label: 'Classic', emoji: '🍅', work: 25, brk: 5 },
-      { label: 'Deep',    emoji: '🧠', work: 50, brk: 10 },
-      { label: 'Quick',   emoji: '⚡', work: 15, brk: 3 },
-    ];
-    const isCustom = !SETUP_PRESETS.some(p => p.work === pomWorkMins && p.brk === pomBreakMins);
+    const isCustom = customMode;
 
     return (
       <div
@@ -368,12 +370,12 @@ export default function PomodoroWidget() {
         {/* Preset cards */}
         <div style={{ padding: '10px 14px 0', display: 'flex', gap: 6 }}>
           {SETUP_PRESETS.map(p => {
-            const sel = p.work === pomWorkMins && p.brk === pomBreakMins;
+            const sel = !customMode && p.work === pomWorkMins && p.brk === pomBreakMins;
             return (
               <button
                 key={p.label}
                 onPointerDown={e => e.stopPropagation()}
-                onClick={e => { e.stopPropagation(); setPomSettings(p.work, p.brk); }}
+                onClick={e => { e.stopPropagation(); setCustomMode(false); setPomSettings(p.work, p.brk); }}
                 style={{
                   flex: 1, padding: '8px 4px', borderRadius: 12, border: `1.5px solid ${sel ? '#6C63FF' : 'rgba(255,255,255,0.08)'}`,
                   background: sel ? 'rgba(108,99,255,0.25)' : 'rgba(255,255,255,0.05)',
@@ -389,7 +391,7 @@ export default function PomodoroWidget() {
           })}
           <button
             onPointerDown={e => e.stopPropagation()}
-            onClick={e => { e.stopPropagation(); setPomSettings(pomWorkMins, pomBreakMins); }}
+            onClick={e => { e.stopPropagation(); setCustomMode(true); }}
             style={{
               width: 52, padding: '8px 4px', borderRadius: 12,
               border: `1.5px solid ${isCustom ? '#6C63FF' : 'rgba(255,255,255,0.08)'}`,
