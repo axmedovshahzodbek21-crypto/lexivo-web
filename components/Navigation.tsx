@@ -144,38 +144,33 @@ export default function Navigation() {
               </Link>
             );
           })}
-        </nav>
 
-        {/* Practice section */}
-        <div className="px-3 pb-2">
-          <div className="border-t border-[var(--border)] pt-3 mt-1">
+          {/* Practice section — inside nav so flex-1 keeps it visible */}
+          <div className="border-t border-[var(--border)] pt-3 mt-3">
             <p className="px-3 mb-1 text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)]">Practice</p>
-            <Link
-              href="/matching"
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-sm font-medium ${
-                isActive('/matching')
-                  ? 'bg-[var(--primary-bg)] text-[var(--primary)]'
-                  : 'text-[var(--text-muted)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]'
-              }`}
-            >
-              <span className="text-lg">🎯</span>
-              <span>Matching</span>
-              {isActive('/matching') && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[var(--primary)]" />}
-            </Link>
-            <Link
-              href="/leaderboard"
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-sm font-medium ${
-                isActive('/leaderboard')
-                  ? 'bg-[var(--primary-bg)] text-[var(--primary)]'
-                  : 'text-[var(--text-muted)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]'
-              }`}
-            >
-              <span className="text-lg">🏆</span>
-              <span>Leaderboard</span>
-              {isActive('/leaderboard') && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[var(--primary)]" />}
-            </Link>
+            {([
+              { href: '/matching',    icon: '🎯', label: 'Matching'    },
+              { href: '/leaderboard', icon: '🏆', label: 'Leaderboard' },
+            ] as const).map(({ href, icon, label }) => {
+              const active = isActive(href);
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-sm font-medium ${
+                    active
+                      ? 'bg-[var(--primary-bg)] text-[var(--primary)]'
+                      : 'text-[var(--text-muted)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]'
+                  }`}
+                >
+                  <span className="text-lg">{icon}</span>
+                  <span>{label}</span>
+                  {active && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[var(--primary)]" />}
+                </Link>
+              );
+            })}
           </div>
-        </div>
+        </nav>
 
         {/* ── Profile block ── */}
         <div className="px-3 pb-4 pt-3 border-t border-[var(--border)]">
