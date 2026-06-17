@@ -1,6 +1,6 @@
 import type { Achievement } from './types';
 import { LEVEL_THRESHOLDS } from './types';
-import { getXP, getLearnedWords, getStreak, getUnlockedAchievements, unlockAchievement, getSRSWords } from './storage';
+import { getXP, getLearnedWords, getStreak, getTotalStudyDays, getUnlockedAchievements, unlockAchievement, getSRSWords } from './storage';
 
 export function getLevelInfo(xp: number) {
   const threshold = LEVEL_THRESHOLDS.find(t => xp >= t.min && xp <= t.max) ?? LEVEL_THRESHOLDS[0];
@@ -23,12 +23,17 @@ export const ALL_ACHIEVEMENTS: Achievement[] = [
   { id: 'words_100', title: 'Centurion', description: 'Learn 100 words', icon: '💯' },
   { id: 'words_250', title: 'Word Master', description: 'Learn 250 words', icon: '🏆' },
   { id: 'words_500', title: 'Lexicon Master', description: 'Learn 500 words', icon: '👑' },
+  { id: 'words_1000', title: 'Lexivo Legend', description: 'Learn 1000 words', icon: '🌍' },
   { id: 'streak_3', title: '3-Day Streak', description: 'Study 3 days in a row', icon: '🔥' },
   { id: 'streak_7', title: 'Week Warrior', description: 'Study 7 days in a row', icon: '⚡' },
   { id: 'streak_30', title: 'Monthly Master', description: 'Study 30 days in a row', icon: '🌟' },
   { id: 'xp_100', title: 'XP Earner', description: 'Earn 100 XP', icon: '✨' },
   { id: 'xp_500', title: 'XP Hunter', description: 'Earn 500 XP', icon: '💎' },
   { id: 'xp_1000', title: 'XP Legend', description: 'Earn 1000 XP', icon: '🚀' },
+  { id: 'xp_2000', title: 'XP Master', description: 'Earn 2000 XP', icon: '🏆' },
+  { id: 'days_7', title: 'Week Warrior', description: 'Study on 7 different days', icon: '📅' },
+  { id: 'days_30', title: 'Dedicated', description: 'Study on 30 different days', icon: '🎯' },
+  { id: 'days_100', title: 'Century Learner', description: 'Study on 100 different days', icon: '🏅' },
   { id: 'srs_first', title: 'Reviewer', description: 'Complete your first SRS review', icon: '🔄' },
   { id: 'srs_mastered_10', title: 'Memory Champion', description: 'Master 10 words in SRS', icon: '🧠' },
   { id: 'flashcard_first', title: 'Flashcard Fan', description: 'Complete a flashcard session', icon: '🃏' },
@@ -41,6 +46,7 @@ export function checkAchievements(): Achievement[] {
   const xp = getXP();
   const learnedCount = getLearnedWords().length;
   const streak = getStreak();
+  const totalDays = getTotalStudyDays();
   const masteredCount = getSRSWords().filter(w => w.reviewStage >= 4).length;
 
   const checks: Array<[string, boolean]> = [
@@ -50,12 +56,17 @@ export function checkAchievements(): Achievement[] {
     ['words_100', learnedCount >= 100],
     ['words_250', learnedCount >= 250],
     ['words_500', learnedCount >= 500],
+    ['words_1000', learnedCount >= 1000],
     ['streak_3', streak >= 3],
     ['streak_7', streak >= 7],
     ['streak_30', streak >= 30],
     ['xp_100', xp >= 100],
     ['xp_500', xp >= 500],
     ['xp_1000', xp >= 1000],
+    ['xp_2000', xp >= 2000],
+    ['days_7', totalDays >= 7],
+    ['days_30', totalDays >= 30],
+    ['days_100', totalDays >= 100],
     ['srs_mastered_10', masteredCount >= 10],
   ];
 
