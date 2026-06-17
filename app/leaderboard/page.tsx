@@ -81,6 +81,24 @@ export default function LeaderboardPage() {
 
   const myIndex = user ? entries.findIndex(e => e.user_id === user.id) : -1;
   const [selected, setSelected] = useState<LeaderboardEntry | null>(null);
+  const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (!user) return;
+    supabase.from('saved_users').select('saved_user_id').eq('user_id', user.id)
+      .then(({ data }) => { if (data) setSavedIds(new Set(data.map((r: {saved_user_id: string}) => r.saved_user_id))); });
+  }, [user]);
+
+  const toggleSave = async (targetId: string) => {
+    if (!user) return;
+    const isSaved = savedIds.has(targetId);
+    setSavedIds(prev => { const next = new Set(prev); isSaved ? next.delete(targetId) : next.add(targetId); return next; });
+    if (isSaved) {
+      await supabase.from('saved_users').delete().eq('user_id', user.id).eq('saved_user_id', targetId);
+    } else {
+      await supabase.from('saved_users').insert({ user_id: user.id, saved_user_id: targetId });
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen animate-fade-in pb-24">
@@ -102,7 +120,14 @@ export default function LeaderboardPage() {
               <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto" />
               <div className="flex flex-col items-center gap-2">
                 <Avatar name={selected.name} url={selected.avatar_url} size={56} />
-                <p className="text-lg font-bold text-[var(--text)]">{selected.name}</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-lg font-bold text-[var(--text)]">{selected.name}</p>
+                  {user && selected.user_id !== user.id && (
+                    <button onClick={() => toggleSave(selected.user_id)} className="text-2xl leading-none">
+                      {savedIds.has(selected.user_id) ? '⭐' : '☆'}
+                    </button>
+                  )}
+                </div>
               </div>
               {/* Stats grid */}
               <div className="grid grid-cols-3 gap-2">
@@ -211,7 +236,7 @@ export default function LeaderboardPage() {
                       <div className="text-2xl mb-1">{MEDAL[rank - 1]}</div>
                       <Avatar name={e.name} url={e.avatar_url} size={col === 1 ? 44 : 36} />
                       <p className="text-xs font-bold text-[var(--text)] mt-2 text-center truncate w-full">
-                        {e.name}{isMe ? ' 👤' : ''}
+                        {savedIds.has(e.user_id) ? '⭐ ' : ''}{e.name}{isMe ? ' 👤' : ''}
                       </p>
                       <p className="text-xs font-black mt-0.5" style={{ color: 'var(--primary)' }}>
                         {e.xp.toLocaleString()} XP
@@ -250,6 +275,7 @@ export default function LeaderboardPage() {
                     <Avatar name={e.name} url={e.avatar_url} size={36} />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
+                        {savedIds.has(e.user_id) && <span className="text-sm">⭐</span>}
                         <p className="font-bold text-sm text-[var(--text)] truncate">{e.name}</p>
                         {isMe && <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: 'var(--primary)', color: 'white' }}>YOU</span>}
                         {e.last_study_date === today && (
