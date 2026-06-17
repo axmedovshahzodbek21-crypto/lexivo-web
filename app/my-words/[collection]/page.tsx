@@ -19,7 +19,10 @@ export default function CollectionDetailPage({ params }: Props) {
   const [words, setWords] = useState<ImportedWord[]>([]);
 
   useEffect(() => {
-    setWords(getImportedWordsByCollection(name));
+    const load = () => setWords(getImportedWordsByCollection(name));
+    load();
+    window.addEventListener('lexivo-sync', load);
+    return () => window.removeEventListener('lexivo-sync', load);
   }, [name]);
 
   function handleDelete(word: string) {
