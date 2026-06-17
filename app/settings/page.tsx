@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { getSettings, saveSettings, setUILanguage, resetOnboarded, saveNameUpdatedAt, saveLevelUpdatedAt } from '@/lib/storage';
 import { getTheme, setTheme, type Theme } from '@/lib/theme';
 import { supabase } from '@/lib/supabase';
@@ -36,12 +37,14 @@ export default function SettingsPage() {
   const [importState, setImportState] = useState<'idle' | 'confirm' | 'success' | 'error'>('idle');
   const [importMsg, setImportMsg] = useState('');
   const [pendingImport, setPendingImport] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
 
   useEffect(() => {
     setThemeState(getTheme());
     setNotif(getNotifSettings());
     setPermission(getNotifPermission());
     setNotifSupported(isNotifSupported());
+    supabase.auth.getUser().then(({ data: { user } }) => setUserEmail(user?.email ?? null));
   }, []);
 
   const handleThemeSelect = (t: Theme) => {
@@ -185,6 +188,12 @@ export default function SettingsPage() {
       setDeleteError('Something went wrong. Please try again.');
       setDeleteLoading(false);
     }
+  };
+
+  const handleSignOut = async () => {
+    stopSync();
+    await supabase.auth.signOut();
+    window.location.replace('/login');
   };
 
   const handleSave = () => {
@@ -619,6 +628,37 @@ export default function SettingsPage() {
           </div>
           <span className="text-sm font-bold" style={{ color: '#3DDC84' }}>↓</span>
         </a>
+      </div>
+
+      {/* Account */}
+      <div className="card space-y-3">
+        <h2 className="font-semibold">{t.settings.account}</h2>
+        {userEmail ? (
+          <>
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-[var(--surface-2)]">
+              <span className="text-xl">👤</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-[var(--text-muted)]">{t.settings.signedInAs}</p>
+                <p className="text-sm font-semibold text-[var(--text)] truncate">{userEmail}</p>
+              </div>
+            </div>
+            <button
+              onClick={handleSignOut}
+              className="w-full flex items-center gap-3 p-3 rounded-xl bg-red-50 hover:bg-red-100 transition-colors text-left"
+            >
+              <span className="text-xl">🚪</span>
+              <p className="text-sm font-semibold text-[var(--danger)]">{t.settings.signOut}</p>
+            </button>
+          </>
+        ) : (
+          <Link href="/login" className="w-full flex items-center gap-3 p-3 rounded-xl bg-[var(--surface-2)] hover:bg-[var(--primary-bg)] transition-colors">
+            <span className="text-xl">🔑</span>
+            <div>
+              <p className="text-sm font-semibold text-[var(--primary)]">{t.common.signIn}</p>
+              <p className="text-xs text-[var(--text-muted)]">{settings.uiLanguage === 'uz' ? "Qurilmalar bo'ylab sinxronlash" : 'Sync your progress across devices'}</p>
+            </div>
+          </Link>
+        )}
       </div>
 
       {/* Danger Zone */}
