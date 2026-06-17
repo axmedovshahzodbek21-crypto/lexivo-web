@@ -1,5 +1,6 @@
 import type { WordItem, SRSWord } from './types';
 import { SRS_INTERVALS } from './types';
+import { localDateStr } from './storage';
 
 export function createSRSWord(
   word: WordItem,
@@ -17,8 +18,8 @@ export function createSRSWord(
     dayNumber,
     topic,
     reviewStage: 0,
-    nextReviewDate: tomorrow.toISOString().split('T')[0],
-    learnedDate: new Date().toISOString().split('T')[0],
+    nextReviewDate: localDateStr(tomorrow),
+    learnedDate: localDateStr(),
   };
 }
 
@@ -33,7 +34,7 @@ export function stageColor(stage: number): string {
 }
 
 export function daysUntilReview(word: SRSWord): number {
-  const today = new Date().toISOString().split('T')[0];
+  const today = localDateStr();
   const next = new Date(word.nextReviewDate);
   const now = new Date(today);
   const diff = Math.ceil((next.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
