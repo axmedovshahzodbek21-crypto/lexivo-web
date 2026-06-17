@@ -1,7 +1,7 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { getSettings, saveSettings, setOnboarded, isOnboarded } from '@/lib/storage';
+import { getSettings, saveSettings, setOnboarded, isOnboarded, saveLevelUpdatedAt, saveNameUpdatedAt } from '@/lib/storage';
 import type { UserSettings } from '@/lib/types';
 import { useTranslation } from '@/lib/useTranslation';
 
@@ -52,7 +52,10 @@ export default function OnboardingPage() {
 
   const finish = () => {
     setFinishing(true);
+    const now = new Date().toISOString();
     saveSettings({ name: name.trim() || 'Learner', dailyGoal: goal, languageLevel: level, defaultAccent: 'us', autoPlayOnReveal: true, sessionSize: 20, fontSize: 'normal', studyOrder: 'random', quizDirection: 'word-to-uz', reduceMotion: false, uiLanguage: getSettings().uiLanguage, showOnLeaderboard: true });
+    saveLevelUpdatedAt(now);
+    saveNameUpdatedAt(now);
     setOnboarded();
     setTimeout(() => router.replace('/'), 1200);
   };
