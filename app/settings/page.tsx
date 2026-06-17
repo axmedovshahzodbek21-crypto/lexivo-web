@@ -496,52 +496,67 @@ export default function SettingsPage() {
 
       {/* Notifications */}
       {notifSupported ? (
-        <div className="card space-y-4">
-          <h2 className="font-semibold">{t.settings.dailyReminder}</h2>
+        <div className="space-y-3">
+          {/* Toggle card */}
+          <div className="card">
+            <h2 className="font-semibold mb-3">{t.settings.dailyReminder}</h2>
 
-          {/* Permission warning */}
-          {permission === 'denied' && (
-            <div className="bg-red-50 border border-[var(--danger)] rounded-xl p-3">
-              <p className="text-xs text-[var(--danger)]">
-                {t.settings.notifBlocked}
-              </p>
-            </div>
-          )}
+            {permission === 'denied' && (
+              <div className="bg-red-50 border border-[var(--danger)] rounded-xl p-3 mb-3">
+                <p className="text-xs text-[var(--danger)]">{t.settings.notifBlocked}</p>
+              </div>
+            )}
 
-          {/* Enable toggle */}
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-[var(--text)]">{t.settings.enableReminder}</p>
-              <p className="text-xs text-[var(--text-muted)] mt-0.5">
-                {notif.enabled ? '3 daily reminders active' : t.settings.reminderOff}
-              </p>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-[var(--text)]">{t.settings.enableReminder}</p>
+                <p className="text-xs text-[var(--text-muted)] mt-0.5">
+                  {notif.enabled ? '3 daily reminders active' : t.settings.reminderOff}
+                </p>
+              </div>
+              <button
+                onClick={handleNotifToggle}
+                disabled={permission === 'denied'}
+                className={`relative w-14 h-7 rounded-full transition-colors duration-300 focus:outline-none disabled:opacity-40 ${notif.enabled ? 'bg-[var(--primary)]' : 'bg-[var(--surface-2)]'}`}
+              >
+                <span className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-300 ${notif.enabled ? 'translate-x-7' : 'translate-x-0'}`} />
+              </button>
             </div>
-            <button
-              onClick={handleNotifToggle}
-              disabled={permission === 'denied'}
-              className={`relative w-14 h-7 rounded-full transition-colors duration-300 focus:outline-none disabled:opacity-40 ${notif.enabled ? 'bg-[var(--primary)]' : 'bg-[var(--surface-2)]'}`}
-            >
-              <span className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-300 ${notif.enabled ? 'translate-x-7' : 'translate-x-0'}`} />
-            </button>
           </div>
 
-          {/* Notification schedule rows */}
+          {/* Notification rows card */}
           {notif.enabled && permission === 'granted' && (
-            <div className="space-y-2">
-              <div className="flex items-center justify-between px-3 py-2.5 rounded-xl bg-[var(--surface-2)]">
-                <span className="text-sm">📚 Morning Motivation</span>
-                <span className="text-sm text-[var(--text-muted)]">8:00 AM</span>
-              </div>
-              <div className="flex items-center justify-between px-3 py-2.5 rounded-xl bg-[var(--surface-2)]">
-                <span className="text-sm">🔥 Streak at Risk</span>
-                <span className="text-sm text-[var(--text-muted)]">9:00 PM</span>
-              </div>
-              <div>
-                <div className="flex items-center justify-between px-3 py-2.5 rounded-xl bg-[var(--surface-2)] mb-1">
-                  <span className="text-sm">📖 Custom Reminder</span>
-                  <span className="text-sm text-[var(--primary)] font-medium">{to12h(notif.time)}</span>
+            <div className="card divide-y divide-[var(--border)]">
+              {/* Morning — fixed */}
+              <div className="flex items-center gap-3 py-3 first:pt-0">
+                <span className="text-2xl">📚</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-[var(--text)]">Good morning!</p>
+                  <p className="text-xs text-[var(--text-muted)]">Start your day with a few words</p>
                 </div>
-                <label className="text-xs text-[var(--text-muted)] block mb-1 px-1">{t.settings.reminderTime}</label>
+                <span className="text-sm text-[var(--text-muted)] shrink-0">8:00 AM</span>
+              </div>
+
+              {/* Streak — fixed */}
+              <div className="flex items-center gap-3 py-3">
+                <span className="text-2xl">🔥</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-[var(--text)]">Streak at Risk</p>
+                  <p className="text-xs text-[var(--text-muted)]">Don&apos;t forget to study today</p>
+                </div>
+                <span className="text-sm text-[var(--text-muted)] shrink-0">9:00 PM</span>
+              </div>
+
+              {/* Custom reminder — editable */}
+              <div className="pt-3 last:pb-0">
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="text-2xl">📖</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-[var(--text)]">Reminder Time</p>
+                    <p className="text-xs text-[var(--text-muted)]">Tap to change</p>
+                  </div>
+                  <span className="text-sm font-semibold text-[var(--primary)] shrink-0">{to12h(notif.time)}</span>
+                </div>
                 <input
                   type="time"
                   value={notif.time}
