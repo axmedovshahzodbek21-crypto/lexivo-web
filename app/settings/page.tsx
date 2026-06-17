@@ -15,6 +15,13 @@ import { exportData, importData } from '@/lib/backup';
 import type { UserSettings } from '@/lib/types';
 import { translations } from '@/lib/i18n';
 
+function to12h(t: string): string {
+  const [h, m] = t.split(':').map(Number);
+  const period = h >= 12 ? 'PM' : 'AM';
+  const h12 = h % 12 || 12;
+  return `${h12}:${String(m).padStart(2, '0')} ${period}`;
+}
+
 export default function SettingsPage() {
   const router = useRouter();
   const [settings, setSettings] = useState<UserSettings>(() =>
@@ -506,7 +513,7 @@ export default function SettingsPage() {
             <div>
               <p className="text-sm font-medium text-[var(--text)]">{t.settings.enableReminder}</p>
               <p className="text-xs text-[var(--text-muted)] mt-0.5">
-                {notif.enabled ? t.settings.reminderOn(notif.time) : t.settings.reminderOff}
+                {notif.enabled ? t.settings.reminderOn(to12h(notif.time)) : t.settings.reminderOff}
               </p>
             </div>
             <button
