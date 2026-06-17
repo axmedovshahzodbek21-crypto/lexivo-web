@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/lib/useTranslation';
 import { useAppStore } from '@/lib/store';
 import { getWordOfDay } from '@/lib/data';
-import { getStreak, getXP, getTodayXP, getTodayLearnedCount, getDueWords, getLearnedWords, getSettings, isOnboarded, getFreezes, checkAndGrantWeeklyFreeze, getImportedWords } from '@/lib/storage';
+import { getStreak, getXP, getTodayXP, getTodayLearnedCount, getDueWords, getLearnedWords, getSettings, isOnboarded, getFreezes, checkAndGrantWeeklyFreeze, getImportedWords, getLastStudyDate } from '@/lib/storage';
 import { getLevelInfo } from '@/lib/gamification';
 import { speak } from '@/lib/speech';
 import { getTheme, toggleTheme, type Theme } from '@/lib/theme';
@@ -33,6 +33,7 @@ export default function HomePage() {
   const [learnedCount, setLearnedCount] = useState(0);
   const [settings, setSettings] = useState<UserSettings>({ name: 'Learner', dailyGoal: 10, languageLevel: 'B1', defaultAccent: 'us', autoPlayOnReveal: true, sessionSize: 20, fontSize: 'normal', studyOrder: 'random', quizDirection: 'word-to-uz', reduceMotion: false, uiLanguage: 'en' });
   const [freezes, setFreezes] = useState(0);
+  const [streakRisk, setStreakRisk] = useState<'safe' | 'at-risk' | 'freeze-saves'>('safe');
   const [importedCount, setImportedCount] = useState(0);
   const [wodRevealed, setWodRevealed] = useState(false);
   const [theme, setThemeState] = useState<Theme>('light');
@@ -42,8 +43,28 @@ export default function HomePage() {
   useEffect(() => {
     if (!isOnboarded()) { router.replace('/onboarding'); return; }
     checkAndGrantWeeklyFreeze();
-    setStreak(getStreak());
-    setFreezes(getFreezes());
+    const currentStreak = getStreak();
+    const currentFreezes = getFreezes();
+    setStreak(currentStreak);
+    setFreezes(currentFreezes);
+
+    if (currentStreak > 0) {
+      const today = new Date().toISOString().split('T')[0];
+      const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+      const yStr = yesterday.toISOString().split('T')[0];
+      const twoDaysAgo = new Date(); twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+      const tdStr = twoDaysAgo.toISOString().split('T')[0];
+      const last = getLastStudyDate();
+      if (last === today) {
+        setStreakRisk('safe');
+      } else if (last === tdStr) {
+        setStreakRisk(currentFreezes > 0 ? 'freeze-saves' : 'at-risk');
+      } else if (last === yStr) {
+        setStreakRisk('safe');
+      } else {
+        setStreakRisk('at-risk');
+      }
+    }
     setXp(getXP());
     setTodayXp(getTodayXP());
     setTodayCount(getTodayLearnedCount());
@@ -211,18 +232,41 @@ export default function HomePage() {
 
       {showXpModal && <XpModal xp={xp} onClose={() => setShowXpModal(false)} />}
 
-      {/* Streak freeze indicator */}
-      {freezes > 0 && (
-        <div
-          className="flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm font-medium"
-          style={{ background: 'rgba(99,179,237,0.12)', border: '1px solid rgba(99,179,237,0.35)', color: '#3B82F6' }}
-        >
-          <span className="text-base">🧊</span>
-          <span>
-            {freezes === 1 ? t.home.freezeSingle : t.home.freezeMulti(freezes)}
-          </span>
+      {/* Streak at risk warning */}
+      {streakRisk === 'freeze-saves' && (
+        <div className="flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm font-medium"
+          style={{ background: 'rgba(251,191,36,0.12)', border: '1px solid rgba(251,191,36,0.4)', color: '#B45309' }}>
+          <span className="text-base">⚠️</span>
+          <span>Study today — a 🧊 freeze will protect your {streak}-day streak!</span>
         </div>
       )}
+      {streakRisk === 'at-risk' && streak > 0 && (
+        <div className="flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm font-medium"
+          style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.35)', color: '#DC2626' }}>
+          <span className="text-base">🔥</span>
+          <span>Your {streak}-day streak is at risk! Study something today.</span>
+        </div>
+      )}
+
+      {/* Streak freeze indicator */}
+      <div
+        className="flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm font-medium"
+        style={{
+          background: freezes > 0 ? 'rgba(99,179,237,0.12)' : 'rgba(148,163,184,0.08)',
+          border: `1px solid ${freezes > 0 ? 'rgba(99,179,237,0.35)' : 'rgba(148,163,184,0.2)'}`,
+          color: freezes > 0 ? '#3B82F6' : 'var(--text-muted)',
+        }}
+      >
+        <span className="text-base">🧊</span>
+        <span className="flex-1">
+          {freezes === 0
+            ? 'No streak freezes — earn one by studying 7 days in a row'
+            : freezes === 1 ? t.home.freezeSingle : t.home.freezeMulti(freezes)}
+        </span>
+        {freezes > 0 && (
+          <span className="text-xs opacity-60">auto-applies if you miss a day</span>
+        )}
+      </div>
 
       {/* Level progress */}
       <TiltCard className="card overflow-hidden hover:border-[var(--primary)] transition-colors cursor-pointer animate-glow-pulse" intensity={4}>

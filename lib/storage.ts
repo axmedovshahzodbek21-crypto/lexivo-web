@@ -257,6 +257,10 @@ export function getFreezes(): number {
   return get<number>(KEYS.freezes, 0);
 }
 
+export function getLastStudyDate(): string {
+  return get<string>(KEYS.lastStudy, '');
+}
+
 function getWeekKey(): string {
   const d = new Date();
   // Use ISO week: shift so Monday = day 1
