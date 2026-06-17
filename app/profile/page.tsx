@@ -142,7 +142,6 @@ export default function ProfilePage() {
     if (!user?.email) return;
     await supabase.auth.resetPasswordForEmail(user.email);
     setPasswordSent(true);
-    setTimeout(() => setPasswordSent(false), 6000);
   }
 
   async function handleDeleteAccount() {
@@ -453,8 +452,17 @@ export default function ProfilePage() {
               className="w-full flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium border border-[var(--border)] hover:bg-[var(--surface-2)] transition-colors text-[var(--text)] disabled:opacity-70"
             >
               <span>🔑</span>
-              <span>{passwordSent ? t.profile.changePasswordSent : t.profile.changePassword}</span>
+              <span>{passwordSent ? '✓ Email sent' : t.profile.changePassword}</span>
             </button>
+            {passwordSent && (
+              <div className="rounded-xl border border-blue-200 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-800 p-3 space-y-1.5 animate-fade-in">
+                <p className="text-sm font-semibold text-blue-700 dark:text-blue-300">Check your email</p>
+                <p className="text-xs text-blue-600 dark:text-blue-400 leading-relaxed">
+                  We sent a password reset link to <strong>{user?.email}</strong>. Open that email and click the link — it will bring you back here to set a new password.
+                </p>
+                <p className="text-xs text-blue-500 dark:text-blue-500">Didn&apos;t get it? Check your spam folder or tap the button again.</p>
+              </div>
+            )}
 
             {/* Sign out */}
             <button
