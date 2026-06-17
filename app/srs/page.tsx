@@ -33,6 +33,13 @@ export default function SRSReviewPage() {
 
   useEffect(() => { loadWords(); }, [loadWords]);
 
+  // Re-load when sync completes (pullAll fires 'lexivo-sync' on window)
+  useEffect(() => {
+    const handler = () => { if (!done) loadWords(); };
+    window.addEventListener('lexivo-sync', handler);
+    return () => window.removeEventListener('lexivo-sync', handler);
+  }, [loadWords, done]);
+
   const current = queue[index];
 
   useEffect(() => {
