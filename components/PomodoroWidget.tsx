@@ -99,6 +99,7 @@ export default function PomodoroWidget() {
   const [tipIndex, setTipIndex] = useState(0);
   const [mounted, setMounted] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
+  const [customMode, setCustomMode] = useState(false);
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -322,7 +323,6 @@ export default function PomodoroWidget() {
     { label: 'Deep',    emoji: '🧠', work: 50, brk: 10 },
     { label: 'Quick',   emoji: '⚡', work: 15, brk: 3 },
   ];
-  const [customMode, setCustomMode] = useState(false);
 
   // ── Setup panel ───────────────────────────────────────────────────────────
   if (isSetup) {
