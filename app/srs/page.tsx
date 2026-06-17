@@ -35,10 +35,20 @@ export default function SRSReviewPage() {
 
   // Re-load when sync completes (pullAll fires 'lexivo-sync' on window)
   useEffect(() => {
-    const handler = () => { if (!done) loadWords(); };
+    const handler = () => {
+      const due = getDueWords();
+      const shuffled = [...due].sort(() => Math.random() - 0.5);
+      setAllWords(getSRSWords());
+      if (shuffled.length > 0) {
+        setQueue(shuffled);
+        setIndex(0);
+        setResults([]);
+        setDone(false);
+      }
+    };
     window.addEventListener('lexivo-sync', handler);
     return () => window.removeEventListener('lexivo-sync', handler);
-  }, [loadWords, done]);
+  }, []);
 
   const current = queue[index];
 
