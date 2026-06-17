@@ -77,9 +77,28 @@ export default function LeaderboardPage() {
   useEffect(() => { load(); }, []);
 
   const myIndex = user ? entries.findIndex(e => e.user_id === user.id) : -1;
+  const [selected, setSelected] = useState<LeaderboardEntry | null>(null);
 
   return (
     <div className="flex flex-col min-h-screen animate-fade-in pb-24">
+      {/* Streak modal */}
+      {selected && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setSelected(null)}>
+          <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-8 flex flex-col items-center gap-4" onClick={e => e.stopPropagation()}>
+            <div className="w-10 h-1 rounded-full bg-[var(--border)] mb-2" />
+            <Avatar name={selected.name} url={selected.avatar_url} size={64} />
+            <p className="text-lg font-bold text-[var(--text)]">{selected.name}</p>
+            <div className="flex items-center gap-4 px-10 py-5 rounded-2xl border" style={{ background: 'rgba(255,140,0,0.08)', borderColor: 'rgba(255,140,0,0.25)' }}>
+              <span className="text-5xl">🔥</span>
+              <div>
+                <p className="text-4xl font-black text-orange-400">{selected.streak}</p>
+                <p className="text-sm text-[var(--text-muted)]">Day Streak</p>
+              </div>
+            </div>
+            <button onClick={() => setSelected(null)} className="w-full py-3 rounded-xl bg-[var(--surface-2)] text-sm font-semibold text-[var(--text)]">Close</button>
+          </div>
+        </div>
+      )}
       {/* Header */}
       <div className="flex items-center gap-3 p-4 border-b border-[var(--border)]">
         <button
@@ -130,7 +149,8 @@ export default function LeaderboardPage() {
                   return (
                     <div
                       key={e.user_id}
-                      className={`flex flex-col items-center rounded-2xl p-3 border transition-all ${col === 1 ? 'py-5' : 'py-3'}`}
+                      onClick={() => setSelected(e)}
+                      className={`flex flex-col items-center rounded-2xl p-3 border transition-all cursor-pointer hover:opacity-80 ${col === 1 ? 'py-5' : 'py-3'}`}
                       style={{
                         background: MEDAL_BG[rank - 1],
                         borderColor: isMe ? 'var(--primary)' : MEDAL_BORDER[rank - 1],
@@ -167,7 +187,8 @@ export default function LeaderboardPage() {
                 return (
                   <div
                     key={e.user_id}
-                    className="flex items-center gap-3 rounded-2xl p-3 border transition-all"
+                    onClick={() => setSelected(e)}
+                    className="flex items-center gap-3 rounded-2xl p-3 border transition-all cursor-pointer hover:opacity-80"
                     style={{
                       background: isMe ? 'var(--primary-bg)' : 'var(--surface)',
                       borderColor: isMe ? 'var(--primary)' : 'var(--border)',
