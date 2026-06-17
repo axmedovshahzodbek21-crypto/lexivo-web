@@ -645,6 +645,24 @@ export default function SettingsPage() {
         )}
       </div>
 
+      {/* Support */}
+      <div className="card">
+        <h2 className="font-semibold mb-3">Support</h2>
+        <a
+          href="https://t.me/lexivo_support_bot"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-3 p-3 rounded-xl bg-[var(--surface-2)] hover:bg-[var(--primary-bg)] transition-colors"
+        >
+          <span className="text-2xl">✈️</span>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-[var(--text)]">Contact Support</p>
+            <p className="text-xs text-[var(--text-muted)]">Chat with us on Telegram</p>
+          </div>
+          <span className="text-xs text-[var(--primary)] font-medium">@lexivo_support_bot →</span>
+        </a>
+      </div>
+
       <div className="card space-y-3">
         <h2 className="font-semibold">{t.settings.about}</h2>
         <p className="text-sm text-[var(--text-muted)]">
