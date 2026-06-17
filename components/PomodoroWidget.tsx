@@ -239,7 +239,7 @@ export default function PomodoroWidget() {
     const breakProgress = 1 - pomSecondsLeft / (pomBreakMins * 60);
 
     return createPortal(
-      <div className="fixed inset-0 z-40 flex items-center justify-center">
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center">
         {/* Blurred backdrop */}
         <div
           className="absolute inset-0"
