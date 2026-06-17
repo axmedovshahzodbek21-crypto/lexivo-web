@@ -79,13 +79,14 @@ export default function FlashcardsPage() {
   const [unknownWords, setUnknownWords] = useState<StudyWord[]>([]);
 
   // Gate: must complete Learn before Flashcards (for unit sessions)
+  const [gateUrl, setGateUrl] = useState<string | null>(null);
   useEffect(() => {
     if (collectionName && dayNumber !== undefined) {
       if (!getUnitProgress(collectionName, dayNumber).learnDone) {
-        router.replace(`/learn?collection=${encodeURIComponent(collectionName)}&day=${dayNumber}`);
+        setGateUrl(`/learn?collection=${encodeURIComponent(collectionName)}&day=${dayNumber}`);
       }
     }
-  }, [collectionName, dayNumber, router]);
+  }, [collectionName, dayNumber]);
 
   useEffect(() => {
     if (sourceMyWords) {
@@ -173,6 +174,24 @@ export default function FlashcardsPage() {
   const markUnknown = () => advance(false);
 
   if (!collectionName && !starredOnly && !hardOnly && !listId && !sourceMyWords) return <UnitPicker mode="flashcards" />;
+
+  if (gateUrl) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen p-6 text-center gap-5 animate-fade-in">
+        <div className="text-5xl">🔒</div>
+        <div className="space-y-2">
+          <h2 className="text-xl font-bold text-[var(--text)]">Complete Learn first</h2>
+          <p className="text-sm text-[var(--text-muted)] max-w-xs leading-relaxed">
+            You need to finish the <strong>Learn</strong> session for this unit before you can do Flashcards. It only takes a few minutes!
+          </p>
+        </div>
+        <div className="flex flex-col gap-3 w-full max-w-xs">
+          <Link href={gateUrl} className="btn-primary text-center">Go to Learn →</Link>
+          <button onClick={() => router.back()} className="btn-secondary">Go back</button>
+        </div>
+      </div>
+    );
+  }
 
   if (!collectionsLoaded) return <Loading />;
   if (deck.length === 0) return (

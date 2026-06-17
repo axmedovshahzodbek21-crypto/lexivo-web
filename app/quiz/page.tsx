@@ -124,16 +124,17 @@ export default function QuizPage() {
   }, []);
 
   // Gate: must complete Learn → Cards before Quiz (for unit sessions)
+  const [gateInfo, setGateInfo] = useState<{ url: string; missing: string } | null>(null);
   useEffect(() => {
     if (collectionName && dayNumber !== undefined) {
       const p = getUnitProgress(collectionName, dayNumber);
       if (!p.learnDone) {
-        router.replace(`/learn?collection=${encodeURIComponent(collectionName)}&day=${dayNumber}`);
+        setGateInfo({ url: `/learn?collection=${encodeURIComponent(collectionName)}&day=${dayNumber}`, missing: 'Learn' });
       } else if (!p.flashcardDone) {
-        router.replace(`/flashcards?collection=${encodeURIComponent(collectionName)}&day=${dayNumber}`);
+        setGateInfo({ url: `/flashcards?collection=${encodeURIComponent(collectionName)}&day=${dayNumber}`, missing: 'Flashcards' });
       }
     }
-  }, [collectionName, dayNumber, router]);
+  }, [collectionName, dayNumber]);
 
   useEffect(() => {
     if (sourceMyWords) {
@@ -233,6 +234,24 @@ export default function QuizPage() {
   }, [index, questions, correct, selected, current, collectionName, pushAchievement, setPendingLevelUp]);
 
   if (!collectionName && !starredOnly && !listId && !sourceMyWords) return <UnitPicker mode="quiz" />;
+
+  if (gateInfo) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen p-6 text-center gap-5 animate-fade-in">
+        <div className="text-5xl">🔒</div>
+        <div className="space-y-2">
+          <h2 className="text-xl font-bold text-[var(--text)]">Complete {gateInfo.missing} first</h2>
+          <p className="text-sm text-[var(--text-muted)] max-w-xs leading-relaxed">
+            You need to finish <strong>{gateInfo.missing}</strong> for this unit before you can take the Quiz. The order is: Learn → Flashcards → Quiz.
+          </p>
+        </div>
+        <div className="flex flex-col gap-3 w-full max-w-xs">
+          <Link href={gateInfo.url} className="btn-primary text-center">Go to {gateInfo.missing} →</Link>
+          <button onClick={() => router.back()} className="btn-secondary">Go back</button>
+        </div>
+      </div>
+    );
+  }
 
   if (!collectionsLoaded) return <Loading />;
   if (questions.length === 0) return (
