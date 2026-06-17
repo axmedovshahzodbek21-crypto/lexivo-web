@@ -187,8 +187,9 @@ export async function pullAll(uid: string) {
         fontSize:        profile.font_size        ?? 'normal',
         studyOrder:      profile.study_order      ?? 'random',
         quizDirection:   profile.quiz_direction   ?? 'word-to-uz',
-        reduceMotion:    profile.reduce_motion    ?? false,
-        uiLanguage:      existing.uiLanguage,
+        reduceMotion:         profile.reduce_motion         ?? false,
+        showOnLeaderboard:    profile.show_on_leaderboard   ?? true,
+        uiLanguage:           existing.uiLanguage,
       });
       setOnboarded();
       if (useRemoteName && remoteNameTs) saveNameUpdatedAt(remoteNameTs);
