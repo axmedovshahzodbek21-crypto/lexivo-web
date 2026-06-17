@@ -231,6 +231,20 @@ export function getMasteredCount(): number {
   return getSRSWords().filter(w => w.reviewStage >= 4).length;
 }
 
+export function removeSRSWord(id: string) {
+  set(KEYS.srs, getSRSWords().filter(w => w.id !== id));
+}
+
+export function resetSRSWord(id: string) {
+  const words = getSRSWords();
+  const idx = words.findIndex(w => w.id === id);
+  if (idx === -1) return;
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  words[idx] = { ...words[idx], reviewStage: 0, nextReviewDate: tomorrow.toISOString().split('T')[0] };
+  set(KEYS.srs, words);
+}
+
 // ─── Streak ───────────────────────────────────────────────────────────────────
 
 export function getStreak(): number {
