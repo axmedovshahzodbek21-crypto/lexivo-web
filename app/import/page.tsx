@@ -157,6 +157,7 @@ function ImportPageInner() {
   const [added, setAdded] = useState(false);
   const [open1, setOpen1] = useState(false);
   const [open2, setOpen2] = useState(false);
+  const [openFmt, setOpenFmt] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [tutorialLang, setTutorialLang] = useState<'en' | 'uz' | 'ru'>('en');
 
@@ -305,6 +306,41 @@ function ImportPageInner() {
               <button onClick={() => copy(buildPrompt2(wordLang, transLang), 2)} className="w-full py-2 rounded-xl bg-[var(--primary)] text-white text-sm font-semibold transition-opacity hover:opacity-90">
                 {copied2 ? t.import.copied : t.import.copyPrompt}
               </button>
+            </div>
+          )}
+        </div>
+
+        {/* Format reference */}
+        <div className="card space-y-3">
+          <button onClick={() => setOpenFmt(p => !p)} className="w-full flex items-center justify-between">
+            <div className="text-left">
+              <p className="font-semibold text-sm text-[var(--text)]">Format reference</p>
+              <p className="text-xs text-[var(--text-muted)] mt-0.5">Exact structure expected — open if pasting manually or fixing errors</p>
+            </div>
+            <span className="text-[var(--text-muted)] ml-2">{openFmt ? '▲' : '▼'}</span>
+          </button>
+          {openFmt && (
+            <div className="space-y-3">
+              <p className="text-xs text-[var(--text-muted)]">Each word is one block. Blocks are separated by <code className="bg-[var(--surface-2)] px-1 py-0.5 rounded font-mono">---</code> on its own line.</p>
+              <div className="rounded-xl bg-[var(--surface-2)] p-3 space-y-1 font-mono text-xs leading-relaxed">
+                <div><span className="text-[var(--primary)] font-bold">word:</span><span className="text-[var(--text)]"> enormous</span><span className="ml-2 text-green-500 font-sans font-semibold text-[10px]">required</span></div>
+                <div><span className="text-[var(--primary)] font-bold">translation:</span><span className="text-[var(--text)]"> ulkan</span><span className="ml-2 text-green-500 font-sans font-semibold text-[10px]">required</span></div>
+                <div><span className="text-[var(--text-muted)]">definition:</span><span className="text-[var(--text)]"> extremely large in size</span><span className="ml-2 text-[var(--text-muted)] font-sans text-[10px]">optional</span></div>
+                <div><span className="text-[var(--text-muted)]">example1:</span><span className="text-[var(--text)]"> The enormous building towered above the city.</span><span className="ml-2 text-[var(--text-muted)] font-sans text-[10px]">optional</span></div>
+                <div><span className="text-[var(--text-muted)]">example1Translation:</span><span className="text-[var(--text)]"> Ulkan bino shahar ustida baland turardi.</span><span className="ml-2 text-[var(--text-muted)] font-sans text-[10px]">optional</span></div>
+                <div><span className="text-[var(--text-muted)]">example2:</span><span className="text-[var(--text)]"> She faced an enormous challenge at work.</span><span className="ml-2 text-[var(--text-muted)] font-sans text-[10px]">optional</span></div>
+                <div><span className="text-[var(--text-muted)]">example2Translation:</span><span className="text-[var(--text)]"> U ishda ulkan muammoga duch keldi.</span><span className="ml-2 text-[var(--text-muted)] font-sans text-[10px]">optional</span></div>
+                <div className="pt-1 text-[var(--text-muted)]">---</div>
+                <div className="pt-1 text-[var(--text-muted)] italic">next word block goes here...</div>
+              </div>
+              <div className="rounded-xl border border-amber-200 bg-amber-50 dark:bg-amber-900/10 dark:border-amber-800 p-3 space-y-1">
+                <p className="text-xs font-semibold text-amber-700 dark:text-amber-400">Common mistakes</p>
+                <ul className="text-xs text-amber-600 dark:text-amber-400 space-y-0.5 list-disc list-inside">
+                  <li>Missing <code className="bg-amber-100 dark:bg-amber-900/30 px-1 rounded">---</code> separator between words</li>
+                  <li>Using <code className="bg-amber-100 dark:bg-amber-900/30 px-1 rounded">**bold**</code> or markdown formatting in values</li>
+                  <li><code className="bg-amber-100 dark:bg-amber-900/30 px-1 rounded">word</code> or <code className="bg-amber-100 dark:bg-amber-900/30 px-1 rounded">translation</code> field missing entirely</li>
+                </ul>
+              </div>
             </div>
           )}
         </div>
