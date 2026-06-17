@@ -6,7 +6,7 @@ import Link from 'next/link';
 import {
   getLearnedWords, getSRSWords, getStreak, getXP, getTotalStudyDays,
   getTodayXP, getTodayLearnedCount, getDueWords, getStarredWords, getHardWords,
-  getStudyHistory,
+  getStudyHistory, localDateStr,
 } from '@/lib/storage';
 import { getLevelInfo, ALL_ACHIEVEMENTS } from '@/lib/gamification';
 import { getUnlockedAchievements } from '@/lib/storage';
@@ -268,7 +268,7 @@ function StudyCalendar({
   const [viewMonth, setViewMonth] = useState(now.getMonth());
   const [selected, setSelected] = useState<string | null>(null);
 
-  const todayStr = now.toISOString().split('T')[0];
+  const todayStr = localDateStr(now);
   const longestStreak = calcLongestStreak(history);
   const activeDays = Object.values(history).filter(c => c > 0).length;
 

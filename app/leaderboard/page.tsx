@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
+import { localDateStr } from '@/lib/storage';
 
 interface LeaderboardEntry {
   user_id: string;
@@ -29,7 +30,7 @@ const MEDAL_BORDER = [
 ];
 
 function todayStr() {
-  return new Date().toISOString().split('T')[0];
+  return localDateStr();
 }
 
 function Avatar({ name, url, size = 40 }: { name: string; url: string | null; size?: number }) {

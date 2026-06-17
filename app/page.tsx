@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/lib/useTranslation';
 import { useAppStore } from '@/lib/store';
 import { getWordOfDay } from '@/lib/data';
-import { getStreak, getXP, getTodayXP, getTodayLearnedCount, getDueWords, getLearnedWords, getSettings, isOnboarded, getFreezes, checkAndGrantWeeklyFreeze, getImportedWords, getLastStudyDate } from '@/lib/storage';
+import { getStreak, getXP, getTodayXP, getTodayLearnedCount, getDueWords, getLearnedWords, getSettings, isOnboarded, getFreezes, checkAndGrantWeeklyFreeze, getImportedWords, getLastStudyDate, localDateStr } from '@/lib/storage';
 import { getLevelInfo } from '@/lib/gamification';
 import { speak } from '@/lib/speech';
 import { getTheme, toggleTheme, type Theme } from '@/lib/theme';
@@ -49,11 +49,11 @@ export default function HomePage() {
     setFreezes(currentFreezes);
 
     if (currentStreak > 0) {
-      const today = new Date().toISOString().split('T')[0];
+      const today = localDateStr();
       const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
-      const yStr = yesterday.toISOString().split('T')[0];
+      const yStr = localDateStr(yesterday);
       const twoDaysAgo = new Date(); twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
-      const tdStr = twoDaysAgo.toISOString().split('T')[0];
+      const tdStr = localDateStr(twoDaysAgo);
       const last = getLastStudyDate();
       if (last === today) {
         setStreakRisk('safe');
