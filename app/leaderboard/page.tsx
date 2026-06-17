@@ -130,11 +130,10 @@ export default function LeaderboardPage() {
                 </div>
               </div>
               {/* Stats grid */}
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 gap-2">
                 {[
                   { emoji: '📖', value: selected.total_learned, label: 'Words learned', color: '#3498DB' },
                   { emoji: '🔥', value: selected.streak,        label: 'Day streak',    color: '#E67E22' },
-                  { emoji: '⚡', value: selected.today_count,   label: 'Today',         color: '#2ECC71' },
                 ].map(s => (
                   <div key={s.label} className="flex flex-col items-center py-3 px-2 rounded-xl border" style={{ background: `${s.color}14`, borderColor: `${s.color}33` }}>
                     <span className="text-xl">{s.emoji}</span>
