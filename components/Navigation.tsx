@@ -146,6 +146,25 @@ export default function Navigation() {
           })}
         </nav>
 
+        {/* Practice section */}
+        <div className="px-3 pb-2">
+          <div className="border-t border-[var(--border)] pt-3 mt-1">
+            <p className="px-3 mb-1 text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)]">Practice</p>
+            <Link
+              href="/matching"
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-sm font-medium ${
+                isActive('/matching')
+                  ? 'bg-[var(--primary-bg)] text-[var(--primary)]'
+                  : 'text-[var(--text-muted)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]'
+              }`}
+            >
+              <span className="text-lg">🎯</span>
+              <span>Matching</span>
+              {isActive('/matching') && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[var(--primary)]" />}
+            </Link>
+          </div>
+        </div>
+
         {/* ── Profile block ── */}
         <div className="px-3 pb-4 pt-3 border-t border-[var(--border)]">
           <Link

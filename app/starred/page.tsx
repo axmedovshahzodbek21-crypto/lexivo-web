@@ -99,6 +99,7 @@ export default function StarredPage() {
             <div className="flex gap-2 flex-wrap">
               <Link href="/flashcards?starred=true" className="btn-secondary text-sm px-3 py-1.5">{t.starred.cards}</Link>
               <Link href="/quiz?starred=true" className="btn-secondary text-sm px-3 py-1.5">{t.starred.quiz}</Link>
+              <Link href="/matching?starred=true" className="btn-secondary text-sm px-3 py-1.5">🎯 Match</Link>
             </div>
           )}
         </div>

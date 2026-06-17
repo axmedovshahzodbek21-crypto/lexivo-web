@@ -107,6 +107,7 @@ export default function HardWordsPage() {
             <div className="flex gap-2 flex-wrap">
               <Link href="/flashcards?hard=true" className="btn-secondary text-sm px-3 py-1.5">🃏 Cards</Link>
               <Link href="/learn?hard=true" className="btn-secondary text-sm px-3 py-1.5">📖 Study</Link>
+              <Link href="/matching?hard=true" className="btn-secondary text-sm px-3 py-1.5">🎯 Match</Link>
             </div>
           )}
         </div>
