@@ -72,6 +72,7 @@ function LearnInner() {
   const [words, setWords] = useState<StudyWord[]>([]);
   const [index, setIndex] = useState(0);
   const [startIndexApplied, setStartIndexApplied] = useState(false);
+  const [resumePrompt, setResumePrompt] = useState<{ savedIndex: number; total: number } | null>(null);
   const [revealed, setRevealed] = useState(false);
   const [showExamples, setShowExamples] = useState(false);
   const [showHint, setShowHint] = useState(false);
@@ -141,6 +142,11 @@ function LearnInner() {
       if (startIndex > 0 && !startIndexApplied) {
         setIndex(Math.min(startIndex, sliced.length - 1));
         setStartIndexApplied(true);
+      } else if (collectionName && dayNumber !== undefined && !startIndexApplied) {
+        const saved = getLearnProgress(collectionName, dayNumber);
+        if (saved && saved > 0 && saved < sliced.length) {
+          setResumePrompt({ savedIndex: saved, total: sliced.length });
+        }
       }
     }
   }, [collectionsLoaded, collections, collectionName, dayNumber, hardOnly, sourceMyWords, myCollection]);
@@ -277,6 +283,37 @@ function LearnInner() {
   }
 
   if (!current) return null;
+
+  if (resumePrompt) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen p-6 text-center gap-5 animate-fade-in">
+        <div className="text-5xl">📖</div>
+        <div className="space-y-2">
+          <h2 className="text-xl font-bold text-[var(--text)]">Resume where you left off?</h2>
+          <p className="text-sm text-[var(--text-muted)] max-w-xs leading-relaxed">
+            You made it to word <strong>{resumePrompt.savedIndex + 1}</strong> of <strong>{resumePrompt.total}</strong> last time.
+          </p>
+        </div>
+        <div className="flex flex-col gap-3 w-full max-w-xs">
+          <button
+            className="btn-primary"
+            onClick={() => { setIndex(resumePrompt.savedIndex); setResumePrompt(null); }}
+          >
+            Resume from word {resumePrompt.savedIndex + 1}
+          </button>
+          <button
+            className="btn-secondary"
+            onClick={() => {
+              if (collectionName && dayNumber !== undefined) clearLearnProgress(collectionName, dayNumber);
+              setResumePrompt(null);
+            }}
+          >
+            Start over
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`flex flex-col min-h-screen ${focusMode ? 'focus-container' : ''}`}>
