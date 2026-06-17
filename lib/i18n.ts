@@ -6,6 +6,8 @@ const en = {
     review: 'Review',
     search: 'Search',
     progress: 'Progress',
+    matching: 'Matching',
+    leaderboard: 'Leaderboard',
   },
   sidebar: {
     tagline: 'Vocabulary Learning',
@@ -437,6 +439,8 @@ const uz: typeof en = {
     review: 'Takrorlash',
     search: 'Qidirish',
     progress: 'Natijalar',
+    matching: 'Moslashtirish',
+    leaderboard: 'Reyting',
   },
   sidebar: {
     tagline: "Lug'at o'rganish",
