@@ -1,6 +1,6 @@
 'use client';
-import { useEffect, useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState, useCallback, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { speakAccent, speakText } from '@/lib/speech';
 import {
@@ -55,10 +55,9 @@ function buildStudyList(
   return words;
 }
 
-export default function LearnPage() {
+function LearnInner() {
   const router = useRouter();
-  const [sp, setSp] = useState<URLSearchParams>(() => new URLSearchParams());
-  useEffect(() => { setSp(new URLSearchParams(window.location.search)); }, []);
+  const sp = useSearchParams();
   const sourceMyWords = sp.get('source') === 'my-words';
   const myCollection = sp.get('myCollection') ?? undefined;
   const collectionName = sp.get('collection') ?? undefined;
@@ -473,6 +472,14 @@ export default function LearnPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LearnPage() {
+  return (
+    <Suspense>
+      <LearnInner />
+    </Suspense>
   );
 }
 
