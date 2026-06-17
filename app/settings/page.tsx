@@ -513,7 +513,7 @@ export default function SettingsPage() {
             <div>
               <p className="text-sm font-medium text-[var(--text)]">{t.settings.enableReminder}</p>
               <p className="text-xs text-[var(--text-muted)] mt-0.5">
-                {notif.enabled ? t.settings.reminderOn(to12h(notif.time)) : t.settings.reminderOff}
+                {notif.enabled ? '3 daily reminders active' : t.settings.reminderOff}
               </p>
             </div>
             <button
@@ -525,16 +525,30 @@ export default function SettingsPage() {
             </button>
           </div>
 
-          {/* Time picker */}
+          {/* Notification schedule rows */}
           {notif.enabled && permission === 'granted' && (
-            <div>
-              <label className="text-sm font-medium text-[var(--text-muted)] block mb-1">{t.settings.reminderTime}</label>
-              <input
-                type="time"
-                value={notif.time}
-                onChange={e => handleTimeChange(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-[var(--surface-2)] border-2 border-transparent focus:border-[var(--primary)] outline-none transition-colors text-[var(--text)]"
-              />
+            <div className="space-y-2">
+              <div className="flex items-center justify-between px-3 py-2.5 rounded-xl bg-[var(--surface-2)]">
+                <span className="text-sm">📚 Morning Motivation</span>
+                <span className="text-sm text-[var(--text-muted)]">8:00 AM</span>
+              </div>
+              <div className="flex items-center justify-between px-3 py-2.5 rounded-xl bg-[var(--surface-2)]">
+                <span className="text-sm">🔥 Streak at Risk</span>
+                <span className="text-sm text-[var(--text-muted)]">9:00 PM</span>
+              </div>
+              <div>
+                <div className="flex items-center justify-between px-3 py-2.5 rounded-xl bg-[var(--surface-2)] mb-1">
+                  <span className="text-sm">📖 Custom Reminder</span>
+                  <span className="text-sm text-[var(--primary)] font-medium">{to12h(notif.time)}</span>
+                </div>
+                <label className="text-xs text-[var(--text-muted)] block mb-1 px-1">{t.settings.reminderTime}</label>
+                <input
+                  type="time"
+                  value={notif.time}
+                  onChange={e => handleTimeChange(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl bg-[var(--surface-2)] border-2 border-transparent focus:border-[var(--primary)] outline-none transition-colors text-[var(--text)]"
+                />
+              </div>
             </div>
           )}
 
