@@ -130,20 +130,6 @@ function ProgressPage() {
               </div>
             </div>
 
-            {/* Learning history link */}
-            <Link
-              href="/history"
-              className="card flex items-center justify-between hover:border-[var(--primary)] transition-colors cursor-pointer"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[var(--primary-bg)] flex items-center justify-center text-xl">📖</div>
-                <div>
-                  <p className="font-semibold text-sm text-[var(--text)]">{t.progress.learningHistory}</p>
-                  <p className="text-xs text-[var(--text-muted)]">{t.progress.browseWords}</p>
-                </div>
-              </div>
-              <span className="text-[var(--primary)]">→</span>
-            </Link>
           </div>
         )}
 

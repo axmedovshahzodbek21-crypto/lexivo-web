@@ -225,7 +225,7 @@ export default function HomePage() {
         <button onClick={() => setShowXpModal(true)} className="text-left w-full">
           <StatCard icon="⚡" value={xp} label={t.home.totalXp} color="#6C63FF" glow />
         </button>
-        <Link href="/history">
+        <Link href="/progress">
           <StatCard icon="📚" value={learnedCount} label={t.home.words} color="#10B981" />
         </Link>
       </div>
@@ -384,7 +384,6 @@ export default function HomePage() {
       <div className="grid grid-cols-3 gap-2">
         <ShortcutCard href="/starred"      icon="⭐" label={t.home.starredTitle}  sub={t.home.starredSub}  accent="var(--primary)" />
         <ShortcutCard href="/hard-words"   icon="😓" label={t.home.hardTitle}    sub={t.home.hardSub}     accent="var(--danger)"  />
-        <ShortcutCard href="/history"      icon="📖" label={t.home.historyTitle} sub={t.home.historySub}  accent="var(--primary)" />
         <ShortcutCard href="/lists"        icon="📋" label={t.home.listsTitle}   sub={t.home.listsSub}    accent="#8B5CF6"        />
         <ShortcutCard href="/grammar-tips" icon="📚" label={t.home.grammarTitle} sub={t.home.grammarSub}  accent="#10B981"        />
       </div>

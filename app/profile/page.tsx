@@ -409,15 +409,6 @@ export default function ProfilePage() {
               </div>
             </Link>
           </TiltCard>
-          <TiltCard className="card flex items-center gap-3 overflow-hidden hover:border-[var(--primary)] transition-colors depth-in-3" intensity={5}>
-            <Link href="/history" className="flex items-center gap-3 w-full" style={{ margin: '-20px', padding: '20px' }}>
-              <span className="text-2xl animate-float-icon">📖</span>
-              <div>
-                <p className="text-sm font-semibold text-[var(--text)]">History</p>
-                <p className="text-xs text-[var(--text-muted)]">All learned words</p>
-              </div>
-            </Link>
-          </TiltCard>
           <TiltCard className={`card flex items-center gap-3 overflow-hidden transition-colors depth-in-4 ${dueCount > 0 ? 'border-[var(--danger)]' : 'hover:border-[var(--primary)]'}`} intensity={5}>
             <Link href="/srs" className="flex items-center gap-3 w-full" style={{ margin: '-20px', padding: '20px' }}>
               <span className="text-2xl animate-float-icon">🔄</span>
