@@ -11,6 +11,9 @@ interface LeaderboardEntry {
   xp: number;
   streak: number;
   last_study_date: string | null;
+  today_count: number;
+  total_learned: number;
+  study_days: string[] | null;
 }
 
 const MEDAL = ['🥇', '🥈', '🥉'];
@@ -81,24 +84,72 @@ export default function LeaderboardPage() {
 
   return (
     <div className="flex flex-col min-h-screen animate-fade-in pb-24">
-      {/* Streak modal */}
-      {selected && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setSelected(null)}>
-          <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-8 flex flex-col items-center gap-4" onClick={e => e.stopPropagation()}>
-            <div className="w-10 h-1 rounded-full bg-[var(--border)] mb-2" />
-            <Avatar name={selected.name} url={selected.avatar_url} size={64} />
-            <p className="text-lg font-bold text-[var(--text)]">{selected.name}</p>
-            <div className="flex items-center gap-4 px-10 py-5 rounded-2xl border" style={{ background: 'rgba(255,140,0,0.08)', borderColor: 'rgba(255,140,0,0.25)' }}>
-              <span className="text-5xl">🔥</span>
-              <div>
-                <p className="text-4xl font-black text-orange-400">{selected.streak}</p>
-                <p className="text-sm text-[var(--text-muted)]">Day Streak</p>
+      {/* Profile modal */}
+      {selected && (() => {
+        const now = new Date();
+        const last30 = Array.from({ length: 30 }, (_, i) => {
+          const d = new Date(now);
+          d.setDate(now.getDate() - (29 - i));
+          return d.toISOString().split('T')[0];
+        });
+        const studiedSet = new Set(selected.study_days ?? []);
+        const activeDays = last30.filter(d => studiedSet.has(d)).length;
+        const totalStudyDays = selected.study_days?.length ?? 0;
+        const avgPerDay = totalStudyDays === 0 ? 0 : Math.round(selected.total_learned / totalStudyDays);
+        return (
+          <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setSelected(null)}>
+            <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-5 flex flex-col gap-4" onClick={e => e.stopPropagation()}>
+              <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto" />
+              <div className="flex flex-col items-center gap-2">
+                <Avatar name={selected.name} url={selected.avatar_url} size={56} />
+                <p className="text-lg font-bold text-[var(--text)]">{selected.name}</p>
               </div>
+              {/* Stats grid */}
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { emoji: '📖', value: selected.total_learned, label: 'Words learned', color: '#3498DB' },
+                  { emoji: '🔥', value: selected.streak,        label: 'Day streak',    color: '#E67E22' },
+                  { emoji: '⚡', value: selected.today_count,   label: 'Today',         color: '#2ECC71' },
+                ].map(s => (
+                  <div key={s.label} className="flex flex-col items-center py-3 px-2 rounded-xl border" style={{ background: `${s.color}14`, borderColor: `${s.color}33` }}>
+                    <span className="text-xl">{s.emoji}</span>
+                    <span className="text-lg font-black mt-0.5" style={{ color: s.color }}>{s.value}</span>
+                    <span className="text-[10px] text-[var(--text-muted)] text-center">{s.label}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { emoji: '📊', value: `~${avgPerDay}`, label: 'Words / day',      color: '#9B59B6' },
+                  { emoji: '📅', value: `${activeDays}/30`, label: 'Days this month', color: '#E67E22' },
+                ].map(s => (
+                  <div key={s.label} className="flex flex-col items-center py-3 px-2 rounded-xl border" style={{ background: `${s.color}14`, borderColor: `${s.color}33` }}>
+                    <span className="text-xl">{s.emoji}</span>
+                    <span className="text-lg font-black mt-0.5" style={{ color: s.color }}>{s.value}</span>
+                    <span className="text-[10px] text-[var(--text-muted)]">{s.label}</span>
+                  </div>
+                ))}
+              </div>
+              {/* Activity calendar */}
+              <div>
+                <p className="text-xs font-bold text-[var(--text-muted)] mb-2">Last 30 days</p>
+                <div className="flex flex-wrap gap-1">
+                  {last30.map(d => (
+                    <div key={d} className="w-[18px] h-[18px] rounded-[4px]"
+                      style={{ background: studiedSet.has(d) ? '#2ECC71' : 'var(--surface-2)', border: `0.5px solid ${studiedSet.has(d) ? '#27AE60' : 'var(--border)'}` }}
+                    />
+                  ))}
+                </div>
+                <div className="flex items-center gap-3 mt-2">
+                  <div className="flex items-center gap-1"><div className="w-2.5 h-2.5 rounded-sm bg-[#2ECC71]" /><span className="text-[10px] text-[var(--text-muted)]">Studied</span></div>
+                  <div className="flex items-center gap-1"><div className="w-2.5 h-2.5 rounded-sm bg-[var(--surface-2)] border border-[var(--border)]" /><span className="text-[10px] text-[var(--text-muted)]">No study</span></div>
+                </div>
+              </div>
+              <button onClick={() => setSelected(null)} className="w-full py-3 rounded-xl bg-[var(--surface-2)] text-sm font-semibold text-[var(--text)]">Close</button>
             </div>
-            <button onClick={() => setSelected(null)} className="w-full py-3 rounded-xl bg-[var(--surface-2)] text-sm font-semibold text-[var(--text)]">Close</button>
           </div>
-        </div>
-      )}
+        );
+      })()}
       {/* Header */}
       <div className="flex items-center gap-3 p-4 border-b border-[var(--border)]">
         <button
