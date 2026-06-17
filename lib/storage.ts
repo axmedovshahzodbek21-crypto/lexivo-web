@@ -177,14 +177,14 @@ export function getStudyHistory(): Record<string, number> {
 }
 
 export function getTodayLearnedCount(): number {
-  const date = new Date().toISOString().split('T')[0];
+  const date = localDateStr();
   const storedDate = get<string>(KEYS.todayCountDate, '');
   if (storedDate !== date) return 0;
   return get<number>(KEYS.todayCount, 0);
 }
 
 export function incrementTodayCount() {
-  const date = new Date().toISOString().split('T')[0];
+  const date = localDateStr();
   const storedDate = get<string>(KEYS.todayCountDate, '');
   const count = storedDate === date ? get<number>(KEYS.todayCount, 0) : 0;
   set(KEYS.todayCount, count + 1);
@@ -297,7 +297,7 @@ export function checkAndGrantWeeklyFreeze(): boolean {
 }
 
 export function recordStudySession(): { freezeUsed: boolean } {
-  const today = new Date().toISOString().split('T')[0];
+  const today = localDateStr();
   const last  = get<string>(KEYS.lastStudy, '');
   if (last === today) return { freezeUsed: false };
 
@@ -305,11 +305,11 @@ export function recordStudySession(): { freezeUsed: boolean } {
 
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
-  const yStr = yesterday.toISOString().split('T')[0];
+  const yStr = localDateStr(yesterday);
 
   const twoDaysAgo = new Date();
   twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
-  const tdStr = twoDaysAgo.toISOString().split('T')[0];
+  const tdStr = localDateStr(twoDaysAgo);
 
   let streak = get<number>(KEYS.streak, 0);
   let freezeUsed = false;
@@ -345,7 +345,7 @@ export function getXP(): number {
 }
 
 export function getTodayXP(): number {
-  const date = new Date().toISOString().split('T')[0];
+  const date = localDateStr();
   const storedDate = get<string>(KEYS.todayXpDate, '');
   if (storedDate !== date) return 0;
   return get<number>(KEYS.todayXp, 0);
@@ -356,7 +356,7 @@ export function addXP(amount: number): { leveledUp: boolean; newLevel: string; n
   const newXp = oldXp + amount;
   set(KEYS.xp, newXp);
 
-  const date = new Date().toISOString().split('T')[0];
+  const date = localDateStr();
   const storedDate = get<string>(KEYS.todayXpDate, '');
   const todayXp = storedDate === date ? get<number>(KEYS.todayXp, 0) : 0;
   set(KEYS.todayXp, todayXp + amount);
