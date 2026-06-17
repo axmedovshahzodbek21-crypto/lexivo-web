@@ -205,8 +205,12 @@ export function addSRSWord(word: SRSWord) {
   }
 }
 
+function localDateStr(d = new Date()): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
 export function getDueWords(): SRSWord[] {
-  const today = new Date().toISOString().split('T')[0];
+  const today = localDateStr();
   return getSRSWords().filter(w => w.nextReviewDate <= today && w.reviewStage < 4);
 }
 
@@ -223,7 +227,7 @@ export function updateSRSWord(id: string, success: boolean) {
   const daysUntilNext = SRS_INTERVALS[Math.min(word.reviewStage, SRS_INTERVALS.length - 1)] ?? 14;
   const next = new Date();
   next.setDate(next.getDate() + daysUntilNext);
-  word.nextReviewDate = next.toISOString().split('T')[0];
+  word.nextReviewDate = localDateStr(next);
   words[idx] = word;
   set(KEYS.srs, words);
 }
@@ -242,7 +246,7 @@ export function resetSRSWord(id: string) {
   if (idx === -1) return;
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
-  words[idx] = { ...words[idx], reviewStage: 0, nextReviewDate: tomorrow.toISOString().split('T')[0] };
+  words[idx] = { ...words[idx], reviewStage: 0, nextReviewDate: localDateStr(tomorrow) };
   set(KEYS.srs, words);
 }
 
