@@ -22,7 +22,12 @@ export default function ListsPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const reload = () => setLists(getCustomLists());
-  useEffect(() => { reload(); }, []);
+  useEffect(() => {
+    reload();
+    window.addEventListener('lexivo-sync', reload);
+    return () => window.removeEventListener('lexivo-sync', reload);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleCreate = () => {
     const name = newName.trim();

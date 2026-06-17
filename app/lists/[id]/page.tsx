@@ -70,6 +70,11 @@ export default function ListDetailPage({ params }: { params: Promise<{ id: strin
   useEffect(() => { reload(); }, [reload]);
 
   useEffect(() => {
+    window.addEventListener('lexivo-sync', reload);
+    return () => window.removeEventListener('lexivo-sync', reload);
+  }, [reload]);
+
+  useEffect(() => {
     if (!collectionsLoaded || !searchQuery.trim()) {
       setSearchResults([]);
       return;
