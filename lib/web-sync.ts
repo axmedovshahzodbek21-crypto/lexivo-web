@@ -300,8 +300,8 @@ export function startSync(uid: string) {
   stopSync();
   _syncInterval = setInterval(async () => {
     const wasReset = await checkAndHandleReset(uid);
-    if (!wasReset) await pushAll(uid);
-    await pullAll(uid);
+    await pullAll(uid);              // Pull first — local becomes authoritative merged state
+    if (!wasReset) await pushAll(uid); // Then push the merged state
   }, 30_000);
 }
 
