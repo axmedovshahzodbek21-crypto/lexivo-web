@@ -1,3 +1,5 @@
+import { localDateStr } from './storage';
+
 const SETTINGS_KEY = 'lexivo_notif_settings';
 const LAST_NOTIF_KEY = 'lexivo_last_notif';
 
@@ -46,7 +48,7 @@ function msUntil(timeStr: string): number {
 }
 
 function todayStr(): string {
-  return new Date().toISOString().split('T')[0];
+  return localDateStr();
 }
 
 function alreadyNotifiedToday(): boolean {

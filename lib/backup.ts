@@ -1,3 +1,5 @@
+import { localDateStr } from './storage';
+
 const BACKUP_VERSION = 1;
 
 // All keys that belong to Lexivo's localStorage data
@@ -50,7 +52,7 @@ export function exportData(): void {
   const blob = new Blob([json], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
 
-  const date = new Date().toISOString().split('T')[0];
+  const date = localDateStr();
   const a = document.createElement('a');
   a.href = url;
   a.download = `lexivo-backup-${date}.json`;

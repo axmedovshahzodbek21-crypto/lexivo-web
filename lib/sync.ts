@@ -12,7 +12,6 @@ import {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function todayStr() { return new Date().toISOString().split('T')[0]; }
 
 function lsGet<T>(key: string, fallback: T): T {
   if (typeof window === 'undefined') return fallback;
