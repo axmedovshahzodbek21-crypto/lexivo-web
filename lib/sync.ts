@@ -9,6 +9,7 @@ import {
   getNameUpdatedAt, saveNameUpdatedAt,
   getLevelUpdatedAt, saveLevelUpdatedAt,
 } from './storage';
+import { getNotifSettings, saveNotifSettings } from './notifications';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -49,6 +50,8 @@ export async function pushAll(userId: string) {
     reduce_motion: s.reduceMotion,
     show_on_leaderboard: s.showOnLeaderboard ?? true,
     ...(avatarUrl !== null && { avatar_url: avatarUrl }),
+    notif_enabled: getNotifSettings().enabled,
+    notif_time: getNotifSettings().time,
   });
 
   // Stats
@@ -148,6 +151,13 @@ export async function pullAll(userId: string) {
     if (useRemoteName && remoteNameTs) saveNameUpdatedAt(remoteNameTs);
     if (useRemoteLevel && remoteLevelTs) saveLevelUpdatedAt(remoteLevelTs);
     if (profile.avatar_url) saveProfilePicUrl(profile.avatar_url);
+    if (profile.notif_enabled !== null || profile.notif_time !== null) {
+      const cur = getNotifSettings();
+      saveNotifSettings({
+        enabled: profile.notif_enabled ?? cur.enabled,
+        time: profile.notif_time ?? cur.time,
+      });
+    }
   }
 
   // Stats
