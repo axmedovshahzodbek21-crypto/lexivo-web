@@ -145,6 +145,22 @@ export default function HomePage() {
         </a>
       )}
 
+      {/* ── Review reminder banner ── */}
+      {dueCount > 0 && (
+        <Link href="/srs" className="flex items-center gap-4 p-4 rounded-2xl border-2 transition-colors hover:opacity-90"
+          style={{ background: 'rgba(239,68,68,0.08)', borderColor: 'rgba(239,68,68,0.35)' }}>
+          <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
+            style={{ background: 'rgba(239,68,68,0.15)' }}>🔔</div>
+          <div className="flex-1 min-w-0">
+            <div className="font-bold text-sm" style={{ color: '#EF4444' }}>
+              {dueCount} {dueCount === 1 ? 'word' : 'words'} due for review!
+            </div>
+            <div className="text-xs mt-0.5 text-[var(--text-muted)]">Complete your reviews for best results.</div>
+          </div>
+          <span className="text-sm font-bold flex-shrink-0" style={{ color: '#EF4444' }}>→</span>
+        </Link>
+      )}
+
       {/* ── Collections (most important, lifted to top) ── */}
       <div>
         <h2 className="font-semibold text-[var(--text)] text-base mb-3">{t.home.collections}</h2>
