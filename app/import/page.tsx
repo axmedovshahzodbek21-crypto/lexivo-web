@@ -89,10 +89,19 @@ Here are my pairs (word - translation):
 [PASTE YOUR PAIRS HERE, one per line]`;
 }
 
-function parseOutput(text: string, langCode: string): ImportedWord[] {
+interface ParseResult {
+  words: ImportedWord[];
+  totalBlocks: number;
+  errors: { index: number; preview: string; reason: string }[];
+}
+
+function parseOutput(text: string, langCode: string): ParseResult {
   const blocks = text.split(/---+/).map(b => b.trim()).filter(Boolean);
-  const result: ImportedWord[] = [];
-  for (const block of blocks) {
+  const words: ImportedWord[] = [];
+  const errors: ParseResult['errors'] = [];
+
+  for (let i = 0; i < blocks.length; i++) {
+    const block = blocks[i];
     const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
     const fields: Record<string, string> = {};
     for (const line of lines) {
@@ -102,8 +111,20 @@ function parseOutput(text: string, langCode: string): ImportedWord[] {
       const val = line.slice(colon + 1).trim().replace(/[*_`]/g, '');
       fields[key] = val;
     }
-    if (!fields.word || !fields.translation) continue;
-    result.push({
+    const preview = block.slice(0, 40).replace(/\n/g, ' ');
+    if (!fields.word && !fields.translation) {
+      errors.push({ index: i + 1, preview, reason: 'Missing both "word:" and "translation:" fields' });
+      continue;
+    }
+    if (!fields.word) {
+      errors.push({ index: i + 1, preview, reason: 'Missing "word:" field' });
+      continue;
+    }
+    if (!fields.translation) {
+      errors.push({ index: i + 1, preview, reason: 'Missing "translation:" field' });
+      continue;
+    }
+    words.push({
       word: fields.word,
       translation: fields.translation,
       definition: fields.definition ?? '',
@@ -115,7 +136,8 @@ function parseOutput(text: string, langCode: string): ImportedWord[] {
       addedAt: Date.now(),
     });
   }
-  return result;
+
+  return { words, totalBlocks: blocks.length, errors };
 }
 
 function ImportPageInner() {
@@ -145,7 +167,8 @@ function ImportPageInner() {
     }
   }, []);
 
-  const parsed = useMemo(() => parseOutput(pasted, wordLangCode), [pasted, wordLangCode]);
+  const parseResult = useMemo(() => parseOutput(pasted, wordLangCode), [pasted, wordLangCode]);
+  const parsed = parseResult.words;
 
   function copy(text: string, which: 1 | 2) {
     navigator.clipboard.writeText(text);
@@ -301,10 +324,44 @@ function ImportPageInner() {
         {/* Preview */}
         {pasted.trim() && (
           <div className="card space-y-3">
-            <p className="font-semibold text-sm text-[var(--text)]">{t.import.preview} ({parsed.length})</p>
-            {parsed.length === 0 ? (
+            {/* Diagnostics header */}
+            <div className="flex items-center justify-between">
+              <p className="font-semibold text-sm text-[var(--text)]">{t.import.preview}</p>
+              <div className="flex items-center gap-2 text-xs">
+                {parsed.length > 0 && (
+                  <span className="px-2 py-0.5 rounded-full font-semibold" style={{ background: 'rgba(16,185,129,0.12)', color: '#10B981' }}>
+                    ✓ {parsed.length} ready
+                  </span>
+                )}
+                {parseResult.errors.length > 0 && (
+                  <span className="px-2 py-0.5 rounded-full font-semibold" style={{ background: 'rgba(239,68,68,0.1)', color: '#DC2626' }}>
+                    ✕ {parseResult.errors.length} failed
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Errors */}
+            {parseResult.errors.length > 0 && (
+              <div className="rounded-xl border border-red-200 bg-red-50 dark:bg-red-900/10 dark:border-red-800 p-3 space-y-2">
+                <p className="text-xs font-semibold text-red-700 dark:text-red-400">
+                  {parseResult.errors.length} block{parseResult.errors.length > 1 ? 's' : ''} could not be parsed:
+                </p>
+                {parseResult.errors.map(e => (
+                  <div key={e.index} className="text-xs text-red-600 dark:text-red-400">
+                    <span className="font-semibold">Block {e.index}:</span> {e.reason}
+                    {e.preview && <span className="block text-red-400 font-mono mt-0.5 truncate">"{e.preview}…"</span>}
+                  </div>
+                ))}
+                <p className="text-xs text-red-500 mt-1">Make sure each block has <code className="bg-red-100 dark:bg-red-900/30 px-1 rounded">word:</code> and <code className="bg-red-100 dark:bg-red-900/30 px-1 rounded">translation:</code> fields, separated by <code className="bg-red-100 dark:bg-red-900/30 px-1 rounded">---</code></p>
+              </div>
+            )}
+
+            {parsed.length === 0 && parseResult.errors.length === 0 && (
               <p className="text-xs text-[var(--text-muted)]">{t.import.errorEmpty}</p>
-            ) : (
+            )}
+
+            {parsed.length > 0 && (
               <div className="space-y-3">
                 {parsed.map((w, i) => (
                   <div key={i} className="rounded-xl border border-[var(--border)] p-3 space-y-1.5">
