@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN!;
-const OWNER_ID  = process.env.TELEGRAM_OWNER_CHAT_ID!;
-
 async function sendMessage(chatId: string | number, text: string) {
-  await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML' }),
@@ -13,6 +11,7 @@ async function sendMessage(chatId: string | number, text: string) {
 
 export async function POST(req: NextRequest) {
   try {
+    const ownerId = process.env.TELEGRAM_OWNER_CHAT_ID;
     const body = await req.json();
     const message = body?.message;
     if (!message) return NextResponse.json({ ok: true });
@@ -24,7 +23,7 @@ export async function POST(req: NextRequest) {
 
     // Forward to owner
     await sendMessage(
-      OWNER_ID,
+      ownerId!,
       `📩 <b>New support message</b>\n👤 ${fromName} (${username})\n🆔 ${fromId}\n\n${text}`,
     );
 
