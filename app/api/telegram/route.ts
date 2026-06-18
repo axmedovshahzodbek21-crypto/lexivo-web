@@ -35,6 +35,18 @@ export async function POST(req: NextRequest) {
       { onConflict: 'chat_id' },
     );
 
+    // Owner replying to a forwarded support message
+    if (String(fromId) === OWNER_ID && message.reply_to_message) {
+      const repliedText = message.reply_to_message.text ?? '';
+      const idMatch = repliedText.match(/🆔\s*(\d+)/);
+      if (idMatch) {
+        const targetId = idMatch[1];
+        await sendMessage(targetId, `💬 Reply from Lexivo Support:\n\n${text}`);
+        await sendMessage(OWNER_ID, `✅ Reply sent to ${targetId}.`);
+        return NextResponse.json({ ok: true });
+      }
+    }
+
     // Broadcast command — owner only
     if (String(fromId) === OWNER_ID && text.startsWith('/broadcast ')) {
       const broadcastText = text.slice('/broadcast '.length).trim();
