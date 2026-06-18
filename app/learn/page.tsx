@@ -172,7 +172,7 @@ function LearnInner() {
   const advanceCard = useCallback(() => {
     if (!current) return;
     if (hardOnly) removeHardWord(current.word);
-    saveLearnedWord({
+    const isNew = saveLearnedWord({
       word: current.word,
       translation: current.translation,
       collectionName: current.collectionName,
@@ -182,7 +182,7 @@ function LearnInner() {
     });
     const srsWord = createSRSWord(current, current.collectionName, current.dayNumber, current.topic);
     storeSRSWord(srsWord);
-    incrementTodayCount();
+    if (isNew) incrementTodayCount();
     const { leveledUp, newLevel, newXp } = addXP(XP_PER_LEARN);
     if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
     recordStudySession();

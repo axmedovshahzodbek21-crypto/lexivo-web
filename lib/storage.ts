@@ -159,12 +159,14 @@ export function getLearnedWords(): LearnedWord[] {
   return get<LearnedWord[]>(KEYS.learned, []);
 }
 
-export function saveLearnedWord(word: LearnedWord) {
+export function saveLearnedWord(word: LearnedWord): boolean {
   const words = getLearnedWords();
   if (!words.find(w => w.word === word.word && w.collectionName === word.collectionName)) {
     words.push(word);
     set(KEYS.learned, words);
+    return true;
   }
+  return false;
 }
 
 // Returns { "2024-01-15": 12, "2024-01-16": 8, ... } derived from learned words
