@@ -1,20 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN ?? '8582829798:AAFMuhQZBOBva-9rZx5q65DTNCctQKX6AiM';
-const OWNER_ID  = process.env.TELEGRAM_OWNER_CHAT_ID ?? '8639830756';
-
-function esc(s: string): string {
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
+const OWNER_ID  = '8639830756';
 
 async function sendMessage(chatId: string | number, text: string) {
   const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML' }),
+    body: JSON.stringify({ chat_id: String(chatId), text }),
   });
   const json = await res.json();
-  console.log(`sendMessage to ${chatId}:`, JSON.stringify(json));
+  console.log(`sendMessage to ${chatId}: ok=${json.ok} err=${json.description ?? ''}`);
   return json;
 }
 
@@ -25,19 +21,15 @@ export async function POST(req: NextRequest) {
     if (!message) return NextResponse.json({ ok: true });
 
     const fromId   = message.from?.id;
-    const fromName = esc([message.from?.first_name, message.from?.last_name].filter(Boolean).join(' ') || 'Unknown');
-    const username = message.from?.username ? `@${esc(message.from.username)}` : 'no username';
-    const text     = esc(message.text ?? '[non-text message]');
+    const fromName = [message.from?.first_name, message.from?.last_name].filter(Boolean).join(' ') || 'Unknown';
+    const username = message.from?.username ? `@${message.from.username}` : 'no username';
+    const text     = message.text ?? '[non-text message]';
 
-    await sendMessage(
-      OWNER_ID,
-      `📩 <b>New support message</b>\n👤 ${fromName} (${username})\n🆔 ${fromId}\n\n${text}`,
-    );
+    // Auto-reply to user first
+    await sendMessage(fromId, `Your message has been received! We'll get back to you as soon as possible.\n\n— Lexivo Team`);
 
-    await sendMessage(
-      fromId,
-      `✅ Your message has been received! We'll get back to you as soon as possible.\n\n— Lexivo Team`,
-    );
+    // Forward to owner
+    await sendMessage(OWNER_ID, `New support message\nFrom: ${fromName} (${username})\nID: ${fromId}\n\n${text}`);
 
     return NextResponse.json({ ok: true });
   } catch (err) {
