@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     await sendMessage(fromId, `Your message has been received! We'll get back to you as soon as possible.\n\n— Lexivo Team`);
 
     // Forward to owner
-    await sendMessage(OWNER_ID, `New support message\nFrom: ${fromName} (${username})\nID: ${fromId}\n\n${text}`);
+    await sendMessage(OWNER_ID, `📩 New support message\n👤 ${fromName} (${username})\n\n${text}`);
 
     return NextResponse.json({ ok: true });
   } catch (err) {
