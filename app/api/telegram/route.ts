@@ -3,6 +3,10 @@ import { NextRequest, NextResponse } from 'next/server';
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN ?? '8582829798:AAFMuhQZBOBva-9rZx5q65DTNCctQKX6AiM';
 const OWNER_ID  = process.env.TELEGRAM_OWNER_CHAT_ID ?? '8639830756';
 
+function esc(s: string): string {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
 async function sendMessage(chatId: string | number, text: string) {
   const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
     method: 'POST',
@@ -21,12 +25,9 @@ export async function POST(req: NextRequest) {
     if (!message) return NextResponse.json({ ok: true });
 
     const fromId   = message.from?.id;
-    const fromName = [message.from?.first_name, message.from?.last_name].filter(Boolean).join(' ') || 'Unknown';
-    const username = message.from?.username ? `@${message.from.username}` : 'no username';
-    const text     = message.text ?? '[non-text message]';
-
-    console.log(`Incoming message from ${fromId} (${fromName}): ${text}`);
-    console.log(`Forwarding to owner: ${OWNER_ID}`);
+    const fromName = esc([message.from?.first_name, message.from?.last_name].filter(Boolean).join(' ') || 'Unknown');
+    const username = message.from?.username ? `@${esc(message.from.username)}` : 'no username';
+    const text     = esc(message.text ?? '[non-text message]');
 
     await sendMessage(
       OWNER_ID,
@@ -35,7 +36,7 @@ export async function POST(req: NextRequest) {
 
     await sendMessage(
       fromId,
-      `✅ Thank you for reaching out! Your message has been received and we'll get back to you as soon as possible.\n\n— Lexivo Team`,
+      `✅ Your message has been received! We'll get back to you as soon as possible.\n\n— Lexivo Team`,
     );
 
     return NextResponse.json({ ok: true });
