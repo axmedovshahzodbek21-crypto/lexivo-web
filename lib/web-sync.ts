@@ -242,21 +242,33 @@ export async function pullAll(uid: string) {
       }
     }
 
-    // srs_words — always overwrite local
+    // srs_words — merge: keep local, add remote words not already in local
     const { data: srsRows } = await supabase.from('srs_words').select('data').eq('user_id', uid);
-    set(K.srs, srsRows?.map(r => r.data) ?? []);
+    if (srsRows && srsRows.length > 0) {
+      const local = getSRSWords();
+      const localIds = new Set(local.map(w => `${w.word}_${w.collectionName}`));
+      const toAdd = srsRows.map(r => r.data).filter(w => w && !localIds.has(`${w.word}_${w.collectionName}`));
+      if (toAdd.length > 0) set(K.srs, [...local, ...toAdd]);
+    }
 
-    // learned_words — always overwrite local
+    // learned_words — merge: keep local, add remote words not already in local
     const { data: learnedRows } = await supabase.from('learned_words').select('word,collection,learned_at').eq('user_id', uid);
-    set(K.learned, learnedRows?.map(r => ({
-      word:           r.word,
-      collectionName: r.collection  ?? '',
-      learnedAt:      r.learned_at  ?? new Date().toISOString(),
-    })) ?? []);
+    if (learnedRows && learnedRows.length > 0) {
+      const local = getLearnedWords();
+      const localKeys = new Set(local.map(w => w.word));
+      const toAdd = learnedRows
+        .filter(r => !localKeys.has(r.word))
+        .map(r => ({ word: r.word, collectionName: r.collection ?? '', learnedAt: r.learned_at ?? new Date().toISOString(), translation: '', topic: '', dayNumber: 0 }));
+      if (toAdd.length > 0) set(K.learned, [...local, ...toAdd]);
+    }
 
-    // starred_words — always overwrite local
+    // starred_words — merge: union of local and remote
     const { data: starredRows } = await supabase.from('starred_words').select('word').eq('user_id', uid);
-    set(K.starred, starredRows?.map(r => r.word) ?? []);
+    if (starredRows && starredRows.length > 0) {
+      const local = getStarredWords();
+      const merged = Array.from(new Set([...local, ...starredRows.map(r => r.word as string)]));
+      if (merged.length > local.length) set(K.starred, merged);
+    }
 
     // unit_progress — OR-merge: remote true always wins, local true never erased
     try {
