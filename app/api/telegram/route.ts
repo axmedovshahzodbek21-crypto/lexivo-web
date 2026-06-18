@@ -27,7 +27,8 @@ export async function POST(req: NextRequest) {
     const fromId   = message.from?.id;
     const fromName = [message.from?.first_name, message.from?.last_name].filter(Boolean).join(' ') || 'Unknown';
     const username = message.from?.username ?? null;
-    const text     = message.text ?? '[non-text message]';
+    const text     = (message.text ?? '').trim();
+    const isOwner  = String(fromId) === OWNER_ID;
 
     // Save user to database
     await supabase.from('bot_users').upsert(
@@ -35,20 +36,29 @@ export async function POST(req: NextRequest) {
       { onConflict: 'chat_id' },
     );
 
-    // Owner replying to a forwarded support message
-    if (String(fromId) === OWNER_ID && message.reply_to_message) {
+    // ── User commands ──────────────────────────────────────────────────────────
+
+    if (text === '/start') {
+      await sendMessage(fromId,
+        `👋 Welcome to Lexivo Support!\n\nHave a question or feedback? Just send it here and our team will get back to you as soon as possible.\n\n📚 Learn vocabulary at lexivo-web-six.vercel.app`
+      );
+      return NextResponse.json({ ok: true });
+    }
+
+    // ── Owner commands ─────────────────────────────────────────────────────────
+
+    if (isOwner && message.reply_to_message) {
       const repliedText = message.reply_to_message.text ?? '';
       const idMatch = repliedText.match(/🆔\s*(\d+)/);
       if (idMatch) {
         const targetId = idMatch[1];
         await sendMessage(targetId, `💬 Reply from Lexivo Support:\n\n${text}`);
-        await sendMessage(OWNER_ID, `✅ Reply sent to ${targetId}.`);
+        await sendMessage(OWNER_ID, `✅ Reply sent.`);
         return NextResponse.json({ ok: true });
       }
     }
 
-    // Broadcast command — owner only
-    if (String(fromId) === OWNER_ID && text.startsWith('/broadcast ')) {
+    if (isOwner && text.startsWith('/broadcast ')) {
       const broadcastText = text.slice('/broadcast '.length).trim();
       if (broadcastText) {
         const { data: users } = await supabase.from('bot_users').select('chat_id');
@@ -63,12 +73,45 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true });
     }
 
-    // Auto-reply to user
-    if (String(fromId) !== OWNER_ID) {
+    if (isOwner && text === '/stats') {
+      const { count } = await supabase.from('bot_users').select('*', { count: 'exact', head: true });
+      await sendMessage(OWNER_ID, `📊 Bot Stats\n\n👥 Total users: ${count ?? 0}`);
+      return NextResponse.json({ ok: true });
+    }
+
+    if (isOwner && text === '/users') {
+      const { data: users } = await supabase.from('bot_users').select('first_name,username,last_seen').order('last_seen', { ascending: false }).limit(20);
+      if (!users || users.length === 0) {
+        await sendMessage(OWNER_ID, `No users yet.`);
+      } else {
+        const lines = users.map((u, i) => {
+          const name = u.first_name ?? 'Unknown';
+          const uname = u.username ? ` (@${u.username})` : '';
+          const date = new Date(u.last_seen).toLocaleDateString();
+          return `${i + 1}. ${name}${uname} — ${date}`;
+        });
+        await sendMessage(OWNER_ID, `👥 Recent users (last 20):\n\n${lines.join('\n')}`);
+      }
+      return NextResponse.json({ ok: true });
+    }
+
+    if (isOwner && text === '/help') {
+      await sendMessage(OWNER_ID,
+        `🛠 Admin Commands\n\n` +
+        `/stats — total number of users\n` +
+        `/users — list of last 20 users\n` +
+        `/broadcast <message> — send to all users\n` +
+        `Reply to a message — send reply to that user`
+      );
+      return NextResponse.json({ ok: true });
+    }
+
+    // ── Regular support message ────────────────────────────────────────────────
+
+    if (!isOwner) {
       await sendMessage(fromId, `Your message has been received! We'll get back to you as soon as possible.\n\n— Lexivo Team`);
     }
 
-    // Forward to owner
     const usernameDisplay = username ? `@${username}` : 'no username';
     await sendMessage(OWNER_ID, `📩 New support message\n👤 ${fromName} (${usernameDisplay})\n🆔 ${fromId}\n\n${text}`);
 
