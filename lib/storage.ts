@@ -29,6 +29,7 @@ const KEYS = {
   onboarded: 'lexivo_onboarded',
   freezes: 'lexivo_freezes',
   lastFreezeWeek: 'lexivo_last_freeze_week',
+  studyDays: 'lexivo_study_days',
 };
 
 function get<T>(key: string, fallback: T): T {
@@ -297,9 +298,25 @@ export function checkAndGrantWeeklyFreeze(): boolean {
   return false;
 }
 
+export function getStudyDays(): string[] {
+  return get<string[]>(KEYS.studyDays, []);
+}
+
+export function saveStudyDays(days: string[]) {
+  set(KEYS.studyDays, days);
+}
+
 export function recordStudySession(): { freezeUsed: boolean } {
   const today = localDateStr();
   const last  = get<string>(KEYS.lastStudy, '');
+
+  // Always record today in the study days list (idempotent)
+  const days = getStudyDays();
+  if (!days.includes(today)) {
+    days.push(today);
+    set(KEYS.studyDays, days);
+  }
+
   if (last === today) return { freezeUsed: false };
 
   checkAndGrantWeeklyFreeze();

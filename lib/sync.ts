@@ -8,6 +8,7 @@ import {
   getProfilePicUrl, saveProfilePicUrl,
   getNameUpdatedAt, saveNameUpdatedAt,
   getLevelUpdatedAt, saveLevelUpdatedAt,
+  getStudyDays, saveStudyDays,
 } from './storage';
 import { getNotifSettings, saveNotifSettings } from './notifications';
 
@@ -65,6 +66,7 @@ export async function pushAll(userId: string) {
     streak: getStreak(),
     last_study_date: lsGet('lexivo_last_study', null),
     total_days: getTotalStudyDays(),
+    study_days: getStudyDays(),
     freezes: getFreezes(),
     last_freeze_week: lsGet('lexivo_last_freeze_week', null),
   });
@@ -173,6 +175,11 @@ export async function pullAll(userId: string) {
     lsSet('lexivo_total_study_days', stats.total_days);
     lsSet('lexivo_freezes', stats.freezes);
     if (stats.last_freeze_week) lsSet('lexivo_last_freeze_week', stats.last_freeze_week);
+    if (Array.isArray(stats.study_days) && stats.study_days.length > 0) {
+      const local = getStudyDays();
+      const merged = Array.from(new Set([...local, ...stats.study_days]));
+      saveStudyDays(merged);
+    }
   }
 
   // Learned words — merge with local

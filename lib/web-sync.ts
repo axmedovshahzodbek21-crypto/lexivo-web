@@ -6,6 +6,7 @@ import {
   getProfilePicUrl, saveProfilePicUrl,
   getNameUpdatedAt, saveNameUpdatedAt,
   getLevelUpdatedAt, saveLevelUpdatedAt,
+  getStudyDays, saveStudyDays,
 } from './storage';
 
 // localStorage key constants (mirrors KEYS in storage.ts)
@@ -66,6 +67,7 @@ export async function pushAll(uid: string) {
       streak: getStreak(),
       last_study_date: ls(K.lastStudy),
       total_days: getTotalStudyDays(),
+      study_days: getStudyDays(),
       freezes: getFreezes(),
       last_freeze_week: ls(K.lastFreezeWeek),
     });
@@ -214,6 +216,11 @@ export async function pullAll(uid: string) {
       if (stats.today_count_date) set(K.todayCountDate, stats.today_count_date);
       if (stats.last_study_date)  set(K.lastStudy,      stats.last_study_date);
       if (stats.last_freeze_week) set(K.lastFreezeWeek, stats.last_freeze_week);
+      if (Array.isArray(stats.study_days) && stats.study_days.length > 0) {
+        const local = getStudyDays();
+        const merged = Array.from(new Set([...local, ...stats.study_days]));
+        saveStudyDays(merged);
+      }
     }
 
     // srs_words — always overwrite local
