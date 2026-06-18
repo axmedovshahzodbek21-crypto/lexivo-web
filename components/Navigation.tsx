@@ -17,6 +17,9 @@ const NAV_HREFS = [
   { href: '/leaderboard',  icon: '🏆', key: 'leaderboard' },
 ] as const;
 
+// Mobile bottom bar: 5 core items only — Matching & Leaderboard are on the home page
+const MOBILE_NAV_HREFS = NAV_HREFS.slice(0, 5);
+
 const LEVEL_COLORS: Record<string, string> = {
   Beginner:             '#2ECC71',
   Elementary:           '#27AE60',
@@ -81,14 +84,14 @@ export default function Navigation() {
         className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[var(--surface)] border-t border-[var(--border)] flex justify-around items-center py-2 px-1 shadow-lg"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
-        {NAV_HREFS.map(({ href, icon, key }) => {
+        {MOBILE_NAV_HREFS.map(({ href, icon, key }) => {
           const active = isActive(href);
           const label = t.nav[key];
           return (
             <Link
               key={href}
               href={href}
-              className={`flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl transition-all ${active ? 'text-[var(--primary)]' : 'text-[var(--text-muted)] hover:text-[var(--text)]'}`}
+              className={`flex flex-col items-center gap-0.5 px-4 py-1 rounded-xl transition-all ${active ? 'text-[var(--primary)]' : 'text-[var(--text-muted)] hover:text-[var(--text)]'}`}
             >
               <span className={`text-xl transition-transform ${active ? 'scale-110' : ''}`}>{icon}</span>
               <span className={`text-xs ${active ? 'font-semibold' : 'font-medium'}`}>{label}</span>
