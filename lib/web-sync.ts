@@ -239,24 +239,20 @@ export async function pullAll(uid: string) {
     const { data: starredRows } = await supabase.from('starred_words').select('word').eq('user_id', uid);
     set(K.starred, starredRows?.map(r => r.word) ?? []);
 
-    // unit_progress — always overwrite local
+    // unit_progress — OR-merge: remote true always wins, local true never erased
     try {
       const { data: upRows } = await supabase.from('unit_progress')
         .select('collection_name,day_number,learn_done,flashcard_done,quiz_done')
         .eq('user_id', uid);
-      if (typeof window !== 'undefined') {
-        const toRemove: string[] = [];
-        for (let i = 0; i < localStorage.length; i++) {
-          const k = localStorage.key(i);
-          if (k?.startsWith('lexivo_unit_progress_')) toRemove.push(k);
-        }
-        toRemove.forEach(k => localStorage.removeItem(k));
-        for (const r of (upRows ?? [])) {
+      if (typeof window !== 'undefined' && upRows && upRows.length > 0) {
+        for (const r of upRows) {
           const key = `lexivo_unit_progress_${r.collection_name}_${r.day_number}`;
+          const existing = localStorage.getItem(key);
+          const local = existing ? JSON.parse(existing) : { learnDone: false, flashcardDone: false, quizDone: false };
           localStorage.setItem(key, JSON.stringify({
-            learnDone: r.learn_done ?? false,
-            flashcardDone: r.flashcard_done ?? false,
-            quizDone: r.quiz_done ?? false,
+            learnDone:    local.learnDone    || (r.learn_done     ?? false),
+            flashcardDone: local.flashcardDone || (r.flashcard_done ?? false),
+            quizDone:     local.quizDone     || (r.quiz_done      ?? false),
           }));
         }
       }
