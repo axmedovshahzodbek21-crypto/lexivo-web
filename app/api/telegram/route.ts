@@ -4,11 +4,14 @@ const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN ?? '8582829798:AAFMuhQZBOBva-9r
 const OWNER_ID  = process.env.TELEGRAM_OWNER_CHAT_ID ?? '8639830756';
 
 async function sendMessage(chatId: string | number, text: string) {
-  await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+  const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML' }),
   });
+  const json = await res.json();
+  console.log(`sendMessage to ${chatId}:`, JSON.stringify(json));
+  return json;
 }
 
 export async function POST(req: NextRequest) {
@@ -21,6 +24,9 @@ export async function POST(req: NextRequest) {
     const fromName = [message.from?.first_name, message.from?.last_name].filter(Boolean).join(' ') || 'Unknown';
     const username = message.from?.username ? `@${message.from.username}` : 'no username';
     const text     = message.text ?? '[non-text message]';
+
+    console.log(`Incoming message from ${fromId} (${fromName}): ${text}`);
+    console.log(`Forwarding to owner: ${OWNER_ID}`);
 
     await sendMessage(
       OWNER_ID,
