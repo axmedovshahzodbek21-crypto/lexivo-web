@@ -118,6 +118,54 @@ export async function pushAll(userId: string) {
       { onConflict: 'id' }
     );
   }
+
+  // unit_progress — OR-merge local with remote before upserting
+  if (typeof window !== 'undefined') {
+    const localRows: {
+      collection_name: string; day_number: number;
+      learn_done: boolean; flashcard_done: boolean; quiz_done: boolean;
+    }[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (!key?.startsWith('lexivo_unit_progress_')) continue;
+      const suffix = key.slice('lexivo_unit_progress_'.length);
+      const lastUnderscore = suffix.lastIndexOf('_');
+      if (lastUnderscore === -1) continue;
+      const collectionName = suffix.slice(0, lastUnderscore);
+      const dayNumber = parseInt(suffix.slice(lastUnderscore + 1), 10);
+      if (isNaN(dayNumber)) continue;
+      const raw = localStorage.getItem(key);
+      if (!raw) continue;
+      const p = JSON.parse(raw);
+      localRows.push({
+        collection_name: collectionName, day_number: dayNumber,
+        learn_done: p.learnDone ?? false,
+        flashcard_done: p.flashcardDone ?? false,
+        quiz_done: p.quizDone ?? false,
+      });
+    }
+    if (localRows.length > 0) {
+      try {
+        const { data: remoteRows } = await supabase
+          .from('unit_progress')
+          .select('collection_name,day_number,learn_done,flashcard_done,quiz_done')
+          .eq('user_id', userId);
+        const remoteMap = new Map((remoteRows ?? []).map(r => [`${r.collection_name}_${r.day_number}`, r]));
+        const upRows = localRows.map(r => {
+          const remote = remoteMap.get(`${r.collection_name}_${r.day_number}`);
+          return {
+            user_id: userId,
+            collection_name: r.collection_name,
+            day_number: r.day_number,
+            learn_done: r.learn_done || (remote?.learn_done ?? false),
+            flashcard_done: r.flashcard_done || (remote?.flashcard_done ?? false),
+            quiz_done: r.quiz_done || (remote?.quiz_done ?? false),
+          };
+        });
+        await supabase.from('unit_progress').upsert(upRows, { onConflict: 'user_id,collection_name,day_number' });
+      } catch (_) {}
+    }
+  }
 }
 
 // ── Pull cloud data into localStorage ────────────────────────────────────────

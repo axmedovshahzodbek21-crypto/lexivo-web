@@ -7,6 +7,7 @@ import {
   getNameUpdatedAt, saveNameUpdatedAt,
   getLevelUpdatedAt, saveLevelUpdatedAt,
   getStudyDays, saveStudyDays,
+  getUnlockedAchievements, getCustomLists,
 } from './storage';
 
 // localStorage key constants (mirrors KEYS in storage.ts)
@@ -106,6 +107,24 @@ export async function pushAll(uid: string) {
     await supabase.from('starred_words').delete().eq('user_id', uid);
     if (starred.length > 0) {
       await supabase.from('starred_words').insert(starred.map(w => ({ user_id: uid, word: w })));
+    }
+
+    // achievements — upsert all
+    const achievements = getUnlockedAchievements();
+    if (achievements.length > 0) {
+      await supabase.from('achievements').upsert(
+        achievements.map(id => ({ user_id: uid, achievement_id: id })),
+        { onConflict: 'user_id,achievement_id' },
+      );
+    }
+
+    // custom_lists — upsert all
+    const lists = getCustomLists();
+    if (lists.length > 0) {
+      await supabase.from('custom_lists').upsert(
+        lists.map(l => ({ id: l.id, user_id: uid, name: l.name, words: l.words })),
+        { onConflict: 'id' },
+      );
     }
 
     // unit_progress — fetch remote first and OR-merge so false never overwrites true
