@@ -361,7 +361,7 @@ function LearnInner() {
 
       <div className="flex-1 p-4 flex flex-col gap-4">
         {/* Word card */}
-        <TiltCard className="flex-1 animate-slide-up" intensity={5}>
+        <TiltCard className="flex-1 animate-slide-up" intensity={5} glare={false}>
         <div
           className={`card h-full transition-all ${!revealed ? 'cursor-pointer hover:border-[var(--primary)]' : ''}`}
           style={{ minHeight: 300 }}
