@@ -74,8 +74,12 @@ function LearnInner() {
   const [startIndexApplied, setStartIndexApplied] = useState(false);
   const [resumePrompt, setResumePrompt] = useState<{ savedIndex: number; total: number } | null>(null);
   const [revealed, setRevealed] = useState(false);
-  const [showExamples, setShowExamples] = useState(false);
   const [showHint, setShowHint] = useState(false);
+  const [showEx1Translation, setShowEx1Translation] = useState(false);
+  const [showEx2Translation, setShowEx2Translation] = useState(false);
+  const [showEx3Translation, setShowEx3Translation] = useState(false);
+  const [showUzDefinition, setShowUzDefinition] = useState(false);
+  const [showMoreExamples, setShowMoreExamples] = useState(false);
   const [skipped, setSkipped] = useState<StudyWord[]>([]);
   const [pureSkipped, setPureSkipped] = useState<StudyWord[]>([]);
   const [done, setDone] = useState(false);
@@ -157,8 +161,12 @@ function LearnInner() {
     if (current) {
       setStarredState(isStarred(current.word));
       setRevealed(false);
-      setShowExamples(false);
       setShowHint(false);
+      setShowEx1Translation(false);
+      setShowEx2Translation(false);
+      setShowEx3Translation(false);
+      setShowUzDefinition(false);
+      setShowMoreExamples(false);
     }
   }, [current]);
 
@@ -411,37 +419,70 @@ function LearnInner() {
 
               <p className="text-sm text-[var(--text)] leading-relaxed">{current.definition}</p>
 
-              <ExampleWithSituation
+              {current.definitionUz && (
+                <div>
+                  <button
+                    onClick={() => setShowUzDefinition(v => !v)}
+                    className="text-xs text-[var(--primary)] font-medium hover:underline"
+                  >
+                    {showUzDefinition ? "Yopish" : "O'zbekcha tushuntirish"}
+                  </button>
+                  {showUzDefinition && (
+                    <p className="text-sm text-[var(--text-muted)] mt-1 animate-fade-in">{current.definitionUz}</p>
+                  )}
+                </div>
+              )}
+
+              <ExampleCard
                 num={1}
                 example={current.example1}
-                situation={current.example1Situation}
                 translation={current.example1Translation}
+                showTranslation={showEx1Translation}
+                onToggle={() => setShowEx1Translation(v => !v)}
                 language={current.language}
               />
+              {current.example2 && (
+                <ExampleCard
+                  num={2}
+                  example={current.example2}
+                  translation={current.example2Translation}
+                  showTranslation={showEx2Translation}
+                  onToggle={() => setShowEx2Translation(v => !v)}
+                  language={current.language}
+                />
+              )}
+              {current.example3 && (
+                <ExampleCard
+                  num={3}
+                  example={current.example3}
+                  translation={current.example3Translation}
+                  showTranslation={showEx3Translation}
+                  onToggle={() => setShowEx3Translation(v => !v)}
+                  language={current.language}
+                />
+              )}
 
-              {!showExamples ? (
-                <button
-                  onClick={() => setShowExamples(true)}
-                  className="text-sm text-[var(--primary)] font-medium hover:underline"
-                >
-                  {t.learn.moreExamples}
-                </button>
-              ) : (
-                <div className="space-y-3 animate-fade-in">
-                  {current.example2 && <ExampleWithSituation
-                    num={2}
-                    example={current.example2}
-                    situation={current.example2Situation}
-                    translation={current.example2Translation}
-                    language={current.language}
-                  />}
-                  {current.example3 && <ExampleWithSituation
-                    num={3}
-                    example={current.example3}
-                    situation={current.example3Situation}
-                    translation={current.example3Translation}
-                    language={current.language}
-                  />}
+              {current.extraExamples && current.extraExamples.length > 0 && (
+                <div>
+                  <button
+                    onClick={() => setShowMoreExamples(v => !v)}
+                    className="text-sm text-[var(--primary)] font-medium hover:underline flex items-center gap-1"
+                  >
+                    {showMoreExamples ? '− Hide examples' : `+ More examples (${current.extraExamples.length})`}
+                  </button>
+                  {showMoreExamples && (
+                    <div className="mt-2 space-y-2 animate-fade-in">
+                      {current.extraExamples.map((ex, i) => (
+                        <ExtraExampleCard
+                          key={i}
+                          index={i}
+                          example={ex}
+                          translation={current.extraExampleTranslations?.[i]}
+                          language={current.language}
+                        />
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -520,36 +561,77 @@ export default function LearnPage() {
   );
 }
 
-function ExampleWithSituation({
-  num, example, situation, translation, language,
+function ExampleCard({
+  num, example, translation, showTranslation, onToggle, language,
 }: {
-  num: number; example: string; situation: string; translation?: string; language?: string;
+  num: number; example: string; translation?: string;
+  showTranslation: boolean; onToggle: () => void; language?: string;
 }) {
-  const t = useTranslation();
   return (
-    <div className="rounded-xl overflow-hidden border border-[var(--border)]">
+    <div
+      className="rounded-xl overflow-hidden border border-[var(--border)] cursor-pointer select-none"
+      onClick={onToggle}
+    >
       <div className="bg-[var(--surface-2)] px-3 pt-3 pb-2">
         <div className="flex items-start justify-between gap-2 mb-1">
-          <p className="text-xs text-[var(--text-muted)]">💬 {t.learn.example(num)}</p>
-          {language ? (
+          <span className="text-xs font-semibold text-[var(--primary)] bg-[var(--primary-bg)] px-2 py-0.5 rounded-full">
+            Example {num} · Medium
+          </span>
+          <div className="flex gap-1 shrink-0" onClick={e => e.stopPropagation()}>
+            {language ? (
+              <button
+                onClick={() => speakText(example, language)}
+                className="w-6 h-6 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-xs hover:bg-[var(--primary-bg)] transition-colors"
+              >🔊</button>
+            ) : (
+              <>
+                <AccentButton onClick={() => speakAccent(example, 'us')} flag="🇺🇸" label="American" size="sm" />
+                <AccentButton onClick={() => speakAccent(example, 'uk')} flag="🇬🇧" label="British" size="sm" />
+              </>
+            )}
+          </div>
+        </div>
+        <p className="text-sm italic text-[var(--text)]">&ldquo;{example}&rdquo;</p>
+      </div>
+      {translation && (
+        <div className="px-3 py-2 bg-[var(--surface)]">
+          {showTranslation
+            ? <p className="text-xs text-[var(--primary)] animate-fade-in">{translation}</p>
+            : <p className="text-xs text-[var(--text-muted)] text-center">Tap to see translation</p>}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ExtraExampleCard({
+  index, example, translation, language,
+}: {
+  index: number; example: string; translation?: string; language?: string;
+}) {
+  const [show, setShow] = useState(false);
+  return (
+    <div
+      className="rounded-xl overflow-hidden border border-[var(--border)] cursor-pointer select-none"
+      onClick={() => setShow(v => !v)}
+    >
+      <div className="bg-[var(--surface-2)] px-3 pt-2.5 pb-2">
+        <div className="flex items-start justify-between gap-2 mb-1">
+          <span className="text-xs text-[var(--text-muted)]">Extra {index + 1}</span>
+          {language && (
             <button
-              onClick={() => speakText(example, language)}
-              className="w-6 h-6 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-xs hover:bg-[var(--primary-bg)] transition-colors shrink-0"
+              onClick={e => { e.stopPropagation(); speakText(example, language); }}
+              className="w-5 h-5 rounded-full flex items-center justify-center text-xs hover:bg-[var(--primary-bg)] transition-colors shrink-0"
             >🔊</button>
-          ) : (
-            <div className="flex gap-1 shrink-0">
-              <AccentButton onClick={() => speakAccent(example, 'us')} flag="🇺🇸" label="American" size="sm" />
-              <AccentButton onClick={() => speakAccent(example, 'uk')} flag="🇬🇧" label="British" size="sm" />
-            </div>
           )}
         </div>
         <p className="text-sm italic text-[var(--text)]">&ldquo;{example}&rdquo;</p>
-        {translation && <p className="text-xs text-[var(--primary)] mt-1">{translation}</p>}
       </div>
-      {situation && (
-        <div className="bg-amber-50 px-3 pt-2 pb-3">
-          <p className="text-xs text-amber-600 mb-1">🗺️ Holat {num}</p>
-          <p className="text-sm text-amber-900">{situation}</p>
+      {translation && (
+        <div className="px-3 py-2 bg-[var(--surface)]">
+          {show
+            ? <p className="text-xs text-[var(--primary)] animate-fade-in">{translation}</p>
+            : <p className="text-xs text-[var(--text-muted)] text-center">Tap to see translation</p>}
         </div>
       )}
     </div>

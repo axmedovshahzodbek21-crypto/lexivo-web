@@ -4,15 +4,18 @@ export interface WordItem {
   pronunciation: string;
   translation: string; // Uzbek
   definition: string;
+  definitionUz?: string;
   example1: string;
-  example1Situation: string; // Uzbek situation description
-  example1Translation?: string; // translation of example1 sentence (imported words)
+  example1Situation: string; // kept for backward compat
+  example1Translation?: string;
   example2: string;
-  example2Situation: string;
-  example2Translation?: string; // translation of example2 sentence (imported words)
+  example2Situation: string; // kept for backward compat
+  example2Translation?: string;
   example3: string;
-  example3Translation: string; // Uzbek translation of example3
-  example3Situation: string;
+  example3Translation: string;
+  example3Situation: string; // kept for backward compat
+  extraExamples?: string[];
+  extraExampleTranslations?: string[];
   language?: string; // BCP-47, only set for imported words
 }
 
