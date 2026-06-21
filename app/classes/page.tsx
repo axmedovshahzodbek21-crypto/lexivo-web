@@ -64,6 +64,7 @@ export default function ClassesPage() {
   const [joinedClasses, setJoinedClasses] = useState<ClassRow[]>([]);
   const [classNotes, setClassNotes] = useState<Record<string, Note[]>>({});
   const [classTargets, setClassTargets] = useState<Record<string, Target[]>>({});
+  const [teacherProfiles, setTeacherProfiles] = useState<Record<string, { name: string; avatar_url: string | null }>>({});
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [className, setClassName] = useState('');
@@ -141,6 +142,14 @@ export default function ClassesPage() {
     setJoinedClasses(joined);
 
     if (joined.length > 0) {
+      const teacherIds = [...new Set(joined.map((c: ClassRow) => c.teacher_id))];
+      const { data: teachers } = await supabase
+        .from('profiles')
+        .select('id, name, avatar_url')
+        .in('id', teacherIds);
+      const tMap: Record<string, { name: string; avatar_url: string | null }> = {};
+      for (const t of teachers ?? []) tMap[t.id] = { name: t.name, avatar_url: t.avatar_url };
+      setTeacherProfiles(tMap);
       await Promise.all([loadNotes(user.id), loadTargets(user.id)]);
     }
 
@@ -368,7 +377,9 @@ export default function ClassesPage() {
                                 <span className="bg-amber-500/20 text-amber-600 dark:text-amber-400 text-[9px] font-bold px-1.5 py-0.5 rounded-full shrink-0">{activeTargets.length} target{activeTargets.length !== 1 ? 's' : ''}</span>
                               )}
                             </div>
-                            <p className="text-xs text-[var(--text-muted)] mt-0.5">Code: {cls.join_code}</p>
+                            <p className="text-xs text-[var(--text-muted)] mt-0.5">
+                            👩‍🏫 {teacherProfiles[cls.teacher_id]?.name ?? 'Teacher'} · {cls.join_code}
+                          </p>
                           </div>
                           <button onClick={() => leaveClass(cls.id)} className="text-xs px-3 py-1.5 rounded-xl bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors shrink-0">Leave</button>
                         </div>
