@@ -33,6 +33,14 @@ interface Note {
   read_at: string | null;
 }
 
+interface Target {
+  id: string;
+  title: string;
+  due_date: string | null;
+  completed_at: string | null;
+  created_at: string;
+}
+
 function Avatar({ name, url, size = 38 }: { name: string; url: string | null; size?: number }) {
   if (url) return <img src={url} alt={name} style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />;
   return (
@@ -66,6 +74,16 @@ function timeAgo(iso: string): string {
   return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }
 
+function dueDateLabel(due: string | null): { text: string; overdue: boolean } | null {
+  if (!due) return null;
+  const today = new Date().toISOString().slice(0, 10);
+  const tomorrow = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+  if (due < today) return { text: `Overdue · ${new Date(due + 'T00:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`, overdue: true };
+  if (due === today) return { text: 'Due today', overdue: false };
+  if (due === tomorrow) return { text: 'Due tomorrow', overdue: false };
+  return { text: `Due ${new Date(due + 'T00:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`, overdue: false };
+}
+
 function ProgressBar({ done, total, color }: { done: number; total: number; color: string }) {
   const pct = total === 0 ? 0 : Math.min(100, (done / total) * 100);
   return (
@@ -94,6 +112,13 @@ export default function ClassDashboardPage() {
   const [sending, setSending] = useState(false);
   const [studentNotes, setStudentNotes] = useState<Record<string, Note[]>>({});
 
+  // Targets state
+  const [targetStudent, setTargetStudent] = useState<StudentRow | null>(null);
+  const [targetTitle, setTargetTitle] = useState('');
+  const [targetDate, setTargetDate] = useState('');
+  const [settingTarget, setSettingTarget] = useState(false);
+  const [studentTargets, setStudentTargets] = useState<Record<string, Target[]>>({});
+
   const loadNotes = async () => {
     if (!id) return;
     const { data } = await supabase
@@ -110,6 +135,22 @@ export default function ClassDashboardPage() {
     setStudentNotes(map);
   };
 
+  const loadTargets = async () => {
+    if (!id) return;
+    const { data } = await supabase
+      .from('class_targets')
+      .select('id, student_id, title, due_date, completed_at, created_at')
+      .eq('class_id', id)
+      .order('created_at', { ascending: false });
+    if (!data) return;
+    const map: Record<string, Target[]> = {};
+    for (const t of data) {
+      if (!map[t.student_id]) map[t.student_id] = [];
+      map[t.student_id].push(t);
+    }
+    setStudentTargets(map);
+  };
+
   const load = async () => {
     if (!user || !id) return;
     setLoading(true);
@@ -118,7 +159,7 @@ export default function ClassDashboardPage() {
     setClassInfo(cls);
     const { data } = await supabase.rpc('get_class_dashboard', { p_class_id: id });
     setStudents((data as StudentRow[]) ?? []);
-    await loadNotes();
+    await Promise.all([loadNotes(), loadTargets()]);
     setLoading(false);
   };
 
@@ -138,7 +179,7 @@ export default function ClassDashboardPage() {
   };
 
   const sendNote = async () => {
-    if (!user || !noteTarget || !noteText.trim() || !classInfo) return;
+    if (!user || !noteTarget || !noteText.trim()) return;
     setSending(true);
     await supabase.from('class_notes').insert({
       class_id: id,
@@ -149,6 +190,27 @@ export default function ClassDashboardPage() {
     setNoteText('');
     await loadNotes();
     setSending(false);
+  };
+
+  const addTarget = async () => {
+    if (!user || !targetStudent || !targetTitle.trim()) return;
+    setSettingTarget(true);
+    await supabase.from('class_targets').insert({
+      class_id: id,
+      student_id: targetStudent.student_id,
+      teacher_id: user.id,
+      title: targetTitle.trim(),
+      due_date: targetDate || null,
+    });
+    setTargetTitle('');
+    setTargetDate('');
+    await loadTargets();
+    setSettingTarget(false);
+  };
+
+  const deleteTarget = async (targetId: string) => {
+    await supabase.from('class_targets').delete().eq('id', targetId);
+    await loadTargets();
   };
 
   if (!user) return (
@@ -205,7 +267,9 @@ export default function ClassDashboardPage() {
           <div className="space-y-3">
             {students.map((s, i) => {
               const notes = studentNotes[s.student_id] ?? [];
-              const unread = notes.filter(n => !n.read_at).length;
+              const unreadNotes = notes.filter(n => !n.read_at).length;
+              const targets = studentTargets[s.student_id] ?? [];
+              const activeTargets = targets.filter(t => !t.completed_at).length;
               return (
                 <div key={s.student_id} className="card space-y-3">
                   {/* Student header */}
@@ -242,14 +306,23 @@ export default function ClassDashboardPage() {
                       onClick={() => { setNoteTarget(s); setNoteText(''); }}
                       className="flex items-center gap-1.5 text-xs font-semibold text-[var(--primary)] hover:opacity-70 transition-opacity"
                     >
-                      ✉️ Send note
-                      {unread > 0 && (
-                        <span className="bg-[var(--primary)] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">{unread}</span>
+                      ✉️ Note
+                      {unreadNotes > 0 && (
+                        <span className="bg-[var(--primary)] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">{unreadNotes}</span>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => { setTargetStudent(s); setTargetTitle(''); setTargetDate(''); }}
+                      className="flex items-center gap-1.5 text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--primary)] transition-colors"
+                    >
+                      🎯 Target
+                      {activeTargets > 0 && (
+                        <span className="bg-[var(--surface-2)] text-[var(--text-muted)] text-[9px] font-bold px-1.5 py-0.5 rounded-full border border-[var(--border)]">{activeTargets}</span>
                       )}
                     </button>
                     <button
                       onClick={() => removeStudent(s.student_id)}
-                      className="text-[10px] text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors"
+                      className="text-[10px] text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors ml-auto"
                     >
                       Remove
                     </button>
@@ -266,7 +339,6 @@ export default function ClassDashboardPage() {
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setNoteTarget(null)}>
           <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-5 space-y-4 max-h-[80vh] flex flex-col" onClick={e => e.stopPropagation()}>
             <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto shrink-0" />
-
             <div className="flex items-center gap-3 shrink-0">
               <Avatar name={noteTarget.name} url={noteTarget.avatar_url} size={36} />
               <div>
@@ -274,8 +346,6 @@ export default function ClassDashboardPage() {
                 <p className="text-xs text-[var(--text-muted)]">Send a note</p>
               </div>
             </div>
-
-            {/* Previous notes */}
             {(studentNotes[noteTarget.student_id] ?? []).length > 0 && (
               <div className="flex-1 overflow-y-auto space-y-2 min-h-0">
                 <p className="text-xs font-semibold text-[var(--text-muted)]">Previous notes</p>
@@ -289,8 +359,6 @@ export default function ClassDashboardPage() {
                 ))}
               </div>
             )}
-
-            {/* Compose */}
             <div className="shrink-0 space-y-3">
               <textarea
                 placeholder={`Write a note to ${noteTarget.name}…`}
@@ -301,15 +369,80 @@ export default function ClassDashboardPage() {
                 className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm resize-none focus:outline-none focus:border-[var(--primary)]"
               />
               <div className="flex gap-3">
-                <button onClick={() => setNoteTarget(null)} className="flex-1 py-3 rounded-xl bg-[var(--surface-2)] text-sm font-semibold text-[var(--text)]">
-                  Cancel
-                </button>
-                <button
-                  onClick={sendNote}
-                  disabled={sending || !noteText.trim()}
-                  className="flex-1 btn-primary py-3 disabled:opacity-50"
-                >
+                <button onClick={() => setNoteTarget(null)} className="flex-1 py-3 rounded-xl bg-[var(--surface-2)] text-sm font-semibold text-[var(--text)]">Cancel</button>
+                <button onClick={sendNote} disabled={sending || !noteText.trim()} className="flex-1 btn-primary py-3 disabled:opacity-50">
                   {sending ? 'Sending…' : 'Send ✉️'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Target modal */}
+      {targetStudent && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setTargetStudent(null)}>
+          <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-5 space-y-4 max-h-[80vh] flex flex-col" onClick={e => e.stopPropagation()}>
+            <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto shrink-0" />
+            <div className="flex items-center gap-3 shrink-0">
+              <Avatar name={targetStudent.name} url={targetStudent.avatar_url} size={36} />
+              <div>
+                <p className="font-bold text-[var(--text)]">{targetStudent.name}</p>
+                <p className="text-xs text-[var(--text-muted)]">Set a target</p>
+              </div>
+            </div>
+
+            {/* Existing targets */}
+            {(studentTargets[targetStudent.student_id] ?? []).length > 0 && (
+              <div className="flex-1 overflow-y-auto space-y-2 min-h-0">
+                <p className="text-xs font-semibold text-[var(--text-muted)]">Active targets</p>
+                {(studentTargets[targetStudent.student_id] ?? []).map(t => {
+                  const due = dueDateLabel(t.due_date);
+                  return (
+                    <div key={t.id} className="flex items-start gap-3 rounded-xl px-3 py-2.5" style={{ background: 'var(--surface-2)' }}>
+                      <span className="text-base mt-0.5 shrink-0">{t.completed_at ? '✅' : '🎯'}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-sm text-[var(--text)] ${t.completed_at ? 'line-through opacity-50' : ''}`}>{t.title}</p>
+                        {due && (
+                          <p className={`text-[10px] mt-0.5 font-medium ${due.overdue && !t.completed_at ? 'text-[var(--danger)]' : 'text-[var(--text-muted)]'}`}>
+                            {t.completed_at ? `Completed ${timeAgo(t.completed_at)}` : due.text}
+                          </p>
+                        )}
+                        {t.completed_at && !due && (
+                          <p className="text-[10px] mt-0.5 text-[var(--text-muted)]">Completed {timeAgo(t.completed_at)}</p>
+                        )}
+                      </div>
+                      <button onClick={() => deleteTarget(t.id)} className="text-[10px] text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors shrink-0 mt-1">✕</button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* New target form */}
+            <div className="shrink-0 space-y-3">
+              <input
+                type="text"
+                placeholder='e.g. "Complete A1 Unit 5 by Friday"'
+                value={targetTitle}
+                onChange={e => setTargetTitle(e.target.value)}
+                autoFocus
+                className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]"
+              />
+              <div>
+                <label className="text-xs text-[var(--text-muted)] mb-1 block">Due date (optional)</label>
+                <input
+                  type="date"
+                  value={targetDate}
+                  onChange={e => setTargetDate(e.target.value)}
+                  min={new Date().toISOString().slice(0, 10)}
+                  className="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]"
+                />
+              </div>
+              <div className="flex gap-3">
+                <button onClick={() => setTargetStudent(null)} className="flex-1 py-3 rounded-xl bg-[var(--surface-2)] text-sm font-semibold text-[var(--text)]">Cancel</button>
+                <button onClick={addTarget} disabled={settingTarget || !targetTitle.trim()} className="flex-1 btn-primary py-3 disabled:opacity-50">
+                  {settingTarget ? 'Setting…' : 'Set target 🎯'}
                 </button>
               </div>
             </div>
