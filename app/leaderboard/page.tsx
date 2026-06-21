@@ -83,6 +83,7 @@ export default function LeaderboardPage() {
   const myIndex = user ? entries.findIndex(e => e.user_id === user.id) : -1;
   const [selected, setSelected] = useState<LeaderboardEntry | null>(null);
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
+  const [filter, setFilter] = useState<'all' | 'starred'>('all');
   const [calMonth, setCalMonth] = useState<{ year: number; month: number }>(() => {
     const n = new Date(); return { year: n.getFullYear(), month: n.getMonth() };
   });
@@ -235,6 +236,21 @@ export default function LeaderboardPage() {
         >↻</button>
       </div>
 
+      {/* All / Starred toggle */}
+      {user && (
+        <div className="flex gap-2 px-4 pt-3">
+          {(['all', 'starred'] as const).map(f => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={`px-4 py-1.5 rounded-xl text-sm font-semibold transition-colors ${filter === f ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface-2)] text-[var(--text-muted)]'}`}
+            >
+              {f === 'all' ? 'All' : '⭐ Starred'}
+            </button>
+          ))}
+        </div>
+      )}
+
       <div className="p-4 space-y-3">
         {loading && (
           <div className="flex items-center justify-center py-20">
@@ -257,12 +273,21 @@ export default function LeaderboardPage() {
           </div>
         )}
 
-        {!loading && !error && entries.length > 0 && (
+        {!loading && !error && entries.length > 0 && (() => {
+          const visible = filter === 'starred' ? entries.filter(e => savedIds.has(e.user_id)) : entries;
+          return (
           <>
+            {filter === 'starred' && visible.length === 0 && (
+              <div className="text-center py-20">
+                <div className="text-5xl mb-3">⭐</div>
+                <p className="font-bold text-[var(--text)]">No starred users yet</p>
+                <p className="text-sm text-[var(--text-muted)] mt-1">Tap a user's profile and star them to follow their progress</p>
+              </div>
+            )}
             {/* Top 3 podium */}
-            {entries.length >= 3 && (
+            {visible.length >= 3 && (
               <div className="grid grid-cols-3 gap-2 mb-2">
-                {[entries[1], entries[0], entries[2]].map((e, col) => {
+                {[visible[1], visible[0], visible[2]].map((e, col) => {
                   const rank = col === 0 ? 2 : col === 1 ? 1 : 3;
                   const isMe = user && e.user_id === user.id;
                   return (
@@ -300,8 +325,8 @@ export default function LeaderboardPage() {
 
             {/* Ranked list (4 onwards, or all if < 3) */}
             <div className="space-y-2">
-              {entries.slice(entries.length >= 3 ? 3 : 0).map((e, i) => {
-                const rank = (entries.length >= 3 ? 3 : 0) + i + 1;
+              {visible.slice(visible.length >= 3 ? 3 : 0).map((e, i) => {
+                const rank = (visible.length >= 3 ? 3 : 0) + i + 1;
                 const isMe = user && e.user_id === user.id;
                 return (
                   <div
@@ -353,7 +378,8 @@ export default function LeaderboardPage() {
               Top 100 · ranked by total XP · opt out in Settings
             </p>
           </>
-        )}
+          );
+        })()}
       </div>
     </div>
   );
