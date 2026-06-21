@@ -44,6 +44,13 @@ interface LeaderboardRow {
   total_words: number;
 }
 
+interface Announcement {
+  id: string;
+  class_id: string;
+  message: string;
+  created_at: string;
+}
+
 function timeAgo(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
   const m = Math.floor(diff / 60000);
@@ -74,6 +81,7 @@ export default function ClassesPage() {
   const [classNotes, setClassNotes] = useState<Record<string, Note[]>>({});
   const [classTargets, setClassTargets] = useState<Record<string, Target[]>>({});
   const [teacherProfiles, setTeacherProfiles] = useState<Record<string, { name: string; avatar_url: string | null }>>({});
+  const [classAnnouncements, setClassAnnouncements] = useState<Record<string, Announcement[]>>({});
   const [classLeaderboards, setClassLeaderboards] = useState<Record<string, LeaderboardRow[]>>({});
   const [expandedLeaderboard, setExpandedLeaderboard] = useState<string | null>(null);
   const [leaderboardLoading, setLeaderboardLoading] = useState<string | null>(null);
@@ -85,6 +93,21 @@ export default function ClassesPage() {
   const [error, setError] = useState('');
   const [joinError, setJoinError] = useState('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const loadAnnouncements = async (classIds: string[]) => {
+    const { data } = await supabase
+      .from('class_announcements')
+      .select('id, class_id, message, created_at')
+      .in('class_id', classIds)
+      .order('created_at', { ascending: false });
+    if (!data) return;
+    const map: Record<string, Announcement[]> = {};
+    for (const a of data) {
+      if (!map[a.class_id]) map[a.class_id] = [];
+      map[a.class_id].push(a);
+    }
+    setClassAnnouncements(map);
+  };
 
   const loadNotes = async (userId: string) => {
     const { data } = await supabase
@@ -162,7 +185,8 @@ export default function ClassesPage() {
       const tMap: Record<string, { name: string; avatar_url: string | null }> = {};
       for (const t of teachers ?? []) tMap[t.id] = { name: t.name, avatar_url: t.avatar_url };
       setTeacherProfiles(tMap);
-      await Promise.all([loadNotes(user.id), loadTargets(user.id)]);
+      const joinedIds = joined.map((c: ClassRow) => c.id);
+      await Promise.all([loadNotes(user.id), loadTargets(user.id), loadAnnouncements(joinedIds)]);
     }
 
     setLoading(false);
@@ -413,6 +437,34 @@ export default function ClassesPage() {
                             <button onClick={() => leaveClass(cls.id)} className="text-xs px-3 py-1.5 rounded-xl bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors">Leave</button>
                           </div>
                         </div>
+
+                        {/* Announcements from teacher */}
+                        {(classAnnouncements[cls.id] ?? []).length > 0 && (
+                          <div className="border-t border-[var(--border)] pt-3 space-y-2">
+                            <p className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-wide">📢 Announcements</p>
+                            {(classAnnouncements[cls.id] ?? []).map(a => {
+                              const isNew = Date.now() - new Date(a.created_at).getTime() < 24 * 3600000;
+                              return (
+                                <div
+                                  key={a.id}
+                                  className="rounded-xl px-3 py-2.5"
+                                  style={{
+                                    background: isNew ? 'var(--primary-bg)' : 'var(--surface-2)',
+                                    borderLeft: isNew ? '3px solid var(--primary)' : 'none',
+                                  }}
+                                >
+                                  <div className="flex items-start gap-2">
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-sm text-[var(--text)] leading-snug">{a.message}</p>
+                                      <p className="text-[10px] text-[var(--text-muted)] mt-1">{timeAgo(a.created_at)}</p>
+                                    </div>
+                                    {isNew && <span className="text-[10px] font-bold text-[var(--primary)] shrink-0 mt-0.5">NEW</span>}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
 
                         {/* Class leaderboard */}
                         {expandedLeaderboard === cls.id && (

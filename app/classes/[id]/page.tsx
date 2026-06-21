@@ -14,6 +14,12 @@ type SortKey = 'lastActive' | 'xp' | 'progress' | 'name';
 type FilterKey = 'all' | 'active' | 'inactive';
 type Tab = 'students' | 'activity';
 
+interface Announcement {
+  id: string;
+  message: string;
+  created_at: string;
+}
+
 interface StudentRow {
   student_id: string;
   name: string;
@@ -160,6 +166,12 @@ export default function ClassDashboardPage() {
   const [activityFeed, setActivityFeed] = useState<ActivityRow[]>([]);
   const [activityLoading, setActivityLoading] = useState(false);
 
+  // Announcements
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [showAnnounce, setShowAnnounce] = useState(false);
+  const [announceText, setAnnounceText] = useState('');
+  const [announcing, setAnnouncing] = useState(false);
+
   const sevenDaysAgo = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
 
   const visibleStudents = useMemo(() => {
@@ -236,6 +248,34 @@ export default function ClassDashboardPage() {
     setStudentTargets(map);
   };
 
+  const loadAnnouncements = async () => {
+    if (!id) return;
+    const { data } = await supabase
+      .from('class_announcements')
+      .select('id, message, created_at')
+      .eq('class_id', id)
+      .order('created_at', { ascending: false });
+    setAnnouncements((data as Announcement[]) ?? []);
+  };
+
+  const postAnnouncement = async () => {
+    if (!user || !announceText.trim()) return;
+    setAnnouncing(true);
+    await supabase.from('class_announcements').insert({
+      class_id: id,
+      teacher_id: user.id,
+      message: announceText.trim(),
+    });
+    setAnnounceText('');
+    await loadAnnouncements();
+    setAnnouncing(false);
+  };
+
+  const deleteAnnouncement = async (announcementId: string) => {
+    await supabase.from('class_announcements').delete().eq('id', announcementId);
+    setAnnouncements(prev => prev.filter(a => a.id !== announcementId));
+  };
+
   const loadActivity = async () => {
     if (!id) return;
     setActivityLoading(true);
@@ -252,7 +292,7 @@ export default function ClassDashboardPage() {
     setClassInfo(cls);
     const { data } = await supabase.rpc('get_class_dashboard', { p_class_id: id });
     setStudents((data as StudentRow[]) ?? []);
-    await Promise.all([loadNotes(), loadTargets()]);
+    await Promise.all([loadNotes(), loadTargets(), loadAnnouncements()]);
     setLoading(false);
   };
 
@@ -358,11 +398,16 @@ export default function ClassDashboardPage() {
         <div className="shrink-0 flex flex-col items-end gap-1">
           <p className="text-xl font-black text-[var(--primary)] leading-tight">{visibleStudents.length}<span className="text-sm text-[var(--text-muted)] font-normal">/{students.length}</span></p>
           <p className="text-[10px] text-[var(--text-muted)]">students</p>
-          {students.length > 0 && (
-            <button onClick={exportCSV} className="text-[10px] font-semibold px-2 py-1 rounded-lg bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--primary)] hover:bg-[var(--primary-bg)] transition-colors">
-              📥 Export CSV
+          <div className="flex gap-1.5">
+            <button onClick={() => { setShowAnnounce(true); setAnnounceText(''); }} className="text-[10px] font-semibold px-2 py-1 rounded-lg bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--primary)] hover:bg-[var(--primary-bg)] transition-colors">
+              📢 Announce
             </button>
-          )}
+            {students.length > 0 && (
+              <button onClick={exportCSV} className="text-[10px] font-semibold px-2 py-1 rounded-lg bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--primary)] hover:bg-[var(--primary-bg)] transition-colors">
+                📥 CSV
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -583,6 +628,55 @@ export default function ClassDashboardPage() {
               <div className="flex gap-3">
                 <button onClick={() => setNoteTarget(null)} className="flex-1 py-3 rounded-xl bg-[var(--surface-2)] text-sm font-semibold text-[var(--text)]">Cancel</button>
                 <button onClick={sendNote} disabled={sending || !noteText.trim()} className="flex-1 btn-primary py-3 disabled:opacity-50">{sending ? 'Sending…' : 'Send ✉️'}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Announce modal */}
+      {showAnnounce && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setShowAnnounce(false)}>
+          <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-5 space-y-4 max-h-[80vh] flex flex-col" onClick={e => e.stopPropagation()}>
+            <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto shrink-0" />
+            <div className="flex items-center justify-between shrink-0">
+              <div>
+                <p className="font-bold text-[var(--text)]">📢 Class Announcement</p>
+                <p className="text-xs text-[var(--text-muted)]">Sent to all students in {classInfo?.name}</p>
+              </div>
+            </div>
+
+            {/* Past announcements */}
+            {announcements.length > 0 && (
+              <div className="flex-1 overflow-y-auto space-y-2 min-h-0">
+                <p className="text-xs font-semibold text-[var(--text-muted)]">Past announcements</p>
+                {announcements.map(a => (
+                  <div key={a.id} className="rounded-xl px-3 py-2.5 flex items-start gap-2" style={{ background: 'var(--surface-2)' }}>
+                    <p className="flex-1 text-sm text-[var(--text)]">{a.message}</p>
+                    <div className="text-right shrink-0 space-y-1">
+                      <p className="text-[10px] text-[var(--text-muted)]">{timeAgo(a.created_at)}</p>
+                      <button onClick={() => deleteAnnouncement(a.id)} className="text-[10px] text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors block">✕ Delete</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Compose */}
+            <div className="shrink-0 space-y-3">
+              <textarea
+                placeholder="Write an announcement for all students…"
+                value={announceText}
+                onChange={e => setAnnounceText(e.target.value)}
+                rows={3}
+                autoFocus
+                className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm resize-none focus:outline-none focus:border-[var(--primary)]"
+              />
+              <div className="flex gap-3">
+                <button onClick={() => setShowAnnounce(false)} className="flex-1 py-3 rounded-xl bg-[var(--surface-2)] text-sm font-semibold text-[var(--text)]">Cancel</button>
+                <button onClick={postAnnouncement} disabled={announcing || !announceText.trim()} className="flex-1 btn-primary py-3 disabled:opacity-50">
+                  {announcing ? 'Posting…' : 'Post 📢'}
+                </button>
               </div>
             </div>
           </div>
