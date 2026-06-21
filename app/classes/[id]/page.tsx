@@ -929,46 +929,39 @@ export default function ClassDashboardPage() {
                   </div>
                 )}
               </div>
-              {/* Unit list */}
-              <div className="overflow-y-auto flex-1 px-4 pb-8 pt-2 space-y-1.5">
+              {/* Unit grid */}
+              <div className="overflow-y-auto flex-1 px-4 pb-8 pt-3">
                 {unitLoading ? (
                   <div className="flex justify-center py-8"><div className="text-3xl animate-bounce">📊</div></div>
                 ) : (
-                  Array.from({ length: collectionModal.total }, (_, i) => {
-                    const unit = unitRows.find(r => r.day_number === i + 1);
-                    const learnDone = unit?.learn_done ?? false;
-                    const flashDone = unit?.flashcard_done ?? false;
-                    const quizDone = unit?.quiz_done ?? false;
-                    const allDone = learnDone && flashDone && quizDone;
-                    const anyDone = learnDone || flashDone || quizDone;
-                    return (
-                      <div key={i + 1} className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl" style={{
-                        background: allDone ? `${c}12` : 'var(--surface-2)',
-                        border: `1px solid ${allDone ? `${c}30` : 'transparent'}`,
-                      }}>
-                        {/* Number circle */}
-                        <div className="w-7 h-7 rounded-full shrink-0 flex items-center justify-center text-[11px] font-black" style={{
-                          background: allDone ? c : anyDone ? `${c}22` : 'var(--border)',
-                          color: allDone ? '#fff' : anyDone ? c : 'var(--text-muted)',
+                  <div className="grid grid-cols-4 gap-2">
+                    {Array.from({ length: collectionModal.total }, (_, i) => {
+                      const unit = unitRows.find(r => r.day_number === i + 1);
+                      const learnDone = unit?.learn_done ?? false;
+                      const flashDone = unit?.flashcard_done ?? false;
+                      const quizDone = unit?.quiz_done ?? false;
+                      const allDone = learnDone && flashDone && quizDone;
+                      const anyDone = learnDone || flashDone || quizDone;
+                      return (
+                        <div key={i + 1} className="flex flex-col items-center gap-2 py-3 rounded-2xl" style={{
+                          background: allDone ? `${c}15` : 'var(--surface-2)',
+                          border: `1px solid ${allDone ? `${c}35` : 'transparent'}`,
                         }}>
-                          {allDone ? '✓' : i + 1}
+                          <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-black" style={{
+                            background: allDone ? c : anyDone ? `${c}25` : 'var(--border)',
+                            color: allDone ? '#fff' : anyDone ? c : 'var(--text-muted)',
+                          }}>
+                            {allDone ? '✓' : i + 1}
+                          </div>
+                          <div className="flex gap-0.5">
+                            {[{ e: '📖', d: learnDone }, { e: '🃏', d: flashDone }, { e: '🧠', d: quizDone }].map(({ e, d }, ei) => (
+                              <span key={ei} className="text-[11px]" style={{ opacity: d ? 1 : 0.2 }}>{e}</span>
+                            ))}
+                          </div>
                         </div>
-                        {/* Unit / topic name */}
-                        <p className="flex-1 text-xs font-semibold truncate" style={{ color: anyDone ? 'var(--text)' : 'var(--text-muted)' }}>
-                          {unitTopics[i + 1] ?? `Unit ${i + 1}`}
-                        </p>
-                        {/* Status badges */}
-                        <div className="flex items-center gap-1 shrink-0">
-                          {[{ e: '📖', d: learnDone }, { e: '🃏', d: flashDone }, { e: '🧠', d: quizDone }].map(({ e, d }, ei) => (
-                            <div key={ei} className="w-6 h-6 flex items-center justify-center rounded-md text-[13px]" style={{
-                              background: d ? `${c}22` : 'transparent',
-                              opacity: d ? 1 : 0.22,
-                            }}>{e}</div>
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })
+                      );
+                    })}
+                  </div>
                 )}
               </div>
             </div>
