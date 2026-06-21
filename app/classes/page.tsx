@@ -203,6 +203,23 @@ export default function ClassesPage() {
   };
 
   const [copiedLinkId, setCopiedLinkId] = useState<string | null>(null);
+  const [renamingId, setRenamingId] = useState<string | null>(null);
+  const [renameText, setRenameText] = useState('');
+  const [renaming, setRenaming] = useState(false);
+
+  const startRename = (cls: ClassRow) => {
+    setRenamingId(cls.id);
+    setRenameText(cls.name);
+  };
+
+  const saveRename = async (classId: string) => {
+    if (!renameText.trim()) return;
+    setRenaming(true);
+    await supabase.from('classes').update({ name: renameText.trim() }).eq('id', classId);
+    setRenamingId(null);
+    setRenaming(false);
+    load();
+  };
 
   const copyCode = (code: string, id: string) => {
     navigator.clipboard.writeText(code);
@@ -260,7 +277,24 @@ export default function ClassesPage() {
                     <div key={cls.id} className="card">
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1 min-w-0">
-                          <p className="font-bold text-[var(--text)]">{cls.name}</p>
+                          {renamingId === cls.id ? (
+                            <div className="flex items-center gap-2">
+                              <input
+                                autoFocus
+                                value={renameText}
+                                onChange={e => setRenameText(e.target.value)}
+                                onKeyDown={e => { if (e.key === 'Enter') saveRename(cls.id); if (e.key === 'Escape') setRenamingId(null); }}
+                                className="flex-1 px-2 py-1 rounded-lg border border-[var(--primary)] bg-[var(--surface-2)] text-[var(--text)] text-sm font-bold focus:outline-none"
+                              />
+                              <button onClick={() => saveRename(cls.id)} disabled={renaming || !renameText.trim()} className="text-xs font-bold text-[var(--primary)] disabled:opacity-50">✓</button>
+                              <button onClick={() => setRenamingId(null)} className="text-xs text-[var(--text-muted)]">✕</button>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-1.5">
+                              <p className="font-bold text-[var(--text)]">{cls.name}</p>
+                              <button onClick={() => startRename(cls)} className="text-[var(--text-muted)] hover:text-[var(--primary)] transition-colors text-xs" title="Rename">✏️</button>
+                            </div>
+                          )}
                           <div className="flex items-center gap-2 mt-1">
                             <span className="text-xs text-[var(--text-muted)]">Code:</span>
                             <code className="text-xs font-bold text-[var(--primary)] bg-[var(--primary-bg)] px-2 py-0.5 rounded-lg">{cls.join_code}</code>
