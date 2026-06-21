@@ -101,6 +101,12 @@ function dueDateLabel(due: string | null): { text: string; overdue: boolean } | 
   return { text: `Due ${new Date(due + 'T00:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`, overdue: false };
 }
 
+function isInactive(date: string | null): boolean {
+  if (!date) return true;
+  const threeDaysAgo = new Date(Date.now() - 3 * 86400000).toISOString().slice(0, 10);
+  return date < threeDaysAgo;
+}
+
 function dayLabel(iso: string): string {
   const date = iso.slice(0, 10);
   const today = new Date().toISOString().slice(0, 10);
@@ -466,12 +472,15 @@ export default function ClassDashboardPage() {
                 const activeTargets = targets.filter(t => !t.completed_at).length;
                 const totalProgress = s.a1_learned + s.a2_learned + s.b1_learned;
                 return (
-                  <div key={s.student_id} className="card space-y-3">
+                  <div key={s.student_id} className="card space-y-3" style={isInactive(s.last_study_date) ? { borderLeft: '3px solid var(--danger)', background: 'color-mix(in srgb, var(--danger) 4%, var(--surface))' } : {}}>
                     <div className="flex items-center gap-3">
                       <span className="text-xs font-bold text-[var(--text-muted)] w-5 text-center shrink-0">{i + 1}</span>
                       <Avatar name={s.name} url={s.avatar_url} />
                       <div className="flex-1 min-w-0">
-                        <p className="font-bold text-sm text-[var(--text)] truncate">{s.name}</p>
+                        <div className="flex items-center gap-1.5">
+                          <p className="font-bold text-sm text-[var(--text)] truncate">{s.name}</p>
+                          {isInactive(s.last_study_date) && <span className="text-[10px] font-bold text-[var(--danger)] shrink-0">⚠️ Inactive</span>}
+                        </div>
                         <p className="text-xs text-[var(--text-muted)]">Last active: {lastActiveLabel(s.last_study_date)}</p>
                       </div>
                       <div className="text-right shrink-0">
