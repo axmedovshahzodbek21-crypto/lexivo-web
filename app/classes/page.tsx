@@ -18,11 +18,32 @@ interface ClassRow {
   member_count?: number;
 }
 
+interface Note {
+  id: string;
+  class_id: string;
+  message: string;
+  created_at: string;
+  read_at: string | null;
+}
+
+function timeAgo(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 1) return 'just now';
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  const d = Math.floor(h / 24);
+  if (d < 7) return `${d}d ago`;
+  return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+}
+
 export default function ClassesPage() {
   const router = useRouter();
   const { user } = useAuth();
   const [myClasses, setMyClasses] = useState<ClassRow[]>([]);
   const [joinedClasses, setJoinedClasses] = useState<ClassRow[]>([]);
+  const [classNotes, setClassNotes] = useState<Record<string, Note[]>>({});
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [className, setClassName] = useState('');
@@ -31,6 +52,31 @@ export default function ClassesPage() {
   const [error, setError] = useState('');
   const [joinError, setJoinError] = useState('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const loadNotes = async (userId: string) => {
+    const { data } = await supabase
+      .from('class_notes')
+      .select('id, class_id, message, created_at, read_at')
+      .eq('student_id', userId)
+      .order('created_at', { ascending: false });
+    if (!data || data.length === 0) return;
+
+    const map: Record<string, Note[]> = {};
+    for (const n of data) {
+      if (!map[n.class_id]) map[n.class_id] = [];
+      map[n.class_id].push(n);
+    }
+    setClassNotes(map);
+
+    // Mark unread notes as read
+    const unreadIds = data.filter((n: Note) => !n.read_at).map((n: Note) => n.id);
+    if (unreadIds.length > 0) {
+      await supabase
+        .from('class_notes')
+        .update({ read_at: new Date().toISOString() })
+        .in('id', unreadIds);
+    }
+  };
 
   const load = async () => {
     if (!user) return;
@@ -59,15 +105,19 @@ export default function ClassesPage() {
       .select('class_id')
       .eq('student_id', user.id);
 
+    let joined: ClassRow[] = [];
     if (memberships && memberships.length > 0) {
       const classIds = memberships.map((m: { class_id: string }) => m.class_id);
-      const { data: joined } = await supabase
+      const { data } = await supabase
         .from('classes')
         .select('*')
         .in('id', classIds);
-      setJoinedClasses((joined ?? []).filter((c: ClassRow) => c.teacher_id !== user.id));
-    } else {
-      setJoinedClasses([]);
+      joined = (data ?? []).filter((c: ClassRow) => c.teacher_id !== user.id);
+    }
+    setJoinedClasses(joined);
+
+    if (joined.length > 0) {
+      await loadNotes(user.id);
     }
 
     setLoading(false);
@@ -251,20 +301,61 @@ export default function ClassesPage() {
               <section>
                 <h2 className="font-bold text-[var(--text)] mb-3">Classes I&apos;ve Joined</h2>
                 <div className="space-y-3">
-                  {joinedClasses.map(cls => (
-                    <div key={cls.id} className="card flex items-center justify-between gap-3">
-                      <div>
-                        <p className="font-semibold text-[var(--text)]">{cls.name}</p>
-                        <p className="text-xs text-[var(--text-muted)] mt-0.5">Code: {cls.join_code}</p>
+                  {joinedClasses.map(cls => {
+                    const notes = classNotes[cls.id] ?? [];
+                    const unreadCount = notes.filter(n => !n.read_at).length;
+                    return (
+                      <div key={cls.id} className="card space-y-3">
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <p className="font-semibold text-[var(--text)]">{cls.name}</p>
+                              {unreadCount > 0 && (
+                                <span className="bg-[var(--primary)] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full shrink-0">
+                                  {unreadCount} new
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-[var(--text-muted)] mt-0.5">Code: {cls.join_code}</p>
+                          </div>
+                          <button
+                            onClick={() => leaveClass(cls.id)}
+                            className="text-xs px-3 py-1.5 rounded-xl bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors shrink-0"
+                          >
+                            Leave
+                          </button>
+                        </div>
+
+                        {/* Notes from teacher */}
+                        {notes.length > 0 && (
+                          <div className="space-y-2 border-t border-[var(--border)] pt-3">
+                            <p className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-wide">Notes from teacher</p>
+                            {notes.map(note => (
+                              <div
+                                key={note.id}
+                                className="rounded-xl px-3 py-2.5 text-sm transition-colors"
+                                style={{
+                                  background: note.read_at ? 'var(--surface-2)' : 'var(--primary-bg)',
+                                  borderLeft: note.read_at ? 'none' : '3px solid var(--primary)',
+                                }}
+                              >
+                                <div className="flex items-start gap-2">
+                                  <span className="text-base shrink-0 mt-0.5">✉️</span>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-[var(--text)] leading-snug">{note.message}</p>
+                                    <p className="text-[10px] text-[var(--text-muted)] mt-1">{timeAgo(note.created_at)}</p>
+                                  </div>
+                                  {!note.read_at && (
+                                    <span className="text-[10px] font-bold text-[var(--primary)] shrink-0 mt-0.5">NEW</span>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                      <button
-                        onClick={() => leaveClass(cls.id)}
-                        className="text-xs px-3 py-1.5 rounded-xl bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors"
-                      >
-                        Leave
-                      </button>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </section>
             )}
