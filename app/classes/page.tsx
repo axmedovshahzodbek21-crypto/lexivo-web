@@ -202,10 +202,18 @@ export default function ClassesPage() {
     load();
   };
 
+  const [copiedLinkId, setCopiedLinkId] = useState<string | null>(null);
+
   const copyCode = (code: string, id: string) => {
     navigator.clipboard.writeText(code);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const copyLink = (code: string, id: string) => {
+    navigator.clipboard.writeText(`${window.location.origin}/join/${code}`);
+    setCopiedLinkId(id);
+    setTimeout(() => setCopiedLinkId(null), 2000);
   };
 
   if (!user) {
@@ -260,6 +268,12 @@ export default function ClassesPage() {
                               {copiedId === cls.id ? '✅' : '📋'}
                             </button>
                           </div>
+                          <button
+                            onClick={() => copyLink(cls.join_code, cls.id)}
+                            className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-[var(--text-muted)] hover:text-[var(--primary)] transition-colors"
+                          >
+                            {copiedLinkId === cls.id ? '✅ Link copied!' : '🔗 Copy invite link'}
+                          </button>
                           <p className="text-xs text-[var(--text-muted)] mt-1">👥 {cls.member_count} student{cls.member_count !== 1 ? 's' : ''}</p>
                         </div>
                         <div className="flex flex-col gap-2 shrink-0">

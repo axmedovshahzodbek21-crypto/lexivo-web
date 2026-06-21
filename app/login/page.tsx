@@ -1,12 +1,14 @@
 'use client';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/lib/supabase';
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get('redirect') ?? '/';
   const { signIn } = useAuth();
   const [email, setEmail]             = useState('');
   const [password, setPassword]       = useState('');
@@ -27,14 +29,14 @@ export default function LoginPage() {
     const { error } = await signIn(email.trim(), password);
     setLoading(false);
     if (error) { setError(error); return; }
-    router.replace('/');
+    router.replace(redirect);
   };
 
   const handleGoogle = async () => {
     setGoogleLoading(true);
     await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${window.location.origin}/` },
+      options: { redirectTo: `${window.location.origin}${redirect}` },
     });
   };
 
