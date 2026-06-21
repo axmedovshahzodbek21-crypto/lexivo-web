@@ -237,19 +237,17 @@ export default function LeaderboardPage() {
       </div>
 
       {/* All / Starred toggle */}
-      {user && (
-        <div className="flex gap-2 px-4 pt-3">
-          {(['all', 'starred'] as const).map(f => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`px-4 py-1.5 rounded-xl text-sm font-semibold transition-colors ${filter === f ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface-2)] text-[var(--text-muted)]'}`}
-            >
-              {f === 'all' ? 'All' : '⭐ Starred'}
-            </button>
-          ))}
-        </div>
-      )}
+      <div className="flex gap-2 px-4 pt-3">
+        {(['all', 'starred'] as const).map(f => (
+          <button
+            key={f}
+            onClick={() => setFilter(f)}
+            className={`px-4 py-1.5 rounded-xl text-sm font-semibold transition-colors ${filter === f ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface-2)] text-[var(--text-muted)]'}`}
+          >
+            {f === 'all' ? 'All' : '⭐ Starred'}
+          </button>
+        ))}
+      </div>
 
       <div className="p-4 space-y-3">
         {loading && (
