@@ -153,7 +153,7 @@ async function fetchTopics(collectionName: string): Promise<Record<number, strin
 }
 
 type UnitRow = { day_number: number; learn_done: boolean; flashcard_done: boolean; quiz_done: boolean };
-type CollectionModal = { student: StudentRow; collectionName: string; label: string; total: number };
+type CollectionModal = { student: StudentRow; collectionName: string; label: string; total: number; color: string };
 
 export default function ClassDashboardPage() {
   const { id } = useParams<{ id: string }>();
@@ -362,7 +362,7 @@ export default function ClassDashboardPage() {
   }, [collectionModal]);
 
   const openCollection = (s: StudentRow, col: CollectionMeta) =>
-    setCollectionModal({ student: s, collectionName: col.collection_name, label: col.label, total: col.total_units });
+    setCollectionModal({ student: s, collectionName: col.collection_name, label: col.label, total: col.total_units, color: col.color_hex });
 
   const copyCode = () => {
     if (!classInfo) return;
@@ -898,56 +898,83 @@ export default function ClassDashboardPage() {
       })()}
 
       {/* Collection drill-down modal */}
-      {collectionModal && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setCollectionModal(null)}>
-          <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl flex flex-col max-h-[85vh]" onClick={e => e.stopPropagation()}>
-            <div className="p-5 shrink-0">
-              <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto mb-4" />
-              <div className="flex items-center gap-3">
-                <Avatar name={collectionModal.student.name} url={collectionModal.student.avatar_url} size={36} />
-                <div className="flex-1 min-w-0">
-                  <p className="font-bold text-sm text-[var(--text)] truncate">{collectionModal.student.name}</p>
-                  <p className="text-xs text-[var(--text-muted)]">{collectionModal.collectionName}</p>
+      {collectionModal && (() => {
+        const c = collectionModal.color;
+        const learnedCount = unitRows.filter(r => r.learn_done).length;
+        const pct = collectionModal.total > 0 ? learnedCount / collectionModal.total : 0;
+        return (
+          <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setCollectionModal(null)}>
+            <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl flex flex-col max-h-[85vh]" onClick={e => e.stopPropagation()}>
+              {/* Colored header */}
+              <div className="p-5 shrink-0 rounded-t-3xl" style={{ background: `linear-gradient(135deg, ${c}18 0%, transparent 70%)` }}>
+                <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto mb-4" />
+                <div className="flex items-center gap-3 mb-3">
+                  <Avatar name={collectionModal.student.name} url={collectionModal.student.avatar_url} size={42} />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-sm text-[var(--text)] truncate">{collectionModal.student.name}</p>
+                    <span className="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full mt-1" style={{ background: `${c}22`, color: c }}>{collectionModal.label}</span>
+                  </div>
+                  {!unitLoading && (
+                    <div className="text-right shrink-0">
+                      <p style={{ fontSize: 24, fontWeight: 900, color: c, lineHeight: 1 }}>
+                        {learnedCount}<span className="text-sm font-normal text-[var(--text-muted)]">/{collectionModal.total}</span>
+                      </p>
+                      <p className="text-[9px] text-[var(--text-muted)] mt-0.5">learned</p>
+                    </div>
+                  )}
                 </div>
                 {!unitLoading && (
-                  <p className="text-sm font-black text-[var(--primary)] shrink-0">
-                    {unitRows.filter(r => r.learn_done).length}<span className="text-xs font-normal text-[var(--text-muted)]">/{collectionModal.total} learned</span>
-                  </p>
+                  <div className="h-1.5 rounded-full overflow-hidden" style={{ background: `${c}20` }}>
+                    <div className="h-full rounded-full" style={{ width: `${Math.round(pct * 100)}%`, background: c, transition: 'width 0.4s ease' }} />
+                  </div>
+                )}
+              </div>
+              {/* Unit list */}
+              <div className="overflow-y-auto flex-1 px-4 pb-8 pt-2 space-y-1.5">
+                {unitLoading ? (
+                  <div className="flex justify-center py-8"><div className="text-3xl animate-bounce">📊</div></div>
+                ) : (
+                  Array.from({ length: collectionModal.total }, (_, i) => {
+                    const unit = unitRows.find(r => r.day_number === i + 1);
+                    const learnDone = unit?.learn_done ?? false;
+                    const flashDone = unit?.flashcard_done ?? false;
+                    const quizDone = unit?.quiz_done ?? false;
+                    const allDone = learnDone && flashDone && quizDone;
+                    const anyDone = learnDone || flashDone || quizDone;
+                    return (
+                      <div key={i + 1} className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl" style={{
+                        background: allDone ? `${c}12` : 'var(--surface-2)',
+                        border: `1px solid ${allDone ? `${c}30` : 'transparent'}`,
+                      }}>
+                        {/* Number circle */}
+                        <div className="w-7 h-7 rounded-full shrink-0 flex items-center justify-center text-[11px] font-black" style={{
+                          background: allDone ? c : anyDone ? `${c}22` : 'var(--border)',
+                          color: allDone ? '#fff' : anyDone ? c : 'var(--text-muted)',
+                        }}>
+                          {allDone ? '✓' : i + 1}
+                        </div>
+                        {/* Unit / topic name */}
+                        <p className="flex-1 text-xs font-semibold truncate" style={{ color: anyDone ? 'var(--text)' : 'var(--text-muted)' }}>
+                          {unitTopics[i + 1] ?? `Unit ${i + 1}`}
+                        </p>
+                        {/* Status badges */}
+                        <div className="flex items-center gap-1 shrink-0">
+                          {[{ e: '📖', d: learnDone }, { e: '🃏', d: flashDone }, { e: '🧠', d: quizDone }].map(({ e, d }, ei) => (
+                            <div key={ei} className="w-6 h-6 flex items-center justify-center rounded-md text-[13px]" style={{
+                              background: d ? `${c}22` : 'transparent',
+                              opacity: d ? 1 : 0.22,
+                            }}>{e}</div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })
                 )}
               </div>
             </div>
-            <div className="overflow-y-auto flex-1 px-5 pb-8 space-y-2">
-              {unitLoading ? (
-                <div className="flex justify-center py-8"><div className="text-3xl animate-bounce">📊</div></div>
-              ) : (
-                Array.from({ length: collectionModal.total }, (_, i) => {
-                  const unit = unitRows.find(r => r.day_number === i + 1);
-                  const learnDone = unit?.learn_done ?? false;
-                  const flashDone = unit?.flashcard_done ?? false;
-                  const quizDone = unit?.quiz_done ?? false;
-                  const anyDone = learnDone || flashDone || quizDone;
-                  const allDone = learnDone && flashDone && quizDone;
-                  return (
-                    <div key={i + 1} className="flex items-center gap-3 px-3 py-2.5 rounded-xl" style={{ background: allDone ? 'color-mix(in srgb, var(--primary) 8%, var(--surface-2))' : 'var(--surface-2)', border: `1px solid ${allDone ? 'color-mix(in srgb, var(--primary) 25%, transparent)' : 'transparent'}` }}>
-                      <span className="text-xs font-black w-7 text-center shrink-0" style={{ color: anyDone ? 'var(--primary)' : 'var(--text-muted)' }}>
-                        {allDone ? '✓' : i + 1}
-                      </span>
-                      <p className="flex-1 text-xs font-semibold truncate" style={{ color: anyDone ? 'var(--text)' : 'var(--text-muted)' }}>
-                        {unitTopics[i + 1] ?? `Unit ${i + 1}`}
-                      </p>
-                      <div className="flex items-center gap-2 shrink-0">
-                        <span className="text-[11px]" style={{ opacity: learnDone ? 1 : 0.2 }}>📖</span>
-                        <span className="text-[11px]" style={{ opacity: flashDone ? 1 : 0.2 }}>🃏</span>
-                        <span className="text-[11px]" style={{ opacity: quizDone ? 1 : 0.2 }}>🧠</span>
-                      </div>
-                    </div>
-                  );
-                })
-              )}
-            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 }
