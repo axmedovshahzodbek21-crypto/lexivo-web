@@ -4,9 +4,14 @@ import { useRouter, useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 
-const COLLECTION_TOTALS: Record<string, number> = { A1: 17, A2: 12, B1: 14, Advanced: 75, '30 Day': 30, '24 Vocab': 24, Mastery: 32 };
-const TOTAL_UNITS = COLLECTION_TOTALS.A1 + COLLECTION_TOTALS.A2 + COLLECTION_TOTALS.B1;
-const LABEL_TO_COLLECTION: Record<string, string> = { A1: 'A1', A2: 'A2', B1: 'B1', Advanced: 'Advanced', '30 Day': '30 Days of Powerful Words', '24 Vocab': '24 Vocabulary Challenge', Mastery: 'Word Mastery' };
+interface CollectionMeta {
+  collection_name: string;
+  label: string;
+  total_units: number;
+  display_order: number;
+  color_hex: string;
+  group_name: string;
+}
 
 const ACTIVITY_ICON: Record<string, string> = { learn: '📖', flashcard: '🃏', quiz: '🧠' };
 const ACTIVITY_LABEL: Record<string, string> = { learn: 'Learn', flashcard: 'Flashcard', quiz: 'Quiz' };
@@ -29,13 +34,8 @@ interface StudentRow {
   streak: number;
   last_study_date: string | null;
   total_words: number;
-  a1_learned: number;
-  a2_learned: number;
-  b1_learned: number;
-  advanced_learned: number;
-  thirty_day_learned: number;
-  twenty_four_learned: number;
-  word_mastery_learned: number;
+  collection_progress: Record<string, number>;
+  total_units_sum: number;
 }
 
 interface ClassInfo {
@@ -161,6 +161,7 @@ export default function ClassDashboardPage() {
   const { user } = useAuth();
   const [classInfo, setClassInfo] = useState<ClassInfo | null>(null);
   const [students, setStudents] = useState<StudentRow[]>([]);
+  const [collections, setCollections] = useState<CollectionMeta[]>([]);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const [notTeacher, setNotTeacher] = useState(false);
@@ -207,7 +208,7 @@ export default function ClassDashboardPage() {
     else if (filterBy === 'inactive') list = list.filter(s => !s.last_study_date || s.last_study_date < sevenDaysAgo);
     list.sort((a, b) => {
       if (sortBy === 'xp') return b.xp - a.xp;
-      if (sortBy === 'progress') return (b.a1_learned + b.a2_learned + b.b1_learned + b.advanced_learned + b.thirty_day_learned + b.twenty_four_learned + b.word_mastery_learned) - (a.a1_learned + a.a2_learned + a.b1_learned + a.advanced_learned + a.thirty_day_learned + a.twenty_four_learned + a.word_mastery_learned);
+      if (sortBy === 'progress') return Object.values(b.collection_progress).reduce((s, v) => s + v, 0) - Object.values(a.collection_progress).reduce((s, v) => s + v, 0);
       if (sortBy === 'name') return a.name.localeCompare(b.name);
       if (!a.last_study_date && !b.last_study_date) return 0;
       if (!a.last_study_date) return 1;
@@ -317,8 +318,12 @@ export default function ClassDashboardPage() {
     const { data: cls } = await supabase.from('classes').select('*').eq('id', id).single();
     if (!cls || cls.teacher_id !== user.id) { setNotTeacher(true); setLoading(false); return; }
     setClassInfo(cls);
-    const { data } = await supabase.rpc('get_class_dashboard', { p_class_id: id });
+    const [{ data }, { data: colData }] = await Promise.all([
+      supabase.rpc('get_class_dashboard', { p_class_id: id }),
+      supabase.from('collections').select('*').order('display_order'),
+    ]);
     setStudents((data as StudentRow[]) ?? []);
+    setCollections((colData as CollectionMeta[]) ?? []);
     await Promise.all([loadNotes(), loadTargets(), loadAnnouncements()]);
     setLoading(false);
   };
@@ -339,8 +344,8 @@ export default function ClassDashboardPage() {
     });
   }, [collectionModal]);
 
-  const openCollection = (s: StudentRow, label: string) =>
-    setCollectionModal({ student: s, collectionName: LABEL_TO_COLLECTION[label], label, total: COLLECTION_TOTALS[label] });
+  const openCollection = (s: StudentRow, col: CollectionMeta) =>
+    setCollectionModal({ student: s, collectionName: col.collection_name, label: col.label, total: col.total_units });
 
   const copyCode = () => {
     if (!classInfo) return;
@@ -350,10 +355,10 @@ export default function ClassDashboardPage() {
   };
 
   const exportCSV = () => {
-    const headers = ['Name', 'Last Active', 'XP', 'Streak', 'Words Learned', `A1 (/${COLLECTION_TOTALS.A1})`, `A2 (/${COLLECTION_TOTALS.A2})`, `B1 (/${COLLECTION_TOTALS.B1})`, `Advanced (/${COLLECTION_TOTALS.Advanced})`, `30 Day (/${COLLECTION_TOTALS['30 Day']})`, `24 Vocab (/${COLLECTION_TOTALS['24 Vocab']})`, `Mastery (/${COLLECTION_TOTALS.Mastery})`];
+    const headers = ['Name', 'Last Active', 'XP', 'Streak', 'Words Learned', ...collections.map(c => `${c.label} (/${c.total_units})`)];
     const rows = students.map(s => [
       s.name, s.last_study_date ?? 'Never', s.xp, s.streak, s.total_words,
-      s.a1_learned, s.a2_learned, s.b1_learned, s.advanced_learned, s.thirty_day_learned, s.twenty_four_learned, s.word_mastery_learned,
+      ...collections.map(c => s.collection_progress[c.collection_name] ?? 0),
     ]);
     const csv = [headers, ...rows].map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -588,7 +593,7 @@ export default function ClassDashboardPage() {
                 const unreadNotes = notes.filter(n => !n.read_at).length;
                 const targets = studentTargets[s.student_id] ?? [];
                 const activeTargets = targets.filter(t => !t.completed_at).length;
-                const totalProgress = s.a1_learned + s.a2_learned + s.b1_learned;
+                const totalProgress = Object.values(s.collection_progress).reduce((sum, v) => sum + v, 0);
                 return (
                   <div key={s.student_id} className="card space-y-3" style={isInactive(s.last_study_date) ? { borderLeft: '3px solid var(--danger)', background: 'color-mix(in srgb, var(--danger) 4%, var(--surface))' } : {}}>
                     <div className="flex items-center gap-3">
@@ -610,41 +615,34 @@ export default function ClassDashboardPage() {
                     <div className="pl-8">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-[10px] font-semibold text-[var(--text-muted)]">Overall progress</span>
-                        <span className="text-[10px] font-bold text-[var(--text-muted)]">{totalProgress}/{TOTAL_UNITS} units</span>
+                        <span className="text-[10px] font-bold text-[var(--text-muted)]">{totalProgress}/{s.total_units_sum} units</span>
                       </div>
                       <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
-                        <div className="h-full rounded-full transition-all" style={{ width: `${Math.min(100, (totalProgress / TOTAL_UNITS) * 100)}%`, background: 'linear-gradient(90deg, #2ECC71, #3498DB)' }} />
+                        <div className="h-full rounded-full transition-all" style={{ width: `${s.total_units_sum > 0 ? Math.min(100, (totalProgress / s.total_units_sum) * 100) : 0}%`, background: 'linear-gradient(90deg, #2ECC71, #3498DB)' }} />
                       </div>
                     </div>
 
                     <div className="pl-8 space-y-2">
-                      <p className="text-[10px] font-semibold text-[var(--text-muted)]">Foundation</p>
-                      <div className="grid grid-cols-4 gap-2">
-                        {[
-                          { label: 'A1', done: s.a1_learned, color: '#2ECC71' },
-                          { label: 'A2', done: s.a2_learned, color: '#27AE60' },
-                          { label: 'B1', done: s.b1_learned, color: '#3498DB' },
-                          { label: 'Advanced', done: s.advanced_learned, color: '#9B59B6' },
-                        ].map(({ label, done, color }) => (
-                          <button key={label} onClick={() => openCollection(s, label)} className="text-left hover:opacity-75 transition-opacity">
-                            <p className="text-[10px] font-bold text-[var(--text-muted)] mb-1">{label} ↗</p>
-                            <ProgressBar done={done} total={COLLECTION_TOTALS[label]} color={color} />
-                          </button>
-                        ))}
-                      </div>
-                      <p className="text-[10px] font-semibold text-[var(--text-muted)] pt-1">Challenges</p>
-                      <div className="grid grid-cols-3 gap-3">
-                        {[
-                          { label: '30 Day', done: s.thirty_day_learned, color: '#6C63FF' },
-                          { label: '24 Vocab', done: s.twenty_four_learned, color: '#FF6584' },
-                          { label: 'Mastery', done: s.word_mastery_learned, color: '#F39C12' },
-                        ].map(({ label, done, color }) => (
-                          <button key={label} onClick={() => openCollection(s, label)} className="text-left hover:opacity-75 transition-opacity">
-                            <p className="text-[10px] font-bold text-[var(--text-muted)] mb-1">{label} ↗</p>
-                            <ProgressBar done={done} total={COLLECTION_TOTALS[label]} color={color} />
-                          </button>
-                        ))}
-                      </div>
+                      {(() => {
+                        const groups: { name: string; cols: CollectionMeta[] }[] = [];
+                        for (const col of collections) {
+                          const g = groups.find(g => g.name === col.group_name);
+                          if (g) g.cols.push(col); else groups.push({ name: col.group_name, cols: [col] });
+                        }
+                        return groups.map(({ name, cols }) => (
+                          <div key={name}>
+                            <p className="text-[10px] font-semibold text-[var(--text-muted)] pt-1">{name}</p>
+                            <div className="grid gap-2 mt-1" style={{ gridTemplateColumns: `repeat(${Math.min(cols.length, 4)}, 1fr)` }}>
+                              {cols.map(col => (
+                                <button key={col.collection_name} onClick={() => openCollection(s, col)} className="text-left hover:opacity-75 transition-opacity">
+                                  <p className="text-[10px] font-bold text-[var(--text-muted)] mb-1">{col.label} ↗</p>
+                                  <ProgressBar done={s.collection_progress[col.collection_name] ?? 0} total={col.total_units} color={col.color_hex} />
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        ));
+                      })()}
                     </div>
 
                     <div className="flex items-center gap-4 pl-8">
