@@ -206,7 +206,7 @@ function PronunciationInner() {
   const advance = useCallback(() => {
     if (!currentText || score === null) return;
     const xp = XP_BY_SCORE[score];
-    if (xp > 0) { addXP(xp); checkAchievements(); }
+    if (xp > 0) { addXP(xp, 'Pronunciation'); checkAchievements(); }
     setResults(prev => [...prev, { text: currentText, score, heard: heardText, xp }]);
     setTotalXp(prev => prev + xp);
     if (index + 1 >= activeItems.length) setPhase('done');

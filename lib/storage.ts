@@ -30,6 +30,7 @@ const KEYS = {
   freezes: 'lexivo_freezes',
   lastFreezeWeek: 'lexivo_last_freeze_week',
   studyDays: 'lexivo_study_days',
+  xpHistory: 'lexivo_xp_history',
 };
 
 function get<T>(key: string, fallback: T): T {
@@ -371,7 +372,13 @@ export function getTodayXP(): number {
   return get<number>(KEYS.todayXp, 0);
 }
 
-export function addXP(amount: number): { leveledUp: boolean; newLevel: string; newXp: number } {
+export interface XpEntry {
+  amount: number;
+  reason: string;
+  timestamp: number;
+}
+
+export function addXP(amount: number, reason = 'Study'): { leveledUp: boolean; newLevel: string; newXp: number } {
   const oldXp = get<number>(KEYS.xp, 0);
   const newXp = oldXp + amount;
   set(KEYS.xp, newXp);
@@ -382,9 +389,18 @@ export function addXP(amount: number): { leveledUp: boolean; newLevel: string; n
   set(KEYS.todayXp, todayXp + amount);
   set(KEYS.todayXpDate, date);
 
+  const history = get<XpEntry[]>(KEYS.xpHistory, []);
+  history.push({ amount, reason, timestamp: Date.now() });
+  if (history.length > 200) history.splice(0, history.length - 200);
+  set(KEYS.xpHistory, history);
+
   const oldLevel = levelForXp(oldXp);
   const newLevel = levelForXp(newXp);
   return { leveledUp: oldLevel !== newLevel, newLevel, newXp };
+}
+
+export function getXPHistory(): XpEntry[] {
+  return get<XpEntry[]>(KEYS.xpHistory, []).slice().reverse();
 }
 
 // ─── Unit Progress ───────────────────────────────────────────────────────────

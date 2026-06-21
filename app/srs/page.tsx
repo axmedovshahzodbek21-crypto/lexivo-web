@@ -78,7 +78,7 @@ export default function SRSReviewPage() {
     if (!current) return;
     updateSRSWord(current.id, success);
     if (success) {
-      const { leveledUp, newLevel, newXp } = addXP(XP_PER_SRS);
+      const { leveledUp, newLevel, newXp } = addXP(XP_PER_SRS, 'SRS Review');
       if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
       unlockAchievement('srs_first');
     }

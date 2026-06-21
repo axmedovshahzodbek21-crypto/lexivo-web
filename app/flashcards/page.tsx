@@ -149,7 +149,7 @@ export default function FlashcardsPage() {
     const card = deck[index];
     if (wasKnown) setKnown(k => k + 1);
     else { setUnknown(u => u + 1); if (card) setUnknownWords(prev => [...prev, card]); }
-    const { leveledUp, newLevel, newXp } = addXP(wasKnown ? 3 : 1);
+    const { leveledUp, newLevel, newXp } = addXP(wasKnown ? 3 : 1, 'Flashcard');
     if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
     recordStudySession();
     const newAchievements = checkAchievements();

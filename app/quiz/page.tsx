@@ -198,11 +198,11 @@ export default function QuizPage() {
     setState('answered');
     if (option === current?.correct) {
       setCorrect(c => c + 1);
-      const { leveledUp, newLevel, newXp } = addXP(XP_PER_QUIZ);
+      const { leveledUp, newLevel, newXp } = addXP(XP_PER_QUIZ, 'Quiz');
       if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
     } else {
       if (current) setWrongQuestions(prev => [...prev, current]);
-      const { leveledUp, newLevel, newXp } = addXP(1);
+      const { leveledUp, newLevel, newXp } = addXP(1, 'Quiz');
       if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
     }
     recordStudySession();

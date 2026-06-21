@@ -6,8 +6,9 @@ import Link from 'next/link';
 import {
   getLearnedWords, getSRSWords, getStreak, getXP, getTotalStudyDays,
   getTodayXP, getTodayLearnedCount, getDueWords, getStarredWords, getHardWords,
-  getStudyHistory, localDateStr,
+  getStudyHistory, getXPHistory, localDateStr,
 } from '@/lib/storage';
+import type { XpEntry } from '@/lib/storage';
 import { getLevelInfo, ALL_ACHIEVEMENTS } from '@/lib/gamification';
 import { getUnlockedAchievements } from '@/lib/storage';
 import { stageLabel, stageColor } from '@/lib/srs';
@@ -37,6 +38,7 @@ function ProgressPage() {
   const [hardCount, setHardCount] = useState(0);
   const [unlockedIds, setUnlockedIds] = useState<string[]>([]);
   const [studyHistory, setStudyHistory] = useState<Record<string, number>>({});
+  const [xpHistory, setXpHistory] = useState<XpEntry[]>([]);
   const [tab, setTab] = useState<'overview' | 'srs' | 'achievements' | 'calendar'>(tabParam ?? 'overview');
 
   useEffect(() => {
@@ -53,6 +55,7 @@ function ProgressPage() {
       setHardCount(getHardWords().length);
       setUnlockedIds(getUnlockedAchievements());
       setStudyHistory(getStudyHistory());
+      setXpHistory(getXPHistory());
     };
     load();
     window.addEventListener('lexivo-sync', load);
@@ -134,6 +137,9 @@ function ProgressPage() {
                 </div>
               </div>
             </div>
+
+            {/* XP History */}
+            <XpHistorySection entries={xpHistory} />
 
           </div>
         )}
@@ -217,6 +223,90 @@ function StatBlock({ icon, label, value, color }: { icon: string; label: string;
       <div className="text-2xl mb-1">{icon}</div>
       <div className="font-bold text-lg" style={{ color }}>{value}</div>
       <div className="text-xs text-[var(--text-muted)]">{label}</div>
+    </div>
+  );
+}
+
+// ─── XP History ──────────────────────────────────────────────────────────────
+
+const XP_ICONS: Record<string, string> = {
+  Learn: '📖', Quiz: '🧠', Flashcard: '🃏', 'SRS Review': '🔄',
+  'Level Complete': '🏆', Matching: '🎯', Pronunciation: '🎤',
+};
+
+function dayLabel(timestamp: number): string {
+  const d = new Date(timestamp);
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+  const fmt = (dt: Date) => `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+  const key = fmt(d);
+  if (key === fmt(today)) return 'Today';
+  if (key === fmt(yesterday)) return 'Yesterday';
+  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+}
+
+function groupByDay(entries: XpEntry[]): { label: string; total: number; items: XpEntry[] }[] {
+  const map = new Map<string, { label: string; total: number; items: XpEntry[] }>();
+  for (const e of entries) {
+    const d = new Date(e.timestamp);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    if (!map.has(key)) map.set(key, { label: dayLabel(e.timestamp), total: 0, items: [] });
+    const group = map.get(key)!;
+    group.total += e.amount;
+    group.items.push(e);
+  }
+  return Array.from(map.values());
+}
+
+function XpHistorySection({ entries }: { entries: XpEntry[] }) {
+  const [expanded, setExpanded] = useState(false);
+  const groups = groupByDay(entries);
+
+  return (
+    <div className="card">
+      <button
+        className="w-full flex items-center justify-between"
+        onClick={() => setExpanded(e => !e)}
+      >
+        <div className="flex items-center gap-2">
+          <span className="text-xl">⭐</span>
+          <span className="font-semibold">XP History</span>
+        </div>
+        <span className="text-[var(--text-muted)] text-sm">{expanded ? '▲' : '▼'}</span>
+      </button>
+
+      {expanded && (
+        <div className="mt-3 space-y-4">
+          {groups.length === 0 ? (
+            <p className="text-sm text-[var(--text-muted)] text-center py-2">No XP earned yet</p>
+          ) : (
+            groups.map((group, i) => (
+              <div key={i}>
+                <div className="flex justify-between text-xs text-[var(--text-muted)] font-semibold mb-2">
+                  <span>{group.label}</span>
+                  <span className="text-[var(--primary)]">+{group.total} XP</span>
+                </div>
+                <div className="space-y-1">
+                  {group.items.map((entry, j) => {
+                    const time = new Date(entry.timestamp).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+                    return (
+                      <div key={j} className="flex items-center gap-3 py-2 border-b border-[var(--border)] last:border-0">
+                        <span className="text-lg">{XP_ICONS[entry.reason] ?? '⭐'}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium">{entry.reason}</p>
+                          <p className="text-xs text-[var(--text-muted)]">{time}</p>
+                        </div>
+                        <span className="text-sm font-bold text-[var(--primary)] whitespace-nowrap">+{entry.amount} XP</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      )}
     </div>
   );
 }

@@ -168,7 +168,7 @@ function MatchingInner() {
         // Round complete
         setTimerActive(false);
         const xp = roundXpFor(roundWords.length, mistakes);
-        addXP(xp);
+        addXP(xp, 'Matching');
         checkAchievements();
         setTotalXp(prev => prev + xp);
         setTotalMistakes(prev => prev + mistakes);
