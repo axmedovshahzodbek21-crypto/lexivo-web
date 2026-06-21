@@ -810,7 +810,8 @@ export default function ClassDashboardPage() {
       {streakModal && (() => {
         const today = new Date(); today.setHours(0, 0, 0, 0);
         const todayStr = today.toISOString().slice(0, 10);
-        const raw = new Date(today); raw.setDate(today.getDate() - 69);
+        // 8 weeks, aligned to Monday
+        const raw = new Date(today); raw.setDate(today.getDate() - 55);
         const dow = raw.getDay();
         raw.setDate(raw.getDate() - (dow === 0 ? 6 : dow - 1));
         const weeks: string[][] = [];
@@ -824,6 +825,12 @@ export default function ClassDashboardPage() {
           weeks.push(week);
         }
         const avgPerWeek = weeks.length > 0 ? (studyDates.size / weeks.length).toFixed(1) : '0';
+        const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        const monthLabel = (week: string[], wi: number) => {
+          if (wi === 0) { const d = week.find(x => x); return d ? MONTHS[new Date(d + 'T12:00:00').getMonth()] : ''; }
+          const d = week.find(x => x && new Date(x + 'T12:00:00').getDate() <= 7);
+          return d ? MONTHS[new Date(d + 'T12:00:00').getMonth()] : '';
+        };
         return (
           <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setStreakModal(null)}>
             <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-5" onClick={e => e.stopPropagation()}>
@@ -832,7 +839,7 @@ export default function ClassDashboardPage() {
                 <Avatar name={streakModal.name} url={streakModal.avatar_url} size={36} />
                 <div className="flex-1 min-w-0">
                   <p className="font-bold text-sm text-[var(--text)] truncate">{streakModal.name}</p>
-                  <p className="text-[10px] text-[var(--text-muted)]">Study calendar · last 10 weeks</p>
+                  <p className="text-[10px] text-[var(--text-muted)]">Study calendar · last 8 weeks</p>
                 </div>
                 <div className="text-right shrink-0">
                   <p className="text-xl font-black text-orange-400">🔥 {streakModal.streak}</p>
@@ -842,40 +849,60 @@ export default function ClassDashboardPage() {
               {streakLoading ? (
                 <div className="flex justify-center py-6"><div className="text-3xl animate-bounce">📅</div></div>
               ) : (
-                <>
-                  <div className="flex gap-1 overflow-x-auto pb-1">
-                    <div className="flex flex-col gap-1 shrink-0 mr-1 pt-0.5">
-                      {['M','T','W','T','F','S','S'].map((d, i) => (
-                        <span key={i} className="text-[8px] text-[var(--text-muted)] h-3 w-2.5 leading-3">{d}</span>
-                      ))}
-                    </div>
+                <div className="space-y-2">
+                  {/* Month labels */}
+                  <div className="flex gap-[3px] pl-9">
                     {weeks.map((week, wi) => (
-                      <div key={wi} className="flex flex-col gap-1 shrink-0">
-                        {week.map((date, di) => (
-                          <div key={di} className="w-3 h-3 rounded-sm" title={date} style={{
-                            background: !date ? 'transparent' : studyDates.has(date) ? 'var(--primary)' : 'var(--surface-2)',
-                            opacity: !date ? 0 : 1,
-                            boxShadow: date === todayStr ? '0 0 0 1.5px var(--primary)' : 'none',
-                          }} />
-                        ))}
+                      <div key={wi} className="shrink-0 text-[8px] font-bold text-[var(--text-muted)]" style={{ width: 18 }}>
+                        {monthLabel(week, wi)}
                       </div>
                     ))}
                   </div>
-                  <div className="flex gap-6 mt-4 pt-4 border-t border-[var(--border)]">
-                    <div>
-                      <p className="text-base font-black text-[var(--text)]">{studyDates.size}</p>
-                      <p className="text-[10px] text-[var(--text-muted)]">active days</p>
+                  {/* Grid */}
+                  <div className="flex gap-[3px] overflow-x-auto pb-1">
+                    <div className="flex flex-col gap-[3px] shrink-0 mr-1">
+                      {['Mon','','Wed','','Fri','','Sun'].map((d, i) => (
+                        <div key={i} className="flex items-center text-[8px] text-[var(--text-muted)]" style={{ width: 24, height: 18 }}>{d}</div>
+                      ))}
                     </div>
-                    <div>
-                      <p className="text-base font-black text-[var(--text)]">{avgPerWeek}</p>
-                      <p className="text-[10px] text-[var(--text-muted)]">days/week avg</p>
-                    </div>
-                    <div>
-                      <p className="text-base font-black text-[var(--text)]">{streakModal.streak > 0 ? '🔥 Active' : '😴 Idle'}</p>
-                      <p className="text-[10px] text-[var(--text-muted)]">status</p>
+                    {weeks.map((week, wi) => (
+                      <div key={wi} className="flex flex-col gap-[3px] shrink-0">
+                        {week.map((date, di) => {
+                          const active = date && studyDates.has(date);
+                          const isToday = date === todayStr;
+                          return (
+                            <div key={di} title={date || ''} style={{
+                              width: 18, height: 18, borderRadius: 4, flexShrink: 0,
+                              background: !date ? 'transparent' : active ? 'var(--primary)' : 'var(--surface-2)',
+                              opacity: !date ? 0 : 1,
+                              border: isToday && !active ? '2px solid var(--primary)' : 'none',
+                              boxShadow: isToday && active ? '0 0 0 2px var(--surface), 0 0 0 4px var(--primary)' : 'none',
+                            }} />
+                          );
+                        })}
+                      </div>
+                    ))}
+                  </div>
+                  {/* Legend */}
+                  <div className="flex items-center gap-4 pt-1">
+                    {[{ bg: 'var(--surface-2)', border: '', label: 'No study' }, { bg: 'var(--primary)', border: '', label: 'Studied' }].map(({ bg, label }) => (
+                      <div key={label} className="flex items-center gap-1.5">
+                        <div style={{ width: 10, height: 10, borderRadius: 2, background: bg }} />
+                        <span className="text-[9px] text-[var(--text-muted)]">{label}</span>
+                      </div>
+                    ))}
+                    <div className="flex items-center gap-1.5">
+                      <div style={{ width: 10, height: 10, borderRadius: 2, border: '1.5px solid var(--primary)' }} />
+                      <span className="text-[9px] text-[var(--text-muted)]">Today</span>
                     </div>
                   </div>
-                </>
+                  {/* Stats */}
+                  <div className="flex gap-6 pt-3 mt-1 border-t border-[var(--border)]">
+                    <div><p className="text-base font-black text-[var(--text)]">{studyDates.size}</p><p className="text-[10px] text-[var(--text-muted)]">active days</p></div>
+                    <div><p className="text-base font-black text-[var(--text)]">{avgPerWeek}</p><p className="text-[10px] text-[var(--text-muted)]">days/week</p></div>
+                    <div><p className="text-base font-black text-[var(--text)]">{streakModal.streak > 0 ? '🔥 Active' : '😴 Idle'}</p><p className="text-[10px] text-[var(--text-muted)]">status</p></div>
+                  </div>
+                </div>
               )}
             </div>
           </div>
