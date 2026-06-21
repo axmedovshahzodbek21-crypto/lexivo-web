@@ -8,6 +8,7 @@ const en = {
     progress: 'Progress',
     matching: 'Matching',
     leaderboard: 'Leaderboard',
+    classes: 'Classes',
   },
   sidebar: {
     tagline: 'Vocabulary Learning',
@@ -441,6 +442,7 @@ const uz: typeof en = {
     progress: 'Natijalar',
     matching: 'Moslashtirish',
     leaderboard: 'Reyting',
+    classes: 'Sinflar',
   },
   sidebar: {
     tagline: "Lug'at o'rganish",

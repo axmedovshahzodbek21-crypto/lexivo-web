@@ -15,6 +15,7 @@ const NAV_HREFS = [
   { href: '/progress',     icon: '📊', key: 'progress'    },
   { href: '/matching',     icon: '🎯', key: 'matching'    },
   { href: '/leaderboard',  icon: '🏆', key: 'leaderboard' },
+  { href: '/classes',      icon: '👩‍🏫', key: 'classes'     },
 ] as const;
 
 // Mobile bottom bar: 5 core items only — Matching & Leaderboard are on the home page
