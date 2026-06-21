@@ -35,6 +35,15 @@ interface Target {
   created_at: string;
 }
 
+interface LeaderboardRow {
+  student_id: string;
+  name: string;
+  avatar_url: string | null;
+  xp: number;
+  streak: number;
+  total_words: number;
+}
+
 function timeAgo(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
   const m = Math.floor(diff / 60000);
@@ -65,6 +74,9 @@ export default function ClassesPage() {
   const [classNotes, setClassNotes] = useState<Record<string, Note[]>>({});
   const [classTargets, setClassTargets] = useState<Record<string, Target[]>>({});
   const [teacherProfiles, setTeacherProfiles] = useState<Record<string, { name: string; avatar_url: string | null }>>({});
+  const [classLeaderboards, setClassLeaderboards] = useState<Record<string, LeaderboardRow[]>>({});
+  const [expandedLeaderboard, setExpandedLeaderboard] = useState<string | null>(null);
+  const [leaderboardLoading, setLeaderboardLoading] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [className, setClassName] = useState('');
@@ -197,6 +209,16 @@ export default function ClassesPage() {
       if (err.code === '23505') setJoinError('You are already in this class.');
       else setJoinError('Failed to join. Please try again.');
     } else { setJoinCode(''); load(); }
+  };
+
+  const toggleLeaderboard = async (classId: string) => {
+    if (expandedLeaderboard === classId) { setExpandedLeaderboard(null); return; }
+    setExpandedLeaderboard(classId);
+    if (classLeaderboards[classId]) return;
+    setLeaderboardLoading(classId);
+    const { data } = await supabase.rpc('get_class_leaderboard', { p_class_id: classId });
+    setClassLeaderboards(prev => ({ ...prev, [classId]: (data as LeaderboardRow[]) ?? [] }));
+    setLeaderboardLoading(null);
   };
 
   const leaveClass = async (classId: string) => {
@@ -381,8 +403,55 @@ export default function ClassesPage() {
                             👩‍🏫 {teacherProfiles[cls.teacher_id]?.name ?? 'Teacher'} · {cls.join_code}
                           </p>
                           </div>
-                          <button onClick={() => leaveClass(cls.id)} className="text-xs px-3 py-1.5 rounded-xl bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors shrink-0">Leave</button>
+                          <div className="flex items-center gap-2 shrink-0">
+                            <button
+                              onClick={() => toggleLeaderboard(cls.id)}
+                              className={`text-xs px-2.5 py-1.5 rounded-xl font-medium transition-colors ${expandedLeaderboard === cls.id ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--primary)]'}`}
+                            >
+                              🏆
+                            </button>
+                            <button onClick={() => leaveClass(cls.id)} className="text-xs px-3 py-1.5 rounded-xl bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors">Leave</button>
+                          </div>
                         </div>
+
+                        {/* Class leaderboard */}
+                        {expandedLeaderboard === cls.id && (
+                          <div className="border-t border-[var(--border)] pt-3 space-y-2">
+                            <p className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-wide">🏆 Class Leaderboard</p>
+                            {leaderboardLoading === cls.id ? (
+                              <div className="text-center py-4 text-2xl animate-bounce">🏆</div>
+                            ) : (classLeaderboards[cls.id] ?? []).length === 0 ? (
+                              <p className="text-xs text-[var(--text-muted)] text-center py-2">No data yet</p>
+                            ) : (
+                              (classLeaderboards[cls.id] ?? []).map((row, idx) => {
+                                const isMe = row.student_id === user?.id;
+                                const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : null;
+                                return (
+                                  <div
+                                    key={row.student_id}
+                                    className="flex items-center gap-2.5 rounded-xl px-3 py-2 transition-colors"
+                                    style={{ background: isMe ? 'var(--primary-bg)' : 'var(--surface-2)', border: isMe ? '1.5px solid var(--primary)' : 'none' }}
+                                  >
+                                    <span className="text-sm w-5 text-center shrink-0 font-bold" style={{ color: isMe ? 'var(--primary)' : 'var(--text-muted)' }}>
+                                      {medal ?? `${idx + 1}`}
+                                    </span>
+                                    {row.avatar_url
+                                      ? <img src={row.avatar_url} alt={row.name} className="w-7 h-7 rounded-full object-cover shrink-0" />
+                                      : <div className="w-7 h-7 rounded-full shrink-0 flex items-center justify-center text-white text-xs font-black" style={{ background: 'var(--primary)' }}>{row.name.charAt(0).toUpperCase()}</div>
+                                    }
+                                    <p className={`flex-1 text-sm truncate ${isMe ? 'font-bold text-[var(--primary)]' : 'text-[var(--text)]'}`}>
+                                      {row.name}{isMe ? ' (you)' : ''}
+                                    </p>
+                                    <div className="text-right shrink-0">
+                                      <p className="text-xs font-bold text-[var(--primary)]">{row.xp} XP</p>
+                                      <p className="text-[10px] text-[var(--text-muted)]">🔥 {row.streak}</p>
+                                    </div>
+                                  </div>
+                                );
+                              })
+                            )}
+                          </div>
+                        )}
 
                         {/* Targets from teacher */}
                         {targets.length > 0 && (
