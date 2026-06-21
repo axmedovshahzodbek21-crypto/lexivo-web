@@ -200,6 +200,11 @@ export default function ClassDashboardPage() {
   const [unitTopics, setUnitTopics] = useState<Record<number, string>>({});
   const [unitLoading, setUnitLoading] = useState(false);
 
+  // Streak calendar
+  const [streakModal, setStreakModal] = useState<StudentRow | null>(null);
+  const [studyDates, setStudyDates] = useState<Set<string>>(new Set());
+  const [streakLoading, setStreakLoading] = useState(false);
+
   const sevenDaysAgo = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
 
   const visibleStudents = useMemo(() => {
@@ -330,6 +335,17 @@ export default function ClassDashboardPage() {
 
   useEffect(() => { if (user) load(); else setLoading(false); }, [user, id]);
   useEffect(() => { if (tab === 'activity' && activityFeed.length === 0) loadActivity(); }, [tab]);
+  useEffect(() => {
+    if (!streakModal || !id) return;
+    setStreakLoading(true);
+    setStudyDates(new Set());
+    supabase.rpc('get_student_study_calendar', { p_class_id: id, p_student_id: streakModal.student_id })
+      .then(({ data }) => {
+        setStudyDates(new Set((data as { study_date: string }[] ?? []).map(r => r.study_date)));
+        setStreakLoading(false);
+      });
+  }, [streakModal]);
+
   useEffect(() => {
     if (!collectionModal || !id) return;
     setUnitLoading(true);
@@ -608,7 +624,10 @@ export default function ClassDashboardPage() {
                       </div>
                       <div className="text-right shrink-0">
                         <p className="text-sm font-black text-[var(--primary)]">{s.xp} XP</p>
-                        <p className="text-[10px] text-[var(--text-muted)]">🔥 {s.streak} · 📚 {s.total_words}</p>
+                        <p className="text-[10px] text-[var(--text-muted)]">
+                          <button onClick={() => setStreakModal(s)} className="font-semibold hover:opacity-70 transition-opacity">🔥 {s.streak} ↗</button>
+                          {' · 📚 '}{s.total_words}
+                        </p>
                       </div>
                     </div>
 
@@ -786,6 +805,82 @@ export default function ClassDashboardPage() {
           </div>
         </div>
       )}
+
+      {/* Streak calendar modal */}
+      {streakModal && (() => {
+        const today = new Date(); today.setHours(0, 0, 0, 0);
+        const todayStr = today.toISOString().slice(0, 10);
+        const raw = new Date(today); raw.setDate(today.getDate() - 69);
+        const dow = raw.getDay();
+        raw.setDate(raw.getDate() - (dow === 0 ? 6 : dow - 1));
+        const weeks: string[][] = [];
+        const cur = new Date(raw);
+        while (cur <= today) {
+          const week: string[] = [];
+          for (let d = 0; d < 7; d++) {
+            week.push(new Date(cur) <= today ? cur.toISOString().slice(0, 10) : '');
+            cur.setDate(cur.getDate() + 1);
+          }
+          weeks.push(week);
+        }
+        const avgPerWeek = weeks.length > 0 ? (studyDates.size / weeks.length).toFixed(1) : '0';
+        return (
+          <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setStreakModal(null)}>
+            <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-5" onClick={e => e.stopPropagation()}>
+              <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto mb-4" />
+              <div className="flex items-center gap-3 mb-5">
+                <Avatar name={streakModal.name} url={streakModal.avatar_url} size={36} />
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-sm text-[var(--text)] truncate">{streakModal.name}</p>
+                  <p className="text-[10px] text-[var(--text-muted)]">Study calendar · last 10 weeks</p>
+                </div>
+                <div className="text-right shrink-0">
+                  <p className="text-xl font-black text-orange-400">🔥 {streakModal.streak}</p>
+                  <p className="text-[9px] text-[var(--text-muted)]">day streak</p>
+                </div>
+              </div>
+              {streakLoading ? (
+                <div className="flex justify-center py-6"><div className="text-3xl animate-bounce">📅</div></div>
+              ) : (
+                <>
+                  <div className="flex gap-1 overflow-x-auto pb-1">
+                    <div className="flex flex-col gap-1 shrink-0 mr-1 pt-0.5">
+                      {['M','T','W','T','F','S','S'].map((d, i) => (
+                        <span key={i} className="text-[8px] text-[var(--text-muted)] h-3 w-2.5 leading-3">{d}</span>
+                      ))}
+                    </div>
+                    {weeks.map((week, wi) => (
+                      <div key={wi} className="flex flex-col gap-1 shrink-0">
+                        {week.map((date, di) => (
+                          <div key={di} className="w-3 h-3 rounded-sm" title={date} style={{
+                            background: !date ? 'transparent' : studyDates.has(date) ? 'var(--primary)' : 'var(--surface-2)',
+                            opacity: !date ? 0 : 1,
+                            boxShadow: date === todayStr ? '0 0 0 1.5px var(--primary)' : 'none',
+                          }} />
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex gap-6 mt-4 pt-4 border-t border-[var(--border)]">
+                    <div>
+                      <p className="text-base font-black text-[var(--text)]">{studyDates.size}</p>
+                      <p className="text-[10px] text-[var(--text-muted)]">active days</p>
+                    </div>
+                    <div>
+                      <p className="text-base font-black text-[var(--text)]">{avgPerWeek}</p>
+                      <p className="text-[10px] text-[var(--text-muted)]">days/week avg</p>
+                    </div>
+                    <div>
+                      <p className="text-base font-black text-[var(--text)]">{streakModal.streak > 0 ? '🔥 Active' : '😴 Idle'}</p>
+                      <p className="text-[10px] text-[var(--text-muted)]">status</p>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Collection drill-down modal */}
       {collectionModal && (
