@@ -44,6 +44,18 @@ interface LeaderboardRow {
   total_words: number;
 }
 
+interface ClassWord {
+  id: string;
+  class_id: string;
+  word: string;
+  translation: string;
+  definition: string | null;
+  example1: string | null;
+  example1_translation: string | null;
+  example2: string | null;
+  example2_translation: string | null;
+}
+
 interface Announcement {
   id: string;
   class_id: string;
@@ -93,6 +105,9 @@ export default function ClassesPage() {
   const [error, setError] = useState('');
   const [joinError, setJoinError] = useState('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [classWords, setClassWords] = useState<Record<string, ClassWord[]>>({});
+  const [learnedWordIds, setLearnedWordIds] = useState<Set<string>>(new Set<string>());
+  const [flashcard, setFlashcard] = useState<{ classId: string; index: number; flipped: boolean } | null>(null);
 
   const loadAnnouncements = async (classIds: string[]) => {
     const { data } = await supabase
@@ -143,6 +158,42 @@ export default function ClassesPage() {
     setClassTargets(map);
   };
 
+  const loadHomework = async (classIds: string[], userId: string) => {
+    if (classIds.length === 0) return;
+    const { data: wordData } = await supabase
+      .from('class_words')
+      .select('id, class_id, word, translation, definition, example1, example1_translation, example2, example2_translation')
+      .in('class_id', classIds)
+      .order('created_at', { ascending: true });
+    if (wordData) {
+      const map: Record<string, ClassWord[]> = {};
+      for (const w of wordData) {
+        if (!map[w.class_id]) map[w.class_id] = [];
+        map[w.class_id].push(w as ClassWord);
+      }
+      setClassWords(map);
+    }
+    const { data: progress } = await supabase
+      .from('class_word_progress')
+      .select('word_id')
+      .eq('student_id', userId);
+    if (progress) {
+      setLearnedWordIds(new Set<string>((progress as Array<{ word_id: string }>).map(p => p.word_id)));
+    }
+  };
+
+  const markLearned = async (wordId: string) => {
+    if (!user || learnedWordIds.has(wordId)) return;
+    await supabase.from('class_word_progress').insert({ word_id: wordId, student_id: user.id });
+    setLearnedWordIds(prev => new Set<string>([...prev, wordId]));
+  };
+
+  const unmarkLearned = async (wordId: string) => {
+    if (!user || !learnedWordIds.has(wordId)) return;
+    await supabase.from('class_word_progress').delete().eq('word_id', wordId).eq('student_id', user.id);
+    setLearnedWordIds(prev => { const s = new Set<string>(prev); s.delete(wordId); return s; });
+  };
+
   const load = async () => {
     if (!user) return;
     setLoading(true);
@@ -186,7 +237,7 @@ export default function ClassesPage() {
       for (const t of teachers ?? []) tMap[t.id] = { name: t.name, avatar_url: t.avatar_url };
       setTeacherProfiles(tMap);
       const joinedIds = joined.map((c: ClassRow) => c.id);
-      await Promise.all([loadNotes(user.id), loadTargets(user.id), loadAnnouncements(joinedIds)]);
+      await Promise.all([loadNotes(user.id), loadTargets(user.id), loadAnnouncements(joinedIds), loadHomework(joinedIds, user.id)]);
     }
 
     setLoading(false);
@@ -299,6 +350,12 @@ export default function ClassesPage() {
     );
   }
 
+  const fcWords = flashcard ? (classWords[flashcard.classId] ?? []) : [];
+  const fcWord = flashcard && fcWords.length > 0 ? (fcWords[flashcard.index] ?? null) : null;
+  const fcClass = flashcard ? joinedClasses.find(c => c.id === flashcard.classId) ?? null : null;
+  const fcLearnedCount = fcWords.filter(w => learnedWordIds.has(w.id)).length;
+  const fcIsLearned = fcWord ? learnedWordIds.has(fcWord.id) : false;
+
   return (
     <div className="flex flex-col min-h-screen pb-24 animate-fade-in">
       {/* Header */}
@@ -408,6 +465,10 @@ export default function ClassesPage() {
                     const targets = classTargets[cls.id] ?? [];
                     const activeTargets = targets.filter(t => !t.completed_at);
                     const doneTargets = targets.filter(t => t.completed_at);
+                    const hw = classWords[cls.id] ?? [];
+                    const hwLearnedCount = hw.filter(w => learnedWordIds.has(w.id)).length;
+                    const hwPct = hw.length === 0 ? 0 : (hwLearnedCount / hw.length) * 100;
+                    const hwAllDone = hw.length > 0 && hwLearnedCount === hw.length;
 
                     return (
                       <div key={cls.id} className="card space-y-3">
@@ -564,6 +625,38 @@ export default function ClassesPage() {
                             ))}
                           </div>
                         )}
+
+                        {/* Homework words */}
+                        {hw.length > 0 && (
+                          <div className="space-y-2 border-t border-[var(--border)] pt-3">
+                            <div className="flex items-center justify-between">
+                              <p className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-wide">📝 Homework</p>
+                              <button
+                                onClick={() => {
+                                  const firstUnlearned = hw.findIndex(w => !learnedWordIds.has(w.id));
+                                  setFlashcard({ classId: cls.id, index: firstUnlearned >= 0 ? firstUnlearned : 0, flipped: false });
+                                }}
+                                className="text-xs font-semibold px-3 py-1 rounded-xl bg-[var(--primary)] text-white"
+                              >
+                                Study →
+                              </button>
+                            </div>
+                            <div>
+                              <div className="flex items-center justify-between mb-1">
+                                <span className="text-xs text-[var(--text-muted)]">{hwLearnedCount}/{hw.length} words learned</span>
+                                {hwAllDone && (
+                                  <span className="text-[10px] font-bold" style={{ color: '#10B981' }}>All done! 🎉</span>
+                                )}
+                              </div>
+                              <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
+                                <div
+                                  className="h-full rounded-full transition-all"
+                                  style={{ width: `${hwPct}%`, background: hwAllDone ? '#10B981' : 'var(--primary)' }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     );
                   })}
@@ -573,6 +666,107 @@ export default function ClassesPage() {
           </>
         )}
       </div>
+
+      {/* Flashcard modal */}
+      {flashcard && fcWord && (
+        <div className="fixed inset-0 z-50 bg-[var(--background)] flex flex-col animate-fade-in">
+          {/* Header */}
+          <div className="flex items-center gap-3 p-4 border-b border-[var(--border)] shrink-0">
+            <button
+              onClick={() => setFlashcard(null)}
+              className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-lg shrink-0"
+            >
+              ✕
+            </button>
+            <div className="flex-1 min-w-0">
+              <p className="font-bold text-[var(--text)] truncate">{fcClass?.name ?? ''}</p>
+              <p className="text-xs text-[var(--text-muted)]">{fcLearnedCount}/{fcWords.length} learned</p>
+            </div>
+            <p className="text-sm font-bold text-[var(--text-muted)] shrink-0">{flashcard.index + 1} / {fcWords.length}</p>
+          </div>
+
+          {/* Progress bar */}
+          <div className="h-1 shrink-0" style={{ background: 'var(--border)' }}>
+            <div
+              className="h-full transition-all"
+              style={{ width: `${((flashcard.index + 1) / fcWords.length) * 100}%`, background: 'var(--primary)' }}
+            />
+          </div>
+
+          {/* Card */}
+          <div className="flex-1 flex items-center justify-center p-6">
+            <button
+              onClick={() => setFlashcard(prev => prev ? { ...prev, flipped: !prev.flipped } : null)}
+              className="w-full max-w-sm rounded-3xl border-2 p-8 text-center space-y-3 transition-all active:scale-95 min-h-[220px] flex flex-col items-center justify-center"
+              style={{
+                background: fcIsLearned ? 'rgba(16,185,129,0.08)' : 'var(--surface-2)',
+                borderColor: fcIsLearned ? '#10B981' : 'var(--border)',
+              }}
+            >
+              {fcIsLearned && (
+                <span className="text-xs font-bold" style={{ color: '#10B981' }}>✓ Learned</span>
+              )}
+              {!flashcard.flipped ? (
+                <>
+                  <p className="text-3xl font-black text-[var(--text)]">{fcWord.word}</p>
+                  <p className="text-sm text-[var(--text-muted)]">Tap to reveal</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-2xl font-bold text-[var(--primary)]">{fcWord.translation}</p>
+                  {fcWord.definition && (
+                    <p className="text-sm text-[var(--text-muted)] leading-snug">{fcWord.definition}</p>
+                  )}
+                  {fcWord.example1 && (
+                    <p className="text-xs italic text-[var(--text-muted)] leading-snug">&ldquo;{fcWord.example1}&rdquo;</p>
+                  )}
+                  {fcWord.example1_translation && (
+                    <p className="text-xs italic text-[var(--text-muted)] leading-snug">&ldquo;{fcWord.example1_translation}&rdquo;</p>
+                  )}
+                </>
+              )}
+            </button>
+          </div>
+
+          {/* Actions */}
+          <div className="p-4 space-y-3 shrink-0" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
+            {flashcard.flipped && (
+              <button
+                onClick={() => {
+                  if (fcIsLearned) unmarkLearned(fcWord.id);
+                  else markLearned(fcWord.id);
+                }}
+                className={`w-full py-3.5 rounded-2xl font-bold text-sm transition-all ${fcIsLearned ? 'bg-[var(--surface-2)] text-[var(--text-muted)]' : 'btn-primary'}`}
+              >
+                {fcIsLearned ? '✕ Unmark as learned' : '✓ Got it — mark as learned'}
+              </button>
+            )}
+            <div className="flex gap-3">
+              <button
+                onClick={() => setFlashcard(prev => prev && prev.index > 0 ? { ...prev, index: prev.index - 1, flipped: false } : prev)}
+                disabled={flashcard.index === 0}
+                className="flex-1 py-3 rounded-2xl text-sm font-semibold text-[var(--text)] disabled:opacity-30"
+                style={{ background: 'var(--surface-2)' }}
+              >
+                ← Prev
+              </button>
+              <button
+                onClick={() => {
+                  if (flashcard.index < fcWords.length - 1) {
+                    setFlashcard(prev => prev ? { ...prev, index: prev.index + 1, flipped: false } : null);
+                  } else {
+                    setFlashcard(null);
+                  }
+                }}
+                className="flex-1 py-3 rounded-2xl text-sm font-semibold text-[var(--text)]"
+                style={{ background: 'var(--surface-2)' }}
+              >
+                {flashcard.index < fcWords.length - 1 ? 'Next →' : 'Finish ✓'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Create Class Modal */}
       {showCreate && (
