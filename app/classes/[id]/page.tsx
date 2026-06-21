@@ -4,7 +4,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 
-const COLLECTION_TOTALS: Record<string, number> = { A1: 17, A2: 12, B1: 14, '30 Day': 30, '24 Vocab': 24, Mastery: 32 };
+const COLLECTION_TOTALS: Record<string, number> = { A1: 17, A2: 12, B1: 14, Advanced: 75, '30 Day': 30, '24 Vocab': 24, Mastery: 32 };
 const TOTAL_UNITS = COLLECTION_TOTALS.A1 + COLLECTION_TOTALS.A2 + COLLECTION_TOTALS.B1;
 
 const ACTIVITY_ICON: Record<string, string> = { learn: '📖', flashcard: '🃏', quiz: '🧠' };
@@ -31,6 +31,7 @@ interface StudentRow {
   a1_learned: number;
   a2_learned: number;
   b1_learned: number;
+  advanced_learned: number;
   thirty_day_learned: number;
   twenty_four_learned: number;
   word_mastery_learned: number;
@@ -183,7 +184,7 @@ export default function ClassDashboardPage() {
     else if (filterBy === 'inactive') list = list.filter(s => !s.last_study_date || s.last_study_date < sevenDaysAgo);
     list.sort((a, b) => {
       if (sortBy === 'xp') return b.xp - a.xp;
-      if (sortBy === 'progress') return (b.a1_learned + b.a2_learned + b.b1_learned + b.thirty_day_learned + b.twenty_four_learned + b.word_mastery_learned) - (a.a1_learned + a.a2_learned + a.b1_learned + a.thirty_day_learned + a.twenty_four_learned + a.word_mastery_learned);
+      if (sortBy === 'progress') return (b.a1_learned + b.a2_learned + b.b1_learned + b.advanced_learned + b.thirty_day_learned + b.twenty_four_learned + b.word_mastery_learned) - (a.a1_learned + a.a2_learned + a.b1_learned + a.advanced_learned + a.thirty_day_learned + a.twenty_four_learned + a.word_mastery_learned);
       if (sortBy === 'name') return a.name.localeCompare(b.name);
       if (!a.last_study_date && !b.last_study_date) return 0;
       if (!a.last_study_date) return 1;
@@ -310,10 +311,10 @@ export default function ClassDashboardPage() {
   };
 
   const exportCSV = () => {
-    const headers = ['Name', 'Last Active', 'XP', 'Streak', 'Words Learned', `A1 (/${COLLECTION_TOTALS.A1})`, `A2 (/${COLLECTION_TOTALS.A2})`, `B1 (/${COLLECTION_TOTALS.B1})`, `30 Day (/${COLLECTION_TOTALS['30 Day']})`, `24 Vocab (/${COLLECTION_TOTALS['24 Vocab']})`, `Mastery (/${COLLECTION_TOTALS.Mastery})`];
+    const headers = ['Name', 'Last Active', 'XP', 'Streak', 'Words Learned', `A1 (/${COLLECTION_TOTALS.A1})`, `A2 (/${COLLECTION_TOTALS.A2})`, `B1 (/${COLLECTION_TOTALS.B1})`, `Advanced (/${COLLECTION_TOTALS.Advanced})`, `30 Day (/${COLLECTION_TOTALS['30 Day']})`, `24 Vocab (/${COLLECTION_TOTALS['24 Vocab']})`, `Mastery (/${COLLECTION_TOTALS.Mastery})`];
     const rows = students.map(s => [
       s.name, s.last_study_date ?? 'Never', s.xp, s.streak, s.total_words,
-      s.a1_learned, s.a2_learned, s.b1_learned, s.thirty_day_learned, s.twenty_four_learned, s.word_mastery_learned,
+      s.a1_learned, s.a2_learned, s.b1_learned, s.advanced_learned, s.thirty_day_learned, s.twenty_four_learned, s.word_mastery_learned,
     ]);
     const csv = [headers, ...rows].map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -579,11 +580,12 @@ export default function ClassDashboardPage() {
 
                     <div className="pl-8 space-y-2">
                       <p className="text-[10px] font-semibold text-[var(--text-muted)]">Foundation</p>
-                      <div className="grid grid-cols-3 gap-3">
+                      <div className="grid grid-cols-4 gap-2">
                         {[
                           { label: 'A1', done: s.a1_learned, color: '#2ECC71' },
                           { label: 'A2', done: s.a2_learned, color: '#27AE60' },
                           { label: 'B1', done: s.b1_learned, color: '#3498DB' },
+                          { label: 'Advanced', done: s.advanced_learned, color: '#9B59B6' },
                         ].map(({ label, done, color }) => (
                           <div key={label}>
                             <p className="text-[10px] font-bold text-[var(--text-muted)] mb-1">{label}</p>
