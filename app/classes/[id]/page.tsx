@@ -178,6 +178,16 @@ export default function ClassDashboardPage() {
     return list;
   }, [students, sortBy, filterBy]);
 
+  const classStats = useMemo(() => {
+    if (students.length === 0) return null;
+    const n = students.length;
+    const totalXP = students.reduce((s, r) => s + r.xp, 0);
+    const avgStreak = students.reduce((s, r) => s + r.streak, 0) / n;
+    const avgWords = students.reduce((s, r) => s + r.total_words, 0) / n;
+    const activeCount = students.filter(r => r.last_study_date && r.last_study_date >= sevenDaysAgo).length;
+    return { totalXP, avgStreak, avgWords, activeCount, n };
+  }, [students]);
+
   // Group activity by calendar day
   const groupedActivity = useMemo(() => {
     const groups: { label: string; items: ActivityRow[] }[] = [];
@@ -371,6 +381,23 @@ export default function ClassDashboardPage() {
             >
               {t === 'students' ? '👥 Students' : '📡 Activity'}
             </button>
+          ))}
+        </div>
+      )}
+
+      {/* Class stats bar — students tab only */}
+      {!loading && tab === 'students' && classStats && (
+        <div className="grid grid-cols-4 divide-x divide-[var(--border)] border-b border-[var(--border)]">
+          {[
+            { label: 'Total XP', value: classStats.totalXP.toLocaleString(), icon: '⚡' },
+            { label: 'Avg streak', value: `${classStats.avgStreak.toFixed(1)}d`, icon: '🔥' },
+            { label: 'Avg words', value: Math.round(classStats.avgWords).toString(), icon: '📚' },
+            { label: 'Active', value: `${classStats.activeCount}/${classStats.n}`, icon: '✅' },
+          ].map(stat => (
+            <div key={stat.label} className="flex flex-col items-center py-2.5 px-1">
+              <p className="text-base font-black text-[var(--text)] leading-tight">{stat.icon} {stat.value}</p>
+              <p className="text-[10px] text-[var(--text-muted)] mt-0.5">{stat.label}</p>
+            </div>
           ))}
         </div>
       )}
