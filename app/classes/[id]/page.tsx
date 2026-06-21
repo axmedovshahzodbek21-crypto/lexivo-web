@@ -340,8 +340,6 @@ export default function ClassDashboardPage() {
     if (!streakModal || !id) return;
     setStreakLoading(true);
     setStudyDates(new Set());
-    const now = new Date();
-    setCalendarMonth({ year: now.getFullYear(), month: now.getMonth() });
     supabase.rpc('get_student_study_calendar', { p_class_id: id, p_student_id: streakModal.student_id })
       .then(({ data }) => {
         setStudyDates(new Set((data as { study_date: string }[] ?? []).map(r => r.study_date)));
@@ -628,7 +626,7 @@ export default function ClassDashboardPage() {
                       <div className="text-right shrink-0">
                         <p className="text-sm font-black text-[var(--primary)]">{s.xp} XP</p>
                         <p className="text-[10px] text-[var(--text-muted)]">
-                          <button onClick={() => setStreakModal(s)} className="font-semibold hover:opacity-70 transition-opacity">🔥 {s.streak} ↗</button>
+                          <button onClick={() => { const now = new Date(); setCalendarMonth({ year: now.getFullYear(), month: now.getMonth() }); setStreakModal(s); }} className="font-semibold hover:opacity-70 transition-opacity">🔥 {s.streak} ↗</button>
                           {' · 📚 '}{s.total_words}
                         </p>
                       </div>
