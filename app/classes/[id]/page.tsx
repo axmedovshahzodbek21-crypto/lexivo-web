@@ -204,6 +204,7 @@ export default function ClassDashboardPage() {
   const [streakModal, setStreakModal] = useState<StudentRow | null>(null);
   const [studyDates, setStudyDates] = useState<Set<string>>(new Set());
   const [streakLoading, setStreakLoading] = useState(false);
+  const [calendarMonth, setCalendarMonth] = useState({ year: new Date().getFullYear(), month: new Date().getMonth() });
 
   const sevenDaysAgo = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
 
@@ -339,6 +340,8 @@ export default function ClassDashboardPage() {
     if (!streakModal || !id) return;
     setStreakLoading(true);
     setStudyDates(new Set());
+    const now = new Date();
+    setCalendarMonth({ year: now.getFullYear(), month: now.getMonth() });
     supabase.rpc('get_student_study_calendar', { p_class_id: id, p_student_id: streakModal.student_id })
       .then(({ data }) => {
         setStudyDates(new Set((data as { study_date: string }[] ?? []).map(r => r.study_date)));
@@ -810,36 +813,36 @@ export default function ClassDashboardPage() {
       {streakModal && (() => {
         const today = new Date(); today.setHours(0, 0, 0, 0);
         const todayStr = today.toISOString().slice(0, 10);
-        // 8 weeks, aligned to Monday
-        const raw = new Date(today); raw.setDate(today.getDate() - 55);
-        const dow = raw.getDay();
-        raw.setDate(raw.getDate() - (dow === 0 ? 6 : dow - 1));
-        const weeks: string[][] = [];
-        const cur = new Date(raw);
-        while (cur <= today) {
-          const week: string[] = [];
-          for (let d = 0; d < 7; d++) {
-            week.push(new Date(cur) <= today ? cur.toISOString().slice(0, 10) : '');
-            cur.setDate(cur.getDate() + 1);
-          }
-          weeks.push(week);
+        const { year, month } = calendarMonth;
+        const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const firstDow = new Date(year, month, 1).getDay();
+        const startOffset = firstDow === 0 ? 6 : firstDow - 1;
+        const rows: (number | null)[][] = [];
+        let dn = 1 - startOffset;
+        while (dn <= daysInMonth) {
+          const row: (number | null)[] = [];
+          for (let c = 0; c < 7; c++) { row.push(dn >= 1 && dn <= daysInMonth ? dn : null); dn++; }
+          rows.push(row);
         }
-        const avgPerWeek = weeks.length > 0 ? (studyDates.size / weeks.length).toFixed(1) : '0';
-        const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-        const monthLabel = (week: string[], wi: number) => {
-          if (wi === 0) { const d = week.find(x => x); return d ? MONTHS[new Date(d + 'T12:00:00').getMonth()] : ''; }
-          const d = week.find(x => x && new Date(x + 'T12:00:00').getDate() <= 7);
-          return d ? MONTHS[new Date(d + 'T12:00:00').getMonth()] : '';
-        };
+        const ds = (d: number) => `${year}-${String(month + 1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const isToday = (d: number) => ds(d) === todayStr;
+        const isStudied = (d: number) => studyDates.has(ds(d));
+        const isFuture = (d: number) => new Date(year, month, d) > today;
+        const nowMonth = new Date(); nowMonth.setDate(1); nowMonth.setHours(0,0,0,0);
+        const thisMonth = new Date(year, month, 1);
+        const canNext = thisMonth < nowMonth;
+        const prev = () => setCalendarMonth(m => m.month === 0 ? { year: m.year - 1, month: 11 } : { year: m.year, month: m.month - 1 });
+        const next = () => setCalendarMonth(m => m.month === 11 ? { year: m.year + 1, month: 0 } : { year: m.year, month: m.month + 1 });
         return (
           <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setStreakModal(null)}>
-            <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-5" onClick={e => e.stopPropagation()}>
+            <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-5 pb-8" onClick={e => e.stopPropagation()}>
               <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto mb-4" />
-              <div className="flex items-center gap-3 mb-5">
+              <div className="flex items-center gap-3 mb-4">
                 <Avatar name={streakModal.name} url={streakModal.avatar_url} size={36} />
                 <div className="flex-1 min-w-0">
                   <p className="font-bold text-sm text-[var(--text)] truncate">{streakModal.name}</p>
-                  <p className="text-[10px] text-[var(--text-muted)]">Study calendar · last 8 weeks</p>
+                  <p className="text-[10px] text-[var(--text-muted)]">Study calendar</p>
                 </div>
                 <div className="text-right shrink-0">
                   <p className="text-xl font-black text-orange-400">🔥 {streakModal.streak}</p>
@@ -847,60 +850,47 @@ export default function ClassDashboardPage() {
                 </div>
               </div>
               {streakLoading ? (
-                <div className="flex justify-center py-6"><div className="text-3xl animate-bounce">📅</div></div>
+                <div className="flex justify-center py-8"><div className="text-3xl animate-bounce">📅</div></div>
               ) : (
-                <div className="space-y-2">
-                  {/* Month labels */}
-                  <div className="flex gap-[3px] pl-9">
-                    {weeks.map((week, wi) => (
-                      <div key={wi} className="shrink-0 text-[8px] font-bold text-[var(--text-muted)]" style={{ width: 18 }}>
-                        {monthLabel(week, wi)}
-                      </div>
+                <div className="bg-[var(--surface-2)] rounded-2xl p-4">
+                  {/* Month nav */}
+                  <div className="flex items-center justify-between mb-4">
+                    <button onClick={prev} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--border)] text-[var(--text)] text-lg font-bold">‹</button>
+                    <p className="font-bold text-sm text-[var(--text)]">{MONTH_NAMES[month]} {year}</p>
+                    <button onClick={next} disabled={!canNext} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--border)] text-[var(--text)] text-lg font-bold disabled:opacity-25">›</button>
+                  </div>
+                  {/* Day headers */}
+                  <div className="grid grid-cols-7 mb-2">
+                    {['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d => (
+                      <div key={d} className="text-center text-[10px] font-semibold text-[var(--text-muted)]">{d}</div>
                     ))}
                   </div>
-                  {/* Grid */}
-                  <div className="flex gap-[3px] overflow-x-auto pb-1">
-                    <div className="flex flex-col gap-[3px] shrink-0 mr-1">
-                      {['Mon','','Wed','','Fri','','Sun'].map((d, i) => (
-                        <div key={i} className="flex items-center text-[8px] text-[var(--text-muted)]" style={{ width: 24, height: 18 }}>{d}</div>
-                      ))}
-                    </div>
-                    {weeks.map((week, wi) => (
-                      <div key={wi} className="flex flex-col gap-[3px] shrink-0">
-                        {week.map((date, di) => {
-                          const active = date && studyDates.has(date);
-                          const isToday = date === todayStr;
-                          return (
-                            <div key={di} title={date || ''} style={{
-                              width: 18, height: 18, borderRadius: 4, flexShrink: 0,
-                              background: !date ? 'transparent' : active ? 'var(--primary)' : 'var(--surface-2)',
-                              opacity: !date ? 0 : 1,
-                              border: isToday && !active ? '2px solid var(--primary)' : 'none',
-                              boxShadow: isToday && active ? '0 0 0 2px var(--surface), 0 0 0 4px var(--primary)' : 'none',
-                            }} />
-                          );
-                        })}
+                  {/* Rows */}
+                  <div className="space-y-1">
+                    {rows.map((row, ri) => (
+                      <div key={ri} className="grid grid-cols-7 gap-1">
+                        {row.map((day, ci) => day === null ? <div key={ci} /> : (
+                          <div key={ci} className="aspect-square flex items-center justify-center rounded-xl" style={{
+                            background: isStudied(day) ? 'var(--primary)' : 'transparent',
+                            border: isToday(day) ? '2px solid var(--primary)' : 'none',
+                            opacity: isFuture(day) ? 0.25 : 1,
+                          }}>
+                            <span className="text-xs font-bold" style={{ color: isStudied(day) ? '#fff' : isFuture(day) ? 'var(--text-muted)' : 'var(--text)' }}>{day}</span>
+                          </div>
+                        ))}
                       </div>
                     ))}
                   </div>
                   {/* Legend */}
-                  <div className="flex items-center gap-4 pt-1">
-                    {[{ bg: 'var(--surface-2)', border: '', label: 'No study' }, { bg: 'var(--primary)', border: '', label: 'Studied' }].map(({ bg, label }) => (
-                      <div key={label} className="flex items-center gap-1.5">
-                        <div style={{ width: 10, height: 10, borderRadius: 2, background: bg }} />
-                        <span className="text-[9px] text-[var(--text-muted)]">{label}</span>
-                      </div>
-                    ))}
+                  <div className="flex items-center gap-5 mt-4 pt-3 border-t border-[var(--border)]">
                     <div className="flex items-center gap-1.5">
-                      <div style={{ width: 10, height: 10, borderRadius: 2, border: '1.5px solid var(--primary)' }} />
-                      <span className="text-[9px] text-[var(--text-muted)]">Today</span>
+                      <div style={{ width: 14, height: 14, borderRadius: 4, border: '2px solid var(--primary)' }} />
+                      <span className="text-[10px] text-[var(--text-muted)]">Today</span>
                     </div>
-                  </div>
-                  {/* Stats */}
-                  <div className="flex gap-6 pt-3 mt-1 border-t border-[var(--border)]">
-                    <div><p className="text-base font-black text-[var(--text)]">{studyDates.size}</p><p className="text-[10px] text-[var(--text-muted)]">active days</p></div>
-                    <div><p className="text-base font-black text-[var(--text)]">{avgPerWeek}</p><p className="text-[10px] text-[var(--text-muted)]">days/week</p></div>
-                    <div><p className="text-base font-black text-[var(--text)]">{streakModal.streak > 0 ? '🔥 Active' : '😴 Idle'}</p><p className="text-[10px] text-[var(--text-muted)]">status</p></div>
+                    <div className="flex items-center gap-1.5">
+                      <div style={{ width: 14, height: 14, borderRadius: 4, background: 'var(--primary)' }} />
+                      <span className="text-[10px] text-[var(--text-muted)]">Studied</span>
+                    </div>
                   </div>
                 </div>
               )}
