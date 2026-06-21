@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth-context';
 
 const COLLECTION_TOTALS: Record<string, number> = { A1: 17, A2: 12, B1: 14, Advanced: 75, '30 Day': 30, '24 Vocab': 24, Mastery: 32 };
 const TOTAL_UNITS = COLLECTION_TOTALS.A1 + COLLECTION_TOTALS.A2 + COLLECTION_TOTALS.B1;
+const LABEL_TO_COLLECTION: Record<string, string> = { A1: 'A1', A2: 'A2', B1: 'B1', Advanced: 'Advanced', '30 Day': '30 Days of Powerful Words', '24 Vocab': '24 Vocabulary Challenge', Mastery: 'Word Mastery' };
 
 const ACTIVITY_ICON: Record<string, string> = { learn: '📖', flashcard: '🃏', quiz: '🧠' };
 const ACTIVITY_LABEL: Record<string, string> = { learn: 'Learn', flashcard: 'Flashcard', quiz: 'Quiz' };
@@ -138,6 +139,22 @@ function ProgressBar({ done, total, color }: { done: number; total: number; colo
   );
 }
 
+async function fetchTopics(collectionName: string): Promise<Record<number, string>> {
+  try {
+    const fileMap: Record<string, string> = { A1: '/data/a1_collection.json', A2: '/data/a2_collection.json', B1: '/data/b1_collection.json', Advanced: '/data/advanced_collection.json' };
+    if (fileMap[collectionName]) {
+      const data = await (await fetch(fileMap[collectionName])).json();
+      return Object.fromEntries((data.days as { dayNumber: number; topic: string }[]).map(d => [d.dayNumber, d.topic]));
+    }
+    const data = await (await fetch('/data/word_data.json')).json();
+    const col = (data as { name: string; days: { dayNumber: number; topic: string }[] }[]).find(c => c.name === collectionName);
+    return col ? Object.fromEntries(col.days.map(d => [d.dayNumber, d.topic])) : {};
+  } catch { return {}; }
+}
+
+type UnitRow = { day_number: number; learn_done: boolean; flashcard_done: boolean; quiz_done: boolean };
+type CollectionModal = { student: StudentRow; collectionName: string; label: string; total: number };
+
 export default function ClassDashboardPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
@@ -175,6 +192,12 @@ export default function ClassDashboardPage() {
   const [showAnnounce, setShowAnnounce] = useState(false);
   const [announceText, setAnnounceText] = useState('');
   const [announcing, setAnnouncing] = useState(false);
+
+  // Collection drill-down
+  const [collectionModal, setCollectionModal] = useState<CollectionModal | null>(null);
+  const [unitRows, setUnitRows] = useState<UnitRow[]>([]);
+  const [unitTopics, setUnitTopics] = useState<Record<number, string>>({});
+  const [unitLoading, setUnitLoading] = useState(false);
 
   const sevenDaysAgo = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
 
@@ -302,6 +325,22 @@ export default function ClassDashboardPage() {
 
   useEffect(() => { if (user) load(); else setLoading(false); }, [user, id]);
   useEffect(() => { if (tab === 'activity' && activityFeed.length === 0) loadActivity(); }, [tab]);
+  useEffect(() => {
+    if (!collectionModal || !id) return;
+    setUnitLoading(true);
+    setUnitRows([]);
+    Promise.all([
+      supabase.rpc('get_student_collection_progress', { p_class_id: id, p_student_id: collectionModal.student.student_id, p_collection_name: collectionModal.collectionName }),
+      fetchTopics(collectionModal.collectionName),
+    ]).then(([{ data }, topics]) => {
+      setUnitRows((data as UnitRow[]) ?? []);
+      setUnitTopics(topics);
+      setUnitLoading(false);
+    });
+  }, [collectionModal]);
+
+  const openCollection = (s: StudentRow, label: string) =>
+    setCollectionModal({ student: s, collectionName: LABEL_TO_COLLECTION[label], label, total: COLLECTION_TOTALS[label] });
 
   const copyCode = () => {
     if (!classInfo) return;
@@ -587,10 +626,10 @@ export default function ClassDashboardPage() {
                           { label: 'B1', done: s.b1_learned, color: '#3498DB' },
                           { label: 'Advanced', done: s.advanced_learned, color: '#9B59B6' },
                         ].map(({ label, done, color }) => (
-                          <div key={label}>
-                            <p className="text-[10px] font-bold text-[var(--text-muted)] mb-1">{label}</p>
+                          <button key={label} onClick={() => openCollection(s, label)} className="text-left hover:opacity-75 transition-opacity">
+                            <p className="text-[10px] font-bold text-[var(--text-muted)] mb-1">{label} ↗</p>
                             <ProgressBar done={done} total={COLLECTION_TOTALS[label]} color={color} />
-                          </div>
+                          </button>
                         ))}
                       </div>
                       <p className="text-[10px] font-semibold text-[var(--text-muted)] pt-1">Challenges</p>
@@ -600,10 +639,10 @@ export default function ClassDashboardPage() {
                           { label: '24 Vocab', done: s.twenty_four_learned, color: '#FF6584' },
                           { label: 'Mastery', done: s.word_mastery_learned, color: '#F39C12' },
                         ].map(({ label, done, color }) => (
-                          <div key={label}>
-                            <p className="text-[10px] font-bold text-[var(--text-muted)] mb-1">{label}</p>
+                          <button key={label} onClick={() => openCollection(s, label)} className="text-left hover:opacity-75 transition-opacity">
+                            <p className="text-[10px] font-bold text-[var(--text-muted)] mb-1">{label} ↗</p>
                             <ProgressBar done={done} total={COLLECTION_TOTALS[label]} color={color} />
-                          </div>
+                          </button>
                         ))}
                       </div>
                     </div>
@@ -745,6 +784,58 @@ export default function ClassDashboardPage() {
                 <button onClick={() => setTargetStudent(null)} className="flex-1 py-3 rounded-xl bg-[var(--surface-2)] text-sm font-semibold text-[var(--text)]">Cancel</button>
                 <button onClick={addTarget} disabled={settingTarget || !targetTitle.trim()} className="flex-1 btn-primary py-3 disabled:opacity-50">{settingTarget ? 'Setting…' : 'Set target 🎯'}</button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Collection drill-down modal */}
+      {collectionModal && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setCollectionModal(null)}>
+          <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl flex flex-col max-h-[85vh]" onClick={e => e.stopPropagation()}>
+            <div className="p-5 shrink-0">
+              <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto mb-4" />
+              <div className="flex items-center gap-3">
+                <Avatar name={collectionModal.student.name} url={collectionModal.student.avatar_url} size={36} />
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-sm text-[var(--text)] truncate">{collectionModal.student.name}</p>
+                  <p className="text-xs text-[var(--text-muted)]">{collectionModal.collectionName}</p>
+                </div>
+                {!unitLoading && (
+                  <p className="text-sm font-black text-[var(--primary)] shrink-0">
+                    {unitRows.filter(r => r.learn_done).length}<span className="text-xs font-normal text-[var(--text-muted)]">/{collectionModal.total} learned</span>
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="overflow-y-auto flex-1 px-5 pb-8 space-y-2">
+              {unitLoading ? (
+                <div className="flex justify-center py-8"><div className="text-3xl animate-bounce">📊</div></div>
+              ) : (
+                Array.from({ length: collectionModal.total }, (_, i) => {
+                  const unit = unitRows.find(r => r.day_number === i + 1);
+                  const learnDone = unit?.learn_done ?? false;
+                  const flashDone = unit?.flashcard_done ?? false;
+                  const quizDone = unit?.quiz_done ?? false;
+                  const anyDone = learnDone || flashDone || quizDone;
+                  const allDone = learnDone && flashDone && quizDone;
+                  return (
+                    <div key={i + 1} className="flex items-center gap-3 px-3 py-2.5 rounded-xl" style={{ background: allDone ? 'color-mix(in srgb, var(--primary) 8%, var(--surface-2))' : 'var(--surface-2)', border: `1px solid ${allDone ? 'color-mix(in srgb, var(--primary) 25%, transparent)' : 'transparent'}` }}>
+                      <span className="text-xs font-black w-7 text-center shrink-0" style={{ color: anyDone ? 'var(--primary)' : 'var(--text-muted)' }}>
+                        {allDone ? '✓' : i + 1}
+                      </span>
+                      <p className="flex-1 text-xs font-semibold truncate" style={{ color: anyDone ? 'var(--text)' : 'var(--text-muted)' }}>
+                        {unitTopics[i + 1] ?? `Unit ${i + 1}`}
+                      </p>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="text-[11px]" style={{ opacity: learnDone ? 1 : 0.2 }}>📖</span>
+                        <span className="text-[11px]" style={{ opacity: flashDone ? 1 : 0.2 }}>🃏</span>
+                        <span className="text-[11px]" style={{ opacity: quizDone ? 1 : 0.2 }}>🧠</span>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
             </div>
           </div>
         </div>
