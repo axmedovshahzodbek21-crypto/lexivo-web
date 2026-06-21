@@ -1,10 +1,14 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 
 const COLLECTION_TOTALS: Record<string, number> = { A1: 17, A2: 12, B1: 14 };
+const TOTAL_UNITS = COLLECTION_TOTALS.A1 + COLLECTION_TOTALS.A2 + COLLECTION_TOTALS.B1;
+
+type SortKey = 'lastActive' | 'xp' | 'progress' | 'name';
+type FilterKey = 'all' | 'active' | 'inactive';
 
 interface StudentRow {
   student_id: string;
@@ -106,6 +110,10 @@ export default function ClassDashboardPage() {
   const [copied, setCopied] = useState(false);
   const [notTeacher, setNotTeacher] = useState(false);
 
+  // Sort & filter
+  const [sortBy, setSortBy] = useState<SortKey>('lastActive');
+  const [filterBy, setFilterBy] = useState<FilterKey>('all');
+
   // Notes state
   const [noteTarget, setNoteTarget] = useState<StudentRow | null>(null);
   const [noteText, setNoteText] = useState('');
@@ -118,6 +126,37 @@ export default function ClassDashboardPage() {
   const [targetDate, setTargetDate] = useState('');
   const [settingTarget, setSettingTarget] = useState(false);
   const [studentTargets, setStudentTargets] = useState<Record<string, Target[]>>({});
+
+  const sevenDaysAgo = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
+
+  const visibleStudents = useMemo(() => {
+    let list = [...students];
+
+    // Filter
+    if (filterBy === 'active') {
+      list = list.filter(s => s.last_study_date && s.last_study_date >= sevenDaysAgo);
+    } else if (filterBy === 'inactive') {
+      list = list.filter(s => !s.last_study_date || s.last_study_date < sevenDaysAgo);
+    }
+
+    // Sort
+    list.sort((a, b) => {
+      if (sortBy === 'xp') return b.xp - a.xp;
+      if (sortBy === 'progress') {
+        const pa = a.a1_learned + a.a2_learned + a.b1_learned;
+        const pb = b.a1_learned + b.b1_learned + b.b1_learned;
+        return pb - pa;
+      }
+      if (sortBy === 'name') return a.name.localeCompare(b.name);
+      // lastActive: nulls last
+      if (!a.last_study_date && !b.last_study_date) return 0;
+      if (!a.last_study_date) return 1;
+      if (!b.last_study_date) return -1;
+      return b.last_study_date.localeCompare(a.last_study_date);
+    });
+
+    return list;
+  }, [students, sortBy, filterBy]);
 
   const loadNotes = async () => {
     if (!id) return;
@@ -230,6 +269,19 @@ export default function ClassDashboardPage() {
     </div>
   );
 
+  const SORT_OPTIONS: { key: SortKey; label: string }[] = [
+    { key: 'lastActive', label: '🕐 Active' },
+    { key: 'xp', label: '⚡ XP' },
+    { key: 'progress', label: '📈 Progress' },
+    { key: 'name', label: '🔤 Name' },
+  ];
+
+  const FILTER_OPTIONS: { key: FilterKey; label: string }[] = [
+    { key: 'all', label: 'All' },
+    { key: 'active', label: '✅ Active' },
+    { key: 'inactive', label: '😴 Inactive' },
+  ];
+
   return (
     <div className="flex flex-col min-h-screen pb-24 animate-fade-in">
       {/* Header */}
@@ -244,10 +296,50 @@ export default function ClassDashboardPage() {
           </div>
         </div>
         <div className="shrink-0 text-right">
-          <p className="text-xl font-black text-[var(--primary)]">{students.length}</p>
+          <p className="text-xl font-black text-[var(--primary)]">{visibleStudents.length}<span className="text-sm text-[var(--text-muted)] font-normal">/{students.length}</span></p>
           <p className="text-[10px] text-[var(--text-muted)]">students</p>
         </div>
       </div>
+
+      {/* Sort & Filter bar */}
+      {!loading && students.length > 0 && (
+        <div className="px-4 py-2.5 border-b border-[var(--border)] space-y-2">
+          {/* Sort */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-0.5">
+            <span className="text-[10px] font-semibold text-[var(--text-muted)] shrink-0">Sort:</span>
+            {SORT_OPTIONS.map(opt => (
+              <button
+                key={opt.key}
+                onClick={() => setSortBy(opt.key)}
+                className={`shrink-0 text-xs px-3 py-1 rounded-full font-medium transition-all ${
+                  sortBy === opt.key
+                    ? 'bg-[var(--primary)] text-white'
+                    : 'bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--text)]'
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+          {/* Filter */}
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-semibold text-[var(--text-muted)] shrink-0">Filter:</span>
+            {FILTER_OPTIONS.map(opt => (
+              <button
+                key={opt.key}
+                onClick={() => setFilterBy(opt.key)}
+                className={`shrink-0 text-xs px-3 py-1 rounded-full font-medium transition-all ${
+                  filterBy === opt.key
+                    ? 'bg-[var(--primary)] text-white'
+                    : 'bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--text)]'
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="p-4">
         {loading ? (
@@ -263,13 +355,20 @@ export default function ClassDashboardPage() {
             </div>
             <p className="text-xs text-[var(--text-muted)]">Students enter this code on the Classes page</p>
           </div>
+        ) : visibleStudents.length === 0 ? (
+          <div className="card text-center py-10 space-y-2">
+            <div className="text-4xl">😴</div>
+            <p className="font-bold text-[var(--text)]">No inactive students</p>
+            <p className="text-sm text-[var(--text-muted)]">Everyone studied in the last 7 days!</p>
+          </div>
         ) : (
           <div className="space-y-3">
-            {students.map((s, i) => {
+            {visibleStudents.map((s, i) => {
               const notes = studentNotes[s.student_id] ?? [];
               const unreadNotes = notes.filter(n => !n.read_at).length;
               const targets = studentTargets[s.student_id] ?? [];
               const activeTargets = targets.filter(t => !t.completed_at).length;
+              const totalProgress = s.a1_learned + s.a2_learned + s.b1_learned;
               return (
                 <div key={s.student_id} className="card space-y-3">
                   {/* Student header */}
@@ -286,7 +385,24 @@ export default function ClassDashboardPage() {
                     </div>
                   </div>
 
-                  {/* Unit progress */}
+                  {/* Overall progress bar */}
+                  <div className="pl-8">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[10px] font-semibold text-[var(--text-muted)]">Overall progress</span>
+                      <span className="text-[10px] font-bold text-[var(--text-muted)]">{totalProgress}/{TOTAL_UNITS} units</span>
+                    </div>
+                    <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
+                      <div
+                        className="h-full rounded-full transition-all"
+                        style={{
+                          width: `${Math.min(100, (totalProgress / TOTAL_UNITS) * 100)}%`,
+                          background: 'linear-gradient(90deg, #2ECC71, #3498DB)',
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Unit breakdown */}
                   <div className="grid grid-cols-3 gap-3 pl-8">
                     {[
                       { label: 'A1', done: s.a1_learned, color: '#2ECC71' },
@@ -391,8 +507,6 @@ export default function ClassDashboardPage() {
                 <p className="text-xs text-[var(--text-muted)]">Set a target</p>
               </div>
             </div>
-
-            {/* Existing targets */}
             {(studentTargets[targetStudent.student_id] ?? []).length > 0 && (
               <div className="flex-1 overflow-y-auto space-y-2 min-h-0">
                 <p className="text-xs font-semibold text-[var(--text-muted)]">Active targets</p>
@@ -418,8 +532,6 @@ export default function ClassDashboardPage() {
                 })}
               </div>
             )}
-
-            {/* New target form */}
             <div className="shrink-0 space-y-3">
               <input
                 type="text"
