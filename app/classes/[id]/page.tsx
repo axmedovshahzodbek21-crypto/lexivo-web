@@ -211,6 +211,31 @@ export default function ClassDashboardPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const exportCSV = () => {
+    const headers = ['Name', 'Last Active', 'XP', 'Streak', 'Words Learned', `A1 (/${COLLECTION_TOTALS.A1})`, `A2 (/${COLLECTION_TOTALS.A2})`, `B1 (/${COLLECTION_TOTALS.B1})`, `Overall (/${TOTAL_UNITS})`];
+    const rows = students.map(s => [
+      s.name,
+      s.last_study_date ?? 'Never',
+      s.xp,
+      s.streak,
+      s.total_words,
+      s.a1_learned,
+      s.a2_learned,
+      s.b1_learned,
+      s.a1_learned + s.a2_learned + s.b1_learned,
+    ]);
+    const csv = [headers, ...rows]
+      .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${(classInfo?.name ?? 'class').replace(/[^a-z0-9]/gi, '-')}-progress-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const removeStudent = async (studentId: string) => {
     if (!confirm('Remove this student from the class?')) return;
     await supabase.from('class_members').delete().eq('class_id', id).eq('student_id', studentId);
@@ -295,9 +320,17 @@ export default function ClassDashboardPage() {
             <button onClick={copyCode} className="text-sm hover:scale-110 transition-transform">{copied ? '✅' : '📋'}</button>
           </div>
         </div>
-        <div className="shrink-0 text-right">
-          <p className="text-xl font-black text-[var(--primary)]">{visibleStudents.length}<span className="text-sm text-[var(--text-muted)] font-normal">/{students.length}</span></p>
+        <div className="shrink-0 flex flex-col items-end gap-1">
+          <p className="text-xl font-black text-[var(--primary)] leading-tight">{visibleStudents.length}<span className="text-sm text-[var(--text-muted)] font-normal">/{students.length}</span></p>
           <p className="text-[10px] text-[var(--text-muted)]">students</p>
+          {students.length > 0 && (
+            <button
+              onClick={exportCSV}
+              className="text-[10px] font-semibold px-2 py-1 rounded-lg bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--primary)] hover:bg-[var(--primary-bg)] transition-colors"
+            >
+              📥 Export CSV
+            </button>
+          )}
         </div>
       </div>
 
