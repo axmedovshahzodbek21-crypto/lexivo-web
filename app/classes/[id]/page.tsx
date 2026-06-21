@@ -7,8 +7,12 @@ import { useAuth } from '@/lib/auth-context';
 const COLLECTION_TOTALS: Record<string, number> = { A1: 17, A2: 12, B1: 14 };
 const TOTAL_UNITS = COLLECTION_TOTALS.A1 + COLLECTION_TOTALS.A2 + COLLECTION_TOTALS.B1;
 
+const ACTIVITY_ICON: Record<string, string> = { learn: '📖', flashcard: '🃏', quiz: '🧠' };
+const ACTIVITY_LABEL: Record<string, string> = { learn: 'Learn', flashcard: 'Flashcard', quiz: 'Quiz' };
+
 type SortKey = 'lastActive' | 'xp' | 'progress' | 'name';
 type FilterKey = 'all' | 'active' | 'inactive';
+type Tab = 'students' | 'activity';
 
 interface StudentRow {
   student_id: string;
@@ -43,6 +47,15 @@ interface Target {
   due_date: string | null;
   completed_at: string | null;
   created_at: string;
+}
+
+interface ActivityRow {
+  student_name: string;
+  avatar_url: string | null;
+  completion_type: string;
+  collection_name: string;
+  day_number: number;
+  completed_at: string;
 }
 
 function Avatar({ name, url, size = 38 }: { name: string; url: string | null; size?: number }) {
@@ -88,6 +101,15 @@ function dueDateLabel(due: string | null): { text: string; overdue: boolean } | 
   return { text: `Due ${new Date(due + 'T00:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`, overdue: false };
 }
 
+function dayLabel(iso: string): string {
+  const date = iso.slice(0, 10);
+  const today = new Date().toISOString().slice(0, 10);
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  if (date === today) return 'Today';
+  if (date === yesterday) return 'Yesterday';
+  return new Date(date).toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' });
+}
+
 function ProgressBar({ done, total, color }: { done: number; total: number; color: string }) {
   const pct = total === 0 ? 0 : Math.min(100, (done / total) * 100);
   return (
@@ -109,6 +131,7 @@ export default function ClassDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const [notTeacher, setNotTeacher] = useState(false);
+  const [tab, setTab] = useState<Tab>('students');
 
   // Sort & filter
   const [sortBy, setSortBy] = useState<SortKey>('lastActive');
@@ -127,36 +150,43 @@ export default function ClassDashboardPage() {
   const [settingTarget, setSettingTarget] = useState(false);
   const [studentTargets, setStudentTargets] = useState<Record<string, Target[]>>({});
 
+  // Activity feed
+  const [activityFeed, setActivityFeed] = useState<ActivityRow[]>([]);
+  const [activityLoading, setActivityLoading] = useState(false);
+
   const sevenDaysAgo = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
 
   const visibleStudents = useMemo(() => {
     let list = [...students];
-
-    // Filter
-    if (filterBy === 'active') {
-      list = list.filter(s => s.last_study_date && s.last_study_date >= sevenDaysAgo);
-    } else if (filterBy === 'inactive') {
-      list = list.filter(s => !s.last_study_date || s.last_study_date < sevenDaysAgo);
-    }
-
-    // Sort
+    if (filterBy === 'active') list = list.filter(s => s.last_study_date && s.last_study_date >= sevenDaysAgo);
+    else if (filterBy === 'inactive') list = list.filter(s => !s.last_study_date || s.last_study_date < sevenDaysAgo);
     list.sort((a, b) => {
       if (sortBy === 'xp') return b.xp - a.xp;
-      if (sortBy === 'progress') {
-        const pa = a.a1_learned + a.a2_learned + a.b1_learned;
-        const pb = b.a1_learned + b.b1_learned + b.b1_learned;
-        return pb - pa;
-      }
+      if (sortBy === 'progress') return (b.a1_learned + b.a2_learned + b.b1_learned) - (a.a1_learned + a.a2_learned + a.b1_learned);
       if (sortBy === 'name') return a.name.localeCompare(b.name);
-      // lastActive: nulls last
       if (!a.last_study_date && !b.last_study_date) return 0;
       if (!a.last_study_date) return 1;
       if (!b.last_study_date) return -1;
       return b.last_study_date.localeCompare(a.last_study_date);
     });
-
     return list;
   }, [students, sortBy, filterBy]);
+
+  // Group activity by calendar day
+  const groupedActivity = useMemo(() => {
+    const groups: { label: string; items: ActivityRow[] }[] = [];
+    let currentLabel = '';
+    for (const item of activityFeed) {
+      const label = dayLabel(item.completed_at);
+      if (label !== currentLabel) {
+        groups.push({ label, items: [item] });
+        currentLabel = label;
+      } else {
+        groups[groups.length - 1].items.push(item);
+      }
+    }
+    return groups;
+  }, [activityFeed]);
 
   const loadNotes = async () => {
     if (!id) return;
@@ -190,6 +220,14 @@ export default function ClassDashboardPage() {
     setStudentTargets(map);
   };
 
+  const loadActivity = async () => {
+    if (!id) return;
+    setActivityLoading(true);
+    const { data } = await supabase.rpc('get_class_activity', { p_class_id: id });
+    setActivityFeed((data as ActivityRow[]) ?? []);
+    setActivityLoading(false);
+  };
+
   const load = async () => {
     if (!user || !id) return;
     setLoading(true);
@@ -203,6 +241,7 @@ export default function ClassDashboardPage() {
   };
 
   useEffect(() => { if (user) load(); else setLoading(false); }, [user, id]);
+  useEffect(() => { if (tab === 'activity' && activityFeed.length === 0) loadActivity(); }, [tab]);
 
   const copyCode = () => {
     if (!classInfo) return;
@@ -214,19 +253,10 @@ export default function ClassDashboardPage() {
   const exportCSV = () => {
     const headers = ['Name', 'Last Active', 'XP', 'Streak', 'Words Learned', `A1 (/${COLLECTION_TOTALS.A1})`, `A2 (/${COLLECTION_TOTALS.A2})`, `B1 (/${COLLECTION_TOTALS.B1})`, `Overall (/${TOTAL_UNITS})`];
     const rows = students.map(s => [
-      s.name,
-      s.last_study_date ?? 'Never',
-      s.xp,
-      s.streak,
-      s.total_words,
-      s.a1_learned,
-      s.a2_learned,
-      s.b1_learned,
-      s.a1_learned + s.a2_learned + s.b1_learned,
+      s.name, s.last_study_date ?? 'Never', s.xp, s.streak, s.total_words,
+      s.a1_learned, s.a2_learned, s.b1_learned, s.a1_learned + s.a2_learned + s.b1_learned,
     ]);
-    const csv = [headers, ...rows]
-      .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
-      .join('\n');
+    const csv = [headers, ...rows].map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -245,12 +275,7 @@ export default function ClassDashboardPage() {
   const sendNote = async () => {
     if (!user || !noteTarget || !noteText.trim()) return;
     setSending(true);
-    await supabase.from('class_notes').insert({
-      class_id: id,
-      student_id: noteTarget.student_id,
-      teacher_id: user.id,
-      message: noteText.trim(),
-    });
+    await supabase.from('class_notes').insert({ class_id: id, student_id: noteTarget.student_id, teacher_id: user.id, message: noteText.trim() });
     setNoteText('');
     await loadNotes();
     setSending(false);
@@ -259,13 +284,7 @@ export default function ClassDashboardPage() {
   const addTarget = async () => {
     if (!user || !targetStudent || !targetTitle.trim()) return;
     setSettingTarget(true);
-    await supabase.from('class_targets').insert({
-      class_id: id,
-      student_id: targetStudent.student_id,
-      teacher_id: user.id,
-      title: targetTitle.trim(),
-      due_date: targetDate || null,
-    });
+    await supabase.from('class_targets').insert({ class_id: id, student_id: targetStudent.student_id, teacher_id: user.id, title: targetTitle.trim(), due_date: targetDate || null });
     setTargetTitle('');
     setTargetDate('');
     await loadTargets();
@@ -324,48 +343,54 @@ export default function ClassDashboardPage() {
           <p className="text-xl font-black text-[var(--primary)] leading-tight">{visibleStudents.length}<span className="text-sm text-[var(--text-muted)] font-normal">/{students.length}</span></p>
           <p className="text-[10px] text-[var(--text-muted)]">students</p>
           {students.length > 0 && (
-            <button
-              onClick={exportCSV}
-              className="text-[10px] font-semibold px-2 py-1 rounded-lg bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--primary)] hover:bg-[var(--primary-bg)] transition-colors"
-            >
+            <button onClick={exportCSV} className="text-[10px] font-semibold px-2 py-1 rounded-lg bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--primary)] hover:bg-[var(--primary-bg)] transition-colors">
               📥 Export CSV
             </button>
           )}
         </div>
       </div>
 
-      {/* Sort & Filter bar */}
-      {!loading && students.length > 0 && (
+      {/* Tab switcher */}
+      {!loading && (
+        <div className="flex border-b border-[var(--border)]">
+          {(['students', 'activity'] as Tab[]).map(t => (
+            <button
+              key={t}
+              onClick={() => setTab(t)}
+              className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${
+                tab === t
+                  ? 'border-b-2 border-[var(--primary)] text-[var(--primary)]'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text)]'
+              }`}
+            >
+              {t === 'students' ? '👥 Students' : '📡 Activity'}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Sort & Filter bar — students tab only */}
+      {!loading && tab === 'students' && students.length > 0 && (
         <div className="px-4 py-2.5 border-b border-[var(--border)] space-y-2">
-          {/* Sort */}
           <div className="flex items-center gap-2 overflow-x-auto pb-0.5">
             <span className="text-[10px] font-semibold text-[var(--text-muted)] shrink-0">Sort:</span>
             {SORT_OPTIONS.map(opt => (
               <button
                 key={opt.key}
                 onClick={() => setSortBy(opt.key)}
-                className={`shrink-0 text-xs px-3 py-1 rounded-full font-medium transition-all ${
-                  sortBy === opt.key
-                    ? 'bg-[var(--primary)] text-white'
-                    : 'bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--text)]'
-                }`}
+                className={`shrink-0 text-xs px-3 py-1 rounded-full font-medium transition-all ${sortBy === opt.key ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--text)]'}`}
               >
                 {opt.label}
               </button>
             ))}
           </div>
-          {/* Filter */}
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-semibold text-[var(--text-muted)] shrink-0">Filter:</span>
             {FILTER_OPTIONS.map(opt => (
               <button
                 key={opt.key}
                 onClick={() => setFilterBy(opt.key)}
-                className={`shrink-0 text-xs px-3 py-1 rounded-full font-medium transition-all ${
-                  filterBy === opt.key
-                    ? 'bg-[var(--primary)] text-white'
-                    : 'bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--text)]'
-                }`}
+                className={`shrink-0 text-xs px-3 py-1 rounded-full font-medium transition-all ${filterBy === opt.key ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--text)]'}`}
               >
                 {opt.label}
               </button>
@@ -377,109 +402,123 @@ export default function ClassDashboardPage() {
       <div className="p-4">
         {loading ? (
           <div className="flex justify-center py-12"><div className="text-4xl animate-bounce">📊</div></div>
-        ) : students.length === 0 ? (
-          <div className="card text-center py-12 space-y-3">
-            <div className="text-5xl">👥</div>
-            <p className="font-bold text-[var(--text)]">No students yet</p>
-            <p className="text-sm text-[var(--text-muted)]">Share this code with your students:</p>
-            <div className="flex items-center justify-center gap-2">
-              <code className="text-xl font-black text-[var(--primary)] bg-[var(--primary-bg)] px-5 py-2.5 rounded-xl tracking-wider">{classInfo?.join_code}</code>
-              <button onClick={copyCode} className="text-2xl">{copied ? '✅' : '📋'}</button>
+
+        ) : tab === 'activity' ? (
+          /* ── Activity feed ── */
+          activityLoading ? (
+            <div className="flex justify-center py-12"><div className="text-4xl animate-bounce">📡</div></div>
+          ) : activityFeed.length === 0 ? (
+            <div className="card text-center py-12 space-y-3">
+              <div className="text-5xl">📡</div>
+              <p className="font-bold text-[var(--text)]">No activity yet</p>
+              <p className="text-sm text-[var(--text-muted)]">Activity appears here as students complete units</p>
             </div>
-            <p className="text-xs text-[var(--text-muted)]">Students enter this code on the Classes page</p>
-          </div>
-        ) : visibleStudents.length === 0 ? (
-          <div className="card text-center py-10 space-y-2">
-            <div className="text-4xl">😴</div>
-            <p className="font-bold text-[var(--text)]">No inactive students</p>
-            <p className="text-sm text-[var(--text-muted)]">Everyone studied in the last 7 days!</p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {visibleStudents.map((s, i) => {
-              const notes = studentNotes[s.student_id] ?? [];
-              const unreadNotes = notes.filter(n => !n.read_at).length;
-              const targets = studentTargets[s.student_id] ?? [];
-              const activeTargets = targets.filter(t => !t.completed_at).length;
-              const totalProgress = s.a1_learned + s.a2_learned + s.b1_learned;
-              return (
-                <div key={s.student_id} className="card space-y-3">
-                  {/* Student header */}
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs font-bold text-[var(--text-muted)] w-5 text-center shrink-0">{i + 1}</span>
-                    <Avatar name={s.name} url={s.avatar_url} />
-                    <div className="flex-1 min-w-0">
-                      <p className="font-bold text-sm text-[var(--text)] truncate">{s.name}</p>
-                      <p className="text-xs text-[var(--text-muted)]">Last active: {lastActiveLabel(s.last_study_date)}</p>
-                    </div>
-                    <div className="text-right shrink-0">
-                      <p className="text-sm font-black text-[var(--primary)]">{s.xp} XP</p>
-                      <p className="text-[10px] text-[var(--text-muted)]">🔥 {s.streak} · 📚 {s.total_words}</p>
-                    </div>
-                  </div>
-
-                  {/* Overall progress bar */}
-                  <div className="pl-8">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-[10px] font-semibold text-[var(--text-muted)]">Overall progress</span>
-                      <span className="text-[10px] font-bold text-[var(--text-muted)]">{totalProgress}/{TOTAL_UNITS} units</span>
-                    </div>
-                    <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
-                      <div
-                        className="h-full rounded-full transition-all"
-                        style={{
-                          width: `${Math.min(100, (totalProgress / TOTAL_UNITS) * 100)}%`,
-                          background: 'linear-gradient(90deg, #2ECC71, #3498DB)',
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Unit breakdown */}
-                  <div className="grid grid-cols-3 gap-3 pl-8">
-                    {[
-                      { label: 'A1', done: s.a1_learned, color: '#2ECC71' },
-                      { label: 'A2', done: s.a2_learned, color: '#27AE60' },
-                      { label: 'B1', done: s.b1_learned, color: '#3498DB' },
-                    ].map(({ label, done, color }) => (
-                      <div key={label}>
-                        <p className="text-[10px] font-bold text-[var(--text-muted)] mb-1">{label}</p>
-                        <ProgressBar done={done} total={COLLECTION_TOTALS[label]} color={color} />
+          ) : (
+            <div className="space-y-5">
+              {groupedActivity.map(group => (
+                <div key={group.label}>
+                  <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide mb-2">{group.label}</p>
+                  <div className="space-y-2">
+                    {group.items.map((item, idx) => (
+                      <div key={idx} className="flex items-center gap-3 py-2.5 px-3 rounded-xl" style={{ background: 'var(--surface-2)' }}>
+                        <Avatar name={item.student_name} url={item.avatar_url} size={34} />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-[var(--text)] leading-tight">
+                            <span className="font-semibold">{item.student_name}</span>
+                            {' '}completed {ACTIVITY_ICON[item.completion_type]}{' '}
+                            <span className="font-medium">{ACTIVITY_LABEL[item.completion_type]}</span>
+                            {' · '}<span className="text-[var(--text-muted)]">{item.collection_name} Unit {item.day_number}</span>
+                          </p>
+                          <p className="text-[10px] text-[var(--text-muted)] mt-0.5">{timeAgo(item.completed_at)}</p>
+                        </div>
                       </div>
                     ))}
                   </div>
-
-                  {/* Actions */}
-                  <div className="flex items-center gap-4 pl-8">
-                    <button
-                      onClick={() => { setNoteTarget(s); setNoteText(''); }}
-                      className="flex items-center gap-1.5 text-xs font-semibold text-[var(--primary)] hover:opacity-70 transition-opacity"
-                    >
-                      ✉️ Note
-                      {unreadNotes > 0 && (
-                        <span className="bg-[var(--primary)] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">{unreadNotes}</span>
-                      )}
-                    </button>
-                    <button
-                      onClick={() => { setTargetStudent(s); setTargetTitle(''); setTargetDate(''); }}
-                      className="flex items-center gap-1.5 text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--primary)] transition-colors"
-                    >
-                      🎯 Target
-                      {activeTargets > 0 && (
-                        <span className="bg-[var(--surface-2)] text-[var(--text-muted)] text-[9px] font-bold px-1.5 py-0.5 rounded-full border border-[var(--border)]">{activeTargets}</span>
-                      )}
-                    </button>
-                    <button
-                      onClick={() => removeStudent(s.student_id)}
-                      className="text-[10px] text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors ml-auto"
-                    >
-                      Remove
-                    </button>
-                  </div>
                 </div>
-              );
-            })}
-          </div>
+              ))}
+            </div>
+          )
+
+        ) : (
+          /* ── Students tab ── */
+          students.length === 0 ? (
+            <div className="card text-center py-12 space-y-3">
+              <div className="text-5xl">👥</div>
+              <p className="font-bold text-[var(--text)]">No students yet</p>
+              <p className="text-sm text-[var(--text-muted)]">Share this code with your students:</p>
+              <div className="flex items-center justify-center gap-2">
+                <code className="text-xl font-black text-[var(--primary)] bg-[var(--primary-bg)] px-5 py-2.5 rounded-xl tracking-wider">{classInfo?.join_code}</code>
+                <button onClick={copyCode} className="text-2xl">{copied ? '✅' : '📋'}</button>
+              </div>
+            </div>
+          ) : visibleStudents.length === 0 ? (
+            <div className="card text-center py-10 space-y-2">
+              <div className="text-4xl">😴</div>
+              <p className="font-bold text-[var(--text)]">No inactive students</p>
+              <p className="text-sm text-[var(--text-muted)]">Everyone studied in the last 7 days!</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {visibleStudents.map((s, i) => {
+                const notes = studentNotes[s.student_id] ?? [];
+                const unreadNotes = notes.filter(n => !n.read_at).length;
+                const targets = studentTargets[s.student_id] ?? [];
+                const activeTargets = targets.filter(t => !t.completed_at).length;
+                const totalProgress = s.a1_learned + s.a2_learned + s.b1_learned;
+                return (
+                  <div key={s.student_id} className="card space-y-3">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs font-bold text-[var(--text-muted)] w-5 text-center shrink-0">{i + 1}</span>
+                      <Avatar name={s.name} url={s.avatar_url} />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-sm text-[var(--text)] truncate">{s.name}</p>
+                        <p className="text-xs text-[var(--text-muted)]">Last active: {lastActiveLabel(s.last_study_date)}</p>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="text-sm font-black text-[var(--primary)]">{s.xp} XP</p>
+                        <p className="text-[10px] text-[var(--text-muted)]">🔥 {s.streak} · 📚 {s.total_words}</p>
+                      </div>
+                    </div>
+
+                    <div className="pl-8">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-[10px] font-semibold text-[var(--text-muted)]">Overall progress</span>
+                        <span className="text-[10px] font-bold text-[var(--text-muted)]">{totalProgress}/{TOTAL_UNITS} units</span>
+                      </div>
+                      <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
+                        <div className="h-full rounded-full transition-all" style={{ width: `${Math.min(100, (totalProgress / TOTAL_UNITS) * 100)}%`, background: 'linear-gradient(90deg, #2ECC71, #3498DB)' }} />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-3 pl-8">
+                      {[
+                        { label: 'A1', done: s.a1_learned, color: '#2ECC71' },
+                        { label: 'A2', done: s.a2_learned, color: '#27AE60' },
+                        { label: 'B1', done: s.b1_learned, color: '#3498DB' },
+                      ].map(({ label, done, color }) => (
+                        <div key={label}>
+                          <p className="text-[10px] font-bold text-[var(--text-muted)] mb-1">{label}</p>
+                          <ProgressBar done={done} total={COLLECTION_TOTALS[label]} color={color} />
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="flex items-center gap-4 pl-8">
+                      <button onClick={() => { setNoteTarget(s); setNoteText(''); }} className="flex items-center gap-1.5 text-xs font-semibold text-[var(--primary)] hover:opacity-70 transition-opacity">
+                        ✉️ Note
+                        {unreadNotes > 0 && <span className="bg-[var(--primary)] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">{unreadNotes}</span>}
+                      </button>
+                      <button onClick={() => { setTargetStudent(s); setTargetTitle(''); setTargetDate(''); }} className="flex items-center gap-1.5 text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--primary)] transition-colors">
+                        🎯 Target
+                        {activeTargets > 0 && <span className="bg-[var(--surface-2)] text-[var(--text-muted)] text-[9px] font-bold px-1.5 py-0.5 rounded-full border border-[var(--border)]">{activeTargets}</span>}
+                      </button>
+                      <button onClick={() => removeStudent(s.student_id)} className="text-[10px] text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors ml-auto">Remove</button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )
         )}
       </div>
 
@@ -490,10 +529,7 @@ export default function ClassDashboardPage() {
             <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto shrink-0" />
             <div className="flex items-center gap-3 shrink-0">
               <Avatar name={noteTarget.name} url={noteTarget.avatar_url} size={36} />
-              <div>
-                <p className="font-bold text-[var(--text)]">{noteTarget.name}</p>
-                <p className="text-xs text-[var(--text-muted)]">Send a note</p>
-              </div>
+              <div><p className="font-bold text-[var(--text)]">{noteTarget.name}</p><p className="text-xs text-[var(--text-muted)]">Send a note</p></div>
             </div>
             {(studentNotes[noteTarget.student_id] ?? []).length > 0 && (
               <div className="flex-1 overflow-y-auto space-y-2 min-h-0">
@@ -501,27 +537,16 @@ export default function ClassDashboardPage() {
                 {(studentNotes[noteTarget.student_id] ?? []).map(n => (
                   <div key={n.id} className="rounded-xl px-3 py-2.5 text-sm" style={{ background: 'var(--surface-2)' }}>
                     <p className="text-[var(--text)]">{n.message}</p>
-                    <p className="text-[10px] text-[var(--text-muted)] mt-1">
-                      {timeAgo(n.created_at)} {n.read_at ? '· Seen ✓' : '· Not seen yet'}
-                    </p>
+                    <p className="text-[10px] text-[var(--text-muted)] mt-1">{timeAgo(n.created_at)} {n.read_at ? '· Seen ✓' : '· Not seen yet'}</p>
                   </div>
                 ))}
               </div>
             )}
             <div className="shrink-0 space-y-3">
-              <textarea
-                placeholder={`Write a note to ${noteTarget.name}…`}
-                value={noteText}
-                onChange={e => setNoteText(e.target.value)}
-                rows={3}
-                autoFocus
-                className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm resize-none focus:outline-none focus:border-[var(--primary)]"
-              />
+              <textarea placeholder={`Write a note to ${noteTarget.name}…`} value={noteText} onChange={e => setNoteText(e.target.value)} rows={3} autoFocus className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm resize-none focus:outline-none focus:border-[var(--primary)]" />
               <div className="flex gap-3">
                 <button onClick={() => setNoteTarget(null)} className="flex-1 py-3 rounded-xl bg-[var(--surface-2)] text-sm font-semibold text-[var(--text)]">Cancel</button>
-                <button onClick={sendNote} disabled={sending || !noteText.trim()} className="flex-1 btn-primary py-3 disabled:opacity-50">
-                  {sending ? 'Sending…' : 'Send ✉️'}
-                </button>
+                <button onClick={sendNote} disabled={sending || !noteText.trim()} className="flex-1 btn-primary py-3 disabled:opacity-50">{sending ? 'Sending…' : 'Send ✉️'}</button>
               </div>
             </div>
           </div>
@@ -535,10 +560,7 @@ export default function ClassDashboardPage() {
             <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto shrink-0" />
             <div className="flex items-center gap-3 shrink-0">
               <Avatar name={targetStudent.name} url={targetStudent.avatar_url} size={36} />
-              <div>
-                <p className="font-bold text-[var(--text)]">{targetStudent.name}</p>
-                <p className="text-xs text-[var(--text-muted)]">Set a target</p>
-              </div>
+              <div><p className="font-bold text-[var(--text)]">{targetStudent.name}</p><p className="text-xs text-[var(--text-muted)]">Set a target</p></div>
             </div>
             {(studentTargets[targetStudent.student_id] ?? []).length > 0 && (
               <div className="flex-1 overflow-y-auto space-y-2 min-h-0">
@@ -550,14 +572,8 @@ export default function ClassDashboardPage() {
                       <span className="text-base mt-0.5 shrink-0">{t.completed_at ? '✅' : '🎯'}</span>
                       <div className="flex-1 min-w-0">
                         <p className={`text-sm text-[var(--text)] ${t.completed_at ? 'line-through opacity-50' : ''}`}>{t.title}</p>
-                        {due && (
-                          <p className={`text-[10px] mt-0.5 font-medium ${due.overdue && !t.completed_at ? 'text-[var(--danger)]' : 'text-[var(--text-muted)]'}`}>
-                            {t.completed_at ? `Completed ${timeAgo(t.completed_at)}` : due.text}
-                          </p>
-                        )}
-                        {t.completed_at && !due && (
-                          <p className="text-[10px] mt-0.5 text-[var(--text-muted)]">Completed {timeAgo(t.completed_at)}</p>
-                        )}
+                        {due && <p className={`text-[10px] mt-0.5 font-medium ${due.overdue && !t.completed_at ? 'text-[var(--danger)]' : 'text-[var(--text-muted)]'}`}>{t.completed_at ? `Completed ${timeAgo(t.completed_at)}` : due.text}</p>}
+                        {t.completed_at && !due && <p className="text-[10px] mt-0.5 text-[var(--text-muted)]">Completed {timeAgo(t.completed_at)}</p>}
                       </div>
                       <button onClick={() => deleteTarget(t.id)} className="text-[10px] text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors shrink-0 mt-1">✕</button>
                     </div>
@@ -566,29 +582,14 @@ export default function ClassDashboardPage() {
               </div>
             )}
             <div className="shrink-0 space-y-3">
-              <input
-                type="text"
-                placeholder='e.g. "Complete A1 Unit 5 by Friday"'
-                value={targetTitle}
-                onChange={e => setTargetTitle(e.target.value)}
-                autoFocus
-                className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]"
-              />
+              <input type="text" placeholder='e.g. "Complete A1 Unit 5 by Friday"' value={targetTitle} onChange={e => setTargetTitle(e.target.value)} autoFocus className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]" />
               <div>
                 <label className="text-xs text-[var(--text-muted)] mb-1 block">Due date (optional)</label>
-                <input
-                  type="date"
-                  value={targetDate}
-                  onChange={e => setTargetDate(e.target.value)}
-                  min={new Date().toISOString().slice(0, 10)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]"
-                />
+                <input type="date" value={targetDate} onChange={e => setTargetDate(e.target.value)} min={new Date().toISOString().slice(0, 10)} className="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]" />
               </div>
               <div className="flex gap-3">
                 <button onClick={() => setTargetStudent(null)} className="flex-1 py-3 rounded-xl bg-[var(--surface-2)] text-sm font-semibold text-[var(--text)]">Cancel</button>
-                <button onClick={addTarget} disabled={settingTarget || !targetTitle.trim()} className="flex-1 btn-primary py-3 disabled:opacity-50">
-                  {settingTarget ? 'Setting…' : 'Set target 🎯'}
-                </button>
+                <button onClick={addTarget} disabled={settingTarget || !targetTitle.trim()} className="flex-1 btn-primary py-3 disabled:opacity-50">{settingTarget ? 'Setting…' : 'Set target 🎯'}</button>
               </div>
             </div>
           </div>
