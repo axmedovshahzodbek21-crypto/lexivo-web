@@ -282,7 +282,7 @@ function ImportPageInner() {
               <pre className="text-xs bg-[var(--surface-2)] rounded-xl p-3 whitespace-pre-wrap text-[var(--text)] leading-relaxed overflow-x-auto">
                 {buildPrompt1(wordLang, transLang)}
               </pre>
-              <button onClick={() => copy(buildPrompt1(wordLang, transLang), 1)} className="w-full py-2 rounded-xl bg-[var(--primary)] text-white text-sm font-semibold transition-opacity hover:opacity-90">
+              <button onClick={() => copy(buildPrompt1(wordLang, transLang), 1)} className="btn-primary w-full py-2 text-sm">
                 {copied1 ? t.import.copied : t.import.copyPrompt}
               </button>
             </div>
@@ -303,7 +303,7 @@ function ImportPageInner() {
               <pre className="text-xs bg-[var(--surface-2)] rounded-xl p-3 whitespace-pre-wrap text-[var(--text)] leading-relaxed overflow-x-auto">
                 {buildPrompt2(wordLang, transLang)}
               </pre>
-              <button onClick={() => copy(buildPrompt2(wordLang, transLang), 2)} className="w-full py-2 rounded-xl bg-[var(--primary)] text-white text-sm font-semibold transition-opacity hover:opacity-90">
+              <button onClick={() => copy(buildPrompt2(wordLang, transLang), 2)} className="btn-primary w-full py-2 text-sm">
                 {copied2 ? t.import.copied : t.import.copyPrompt}
               </button>
             </div>

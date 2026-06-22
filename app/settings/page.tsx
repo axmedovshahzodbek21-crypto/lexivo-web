@@ -288,7 +288,7 @@ export default function SettingsPage() {
 
         <button
           onClick={() => { resetOnboarded(); router.replace('/onboarding'); }}
-          className="w-full py-2.5 rounded-xl border border-[var(--border)] text-sm text-[var(--text-muted)] hover:bg-[var(--surface-2)] transition-colors"
+          className="btn-outline w-full py-2.5 text-sm"
         >
           {t.settings.startSetupAgain}
         </button>
@@ -571,7 +571,7 @@ export default function SettingsPage() {
           {permission === 'granted' && (
             <button
               onClick={handleTest}
-              className="w-full py-2 rounded-xl border border-[var(--border)] text-sm text-[var(--text-muted)] hover:bg-[var(--surface-2)] transition-colors"
+              className="btn-outline w-full py-2 text-sm"
             >
               {testSent ? t.settings.testNotifSent : t.settings.testNotif}
             </button>
@@ -619,10 +619,10 @@ export default function SettingsPage() {
             <p className="text-sm font-semibold text-amber-800">{t.settings.confirmImport}</p>
             <p className="text-xs text-amber-700">{importMsg}</p>
             <div className="flex gap-2">
-              <button onClick={() => setImportState('idle')} className="flex-1 py-2 rounded-xl border border-[var(--border)] text-sm text-[var(--text-muted)] hover:bg-[var(--surface-2)] transition-colors">
+              <button onClick={() => setImportState('idle')} className="flex-1 btn-outline py-2 text-sm">
                 {t.settings.dismiss}
               </button>
-              <button onClick={confirmImport} className="flex-1 py-2 rounded-xl bg-[var(--primary)] text-white text-sm font-semibold hover:bg-[var(--primary-dark)] transition-colors">
+              <button onClick={confirmImport} className="flex-1 btn-primary py-2 text-sm">
                 {t.settings.yesOverwrite}
               </button>
             </div>

@@ -510,7 +510,7 @@ export default function ProfilePage() {
                 <div className="flex gap-2">
                   <button
                     onClick={() => { setShowDeleteConfirm(false); setDeleteConfirmText(''); setDeleteError(null); }}
-                    className="flex-1 py-2.5 rounded-xl border border-[var(--border)] text-sm font-medium text-[var(--text-muted)] hover:bg-[var(--surface-2)] transition-colors"
+                    className="flex-1 btn-outline py-2.5 text-sm"
                   >
                     {t.common.cancel}
                   </button>
