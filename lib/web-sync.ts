@@ -278,7 +278,7 @@ export async function pullAll(uid: string) {
     // unit_progress — OR-merge: remote true always wins, local true never erased
     try {
       const { data: upRows } = await supabase.from('unit_progress')
-        .select('collection_name,day_number,learn_done,flashcard_done,quiz_done')
+        .select('collection_name,day_number,learn_done,flashcard_done,quiz_done,completed_at')
         .eq('user_id', uid);
       if (typeof window !== 'undefined' && upRows && upRows.length > 0) {
         for (const r of upRows) {
@@ -286,9 +286,10 @@ export async function pullAll(uid: string) {
           const existing = localStorage.getItem(key);
           const local = existing ? JSON.parse(existing) : { learnDone: false, flashcardDone: false, quizDone: false };
           localStorage.setItem(key, JSON.stringify({
-            learnDone:    local.learnDone    || (r.learn_done     ?? false),
-            flashcardDone: local.flashcardDone || (r.flashcard_done ?? false),
-            quizDone:     local.quizDone     || (r.quiz_done      ?? false),
+            learnDone:     local.learnDone     || (r.learn_done      ?? false),
+            flashcardDone: local.flashcardDone || (r.flashcard_done  ?? false),
+            quizDone:      local.quizDone      || (r.quiz_done       ?? false),
+            completedAt:   local.completedAt   ?? (r.completed_at    ?? null),
           }));
         }
       }
