@@ -1,4 +1,5 @@
-'use client';
+﻿'use client';
+import { PageLoader, SectionLoader } from '@/components/Loader';
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
@@ -397,9 +398,10 @@ function Loading() {
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="text-center">
-        <div className="text-4xl mb-3 animate-bounce">❓</div>
+        <SectionLoader />
         <p className="text-[var(--text-muted)]">{t.quiz.loading}</p>
       </div>
     </div>
   );
 }
+

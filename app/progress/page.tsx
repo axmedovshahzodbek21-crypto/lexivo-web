@@ -1,4 +1,5 @@
-'use client';
+﻿'use client';
+import { PageLoader, SectionLoader } from '@/components/Loader';
 import { Suspense } from 'react';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
@@ -17,7 +18,7 @@ import { useTranslation } from '@/lib/useTranslation';
 
 export default function ProgressPageWrapper() {
   return (
-    <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="text-4xl animate-bounce">📊</div></div>}>
+    <Suspense fallback={<PageLoader />}>
       <ProgressPage />
     </Suspense>
   );
@@ -515,3 +516,4 @@ function MonthlyBreakdown({ history }: { history: Record<string, number> }) {
     </div>
   );
 }
+

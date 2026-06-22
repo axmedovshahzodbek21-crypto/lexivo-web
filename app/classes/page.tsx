@@ -1,4 +1,5 @@
-'use client';
+﻿'use client';
+import { PageLoader, SectionLoader } from '@/components/Loader';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
@@ -369,7 +370,7 @@ export default function ClassesPage() {
 
       <div className="p-4 space-y-6">
         {loading ? (
-          <div className="flex justify-center py-12"><div className="text-4xl animate-bounce">👩‍🏫</div></div>
+          <SectionLoader />
         ) : (
           <>
             {/* My Classes (Teacher) */}
@@ -532,7 +533,7 @@ export default function ClassesPage() {
                           <div className="border-t border-[var(--border)] pt-3 space-y-2">
                             <p className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-wide">🏆 Class Leaderboard</p>
                             {leaderboardLoading === cls.id ? (
-                              <div className="text-center py-4 text-2xl animate-bounce">🏆</div>
+                              <SectionLoader rows={2} />
                             ) : (classLeaderboards[cls.id] ?? []).length === 0 ? (
                               <p className="text-xs text-[var(--text-muted)] text-center py-2">No data yet</p>
                             ) : (
@@ -800,3 +801,4 @@ export default function ClassesPage() {
     </div>
   );
 }
+

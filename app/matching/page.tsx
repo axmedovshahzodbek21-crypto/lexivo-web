@@ -1,4 +1,5 @@
-'use client';
+﻿'use client';
+import { PageLoader, SectionLoader } from '@/components/Loader';
 import { Suspense } from 'react';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -189,7 +190,7 @@ function MatchingInner() {
   if (!collectionsLoaded) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-4xl animate-bounce">🎯</div>
+        <SectionLoader />
       </div>
     );
   }
@@ -410,10 +411,11 @@ export default function MatchingPage() {
   return (
     <Suspense fallback={
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-4xl animate-bounce">🎯</div>
+        <SectionLoader />
       </div>
     }>
       <MatchingInner />
     </Suspense>
   );
 }
+

@@ -1,4 +1,5 @@
-'use client';
+﻿'use client';
+import { PageLoader, SectionLoader } from '@/components/Loader';
 import { useState, useMemo, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslation } from '@/lib/useTranslation';
@@ -435,8 +436,9 @@ function ImportPageInner() {
 
 export default function ImportPage() {
   return (
-    <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="text-4xl animate-bounce">✨</div></div>}>
+    <Suspense fallback={<PageLoader />}>
       <ImportPageInner />
     </Suspense>
   );
 }
+

@@ -1,4 +1,5 @@
-'use client';
+﻿'use client';
+import { PageLoader, SectionLoader } from '@/components/Loader';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
@@ -252,7 +253,7 @@ export default function LeaderboardPage() {
       <div className="p-4 space-y-3">
         {loading && (
           <div className="flex items-center justify-center py-20">
-            <div className="text-4xl animate-bounce">🏆</div>
+            <SectionLoader />
           </div>
         )}
 
@@ -382,3 +383,4 @@ export default function LeaderboardPage() {
     </div>
   );
 }
+

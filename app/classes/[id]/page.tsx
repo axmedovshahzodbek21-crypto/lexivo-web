@@ -1,4 +1,5 @@
-'use client';
+﻿'use client';
+import { PageLoader, SectionLoader } from '@/components/Loader';
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
@@ -13,7 +14,7 @@ interface CollectionMeta {
   group_name: string;
 }
 
-const ACTIVITY_ICON: Record<string, string> = { learn: '📖', flashcard: '🃏', quiz: '🧠' };
+const ACTIVITY_ICON: Record<string, string> = { learn: 'рџ“–', flashcard: 'рџѓЏ', quiz: 'рџ§ ' };
 const ACTIVITY_LABEL: Record<string, string> = { learn: 'Learn', flashcard: 'Flashcard', quiz: 'Quiz' };
 
 type SortKey = 'lastActive' | 'xp' | 'progress' | 'name';
@@ -82,7 +83,7 @@ function lastActiveLabel(date: string | null): string {
   if (!date) return 'Never';
   const today = new Date().toISOString().slice(0, 10);
   const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
-  if (date >= today) return 'Today ✅';
+  if (date >= today) return 'Today вњ…';
   if (date >= yesterday) return 'Yesterday';
   const days = Math.floor((Date.now() - new Date(date).getTime()) / 86400000);
   if (days < 7) return `${days}d ago`;
@@ -106,7 +107,7 @@ function dueDateLabel(due: string | null): { text: string; overdue: boolean } | 
   if (!due) return null;
   const today = new Date().toISOString().slice(0, 10);
   const tomorrow = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
-  if (due < today) return { text: `Overdue · ${new Date(due + 'T00:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`, overdue: true };
+  if (due < today) return { text: `Overdue В· ${new Date(due + 'T00:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`, overdue: true };
   if (due === today) return { text: 'Due today', overdue: false };
   if (due === tomorrow) return { text: 'Due tomorrow', overdue: false };
   return { text: `Due ${new Date(due + 'T00:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`, overdue: false };
@@ -419,7 +420,7 @@ export default function ClassDashboardPage() {
 
   if (!user) return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8">
-      <div className="text-5xl">🔒</div>
+      <div className="text-5xl">рџ”’</div>
       <p className="text-[var(--text-muted)]">Sign in to view this class</p>
       <button onClick={() => router.push('/login')} className="btn-primary">Sign in</button>
     </div>
@@ -427,7 +428,7 @@ export default function ClassDashboardPage() {
 
   if (notTeacher) return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8">
-      <div className="text-5xl">⛔</div>
+      <div className="text-5xl">в›”</div>
       <p className="font-bold text-[var(--text)]">Not your class</p>
       <p className="text-sm text-[var(--text-muted)]">Only the teacher can view this dashboard</p>
       <button onClick={() => router.back()} className="btn-primary">Go back</button>
@@ -435,29 +436,29 @@ export default function ClassDashboardPage() {
   );
 
   const SORT_OPTIONS: { key: SortKey; label: string }[] = [
-    { key: 'lastActive', label: '🕐 Active' },
-    { key: 'xp', label: '⚡ XP' },
-    { key: 'progress', label: '📈 Progress' },
-    { key: 'name', label: '🔤 Name' },
+    { key: 'lastActive', label: 'рџ•ђ Active' },
+    { key: 'xp', label: 'вљЎ XP' },
+    { key: 'progress', label: 'рџ“€ Progress' },
+    { key: 'name', label: 'рџ”¤ Name' },
   ];
 
   const FILTER_OPTIONS: { key: FilterKey; label: string }[] = [
     { key: 'all', label: 'All' },
-    { key: 'active', label: '✅ Active' },
-    { key: 'inactive', label: '😴 Inactive' },
+    { key: 'active', label: 'вњ… Active' },
+    { key: 'inactive', label: 'рџґ Inactive' },
   ];
 
   return (
     <div className="flex flex-col min-h-screen pb-24 animate-fade-in">
       {/* Header */}
       <div className="flex items-center gap-3 p-4 border-b border-[var(--border)]">
-        <button onClick={() => router.back()} className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-lg shrink-0">←</button>
+        <button onClick={() => router.back()} className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-lg shrink-0">в†ђ</button>
         <div className="flex-1 min-w-0">
           <h1 className="font-bold text-[var(--text)] truncate">{classInfo?.name ?? 'Class Dashboard'}</h1>
           <div className="flex items-center gap-2 mt-0.5">
             <span className="text-xs text-[var(--text-muted)]">Join code:</span>
             <code className="text-xs font-bold text-[var(--primary)]">{classInfo?.join_code}</code>
-            <button onClick={copyCode} className="text-sm hover:scale-110 transition-transform">{copied ? '✅' : '📋'}</button>
+            <button onClick={copyCode} className="text-sm hover:scale-110 transition-transform">{copied ? 'вњ…' : 'рџ“‹'}</button>
           </div>
         </div>
         <div className="shrink-0 flex flex-col items-end gap-1">
@@ -465,14 +466,14 @@ export default function ClassDashboardPage() {
           <p className="text-[10px] text-[var(--text-muted)]">students</p>
           <div className="flex gap-1.5">
             <button onClick={() => router.push(`/classes/${id}/words`)} className="text-[10px] font-semibold px-2 py-1 rounded-lg bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--primary)] hover:bg-[var(--primary-bg)] transition-colors">
-              📝 Words
+              рџ“ќ Words
             </button>
             <button onClick={() => { setShowAnnounce(true); setAnnounceText(''); }} className="text-[10px] font-semibold px-2 py-1 rounded-lg bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--primary)] hover:bg-[var(--primary-bg)] transition-colors">
-              📢 Announce
+              рџ“ў Announce
             </button>
             {students.length > 0 && (
               <button onClick={exportCSV} className="text-[10px] font-semibold px-2 py-1 rounded-lg bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--primary)] hover:bg-[var(--primary-bg)] transition-colors">
-                📥 CSV
+                рџ“Ґ CSV
               </button>
             )}
           </div>
@@ -492,20 +493,20 @@ export default function ClassDashboardPage() {
                   : 'text-[var(--text-muted)] hover:text-[var(--text)]'
               }`}
             >
-              {t === 'students' ? '👥 Students' : '📡 Activity'}
+              {t === 'students' ? 'рџ‘Ґ Students' : 'рџ“Ў Activity'}
             </button>
           ))}
         </div>
       )}
 
-      {/* Class stats bar — students tab only */}
+      {/* Class stats bar вЂ” students tab only */}
       {!loading && tab === 'students' && classStats && (
         <div className="grid grid-cols-4 divide-x divide-[var(--border)] border-b border-[var(--border)]">
           {[
-            { label: 'Total XP', value: classStats.totalXP.toLocaleString(), icon: '⚡' },
-            { label: 'Avg streak', value: `${classStats.avgStreak.toFixed(1)}d`, icon: '🔥' },
-            { label: 'Avg words', value: Math.round(classStats.avgWords).toString(), icon: '📚' },
-            { label: 'Active', value: `${classStats.activeCount}/${classStats.n}`, icon: '✅' },
+            { label: 'Total XP', value: classStats.totalXP.toLocaleString(), icon: 'вљЎ' },
+            { label: 'Avg streak', value: `${classStats.avgStreak.toFixed(1)}d`, icon: 'рџ”Ґ' },
+            { label: 'Avg words', value: Math.round(classStats.avgWords).toString(), icon: 'рџ“љ' },
+            { label: 'Active', value: `${classStats.activeCount}/${classStats.n}`, icon: 'вњ…' },
           ].map(stat => (
             <div key={stat.label} className="flex flex-col items-center py-2.5 px-1">
               <p className="text-base font-black text-[var(--text)] leading-tight">{stat.icon} {stat.value}</p>
@@ -515,7 +516,7 @@ export default function ClassDashboardPage() {
         </div>
       )}
 
-      {/* Sort & Filter bar — students tab only */}
+      {/* Sort & Filter bar вЂ” students tab only */}
       {!loading && tab === 'students' && students.length > 0 && (
         <div className="px-4 py-2.5 border-b border-[var(--border)] space-y-2">
           <div className="flex items-center gap-2 overflow-x-auto pb-0.5">
@@ -547,15 +548,15 @@ export default function ClassDashboardPage() {
 
       <div className="p-4">
         {loading ? (
-          <div className="flex justify-center py-12"><div className="text-4xl animate-bounce">📊</div></div>
+          <SectionLoader />
 
         ) : tab === 'activity' ? (
-          /* ── Activity feed ── */
+          /* в”Ђв”Ђ Activity feed в”Ђв”Ђ */
           activityLoading ? (
-            <div className="flex justify-center py-12"><div className="text-4xl animate-bounce">📡</div></div>
+            <SectionLoader />
           ) : activityFeed.length === 0 ? (
             <div className="card text-center py-12 space-y-3">
-              <div className="text-5xl">📡</div>
+              <div className="text-5xl">рџ“Ў</div>
               <p className="font-bold text-[var(--text)]">No activity yet</p>
               <p className="text-sm text-[var(--text-muted)]">Activity appears here as students complete units</p>
             </div>
@@ -573,7 +574,7 @@ export default function ClassDashboardPage() {
                             <span className="font-semibold">{item.student_name}</span>
                             {' '}completed {ACTIVITY_ICON[item.completion_type]}{' '}
                             <span className="font-medium">{ACTIVITY_LABEL[item.completion_type]}</span>
-                            {' · '}<span className="text-[var(--text-muted)]">{item.collection_name} Unit {item.day_number}</span>
+                            {' В· '}<span className="text-[var(--text-muted)]">{item.collection_name} Unit {item.day_number}</span>
                           </p>
                           <p className="text-[10px] text-[var(--text-muted)] mt-0.5">{timeAgo(item.completed_at)}</p>
                         </div>
@@ -586,20 +587,20 @@ export default function ClassDashboardPage() {
           )
 
         ) : (
-          /* ── Students tab ── */
+          /* в”Ђв”Ђ Students tab в”Ђв”Ђ */
           students.length === 0 ? (
             <div className="card text-center py-12 space-y-3">
-              <div className="text-5xl">👥</div>
+              <div className="text-5xl">рџ‘Ґ</div>
               <p className="font-bold text-[var(--text)]">No students yet</p>
               <p className="text-sm text-[var(--text-muted)]">Share this code with your students:</p>
               <div className="flex items-center justify-center gap-2">
                 <code className="text-xl font-black text-[var(--primary)] bg-[var(--primary-bg)] px-5 py-2.5 rounded-xl tracking-wider">{classInfo?.join_code}</code>
-                <button onClick={copyCode} className="text-2xl">{copied ? '✅' : '📋'}</button>
+                <button onClick={copyCode} className="text-2xl">{copied ? 'вњ…' : 'рџ“‹'}</button>
               </div>
             </div>
           ) : visibleStudents.length === 0 ? (
             <div className="card text-center py-10 space-y-2">
-              <div className="text-4xl">😴</div>
+              <div className="text-4xl">рџґ</div>
               <p className="font-bold text-[var(--text)]">No inactive students</p>
               <p className="text-sm text-[var(--text-muted)]">Everyone studied in the last 7 days!</p>
             </div>
@@ -619,15 +620,15 @@ export default function ClassDashboardPage() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5">
                           <p className="font-bold text-sm text-[var(--text)] truncate">{s.name}</p>
-                          {isInactive(s.last_study_date) && <span className="text-[10px] font-bold text-[var(--danger)] shrink-0">⚠️ Inactive</span>}
+                          {isInactive(s.last_study_date) && <span className="text-[10px] font-bold text-[var(--danger)] shrink-0">вљ пёЏ Inactive</span>}
                         </div>
                         <p className="text-xs text-[var(--text-muted)]">Last active: {lastActiveLabel(s.last_study_date)}</p>
                       </div>
                       <div className="text-right shrink-0">
                         <p className="text-sm font-black text-[var(--primary)]">{s.xp} XP</p>
                         <p className="text-[10px] text-[var(--text-muted)]">
-                          <button onClick={() => { const now = new Date(); setCalendarMonth({ year: now.getFullYear(), month: now.getMonth() }); setStreakModal(s); }} className="font-semibold hover:opacity-70 transition-opacity">🔥 {s.streak} ↗</button>
-                          {' · 📚 '}{s.total_words}
+                          <button onClick={() => { const now = new Date(); setCalendarMonth({ year: now.getFullYear(), month: now.getMonth() }); setStreakModal(s); }} className="font-semibold hover:opacity-70 transition-opacity">рџ”Ґ {s.streak} в†—</button>
+                          {' В· рџ“љ '}{s.total_words}
                         </p>
                       </div>
                     </div>
@@ -655,7 +656,7 @@ export default function ClassDashboardPage() {
                             <div className="grid gap-2 mt-1" style={{ gridTemplateColumns: `repeat(${Math.min(cols.length, 4)}, 1fr)` }}>
                               {cols.map(col => (
                                 <button key={col.collection_name} onClick={() => openCollection(s, col)} className="text-left hover:opacity-75 transition-opacity">
-                                  <p className="text-[10px] font-bold text-[var(--text-muted)] mb-1">{col.label} ↗</p>
+                                  <p className="text-[10px] font-bold text-[var(--text-muted)] mb-1">{col.label} в†—</p>
                                   <ProgressBar done={s.collection_progress[col.collection_name] ?? 0} total={col.total_units} color={col.color_hex} />
                                 </button>
                               ))}
@@ -667,11 +668,11 @@ export default function ClassDashboardPage() {
 
                     <div className="flex items-center gap-4 pl-8">
                       <button onClick={() => { setNoteTarget(s); setNoteText(''); }} className="flex items-center gap-1.5 text-xs font-semibold text-[var(--primary)] hover:opacity-70 transition-opacity">
-                        ✉️ Note
+                        вњ‰пёЏ Note
                         {unreadNotes > 0 && <span className="bg-[var(--primary)] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">{unreadNotes}</span>}
                       </button>
                       <button onClick={() => { setTargetStudent(s); setTargetTitle(''); setTargetDate(''); }} className="flex items-center gap-1.5 text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--primary)] transition-colors">
-                        🎯 Target
+                        рџЋЇ Target
                         {activeTargets > 0 && <span className="bg-[var(--surface-2)] text-[var(--text-muted)] text-[9px] font-bold px-1.5 py-0.5 rounded-full border border-[var(--border)]">{activeTargets}</span>}
                       </button>
                       <button onClick={() => removeStudent(s.student_id)} className="text-[10px] text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors ml-auto">Remove</button>
@@ -699,16 +700,16 @@ export default function ClassDashboardPage() {
                 {(studentNotes[noteTarget.student_id] ?? []).map(n => (
                   <div key={n.id} className="rounded-xl px-3 py-2.5 text-sm" style={{ background: 'var(--surface-2)' }}>
                     <p className="text-[var(--text)]">{n.message}</p>
-                    <p className="text-[10px] text-[var(--text-muted)] mt-1">{timeAgo(n.created_at)} {n.read_at ? '· Seen ✓' : '· Not seen yet'}</p>
+                    <p className="text-[10px] text-[var(--text-muted)] mt-1">{timeAgo(n.created_at)} {n.read_at ? 'В· Seen вњ“' : 'В· Not seen yet'}</p>
                   </div>
                 ))}
               </div>
             )}
             <div className="shrink-0 space-y-3">
-              <textarea placeholder={`Write a note to ${noteTarget.name}…`} value={noteText} onChange={e => setNoteText(e.target.value)} rows={3} autoFocus className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm resize-none focus:outline-none focus:border-[var(--primary)]" />
+              <textarea placeholder={`Write a note to ${noteTarget.name}вЂ¦`} value={noteText} onChange={e => setNoteText(e.target.value)} rows={3} autoFocus className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm resize-none focus:outline-none focus:border-[var(--primary)]" />
               <div className="flex gap-3">
                 <button onClick={() => setNoteTarget(null)} className="flex-1 py-3 rounded-xl bg-[var(--surface-2)] text-sm font-semibold text-[var(--text)]">Cancel</button>
-                <button onClick={sendNote} disabled={sending || !noteText.trim()} className="flex-1 btn-primary py-3 disabled:opacity-50">{sending ? 'Sending…' : 'Send ✉️'}</button>
+                <button onClick={sendNote} disabled={sending || !noteText.trim()} className="flex-1 btn-primary py-3 disabled:opacity-50">{sending ? 'SendingвЂ¦' : 'Send вњ‰пёЏ'}</button>
               </div>
             </div>
           </div>
@@ -722,7 +723,7 @@ export default function ClassDashboardPage() {
             <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto shrink-0" />
             <div className="flex items-center justify-between shrink-0">
               <div>
-                <p className="font-bold text-[var(--text)]">📢 Class Announcement</p>
+                <p className="font-bold text-[var(--text)]">рџ“ў Class Announcement</p>
                 <p className="text-xs text-[var(--text-muted)]">Sent to all students in {classInfo?.name}</p>
               </div>
             </div>
@@ -736,7 +737,7 @@ export default function ClassDashboardPage() {
                     <p className="flex-1 text-sm text-[var(--text)]">{a.message}</p>
                     <div className="text-right shrink-0 space-y-1">
                       <p className="text-[10px] text-[var(--text-muted)]">{timeAgo(a.created_at)}</p>
-                      <button onClick={() => deleteAnnouncement(a.id)} className="text-[10px] text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors block">✕ Delete</button>
+                      <button onClick={() => deleteAnnouncement(a.id)} className="text-[10px] text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors block">вњ• Delete</button>
                     </div>
                   </div>
                 ))}
@@ -746,7 +747,7 @@ export default function ClassDashboardPage() {
             {/* Compose */}
             <div className="shrink-0 space-y-3">
               <textarea
-                placeholder="Write an announcement for all students…"
+                placeholder="Write an announcement for all studentsвЂ¦"
                 value={announceText}
                 onChange={e => setAnnounceText(e.target.value)}
                 rows={3}
@@ -756,7 +757,7 @@ export default function ClassDashboardPage() {
               <div className="flex gap-3">
                 <button onClick={() => setShowAnnounce(false)} className="flex-1 py-3 rounded-xl bg-[var(--surface-2)] text-sm font-semibold text-[var(--text)]">Cancel</button>
                 <button onClick={postAnnouncement} disabled={announcing || !announceText.trim()} className="flex-1 btn-primary py-3 disabled:opacity-50">
-                  {announcing ? 'Posting…' : 'Post 📢'}
+                  {announcing ? 'PostingвЂ¦' : 'Post рџ“ў'}
                 </button>
               </div>
             </div>
@@ -780,13 +781,13 @@ export default function ClassDashboardPage() {
                   const due = dueDateLabel(t.due_date);
                   return (
                     <div key={t.id} className="flex items-start gap-3 rounded-xl px-3 py-2.5" style={{ background: 'var(--surface-2)' }}>
-                      <span className="text-base mt-0.5 shrink-0">{t.completed_at ? '✅' : '🎯'}</span>
+                      <span className="text-base mt-0.5 shrink-0">{t.completed_at ? 'вњ…' : 'рџЋЇ'}</span>
                       <div className="flex-1 min-w-0">
                         <p className={`text-sm text-[var(--text)] ${t.completed_at ? 'line-through opacity-50' : ''}`}>{t.title}</p>
                         {due && <p className={`text-[10px] mt-0.5 font-medium ${due.overdue && !t.completed_at ? 'text-[var(--danger)]' : 'text-[var(--text-muted)]'}`}>{t.completed_at ? `Completed ${timeAgo(t.completed_at)}` : due.text}</p>}
                         {t.completed_at && !due && <p className="text-[10px] mt-0.5 text-[var(--text-muted)]">Completed {timeAgo(t.completed_at)}</p>}
                       </div>
-                      <button onClick={() => deleteTarget(t.id)} className="text-[10px] text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors shrink-0 mt-1">✕</button>
+                      <button onClick={() => deleteTarget(t.id)} className="text-[10px] text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors shrink-0 mt-1">вњ•</button>
                     </div>
                   );
                 })}
@@ -800,7 +801,7 @@ export default function ClassDashboardPage() {
               </div>
               <div className="flex gap-3">
                 <button onClick={() => setTargetStudent(null)} className="flex-1 py-3 rounded-xl bg-[var(--surface-2)] text-sm font-semibold text-[var(--text)]">Cancel</button>
-                <button onClick={addTarget} disabled={settingTarget || !targetTitle.trim()} className="flex-1 btn-primary py-3 disabled:opacity-50">{settingTarget ? 'Setting…' : 'Set target 🎯'}</button>
+                <button onClick={addTarget} disabled={settingTarget || !targetTitle.trim()} className="flex-1 btn-primary py-3 disabled:opacity-50">{settingTarget ? 'SettingвЂ¦' : 'Set target рџЋЇ'}</button>
               </div>
             </div>
           </div>
@@ -843,19 +844,19 @@ export default function ClassDashboardPage() {
                   <p className="text-[10px] text-[var(--text-muted)]">Study calendar</p>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="text-xl font-black text-orange-400">🔥 {streakModal.streak}</p>
+                  <p className="text-xl font-black text-orange-400">рџ”Ґ {streakModal.streak}</p>
                   <p className="text-[9px] text-[var(--text-muted)]">day streak</p>
                 </div>
               </div>
               {streakLoading ? (
-                <div className="flex justify-center py-8"><div className="text-3xl animate-bounce">📅</div></div>
+                <SectionLoader rows={3} />
               ) : (
                 <div className="bg-[var(--surface-2)] rounded-2xl p-4">
                   {/* Month nav */}
                   <div className="flex items-center justify-between mb-4">
-                    <button onClick={prev} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--border)] text-[var(--text)] text-lg font-bold">‹</button>
+                    <button onClick={prev} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--border)] text-[var(--text)] text-lg font-bold">вЂ№</button>
                     <p className="font-bold text-sm text-[var(--text)]">{MONTH_NAMES[month]} {year}</p>
-                    <button onClick={next} disabled={!canNext} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--border)] text-[var(--text)] text-lg font-bold disabled:opacity-25">›</button>
+                    <button onClick={next} disabled={!canNext} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--border)] text-[var(--text)] text-lg font-bold disabled:opacity-25">вЂє</button>
                   </div>
                   {/* Day headers */}
                   <div className="grid grid-cols-7 mb-2">
@@ -932,7 +933,7 @@ export default function ClassDashboardPage() {
               {/* Unit grid */}
               <div className="overflow-y-auto flex-1 px-4 pb-8 pt-3">
                 {unitLoading ? (
-                  <div className="flex justify-center py-8"><div className="text-3xl animate-bounce">📊</div></div>
+                  <SectionLoader rows={3} />
                 ) : (() => {
                   const latestDoneUnit = unitRows.filter(r => r.completed_at).sort((a, b) => (b.completed_at! > a.completed_at! ? 1 : -1))[0];
                   const fmtDate = (iso: string) => new Date(iso).toLocaleDateString('en', { month: 'short', day: 'numeric' });
@@ -954,7 +955,7 @@ export default function ClassDashboardPage() {
                           }}>
                             {/* Corner check badge */}
                             {allDone && (
-                              <div className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-black text-white" style={{ background: c }}>✓</div>
+                              <div className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-black text-white" style={{ background: c }}>вњ“</div>
                             )}
                             {/* Latest chip */}
                             {isLatest && (
@@ -964,10 +965,10 @@ export default function ClassDashboardPage() {
                               background: allDone ? c : anyDone ? `${c}25` : 'var(--border)',
                               color: allDone ? '#fff' : anyDone ? c : 'var(--text-muted)',
                             }}>
-                              {allDone ? '✓' : i + 1}
+                              {allDone ? 'вњ“' : i + 1}
                             </div>
                             <div className="flex gap-0.5">
-                              {[{ e: '📖', d: learnDone }, { e: '🃏', d: flashDone }, { e: '🧠', d: quizDone }].map(({ e, d }, ei) => (
+                              {[{ e: 'рџ“–', d: learnDone }, { e: 'рџѓЏ', d: flashDone }, { e: 'рџ§ ', d: quizDone }].map(({ e, d }, ei) => (
                                 <span key={ei} className="text-[11px]" style={{ opacity: d ? 1 : 0.2 }}>{e}</span>
                               ))}
                             </div>

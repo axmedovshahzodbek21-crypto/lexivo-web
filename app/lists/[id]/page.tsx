@@ -1,4 +1,5 @@
-'use client';
+﻿'use client';
+import { PageLoader, SectionLoader } from '@/components/Loader';
 import { use, useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -102,13 +103,13 @@ export default function ListDetailPage({ params }: { params: Promise<{ id: strin
       addWordToList(id, word);
     }
     reload();
-    // Keep search results live — just re-render
+    // Keep search results live вЂ” just re-render
   };
 
   if (!collectionsLoaded) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-4xl animate-bounce">📋</div>
+        <SectionLoader />
       </div>
     );
   }
@@ -117,7 +118,7 @@ export default function ListDetailPage({ params }: { params: Promise<{ id: strin
     return (
       <div className="p-6 text-center space-y-4">
         <p className="text-[var(--text-muted)]">List not found.</p>
-        <Link href="/lists" className="btn-primary inline-block">← My Lists</Link>
+        <Link href="/lists" className="btn-primary inline-block">в†ђ My Lists</Link>
       </div>
     );
   }
@@ -134,7 +135,7 @@ export default function ListDetailPage({ params }: { params: Promise<{ id: strin
           onClick={() => router.back()}
           className="flex items-center gap-2 text-sm text-[var(--text-muted)] mb-3 hover:text-[var(--text)] transition-colors"
         >
-          ← My Lists
+          в†ђ My Lists
         </button>
 
         {/* Name row */}
@@ -148,7 +149,7 @@ export default function ListDetailPage({ params }: { params: Promise<{ id: strin
               className="flex-1 text-xl font-bold px-3 py-1.5 rounded-xl border border-[var(--primary)] bg-[var(--surface-2)] text-[var(--text)] focus:outline-none"
             />
             <button onClick={handleRename} className="btn-primary text-sm px-3 py-1.5">Save</button>
-            <button onClick={() => setEditingName(false)} className="btn-secondary text-sm px-3 py-1.5">✕</button>
+            <button onClick={() => setEditingName(false)} className="btn-secondary text-sm px-3 py-1.5">вњ•</button>
           </div>
         ) : (
           <div className="flex items-center gap-2">
@@ -158,7 +159,7 @@ export default function ListDetailPage({ params }: { params: Promise<{ id: strin
               className="w-8 h-8 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-sm hover:bg-[var(--primary-bg)] transition-colors"
               title="Rename"
             >
-              ✏️
+              вњЏпёЏ
             </button>
           </div>
         )}
@@ -167,10 +168,10 @@ export default function ListDetailPage({ params }: { params: Promise<{ id: strin
         {/* Study buttons */}
         {list.words.length > 0 && (
           <div className="flex gap-2 flex-wrap mt-3">
-            <StudyBtn href={`/flashcards?list=${enc}`} icon="🃏" label="Cards" disabled={!hasEnough} />
-            <StudyBtn href={`/quiz?list=${enc}`}       icon="❓" label="Quiz"  disabled={!hasForQuiz} />
-            <StudyBtn href={`/matching?list=${enc}`}   icon="🎯" label="Match" disabled={!hasEnough} />
-            <StudyBtn href={`/pronunciation?list=${enc}`} icon="🎙️" label="Speak" disabled={!hasEnough} />
+            <StudyBtn href={`/flashcards?list=${enc}`} icon="рџѓЏ" label="Cards" disabled={!hasEnough} />
+            <StudyBtn href={`/quiz?list=${enc}`}       icon="вќ“" label="Quiz"  disabled={!hasForQuiz} />
+            <StudyBtn href={`/matching?list=${enc}`}   icon="рџЋЇ" label="Match" disabled={!hasEnough} />
+            <StudyBtn href={`/pronunciation?list=${enc}`} icon="рџЋ™пёЏ" label="Speak" disabled={!hasEnough} />
           </div>
         )}
       </div>
@@ -179,7 +180,7 @@ export default function ListDetailPage({ params }: { params: Promise<{ id: strin
       <div className="flex-1 p-4 space-y-4">
         {words.length === 0 ? (
           <div className="text-center py-10">
-            <div className="text-5xl mb-3">📭</div>
+            <div className="text-5xl mb-3">рџ“­</div>
             <p className="text-[var(--text-muted)] text-sm mb-4">No words yet. Use the search below to add some.</p>
           </div>
         ) : (
@@ -197,21 +198,21 @@ export default function ListDetailPage({ params }: { params: Promise<{ id: strin
                     <span className="text-xs text-[var(--text-muted)] italic">{w.partOfSpeech}</span>
                   </div>
                   <p className="text-xs text-[var(--primary)] font-medium mt-0.5 truncate">{w.translation}</p>
-                  <p className="text-xs text-[var(--text-muted)] truncate">{w.collectionName} · Unit {w.dayNumber}</p>
+                  <p className="text-xs text-[var(--text-muted)] truncate">{w.collectionName} В· Unit {w.dayNumber}</p>
                 </div>
                 <div className="flex items-center gap-1 flex-shrink-0">
                   <button
                     onClick={() => speak(w.word)}
                     className="w-8 h-8 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-sm hover:bg-[var(--primary)] hover:text-white transition-colors"
                   >
-                    🔊
+                    рџ”Љ
                   </button>
                   <button
                     onClick={() => handleRemove(w.word)}
                     className="w-8 h-8 rounded-full flex items-center justify-center text-sm text-[var(--text-muted)] hover:bg-red-50 hover:text-[var(--danger)] transition-colors"
                     title="Remove from list"
                   >
-                    ✕
+                    вњ•
                   </button>
                 </div>
               </div>
@@ -228,9 +229,9 @@ export default function ListDetailPage({ params }: { params: Promise<{ id: strin
             }}
             className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[var(--surface-2)] transition-colors"
           >
-            <span className="text-lg">🔍</span>
+            <span className="text-lg">рџ”Ќ</span>
             <span className="font-semibold text-[var(--text)] text-sm flex-1">Add words</span>
-            <span className="text-xs text-[var(--text-muted)]">{addPanelOpen ? '▲' : '▼'}</span>
+            <span className="text-xs text-[var(--text-muted)]">{addPanelOpen ? 'в–І' : 'в–ј'}</span>
           </button>
 
           {addPanelOpen && (
@@ -238,7 +239,7 @@ export default function ListDetailPage({ params }: { params: Promise<{ id: strin
               <input
                 ref={searchRef}
                 type="text"
-                placeholder="Search by word, translation, or definition…"
+                placeholder="Search by word, translation, or definitionвЂ¦"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 className="w-full px-4 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]"
@@ -255,7 +256,7 @@ export default function ListDetailPage({ params }: { params: Promise<{ id: strin
                     <div key={w.word} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[var(--surface-2)] transition-colors">
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-[var(--text)] truncate">{w.word}</p>
-                        <p className="text-xs text-[var(--text-muted)] truncate">{w.translation} · {w.collectionName}</p>
+                        <p className="text-xs text-[var(--text-muted)] truncate">{w.translation} В· {w.collectionName}</p>
                       </div>
                       <button
                         onClick={() => handleToggleWord(w.word)}
@@ -265,7 +266,7 @@ export default function ListDetailPage({ params }: { params: Promise<{ id: strin
                             : 'bg-[var(--primary-bg)] text-[var(--primary)] border border-[var(--primary)] hover:bg-[var(--primary)] hover:text-white'
                         }`}
                       >
-                        {inList ? '✓ Added' : '+ Add'}
+                        {inList ? 'вњ“ Added' : '+ Add'}
                       </button>
                     </div>
                   );

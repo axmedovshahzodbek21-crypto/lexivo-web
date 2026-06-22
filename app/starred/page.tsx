@@ -1,4 +1,5 @@
-'use client';
+﻿'use client';
+import { PageLoader, SectionLoader } from '@/components/Loader';
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -80,7 +81,7 @@ export default function StarredPage() {
   if (!collectionsLoaded) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-4xl animate-bounce">⭐</div>
+        <SectionLoader />
       </div>
     );
   }
@@ -229,3 +230,4 @@ function WordCard({
     </div>
   );
 }
+

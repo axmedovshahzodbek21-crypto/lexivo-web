@@ -1,4 +1,5 @@
-'use client';
+﻿'use client';
+import { PageLoader, SectionLoader } from '@/components/Loader';
 import { Suspense } from 'react';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -232,7 +233,7 @@ function PronunciationInner() {
   }
 
   if (!collectionsLoaded) {
-    return <div className="flex items-center justify-center min-h-screen"><div className="text-4xl animate-bounce">🎙️</div></div>;
+    return <PageLoader />;
   }
 
   if (activeItems.length === 0) {
@@ -598,8 +599,9 @@ function ScorePill({ count, label, color }: { count: number; label: string; colo
 
 export default function PronunciationPage() {
   return (
-    <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="text-4xl animate-bounce">🎙️</div></div>}>
+    <Suspense fallback={<PageLoader />}>
       <PronunciationInner />
     </Suspense>
   );
 }
+

@@ -200,6 +200,14 @@ body.focus-mode .focus-container {
 }
 .btn-secondary:hover { background: var(--primary-light); color: white; }
 
+/* Skeleton shimmer */
+.skeleton {
+  background: linear-gradient(90deg, var(--surface-2) 25%, var(--border) 50%, var(--surface-2) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  border-radius: 8px;
+}
+
 /* Badge */
 .badge {
   display: inline-flex;
