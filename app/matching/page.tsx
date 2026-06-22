@@ -5,7 +5,7 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
-import { addXP, getHardWords, getStarredWords, getCustomListWords } from '@/lib/storage';
+import { addXP, getHardWords, getStarredWords, getCustomListWords, getImportedWords, getImportedWordsByCollection } from '@/lib/storage';
 import { checkAchievements } from '@/lib/gamification';
 import type { WordItem, WordCollection } from '@/lib/types';
 
@@ -75,6 +75,9 @@ function MatchingInner() {
   const starredParam     = searchParams.get('starred') === 'true';
   const hardParam        = searchParams.get('hard') === 'true';
   const listId           = searchParams.get('list') ?? undefined;
+  const sourceMyWords    = searchParams.get('source') === 'my-words';
+  const myCollection     = searchParams.get('myCollection') ?? undefined;
+  const myFolder         = searchParams.get('myFolder') ?? undefined;
 
   const [words,       setWords]       = useState<MatchWord[]>([]);
   const [roundIndex,  setRoundIndex]  = useState(0);
@@ -100,9 +103,36 @@ function MatchingInner() {
   const timerInterval = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
+    if (sourceMyWords) {
+      const imported = myCollection
+        ? getImportedWordsByCollection(myCollection, myFolder)
+        : getImportedWords();
+      const list: MatchWord[] = imported.map(w => ({
+        word: w.word,
+        partOfSpeech: '',
+        pronunciation: '',
+        translation: w.translation,
+        definition: w.definition ?? '',
+        example1: w.example1 ?? '',
+        example1Situation: '',
+        example1Translation: w.example1Translation ?? '',
+        example2: w.example2 ?? '',
+        example2Situation: '',
+        example2Translation: w.example2Translation ?? '',
+        example3: '',
+        example3Translation: '',
+        example3Situation: '',
+        language: w.language ?? 'en-US',
+        collectionName: 'my-words',
+        topic: myCollection ?? 'My Words',
+        dayNumber: 0,
+      }));
+      setWords(shuffle(list));
+      return;
+    }
     if (!collectionsLoaded) return;
     setWords(buildList(collections, collectionParam, dayParam, starredParam, hardParam, listId));
-  }, [collectionsLoaded, collections, collectionParam, dayParam, starredParam, hardParam, listId]);
+  }, [collectionsLoaded, collections, collectionParam, dayParam, starredParam, hardParam, listId, sourceMyWords, myCollection, myFolder]);
 
   const initRound = useCallback((idx: number, wordList: MatchWord[]) => {
     const batch = wordList.slice(idx * BATCH_SIZE, (idx + 1) * BATCH_SIZE);
@@ -187,7 +217,7 @@ function MatchingInner() {
   }, [matched, wrongPair, selected, timerActive, roundWords, mistakes, elapsed, roundIndex, words.length]);
 
   // ── Not supported / loading ──
-  if (!collectionsLoaded) {
+  if (!collectionsLoaded && !sourceMyWords) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <SectionLoader />
