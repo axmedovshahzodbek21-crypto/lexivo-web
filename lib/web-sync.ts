@@ -263,7 +263,9 @@ export async function pullAll(uid: string) {
           cloudStage > localStage ||
           (cloudStage === localStage && (w.nextReviewDate ?? '') > (existing.nextReviewDate ?? ''));
         if (cloudWins) {
-          localMap.set(key, w);
+          // Backfill id if the word came from the Flutter app (which omits it)
+          const synced = w.id ? w : { ...w, id: `${w.collectionName}::${w.word}` };
+          localMap.set(key, synced);
         }
       }
       set(K.srs, [...localMap.values()]);
