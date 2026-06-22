@@ -198,7 +198,14 @@ export function incrementTodayCount() {
 // ─── SRS ─────────────────────────────────────────────────────────────────────
 
 export function getSRSWords(): SRSWord[] {
-  return get<SRSWord[]>(KEYS.srs, []);
+  const words = get<SRSWord[]>(KEYS.srs, []);
+  // One-time migration: backfill id for words synced from Flutter before it was included in the data blob
+  if (words.some(w => !w.id)) {
+    const fixed = words.map(w => w.id ? w : { ...w, id: `${w.collectionName}::${w.word}` });
+    set(KEYS.srs, fixed);
+    return fixed;
+  }
+  return words;
 }
 
 export function addSRSWord(word: SRSWord) {

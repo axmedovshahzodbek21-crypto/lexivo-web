@@ -249,26 +249,22 @@ export async function pullAll(uid: string) {
 
     // srs_words — merge: add new words, update existing if cloud has advanced further
     const { data: srsRows } = await supabase.from('srs_words').select('data').eq('user_id', uid);
-    if (srsRows && srsRows.length > 0) {
-      const local = getSRSWords();
-      const localMap = new Map(local.map(w => [`${w.word}_${w.collectionName}`, w]));
-      for (const row of srsRows) {
-        const w = row.data;
-        if (!w) continue;
-        const key = `${w.word}_${w.collectionName}`;
-        const existing = localMap.get(key);
-        const cloudStage = (w.reviewStage ?? 0);
-        const localStage = (existing?.reviewStage ?? 0);
-        const cloudWins = !existing ||
-          cloudStage > localStage ||
-          (cloudStage === localStage && (w.nextReviewDate ?? '') > (existing.nextReviewDate ?? ''));
-        if (cloudWins) {
-          // Backfill id if the word came from the Flutter app (which omits it)
-          const synced = w.id ? w : { ...w, id: `${w.collectionName}::${w.word}` };
-          localMap.set(key, synced);
-        }
-      }
-      // Final pass: backfill id on any word still missing it (local-wins words from old Flutter syncs)
+    const localSRS = getSRSWords();
+    const localMap = new Map(localSRS.map(w => [`${w.word}_${w.collectionName}`, w]));
+    for (const row of srsRows ?? []) {
+      const w = row.data;
+      if (!w) continue;
+      const key = `${w.word}_${w.collectionName}`;
+      const existing = localMap.get(key);
+      const cloudStage = (w.reviewStage ?? 0);
+      const localStage = (existing?.reviewStage ?? 0);
+      const cloudWins = !existing ||
+        cloudStage > localStage ||
+        (cloudStage === localStage && (w.nextReviewDate ?? '') > (existing.nextReviewDate ?? ''));
+      if (cloudWins) localMap.set(key, w);
+    }
+    // Write if cloud responded (even empty) — backfills id for any word still missing it
+    if (srsRows !== null && localMap.size > 0) {
       set(K.srs, [...localMap.values()].map(
         w => w.id ? w : { ...w, id: `${w.collectionName}::${w.word}` }
       ));
