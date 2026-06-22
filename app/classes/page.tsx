@@ -666,7 +666,7 @@ export default function ClassesPage() {
                             </div>
                             <div>
                               <div className="flex items-center justify-between mb-1">
-                                <span className="text-xs text-[var(--text-muted)]">{hwLearnedCount}/{hw.length} words learned</span>
+                                <span className="text-xs text-[var(--text-muted)]">{hwLearnedCount}/{hw.length} items learned</span>
                                 {hwAllDone && (
                                   <span className="text-[10px] font-bold" style={{ color: 'var(--success)' }}>All done! 🎉</span>
                                 )}

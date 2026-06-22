@@ -611,8 +611,8 @@ export default function ClassWordsPage() {
           {words.length === 0 && !loading && (
             <div className="card text-center py-10 space-y-2">
               <div className="text-4xl">📝</div>
-              <p className="font-bold text-[var(--text)]">No words yet</p>
-              <p className="text-sm text-[var(--text-muted)]">Add words manually or use AI Import above</p>
+              <p className="font-bold text-[var(--text)]">No items yet</p>
+              <p className="text-sm text-[var(--text-muted)]">Add items manually or use AI Import above</p>
             </div>
           )}
         </div>

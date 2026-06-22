@@ -505,7 +505,7 @@ export default function ClassDashboardPage() {
           {[
             { label: 'Total XP', value: classStats.totalXP.toLocaleString(), icon: '⚡' },
             { label: 'Avg streak', value: `${classStats.avgStreak.toFixed(1)}d`, icon: '🔥' },
-            { label: 'Avg words', value: Math.round(classStats.avgWords).toString(), icon: '📚' },
+            { label: 'Avg items', value: Math.round(classStats.avgWords).toString(), icon: '📚' },
             { label: 'Active', value: `${classStats.activeCount}/${classStats.n}`, icon: '✅' },
           ].map(stat => (
             <div key={stat.label} className="flex flex-col items-center py-2.5 px-1">
