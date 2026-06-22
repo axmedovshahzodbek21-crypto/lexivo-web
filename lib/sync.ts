@@ -27,7 +27,13 @@ function lsSet(key: string, value: unknown) {
 
 // ── Push all local data to Supabase ───────────────────────────────────────────
 
+function dispatch(name: string) {
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event(name));
+}
+
 export async function pushAll(userId: string) {
+  dispatch('lexivo-sync-start');
+  try {
   const s = getSettings();
 
   const avatarUrl = getProfilePicUrl();
@@ -170,6 +176,10 @@ export async function pushAll(userId: string) {
         await supabase.from('unit_progress').upsert(upRows, { onConflict: 'user_id,collection_name,day_number' });
       } catch (_) {}
     }
+  }
+  dispatch('lexivo-sync-done');
+  } catch {
+    dispatch('lexivo-sync-error');
   }
 }
 
