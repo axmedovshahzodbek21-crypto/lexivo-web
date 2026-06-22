@@ -403,7 +403,8 @@ export default function HomePage() {
         <ShortcutCard href="/starred"      icon="⭐" label={t.home.starredTitle}  sub={t.home.starredSub}  accent="var(--primary)" />
         <ShortcutCard href="/hard-words"   icon="😓" label={t.home.hardTitle}    sub={t.home.hardSub}     accent="var(--danger)"  />
         <ShortcutCard href="/lists"        icon="📋" label={t.home.listsTitle}   sub={t.home.listsSub}    accent="#8B5CF6"        />
-        <ShortcutCard href="/grammar-tips" icon="📚" label={t.home.grammarTitle} sub={t.home.grammarSub}  accent="var(--success)"        />
+        <ShortcutCard href="/grammar-tips" icon="📚" label={t.home.grammarTitle} sub={t.home.grammarSub}  accent="var(--success)" />
+        <ShortcutCard href="/classes"      icon="👩‍🏫" label={t.home.classesTitle} sub={t.home.classesSub} accent="#0EA5E9"        />
       </div>
 
       <div className="pb-4" />
