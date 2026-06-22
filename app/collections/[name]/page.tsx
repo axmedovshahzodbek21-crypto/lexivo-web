@@ -177,7 +177,7 @@ function UnitCard({ unit, collectionName }: { unit: UnitRow; collectionName: str
           <button
             onClick={() => setShowInfo(true)}
             className="text-sm leading-none opacity-60 hover:opacity-100 transition-opacity"
-            title={t.collections.howMarking}
+            aria-label={t.collections.howMarking}
           >🕯️</button>
         </div>
         <h3 className="font-semibold text-sm text-[var(--text)] truncate mt-0.5">{unit.topic}</h3>

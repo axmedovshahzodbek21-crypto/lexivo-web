@@ -659,7 +659,7 @@ function AccentButton({
   return (
     <button
       onClick={onClick}
-      title={label}
+      aria-label={label}
       className={`rounded-full flex items-center justify-center transition-colors ${
         size === 'sm' ? 'w-6 h-6 text-xs' : 'w-8 h-8 text-base'
       } ${active ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface-2)] hover:bg-[var(--primary-bg)]'}`}

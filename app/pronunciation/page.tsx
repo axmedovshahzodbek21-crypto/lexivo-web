@@ -345,7 +345,7 @@ function PronunciationInner() {
             <button
               key={a}
               onClick={() => setAccent(a)}
-              title={a === 'us' ? 'American English' : 'British English'}
+              aria-label={a === 'us' ? 'American English' : 'British English'}
               className={`px-2.5 py-1.5 text-sm transition-colors ${accent === a ? 'bg-[var(--primary)] text-white' : 'text-[var(--text-muted)] hover:text-[var(--text)]'}`}
             >
               {a === 'us' ? '🇺🇸' : '🇬🇧'}
