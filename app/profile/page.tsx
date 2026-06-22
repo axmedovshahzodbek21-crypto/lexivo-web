@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -164,7 +164,7 @@ export default function ProfilePage() {
 
   const t = useTranslation();
   const levelInfo  = getLevelInfo(xp);
-  const levelColor = LEVEL_COLORS[levelInfo.level] ?? '#6C63FF';
+  const levelColor = LEVEL_COLORS[levelInfo.level] ?? 'var(--primary)';
   const initial    = settings.name.charAt(0).toUpperCase();
 
   // Per-collection unit progress
@@ -318,16 +318,16 @@ export default function ProfilePage() {
 
         {/* ── Stats grid ── */}
         <div className="grid grid-cols-2 gap-3">
-          <StatTile icon="📚" value={learnedCount} label={t.profile.wordsLearned} color="#6C63FF" />
+          <StatTile icon="📚" value={learnedCount} label={t.profile.wordsLearned} color="var(--primary)" />
           <StatTile icon="🔄" value={srsCount}     label={t.profile.inSrs}        color="#3498DB" />
           <StatTile
             icon="⏳"
             value={dueCount}
             label={t.profile.dueReview}
-            color={dueCount > 0 ? '#EF4444' : '#10B981'}
+            color={dueCount > 0 ? 'var(--danger)' : 'var(--success)'}
             href="/srs"
           />
-          <StatTile icon="🎯" value={settings.dailyGoal} label={t.profile.dailyGoal} color="#F59E0B" />
+          <StatTile icon="🎯" value={settings.dailyGoal} label={t.profile.dailyGoal} color="var(--warning)" />
         </div>
 
         {/* ── Collections progress ── */}

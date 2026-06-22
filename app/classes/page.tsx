@@ -667,13 +667,13 @@ export default function ClassesPage() {
                               <div className="flex items-center justify-between mb-1">
                                 <span className="text-xs text-[var(--text-muted)]">{hwLearnedCount}/{hw.length} words learned</span>
                                 {hwAllDone && (
-                                  <span className="text-[10px] font-bold" style={{ color: '#10B981' }}>All done! 🎉</span>
+                                  <span className="text-[10px] font-bold" style={{ color: 'var(--success)' }}>All done! 🎉</span>
                                 )}
                               </div>
                               <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
                                 <div
                                   className="h-full rounded-full transition-all"
-                                  style={{ width: `${hwPct}%`, background: hwAllDone ? '#10B981' : 'var(--primary)' }}
+                                  style={{ width: `${hwPct}%`, background: hwAllDone ? 'var(--success)' : 'var(--primary)' }}
                                 />
                               </div>
                             </div>
@@ -722,11 +722,11 @@ export default function ClassesPage() {
               className="w-full max-w-sm rounded-3xl border-2 p-8 text-center space-y-3 transition-all active:scale-95 min-h-[220px] flex flex-col items-center justify-center"
               style={{
                 background: fcIsLearned ? 'rgba(16,185,129,0.08)' : 'var(--surface-2)',
-                borderColor: fcIsLearned ? '#10B981' : 'var(--border)',
+                borderColor: fcIsLearned ? 'var(--success)' : 'var(--border)',
               }}
             >
               {fcIsLearned && (
-                <span className="text-xs font-bold" style={{ color: '#10B981' }}>✓ Learned</span>
+                <span className="text-xs font-bold" style={{ color: 'var(--success)' }}>✓ Learned</span>
               )}
               {!flashcard.flipped ? (
                 <>

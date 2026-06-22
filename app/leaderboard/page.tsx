@@ -312,7 +312,7 @@ export default function LeaderboardPage() {
                         <p className="text-[10px] text-[var(--text-muted)]">🔥 {e.streak}</p>
                       )}
                       {e.last_study_date === today && (
-                        <span className="mt-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(16,185,129,0.15)', color: '#10B981' }}>
+                        <span className="mt-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(16,185,129,0.15)', color: 'var(--success)' }}>
                           TODAY
                         </span>
                       )}
@@ -346,7 +346,7 @@ export default function LeaderboardPage() {
                         <p className="font-bold text-sm text-[var(--text)] truncate">{e.name}</p>
                         {isMe && <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: 'var(--primary)', color: 'white' }}>YOU</span>}
                         {e.last_study_date === today && (
-                          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(16,185,129,0.15)', color: '#10B981' }}>TODAY</span>
+                          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(16,185,129,0.15)', color: 'var(--success)' }}>TODAY</span>
                         )}
                       </div>
                       <p className="text-xs text-[var(--text-muted)]">

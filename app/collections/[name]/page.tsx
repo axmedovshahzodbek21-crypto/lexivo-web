@@ -222,13 +222,13 @@ function UnitCard({ unit, collectionName }: { unit: UnitRow; collectionName: str
 
       {/* Learning path */}
       <div className="grid grid-cols-3 gap-2 mb-2">
-        <ModeButton href={learnUrl} icon="📖" label="Learn" done={learnDone} color="#6C63FF" />
+        <ModeButton href={learnUrl} icon="📖" label="Learn" done={learnDone} color="var(--primary)" />
         <ModeButton
           href={flashUrl} icon="🃏" label={hardCount > 0 ? `Cards (${hardCount})` : 'Cards'} done={flashcardDone} color="#FF6B35"
           locked={!learnDone} lockReason={t.collections.completeLearnFirst}
         />
         <ModeButton
-          href={quizUrl} icon="❓" label="Quiz" done={quizDone} color="#F59E0B"
+          href={quizUrl} icon="❓" label="Quiz" done={quizDone} color="var(--warning)"
           locked={!learnDone} lockReason={t.collections.completeLearnFirst}
           softLocked={learnDone && !flashcardDone}
           softLockReason={t.collections.hardWordsRemain}

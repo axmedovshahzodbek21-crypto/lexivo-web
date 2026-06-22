@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
@@ -50,7 +50,7 @@ export default function PomodoroPage() {
   // Running ring (big, shows time remaining in current phase)
   const phaseTotalSeconds = pomPhase === 'work' ? pomWorkMins * 60 : pomBreakMins * 60;
   const remainFraction = phaseTotalSeconds > 0 ? pomSecondsLeft / phaseTotalSeconds : 1;
-  const ringColor = pomPhase === 'work' ? '#6C63FF' : '#10B981';
+  const ringColor = pomPhase === 'work' ? 'var(--primary)' : 'var(--success)';
   const ringDash = remainFraction * RING_C;
 
   return (
@@ -77,20 +77,20 @@ export default function PomodoroPage() {
                 <svg width="130" height="130">
                   <circle cx="65" cy="65" r={ARC_R} fill="none" stroke="var(--border)" strokeWidth="12" />
                   <circle
-                    cx="65" cy="65" r={ARC_R} fill="none" stroke="#6C63FF" strokeWidth="12"
+                    cx="65" cy="65" r={ARC_R} fill="none" stroke="var(--primary)" strokeWidth="12"
                     strokeDasharray={`${workDash} ${ARC_C - workDash}`}
                     style={{ transformOrigin: '65px 65px', transform: 'rotate(-90deg)', transition: 'stroke-dasharray 0.45s ease-in-out' }}
                   />
                   <circle
-                    cx="65" cy="65" r={ARC_R} fill="none" stroke="#10B981" strokeWidth="12"
+                    cx="65" cy="65" r={ARC_R} fill="none" stroke="var(--success)" strokeWidth="12"
                     strokeDasharray={`${breakDash} ${ARC_C - breakDash}`}
                     style={{ transformOrigin: '65px 65px', transform: `rotate(${-90 + workFraction * 360}deg)`, transition: 'stroke-dasharray 0.45s ease-in-out, transform 0.45s ease-in-out' }}
                   />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <div className="font-bold leading-none" style={{ fontSize: 28 }}>
-                    <span style={{ color: '#6C63FF' }}>{pomWorkMins}</span>
-                    <span style={{ color: '#10B981', fontSize: 18 }}>+{pomBreakMins}</span>
+                    <span style={{ color: 'var(--primary)' }}>{pomWorkMins}</span>
+                    <span style={{ color: 'var(--success)', fontSize: 18 }}>+{pomBreakMins}</span>
                   </div>
                   <div className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>min cycle</div>
                 </div>
@@ -99,11 +99,11 @@ export default function PomodoroPage() {
               {/* Legend */}
               <div className="flex items-center gap-5">
                 <div className="flex items-center gap-1.5">
-                  <div className="w-2 h-2 rounded-full" style={{ background: '#6C63FF' }} />
+                  <div className="w-2 h-2 rounded-full" style={{ background: 'var(--primary)' }} />
                   <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Focus</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <div className="w-2 h-2 rounded-full" style={{ background: '#10B981' }} />
+                  <div className="w-2 h-2 rounded-full" style={{ background: 'var(--success)' }} />
                   <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Break</span>
                 </div>
               </div>
@@ -120,14 +120,14 @@ export default function PomodoroPage() {
                     className="flex-1 flex flex-col items-center py-3 rounded-2xl transition-all"
                     style={{
                       background: sel ? 'rgba(108,99,255,0.1)' : 'var(--surface-2)',
-                      border: `1.5px solid ${sel ? '#6C63FF' : 'transparent'}`,
+                      border: `1.5px solid ${sel ? 'var(--primary)' : 'transparent'}`,
                     }}
                   >
                     <span style={{ fontSize: 20 }}>{p.emoji}</span>
-                    <span className="text-[10px] font-semibold mt-1" style={{ color: sel ? '#6C63FF' : 'var(--text-muted)' }}>
+                    <span className="text-[10px] font-semibold mt-1" style={{ color: sel ? 'var(--primary)' : 'var(--text-muted)' }}>
                       {p.label}
                     </span>
-                    <span className="text-xs font-bold" style={{ color: sel ? '#6C63FF' : 'var(--text)' }}>
+                    <span className="text-xs font-bold" style={{ color: sel ? 'var(--primary)' : 'var(--text)' }}>
                       {p.work}+{p.break}
                     </span>
                   </button>
@@ -139,11 +139,11 @@ export default function PomodoroPage() {
                 style={{
                   width: 66,
                   background: selectedPreset === null ? 'rgba(108,99,255,0.1)' : 'var(--surface-2)',
-                  border: `1.5px solid ${selectedPreset === null ? '#6C63FF' : 'transparent'}`,
+                  border: `1.5px solid ${selectedPreset === null ? 'var(--primary)' : 'transparent'}`,
                 }}
               >
                 <span style={{ fontSize: 18 }}>⚙️</span>
-                <span className="text-[10px] font-semibold mt-1" style={{ color: selectedPreset === null ? '#6C63FF' : 'var(--text-muted)' }}>
+                <span className="text-[10px] font-semibold mt-1" style={{ color: selectedPreset === null ? 'var(--primary)' : 'var(--text-muted)' }}>
                   Custom
                 </span>
               </button>
@@ -152,9 +152,9 @@ export default function PomodoroPage() {
             {/* Custom sliders */}
             {selectedPreset === null && (
               <div className="w-full space-y-3 animate-fade-in">
-                <PomSliderRow label="Focus" value={pomWorkMins} min={5} max={60} step={5} color="#6C63FF"
+                <PomSliderRow label="Focus" value={pomWorkMins} min={5} max={60} step={5} color="var(--primary)"
                   onChange={v => setPomSettings(v, pomBreakMins)} />
-                <PomSliderRow label="Break" value={pomBreakMins} min={1} max={20} step={1} color="#10B981"
+                <PomSliderRow label="Break" value={pomBreakMins} min={1} max={20} step={1} color="var(--success)"
                   onChange={v => setPomSettings(pomWorkMins, v)} />
               </div>
             )}
@@ -164,7 +164,7 @@ export default function PomodoroPage() {
               <button
                 onClick={() => startPomodoro(pomWorkMins, pomBreakMins)}
                 className="w-full py-4 rounded-2xl text-white font-bold text-base transition-all hover:opacity-90 active:scale-95"
-                style={{ background: '#6C63FF' }}
+                style={{ background: 'var(--primary)' }}
               >
                 Start Focusing
               </button>
@@ -232,7 +232,7 @@ export default function PomodoroPage() {
                     style={{
                       width: i < pomSessions ? 10 : 8,
                       height: i < pomSessions ? 10 : 8,
-                      background: i < pomSessions ? '#6C63FF' : 'var(--border)',
+                      background: i < pomSessions ? 'var(--primary)' : 'var(--border)',
                     }}
                   />
                 ))}

@@ -1,14 +1,14 @@
-'use client';
+﻿'use client';
 import { useEffect, useRef } from 'react';
 import { useAppStore } from '@/lib/store';
 
 const LEVEL_META: Record<string, { icon: string; color: string; bg: string }> = {
-  'Beginner':            { icon: '🌱', color: '#10B981', bg: '#d1fae5' },
+  'Beginner':            { icon: '🌱', color: 'var(--success)', bg: '#d1fae5' },
   'Elementary':          { icon: '📗', color: '#3B82F6', bg: '#dbeafe' },
   'Intermediate':        { icon: '⭐', color: '#8B5CF6', bg: '#ede9fe' },
-  'Upper-Intermediate':  { icon: '🔥', color: '#F59E0B', bg: '#fef3c7' },
-  'Advanced':            { icon: '💎', color: '#6C63FF', bg: '#ede9fe' },
-  'Master':              { icon: '👑', color: '#EF4444', bg: '#fee2e2' },
+  'Upper-Intermediate':  { icon: '🔥', color: 'var(--warning)', bg: '#fef3c7' },
+  'Advanced':            { icon: '💎', color: 'var(--primary)', bg: '#ede9fe' },
+  'Master':              { icon: '👑', color: 'var(--danger)', bg: '#fee2e2' },
 };
 
 const CONFETTI_COLORS = ['#6C63FF', '#FF6B35', '#10B981', '#F59E0B', '#EC4899', '#3B82F6'];

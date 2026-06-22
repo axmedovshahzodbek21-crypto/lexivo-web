@@ -366,7 +366,7 @@ function ImportPageInner() {
               <p className="font-semibold text-sm text-[var(--text)]">{t.import.preview}</p>
               <div className="flex items-center gap-2 text-xs">
                 {parsed.length > 0 && (
-                  <span className="px-2 py-0.5 rounded-full font-semibold" style={{ background: 'rgba(16,185,129,0.12)', color: '#10B981' }}>
+                  <span className="px-2 py-0.5 rounded-full font-semibold" style={{ background: 'rgba(16,185,129,0.12)', color: 'var(--success)' }}>
                     ✓ {parsed.length} ready
                   </span>
                 )}

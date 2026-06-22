@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useEffect, useState, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -95,7 +95,7 @@ export default function CollectionDetailPage({ params }: Props) {
                 style={{ background: 'rgba(245,158,11,0.1)', border: '1.5px solid rgba(245,158,11,0.3)' }}
               >
                 <span className="text-2xl">❓</span>
-                <span className="text-xs font-semibold" style={{ color: '#F59E0B' }}>Quiz</span>
+                <span className="text-xs font-semibold" style={{ color: 'var(--warning)' }}>Quiz</span>
               </Link>
               <Link
                 href={`/matching?${studyParam}`}
@@ -103,7 +103,7 @@ export default function CollectionDetailPage({ params }: Props) {
                 style={{ background: 'rgba(16,185,129,0.1)', border: '1.5px solid rgba(16,185,129,0.3)' }}
               >
                 <span className="text-2xl">🔗</span>
-                <span className="text-xs font-semibold" style={{ color: '#10B981' }}>Match</span>
+                <span className="text-xs font-semibold" style={{ color: 'var(--success)' }}>Match</span>
               </Link>
             </div>
 

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -9,9 +9,9 @@ import type { UnitProgress, WordCollection } from '@/lib/types';
 type Mode = 'learn' | 'flashcards' | 'quiz';
 
 const MODE_CONFIG: Record<Mode, { label: string; icon: string; color: string }> = {
-  learn:      { label: 'Learn',      icon: '📖', color: '#6C63FF' },
+  learn:      { label: 'Learn',      icon: '📖', color: 'var(--primary)' },
   flashcards: { label: 'Flashcards', icon: '🃏', color: '#FF6B35' },
-  quiz:       { label: 'Quiz',       icon: '❓', color: '#F59E0B' },
+  quiz:       { label: 'Quiz',       icon: '❓', color: 'var(--warning)' },
 };
 
 function isLocked(mode: Mode, p: UnitProgress): boolean {

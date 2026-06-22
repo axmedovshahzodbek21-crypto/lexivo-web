@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
@@ -361,8 +361,8 @@ export default function PomodoroWidget() {
         {/* Time display */}
         <div style={{ padding: '12px 14px 0', textAlign: 'center' }}>
           <div style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4 }}>
-            <span style={{ fontSize: 36, fontWeight: 900, color: '#6C63FF', lineHeight: 1 }}>{pomWorkMins}</span>
-            <span style={{ fontSize: 20, fontWeight: 700, color: '#10B981', lineHeight: 1 }}>+{pomBreakMins}</span>
+            <span style={{ fontSize: 36, fontWeight: 900, color: 'var(--primary)', lineHeight: 1 }}>{pomWorkMins}</span>
+            <span style={{ fontSize: 20, fontWeight: 700, color: 'var(--success)', lineHeight: 1 }}>+{pomBreakMins}</span>
             <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginLeft: 2 }}>min</span>
           </div>
         </div>
@@ -377,7 +377,7 @@ export default function PomodoroWidget() {
                 onPointerDown={e => e.stopPropagation()}
                 onClick={e => { e.stopPropagation(); setCustomMode(false); setPomSettings(p.work, p.brk); }}
                 style={{
-                  flex: 1, padding: '8px 4px', borderRadius: 12, border: `1.5px solid ${sel ? '#6C63FF' : 'rgba(255,255,255,0.08)'}`,
+                  flex: 1, padding: '8px 4px', borderRadius: 12, border: `1.5px solid ${sel ? 'var(--primary)' : 'rgba(255,255,255,0.08)'}`,
                   background: sel ? 'rgba(108,99,255,0.25)' : 'rgba(255,255,255,0.05)',
                   cursor: 'pointer', transition: 'all 0.15s',
                   display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
@@ -394,7 +394,7 @@ export default function PomodoroWidget() {
             onClick={e => { e.stopPropagation(); setCustomMode(true); }}
             style={{
               width: 52, padding: '8px 4px', borderRadius: 12,
-              border: `1.5px solid ${isCustom ? '#6C63FF' : 'rgba(255,255,255,0.08)'}`,
+              border: `1.5px solid ${isCustom ? 'var(--primary)' : 'rgba(255,255,255,0.08)'}`,
               background: isCustom ? 'rgba(108,99,255,0.25)' : 'rgba(255,255,255,0.05)',
               cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
             }}
@@ -407,9 +407,9 @@ export default function PomodoroWidget() {
         {/* Custom sliders — only when custom selected */}
         {isCustom && (
           <div style={{ padding: '10px 14px 0', display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <MiniSlider label="Focus" value={pomWorkMins} min={5} max={60} color="#6C63FF"
+            <MiniSlider label="Focus" value={pomWorkMins} min={5} max={60} color="var(--primary)"
               onChange={v => setPomSettings(v, pomBreakMins)} />
-            <MiniSlider label="Break" value={pomBreakMins} min={1} max={20} color="#10B981"
+            <MiniSlider label="Break" value={pomBreakMins} min={1} max={20} color="var(--success)"
               onChange={v => setPomSettings(pomWorkMins, v)} />
           </div>
         )}
@@ -434,7 +434,7 @@ export default function PomodoroWidget() {
   }
 
   // ── Running work timer (compact draggable widget) ─────────────────────────
-  const accentColor = isWork ? '#6C63FF' : '#10B981';
+  const accentColor = isWork ? 'var(--primary)' : 'var(--success)';
   const timeStr = fmt(pomSecondsLeft);
 
   const cardStyle = {

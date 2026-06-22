@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useEffect, useState } from 'react';
 
 type SyncState = 'idle' | 'syncing' | 'synced' | 'error';
@@ -34,8 +34,8 @@ export default function SyncStatusBadge() {
 
   const config = {
     syncing: { icon: '↻', label: 'Syncing…',    bg: 'var(--border)',   color: 'var(--text-muted)', spin: true  },
-    synced:  { icon: '✓', label: 'Synced',       bg: '#10B98122',       color: '#10B981',           spin: false },
-    error:   { icon: '⚠', label: 'Sync failed',  bg: '#EF444422',       color: '#EF4444',           spin: false },
+    synced:  { icon: '✓', label: 'Synced',       bg: '#10B98122',       color: 'var(--success)',           spin: false },
+    error:   { icon: '⚠', label: 'Sync failed',  bg: '#EF444422',       color: 'var(--danger)',           spin: false },
   }[state];
 
   return (

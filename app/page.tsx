@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -14,7 +14,7 @@ import XpModal from '@/components/XpModal';
 import TiltCard from '@/components/TiltCard';
 
 const COLLECTION_META: Record<string, { icon: string; color: string; desc: string }> = {
-  '30 Days of Powerful Words': { icon: '🏆', color: '#6C63FF', desc: 'Essential IELTS vocabulary by topic' },
+  '30 Days of Powerful Words': { icon: '🏆', color: 'var(--primary)', desc: 'Essential IELTS vocabulary by topic' },
   '24 Vocabulary Challenge':   { icon: '💡', color: '#FF6584', desc: 'Idioms and phrases for fluent speakers' },
   'Word Mastery':              { icon: '🎯', color: '#2ECC71', desc: 'High-level C1 & B2 collocations' },
 };
@@ -152,12 +152,12 @@ export default function HomePage() {
           <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
             style={{ background: 'rgba(239,68,68,0.15)' }}>🔔</div>
           <div className="flex-1 min-w-0">
-            <div className="font-bold text-sm" style={{ color: '#EF4444' }}>
+            <div className="font-bold text-sm" style={{ color: 'var(--danger)' }}>
               {dueCount} {dueCount === 1 ? 'word' : 'words'} due for review!
             </div>
             <div className="text-xs mt-0.5 text-[var(--text-muted)]">Complete your reviews for best results.</div>
           </div>
-          <span className="text-sm font-bold flex-shrink-0" style={{ color: '#EF4444' }}>→</span>
+          <span className="text-sm font-bold flex-shrink-0" style={{ color: 'var(--danger)' }}>→</span>
         </Link>
       )}
 
@@ -186,7 +186,7 @@ export default function HomePage() {
 
           {/* Curated collections first */}
           {mainCollections.map(col => {
-            const meta = COLLECTION_META[col.name] ?? { icon: '📖', color: '#6C63FF', desc: col.description };
+            const meta = COLLECTION_META[col.name] ?? { icon: '📖', color: 'var(--primary)', desc: col.description };
             const enc = encodeURIComponent(col.name);
             const wordCount = col.days.reduce((a, d) => a + d.words.length, 0);
             return (
@@ -240,10 +240,10 @@ export default function HomePage() {
           <StatCard icon="🔥" value={streak} label={t.home.dayStreak} color="#FF6B35" />
         </Link>
         <button onClick={() => setShowXpModal(true)} className="text-left w-full">
-          <StatCard icon="⚡" value={xp} label={t.home.totalXp} color="#6C63FF" glow />
+          <StatCard icon="⚡" value={xp} label={t.home.totalXp} color="var(--primary)" glow />
         </button>
         <Link href="/progress">
-          <StatCard icon="📚" value={learnedCount} label={t.home.words} color="#10B981" />
+          <StatCard icon="📚" value={learnedCount} label={t.home.words} color="var(--success)" />
         </Link>
       </div>
 
@@ -258,7 +258,7 @@ export default function HomePage() {
               <circle cx="32" cy="32" r="26" fill="none" stroke="var(--border)" strokeWidth="6" />
               <circle
                 cx="32" cy="32" r="26" fill="none"
-                stroke={dailyProgress >= 100 ? '#10B981' : '#6C63FF'}
+                stroke={dailyProgress >= 100 ? 'var(--success)' : 'var(--primary)'}
                 strokeWidth="6"
                 strokeLinecap="round"
                 strokeDasharray={`${Math.min(dailyProgress, 100) / 100 * 163.4} 163.4`}
@@ -266,7 +266,7 @@ export default function HomePage() {
               />
             </svg>
             <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-lg font-black" style={{ color: dailyProgress >= 100 ? '#10B981' : '#6C63FF' }}>
+              <span className="text-lg font-black" style={{ color: dailyProgress >= 100 ? 'var(--success)' : 'var(--primary)' }}>
                 {dailyProgress >= 100 ? '✓' : todayCount}
               </span>
             </div>
@@ -280,10 +280,10 @@ export default function HomePage() {
             <div className="mt-1.5 h-2 rounded-full bg-[var(--border)] overflow-hidden">
               <div
                 className="h-full rounded-full transition-all duration-500"
-                style={{ width: `${Math.min(dailyProgress, 100)}%`, background: dailyProgress >= 100 ? '#10B981' : '#6C63FF' }}
+                style={{ width: `${Math.min(dailyProgress, 100)}%`, background: dailyProgress >= 100 ? 'var(--success)' : 'var(--primary)' }}
               />
             </div>
-            <p className="text-xs mt-1" style={{ color: dailyProgress >= 100 ? '#10B981' : 'var(--text-muted)' }}>
+            <p className="text-xs mt-1" style={{ color: dailyProgress >= 100 ? 'var(--success)' : 'var(--text-muted)' }}>
               {dailyProgress >= 100 ? `${t.home.goalReached} · ${todayXp} XP today` : `${todayXp} XP today · ${Math.max(0, settings.dailyGoal - todayCount)} words to go`}
             </p>
           </div>
@@ -346,22 +346,22 @@ export default function HomePage() {
 
       {/* Quick actions */}
       <div className="grid grid-cols-2 gap-3">
-        <ActionCard href="/learn"         icon="📖" title={t.home.learnTitle}     subtitle={t.home.learnSub}          color="#6C63FF" depthClass="depth-in-1" />
+        <ActionCard href="/learn"         icon="📖" title={t.home.learnTitle}     subtitle={t.home.learnSub}          color="var(--primary)" depthClass="depth-in-1" />
         <ActionCard href="/flashcards"    icon="🃏" title={t.home.flashcardsTitle} subtitle={t.home.flashcardsSub}     color="#FF6B35" depthClass="depth-in-2" />
         <ActionCard
           href="/srs"
           icon="🔄"
           title={t.home.srsTitle}
           subtitle={dueCount > 0 ? t.home.srsDue(dueCount) : t.home.srsAllCaughtUp}
-          color={dueCount > 0 ? '#EF4444' : '#10B981'}
+          color={dueCount > 0 ? 'var(--danger)' : 'var(--success)'}
           badge={dueCount > 0 ? String(dueCount) : undefined}
           depthClass="depth-in-3"
         />
-        <ActionCard href="/quiz"          icon="❓" title={t.home.quizTitle}       subtitle={t.home.quizSub}           color="#F59E0B" depthClass="depth-in-4" />
+        <ActionCard href="/quiz"          icon="❓" title={t.home.quizTitle}       subtitle={t.home.quizSub}           color="var(--warning)" depthClass="depth-in-4" />
         <ActionCard href="/pronunciation" icon="🎙️" title={t.home.pronounceTitle}  subtitle={t.home.pronounceSub}      color="#8B5CF6" depthClass="depth-in-5" />
         <ActionCard href="/matching"      icon="🎯" title={t.home.matchTitle}       subtitle={t.home.matchSub}          color="#EC4899" depthClass="depth-in-6" />
-        <ActionCard href="/pomodoro"      icon="🍅" title={t.home.pomodoroTitle}    subtitle={t.home.pomodoroSub}       color="#EF4444" depthClass="depth-in-7" />
-        <ActionCard href="/leaderboard"   icon="🏆" title="Leaderboard"             subtitle="See top learners"          color="#F59E0B" depthClass="depth-in-8" />
+        <ActionCard href="/pomodoro"      icon="🍅" title={t.home.pomodoroTitle}    subtitle={t.home.pomodoroSub}       color="var(--danger)" depthClass="depth-in-7" />
+        <ActionCard href="/leaderboard"   icon="🏆" title="Leaderboard"             subtitle="See top learners"          color="var(--warning)" depthClass="depth-in-8" />
       </div>
 
       {/* Word of the Day */}
@@ -403,7 +403,7 @@ export default function HomePage() {
         <ShortcutCard href="/starred"      icon="⭐" label={t.home.starredTitle}  sub={t.home.starredSub}  accent="var(--primary)" />
         <ShortcutCard href="/hard-words"   icon="😓" label={t.home.hardTitle}    sub={t.home.hardSub}     accent="var(--danger)"  />
         <ShortcutCard href="/lists"        icon="📋" label={t.home.listsTitle}   sub={t.home.listsSub}    accent="#8B5CF6"        />
-        <ShortcutCard href="/grammar-tips" icon="📚" label={t.home.grammarTitle} sub={t.home.grammarSub}  accent="#10B981"        />
+        <ShortcutCard href="/grammar-tips" icon="📚" label={t.home.grammarTitle} sub={t.home.grammarSub}  accent="var(--success)"        />
       </div>
 
       <div className="pb-4" />

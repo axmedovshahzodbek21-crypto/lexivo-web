@@ -443,7 +443,7 @@ export default function ClassWordsPage() {
                 <div className="card space-y-3">
                   <div className="flex items-center justify-between">
                     <p className="font-semibold text-sm text-[var(--text)]">Preview</p>
-                    <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(16,185,129,0.12)', color: '#10B981' }}>
+                    <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(16,185,129,0.12)', color: 'var(--success)' }}>
                       {parsed.length} words ready
                     </span>
                   </div>

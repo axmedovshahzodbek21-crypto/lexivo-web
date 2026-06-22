@@ -106,10 +106,10 @@ function ProgressPage() {
             {/* Stats grid */}
             <div className="grid grid-cols-2 gap-3">
               <StatBlock icon="🔥" label={t.progress.currentStreak} value={`${streak} ${t.progress.days}`} color="#FF6B35" />
-              <StatBlock icon="📅" label={t.progress.studyDays} value={`${totalDays} ${t.progress.days}`} color="#6C63FF" />
-              <StatBlock icon="📚" label={t.progress.wordsLearned} value={learnedCount} color="#10B981" />
+              <StatBlock icon="📅" label={t.progress.studyDays} value={`${totalDays} ${t.progress.days}`} color="var(--primary)" />
+              <StatBlock icon="📚" label={t.progress.wordsLearned} value={learnedCount} color="var(--success)" />
               <StatBlock icon="🧠" label={t.progress.srsMastered} value={masteredCount} color="#8B5CF6" />
-              <StatBlock icon="⚡" label={t.progress.todayXp} value={`+${todayXp}`} color="#F59E0B" />
+              <StatBlock icon="⚡" label={t.progress.todayXp} value={`+${todayXp}`} color="var(--warning)" />
               <StatBlock icon="🎯" label={t.progress.todayWords} value={todayCount} color="#EC4899" />
             </div>
 

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -6,6 +6,7 @@ import { getSettings, getStreak, getXP, getProfilePic, getProfilePicUrl } from '
 import { getLevelInfo } from '@/lib/gamification';
 import { useAuth } from '@/lib/auth-context';
 import { useTranslation } from '@/lib/useTranslation';
+import { LEVEL_COLORS, LEVEL_COLORS_FALLBACK } from '@/lib/colors';
 import SyncStatusBadge from './SyncStatusBadge';
 
 const NAV_HREFS = [
@@ -22,14 +23,6 @@ const NAV_HREFS = [
 // Mobile bottom bar: 5 core items only — Matching & Leaderboard are on the home page
 const MOBILE_NAV_HREFS = NAV_HREFS.slice(0, 5);
 
-const LEVEL_COLORS: Record<string, string> = {
-  Beginner:             '#2ECC71',
-  Elementary:           '#27AE60',
-  Intermediate:         '#3498DB',
-  'Upper-Intermediate': '#2980B9',
-  Advanced:             '#9B59B6',
-  Master:               '#F39C12',
-};
 
 export default function Navigation() {
   const pathname  = usePathname();
@@ -72,7 +65,7 @@ export default function Navigation() {
 
   const levelInfo  = getLevelInfo(xp);
   const initial    = name.charAt(0).toUpperCase();
-  const levelColor = LEVEL_COLORS[levelInfo.level] ?? '#6C63FF';
+  const levelColor = LEVEL_COLORS[levelInfo.level] ?? LEVEL_COLORS_FALLBACK;
 
   const handleSignOut = async () => {
     await signOut();
