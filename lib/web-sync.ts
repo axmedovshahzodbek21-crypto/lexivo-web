@@ -1,6 +1,6 @@
 import { supabase } from './supabase';
 import {
-  getSettings, saveSettings, setOnboarded, isOnboarded,
+  getSettings, saveSettings, setOnboarded,
   getLearnedWords, getSRSWords, getStarredWords,
   getXP, getTodayXP, getStreak, getFreezes, getTotalStudyDays,
   getProfilePicUrl, saveProfilePicUrl,
@@ -140,14 +140,12 @@ export async function pushAll(uid: string) {
     }
 
     // imported_words — full replace so collection deletions propagate.
-    // Skip entirely when local is empty AND user isn't onboarded yet (fresh browser/new
-    // device) — otherwise the push would wipe cloud data before pull can restore it.
-    // If onboarded + empty: user intentionally deleted everything, propagate the deletion.
+    // Only replace when local has data — never delete from cloud when local is empty,
+    // because that would wipe cloud data if push runs before the initial pull (race).
     const imported = getImportedWords();
-    if (imported.length > 0 || isOnboarded()) {
+    if (imported.length > 0) {
       await supabase.from('imported_words').delete().eq('user_id', uid);
-      if (imported.length > 0) {
-        await supabase.from('imported_words').insert(
+      await supabase.from('imported_words').insert(
           imported.map(w => ({
             user_id: uid,
             word: w.word,
@@ -163,7 +161,6 @@ export async function pushAll(uid: string) {
             added_at: w.addedAt,
           }))
         );
-      }
     }
 
     // unit_progress — fetch remote first and OR-merge so false never overwrites true
