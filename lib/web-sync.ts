@@ -227,7 +227,13 @@ export async function pullAll(uid: string) {
   try {
     const set = (key: string, val: unknown) => {
       if (typeof window === 'undefined') return;
-      try { localStorage.setItem(key, JSON.stringify(val)); } catch {
+      const serialized = JSON.stringify(val);
+      // Guard: never write a value larger than 256KB — corrupt Supabase data can be huge
+      if (serialized.length > 256 * 1024) {
+        console.warn(`pullAll: skipping oversized value for ${key} (${(serialized.length/1024).toFixed(0)}KB)`);
+        return;
+      }
+      try { localStorage.setItem(key, serialized); } catch {
         // localStorage full — evict the largest non-critical key and retry once
         try {
           let biggestKey = ''; let biggestSize = 0;
@@ -239,7 +245,7 @@ export async function pullAll(uid: string) {
             if (size > biggestSize) { biggestSize = size; biggestKey = k; }
           }
           if (biggestKey) localStorage.removeItem(biggestKey);
-          localStorage.setItem(key, JSON.stringify(val));
+          localStorage.setItem(key, serialized);
         } catch { /* give up on this key, continue */ }
       }
     };
