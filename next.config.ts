@@ -11,7 +11,7 @@ const withPWA = withPWAInit({
     skipWaiting: true,
     clientsClaim: true,
     cleanupOutdatedCaches: true,
-    cacheId: "lexivo-v2",
+    cacheId: "lexivo-v3",
   },
 });
 
