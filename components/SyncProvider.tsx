@@ -1,7 +1,7 @@
 'use client';
 import { useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
-import { pushAll } from '@/lib/sync';
+import { pushAll } from '@/lib/web-sync';
 
 // Periodic sync is handled by startSync in auth-context (web-sync.ts).
 // This component only adds tab-close/hide push so in-flight progress is saved immediately.

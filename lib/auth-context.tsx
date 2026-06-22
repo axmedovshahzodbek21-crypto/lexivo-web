@@ -2,7 +2,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import type { Session, User } from '@supabase/supabase-js';
 import { supabase } from './supabase';
-import { pullAll, startSync, stopSync } from './web-sync';
+import { pullAll, pushAll, startSync, stopSync } from './web-sync';
 
 function dispatch(name: string) {
   if (typeof window !== 'undefined') window.dispatchEvent(new Event(name));
@@ -10,7 +10,11 @@ function dispatch(name: string) {
 
 async function syncPull(uid: string) {
   dispatch('lexivo-sync-start');
-  try { await pullAll(uid); dispatch('lexivo-sync-done'); }
+  try {
+    await pushAll(uid);
+    await pullAll(uid);
+    dispatch('lexivo-sync-done');
+  }
   catch { dispatch('lexivo-sync-error'); }
 }
 
