@@ -76,7 +76,7 @@ export async function pushAll(uid: string) {
       total_days: getTotalStudyDays(),
       study_days: getStudyDays(),
       freezes: getFreezes(),
-      last_freeze_week: ls(K.lastFreezeWeek),
+      last_freeze_week: (() => { const v = ls(K.lastFreezeWeek); return (v && /^\d{4}-W\d{1,2}$/.test(JSON.parse(v))) ? JSON.parse(v) : null; })(),
     });
 
     // learned_words — deduplicate by word
@@ -316,7 +316,9 @@ export async function pullAll(uid: string) {
       if (cloudLastStudy && (!localLastStudy || cloudLastStudy > localLastStudy)) {
         set(K.lastStudy, cloudLastStudy);
       }
-      if (stats.last_freeze_week) set(K.lastFreezeWeek, stats.last_freeze_week);
+      // Validate freeze week looks like "YYYY-Wnn" before writing (guards against corrupt 100KB+ values)
+      const fwVal = stats.last_freeze_week as string | null;
+      if (fwVal && /^\d{4}-W\d{1,2}$/.test(fwVal)) set(K.lastFreezeWeek, fwVal);
       if (Array.isArray(stats.study_days) && stats.study_days.length > 0) {
         const local = getStudyDays();
         const merged = Array.from(new Set([...local, ...stats.study_days]));
