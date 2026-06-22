@@ -1,6 +1,6 @@
 import { supabase } from './supabase';
 import {
-  getSettings, saveSettings, setOnboarded,
+  getSettings, saveSettings, setOnboarded, isOnboarded,
   getLearnedWords, getSRSWords, getStarredWords,
   getXP, getTodayXP, getStreak, getFreezes, getTotalStudyDays,
   getProfilePicUrl, saveProfilePicUrl,
@@ -139,28 +139,31 @@ export async function pushAll(uid: string) {
       );
     }
 
-    // imported_words — full replace so collection deletions propagate
-    // Guard: only delete+replace when local is non-empty. If local is empty
-    // (fresh browser/new device), skip so cloud data isn't wiped before pull runs.
+    // imported_words — full replace so collection deletions propagate.
+    // Skip entirely when local is empty AND user isn't onboarded yet (fresh browser/new
+    // device) — otherwise the push would wipe cloud data before pull can restore it.
+    // If onboarded + empty: user intentionally deleted everything, propagate the deletion.
     const imported = getImportedWords();
-    if (imported.length > 0) {
+    if (imported.length > 0 || isOnboarded()) {
       await supabase.from('imported_words').delete().eq('user_id', uid);
-      await supabase.from('imported_words').insert(
-        imported.map(w => ({
-          user_id: uid,
-          word: w.word,
-          collection_name: w.collectionName ?? 'My Words',
-          folder_name: w.folderName ?? null,
-          translation: w.translation,
-          definition: w.definition,
-          example1: w.example1,
-          example1_translation: w.example1Translation ?? '',
-          example2: w.example2,
-          example2_translation: w.example2Translation ?? '',
-          language: w.language,
-          added_at: w.addedAt,
-        }))
-      );
+      if (imported.length > 0) {
+        await supabase.from('imported_words').insert(
+          imported.map(w => ({
+            user_id: uid,
+            word: w.word,
+            collection_name: w.collectionName ?? 'My Words',
+            folder_name: w.folderName ?? null,
+            translation: w.translation,
+            definition: w.definition,
+            example1: w.example1,
+            example1_translation: w.example1Translation ?? '',
+            example2: w.example2,
+            example2_translation: w.example2Translation ?? '',
+            language: w.language,
+            added_at: w.addedAt,
+          }))
+        );
+      }
     }
 
     // unit_progress — fetch remote first and OR-merge so false never overwrites true
