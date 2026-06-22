@@ -136,12 +136,12 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
     <div className="flex flex-col min-h-screen animate-fade-in pb-8">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-[var(--border)]">
-        <button onClick={() => router.back()} className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-lg">←</button>
+        <button onClick={() => router.back()} className="btn-icon text-lg">←</button>
         <span className="badge">{word.topic}</span>
         <div className="flex gap-2">
           <button
             onClick={handleStar}
-            className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-lg"
+            className="btn-icon text-lg"
             title={starred ? 'Unstar' : 'Star'}
           >{starred ? '⭐' : '☆'}</button>
         </div>

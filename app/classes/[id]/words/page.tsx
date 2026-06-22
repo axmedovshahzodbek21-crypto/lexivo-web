@@ -235,7 +235,7 @@ export default function ClassWordsPage() {
       <div className="flex items-center gap-3 p-4 border-b border-[var(--border)]">
         <button
           onClick={() => router.back()}
-          className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-lg shrink-0"
+          className="btn-icon text-lg"
         >
           ←
         </button>

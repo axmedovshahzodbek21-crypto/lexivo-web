@@ -452,7 +452,7 @@ export default function ClassDashboardPage() {
     <div className="flex flex-col min-h-screen pb-24 animate-fade-in">
       {/* Header */}
       <div className="flex items-center gap-3 p-4 border-b border-[var(--border)]">
-        <button onClick={() => router.back()} className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-lg shrink-0">←</button>
+        <button onClick={() => router.back()} className="btn-icon text-lg">←</button>
         <div className="flex-1 min-w-0">
           <h1 className="font-bold text-[var(--text)] truncate">{classInfo?.name ?? 'Class Dashboard'}</h1>
           <div className="flex items-center gap-2 mt-0.5">
@@ -708,7 +708,7 @@ export default function ClassDashboardPage() {
             <div className="shrink-0 space-y-3">
               <textarea placeholder={`Write a note to ${noteTarget.name}…`} value={noteText} onChange={e => setNoteText(e.target.value)} rows={3} autoFocus className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm resize-none focus:outline-none focus:border-[var(--primary)]" />
               <div className="flex gap-3">
-                <button onClick={() => setNoteTarget(null)} className="flex-1 py-3 rounded-xl bg-[var(--surface-2)] text-sm font-semibold text-[var(--text)]">Cancel</button>
+                <button onClick={() => setNoteTarget(null)} className="flex-1 btn-ghost py-3 text-sm">Cancel</button>
                 <button onClick={sendNote} disabled={sending || !noteText.trim()} className="flex-1 btn-primary py-3 disabled:opacity-50">{sending ? 'Sending…' : 'Send ✉️'}</button>
               </div>
             </div>
@@ -755,7 +755,7 @@ export default function ClassDashboardPage() {
                 className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm resize-none focus:outline-none focus:border-[var(--primary)]"
               />
               <div className="flex gap-3">
-                <button onClick={() => setShowAnnounce(false)} className="flex-1 py-3 rounded-xl bg-[var(--surface-2)] text-sm font-semibold text-[var(--text)]">Cancel</button>
+                <button onClick={() => setShowAnnounce(false)} className="flex-1 btn-ghost py-3 text-sm">Cancel</button>
                 <button onClick={postAnnouncement} disabled={announcing || !announceText.trim()} className="flex-1 btn-primary py-3 disabled:opacity-50">
                   {announcing ? 'Posting…' : 'Post 📢'}
                 </button>
@@ -800,7 +800,7 @@ export default function ClassDashboardPage() {
                 <input type="date" value={targetDate} onChange={e => setTargetDate(e.target.value)} min={new Date().toISOString().slice(0, 10)} className="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]" />
               </div>
               <div className="flex gap-3">
-                <button onClick={() => setTargetStudent(null)} className="flex-1 py-3 rounded-xl bg-[var(--surface-2)] text-sm font-semibold text-[var(--text)]">Cancel</button>
+                <button onClick={() => setTargetStudent(null)} className="flex-1 btn-ghost py-3 text-sm">Cancel</button>
                 <button onClick={addTarget} disabled={settingTarget || !targetTitle.trim()} className="flex-1 btn-primary py-3 disabled:opacity-50">{settingTarget ? 'Setting…' : 'Set target 🎯'}</button>
               </div>
             </div>

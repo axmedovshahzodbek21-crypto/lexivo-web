@@ -109,7 +109,7 @@ export default function SRSReviewPage() {
     return (
       <div className="flex flex-col min-h-screen">
         <div className="flex items-center justify-between p-4 border-b border-[var(--border)]">
-          <button onClick={() => setManaging(false)} className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center">←</button>
+          <button onClick={() => setManaging(false)} className="btn-icon">←</button>
           <h1 className="font-bold">Manage SRS Deck</h1>
           <span className="text-sm text-[var(--text-muted)]">{allWords.length} words</span>
         </div>
@@ -202,14 +202,14 @@ export default function SRSReviewPage() {
     <div className="flex flex-col min-h-screen">
       {/* Header */}
       <div className="flex items-center justify-between p-4">
-        <button onClick={() => router.back()} className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center">←</button>
+        <button onClick={() => router.back()} className="btn-icon">←</button>
         <div className="text-center">
           <div className="font-semibold text-sm">{t.srs.title}</div>
           <div className="text-xs text-[var(--text-muted)]">{index + 1} / {queue.length}</div>
         </div>
         <button
           onClick={() => { setAllWords(getSRSWords()); setManaging(true); }}
-          className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-sm"
+          className="btn-icon text-sm"
           title="Manage deck"
         >
           ⚙️

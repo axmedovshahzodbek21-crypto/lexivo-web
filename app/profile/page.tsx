@@ -190,7 +190,7 @@ export default function ProfilePage() {
       <div className="flex items-center justify-between p-4 border-b border-[var(--border)]">
         <button
           onClick={() => router.back()}
-          className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-lg"
+          className="btn-icon text-lg"
         >←</button>
         <h1 className="font-bold text-[var(--text)]">{t.profile.title}</h1>
         <Link

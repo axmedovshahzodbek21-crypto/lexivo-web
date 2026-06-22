@@ -335,7 +335,7 @@ function LearnInner() {
             }
             router.back();
           }}
-          className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-lg shrink-0"
+          className="btn-icon text-lg"
         >←</button>
         <div className="flex-1 mx-3">
           <div className="flex items-center justify-between mb-1.5">
@@ -351,10 +351,10 @@ function LearnInner() {
           </div>
         </div>
         <div className="flex gap-2 shrink-0">
-          <button onClick={handleStar} className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-lg">
+          <button onClick={handleStar} className="btn-icon text-lg">
             {starred ? '⭐' : '☆'}
           </button>
-          <button onClick={() => setFocusMode(!focusMode)} className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-base">
+          <button onClick={() => setFocusMode(!focusMode)} className="btn-icon text-base">
             {focusMode ? '⊠' : '⛶'}
           </button>
         </div>

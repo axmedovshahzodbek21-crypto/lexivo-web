@@ -42,14 +42,14 @@ export default function CollectionDetailPage({ params }: Props) {
   return (
     <div className="flex flex-col min-h-screen animate-fade-in pb-24">
       <div className="flex items-center gap-3 p-4 border-b border-[var(--border)]">
-        <button onClick={() => router.back()} className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-lg">←</button>
+        <button onClick={() => router.back()} className="btn-icon text-lg">←</button>
         <div className="flex-1 min-w-0">
           <h1 className="font-bold text-[var(--text)] truncate">{name}</h1>
           <p className="text-xs text-[var(--text-muted)]">{t.myWords.wordCount(words.length)}</p>
         </div>
         <button
           onClick={handleDeleteCollection}
-          className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-base text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors"
+          className="btn-icon text-base text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors"
           title="Delete collection"
         >🗑️</button>
         <Link

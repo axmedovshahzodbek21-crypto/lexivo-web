@@ -53,7 +53,7 @@ function UnitList({
       <div className="flex items-center gap-3 pt-2">
         <button
           onClick={onBack}
-          className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center shrink-0 text-lg"
+          className="btn-icon text-lg"
         >←</button>
         <div className="min-w-0">
           <p className="text-xs text-[var(--text-muted)] truncate">{col.name}</p>
@@ -174,7 +174,7 @@ export default function UnitPicker({ mode }: { mode: Mode }) {
       <div className="flex items-center gap-3 pt-2">
         <button
           onClick={() => router.back()}
-          className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center shrink-0"
+          className="btn-icon"
         >←</button>
         <h1 className="text-xl font-bold text-[var(--text)]">
           {cfg.icon} Choose a collection

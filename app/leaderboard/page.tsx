@@ -215,7 +215,7 @@ export default function LeaderboardPage() {
                   <div className="flex items-center gap-1"><div className="w-2.5 h-2.5 rounded-full bg-[#2ECC71]" /><span className="text-[10px] text-[var(--text-muted)]">Studied</span></div>
                 </div>
               </div>
-              <button onClick={() => setSelected(null)} className="w-full py-3 rounded-xl bg-[var(--surface-2)] text-sm font-semibold text-[var(--text)]">Close</button>
+              <button onClick={() => setSelected(null)} className="w-full btn-ghost py-3 text-sm">Close</button>
             </div>
           </div>
         );
@@ -224,7 +224,7 @@ export default function LeaderboardPage() {
       <div className="flex items-center gap-3 p-4 border-b border-[var(--border)]">
         <button
           onClick={() => router.back()}
-          className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-lg"
+          className="btn-icon text-lg"
         >←</button>
         <div className="flex-1">
           <h1 className="font-bold text-[var(--text)]">🏆 Leaderboard</h1>
@@ -232,7 +232,7 @@ export default function LeaderboardPage() {
         </div>
         <button
           onClick={load}
-          className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-lg hover:bg-[var(--primary-bg)] transition-colors"
+          className="btn-icon text-lg hover:bg-[var(--primary-bg)] transition-colors"
           title="Refresh"
         >↻</button>
       </div>

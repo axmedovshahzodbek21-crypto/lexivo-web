@@ -200,6 +200,46 @@ body.focus-mode .focus-container {
 }
 .btn-secondary:hover { background: var(--primary-light); color: white; }
 
+.btn-ghost {
+  background: var(--surface-2);
+  color: var(--text);
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-ghost:hover { background: var(--border); }
+
+.btn-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-icon:hover { background: var(--border); }
+
+.btn-danger-ghost {
+  background: var(--surface-2);
+  color: var(--text-muted);
+  border: none;
+  border-radius: 12px;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.btn-danger-ghost:hover { color: var(--danger); }
+
 /* Skeleton shimmer */
 .skeleton {
   background: linear-gradient(90deg, var(--surface-2) 25%, var(--border) 50%, var(--surface-2) 75%);

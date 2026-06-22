@@ -252,7 +252,7 @@ export default function FlashcardsPage() {
     <div className="flex flex-col min-h-screen">
       {/* Header */}
       <div className="flex items-center justify-between p-4">
-        <button onClick={() => router.back()} className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center">←</button>
+        <button onClick={() => router.back()} className="btn-icon">←</button>
         <div className="text-center">
           <div className="font-semibold text-sm">{t.flashcards.title}</div>
           <div className="text-xs text-[var(--text-muted)]">{index + 1} / {deck.length}</div>

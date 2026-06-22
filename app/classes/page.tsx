@@ -361,7 +361,7 @@ export default function ClassesPage() {
     <div className="flex flex-col min-h-screen pb-24 animate-fade-in">
       {/* Header */}
       <div className="flex items-center gap-3 p-4 border-b border-[var(--border)]">
-        <button onClick={() => router.back()} className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-lg">←</button>
+        <button onClick={() => router.back()} className="btn-icon text-lg">←</button>
         <div className="flex-1">
           <h1 className="font-bold text-[var(--text)]">👩‍🏫 Classes</h1>
           <p className="text-xs text-[var(--text-muted)]">Create or join a class</p>
@@ -446,7 +446,7 @@ export default function ClassesPage() {
                         </div>
                         <div className="flex flex-col gap-2 shrink-0">
                           <button onClick={() => router.push(`/classes/${cls.id}`)} className="btn-primary text-xs px-3 py-1.5">Dashboard →</button>
-                          <button onClick={() => deleteClass(cls.id)} className="text-xs px-3 py-1.5 rounded-xl bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors">Delete</button>
+                          <button onClick={() => deleteClass(cls.id)} className="btn-danger-ghost">Delete</button>
                         </div>
                       </div>
                     </div>
@@ -517,7 +517,7 @@ export default function ClassesPage() {
                             >
                               🏆
                             </button>
-                            <button onClick={() => leaveClass(cls.id)} className="text-xs px-3 py-1.5 rounded-xl bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors">Leave</button>
+                            <button onClick={() => leaveClass(cls.id)} className="btn-danger-ghost">Leave</button>
                           </div>
                         </div>
 
@@ -696,7 +696,7 @@ export default function ClassesPage() {
           <div className="flex items-center gap-3 p-4 border-b border-[var(--border)] shrink-0">
             <button
               onClick={() => setFlashcard(null)}
-              className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-lg shrink-0"
+              className="btn-icon text-lg"
             >
               ✕
             </button>
@@ -811,7 +811,7 @@ export default function ClassesPage() {
             {error && <p className="text-sm text-[var(--danger)]">{error}</p>}
             <p className="text-xs text-[var(--text-muted)]">A unique join code will be generated automatically.</p>
             <div className="flex gap-3">
-              <button onClick={() => { setShowCreate(false); setError(''); }} className="flex-1 py-3 rounded-xl bg-[var(--surface-2)] text-sm font-semibold text-[var(--text)]">Cancel</button>
+              <button onClick={() => { setShowCreate(false); setError(''); }} className="flex-1 btn-ghost py-3 text-sm">Cancel</button>
               <button onClick={createClass} disabled={creating || !className.trim()} className="flex-1 btn-primary py-3 disabled:opacity-50">
                 {creating ? 'Creating…' : 'Create Class'}
               </button>

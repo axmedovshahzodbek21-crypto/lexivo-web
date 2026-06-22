@@ -21,7 +21,7 @@ export default function MyWordsPage() {
   return (
     <div className="flex flex-col min-h-screen animate-fade-in pb-24">
       <div className="flex items-center justify-between p-4 border-b border-[var(--border)]">
-        <button onClick={() => router.back()} className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-lg">←</button>
+        <button onClick={() => router.back()} className="btn-icon text-lg">←</button>
         <h1 className="font-bold text-[var(--text)]">{t.myWords.title}</h1>
         <Link
           href="/import"

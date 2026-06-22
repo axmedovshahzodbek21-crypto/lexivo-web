@@ -216,7 +216,7 @@ export default function SettingsPage() {
   return (
     <div className="p-4 space-y-4 animate-fade-in">
       <div className="sticky top-0 z-10 -mx-4 px-4 py-3 bg-[var(--background)] border-b border-[var(--border)] flex items-center gap-3">
-        <button onClick={() => router.back()} className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center shrink-0">←</button>
+        <button onClick={() => router.back()} className="btn-icon">←</button>
         <h1 className="text-xl font-bold flex-1">{t.settings.title}</h1>
         <button
           onClick={handleSave}
