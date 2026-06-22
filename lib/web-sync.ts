@@ -349,12 +349,22 @@ async function checkAndHandleReset(uid: string): Promise<boolean> {
 
 let _syncInterval: ReturnType<typeof setInterval> | null = null;
 
+function dispatch(name: string) {
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event(name));
+}
+
 export function startSync(uid: string) {
   stopSync();
   _syncInterval = setInterval(async () => {
-    const wasReset = await checkAndHandleReset(uid);
-    await pullAll(uid);              // Pull first — local becomes authoritative merged state
-    if (!wasReset) await pushAll(uid); // Then push the merged state
+    dispatch('lexivo-sync-start');
+    try {
+      const wasReset = await checkAndHandleReset(uid);
+      await pullAll(uid);
+      if (!wasReset) await pushAll(uid);
+      dispatch('lexivo-sync-done');
+    } catch {
+      dispatch('lexivo-sync-error');
+    }
   }, 30_000);
 }
 
