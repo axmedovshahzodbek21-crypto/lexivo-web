@@ -1,7 +1,7 @@
 import { supabase } from './supabase';
 import type { ImportedWord } from './types';
 import {
-  getSettings, saveSettings, setOnboarded,
+  getSettings, saveSettings, setOnboarded, updateFolderMap,
   getLearnedWords, getSRSWords, getStarredWords,
   getXP, getTodayXP, getStreak, getFreezes, getTotalStudyDays,
   getProfilePicUrl, saveProfilePicUrl,
@@ -394,6 +394,12 @@ export async function pullAll(uid: string) {
         `${w.word.toLowerCase()}__${(w.collectionName ?? 'My Words').toLowerCase()}`,
         w,
       ]));
+      // Update folder map from cloud data so cross-device pulls restore folder assignments
+      for (const r of importedRows) {
+        if (r.folder_name && r.collection_name) {
+          updateFolderMap(r.collection_name as string, r.folder_name as string);
+        }
+      }
       const cloudWords = importedRows.map(r => {
         const key = `${(r.word as string).toLowerCase()}__${(r.collection_name ?? 'My Words').toLowerCase()}`;
         const localMatch = localByKey.get(key);
@@ -408,8 +414,6 @@ export async function pullAll(uid: string) {
           language: (r.language as string) ?? 'en-US',
           addedAt: (r.added_at as number) ?? 0,
           collectionName: (r.collection_name as string) ?? 'My Words',
-          // Prefer cloud folderName if present; fall back to local's so a bad push that
-          // wiped folder_name doesn't destroy the user's folder assignment
           folderName: (r.folder_name as string | null) ?? localMatch?.folderName,
         } as ImportedWord;
       });

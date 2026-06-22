@@ -513,12 +513,33 @@ export function deleteCustomList(id: string) {
 // ─── Imported Words ──────────────────────────────────────────────────────────
 
 const IMPORTED_KEY = 'lexivo_imported_words';
+const FOLDER_MAP_KEY = 'lexivo_folder_map';
 const DEFAULT_COLLECTION = 'My Words';
 
+// Stores collection→folder mapping as a backup. Survives any pullAll wipe that
+// strips folderName from word objects, because no sync code touches this key.
+function getFolderMap(): Record<string, string> {
+  if (typeof window === 'undefined') return {};
+  try { return JSON.parse(localStorage.getItem(FOLDER_MAP_KEY) ?? '{}'); } catch { return {}; }
+}
+
+export function updateFolderMap(collectionName: string, folderName: string) {
+  if (typeof window === 'undefined') return;
+  const map = getFolderMap();
+  map[collectionName] = folderName;
+  localStorage.setItem(FOLDER_MAP_KEY, JSON.stringify(map));
+}
+
 export function getImportedWords(): ImportedWord[] {
-  return get<ImportedWord[]>(IMPORTED_KEY, []).map(w =>
-    w.collectionName ? w : { ...w, collectionName: DEFAULT_COLLECTION }
-  );
+  const folderMap = getFolderMap();
+  return get<ImportedWord[]>(IMPORTED_KEY, []).map(w => {
+    const col = w.collectionName ?? DEFAULT_COLLECTION;
+    return {
+      ...(w.collectionName ? w : { ...w, collectionName: DEFAULT_COLLECTION }),
+      // Restore folderName from backup map if the word lost it (e.g. from old cached pullAll)
+      folderName: w.folderName ?? folderMap[col],
+    };
+  });
 }
 
 export function getImportedWordsByCollection(collectionName: string, folderName?: string): ImportedWord[] {
@@ -580,6 +601,7 @@ export function addImportedWords(words: ImportedWord[], collectionName: string, 
     .filter(w => !existingSet.has(w.word.toLowerCase().trim()))
     .map(w => ({ ...w, collectionName, ...(folderName ? { folderName } : {}) }));
   set(IMPORTED_KEY, [...existing, ...fresh]);
+  if (folderName) updateFolderMap(collectionName, folderName);
 }
 
 export function deleteImportedWord(word: string, collectionName: string, folderName?: string) {
