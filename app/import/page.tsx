@@ -202,14 +202,15 @@ function ImportPageInner() {
   }
 
   function handleAdd() {
+    const folder = folderName.trim();
     const name = collectionName.trim() || 'My Words';
-    const folder = folderName.trim() || undefined;
+    if (!folder) {
+      alert('Please enter a folder name before saving.');
+      return;
+    }
     addImportedWords(parsed, name, folder);
     setAdded(true);
-    const dest = folder
-      ? `/my-words/${encodeURIComponent(folder)}/${encodeURIComponent(name)}`
-      : `/my-words/${encodeURIComponent(name)}`;
-    setTimeout(() => router.push(dest), 1200);
+    setTimeout(() => router.push(`/my-words/${encodeURIComponent(folder)}/${encodeURIComponent(name)}`), 1200);
   }
 
   return (
@@ -256,10 +257,7 @@ function ImportPageInner() {
         {/* Folder + Collection name */}
         <div className="card space-y-3">
           <div className="space-y-1.5">
-            <div className="flex items-center gap-2">
-              <label className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">📁 Folder</label>
-              <span className="text-[10px] text-[var(--text-muted)] font-normal">(optional)</span>
-            </div>
+            <label className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">📁 Folder</label>
             <input
               type="text"
               value={folderName}
