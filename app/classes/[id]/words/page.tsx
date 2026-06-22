@@ -30,6 +30,11 @@ interface ParsedWord {
   language: string;
 }
 
+interface ParseResult {
+  words: ParsedWord[];
+  errors: { index: number; preview: string; reason: string }[];
+}
+
 const LANGUAGES = [
   { label: 'English', code: 'en-US' },
   { label: 'Russian', code: 'ru-RU' },
@@ -58,6 +63,8 @@ example2: She faced an enormous challenge at work.
 example2Translation: U ishda ulkan muammoga duch keldi.
 ---
 
+Important: the example above uses English/Uzbek only to show the format. In your actual response, write the definition and examples in ${wordLang}, and the translations in ${transLang}.
+
 Here are my words:
 [PASTE YOUR WORDS HERE, one per line]`;
 }
@@ -76,14 +83,18 @@ example2: She faced an enormous challenge at work.
 example2Translation: U ishda ulkan muammoga duch keldi.
 ---
 
+Important: the example above uses English/Uzbek only to show the format. In your actual response, write the definition and examples in ${wordLang}, and the translations in ${transLang}.
+
 Here are my pairs (word - translation):
 [PASTE YOUR PAIRS HERE, one per line]`;
 }
 
-function parseOutput(text: string, langCode: string): ParsedWord[] {
+function parseOutput(text: string, langCode: string): ParseResult {
   const blocks = text.split(/---+/).map(b => b.trim()).filter(Boolean);
   const words: ParsedWord[] = [];
-  for (const block of blocks) {
+  const errors: ParseResult['errors'] = [];
+  for (let i = 0; i < blocks.length; i++) {
+    const block = blocks[i];
     const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
     const fields: Record<string, string> = {};
     for (const line of lines) {
@@ -93,7 +104,19 @@ function parseOutput(text: string, langCode: string): ParsedWord[] {
       const val = line.slice(colon + 1).trim().replace(/[*_`]/g, '');
       fields[key] = val;
     }
-    if (!fields.word || !fields.translation) continue;
+    const preview = block.slice(0, 40).replace(/\n/g, ' ');
+    if (!fields.word && !fields.translation) {
+      errors.push({ index: i + 1, preview, reason: 'Missing both "word:" and "translation:" fields' });
+      continue;
+    }
+    if (!fields.word) {
+      errors.push({ index: i + 1, preview, reason: 'Missing "word:" field' });
+      continue;
+    }
+    if (!fields.translation) {
+      errors.push({ index: i + 1, preview, reason: 'Missing "translation:" field' });
+      continue;
+    }
     words.push({
       word: fields.word,
       translation: fields.translation,
@@ -105,7 +128,7 @@ function parseOutput(text: string, langCode: string): ParsedWord[] {
       language: langCode,
     });
   }
-  return words;
+  return { words, errors };
 }
 
 export default function ClassWordsPage() {
@@ -134,11 +157,13 @@ export default function ClassWordsPage() {
   const [pasted, setPasted] = useState('');
   const [open1, setOpen1] = useState(false);
   const [open2, setOpen2] = useState(false);
+  const [openFmt, setOpenFmt] = useState(false);
   const [copied1, setCopied1] = useState(false);
   const [copied2, setCopied2] = useState(false);
   const [importing, setImporting] = useState(false);
 
-  const parsed = useMemo(() => parseOutput(pasted, wordLangCode), [pasted, wordLangCode]);
+  const parseResult = useMemo(() => parseOutput(pasted, wordLangCode), [pasted, wordLangCode]);
+  const parsed = parseResult.words;
 
   const loadWords = async () => {
     const { data } = await supabase
@@ -427,6 +452,41 @@ export default function ClassWordsPage() {
                 )}
               </div>
 
+              {/* Format reference */}
+              <div className="card space-y-3">
+                <button onClick={() => setOpenFmt(p => !p)} className="w-full flex items-center justify-between">
+                  <div className="text-left">
+                    <p className="font-semibold text-sm text-[var(--text)]">Format reference</p>
+                    <p className="text-xs text-[var(--text-muted)] mt-0.5">Exact structure expected — open if pasting manually or fixing errors</p>
+                  </div>
+                  <span className="text-[var(--text-muted)] ml-2">{openFmt ? '▲' : '▼'}</span>
+                </button>
+                {openFmt && (
+                  <div className="space-y-3">
+                    <p className="text-xs text-[var(--text-muted)]">Each word is one block. Blocks are separated by <code className="bg-[var(--surface-2)] px-1 py-0.5 rounded font-mono">---</code> on its own line.</p>
+                    <div className="rounded-xl bg-[var(--surface-2)] p-3 space-y-1 font-mono text-xs leading-relaxed">
+                      <div><span className="text-[var(--primary)] font-bold">word:</span><span className="text-[var(--text)]"> enormous</span><span className="ml-2 text-green-500 font-sans font-semibold text-[10px]">required</span></div>
+                      <div><span className="text-[var(--primary)] font-bold">translation:</span><span className="text-[var(--text)]"> ulkan</span><span className="ml-2 text-green-500 font-sans font-semibold text-[10px]">required</span></div>
+                      <div><span className="text-[var(--text-muted)]">definition:</span><span className="text-[var(--text)]"> extremely large in size</span><span className="ml-2 text-[var(--text-muted)] font-sans text-[10px]">optional</span></div>
+                      <div><span className="text-[var(--text-muted)]">example1:</span><span className="text-[var(--text)]"> The enormous building towered above the city.</span><span className="ml-2 text-[var(--text-muted)] font-sans text-[10px]">optional</span></div>
+                      <div><span className="text-[var(--text-muted)]">example1Translation:</span><span className="text-[var(--text)]"> Ulkan bino shahar ustida baland turardi.</span><span className="ml-2 text-[var(--text-muted)] font-sans text-[10px]">optional</span></div>
+                      <div><span className="text-[var(--text-muted)]">example2:</span><span className="text-[var(--text)]"> She faced an enormous challenge at work.</span><span className="ml-2 text-[var(--text-muted)] font-sans text-[10px]">optional</span></div>
+                      <div><span className="text-[var(--text-muted)]">example2Translation:</span><span className="text-[var(--text)]"> U ishda ulkan muammoga duch keldi.</span><span className="ml-2 text-[var(--text-muted)] font-sans text-[10px]">optional</span></div>
+                      <div className="pt-1 text-[var(--text-muted)]">---</div>
+                      <div className="pt-1 text-[var(--text-muted)] italic">next word block goes here...</div>
+                    </div>
+                    <div className="rounded-xl border border-amber-200 bg-amber-50 dark:bg-amber-900/10 dark:border-amber-800 p-3 space-y-1">
+                      <p className="text-xs font-semibold text-amber-700 dark:text-amber-400">Common mistakes</p>
+                      <ul className="text-xs text-amber-600 dark:text-amber-400 space-y-0.5 list-disc list-inside">
+                        <li>Missing <code className="bg-amber-100 dark:bg-amber-900/30 px-1 rounded">---</code> separator between words</li>
+                        <li>Using <code className="bg-amber-100 dark:bg-amber-900/30 px-1 rounded">**bold**</code> or markdown formatting in values</li>
+                        <li><code className="bg-amber-100 dark:bg-amber-900/30 px-1 rounded">word</code> or <code className="bg-amber-100 dark:bg-amber-900/30 px-1 rounded">translation</code> field missing entirely</li>
+                      </ul>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {/* Paste area */}
               <div className="card space-y-2">
                 <p className="font-semibold text-sm text-[var(--text)]">Paste AI response here</p>
@@ -440,33 +500,67 @@ export default function ClassWordsPage() {
               </div>
 
               {/* Preview & add */}
-              {parsed.length > 0 && (
+              {pasted.trim() && (
                 <div className="card space-y-3">
                   <div className="flex items-center justify-between">
                     <p className="font-semibold text-sm text-[var(--text)]">Preview</p>
-                    <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(16,185,129,0.12)', color: 'var(--success)' }}>
-                      {parsed.length} words ready
-                    </span>
+                    <div className="flex items-center gap-2 text-xs">
+                      {parsed.length > 0 && (
+                        <span className="px-2 py-0.5 rounded-full font-semibold" style={{ background: 'rgba(16,185,129,0.12)', color: 'var(--success)' }}>
+                          ✓ {parsed.length} ready
+                        </span>
+                      )}
+                      {parseResult.errors.length > 0 && (
+                        <span className="px-2 py-0.5 rounded-full font-semibold" style={{ background: 'rgba(239,68,68,0.1)', color: '#DC2626' }}>
+                          ✕ {parseResult.errors.length} failed
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  <div className="space-y-2 max-h-64 overflow-y-auto">
-                    {parsed.map((w, i) => (
-                      <div key={i} className="rounded-xl border border-[var(--border)] px-3 py-2">
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-sm text-[var(--text)]">{w.word}</span>
-                          <span className="text-[var(--text-muted)]">·</span>
-                          <span className="text-[var(--primary)] text-sm font-medium">{w.translation}</span>
+
+                  {parseResult.errors.length > 0 && (
+                    <div className="rounded-xl border border-red-200 bg-red-50 dark:bg-red-900/10 dark:border-red-800 p-3 space-y-2">
+                      <p className="text-xs font-semibold text-red-700 dark:text-red-400">
+                        {parseResult.errors.length} block{parseResult.errors.length > 1 ? 's' : ''} could not be parsed:
+                      </p>
+                      {parseResult.errors.map(e => (
+                        <div key={e.index} className="text-xs text-red-600 dark:text-red-400">
+                          <span className="font-semibold">Block {e.index}:</span> {e.reason}
+                          {e.preview && <span className="block text-red-400 font-mono mt-0.5 truncate">&quot;{e.preview}…&quot;</span>}
                         </div>
-                        {w.definition && <p className="text-xs text-[var(--text-muted)] mt-0.5">{w.definition}</p>}
-                      </div>
-                    ))}
-                  </div>
-                  <button
-                    onClick={importWords}
-                    disabled={importing}
-                    className="w-full btn-primary py-3 disabled:opacity-50"
-                  >
-                    {importing ? 'Adding…' : `Add ${parsed.length} word${parsed.length !== 1 ? 's' : ''} to class`}
-                  </button>
+                      ))}
+                      <p className="text-xs text-red-500 mt-1">Make sure each block has <code className="bg-red-100 dark:bg-red-900/30 px-1 rounded">word:</code> and <code className="bg-red-100 dark:bg-red-900/30 px-1 rounded">translation:</code> fields, separated by <code className="bg-red-100 dark:bg-red-900/30 px-1 rounded">---</code></p>
+                    </div>
+                  )}
+
+                  {parsed.length > 0 && (
+                    <div className="space-y-2 max-h-64 overflow-y-auto">
+                      {parsed.map((w, i) => (
+                        <div key={i} className="rounded-xl border border-[var(--border)] p-3 space-y-1.5">
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-[var(--text)]">{w.word}</span>
+                            <span className="text-[var(--text-muted)]">·</span>
+                            <span className="text-[var(--primary)] font-medium">{w.translation}</span>
+                          </div>
+                          {w.definition && <p className="text-xs text-[var(--text-muted)]">{w.definition}</p>}
+                          {w.example1 && <p className="text-xs italic text-[var(--text)]">&quot;{w.example1}&quot;</p>}
+                          {w.example1Translation && <p className="text-xs text-[var(--text-muted)] pl-2">↳ {w.example1Translation}</p>}
+                          {w.example2 && <p className="text-xs italic text-[var(--text)]">&quot;{w.example2}&quot;</p>}
+                          {w.example2Translation && <p className="text-xs text-[var(--text-muted)] pl-2">↳ {w.example2Translation}</p>}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {parsed.length > 0 && (
+                    <button
+                      onClick={importWords}
+                      disabled={importing}
+                      className="w-full btn-primary py-3 disabled:opacity-50"
+                    >
+                      {importing ? 'Adding…' : `Add ${parsed.length} word${parsed.length !== 1 ? 's' : ''} to class`}
+                    </button>
+                  )}
                 </div>
               )}
             </div>
