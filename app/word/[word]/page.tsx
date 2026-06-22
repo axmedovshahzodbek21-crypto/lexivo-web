@@ -1,5 +1,5 @@
 ﻿'use client';
-import { PageLoader, SectionLoader } from '@/components/Loader';
+import { PageLoader } from '@/components/Loader';
 import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -113,13 +113,13 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
   };
 
   if (!collectionsLoaded) {
-    return <PageLoader />;
+    return <div className="flex items-center justify-center min-h-screen"><div className="text-4xl animate-bounce">📖</div></div>;
   }
 
   if (!word) {
     return (
       <div className="p-6 text-center">
-        <div className="text-5xl mb-4">рџ”Ќ</div>
+        <div className="text-5xl mb-4">🔍</div>
         <h2 className="font-bold text-xl mb-2">Word not found</h2>
         <p className="text-[var(--text-muted)] text-sm mb-4">"{wordText}" isn't in any collection.</p>
         <Link href="/search" className="btn-primary inline-block">Search Words</Link>
@@ -136,14 +136,14 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
     <div className="flex flex-col min-h-screen animate-fade-in pb-8">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-[var(--border)]">
-        <button onClick={() => router.back()} className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-lg">в†ђ</button>
+        <button onClick={() => router.back()} className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-lg">←</button>
         <span className="badge">{word.topic}</span>
         <div className="flex gap-2">
           <button
             onClick={handleStar}
             className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-lg"
             title={starred ? 'Unstar' : 'Star'}
-          >{starred ? 'в­ђ' : 'в†'}</button>
+          >{starred ? '⭐' : '☆'}</button>
         </div>
       </div>
 
@@ -155,7 +155,7 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
               <h1 className="text-4xl font-black text-[var(--text)] mb-1">{word.word}</h1>
               <p className="text-sm text-[var(--text-muted)]">
                 <span className="italic">{word.partOfSpeech}</span>
-                <span className="mx-2">В·</span>
+                <span className="mx-2">·</span>
                 <span>{word.pronunciation}</span>
               </p>
             </div>
@@ -164,31 +164,31 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
                 onClick={() => speak(word.word)}
                 className="w-10 h-10 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-lg hover:bg-[var(--primary)] hover:text-white transition-colors"
                 title="Normal speed"
-              >рџ”Љ</button>
+              >🔊</button>
               <button
                 onClick={() => speak(word.word, 0.6)}
                 className="w-10 h-10 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-base hover:bg-[var(--primary-bg)] transition-colors"
                 title="Slow"
-              >рџђЊ</button>
+              >🐌</button>
             </div>
           </div>
 
           {/* Translation */}
           <div className="bg-[var(--primary-bg)] rounded-2xl p-4">
-            <p className="text-xs font-semibold text-[var(--primary)] mb-1">рџ‡єрџ‡ї O'zbek tarjimasi</p>
+            <p className="text-xs font-semibold text-[var(--primary)] mb-1">🇺🇿 O'zbek tarjimasi</p>
             <p className="text-2xl font-bold text-[var(--primary)]">{word.translation}</p>
           </div>
         </div>
 
         {/* Definition */}
         <div className="card">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] mb-2">рџ“– Definition</h2>
+          <h2 className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] mb-2">📖 Definition</h2>
           <p className="text-[var(--text)] leading-relaxed">{word.definition}</p>
         </div>
 
         {/* Examples */}
         <div className="card space-y-3">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">рџ’¬ Examples</h2>
+          <h2 className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">💬 Examples</h2>
           {[
             { text: word.example1, situation: word.example1Situation, translation: null },
             { text: word.example2, situation: word.example2Situation, translation: null },
@@ -204,7 +204,7 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
               </div>
               {ex.situation && (
                 <div className="bg-amber-50 rounded-xl p-3">
-                  <p className="text-xs text-amber-600 mb-0.5">рџ—єпёЏ Holat {i + 1} (O'zbek)</p>
+                  <p className="text-xs text-amber-600 mb-0.5">🗺️ Holat {i + 1} (O'zbek)</p>
                   <p className="text-xs text-amber-900">{ex.situation}</p>
                 </div>
               )}
@@ -218,7 +218,7 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
           <div className="card py-3 text-center">
             {learnedAt ? (
               <>
-                <div className="text-2xl mb-1">вњ…</div>
+                <div className="text-2xl mb-1">✅</div>
                 <div className="text-xs font-semibold text-[var(--success)]">Learned</div>
                 <div className="text-xs text-[var(--text-muted)] mt-0.5">
                   {new Date(learnedAt).toLocaleDateString()}
@@ -226,7 +226,7 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
               </>
             ) : (
               <>
-                <div className="text-2xl mb-1">рџ“љ</div>
+                <div className="text-2xl mb-1">📚</div>
                 <div className="text-xs font-semibold text-[var(--text-muted)]">Not learned yet</div>
               </>
             )}
@@ -236,7 +236,7 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
           <div className="card py-3 text-center">
             {srsInfo ? (
               <>
-                <div className="text-2xl mb-1">рџ”„</div>
+                <div className="text-2xl mb-1">🔄</div>
                 <div
                   className="text-xs font-semibold"
                   style={{ color: stageColor(srsInfo.stage) }}
@@ -247,7 +247,7 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
               </>
             ) : (
               <>
-                <div className="text-2xl mb-1">рџ’¤</div>
+                <div className="text-2xl mb-1">💤</div>
                 <div className="text-xs font-semibold text-[var(--text-muted)]">Not in SRS</div>
               </>
             )}
@@ -259,10 +259,10 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
           <div>
             <p className="text-xs text-[var(--text-muted)]">From collection</p>
             <p className="font-semibold text-sm text-[var(--text)]">{word.collectionName}</p>
-            <p className="text-xs text-[var(--text-muted)]">Unit {word.dayNumber} В· {word.topic}</p>
+            <p className="text-xs text-[var(--text-muted)]">Unit {word.dayNumber} · {word.topic}</p>
           </div>
           <Link href={unitUrl} className="text-[var(--primary)] text-sm font-medium hover:underline">
-            View unit в†’
+            View unit →
           </Link>
         </div>
 
@@ -275,7 +275,7 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
               : 'border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--danger)] hover:text-[var(--danger)]'
           }`}
         >
-          {isHard ? 'вњ“ In hard words list вЂ” tap to remove' : 'рџ“ Add to Hard Words'}
+          {isHard ? '✓ In hard words list — tap to remove' : '😓 Add to Hard Words'}
         </button>
 
         {/* Add to list */}
@@ -284,14 +284,14 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
             onClick={() => setListPanelOpen(o => !o)}
             className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[var(--surface-2)] transition-colors"
           >
-            <span className="text-lg">рџ“‹</span>
+            <span className="text-lg">📋</span>
             <span className="font-semibold text-[var(--text)] text-sm flex-1">Add to list</span>
             {customLists.filter(l => isWordInList(l.id, word.word)).length > 0 && (
               <span className="text-xs bg-[var(--primary-bg)] text-[var(--primary)] px-2 py-0.5 rounded-full font-semibold">
                 {customLists.filter(l => isWordInList(l.id, word.word)).length}
               </span>
             )}
-            <span className="text-xs text-[var(--text-muted)]">{listPanelOpen ? 'в–І' : 'в–ј'}</span>
+            <span className="text-xs text-[var(--text-muted)]">{listPanelOpen ? '▲' : '▼'}</span>
           </button>
 
           {listPanelOpen && (
@@ -312,7 +312,7 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
                       }`}
                     >
                       <span className={`text-base flex-shrink-0 ${inList ? 'text-[var(--success)]' : 'text-[var(--text-muted)]'}`}>
-                        {inList ? 'вњ“' : 'в—‹'}
+                        {inList ? '✓' : '○'}
                       </span>
                       <span className={`flex-1 text-left font-medium truncate ${inList ? 'text-[var(--success)]' : 'text-[var(--text)]'}`}>
                         {list.name}
@@ -335,7 +335,7 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
                 href="/lists"
                 className="block text-center text-xs text-[var(--text-muted)] hover:text-[var(--primary)] transition-colors pt-1"
               >
-                Manage all lists в†’
+                Manage all lists →
               </Link>
             </div>
           )}
@@ -344,10 +344,10 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
         {/* Practice buttons */}
         <div className="grid grid-cols-3 gap-2">
           <Link href={learnUrl} className="flex flex-col items-center gap-1 py-3 rounded-xl bg-[var(--primary-bg)] text-[var(--primary)] text-xs font-semibold hover:bg-[var(--primary)] hover:text-white transition-colors">
-            <span className="text-lg">рџ“–</span>Learn
+            <span className="text-lg">📖</span>Learn
           </Link>
           <Link href={flashUrl} className="flex flex-col items-center gap-1 py-3 rounded-xl bg-[var(--primary-bg)] text-[var(--primary)] text-xs font-semibold hover:bg-[var(--primary)] hover:text-white transition-colors">
-            <span className="text-lg">рџѓЏ</span>Cards
+            <span className="text-lg">🃏</span>Cards
           </Link>
         </div>
       </div>

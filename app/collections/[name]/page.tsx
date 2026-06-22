@@ -1,5 +1,5 @@
 ﻿'use client';
-import { PageLoader, SectionLoader } from '@/components/Loader';
+import { SectionLoader } from '@/components/Loader';
 import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -73,7 +73,7 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
   if (!collectionsLoaded) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <SectionLoader />
+        <div className="text-4xl animate-bounce">📚</div>
       </div>
     );
   }
@@ -123,7 +123,7 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
         )}
       </div>
 
-      {/* Units list вЂ” columns driven by window.innerWidth so Ctrl+zoom adjusts density */}
+      {/* Units list — columns driven by window.innerWidth so Ctrl+zoom adjusts density */}
       <div
         className="flex-1 p-3 grid gap-2"
         style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
@@ -178,16 +178,16 @@ function UnitCard({ unit, collectionName }: { unit: UnitRow; collectionName: str
             onClick={() => setShowInfo(true)}
             className="text-sm leading-none opacity-60 hover:opacity-100 transition-opacity"
             title={t.collections.howMarking}
-          >рџ•ЇпёЏ</button>
+          >🕯️</button>
         </div>
         <h3 className="font-semibold text-sm text-[var(--text)] truncate mt-0.5">{unit.topic}</h3>
         <div className="flex items-center justify-between mt-1">
           <div className="flex gap-1">
-            <StageIcon done={learnDone} icon="рџ“–" label="Learn" />
-            <StageIcon done={flashcardDone} icon="рџѓЏ" label="Cards" />
-            <StageIcon done={quizDone} icon="вќ“" label="Quiz" />
+            <StageIcon done={learnDone} icon="📖" label="Learn" />
+            <StageIcon done={flashcardDone} icon="🃏" label="Cards" />
+            <StageIcon done={quizDone} icon="❓" label="Quiz" />
           </div>
-          {isComplete && <span className="text-xs text-[var(--success)] font-semibold">вњ“</span>}
+          {isComplete && <span className="text-xs text-[var(--success)] font-semibold">✓</span>}
         </div>
       </div>
 
@@ -202,7 +202,7 @@ function UnitCard({ unit, collectionName }: { unit: UnitRow; collectionName: str
           <span className="text-xs text-[var(--primary)]">{t.collections.savedAtWord((learnProgress ?? 0) + 1)}</span>
           <div className="flex gap-2">
             <Link href={resumeUrl} className="text-xs font-semibold text-[var(--primary)] hover:underline">{t.collections.continueBtn}</Link>
-            <span className="text-[var(--text-muted)]">В·</span>
+            <span className="text-[var(--text-muted)]">·</span>
             <Link href={learnUrl} className="text-xs text-[var(--text-muted)] hover:underline">{t.collections.restart}</Link>
           </div>
         </div>
@@ -214,7 +214,7 @@ function UnitCard({ unit, collectionName }: { unit: UnitRow; collectionName: str
           <span className="text-xs text-purple-600">{t.collections.cardsRemaining(flashcardProgress)}</span>
           <div className="flex gap-2">
             <Link href={flashUrl} className="text-xs font-semibold text-purple-600 hover:underline">{t.collections.continueBtn}</Link>
-            <span className="text-[var(--text-muted)]">В·</span>
+            <span className="text-[var(--text-muted)]">·</span>
             <Link href={`${flashUrl}&fresh=true`} className="text-xs text-[var(--text-muted)] hover:underline">{t.collections.restart}</Link>
           </div>
         </div>
@@ -222,13 +222,13 @@ function UnitCard({ unit, collectionName }: { unit: UnitRow; collectionName: str
 
       {/* Learning path */}
       <div className="grid grid-cols-3 gap-2 mb-2">
-        <ModeButton href={learnUrl} icon="рџ“–" label="Learn" done={learnDone} color="#6C63FF" />
+        <ModeButton href={learnUrl} icon="📖" label="Learn" done={learnDone} color="#6C63FF" />
         <ModeButton
-          href={flashUrl} icon="рџѓЏ" label={hardCount > 0 ? `Cards (${hardCount})` : 'Cards'} done={flashcardDone} color="#FF6B35"
+          href={flashUrl} icon="🃏" label={hardCount > 0 ? `Cards (${hardCount})` : 'Cards'} done={flashcardDone} color="#FF6B35"
           locked={!learnDone} lockReason={t.collections.completeLearnFirst}
         />
         <ModeButton
-          href={quizUrl} icon="вќ“" label="Quiz" done={quizDone} color="#F59E0B"
+          href={quizUrl} icon="❓" label="Quiz" done={quizDone} color="#F59E0B"
           locked={!learnDone} lockReason={t.collections.completeLearnFirst}
           softLocked={learnDone && !flashcardDone}
           softLockReason={t.collections.hardWordsRemain}
@@ -237,8 +237,8 @@ function UnitCard({ unit, collectionName }: { unit: UnitRow; collectionName: str
 
       {/* Extra activities */}
       <div className="grid grid-cols-2 gap-2">
-        <ModeButton href={pronUrl}  icon="рџЋ™пёЏ" label="Speak" done={false} color="#8B5CF6" />
-        <ModeButton href={matchUrl} icon="рџЋЇ" label="Match" done={false} color="#EC4899" />
+        <ModeButton href={pronUrl}  icon="🎙️" label="Speak" done={false} color="#8B5CF6" />
+        <ModeButton href={matchUrl} icon="🎯" label="Match" done={false} color="#EC4899" />
       </div>
 
       {/* Marking info modal */}
@@ -254,10 +254,10 @@ function UnitCard({ unit, collectionName }: { unit: UnitRow; collectionName: str
             <h3 className="font-bold text-lg mb-4 text-center">{t.collections.markingModal}</h3>
             <div className="space-y-3">
               {[
-                { icon: 'рџ“–', label: 'Learn', desc: t.collections.markingLearn },
-                { icon: 'рџѓЏ', label: 'Flashcards', desc: t.collections.markingFlash },
-                { icon: 'вќ“', label: 'Quiz', desc: t.collections.markingQuiz },
-                { icon: 'рџЏ†', label: 'Unit Complete', desc: t.collections.markingUnit },
+                { icon: '📖', label: 'Learn', desc: t.collections.markingLearn },
+                { icon: '🃏', label: 'Flashcards', desc: t.collections.markingFlash },
+                { icon: '❓', label: 'Quiz', desc: t.collections.markingQuiz },
+                { icon: '🏆', label: 'Unit Complete', desc: t.collections.markingUnit },
               ].map(({ icon, label, desc }) => (
                 <div key={label} className="flex gap-3 items-start">
                   <span className="text-xl shrink-0">{icon}</span>
@@ -289,7 +289,7 @@ function StageIcon({ done, icon, label }: { done: boolean; icon: string; label: 
           : 'bg-[var(--surface-2)] text-[var(--text-muted)]'
       }`}
     >
-      {done ? 'вњ“' : icon}
+      {done ? '✓' : icon}
     </div>
   );
 }
@@ -307,7 +307,7 @@ function ModeButton({
         title={lockReason}
         className="flex flex-col items-center gap-1 py-2 rounded-xl text-xs font-medium border-2 border-dashed border-[var(--border)] text-[var(--text-muted)] opacity-50 cursor-not-allowed select-none"
       >
-        <span className="text-base">рџ”’</span>
+        <span className="text-base">🔒</span>
         <span>{label}</span>
       </div>
     );
@@ -319,7 +319,7 @@ function ModeButton({
         title={softLockReason}
         className="flex flex-col items-center gap-1 py-2 rounded-xl text-xs font-medium border-2 border-orange-300 text-orange-500 hover:bg-orange-50 transition-all hover:scale-105"
       >
-        <span className="text-base">вљ пёЏ</span>
+        <span className="text-base">⚠️</span>
         <span className="text-center leading-tight">{label}</span>
       </Link>
     );
@@ -334,7 +334,7 @@ function ModeButton({
       }`}
       style={done ? {} : { '--hover-color': color } as React.CSSProperties}
     >
-      <span className="text-base">{done ? 'вњ“' : icon}</span>
+      <span className="text-base">{done ? '✓' : icon}</span>
       <span>{label}</span>
     </Link>
   );

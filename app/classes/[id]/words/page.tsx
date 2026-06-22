@@ -1,5 +1,5 @@
 ﻿'use client';
-import { PageLoader, SectionLoader } from '@/components/Loader';
+import { SectionLoader } from '@/components/Loader';
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
@@ -47,7 +47,7 @@ const LANGUAGES = [
 function buildPrompt1(wordLang: string, transLang: string): string {
   return `I have a list of ${wordLang} words I want to learn. For each word, provide the translation in ${transLang}, a short definition in ${wordLang}, and 2 example sentences in ${wordLang} with their ${transLang} translations.
 
-Format EXACTLY like this for every word. Use plain text only вЂ” no markdown, no bold, no asterisks, no extra formatting:
+Format EXACTLY like this for every word. Use plain text only — no markdown, no bold, no asterisks, no extra formatting:
 
 word: enormous
 translation: ulkan
@@ -65,7 +65,7 @@ Here are my words:
 function buildPrompt2(wordLang: string, transLang: string): string {
   return `I have ${wordLang}-${transLang} word pairs. For each pair, keep my translation exactly as written. Add a short definition in ${wordLang} and 2 example sentences in ${wordLang} with their ${transLang} translations.
 
-Format EXACTLY like this for every word. Use plain text only вЂ” no markdown, no bold, no asterisks, no extra formatting:
+Format EXACTLY like this for every word. Use plain text only — no markdown, no bold, no asterisks, no extra formatting:
 
 word: enormous
 translation: ulkan
@@ -216,14 +216,14 @@ export default function ClassWordsPage() {
 
   if (!user) return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8">
-      <div className="text-5xl">рџ”’</div>
+      <div className="text-5xl">🔒</div>
       <button onClick={() => router.push('/login')} className="btn-primary">Sign in</button>
     </div>
   );
 
   if (notTeacher) return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8">
-      <div className="text-5xl">в›”</div>
+      <div className="text-5xl">⛔</div>
       <p className="font-bold text-[var(--text)]">Not your class</p>
       <button onClick={() => router.back()} className="btn-primary">Go back</button>
     </div>
@@ -237,10 +237,10 @@ export default function ClassWordsPage() {
           onClick={() => router.back()}
           className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-lg shrink-0"
         >
-          в†ђ
+          ←
         </button>
         <div className="flex-1 min-w-0">
-          <h1 className="font-bold text-[var(--text)]">рџ“ќ Homework Words</h1>
+          <h1 className="font-bold text-[var(--text)]">📝 Homework Words</h1>
           <p className="text-xs text-[var(--text-muted)] truncate">{className}</p>
         </div>
         <div className="shrink-0 text-right">
@@ -250,7 +250,7 @@ export default function ClassWordsPage() {
       </div>
 
       {loading ? (
-        <SectionLoader />
+        <div className="flex justify-center py-12"><div className="text-4xl animate-bounce">📝</div></div>
       ) : (
         <div className="p-4 space-y-4">
           {/* Tab switcher */}
@@ -261,7 +261,7 @@ export default function ClassWordsPage() {
                 onClick={() => setTab(t)}
                 className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${tab === t ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface-2)] text-[var(--text-muted)]'}`}
               >
-                {t === 'manual' ? 'вњЏпёЏ Manual' : 'рџ¤– AI Import'}
+                {t === 'manual' ? '✏️ Manual' : '🤖 AI Import'}
               </button>
             ))}
           </div>
@@ -299,7 +299,7 @@ export default function ClassWordsPage() {
                 </label>
                 <input
                   type="text"
-                  placeholder="Short definitionвЂ¦"
+                  placeholder="Short definition…"
                   value={manualDefinition}
                   onChange={e => setManualDefinition(e.target.value)}
                   className="w-full px-3 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]"
@@ -309,20 +309,20 @@ export default function ClassWordsPage() {
                 onClick={() => setShowExamples(p => !p)}
                 className="text-xs text-[var(--primary)] font-medium"
               >
-                {showExamples ? 'в–І Hide example' : 'в–ј Add example sentence (optional)'}
+                {showExamples ? '▲ Hide example' : '▼ Add example sentence (optional)'}
               </button>
               {showExamples && (
                 <div className="space-y-2">
                   <input
                     type="text"
-                    placeholder="Example sentenceвЂ¦"
+                    placeholder="Example sentence…"
                     value={manualExample1}
                     onChange={e => setManualExample1(e.target.value)}
                     className="w-full px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]"
                   />
                   <input
                     type="text"
-                    placeholder="Translation of exampleвЂ¦"
+                    placeholder="Translation of example…"
                     value={manualExample1Trans}
                     onChange={e => setManualExample1Trans(e.target.value)}
                     className="w-full px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]"
@@ -334,7 +334,7 @@ export default function ClassWordsPage() {
                 disabled={adding || !manualWord.trim() || !manualTranslation.trim()}
                 className="w-full btn-primary py-3 disabled:opacity-50"
               >
-                {adding ? 'AddingвЂ¦' : '+ Add word'}
+                {adding ? 'Adding…' : '+ Add word'}
               </button>
             </div>
           )}
@@ -382,7 +382,7 @@ export default function ClassWordsPage() {
                     <p className="font-semibold text-sm text-[var(--text)]">I have words only (no translations)</p>
                     <p className="text-xs text-[var(--text-muted)] mt-0.5">AI adds translations, definitions, examples</p>
                   </div>
-                  <span className="text-[var(--text-muted)] ml-2">{open1 ? 'в–І' : 'в–ј'}</span>
+                  <span className="text-[var(--text-muted)] ml-2">{open1 ? '▲' : '▼'}</span>
                 </button>
                 {open1 && (
                   <div className="space-y-2">
@@ -393,7 +393,7 @@ export default function ClassWordsPage() {
                       onClick={() => copyPrompt(buildPrompt1(wordLang, transLang), 1)}
                       className="w-full py-2 rounded-xl bg-[var(--primary)] text-white text-sm font-semibold"
                     >
-                      {copied1 ? 'вњ… Copied!' : 'рџ“‹ Copy prompt'}
+                      {copied1 ? '✅ Copied!' : '📋 Copy prompt'}
                     </button>
                   </div>
                 )}
@@ -409,7 +409,7 @@ export default function ClassWordsPage() {
                     <p className="font-semibold text-sm text-[var(--text)]">I have word-translation pairs</p>
                     <p className="text-xs text-[var(--text-muted)] mt-0.5">AI keeps your translations, adds definitions and examples</p>
                   </div>
-                  <span className="text-[var(--text-muted)] ml-2">{open2 ? 'в–І' : 'в–ј'}</span>
+                  <span className="text-[var(--text-muted)] ml-2">{open2 ? '▲' : '▼'}</span>
                 </button>
                 {open2 && (
                   <div className="space-y-2">
@@ -420,7 +420,7 @@ export default function ClassWordsPage() {
                       onClick={() => copyPrompt(buildPrompt2(wordLang, transLang), 2)}
                       className="w-full py-2 rounded-xl bg-[var(--primary)] text-white text-sm font-semibold"
                     >
-                      {copied2 ? 'вњ… Copied!' : 'рџ“‹ Copy prompt'}
+                      {copied2 ? '✅ Copied!' : '📋 Copy prompt'}
                     </button>
                   </div>
                 )}
@@ -432,7 +432,7 @@ export default function ClassWordsPage() {
                 <textarea
                   value={pasted}
                   onChange={e => setPasted(e.target.value)}
-                  placeholder="Paste the AI-formatted output hereвЂ¦"
+                  placeholder="Paste the AI-formatted output here…"
                   rows={8}
                   className="w-full px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)] resize-none font-mono"
                 />
@@ -452,7 +452,7 @@ export default function ClassWordsPage() {
                       <div key={i} className="rounded-xl border border-[var(--border)] px-3 py-2">
                         <div className="flex items-center gap-2">
                           <span className="font-bold text-sm text-[var(--text)]">{w.word}</span>
-                          <span className="text-[var(--text-muted)]">В·</span>
+                          <span className="text-[var(--text-muted)]">·</span>
                           <span className="text-[var(--primary)] text-sm font-medium">{w.translation}</span>
                         </div>
                         {w.definition && <p className="text-xs text-[var(--text-muted)] mt-0.5">{w.definition}</p>}
@@ -464,7 +464,7 @@ export default function ClassWordsPage() {
                     disabled={importing}
                     className="w-full btn-primary py-3 disabled:opacity-50"
                   >
-                    {importing ? 'AddingвЂ¦' : `Add ${parsed.length} word${parsed.length !== 1 ? 's' : ''} to class`}
+                    {importing ? 'Adding…' : `Add ${parsed.length} word${parsed.length !== 1 ? 's' : ''} to class`}
                   </button>
                 </div>
               )}
@@ -482,7 +482,7 @@ export default function ClassWordsPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-bold text-sm text-[var(--text)]">{w.word}</span>
-                      <span className="text-[var(--text-muted)] text-sm">В·</span>
+                      <span className="text-[var(--text-muted)] text-sm">·</span>
                       <span className="text-[var(--primary)] text-sm font-medium">{w.translation}</span>
                     </div>
                     {w.definition && (
@@ -496,7 +496,7 @@ export default function ClassWordsPage() {
                     onClick={() => deleteWord(w.id)}
                     className="text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors text-sm shrink-0"
                   >
-                    вњ•
+                    ✕
                   </button>
                 </div>
               ))}
@@ -505,7 +505,7 @@ export default function ClassWordsPage() {
 
           {words.length === 0 && !loading && (
             <div className="card text-center py-10 space-y-2">
-              <div className="text-4xl">рџ“ќ</div>
+              <div className="text-4xl">📝</div>
               <p className="font-bold text-[var(--text)]">No words yet</p>
               <p className="text-sm text-[var(--text-muted)]">Add words manually or use AI Import above</p>
             </div>
