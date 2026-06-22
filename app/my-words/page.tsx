@@ -3,20 +3,26 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/lib/useTranslation';
-import { getImportedCollections } from '@/lib/storage';
-import type { ImportedCollection } from '@/lib/types';
+import { getImportedCollections, getImportedFolders } from '@/lib/storage';
+import type { ImportedCollection, ImportedFolder } from '@/lib/types';
 
 export default function MyWordsPage() {
   const router = useRouter();
   const t = useTranslation();
   const [collections, setCollections] = useState<ImportedCollection[]>([]);
+  const [folders, setFolders] = useState<ImportedFolder[]>([]);
 
   useEffect(() => {
-    const load = () => setCollections(getImportedCollections());
+    const load = () => {
+      setCollections(getImportedCollections());
+      setFolders(getImportedFolders());
+    };
     load();
     window.addEventListener('lexivo-sync', load);
     return () => window.removeEventListener('lexivo-sync', load);
   }, []);
+
+  const isEmpty = folders.length === 0 && collections.length === 0;
 
   return (
     <div className="flex flex-col min-h-screen animate-fade-in pb-24">
@@ -30,8 +36,8 @@ export default function MyWordsPage() {
         >+</Link>
       </div>
 
-      <div className="p-4 space-y-3">
-        {collections.length === 0 ? (
+      <div className="p-4 space-y-4">
+        {isEmpty ? (
           <div className="flex flex-col items-center justify-center gap-4 py-16 text-center">
             <div className="text-6xl">📚</div>
             <p className="text-[var(--text-muted)] text-sm">{t.myWords.empty}</p>
@@ -40,22 +46,59 @@ export default function MyWordsPage() {
             </Link>
           </div>
         ) : (
-          collections.map(col => (
-            <Link
-              key={col.name}
-              href={`/my-words/${encodeURIComponent(col.name)}`}
-              className="card flex items-center gap-4 hover:border-[var(--primary)] transition-colors"
-            >
-              <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0" style={{ background: 'var(--primary-bg)' }}>
-                📖
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-bold text-[var(--text)] truncate">{col.name}</p>
-                <p className="text-xs text-[var(--text-muted)] mt-0.5">{t.myWords.wordCount(col.count)}</p>
-              </div>
-              <span className="text-[var(--text-muted)] text-lg">›</span>
-            </Link>
-          ))
+          <>
+            {/* Folders */}
+            {folders.length > 0 && (
+              <section className="space-y-2">
+                {collections.length > 0 && (
+                  <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide px-1">Folders</p>
+                )}
+                {folders.map(folder => (
+                  <Link
+                    key={folder.name}
+                    href={`/my-words/${encodeURIComponent(folder.name)}`}
+                    className="card flex items-center gap-4 hover:border-[var(--primary)] transition-colors"
+                  >
+                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0" style={{ background: 'var(--primary-bg)' }}>
+                      📁
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-[var(--text)] truncate">{folder.name}</p>
+                      <p className="text-xs text-[var(--text-muted)] mt-0.5">
+                        {folder.collectionCount} collection{folder.collectionCount !== 1 ? 's' : ''} · {folder.wordCount} word{folder.wordCount !== 1 ? 's' : ''}
+                      </p>
+                    </div>
+                    <span className="text-[var(--text-muted)] text-lg">›</span>
+                  </Link>
+                ))}
+              </section>
+            )}
+
+            {/* Root-level collections */}
+            {collections.length > 0 && (
+              <section className="space-y-2">
+                {folders.length > 0 && (
+                  <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide px-1">Collections</p>
+                )}
+                {collections.map(col => (
+                  <Link
+                    key={col.name}
+                    href={`/my-words/${encodeURIComponent(col.name)}`}
+                    className="card flex items-center gap-4 hover:border-[var(--primary)] transition-colors"
+                  >
+                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0" style={{ background: 'var(--primary-bg)' }}>
+                      📖
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-[var(--text)] truncate">{col.name}</p>
+                      <p className="text-xs text-[var(--text-muted)] mt-0.5">{t.myWords.wordCount(col.count)}</p>
+                    </div>
+                    <span className="text-[var(--text-muted)] text-lg">›</span>
+                  </Link>
+                ))}
+              </section>
+            )}
+          </>
         )}
       </div>
     </div>

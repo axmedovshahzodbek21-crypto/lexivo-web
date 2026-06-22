@@ -97,11 +97,20 @@ export interface ImportedWord {
   language: string; // BCP-47 e.g. 'en-US', 'ru-RU'
   addedAt: number;
   collectionName?: string; // optional for backward compat; defaults to 'My Words'
+  folderName?: string;     // optional; if set, collection lives inside this folder
 }
 
 export interface ImportedCollection {
   name: string;
   count: number;
+  addedAt: number;
+  folderName?: string; // undefined = root-level collection
+}
+
+export interface ImportedFolder {
+  name: string;
+  collectionCount: number;
+  wordCount: number;
   addedAt: number;
 }
 

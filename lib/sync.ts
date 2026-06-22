@@ -142,6 +142,7 @@ export async function pushAll(userId: string) {
         user_id: userId,
         word: w.word,
         collection_name: w.collectionName ?? 'My Words',
+        folder_name: w.folderName ?? null,
         translation: w.translation,
         definition: w.definition,
         example1: w.example1,
@@ -335,6 +336,7 @@ export async function pullAll(userId: string) {
       language: r.language ?? 'en-US',
       addedAt: r.added_at ?? 0,
       collectionName: r.collection_name ?? 'My Words',
+      ...(r.folder_name ? { folderName: r.folder_name as string } : {}),
     })));
   }
 

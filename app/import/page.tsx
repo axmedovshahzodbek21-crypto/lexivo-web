@@ -147,7 +147,9 @@ function ImportPageInner() {
   const t = useTranslation();
 
   const prefilledCollection = searchParams.get('collection') ?? '';
+  const prefilledFolder = searchParams.get('folder') ?? '';
 
+  const [folderName, setFolderName] = useState(prefilledFolder);
   const [collectionName, setCollectionName] = useState(prefilledCollection);
   const [wordLang, setWordLang] = useState('English');
   const [transLang, setTransLang] = useState('Uzbek');
@@ -180,9 +182,13 @@ function ImportPageInner() {
 
   function handleAdd() {
     const name = collectionName.trim() || 'My Words';
-    addImportedWords(parsed, name);
+    const folder = folderName.trim() || undefined;
+    addImportedWords(parsed, name, folder);
     setAdded(true);
-    setTimeout(() => router.push(`/my-words/${encodeURIComponent(name)}`), 1200);
+    const dest = folder
+      ? `/my-words/${encodeURIComponent(folder)}/${encodeURIComponent(name)}`
+      : `/my-words/${encodeURIComponent(name)}`;
+    setTimeout(() => router.push(dest), 1200);
   }
 
   return (
@@ -226,16 +232,36 @@ function ImportPageInner() {
 
       <div className="p-4 space-y-4">
 
-        {/* Collection name */}
-        <div className="card space-y-2">
-          <label className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide block">Collection name</label>
-          <input
-            type="text"
-            value={collectionName}
-            onChange={e => setCollectionName(e.target.value)}
-            placeholder="e.g. Russian B1, Korean Verbs…"
-            className="w-full px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
-          />
+        {/* Folder + Collection name */}
+        <div className="card space-y-3">
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-2">
+              <label className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">📁 Folder</label>
+              <span className="text-[10px] text-[var(--text-muted)] font-normal">(optional)</span>
+            </div>
+            <input
+              type="text"
+              value={folderName}
+              onChange={e => setFolderName(e.target.value)}
+              placeholder="e.g. Spanish Course, B2 Prep…"
+              className="w-full px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide block">📖 Collection</label>
+            <input
+              type="text"
+              value={collectionName}
+              onChange={e => setCollectionName(e.target.value)}
+              placeholder="e.g. Unit 1, Week 3 Vocab…"
+              className="w-full px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+            />
+          </div>
+          {folderName.trim() && collectionName.trim() && (
+            <p className="text-xs text-[var(--text-muted)]">
+              Will save to: <span className="text-[var(--primary)] font-medium">{folderName.trim()}</span> › <span className="text-[var(--text)] font-medium">{collectionName.trim()}</span>
+            </p>
+          )}
         </div>
 
         {/* Language selectors */}

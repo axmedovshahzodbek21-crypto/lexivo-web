@@ -1,4 +1,4 @@
-import type { SRSWord, LearnedWord, UnitProgress, UserSettings, Achievement, CustomList, WordItem, WordCollection, ImportedWord, ImportedCollection } from './types';
+import type { SRSWord, LearnedWord, UnitProgress, UserSettings, Achievement, CustomList, WordItem, WordCollection, ImportedWord, ImportedCollection, ImportedFolder } from './types';
 import { SRS_INTERVALS, LEVEL_THRESHOLDS } from './types';
 
 function levelForXp(xp: number): string {
@@ -521,12 +521,16 @@ export function getImportedWords(): ImportedWord[] {
   );
 }
 
-export function getImportedWordsByCollection(collectionName: string): ImportedWord[] {
-  return getImportedWords().filter(w => w.collectionName === collectionName);
+export function getImportedWordsByCollection(collectionName: string, folderName?: string): ImportedWord[] {
+  return getImportedWords().filter(w =>
+    w.collectionName === collectionName &&
+    (folderName === undefined ? !w.folderName : w.folderName === folderName)
+  );
 }
 
+// Root-level collections (no folder)
 export function getImportedCollections(): ImportedCollection[] {
-  const words = getImportedWords();
+  const words = getImportedWords().filter(w => !w.folderName);
   const map = new Map<string, { count: number; addedAt: number }>();
   for (const w of words) {
     const name = w.collectionName!;
@@ -539,21 +543,61 @@ export function getImportedCollections(): ImportedCollection[] {
     .sort((a, b) => b.addedAt - a.addedAt);
 }
 
-export function addImportedWords(words: ImportedWord[], collectionName: string) {
+// All folders, with collection count + word count
+export function getImportedFolders(): ImportedFolder[] {
+  const words = getImportedWords().filter(w => !!w.folderName);
+  const map = new Map<string, { collections: Set<string>; wordCount: number; addedAt: number }>();
+  for (const w of words) {
+    const folder = w.folderName!;
+    const entry = map.get(folder);
+    if (!entry) map.set(folder, { collections: new Set([w.collectionName!]), wordCount: 1, addedAt: w.addedAt });
+    else { entry.collections.add(w.collectionName!); entry.wordCount++; }
+  }
+  return Array.from(map.entries())
+    .map(([name, { collections, wordCount, addedAt }]) => ({ name, collectionCount: collections.size, wordCount, addedAt }))
+    .sort((a, b) => b.addedAt - a.addedAt);
+}
+
+// Collections within a specific folder
+export function getCollectionsByFolder(folderName: string): ImportedCollection[] {
+  const words = getImportedWords().filter(w => w.folderName === folderName);
+  const map = new Map<string, { count: number; addedAt: number }>();
+  for (const w of words) {
+    const name = w.collectionName!;
+    const entry = map.get(name);
+    if (!entry) map.set(name, { count: 1, addedAt: w.addedAt });
+    else entry.count++;
+  }
+  return Array.from(map.entries())
+    .map(([name, { count, addedAt }]) => ({ name, count, addedAt, folderName }))
+    .sort((a, b) => b.addedAt - a.addedAt);
+}
+
+export function addImportedWords(words: ImportedWord[], collectionName: string, folderName?: string) {
   const existing = getImportedWords();
   const existingSet = new Set(existing.map(w => w.word.toLowerCase().trim()));
   const fresh = words
     .filter(w => !existingSet.has(w.word.toLowerCase().trim()))
-    .map(w => ({ ...w, collectionName }));
+    .map(w => ({ ...w, collectionName, ...(folderName ? { folderName } : {}) }));
   set(IMPORTED_KEY, [...existing, ...fresh]);
 }
 
-export function deleteImportedWord(word: string, collectionName: string) {
-  set(IMPORTED_KEY, getImportedWords().filter(w => !(w.word === word && w.collectionName === collectionName)));
+export function deleteImportedWord(word: string, collectionName: string, folderName?: string) {
+  set(IMPORTED_KEY, getImportedWords().filter(w =>
+    !(w.word === word && w.collectionName === collectionName &&
+      (folderName === undefined ? !w.folderName : w.folderName === folderName))
+  ));
 }
 
-export function deleteImportedCollection(collectionName: string) {
-  set(IMPORTED_KEY, getImportedWords().filter(w => w.collectionName !== collectionName));
+export function deleteImportedCollection(collectionName: string, folderName?: string) {
+  set(IMPORTED_KEY, getImportedWords().filter(w =>
+    !(w.collectionName === collectionName &&
+      (folderName === undefined ? !w.folderName : w.folderName === folderName))
+  ));
+}
+
+export function deleteImportedFolder(folderName: string) {
+  set(IMPORTED_KEY, getImportedWords().filter(w => w.folderName !== folderName));
 }
 
 export function saveImportedWords(words: ImportedWord[]) {
