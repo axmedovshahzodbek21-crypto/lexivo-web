@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import type { ImportedWord } from './types';
 import {
   getSettings, saveSettings, setOnboarded,
   getLearnedWords, getSRSWords, getStarredWords,
@@ -381,33 +382,45 @@ export async function pullAll(uid: string) {
       set('lexivo_custom_lists', listRows.map(l => ({ id: l.id, name: l.name, words: l.words })));
     }
 
-    // imported_words — merge: add cloud words not already local.
-    // Never wipe local words from pull — push already handles deletions.
-    // This makes pull safe regardless of what Supabase returns.
+    // imported_words — smart merge: cloud version wins for each word+collection pair,
+    // but local folderName is preserved when cloud has none (guards against Supabase
+    // corruption where folder_name was wiped by an earlier bad push).
+    // Dedup key is word+collection only (not folder) so a local word with folderName
+    // is never duplicated by a cloud copy of the same word that lost its folder_name.
     const { data: importedRows } = await supabase.from('imported_words').select('*').eq('user_id', uid);
     if (importedRows !== null && importedRows.length > 0) {
       const local = getImportedWords();
-      const localKeys = new Set(local.map(w =>
-        `${w.word}__${w.collectionName ?? 'My Words'}__${w.folderName ?? ''}`
-      ));
-      const toAdd = importedRows
-        .filter(r => !localKeys.has(
-          `${r.word}__${r.collection_name ?? 'My Words'}__${r.folder_name ?? ''}`
-        ))
-        .map(r => ({
+      const localByKey = new Map(local.map(w => [
+        `${w.word.toLowerCase()}__${(w.collectionName ?? 'My Words').toLowerCase()}`,
+        w,
+      ]));
+      const cloudWords = importedRows.map(r => {
+        const key = `${(r.word as string).toLowerCase()}__${(r.collection_name ?? 'My Words').toLowerCase()}`;
+        const localMatch = localByKey.get(key);
+        return {
           word: r.word as string,
-          translation: r.translation as string ?? '',
-          definition: r.definition as string ?? '',
-          example1: r.example1 as string ?? '',
-          example1Translation: r.example1_translation as string ?? '',
-          example2: r.example2 as string ?? '',
-          example2Translation: r.example2_translation as string ?? '',
-          language: r.language as string ?? 'en-US',
-          addedAt: r.added_at as number ?? 0,
-          collectionName: r.collection_name as string ?? 'My Words',
-          ...(r.folder_name ? { folderName: r.folder_name as string } : {}),
-        }));
-      if (toAdd.length > 0) saveImportedWords([...local, ...toAdd]);
+          translation: (r.translation as string) ?? '',
+          definition: (r.definition as string) ?? '',
+          example1: (r.example1 as string) ?? '',
+          example1Translation: (r.example1_translation as string) ?? '',
+          example2: (r.example2 as string) ?? '',
+          example2Translation: (r.example2_translation as string) ?? '',
+          language: (r.language as string) ?? 'en-US',
+          addedAt: (r.added_at as number) ?? 0,
+          collectionName: (r.collection_name as string) ?? 'My Words',
+          // Prefer cloud folderName if present; fall back to local's so a bad push that
+          // wiped folder_name doesn't destroy the user's folder assignment
+          folderName: (r.folder_name as string | null) ?? localMatch?.folderName,
+        } as ImportedWord;
+      });
+      // Preserve any local-only words not yet in Supabase (just imported, push pending)
+      const cloudKeySet = new Set(cloudWords.map(w =>
+        `${w.word.toLowerCase()}__${(w.collectionName ?? 'My Words').toLowerCase()}`
+      ));
+      const localOnly = local.filter(w =>
+        !cloudKeySet.has(`${w.word.toLowerCase()}__${(w.collectionName ?? 'My Words').toLowerCase()}`)
+      );
+      saveImportedWords([...cloudWords, ...localOnly]);
     }
 
     if (typeof window !== 'undefined') {
