@@ -140,9 +140,11 @@ export async function pushAll(uid: string) {
     }
 
     // imported_words — full replace so collection deletions propagate
+    // Guard: only delete+replace when local is non-empty. If local is empty
+    // (fresh browser/new device), skip so cloud data isn't wiped before pull runs.
     const imported = getImportedWords();
-    await supabase.from('imported_words').delete().eq('user_id', uid);
     if (imported.length > 0) {
+      await supabase.from('imported_words').delete().eq('user_id', uid);
       await supabase.from('imported_words').insert(
         imported.map(w => ({
           user_id: uid,
