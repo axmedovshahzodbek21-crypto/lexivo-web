@@ -15,8 +15,8 @@ async function syncPull(uid: string) {
   _syncInProgress = true;
   dispatch('lexivo-sync-start');
   try {
-    await pushAll(uid);
     await pullAll(uid);
+    await pushAll(uid);
     dispatch('lexivo-sync-done');
   }
   catch { dispatch('lexivo-sync-error'); }
