@@ -1,8 +1,5 @@
 ﻿import type { Metadata, Viewport } from 'next';
-import { Inter } from 'next/font/google';
 import './globals.css';
-
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 import Navigation from '@/components/Navigation';
 import AchievementToast from '@/components/AchievementToast';
 import LevelUpOverlay from '@/components/LevelUpOverlay';
@@ -33,7 +30,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={inter.variable}>
+      <body>
         <AuthProvider>
         <SyncProvider />
         <ThemeProvider />
