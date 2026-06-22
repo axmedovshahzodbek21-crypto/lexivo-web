@@ -380,9 +380,30 @@ export default function ClassesPage() {
                 <button onClick={() => setShowCreate(true)} className="btn-primary text-sm px-3 py-1.5">+ Create</button>
               </div>
               {myClasses.length === 0 ? (
-                <div className="card text-center py-8 space-y-2">
-                  <div className="text-4xl">📋</div>
-                  <p className="text-sm text-[var(--text-muted)]">No classes yet. Create one to track your students.</p>
+                <div className="card py-8 px-6 space-y-6">
+                  <div className="text-center space-y-2">
+                    <div className="w-16 h-16 rounded-2xl bg-[var(--primary-bg)] flex items-center justify-center text-3xl mx-auto">👩‍🏫</div>
+                    <h3 className="font-bold text-lg text-[var(--text)]">Set up your first class</h3>
+                    <p className="text-sm text-[var(--text-muted)]">Track every student&apos;s progress — words learned, streaks, quiz scores, and more.</p>
+                  </div>
+                  <div className="space-y-3">
+                    {([
+                      { icon: '✏️', title: 'Create a class', desc: 'Give it a name — a unique join code is generated automatically.' },
+                      { icon: '📤', title: 'Share the code', desc: 'Students enter it in the app to join your class instantly.' },
+                      { icon: '📊', title: 'Watch their progress', desc: 'See XP, streaks, units completed, quiz results, and more.' },
+                    ] as { icon: string; title: string; desc: string }[]).map((step, i) => (
+                      <div key={i} className="flex items-start gap-3">
+                        <div className="w-9 h-9 rounded-xl bg-[var(--primary-bg)] flex items-center justify-center text-lg shrink-0">{step.icon}</div>
+                        <div>
+                          <p className="text-sm font-semibold text-[var(--text)]">{step.title}</p>
+                          <p className="text-xs text-[var(--text-muted)] mt-0.5">{step.desc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <button onClick={() => setShowCreate(true)} className="btn-primary w-full py-3 text-sm">
+                    Create your first class →
+                  </button>
                 </div>
               ) : (
                 <div className="space-y-3">
