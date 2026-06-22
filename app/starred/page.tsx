@@ -168,7 +168,7 @@ function WordCard({
     <div className="card transition-all">
       {/* Top row */}
       <div className="flex items-start gap-3">
-        <div className="flex-1 min-w-0" onClick={onToggle} style={{ cursor: 'pointer' }}>
+        <div className="flex-1 min-w-0" onClick={onToggle} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggle(); } }} role="button" tabIndex={0} style={{ cursor: 'pointer' }}>
           <div className="flex items-center gap-2 flex-wrap">
             <h3 className="font-bold text-[var(--text)] text-lg">{word.word}</h3>
             <span className="text-xs text-[var(--text-muted)] italic">{word.partOfSpeech}</span>
@@ -181,12 +181,12 @@ function WordCard({
           <button
             onClick={() => speak(word.word)}
             className="w-8 h-8 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-sm hover:bg-[var(--primary)] hover:text-white transition-colors"
-            title="Listen"
+            aria-label="Listen to pronunciation"
           >🔊</button>
           <button
             onClick={onUnstar}
             className="w-8 h-8 rounded-full bg-yellow-50 flex items-center justify-center text-sm hover:bg-red-50 transition-colors"
-            title="Remove from starred"
+            aria-label="Remove from starred"
           >⭐</button>
         </div>
       </div>

@@ -241,6 +241,7 @@ export default function SRSReviewPage() {
             <button
               onClick={() => current.language ? speakText(current.word, current.language) : speak(current.word)}
               className="w-8 h-8 rounded-full bg-[var(--primary-bg)] flex items-center justify-center hover:bg-[var(--primary)] hover:text-white transition-colors"
+              aria-label="Listen to pronunciation"
             >🔊</button>
           </div>
 

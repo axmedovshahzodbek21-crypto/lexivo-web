@@ -172,7 +172,7 @@ function HardWordCard({
     <div className="card border-l-4 border-l-[var(--danger)] transition-all">
       {/* Top row */}
       <div className="flex items-start gap-3">
-        <div className="flex-1 min-w-0" onClick={onToggle} style={{ cursor: 'pointer' }}>
+        <div className="flex-1 min-w-0" onClick={onToggle} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggle(); } }} role="button" tabIndex={0} style={{ cursor: 'pointer' }}>
           <div className="flex items-center gap-2 flex-wrap">
             <h3 className="font-bold text-[var(--text)] text-lg">{word.word}</h3>
             <span className="text-xs text-[var(--text-muted)] italic">{word.partOfSpeech}</span>
@@ -185,12 +185,12 @@ function HardWordCard({
           <button
             onClick={() => speak(word.word)}
             className="w-8 h-8 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-sm hover:bg-[var(--primary)] hover:text-white transition-colors"
-            title="Listen"
+            aria-label="Listen to pronunciation"
           >🔊</button>
           <button
             onClick={onRemove}
             className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center text-sm hover:bg-red-100 transition-colors"
-            title="Remove from hard list"
+            aria-label="Remove from hard list"
           >✕</button>
         </div>
       </div>

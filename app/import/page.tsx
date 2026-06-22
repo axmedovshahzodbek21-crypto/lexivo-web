@@ -219,9 +219,9 @@ function ImportPageInner() {
       )}
 
       <div className="flex items-center gap-3 p-4 border-b border-[var(--border)]">
-        <button onClick={() => router.back()} className="btn-icon text-lg">←</button>
+        <button onClick={() => router.back()} className="btn-icon text-lg" aria-label="Go back">←</button>
         <h1 className="font-bold text-[var(--text)] flex-1">{t.import.title}</h1>
-        <button onClick={() => setShowHelp(true)} className="btn-icon text-lg">💡</button>
+        <button onClick={() => setShowHelp(true)} className="btn-icon text-lg" aria-label="Show import help">💡</button>
       </div>
 
       <div className="p-4 space-y-4">

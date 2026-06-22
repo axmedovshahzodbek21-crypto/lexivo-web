@@ -104,7 +104,7 @@ export default function Navigation() {
       {/* ── Desktop: floating expand button (visible only when sidebar is hidden) ── */}
       <button
         onClick={toggleSidebar}
-        title="Show sidebar"
+        aria-label="Show sidebar"
         tabIndex={sidebarOpen ? -1 : 0}
         className={`hidden sm:flex fixed top-4 left-2 z-50 w-7 h-7 items-center justify-center rounded-lg bg-[var(--surface)] border border-[var(--border)] shadow-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-opacity duration-300 ${sidebarOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
       >
@@ -121,7 +121,7 @@ export default function Navigation() {
           </div>
           <button
             onClick={toggleSidebar}
-            title="Hide sidebar"
+            aria-label="Hide sidebar"
             className="mt-1 shrink-0 w-6 h-6 rounded-md flex items-center justify-center text-xs text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--surface-2)] border border-[var(--border)] transition-colors"
           >
             ‹

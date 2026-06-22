@@ -452,7 +452,7 @@ export default function ClassDashboardPage() {
     <div className="flex flex-col min-h-screen pb-24 animate-fade-in">
       {/* Header */}
       <div className="flex items-center gap-3 p-4 border-b border-[var(--border)]">
-        <button onClick={() => router.back()} className="btn-icon text-lg">←</button>
+        <button onClick={() => router.back()} className="btn-icon text-lg" aria-label="Go back">←</button>
         <div className="flex-1 min-w-0">
           <h1 className="font-bold text-[var(--text)] truncate">{classInfo?.name ?? 'Class Dashboard'}</h1>
           <div className="flex items-center gap-2 mt-0.5">

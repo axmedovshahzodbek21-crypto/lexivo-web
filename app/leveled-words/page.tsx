@@ -12,6 +12,7 @@ export default function LeveledWordsPage() {
         <button
           onClick={() => router.back()}
           className="btn-icon text-lg"
+          aria-label="Go back"
         >
           ←
         </button>

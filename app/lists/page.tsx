@@ -161,7 +161,7 @@ function ListRow({
   }
 
   return (
-    <div className="card flex items-center gap-3 hover:border-[var(--primary)] transition-colors cursor-pointer" onClick={onOpen}>
+    <div className="card flex items-center gap-3 hover:border-[var(--primary)] transition-colors cursor-pointer" onClick={onOpen} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpen(); } }} role="button" tabIndex={0} aria-label={`Open ${list.name}`}>
       <div
         className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
         style={{ background: 'var(--primary-bg)' }}
@@ -178,7 +178,7 @@ function ListRow({
         <button
           onClick={e => { e.stopPropagation(); onDeleteRequest(); }}
           className="w-8 h-8 rounded-full flex items-center justify-center text-sm text-[var(--text-muted)] hover:bg-red-50 hover:text-[var(--danger)] transition-colors"
-          title="Delete list"
+          aria-label="Delete list"
         >
           🗑
         </button>

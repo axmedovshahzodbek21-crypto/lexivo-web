@@ -191,6 +191,7 @@ export default function ProfilePage() {
         <button
           onClick={() => router.back()}
           className="btn-icon text-lg"
+          aria-label="Go back"
         >←</button>
         <h1 className="font-bold text-[var(--text)]">{t.profile.title}</h1>
         <Link

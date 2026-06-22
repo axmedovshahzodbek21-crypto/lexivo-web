@@ -95,6 +95,10 @@ export default function SearchPage() {
             key={`${result.collectionName}-${result.word}`}
             className="card cursor-pointer hover:border-[var(--primary)] transition-colors"
             onClick={() => setExpanded(expanded === result.word ? null : result.word)}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpanded(expanded === result.word ? null : result.word); } }}
+            role="button"
+            tabIndex={0}
+            aria-expanded={expanded === result.word}
           >
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1 min-w-0">
@@ -112,12 +116,14 @@ export default function SearchPage() {
                 <button
                   onClick={e => { e.stopPropagation(); speak(result.word); }}
                   className="w-8 h-8 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-sm hover:bg-[var(--primary)] hover:text-white transition-colors"
+                  aria-label="Listen to pronunciation"
                 >
                   🔊
                 </button>
                 <button
                   onClick={e => { e.stopPropagation(); handleStar(result.word); }}
                   className="w-8 h-8 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-sm"
+                  aria-label={starredMap[result.word] ? 'Remove from starred' : 'Add to starred'}
                 >
                   {starredMap[result.word] ? '⭐' : '☆'}
                 </button>
@@ -125,7 +131,7 @@ export default function SearchPage() {
                   href={`/word/${encodeURIComponent(result.word)}`}
                   onClick={e => e.stopPropagation()}
                   className="w-8 h-8 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-sm hover:bg-[var(--primary-bg)] transition-colors"
-                  title="Word details"
+                  aria-label={`View details for ${result.word}`}
                 >
                   →
                 </Link>

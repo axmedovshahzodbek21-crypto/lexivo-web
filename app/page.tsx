@@ -116,7 +116,7 @@ export default function HomePage() {
           <button
             onClick={() => { const next = toggleTheme(); setThemeState(next); }}
             className="w-10 h-10 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-lg hover:bg-[var(--primary-bg)] transition-colors"
-            title={t.home.toggleDark}
+            aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
           >
             {theme === 'dark' ? '☀️' : '🌙'}
           </button>
@@ -372,7 +372,7 @@ export default function HomePage() {
             <button
               onClick={() => speak(wod.word)}
               className="w-8 h-8 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-sm hover:bg-[var(--primary)] hover:text-white transition-colors"
-              title={t.home.listen}
+              aria-label="Listen to pronunciation"
             >
               🔊
             </button>

@@ -310,7 +310,7 @@ export default function QuizPage() {
     <div className="flex flex-col min-h-screen">
       {/* Header */}
       <div className="flex items-center justify-between p-4">
-        <button onClick={() => router.back()} className="btn-icon">←</button>
+        <button onClick={() => router.back()} className="btn-icon" aria-label="Go back">←</button>
         <div className="text-center">
           <div className="font-semibold text-sm">{t.quiz.title}</div>
           <div className="text-xs text-[var(--text-muted)]">{index + 1} / {questions.length}</div>

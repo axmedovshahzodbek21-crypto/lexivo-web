@@ -157,7 +157,7 @@ export default function ListDetailPage({ params }: { params: Promise<{ id: strin
             <button
               onClick={() => { setNameInput(list.name); setEditingName(true); }}
               className="w-8 h-8 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-sm hover:bg-[var(--primary-bg)] transition-colors"
-              title="Rename"
+              aria-label="Rename list"
             >
               ✏️
             </button>
@@ -204,13 +204,14 @@ export default function ListDetailPage({ params }: { params: Promise<{ id: strin
                   <button
                     onClick={() => speak(w.word)}
                     className="w-8 h-8 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-sm hover:bg-[var(--primary)] hover:text-white transition-colors"
+                    aria-label="Listen to pronunciation"
                   >
                     🔊
                   </button>
                   <button
                     onClick={() => handleRemove(w.word)}
                     className="w-8 h-8 rounded-full flex items-center justify-center text-sm text-[var(--text-muted)] hover:bg-red-50 hover:text-[var(--danger)] transition-colors"
-                    title="Remove from list"
+                    aria-label="Remove from list"
                   >
                     ✕
                   </button>

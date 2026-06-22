@@ -402,9 +402,9 @@ function StudyCalendar({
       <div className="card">
         {/* Month navigation */}
         <div className="flex items-center justify-between mb-4">
-          <button onClick={prevMonth} className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[var(--surface-2)] transition-colors text-[var(--text)]">‹</button>
+          <button onClick={prevMonth} className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[var(--surface-2)] transition-colors text-[var(--text)]" aria-label="Previous month">‹</button>
           <span className="font-semibold text-sm text-[var(--text)]">{monthName}</span>
-          <button onClick={nextMonth} disabled={!canGoNext} className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[var(--surface-2)] transition-colors text-[var(--text)] disabled:opacity-30">›</button>
+          <button onClick={nextMonth} disabled={!canGoNext} className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[var(--surface-2)] transition-colors text-[var(--text)] disabled:opacity-30" aria-label="Next month">›</button>
         </div>
 
         {/* Day headers */}
