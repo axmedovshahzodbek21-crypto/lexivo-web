@@ -236,6 +236,7 @@ export default function ClassWordsPage() {
         <button
           onClick={() => router.back()}
           className="btn-icon text-lg"
+          aria-label="Go back"
         >
           ←
         </button>

@@ -432,7 +432,7 @@ export default function ClassesPage() {
                           <div className="flex items-center gap-2 mt-1">
                             <span className="text-xs text-[var(--text-muted)]">Code:</span>
                             <code className="text-xs font-bold text-[var(--primary)] bg-[var(--primary-bg)] px-2 py-0.5 rounded-lg">{cls.join_code}</code>
-                            <button onClick={() => copyCode(cls.join_code, cls.id)} className="text-sm hover:scale-110 transition-transform">
+                            <button onClick={() => copyCode(cls.join_code, cls.id)} className="text-sm hover:scale-110 transition-transform" aria-label="Copy join code">
                               {copiedId === cls.id ? '✅' : '📋'}
                             </button>
                           </div>
@@ -514,6 +514,7 @@ export default function ClassesPage() {
                             <button
                               onClick={() => toggleLeaderboard(cls.id)}
                               className={`text-xs px-2.5 py-1.5 rounded-xl font-medium transition-colors ${expandedLeaderboard === cls.id ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--primary)]'}`}
+                              aria-label="Toggle leaderboard"
                             >
                               🏆
                             </button>

@@ -496,6 +496,7 @@ export default function PomodoroWidget() {
               onPointerDown={e => e.stopPropagation()}
               onClick={() => { pomRunning ? pausePomodoro() : resumePomodoro(); }}
               style={{ flex: 1, padding: '10px 0', borderRadius: 12, border: 'none', background: accentColor, color: '#fff', fontWeight: 800, fontSize: 16, cursor: 'pointer' }}
+              aria-label={pomRunning ? 'Pause' : 'Resume'}
             >
               {pomRunning ? '⏸' : '▶'}
             </button>
@@ -503,6 +504,7 @@ export default function PomodoroWidget() {
               onPointerDown={e => e.stopPropagation()}
               onClick={skipPomodoro}
               style={{ flex: 1, padding: '10px 0', borderRadius: 12, border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.6)', fontWeight: 800, fontSize: 16, cursor: 'pointer' }}
+              aria-label="Skip to next"
             >
               ⏭
             </button>

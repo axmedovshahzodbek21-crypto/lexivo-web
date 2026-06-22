@@ -109,7 +109,7 @@ export default function SRSReviewPage() {
     return (
       <div className="flex flex-col min-h-screen">
         <div className="flex items-center justify-between p-4 border-b border-[var(--border)]">
-          <button onClick={() => setManaging(false)} className="btn-icon">←</button>
+          <button onClick={() => setManaging(false)} className="btn-icon" aria-label="Go back">←</button>
           <h1 className="font-bold">Manage SRS Deck</h1>
           <span className="text-sm text-[var(--text-muted)]">{allWords.length} words</span>
         </div>
@@ -202,7 +202,7 @@ export default function SRSReviewPage() {
     <div className="flex flex-col min-h-screen">
       {/* Header */}
       <div className="flex items-center justify-between p-4">
-        <button onClick={() => router.back()} className="btn-icon">←</button>
+        <button onClick={() => router.back()} className="btn-icon" aria-label="Go back">←</button>
         <div className="text-center">
           <div className="font-semibold text-sm">{t.srs.title}</div>
           <div className="text-xs text-[var(--text-muted)]">{index + 1} / {queue.length}</div>

@@ -54,6 +54,7 @@ function UnitList({
         <button
           onClick={onBack}
           className="btn-icon text-lg"
+          aria-label="Go back"
         >←</button>
         <div className="min-w-0">
           <p className="text-xs text-[var(--text-muted)] truncate">{col.name}</p>
@@ -175,6 +176,7 @@ export default function UnitPicker({ mode }: { mode: Mode }) {
         <button
           onClick={() => router.back()}
           className="btn-icon"
+          aria-label="Go back"
         >←</button>
         <h1 className="text-xl font-bold text-[var(--text)]">
           {cfg.icon} Choose a collection

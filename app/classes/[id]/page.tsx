@@ -458,7 +458,7 @@ export default function ClassDashboardPage() {
           <div className="flex items-center gap-2 mt-0.5">
             <span className="text-xs text-[var(--text-muted)]">Join code:</span>
             <code className="text-xs font-bold text-[var(--primary)]">{classInfo?.join_code}</code>
-            <button onClick={copyCode} className="text-sm hover:scale-110 transition-transform">{copied ? '✅' : '📋'}</button>
+            <button onClick={copyCode} className="text-sm hover:scale-110 transition-transform" aria-label="Copy join code">{copied ? '✅' : '📋'}</button>
           </div>
         </div>
         <div className="shrink-0 flex flex-col items-end gap-1">
@@ -595,7 +595,7 @@ export default function ClassDashboardPage() {
               <p className="text-sm text-[var(--text-muted)]">Share this code with your students:</p>
               <div className="flex items-center justify-center gap-2">
                 <code className="text-xl font-black text-[var(--primary)] bg-[var(--primary-bg)] px-5 py-2.5 rounded-xl tracking-wider">{classInfo?.join_code}</code>
-                <button onClick={copyCode} className="text-2xl">{copied ? '✅' : '📋'}</button>
+                <button onClick={copyCode} className="text-2xl" aria-label="Copy join code">{copied ? '✅' : '📋'}</button>
               </div>
             </div>
           ) : visibleStudents.length === 0 ? (
