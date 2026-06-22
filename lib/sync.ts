@@ -268,7 +268,12 @@ export async function pullAll(userId: string) {
       if (!w) continue;
       const key = `${w.word}_${w.collectionName}`;
       const existing = srsMap.get(key) as { reviewStage?: number } | undefined;
-      if (!existing || (w.reviewStage ?? 0) >= (existing.reviewStage ?? 0)) {
+      const cloudStage = (w.reviewStage ?? 0);
+      const existingStage = (existing?.reviewStage ?? 0);
+      const cloudWins = !existing ||
+        cloudStage > existingStage ||
+        (cloudStage === existingStage && (w.nextReviewDate ?? '') >= ((existing as { nextReviewDate?: string }).nextReviewDate ?? ''));
+      if (cloudWins) {
         srsMap.set(key, w);
       }
     }

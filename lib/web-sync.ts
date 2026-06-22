@@ -257,7 +257,12 @@ export async function pullAll(uid: string) {
         if (!w) continue;
         const key = `${w.word}_${w.collectionName}`;
         const existing = localMap.get(key);
-        if (!existing || (w.reviewStage ?? 0) > (existing.reviewStage ?? 0)) {
+        const cloudStage = (w.reviewStage ?? 0);
+        const localStage = (existing?.reviewStage ?? 0);
+        const cloudWins = !existing ||
+          cloudStage > localStage ||
+          (cloudStage === localStage && (w.nextReviewDate ?? '') > (existing.nextReviewDate ?? ''));
+        if (cloudWins) {
           localMap.set(key, w);
         }
       }
