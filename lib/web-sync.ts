@@ -268,7 +268,10 @@ export async function pullAll(uid: string) {
           localMap.set(key, synced);
         }
       }
-      set(K.srs, [...localMap.values()]);
+      // Final pass: backfill id on any word still missing it (local-wins words from old Flutter syncs)
+      set(K.srs, [...localMap.values()].map(
+        w => w.id ? w : { ...w, id: `${w.collectionName}::${w.word}` }
+      ));
     }
 
     // learned_words — merge: keep local, add remote words not already in local
