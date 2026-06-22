@@ -225,8 +225,24 @@ export async function pushAll(uid: string) {
 
 export async function pullAll(uid: string) {
   try {
-    const set = (key: string, val: unknown) =>
-      typeof window !== 'undefined' && localStorage.setItem(key, JSON.stringify(val));
+    const set = (key: string, val: unknown) => {
+      if (typeof window === 'undefined') return;
+      try { localStorage.setItem(key, JSON.stringify(val)); } catch {
+        // localStorage full — evict the largest non-critical key and retry once
+        try {
+          let biggestKey = ''; let biggestSize = 0;
+          const skip = new Set(['lexivo_settings', 'lexivo_imported_words', 'lexivo_ui_lang']);
+          for (let i = 0; i < localStorage.length; i++) {
+            const k = localStorage.key(i)!;
+            if (skip.has(k)) continue;
+            const size = (localStorage.getItem(k) ?? '').length;
+            if (size > biggestSize) { biggestSize = size; biggestKey = k; }
+          }
+          if (biggestKey) localStorage.removeItem(biggestKey);
+          localStorage.setItem(key, JSON.stringify(val));
+        } catch { /* give up on this key, continue */ }
+      }
+    };
 
     // profiles → settings
     const { data: profile } = await supabase.from('profiles').select().eq('id', uid).maybeSingle();
