@@ -148,18 +148,23 @@ export async function pushAll(userId: string) {
       try {
         const { data: remoteRows } = await supabase
           .from('unit_progress')
-          .select('collection_name,day_number,learn_done,flashcard_done,quiz_done')
+          .select('collection_name,day_number,learn_done,flashcard_done,quiz_done,completed_at')
           .eq('user_id', userId);
         const remoteMap = new Map((remoteRows ?? []).map(r => [`${r.collection_name}_${r.day_number}`, r]));
         const upRows = localRows.map(r => {
           const remote = remoteMap.get(`${r.collection_name}_${r.day_number}`);
+          const mergedLearn = r.learn_done || (remote?.learn_done ?? false);
+          const mergedFlash = r.flashcard_done || (remote?.flashcard_done ?? false);
+          const mergedQuiz = r.quiz_done || (remote?.quiz_done ?? false);
+          const allDone = mergedLearn && mergedFlash && mergedQuiz;
           return {
             user_id: userId,
             collection_name: r.collection_name,
             day_number: r.day_number,
-            learn_done: r.learn_done || (remote?.learn_done ?? false),
-            flashcard_done: r.flashcard_done || (remote?.flashcard_done ?? false),
-            quiz_done: r.quiz_done || (remote?.quiz_done ?? false),
+            learn_done: mergedLearn,
+            flashcard_done: mergedFlash,
+            quiz_done: mergedQuiz,
+            completed_at: remote?.completed_at ?? (allDone ? new Date().toISOString() : null),
           };
         });
         await supabase.from('unit_progress').upsert(upRows, { onConflict: 'user_id,collection_name,day_number' });

@@ -152,7 +152,7 @@ async function fetchTopics(collectionName: string): Promise<Record<number, strin
   } catch { return {}; }
 }
 
-type UnitRow = { day_number: number; learn_done: boolean; flashcard_done: boolean; quiz_done: boolean };
+type UnitRow = { day_number: number; learn_done: boolean; flashcard_done: boolean; quiz_done: boolean; completed_at: string | null };
 type CollectionModal = { student: StudentRow; collectionName: string; label: string; total: number; color: string };
 
 export default function ClassDashboardPage() {
@@ -933,36 +933,53 @@ export default function ClassDashboardPage() {
               <div className="overflow-y-auto flex-1 px-4 pb-8 pt-3">
                 {unitLoading ? (
                   <div className="flex justify-center py-8"><div className="text-3xl animate-bounce">📊</div></div>
-                ) : (
-                  <div className="grid grid-cols-4 gap-2">
-                    {Array.from({ length: collectionModal.total }, (_, i) => {
-                      const unit = unitRows.find(r => r.day_number === i + 1);
-                      const learnDone = unit?.learn_done ?? false;
-                      const flashDone = unit?.flashcard_done ?? false;
-                      const quizDone = unit?.quiz_done ?? false;
-                      const allDone = learnDone && flashDone && quizDone;
-                      const anyDone = learnDone || flashDone || quizDone;
-                      return (
-                        <div key={i + 1} className="flex flex-col items-center gap-2 py-3 rounded-2xl" style={{
-                          background: allDone ? `${c}15` : 'var(--surface-2)',
-                          border: `1px solid ${allDone ? `${c}35` : 'transparent'}`,
-                        }}>
-                          <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-black" style={{
-                            background: allDone ? c : anyDone ? `${c}25` : 'var(--border)',
-                            color: allDone ? '#fff' : anyDone ? c : 'var(--text-muted)',
+                ) : (() => {
+                  const latestDoneUnit = unitRows.filter(r => r.completed_at).sort((a, b) => (b.completed_at! > a.completed_at! ? 1 : -1))[0];
+                  const fmtDate = (iso: string) => new Date(iso).toLocaleDateString('en', { month: 'short', day: 'numeric' });
+                  return (
+                    <div className="grid grid-cols-4 gap-2">
+                      {Array.from({ length: collectionModal.total }, (_, i) => {
+                        const unit = unitRows.find(r => r.day_number === i + 1);
+                        const learnDone = unit?.learn_done ?? false;
+                        const flashDone = unit?.flashcard_done ?? false;
+                        const quizDone = unit?.quiz_done ?? false;
+                        const allDone = learnDone && flashDone && quizDone;
+                        const anyDone = learnDone || flashDone || quizDone;
+                        const isLatest = allDone && latestDoneUnit?.day_number === i + 1;
+                        return (
+                          <div key={i + 1} className="relative flex flex-col items-center gap-1.5 pt-4 pb-2.5 rounded-2xl" style={{
+                            background: allDone ? `${c}25` : 'var(--surface-2)',
+                            border: `2px solid ${allDone ? c : 'transparent'}`,
+                            boxShadow: isLatest ? `0 0 12px ${c}55` : 'none',
                           }}>
-                            {allDone ? '✓' : i + 1}
+                            {/* Corner check badge */}
+                            {allDone && (
+                              <div className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-black text-white" style={{ background: c }}>✓</div>
+                            )}
+                            {/* Latest chip */}
+                            {isLatest && (
+                              <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 text-[8px] font-black px-1.5 py-0.5 rounded-full whitespace-nowrap text-white" style={{ background: c }}>LATEST</div>
+                            )}
+                            <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-black" style={{
+                              background: allDone ? c : anyDone ? `${c}25` : 'var(--border)',
+                              color: allDone ? '#fff' : anyDone ? c : 'var(--text-muted)',
+                            }}>
+                              {allDone ? '✓' : i + 1}
+                            </div>
+                            <div className="flex gap-0.5">
+                              {[{ e: '📖', d: learnDone }, { e: '🃏', d: flashDone }, { e: '🧠', d: quizDone }].map(({ e, d }, ei) => (
+                                <span key={ei} className="text-[11px]" style={{ opacity: d ? 1 : 0.2 }}>{e}</span>
+                              ))}
+                            </div>
+                            {allDone && unit?.completed_at && (
+                              <p className="text-[9px] font-semibold" style={{ color: c }}>{fmtDate(unit.completed_at)}</p>
+                            )}
                           </div>
-                          <div className="flex gap-0.5">
-                            {[{ e: '📖', d: learnDone }, { e: '🃏', d: flashDone }, { e: '🧠', d: quizDone }].map(({ e, d }, ei) => (
-                              <span key={ei} className="text-[11px]" style={{ opacity: d ? 1 : 0.2 }}>{e}</span>
-                            ))}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
+                        );
+                      })}
+                    </div>
+                  );
+                })()}
               </div>
             </div>
           </div>
