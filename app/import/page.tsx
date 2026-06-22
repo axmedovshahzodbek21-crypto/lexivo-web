@@ -195,8 +195,7 @@ function ImportPageInner() {
               <h2 className="flex-1 text-lg font-bold text-[var(--text)]">{TUTORIAL[tutorialLang].title}</h2>
               {(['en', 'uz', 'ru'] as const).map(l => (
                 <button key={l} onClick={() => setTutorialLang(l)}
-                  className="px-2.5 py-1 rounded-lg text-xs font-bold transition-colors"
-                  style={{ background: tutorialLang === l ? 'var(--primary)' : 'var(--primary-bg)', color: tutorialLang === l ? 'white' : 'var(--primary)' }}>
+                  className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-colors ${tutorialLang === l ? 'bg-[var(--primary)] text-white' : 'bg-[var(--primary-bg)] text-[var(--primary)]'}`}>
                   {l.toUpperCase()}
                 </button>
               ))}
@@ -212,7 +211,7 @@ function ImportPageInner() {
                 </div>
               ))}
             </div>
-            <button onClick={() => setShowHelp(false)} className="w-full py-3 rounded-2xl font-bold text-sm text-white" style={{ background: 'var(--primary)' }}>
+            <button onClick={() => setShowHelp(false)} className="btn-primary w-full py-3 text-sm rounded-2xl">
               {TUTORIAL[tutorialLang].btn}
             </button>
           </div>

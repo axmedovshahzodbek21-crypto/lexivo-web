@@ -419,10 +419,10 @@ export default function PomodoroWidget() {
           <button
             onPointerDown={e => e.stopPropagation()}
             onClick={e => { e.stopPropagation(); requestNotifPermission(); startPomodoro(pomWorkMins, pomBreakMins); }}
+            className="btn-primary w-full font-extrabold"
             style={{
-              width: '100%', padding: '11px 0', borderRadius: 14, border: 'none',
+              padding: '11px 0', borderRadius: 14,
               background: 'linear-gradient(135deg, var(--primary), #8b85ff)',
-              color: '#fff', fontWeight: 800, fontSize: 14, cursor: 'pointer',
               boxShadow: '0 4px 20px rgba(108,99,255,0.4)',
             }}
           >
