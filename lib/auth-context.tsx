@@ -8,7 +8,11 @@ function dispatch(name: string) {
   if (typeof window !== 'undefined') window.dispatchEvent(new Event(name));
 }
 
+let _syncInProgress = false;
+
 async function syncPull(uid: string) {
+  if (_syncInProgress) return;
+  _syncInProgress = true;
   dispatch('lexivo-sync-start');
   try {
     await pushAll(uid);
@@ -16,6 +20,7 @@ async function syncPull(uid: string) {
     dispatch('lexivo-sync-done');
   }
   catch { dispatch('lexivo-sync-error'); }
+  finally { _syncInProgress = false; }
 }
 
 interface AuthCtx {
