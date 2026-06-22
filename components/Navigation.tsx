@@ -82,13 +82,13 @@ export default function Navigation() {
   return (
     <>
       {/* ── Mobile: sync status pill (top-right) ── */}
-      <div className="md:hidden fixed top-3 right-3 z-50">
+      <div className="sm:hidden fixed top-3 right-3 z-50">
         <SyncStatusBadge />
       </div>
 
       {/* ── Mobile: fixed bottom tab bar ── */}
       <nav
-        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[var(--surface)] border-t border-[var(--border)] flex justify-around items-center py-2 px-1 shadow-lg"
+        className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-[var(--surface)] border-t border-[var(--border)] flex justify-around items-center py-2 px-1 shadow-lg"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
         {MOBILE_NAV_HREFS.map(({ href, icon, key }) => {
@@ -113,13 +113,13 @@ export default function Navigation() {
         onClick={toggleSidebar}
         title="Show sidebar"
         tabIndex={sidebarOpen ? -1 : 0}
-        className={`hidden md:flex fixed top-4 left-2 z-50 w-7 h-7 items-center justify-center rounded-lg bg-[var(--surface)] border border-[var(--border)] shadow-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-opacity duration-300 ${sidebarOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+        className={`hidden sm:flex fixed top-4 left-2 z-50 w-7 h-7 items-center justify-center rounded-lg bg-[var(--surface)] border border-[var(--border)] shadow-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-opacity duration-300 ${sidebarOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
       >
         ›
       </button>
 
       {/* ── Desktop: persistent left sidebar ── */}
-      <aside className={`hidden md:flex flex-col shrink-0 bg-[var(--surface)] sticky top-0 h-screen z-30 transition-[width] duration-300 ${sidebarOpen ? 'w-52 border-r border-[var(--border)] overflow-y-auto' : 'w-0 overflow-hidden'}`}>
+      <aside className={`hidden sm:flex flex-col shrink-0 bg-[var(--surface)] sticky top-0 h-screen z-30 transition-[width] duration-300 ${sidebarOpen ? 'w-52 border-r border-[var(--border)] overflow-y-auto' : 'w-0 overflow-hidden'}`}>
         {/* Brand + collapse button */}
         <div className="px-5 pt-6 pb-4 flex items-start justify-between gap-2">
           <div className="min-w-0">

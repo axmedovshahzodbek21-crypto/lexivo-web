@@ -40,11 +40,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <NotificationScheduler />
         <DataLoader />
         <GlobalKeyboardHandler />
-        <div className="md:flex md:min-h-screen">
+        <div className="sm:flex sm:min-h-screen">
           <Navigation />
           <div className="flex-1 min-w-0">
             <div className="max-w-2xl mx-auto">
-              <main className="min-h-screen pb-20 md:pb-8">
+              <main className="min-h-screen pb-20 sm:pb-8">
                 {children}
               </main>
             </div>
