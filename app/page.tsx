@@ -167,7 +167,7 @@ export default function HomePage() {
         <div className="space-y-3">
           {/* My Words — always shown so new users can discover import */}
           <TiltCard className="card overflow-hidden hover:border-[var(--primary)] transition-colors" intensity={6}>
-            <Link href={importedCount > 0 ? '/my-words' : '/import'} className="flex items-center gap-4" style={{ margin: '-20px', padding: '20px' }}>
+            <Link href="/my-words" className="flex items-center gap-4" style={{ margin: '-20px', padding: '20px' }}>
               <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0 animate-float-icon" style={{ background: 'rgba(108,99,255,0.12)' }}>
                 ✍️
               </div>
