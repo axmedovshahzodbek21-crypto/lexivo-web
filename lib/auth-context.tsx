@@ -4,6 +4,16 @@ import type { Session, User } from '@supabase/supabase-js';
 import { supabase } from './supabase';
 import { pullAll, startSync, stopSync } from './web-sync';
 
+function dispatch(name: string) {
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event(name));
+}
+
+async function syncPull(uid: string) {
+  dispatch('lexivo-sync-start');
+  try { await pullAll(uid); dispatch('lexivo-sync-done'); }
+  catch { dispatch('lexivo-sync-error'); }
+}
+
 interface AuthCtx {
   user: User | null;
   session: Session | null;
@@ -31,7 +41,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(data.session?.user ?? null);
       setLoading(false);
       if (data.session?.user) {
-        pullAll(data.session.user.id).then(() => startSync(data.session!.user.id));
+        syncPull(data.session.user.id).then(() => startSync(data.session!.user.id));
       }
     });
 
@@ -39,7 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(session);
       setUser(session?.user ?? null);
       if (event === 'SIGNED_IN' && session?.user) {
-        pullAll(session.user.id).then(() => startSync(session.user.id));
+        syncPull(session.user.id).then(() => startSync(session.user.id));
       }
       if (event === 'SIGNED_OUT') {
         stopSync();
@@ -56,13 +66,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { error } = await supabase.auth.signUp({ email, password });
     if (error) return { error: error.message };
     const { data, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
-    if (data.user) { await pullAll(data.user.id); startSync(data.user.id); }
+    if (data.user) { await syncPull(data.user.id); startSync(data.user.id); }
     return { error: signInError?.message ?? null };
   };
 
   const signIn = async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (data.user) { await pullAll(data.user.id); startSync(data.user.id); }
+    if (data.user) { await syncPull(data.user.id); startSync(data.user.id); }
     return { error: error?.message ?? null };
   };
 
