@@ -107,6 +107,13 @@ export async function pushAll(userId: string) {
     await supabase.from('starred_words').insert(starred.map(w => ({ user_id: userId, word: w })));
   }
 
+  // Hard words — full replace so removals propagate
+  await supabase.from('hard_words').delete().eq('user_id', userId);
+  const hardWords = getHardWords();
+  if (hardWords.length > 0) {
+    await supabase.from('hard_words').insert(hardWords.map(w => ({ user_id: userId, word: w })));
+  }
+
   // Achievements — upsert all
   const achievements = getUnlockedAchievements();
   if (achievements.length > 0) {
@@ -284,6 +291,12 @@ export async function pullAll(userId: string) {
   const { data: starred } = await supabase.from('starred_words').select('word').eq('user_id', userId);
   if (starred && starred.length > 0) {
     lsSet('lexivo_starred', starred.map(r => r.word));
+  }
+
+  // Hard words — authoritative replace
+  const { data: hardRows } = await supabase.from('hard_words').select('word').eq('user_id', userId);
+  if (hardRows !== null) {
+    lsSet('lexivo_hard_words', hardRows.map(r => r.word));
   }
 
   // Achievements — merge

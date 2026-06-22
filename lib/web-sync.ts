@@ -8,6 +8,7 @@ import {
   getLevelUpdatedAt, saveLevelUpdatedAt,
   getStudyDays, saveStudyDays,
   getUnlockedAchievements, getCustomLists,
+  getHardWords,
   localDateStr,
 } from './storage';
 
@@ -26,6 +27,7 @@ const K = {
   srs:            'lexivo_srs_words',
   learned:        'lexivo_learned_words',
   starred:        'lexivo_starred',
+  hardWords:      'lexivo_hard_words',
 };
 
 function ls(key: string): string | null {
@@ -109,6 +111,13 @@ export async function pushAll(uid: string) {
     await supabase.from('starred_words').delete().eq('user_id', uid);
     if (starred.length > 0) {
       await supabase.from('starred_words').insert(starred.map(w => ({ user_id: uid, word: w })));
+    }
+
+    // hard_words — full replace so removals propagate
+    const hard = getHardWords();
+    await supabase.from('hard_words').delete().eq('user_id', uid);
+    if (hard.length > 0) {
+      await supabase.from('hard_words').insert(hard.map(w => ({ user_id: uid, word: w })));
     }
 
     // achievements — upsert all
@@ -305,6 +314,12 @@ export async function pullAll(uid: string) {
     const { data: starredRows } = await supabase.from('starred_words').select('word').eq('user_id', uid);
     if (starredRows !== null) {
       set(K.starred, starredRows.map(r => r.word as string));
+    }
+
+    // hard_words — authoritative replace
+    const { data: hardRows } = await supabase.from('hard_words').select('word').eq('user_id', uid);
+    if (hardRows !== null) {
+      set(K.hardWords, hardRows.map(r => r.word as string));
     }
 
     // unit_progress — OR-merge: remote true always wins, local true never erased
