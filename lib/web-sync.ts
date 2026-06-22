@@ -384,22 +384,33 @@ export async function pullAll(uid: string) {
       set('lexivo_custom_lists', listRows.map(l => ({ id: l.id, name: l.name, words: l.words })));
     }
 
-    // imported_words — authoritative replace
+    // imported_words — merge: add cloud words not already local.
+    // Never wipe local words from pull — push already handles deletions.
+    // This makes pull safe regardless of what Supabase returns.
     const { data: importedRows } = await supabase.from('imported_words').select('*').eq('user_id', uid);
-    if (importedRows !== null) {
-      saveImportedWords(importedRows.map(r => ({
-        word: r.word as string,
-        translation: r.translation as string ?? '',
-        definition: r.definition as string ?? '',
-        example1: r.example1 as string ?? '',
-        example1Translation: r.example1_translation as string ?? '',
-        example2: r.example2 as string ?? '',
-        example2Translation: r.example2_translation as string ?? '',
-        language: r.language as string ?? 'en-US',
-        addedAt: r.added_at as number ?? 0,
-        collectionName: r.collection_name as string ?? 'My Words',
-        ...(r.folder_name ? { folderName: r.folder_name as string } : {}),
-      })));
+    if (importedRows !== null && importedRows.length > 0) {
+      const local = getImportedWords();
+      const localKeys = new Set(local.map(w =>
+        `${w.word}__${w.collectionName ?? 'My Words'}__${w.folderName ?? ''}`
+      ));
+      const toAdd = importedRows
+        .filter(r => !localKeys.has(
+          `${r.word}__${r.collection_name ?? 'My Words'}__${r.folder_name ?? ''}`
+        ))
+        .map(r => ({
+          word: r.word as string,
+          translation: r.translation as string ?? '',
+          definition: r.definition as string ?? '',
+          example1: r.example1 as string ?? '',
+          example1Translation: r.example1_translation as string ?? '',
+          example2: r.example2 as string ?? '',
+          example2Translation: r.example2_translation as string ?? '',
+          language: r.language as string ?? 'en-US',
+          addedAt: r.added_at as number ?? 0,
+          collectionName: r.collection_name as string ?? 'My Words',
+          ...(r.folder_name ? { folderName: r.folder_name as string } : {}),
+        }));
+      if (toAdd.length > 0) saveImportedWords([...local, ...toAdd]);
     }
 
     if (typeof window !== 'undefined') {
