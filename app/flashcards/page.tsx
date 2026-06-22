@@ -220,7 +220,7 @@ export default function FlashcardsPage() {
             <Link
               href={`/quiz?collection=${encodeURIComponent(collectionName)}&day=${dayNumber}`}
               className="w-full flex items-center justify-between px-5 py-4 rounded-2xl text-white"
-              style={{ background: 'linear-gradient(135deg, #F59E0B, #FBBF24)' }}
+              style={{ background: 'linear-gradient(135deg, var(--warning), #FBBF24)' }}
             >
               <div>
                 <div className="font-bold text-sm">{t.flashcards.takeQuiz}</div>

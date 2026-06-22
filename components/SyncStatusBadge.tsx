@@ -34,8 +34,8 @@ export default function SyncStatusBadge() {
 
   const config = {
     syncing: { icon: '↻', label: 'Syncing…',    bg: 'var(--border)',   color: 'var(--text-muted)', spin: true  },
-    synced:  { icon: '✓', label: 'Synced',       bg: '#10B98122',       color: 'var(--success)',           spin: false },
-    error:   { icon: '⚠', label: 'Sync failed',  bg: '#EF444422',       color: 'var(--danger)',           spin: false },
+    synced:  { icon: '✓', label: 'Synced',       bg: 'color-mix(in srgb, var(--success) 13%, transparent)',  color: 'var(--success)', spin: false },
+    error:   { icon: '⚠', label: 'Sync failed',  bg: 'color-mix(in srgb, var(--danger)  13%, transparent)',  color: 'var(--danger)',  spin: false },
   }[state];
 
   return (

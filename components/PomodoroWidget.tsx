@@ -421,7 +421,7 @@ export default function PomodoroWidget() {
             onClick={e => { e.stopPropagation(); requestNotifPermission(); startPomodoro(pomWorkMins, pomBreakMins); }}
             style={{
               width: '100%', padding: '11px 0', borderRadius: 14, border: 'none',
-              background: 'linear-gradient(135deg, #6C63FF, #8b85ff)',
+              background: 'linear-gradient(135deg, var(--primary), #8b85ff)',
               color: '#fff', fontWeight: 800, fontSize: 14, cursor: 'pointer',
               boxShadow: '0 4px 20px rgba(108,99,255,0.4)',
             }}
