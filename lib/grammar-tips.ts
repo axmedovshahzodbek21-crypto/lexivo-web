@@ -1,3 +1,5 @@
+import { ACCENT } from './colors';
+
 export interface GrammarTip {
   id: string;
   title: string;
@@ -15,7 +17,7 @@ export const GRAMMAR_TIPS: GrammarTip[] = [
     id: 'collocations',
     title: 'Collocations',
     category: 'Vocabulary',
-    categoryColor: '#6C63FF',
+    categoryColor: ACCENT.learn,
     icon: '🔗',
     explanation:
       'Collocations are words that naturally go together in English. Native speakers use specific combinations even when others seem logical. Learning collocations rather than individual words sounds more natural.',
@@ -31,7 +33,7 @@ export const GRAMMAR_TIPS: GrammarTip[] = [
     id: 'idioms',
     title: 'Idioms',
     category: 'Vocabulary',
-    categoryColor: '#6C63FF',
+    categoryColor: ACCENT.learn,
     icon: '🎭',
     explanation:
       "Idioms are fixed phrases whose meaning can't be understood from the individual words. They are very common in spoken and informal English.",
@@ -47,7 +49,7 @@ export const GRAMMAR_TIPS: GrammarTip[] = [
     id: 'articles',
     title: 'Articles: a, an, the',
     category: 'Grammar',
-    categoryColor: '#10B981',
+    categoryColor: ACCENT.grammar,
     icon: '📌',
     explanation:
       'Use "a/an" for something mentioned for the first time or any one of many. Use "the" for something already known, specific, or unique. Use no article with plural/uncountable nouns in general statements.',
@@ -63,7 +65,7 @@ export const GRAMMAR_TIPS: GrammarTip[] = [
     id: 'countable',
     title: 'Countable & Uncountable Nouns',
     category: 'Grammar',
-    categoryColor: '#10B981',
+    categoryColor: ACCENT.grammar,
     icon: '🔢',
     explanation:
       'Countable nouns have a singular and plural form. Uncountable nouns have no plural and cannot be used with "a/an". Many nouns can be both — with a meaning change.',
@@ -79,7 +81,7 @@ export const GRAMMAR_TIPS: GrammarTip[] = [
     id: 'present-tenses',
     title: 'Present Simple vs Continuous',
     category: 'Grammar',
-    categoryColor: '#10B981',
+    categoryColor: ACCENT.grammar,
     icon: '⏱️',
     explanation:
       'Present Simple is for habits, facts, and routines. Present Continuous is for actions happening right now or temporary situations.',
@@ -95,7 +97,7 @@ export const GRAMMAR_TIPS: GrammarTip[] = [
     id: 'past-tenses',
     title: 'Past Simple vs Past Perfect',
     category: 'Grammar',
-    categoryColor: '#10B981',
+    categoryColor: ACCENT.grammar,
     icon: '⏪',
     explanation:
       'Past Simple describes completed actions in the past. Past Perfect (had + past participle) describes an action completed before another past action.',
@@ -111,7 +113,7 @@ export const GRAMMAR_TIPS: GrammarTip[] = [
     id: 'modal-verbs',
     title: 'Modal Verbs',
     category: 'Grammar',
-    categoryColor: '#10B981',
+    categoryColor: ACCENT.grammar,
     icon: '🎛️',
     explanation:
       'Modal verbs (can, could, should, must, might, may, would) add meaning like ability, possibility, obligation, or permission. They are followed by the base form of the verb.',
@@ -127,7 +129,7 @@ export const GRAMMAR_TIPS: GrammarTip[] = [
     id: 'passive',
     title: 'Passive Voice',
     category: 'Grammar',
-    categoryColor: '#10B981',
+    categoryColor: ACCENT.grammar,
     icon: '🔄',
     explanation:
       'The passive voice is formed with be + past participle. Use it when the action is more important than who does it, or when the agent is unknown.',
@@ -143,7 +145,7 @@ export const GRAMMAR_TIPS: GrammarTip[] = [
     id: 'conditionals',
     title: 'Conditionals',
     category: 'Grammar',
-    categoryColor: '#10B981',
+    categoryColor: ACCENT.grammar,
     icon: '🔀',
     explanation:
       'English has four main conditionals. Zero = always true. First = real/likely future. Second = unreal/hypothetical present. Third = impossible past.',
@@ -159,7 +161,7 @@ export const GRAMMAR_TIPS: GrammarTip[] = [
     id: 'gerunds-infinitives',
     title: 'Gerunds vs Infinitives',
     category: 'Grammar',
-    categoryColor: '#10B981',
+    categoryColor: ACCENT.grammar,
     icon: '⚖️',
     explanation:
       'Some verbs are followed by gerund (-ing), some by infinitive (to + verb), and some by either with a meaning change.',
@@ -175,7 +177,7 @@ export const GRAMMAR_TIPS: GrammarTip[] = [
     id: 'relative-clauses',
     title: 'Relative Clauses',
     category: 'Grammar',
-    categoryColor: '#10B981',
+    categoryColor: ACCENT.grammar,
     icon: '🔍',
     explanation:
       'Defining relative clauses identify which person/thing you mean (no commas). Non-defining clauses add extra info about something already identified (use commas).',
@@ -191,7 +193,7 @@ export const GRAMMAR_TIPS: GrammarTip[] = [
     id: 'word-formation',
     title: 'Word Formation',
     category: 'Vocabulary',
-    categoryColor: '#6C63FF',
+    categoryColor: ACCENT.learn,
     icon: '🏗️',
     explanation:
       'English builds new words using prefixes (before the root) and suffixes (after the root). Knowing common affixes dramatically expands your vocabulary.',
@@ -207,7 +209,7 @@ export const GRAMMAR_TIPS: GrammarTip[] = [
     id: 'prepositions-time',
     title: 'Prepositions of Time',
     category: 'Grammar',
-    categoryColor: '#10B981',
+    categoryColor: ACCENT.grammar,
     icon: '🕐',
     explanation:
       'AT is for precise times and fixed expressions. ON is for days and dates. IN is for longer periods like months, years, and seasons.',
@@ -223,7 +225,7 @@ export const GRAMMAR_TIPS: GrammarTip[] = [
     id: 'prepositions-place',
     title: 'Prepositions of Place',
     category: 'Grammar',
-    categoryColor: '#10B981',
+    categoryColor: ACCENT.grammar,
     icon: '📍',
     explanation:
       'AT indicates a general location or point. IN indicates being inside/enclosed. ON indicates a surface or position.',
@@ -239,7 +241,7 @@ export const GRAMMAR_TIPS: GrammarTip[] = [
     id: 'phrasal-verbs',
     title: 'Phrasal Verbs',
     category: 'Vocabulary',
-    categoryColor: '#6C63FF',
+    categoryColor: ACCENT.learn,
     icon: '🔧',
     explanation:
       'Phrasal verbs combine a verb + particle(s) to create a new meaning. They are extremely common in informal English and often have surprising meanings.',
@@ -255,7 +257,7 @@ export const GRAMMAR_TIPS: GrammarTip[] = [
     id: 'adjective-order',
     title: 'Adjective Order',
     category: 'Grammar',
-    categoryColor: '#10B981',
+    categoryColor: ACCENT.grammar,
     icon: '📐',
     explanation:
       'When using multiple adjectives before a noun, English follows a strict order: Opinion → Size → Age → Shape → Color → Origin → Material → Purpose.',
@@ -271,7 +273,7 @@ export const GRAMMAR_TIPS: GrammarTip[] = [
     id: 'reported-speech',
     title: 'Reported Speech',
     category: 'Grammar',
-    categoryColor: '#10B981',
+    categoryColor: ACCENT.grammar,
     icon: '💬',
     explanation:
       'When reporting what someone said, verbs shift back one tense (backshift). Present → Past, Past → Past Perfect. Time expressions also change.',
@@ -287,7 +289,7 @@ export const GRAMMAR_TIPS: GrammarTip[] = [
     id: 'quantifiers',
     title: 'Quantifiers',
     category: 'Grammar',
-    categoryColor: '#10B981',
+    categoryColor: ACCENT.grammar,
     icon: '🔢',
     explanation:
       'Quantifiers express amounts. Some work only with countable, some only with uncountable, and some with both.',
@@ -303,7 +305,7 @@ export const GRAMMAR_TIPS: GrammarTip[] = [
     id: 'comparatives',
     title: 'Comparatives & Superlatives',
     category: 'Grammar',
-    categoryColor: '#10B981',
+    categoryColor: ACCENT.grammar,
     icon: '📊',
     explanation:
       'Short adjectives add -er/-est. Long adjectives (2+ syllables) use more/most. Irregular forms must be memorized.',
@@ -319,7 +321,7 @@ export const GRAMMAR_TIPS: GrammarTip[] = [
     id: 'cohesive-devices',
     title: 'Cohesive Devices',
     category: 'Writing',
-    categoryColor: '#F59E0B',
+    categoryColor: ACCENT.quiz,
     icon: '🔗',
     explanation:
       'Linking words connect ideas and make your writing flow. They show relationship: addition, contrast, cause/effect, sequence, or concession.',

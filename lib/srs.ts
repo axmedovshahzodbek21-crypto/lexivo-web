@@ -1,4 +1,5 @@
 import type { WordItem, SRSWord } from './types';
+import { ACCENT } from './colors';
 import { SRS_INTERVALS } from './types';
 import { localDateStr } from './storage';
 
@@ -29,7 +30,7 @@ export function stageLabel(stage: number): string {
 }
 
 export function stageColor(stage: number): string {
-  const colors = ['#9CA3AF', '#F59E0B', '#3B82F6', '#10B981', '#6C63FF'];
+  const colors = ['#9CA3AF', ACCENT.quiz, ACCENT.srs, ACCENT.grammar, ACCENT.learn];
   return colors[Math.min(stage, 4)];
 }
 
