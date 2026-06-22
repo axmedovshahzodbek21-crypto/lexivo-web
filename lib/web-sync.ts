@@ -448,8 +448,8 @@ export function startSync(uid: string) {
     dispatch('lexivo-sync-start');
     try {
       const wasReset = await checkAndHandleReset(uid);
-      await pullAll(uid);
       if (!wasReset) await pushAll(uid);
+      await pullAll(uid);
       dispatch('lexivo-sync-done');
     } catch {
       dispatch('lexivo-sync-error');
