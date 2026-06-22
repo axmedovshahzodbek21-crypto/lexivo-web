@@ -247,13 +247,21 @@ export async function pullAll(uid: string) {
       }
     }
 
-    // srs_words — merge: keep local, add remote words not already in local
+    // srs_words — merge: add new words, update existing if cloud has advanced further
     const { data: srsRows } = await supabase.from('srs_words').select('data').eq('user_id', uid);
     if (srsRows && srsRows.length > 0) {
       const local = getSRSWords();
-      const localIds = new Set(local.map(w => `${w.word}_${w.collectionName}`));
-      const toAdd = srsRows.map(r => r.data).filter(w => w && !localIds.has(`${w.word}_${w.collectionName}`));
-      if (toAdd.length > 0) set(K.srs, [...local, ...toAdd]);
+      const localMap = new Map(local.map(w => [`${w.word}_${w.collectionName}`, w]));
+      for (const row of srsRows) {
+        const w = row.data;
+        if (!w) continue;
+        const key = `${w.word}_${w.collectionName}`;
+        const existing = localMap.get(key);
+        if (!existing || (w.reviewStage ?? 0) > (existing.reviewStage ?? 0)) {
+          localMap.set(key, w);
+        }
+      }
+      set(K.srs, [...localMap.values()]);
     }
 
     // learned_words — merge: keep local, add remote words not already in local

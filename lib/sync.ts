@@ -95,7 +95,7 @@ export async function pushAll(userId: string) {
   const srs = getSRSWords();
   if (srs.length > 0) {
     await supabase.from('srs_words').upsert(
-      srs.map(w => ({ user_id: userId, word_id: w.id, data: w })),
+      srs.map(w => ({ user_id: userId, word_id: `${w.word}_${w.collectionName}`, data: w })),
       { onConflict: 'user_id,word_id' }
     );
   }
@@ -259,10 +259,20 @@ export async function pullAll(userId: string) {
     lsSet('lexivo_learned_words', merged);
   }
 
-  // SRS words — replace local with cloud
-  const { data: srs } = await supabase.from('srs_words').select('data').eq('user_id', userId);
-  if (srs && srs.length > 0) {
-    lsSet('lexivo_srs_words', srs.map(r => r.data));
+  // SRS words — replace local with cloud (deduplicate by word+collection in case of legacy format rows)
+  const { data: srsRows } = await supabase.from('srs_words').select('data').eq('user_id', userId);
+  if (srsRows && srsRows.length > 0) {
+    const srsMap = new Map<string, unknown>();
+    for (const row of srsRows) {
+      const w = row.data;
+      if (!w) continue;
+      const key = `${w.word}_${w.collectionName}`;
+      const existing = srsMap.get(key) as { reviewStage?: number } | undefined;
+      if (!existing || (w.reviewStage ?? 0) >= (existing.reviewStage ?? 0)) {
+        srsMap.set(key, w);
+      }
+    }
+    lsSet('lexivo_srs_words', [...srsMap.values()]);
   }
 
   // Starred words — replace local with cloud
