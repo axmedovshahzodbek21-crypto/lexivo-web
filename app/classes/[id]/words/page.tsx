@@ -327,7 +327,7 @@ export default function ClassWordsPage() {
         </div>
         <div className="shrink-0 text-right">
           <p className="text-xl font-black text-[var(--primary)]">{words.length}</p>
-          <p className="text-[10px] text-[var(--text-muted)]">words</p>
+          <p className="text-[10px] text-[var(--text-muted)]">items</p>
         </div>
       </div>
 
@@ -397,7 +397,7 @@ export default function ClassWordsPage() {
                   </div>
                 )}
                 <button onClick={addManual} disabled={adding || !manualWord.trim() || !manualTranslation.trim()} className="w-full btn-primary py-3 disabled:opacity-50">
-                  {adding ? 'Adding…' : '+ Add word'}
+                  {adding ? 'Adding…' : '+ Add item'}
                 </button>
               </div>
             </div>
@@ -554,7 +554,7 @@ export default function ClassWordsPage() {
 
                   {parsed.length > 0 && (
                     <button onClick={importWords} disabled={importing} className="w-full btn-primary py-3 disabled:opacity-50">
-                      {importing ? 'Adding…' : `Add ${parsed.length} word${parsed.length !== 1 ? 's' : ''} to class`}
+                      {importing ? 'Adding…' : `Add ${parsed.length} item${parsed.length !== 1 ? 's' : ''} to class`}
                     </button>
                   )}
                 </div>
@@ -566,7 +566,7 @@ export default function ClassWordsPage() {
           {words.length > 0 && (
             <div className="space-y-4 pt-2">
               <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">
-                {words.length} word{words.length !== 1 ? 's' : ''} assigned to this class
+                {words.length} item{words.length !== 1 ? 's' : ''} assigned to this class
               </p>
               {Array.from(grouped.entries()).map(([folder, colMap]) => (
                 <div key={folder} className="space-y-2">
@@ -584,7 +584,7 @@ export default function ClassWordsPage() {
                         <div className="flex items-center gap-2 px-1">
                           <span className="text-sm">📖</span>
                           <span className="font-semibold text-xs text-[var(--text-muted)]">{col}</span>
-                          <span className="text-[10px] text-[var(--text-muted)]">· {colWords.length} word{colWords.length !== 1 ? 's' : ''}</span>
+                          <span className="text-[10px] text-[var(--text-muted)]">· {colWords.length} item{colWords.length !== 1 ? 's' : ''}</span>
                         </div>
                       )}
                       {colWords.map(w => (

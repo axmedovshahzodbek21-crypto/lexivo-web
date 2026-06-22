@@ -65,7 +65,7 @@ export default function MyWordsPage() {
                     <div className="flex-1 min-w-0">
                       <p className="font-bold text-[var(--text)] truncate">{folder.name}</p>
                       <p className="text-xs text-[var(--text-muted)] mt-0.5">
-                        {folder.collectionCount} collection{folder.collectionCount !== 1 ? 's' : ''} · {folder.wordCount} word{folder.wordCount !== 1 ? 's' : ''}
+                        {folder.collectionCount} collection{folder.collectionCount !== 1 ? 's' : ''} · {folder.wordCount} item{folder.wordCount !== 1 ? 's' : ''}
                       </p>
                     </div>
                     <span className="text-[var(--text-muted)] text-lg">›</span>
