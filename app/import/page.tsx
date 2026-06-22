@@ -96,8 +96,29 @@ interface ParseResult {
   errors: { index: number; preview: string; reason: string }[];
 }
 
+function splitIntoBlocks(text: string): string[] {
+  // Primary: split by --- separator
+  if (/---+/.test(text)) {
+    return text.split(/---+/).map(b => b.trim()).filter(Boolean);
+  }
+  // Fallback: split each time a new 'word:' line appears after one already seen
+  const blocks: string[] = [];
+  const lines = text.split('\n');
+  let current: string[] = [];
+  for (const line of lines) {
+    if (/^word\s*:/i.test(line.trim()) && current.some(l => /^word\s*:/i.test(l.trim()))) {
+      blocks.push(current.join('\n').trim());
+      current = [line];
+    } else {
+      current.push(line);
+    }
+  }
+  if (current.length) blocks.push(current.join('\n').trim());
+  return blocks.filter(Boolean);
+}
+
 function parseOutput(text: string, langCode: string): ParseResult {
-  const blocks = text.split(/---+/).map(b => b.trim()).filter(Boolean);
+  const blocks = splitIntoBlocks(text);
   const words: ImportedWord[] = [];
   const errors: ParseResult['errors'] = [];
 

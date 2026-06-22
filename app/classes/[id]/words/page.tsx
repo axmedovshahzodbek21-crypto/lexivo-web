@@ -91,8 +91,27 @@ Here are my pairs (word - translation):
 [PASTE YOUR PAIRS HERE, one per line]`;
 }
 
+function splitIntoBlocks(text: string): string[] {
+  if (/---+/.test(text)) {
+    return text.split(/---+/).map(b => b.trim()).filter(Boolean);
+  }
+  const blocks: string[] = [];
+  const lines = text.split('\n');
+  let current: string[] = [];
+  for (const line of lines) {
+    if (/^word\s*:/i.test(line.trim()) && current.some(l => /^word\s*:/i.test(l.trim()))) {
+      blocks.push(current.join('\n').trim());
+      current = [line];
+    } else {
+      current.push(line);
+    }
+  }
+  if (current.length) blocks.push(current.join('\n').trim());
+  return blocks.filter(Boolean);
+}
+
 function parseOutput(text: string, langCode: string): ParseResult {
-  const blocks = text.split(/---+/).map(b => b.trim()).filter(Boolean);
+  const blocks = splitIntoBlocks(text);
   const words: ParsedWord[] = [];
   const errors: ParseResult['errors'] = [];
   for (let i = 0; i < blocks.length; i++) {
