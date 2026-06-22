@@ -5,6 +5,7 @@ import {
   getLearnedWords, getSRSWords, getStarredWords,
   getUnlockedAchievements, getCustomLists,
   getHardWords,
+  getImportedWords, saveImportedWords,
   getProfilePicUrl, saveProfilePicUrl,
   getNameUpdatedAt, saveNameUpdatedAt,
   getLevelUpdatedAt, saveLevelUpdatedAt,
@@ -129,6 +130,27 @@ export async function pushAll(userId: string) {
     await supabase.from('custom_lists').upsert(
       lists.map(l => ({ id: l.id, user_id: userId, name: l.name, words: l.words })),
       { onConflict: 'id' }
+    );
+  }
+
+  // Imported words — full replace so collection deletions propagate
+  const imported = getImportedWords();
+  await supabase.from('imported_words').delete().eq('user_id', userId);
+  if (imported.length > 0) {
+    await supabase.from('imported_words').insert(
+      imported.map(w => ({
+        user_id: userId,
+        word: w.word,
+        collection_name: w.collectionName ?? 'My Words',
+        translation: w.translation,
+        definition: w.definition,
+        example1: w.example1,
+        example1_translation: w.example1Translation ?? '',
+        example2: w.example2,
+        example2_translation: w.example2Translation ?? '',
+        language: w.language,
+        added_at: w.addedAt,
+      }))
     );
   }
 
@@ -297,6 +319,23 @@ export async function pullAll(userId: string) {
   const { data: hardRows } = await supabase.from('hard_words').select('word').eq('user_id', userId);
   if (hardRows !== null) {
     lsSet('lexivo_hard_words', hardRows.map(r => r.word));
+  }
+
+  // Imported words — authoritative replace
+  const { data: importedRows } = await supabase.from('imported_words').select('*').eq('user_id', userId);
+  if (importedRows !== null) {
+    saveImportedWords(importedRows.map(r => ({
+      word: r.word,
+      translation: r.translation ?? '',
+      definition: r.definition ?? '',
+      example1: r.example1 ?? '',
+      example1Translation: r.example1_translation ?? '',
+      example2: r.example2 ?? '',
+      example2Translation: r.example2_translation ?? '',
+      language: r.language ?? 'en-US',
+      addedAt: r.added_at ?? 0,
+      collectionName: r.collection_name ?? 'My Words',
+    })));
   }
 
   // Achievements — merge

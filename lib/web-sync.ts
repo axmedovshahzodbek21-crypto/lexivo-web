@@ -9,6 +9,7 @@ import {
   getStudyDays, saveStudyDays,
   getUnlockedAchievements, getCustomLists,
   getHardWords,
+  getImportedWords, saveImportedWords,
   localDateStr,
 } from './storage';
 
@@ -135,6 +136,27 @@ export async function pushAll(uid: string) {
       await supabase.from('custom_lists').upsert(
         lists.map(l => ({ id: l.id, user_id: uid, name: l.name, words: l.words })),
         { onConflict: 'id' },
+      );
+    }
+
+    // imported_words — full replace so collection deletions propagate
+    const imported = getImportedWords();
+    await supabase.from('imported_words').delete().eq('user_id', uid);
+    if (imported.length > 0) {
+      await supabase.from('imported_words').insert(
+        imported.map(w => ({
+          user_id: uid,
+          word: w.word,
+          collection_name: w.collectionName ?? 'My Words',
+          translation: w.translation,
+          definition: w.definition,
+          example1: w.example1,
+          example1_translation: w.example1Translation ?? '',
+          example2: w.example2,
+          example2_translation: w.example2Translation ?? '',
+          language: w.language,
+          added_at: w.addedAt,
+        }))
       );
     }
 
@@ -354,6 +376,23 @@ export async function pullAll(uid: string) {
     const { data: listRows } = await supabase.from('custom_lists').select('*').eq('user_id', uid);
     if (listRows !== null) {
       set('lexivo_custom_lists', listRows.map(l => ({ id: l.id, name: l.name, words: l.words })));
+    }
+
+    // imported_words — authoritative replace
+    const { data: importedRows } = await supabase.from('imported_words').select('*').eq('user_id', uid);
+    if (importedRows !== null) {
+      saveImportedWords(importedRows.map(r => ({
+        word: r.word as string,
+        translation: r.translation as string ?? '',
+        definition: r.definition as string ?? '',
+        example1: r.example1 as string ?? '',
+        example1Translation: r.example1_translation as string ?? '',
+        example2: r.example2 as string ?? '',
+        example2Translation: r.example2_translation as string ?? '',
+        language: r.language as string ?? 'en-US',
+        addedAt: r.added_at as number ?? 0,
+        collectionName: r.collection_name as string ?? 'My Words',
+      })));
     }
 
     if (typeof window !== 'undefined') {
