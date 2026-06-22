@@ -296,7 +296,7 @@ export async function pullAll(userId: string) {
 
   // Custom lists — replace local with cloud
   const { data: lists } = await supabase.from('custom_lists').select('*').eq('user_id', userId);
-  if (lists && lists.length > 0) {
+  if (lists !== null) {
     lsSet('lexivo_custom_lists', lists.map(l => ({ id: l.id, name: l.name, words: l.words })));
   }
 }
