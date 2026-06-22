@@ -8,6 +8,7 @@ import {
   getLevelUpdatedAt, saveLevelUpdatedAt,
   getStudyDays, saveStudyDays,
   getUnlockedAchievements, getCustomLists,
+  localDateStr,
 } from './storage';
 
 // localStorage key constants (mirrors KEYS in storage.ts)
@@ -55,6 +56,7 @@ export async function pushAll(uid: string) {
       study_order: settings.studyOrder,
       quiz_direction: settings.quizDirection,
       reduce_motion: settings.reduceMotion,
+      show_on_leaderboard: settings.showOnLeaderboard ?? true,
       ...(avatarUrl !== null && { avatar_url: avatarUrl }),
     });
 
@@ -230,15 +232,33 @@ export async function pullAll(uid: string) {
     // user_stats
     const { data: stats } = await supabase.from('user_stats').select().eq('id', uid).maybeSingle();
     if (stats) {
-      set(K.xp,             stats.xp             ?? 0);
-      set(K.todayXp,        stats.today_xp        ?? 0);
-      set(K.todayCount,     stats.today_count     ?? 0);
-      set(K.streak,         stats.streak          ?? 0);
-      set(K.totalDays,      stats.total_days      ?? 0);
-      set(K.freezes,        stats.freezes         ?? 0);
-      if (stats.today_xp_date)    set(K.todayXpDate,    stats.today_xp_date);
-      if (stats.today_count_date) set(K.todayCountDate, stats.today_count_date);
-      if (stats.last_study_date)  set(K.lastStudy,      stats.last_study_date);
+      // Accumulating counters: take max so locally earned progress isn't overwritten by a stale cloud value
+      set(K.xp,     Math.max(parseInt(ls(K.xp)      ?? '0', 10), stats.xp      ?? 0));
+      set(K.streak, Math.max(parseInt(ls(K.streak)  ?? '0', 10), stats.streak  ?? 0));
+      set(K.freezes,Math.max(parseInt(ls(K.freezes) ?? '0', 10), stats.freezes ?? 0));
+      set(K.totalDays, stats.total_days ?? 0);
+
+      // today_xp / today_count: only sync if the cloud value is from today (avoids resetting today's progress with yesterday's cloud data)
+      const todayStr = localDateStr();
+      const cloudXpDate    = stats.today_xp_date    as string | null;
+      const cloudCountDate = stats.today_count_date as string | null;
+      if (cloudXpDate === todayStr) {
+        const localXp = parseInt(ls(K.todayXp) ?? '0', 10);
+        set(K.todayXp,    ls(K.todayXpDate) === todayStr ? Math.max(localXp, stats.today_xp ?? 0) : (stats.today_xp ?? 0));
+        set(K.todayXpDate, cloudXpDate);
+      }
+      if (cloudCountDate === todayStr) {
+        const localCount = parseInt(ls(K.todayCount) ?? '0', 10);
+        set(K.todayCount,    ls(K.todayCountDate) === todayStr ? Math.max(localCount, stats.today_count ?? 0) : (stats.today_count ?? 0));
+        set(K.todayCountDate, cloudCountDate);
+      }
+
+      // last_study_date: take the more recent of local and cloud
+      const cloudLastStudy = stats.last_study_date as string | null;
+      const localLastStudy = ls(K.lastStudy);
+      if (cloudLastStudy && (!localLastStudy || cloudLastStudy > localLastStudy)) {
+        set(K.lastStudy, cloudLastStudy);
+      }
       if (stats.last_freeze_week) set(K.lastFreezeWeek, stats.last_freeze_week);
       if (Array.isArray(stats.study_days) && stats.study_days.length > 0) {
         const local = getStudyDays();
@@ -281,12 +301,10 @@ export async function pullAll(uid: string) {
       if (toAdd.length > 0) set(K.learned, [...local, ...toAdd]);
     }
 
-    // starred_words — merge: union of local and remote
+    // starred_words — authoritative replace: cloud state wins so removals propagate cross-device
     const { data: starredRows } = await supabase.from('starred_words').select('word').eq('user_id', uid);
-    if (starredRows && starredRows.length > 0) {
-      const local = getStarredWords();
-      const merged = Array.from(new Set([...local, ...starredRows.map(r => r.word as string)]));
-      if (merged.length > local.length) set(K.starred, merged);
+    if (starredRows !== null) {
+      set(K.starred, starredRows.map(r => r.word as string));
     }
 
     // unit_progress — OR-merge: remote true always wins, local true never erased
