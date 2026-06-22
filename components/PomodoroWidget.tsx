@@ -355,6 +355,7 @@ export default function PomodoroWidget() {
             onPointerDown={e => e.stopPropagation()}
             onClick={e => { e.stopPropagation(); hidePomodoroSetup(); }}
             style={{ width: 24, height: 24, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', border: 'none', color: 'rgba(255,255,255,0.6)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            aria-label="Close"
           >✕</button>
         </div>
 
@@ -465,6 +466,7 @@ export default function PomodoroWidget() {
               onPointerDown={e => e.stopPropagation()}
               onClick={() => setPanelOpen(false)}
               style={{ width: 24, height: 24, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', border: 'none', color: 'rgba(255,255,255,0.6)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              aria-label="Close"
             >✕</button>
           </div>
 

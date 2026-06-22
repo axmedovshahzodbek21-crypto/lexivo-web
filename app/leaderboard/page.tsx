@@ -132,7 +132,7 @@ export default function LeaderboardPage() {
                 <div className="flex items-center gap-2">
                   <p className="text-lg font-bold text-[var(--text)]">{selected.name}</p>
                   {user && selected.user_id !== user.id && (
-                    <button onClick={() => toggleSave(selected.user_id)} className="text-2xl leading-none">
+                    <button onClick={() => toggleSave(selected.user_id)} className="text-2xl leading-none" aria-label={savedIds.has(selected.user_id) ? 'Unstar user' : 'Star user'}>
                       {savedIds.has(selected.user_id) ? '⭐' : '☆'}
                     </button>
                   )}
@@ -169,6 +169,7 @@ export default function LeaderboardPage() {
                   <button
                     onClick={() => setCalMonth(m => { const d = new Date(m.year, m.month - 1); return { year: d.getFullYear(), month: d.getMonth() }; })}
                     className="w-7 h-7 rounded-full flex items-center justify-center text-base text-[var(--text-muted)] hover:bg-[var(--surface-2)]"
+                    aria-label="Previous month"
                   >‹</button>
                   <p className="text-xs font-bold text-[var(--text-muted)]">
                     {new Date(cYear, cMonth).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
@@ -176,6 +177,7 @@ export default function LeaderboardPage() {
                   <button
                     onClick={() => setCalMonth(m => { const d = new Date(m.year, m.month + 1); return { year: d.getFullYear(), month: d.getMonth() }; })}
                     className="w-7 h-7 rounded-full flex items-center justify-center text-base text-[var(--text-muted)] hover:bg-[var(--surface-2)]"
+                    aria-label="Next month"
                   >›</button>
                 </div>
                 <div className="grid grid-cols-7 mb-1">
@@ -225,6 +227,7 @@ export default function LeaderboardPage() {
         <button
           onClick={() => router.back()}
           className="btn-icon text-lg"
+          aria-label="Go back"
         >←</button>
         <div className="flex-1">
           <h1 className="font-bold text-[var(--text)]">🏆 Leaderboard</h1>
@@ -233,7 +236,7 @@ export default function LeaderboardPage() {
         <button
           onClick={load}
           className="btn-icon text-lg hover:bg-[var(--primary-bg)] transition-colors"
-          title="Refresh"
+          aria-label="Refresh"
         >↻</button>
       </div>
 

@@ -286,6 +286,7 @@ export default function FlashcardsPage() {
               <button
                 onClick={e => { e.stopPropagation(); current.language ? speakText(current.word, current.language) : speak(current.word); }}
                 className="mt-4 w-10 h-10 rounded-full bg-[var(--primary-bg)] flex items-center justify-center"
+                aria-label="Listen to pronunciation"
               >
                 🔊
               </button>

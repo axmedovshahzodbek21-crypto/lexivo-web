@@ -210,7 +210,7 @@ export default function SRSReviewPage() {
         <button
           onClick={() => { setAllWords(getSRSWords()); setManaging(true); }}
           className="btn-icon text-sm"
-          title="Manage deck"
+          aria-label="Manage deck"
         >
           ⚙️
         </button>
@@ -358,14 +358,14 @@ function WordManageRow({
           <button
             onClick={() => setConfirming('reset')}
             className="text-xs px-2 py-1 rounded-lg bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-amber-600"
-            title="Reset to stage 0"
+            aria-label="Reset to stage 0"
           >
             ↺
           </button>
           <button
             onClick={() => setConfirming('remove')}
             className="text-xs px-2 py-1 rounded-lg bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-red-500"
-            title="Remove from deck"
+            aria-label="Remove from deck"
           >
             ✕
           </button>

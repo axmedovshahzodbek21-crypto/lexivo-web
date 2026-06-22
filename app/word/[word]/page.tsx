@@ -136,13 +136,13 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
     <div className="flex flex-col min-h-screen animate-fade-in pb-8">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-[var(--border)]">
-        <button onClick={() => router.back()} className="btn-icon text-lg">←</button>
+        <button onClick={() => router.back()} className="btn-icon text-lg" aria-label="Go back">←</button>
         <span className="badge">{word.topic}</span>
         <div className="flex gap-2">
           <button
             onClick={handleStar}
             className="btn-icon text-lg"
-            title={starred ? 'Unstar' : 'Star'}
+            aria-label={starred ? 'Remove from starred' : 'Add to starred'}
           >{starred ? '⭐' : '☆'}</button>
         </div>
       </div>
@@ -163,12 +163,12 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
               <button
                 onClick={() => speak(word.word)}
                 className="w-10 h-10 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-lg hover:bg-[var(--primary)] hover:text-white transition-colors"
-                title="Normal speed"
+                aria-label="Listen at normal speed"
               >🔊</button>
               <button
                 onClick={() => speak(word.word, 0.6)}
                 className="w-10 h-10 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-base hover:bg-[var(--primary-bg)] transition-colors"
-                title="Slow"
+                aria-label="Listen at slow speed"
               >🐌</button>
             </div>
           </div>

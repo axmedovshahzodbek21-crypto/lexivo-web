@@ -524,7 +524,7 @@ function LearnInner() {
                   <p className="text-xs font-semibold text-orange-700">{t.learn.skipTipTitle}</p>
                   <p className="text-xs text-orange-600 mt-0.5">{t.learn.skipTipBody}</p>
                 </div>
-                <button onClick={dismissSkipTip} className="text-orange-400 hover:text-orange-600 text-sm font-bold shrink-0 mt-0.5">✕</button>
+                <button onClick={dismissSkipTip} className="text-orange-400 hover:text-orange-600 text-sm font-bold shrink-0 mt-0.5" aria-label="Dismiss tip">✕</button>
               </div>
             )}
           </div>
@@ -585,6 +585,7 @@ function ExampleCard({
               <button
                 onClick={() => speakText(example, language)}
                 className="w-6 h-6 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-xs hover:bg-[var(--primary-bg)] transition-colors"
+                aria-label="Listen to pronunciation"
               >🔊</button>
             ) : (
               <>
@@ -617,6 +618,10 @@ function ExtraExampleCard({
     <div
       className="rounded-xl overflow-hidden border border-[var(--border)] cursor-pointer select-none"
       onClick={() => setShow(v => !v)}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setShow(v => !v); } }}
+      role="button"
+      tabIndex={0}
+      aria-expanded={show}
     >
       <div className="bg-[var(--surface-2)] px-3 pt-2.5 pb-2">
         <div className="flex items-start justify-between gap-2 mb-1">
@@ -625,6 +630,7 @@ function ExtraExampleCard({
             <button
               onClick={e => { e.stopPropagation(); speakText(example, language); }}
               className="w-5 h-5 rounded-full flex items-center justify-center text-xs hover:bg-[var(--primary-bg)] transition-colors shrink-0"
+              aria-label="Listen to pronunciation"
             >🔊</button>
           )}
         </div>

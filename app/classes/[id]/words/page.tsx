@@ -495,6 +495,7 @@ export default function ClassWordsPage() {
                   <button
                     onClick={() => deleteWord(w.id)}
                     className="text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors text-sm shrink-0"
+                    aria-label="Delete word"
                   >
                     ✕
                   </button>

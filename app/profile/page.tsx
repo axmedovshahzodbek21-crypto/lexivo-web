@@ -197,7 +197,7 @@ export default function ProfilePage() {
         <Link
           href="/settings"
           className="w-9 h-9 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-lg"
-          title="Settings"
+          aria-label="Settings"
         >⚙️</Link>
       </div>
 
@@ -225,7 +225,7 @@ export default function ProfilePage() {
           <button
             onClick={() => fileInputRef.current?.click()}
             className="relative mb-3 group"
-            title={t.profile.changePhoto}
+            aria-label={t.profile.changePhoto}
           >
             <div
               className="w-20 h-20 rounded-full overflow-hidden shadow-lg border-4"

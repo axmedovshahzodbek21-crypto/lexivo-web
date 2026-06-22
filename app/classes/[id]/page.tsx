@@ -787,7 +787,7 @@ export default function ClassDashboardPage() {
                         {due && <p className={`text-[10px] mt-0.5 font-medium ${due.overdue && !t.completed_at ? 'text-[var(--danger)]' : 'text-[var(--text-muted)]'}`}>{t.completed_at ? `Completed ${timeAgo(t.completed_at)}` : due.text}</p>}
                         {t.completed_at && !due && <p className="text-[10px] mt-0.5 text-[var(--text-muted)]">Completed {timeAgo(t.completed_at)}</p>}
                       </div>
-                      <button onClick={() => deleteTarget(t.id)} className="text-[10px] text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors shrink-0 mt-1">✕</button>
+                      <button onClick={() => deleteTarget(t.id)} className="text-[10px] text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors shrink-0 mt-1" aria-label="Delete target">✕</button>
                     </div>
                   );
                 })}
@@ -854,9 +854,9 @@ export default function ClassDashboardPage() {
                 <div className="bg-[var(--surface-2)] rounded-2xl p-4">
                   {/* Month nav */}
                   <div className="flex items-center justify-between mb-4">
-                    <button onClick={prev} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--border)] text-[var(--text)] text-lg font-bold">‹</button>
+                    <button onClick={prev} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--border)] text-[var(--text)] text-lg font-bold" aria-label="Previous month">‹</button>
                     <p className="font-bold text-sm text-[var(--text)]">{MONTH_NAMES[month]} {year}</p>
-                    <button onClick={next} disabled={!canNext} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--border)] text-[var(--text)] text-lg font-bold disabled:opacity-25">›</button>
+                    <button onClick={next} disabled={!canNext} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--border)] text-[var(--text)] text-lg font-bold disabled:opacity-25" aria-label="Next month">›</button>
                   </div>
                   {/* Day headers */}
                   <div className="grid grid-cols-7 mb-2">

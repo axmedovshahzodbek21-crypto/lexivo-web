@@ -63,6 +63,7 @@ export default function SearchPage() {
             <button
               onClick={() => setQuery('')}
               className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text)]"
+              aria-label="Clear search"
             >
               ✕
             </button>

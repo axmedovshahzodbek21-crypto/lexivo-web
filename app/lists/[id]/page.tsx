@@ -149,7 +149,7 @@ export default function ListDetailPage({ params }: { params: Promise<{ id: strin
               className="flex-1 text-xl font-bold px-3 py-1.5 rounded-xl border border-[var(--primary)] bg-[var(--surface-2)] text-[var(--text)] focus:outline-none"
             />
             <button onClick={handleRename} className="btn-primary text-sm px-3 py-1.5">Save</button>
-            <button onClick={() => setEditingName(false)} className="btn-secondary text-sm px-3 py-1.5">✕</button>
+            <button onClick={() => setEditingName(false)} className="btn-secondary text-sm px-3 py-1.5" aria-label="Cancel rename">✕</button>
           </div>
         ) : (
           <div className="flex items-center gap-2">

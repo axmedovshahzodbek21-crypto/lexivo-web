@@ -26,7 +26,7 @@ export default function MyWordsPage() {
         <Link
           href="/import"
           className="w-9 h-9 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-lg font-bold text-[var(--primary)]"
-          title={t.myWords.addWords}
+          aria-label={t.myWords.addWords}
         >+</Link>
       </div>
 

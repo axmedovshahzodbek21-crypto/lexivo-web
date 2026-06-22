@@ -420,13 +420,13 @@ export default function ClassesPage() {
                                 onKeyDown={e => { if (e.key === 'Enter') saveRename(cls.id); if (e.key === 'Escape') setRenamingId(null); }}
                                 className="flex-1 px-2 py-1 rounded-lg border border-[var(--primary)] bg-[var(--surface-2)] text-[var(--text)] text-sm font-bold focus:outline-none"
                               />
-                              <button onClick={() => saveRename(cls.id)} disabled={renaming || !renameText.trim()} className="text-xs font-bold text-[var(--primary)] disabled:opacity-50">✓</button>
-                              <button onClick={() => setRenamingId(null)} className="text-xs text-[var(--text-muted)]">✕</button>
+                              <button onClick={() => saveRename(cls.id)} disabled={renaming || !renameText.trim()} className="text-xs font-bold text-[var(--primary)] disabled:opacity-50" aria-label="Save rename">✓</button>
+                              <button onClick={() => setRenamingId(null)} className="text-xs text-[var(--text-muted)]" aria-label="Cancel rename">✕</button>
                             </div>
                           ) : (
                             <div className="flex items-center gap-1.5">
                               <p className="font-bold text-[var(--text)]">{cls.name}</p>
-                              <button onClick={() => startRename(cls)} className="text-[var(--text-muted)] hover:text-[var(--primary)] transition-colors text-xs" title="Rename">✏️</button>
+                              <button onClick={() => startRename(cls)} className="text-[var(--text-muted)] hover:text-[var(--primary)] transition-colors text-xs" aria-label="Rename class">✏️</button>
                             </div>
                           )}
                           <div className="flex items-center gap-2 mt-1">
@@ -697,6 +697,7 @@ export default function ClassesPage() {
             <button
               onClick={() => setFlashcard(null)}
               className="btn-icon text-lg"
+              aria-label="Close"
             >
               ✕
             </button>

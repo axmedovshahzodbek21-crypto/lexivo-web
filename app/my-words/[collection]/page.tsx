@@ -50,12 +50,12 @@ export default function CollectionDetailPage({ params }: Props) {
         <button
           onClick={handleDeleteCollection}
           className="btn-icon text-base text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors"
-          title="Delete collection"
+          aria-label="Delete collection"
         >🗑️</button>
         <Link
           href={`/import?collection=${encodeURIComponent(name)}`}
           className="w-9 h-9 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-lg font-bold text-[var(--primary)]"
-          title={t.myWords.addWords}
+          aria-label={t.myWords.addWords}
         >+</Link>
       </div>
 
@@ -118,6 +118,7 @@ export default function CollectionDetailPage({ params }: Props) {
                         <button
                           onClick={() => speakText(w.word, w.language)}
                           className="w-6 h-6 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-xs hover:bg-[var(--primary)] hover:text-white transition-colors shrink-0"
+                          aria-label="Listen to pronunciation"
                         >🔊</button>
                       </div>
                       <p className="text-sm font-medium text-[var(--primary)] mt-0.5">{w.translation}</p>
@@ -130,6 +131,7 @@ export default function CollectionDetailPage({ params }: Props) {
                     <button
                       onClick={() => handleDelete(w.word)}
                       className="text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors text-sm shrink-0 mt-0.5"
+                      aria-label="Delete word"
                     >🗑️</button>
                   </div>
                 </div>
