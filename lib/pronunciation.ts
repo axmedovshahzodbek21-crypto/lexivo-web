@@ -1,3 +1,5 @@
+import { supabase } from './supabase';
+
 export type MatchScore = 'perfect' | 'close' | 'wrong';
 
 export function isRecognitionSupported(): boolean {
@@ -181,11 +183,16 @@ export function createWhisperRecognizer(
         onProcessing();
 
         try {
+          const { data: { session } } = await supabase.auth.getSession();
           const form = new FormData();
           form.append('audio', blob, 'audio.webm');
-          const res = await fetch('/api/transcribe', { method: 'POST', body: form });
+          const res = await fetch('/api/transcribe', {
+            method: 'POST',
+            body: form,
+            headers: session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {},
+          });
           if (!res.ok) {
-            onError(res.status === 503 ? 'no-api-key' : 'network');
+            onError(res.status === 503 || res.status === 401 || res.status === 429 ? 'no-api-key' : 'network');
             onEnd();
             return;
           }
