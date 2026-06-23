@@ -174,6 +174,7 @@ export async function pushAll(uid: string) {
     const localRows: {
       collection_name: string; day_number: number;
       learn_done: boolean; flashcard_done: boolean; quiz_done: boolean;
+      completed_at: string | null;
     }[] = [];
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
@@ -192,13 +193,17 @@ export async function pushAll(uid: string) {
         learn_done: p.learnDone ?? false,
         flashcard_done: p.flashcardDone ?? false,
         quiz_done: p.quizDone ?? false,
+        // Preserve the stored completedAt so periodic sync never overwrites the
+        // real completion timestamp with "now". pullAll writes it here after each pull.
+        completed_at: p.completedAt ?? null,
       });
     }
     console.log('[unit_progress] periodic push: found', localRows.length, 'local rows');
     for (const r of localRows) {
       try {
         const allDone = r.learn_done && r.flashcard_done && r.quiz_done;
-        const completedAt = allDone ? new Date().toISOString() : null;
+        // Use stored timestamp if available; only generate "now" on the very first push
+        const completedAt = allDone ? (r.completed_at ?? new Date().toISOString()) : null;
         const { data: updated, error: updateErr } = await supabase
           .from('unit_progress')
           .update({ learn_done: r.learn_done, flashcard_done: r.flashcard_done, quiz_done: r.quiz_done, completed_at: completedAt })
