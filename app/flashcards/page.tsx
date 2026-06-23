@@ -193,7 +193,7 @@ export default function FlashcardsPage() {
       }
       setDone(true);
     } else {
-      if (collectionName && dayNumber !== undefined) {
+      if (collectionName && dayNumber !== undefined && cardsSinceLastPush.current === 0) {
         saveFlashcardProgress(collectionName, dayNumber, deck.slice(index + 1).map(w => w.word));
       }
       setIndex(i => i + 1);
