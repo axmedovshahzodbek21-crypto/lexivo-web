@@ -3,6 +3,7 @@ import { PageLoader, SectionLoader } from '@/components/Loader';
 import { useEffect, useState, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
+import { useShallow } from 'zustand/react/shallow';
 import { speakAccent, speakText } from '@/lib/speech';
 import {
   saveLearnedWord, incrementTodayCount, addXP, recordStudySession,
@@ -69,8 +70,14 @@ function LearnInner() {
   const hardOnly = sp.get('hard') === 'true';
   const startIndexParam = sp.get('startIndex');
   const startIndex = startIndexParam ? parseInt(startIndexParam) || 0 : 0;
-  const { collections, collectionsLoaded, pushAchievement, setPendingLevelUp, focusMode, setFocusMode,
-    showPomodoroSetup } = useAppStore();
+  const { collections, collectionsLoaded, pushAchievement, setPendingLevelUp, focusMode, setFocusMode, showPomodoroSetup } = useAppStore(
+    useShallow(s => ({
+      collections: s.collections, collectionsLoaded: s.collectionsLoaded,
+      pushAchievement: s.pushAchievement, setPendingLevelUp: s.setPendingLevelUp,
+      focusMode: s.focusMode, setFocusMode: s.setFocusMode,
+      showPomodoroSetup: s.showPomodoroSetup,
+    }))
+  );
 
   const [words, setWords] = useState<StudyWord[]>([]);
   const [index, setIndex] = useState(0);

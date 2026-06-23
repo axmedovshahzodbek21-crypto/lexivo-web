@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/lib/useTranslation';
 import { useAppStore } from '@/lib/store';
+import { useShallow } from 'zustand/react/shallow';
 import { getWordOfDay } from '@/lib/data';
 import { getStreak, getXP, getTodayXP, getTodayLearnedCount, getDueWords, getLearnedWords, getSettings, isOnboarded, getFreezes, checkAndGrantWeeklyFreeze, getImportedWords, getLastStudyDate, localDateStr } from '@/lib/storage';
 import { getLevelInfo } from '@/lib/gamification';
@@ -23,7 +24,9 @@ const LEVELED_NAMES = new Set(['A1', 'A2', 'B1', 'Advanced']);
 
 export default function HomePage() {
   const router = useRouter();
-  const { collections, collectionsLoaded } = useAppStore();
+  const { collections, collectionsLoaded } = useAppStore(
+    useShallow(s => ({ collections: s.collections, collectionsLoaded: s.collectionsLoaded }))
+  );
   const [wod, setWod] = useState<WordItem | null>(null);
   const [streak, setStreak] = useState(0);
   const [xp, setXp] = useState(0);

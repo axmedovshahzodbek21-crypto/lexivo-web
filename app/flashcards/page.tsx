@@ -3,6 +3,7 @@ import { PageLoader, SectionLoader } from '@/components/Loader';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
+import { useShallow } from 'zustand/react/shallow';
 import { speak, speakText } from '@/lib/speech';
 import { addXP, recordStudySession, markFlashcardComplete, getStarredWords, getHardWords, getCustomListWords, getUnitProgress, saveFlashcardProgress, getFlashcardProgress, clearFlashcardProgress, getImportedWords, getImportedWordsByCollection, getClassHWTemp } from '@/lib/storage';
 import { checkAchievements } from '@/lib/gamification';
@@ -71,7 +72,13 @@ export default function FlashcardsPage() {
   const sourceClassHW = sp.get('source') === 'class-hw';
   const myCollection = sp.get('myCollection') ?? undefined;
   const myFolder     = sp.get('myFolder') ?? undefined;
-  const { collections, collectionsLoaded, pushAchievement, setPendingLevelUp, focusMode, setFocusMode } = useAppStore();
+  const { collections, collectionsLoaded, pushAchievement, setPendingLevelUp, focusMode, setFocusMode } = useAppStore(
+    useShallow(s => ({
+      collections: s.collections, collectionsLoaded: s.collectionsLoaded,
+      pushAchievement: s.pushAchievement, setPendingLevelUp: s.setPendingLevelUp,
+      focusMode: s.focusMode, setFocusMode: s.setFocusMode,
+    }))
+  );
 
   const t = useTranslation();
   const [deck, setDeck] = useState<StudyWord[]>([]);
