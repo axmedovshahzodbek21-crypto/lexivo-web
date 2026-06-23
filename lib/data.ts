@@ -2,10 +2,46 @@ import type { WordCollection, WordItem } from './types';
 
 const cache: Record<string, WordCollection | WordCollection[]> = {};
 
+function stripHtml(s: unknown): string {
+  if (typeof s !== 'string') return '';
+  return s.replace(/<[^>]*>/g, '');
+}
+
+function sanitizeWord(w: WordItem): WordItem {
+  return {
+    ...w,
+    word:                 stripHtml(w.word),
+    partOfSpeech:         stripHtml(w.partOfSpeech),
+    pronunciation:        stripHtml(w.pronunciation),
+    translation:          stripHtml(w.translation),
+    definition:           stripHtml(w.definition),
+    definitionUz:         w.definitionUz         !== undefined ? stripHtml(w.definitionUz)         : undefined,
+    example1:             stripHtml(w.example1),
+    example1Situation:    stripHtml(w.example1Situation),
+    example1Translation:  w.example1Translation  !== undefined ? stripHtml(w.example1Translation)  : undefined,
+    example2:             stripHtml(w.example2),
+    example2Situation:    stripHtml(w.example2Situation),
+    example2Translation:  w.example2Translation  !== undefined ? stripHtml(w.example2Translation)  : undefined,
+    example3:             stripHtml(w.example3),
+    example3Translation:  stripHtml(w.example3Translation),
+    example3Situation:    stripHtml(w.example3Situation),
+    extraExamples:        w.extraExamples?.map(stripHtml),
+    extraExampleTranslations: w.extraExampleTranslations?.map(stripHtml),
+  };
+}
+
+function sanitizeCollection(col: WordCollection): WordCollection {
+  return {
+    ...col,
+    days: col.days.map(d => ({ ...d, words: d.words.map(sanitizeWord) })),
+  };
+}
+
 export async function loadCollections(): Promise<WordCollection[]> {
   if (cache['main']) return cache['main'] as WordCollection[];
   const res = await fetch('/data/word_data.json');
-  const data: WordCollection[] = await res.json();
+  const raw: WordCollection[] = await res.json();
+  const data = raw.map(sanitizeCollection);
   cache['main'] = data;
   return data;
 }
@@ -13,7 +49,8 @@ export async function loadCollections(): Promise<WordCollection[]> {
 export async function loadCEFRCollection(level: 'a1' | 'a2' | 'b1' | 'advanced'): Promise<WordCollection> {
   if (cache[level]) return cache[level] as WordCollection;
   const res = await fetch(`/data/${level}_collection.json`);
-  const data: WordCollection = await res.json();
+  const raw: WordCollection = await res.json();
+  const data = sanitizeCollection(raw);
   cache[level] = data;
   return data;
 }
