@@ -178,6 +178,8 @@ export default function ClassWordsPage() {
   const [tab, setTab] = useState<InputTab>('manual');
   const [collapsedCols, setCollapsedCols] = useState<Set<string>>(new Set());
   const toggleCol = (key: string) => setCollapsedCols(prev => { const s = new Set(prev); s.has(key) ? s.delete(key) : s.add(key); return s; });
+  const [collapsedFolders, setCollapsedFolders] = useState<Set<string>>(new Set());
+  const toggleFolder = (key: string) => setCollapsedFolders(prev => { const s = new Set(prev); s.has(key) ? s.delete(key) : s.add(key); return s; });
 
   // Shared folder/collection for both manual and AI import
   const [folderInput, setFolderInput] = useState('');
@@ -589,16 +591,19 @@ export default function ClassWordsPage() {
               <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">
                 {words.length} item{words.length !== 1 ? 's' : ''} assigned to this class
               </p>
-              {Array.from(grouped.entries()).map(([folder, colMap]) => (
+              {Array.from(grouped.entries()).map(([folder, colMap]) => {
+                const folderCollapsed = folder ? collapsedFolders.has(folder) : false;
+                return (
                 <div key={folder} className="space-y-2">
                   {/* Folder header */}
                   {folder && (
-                    <div className="flex items-center gap-2 px-1 pt-1">
+                    <button onClick={() => toggleFolder(folder)} className="flex items-center gap-2 px-1 pt-1 w-full text-left">
                       <span className="text-base">📁</span>
                       <span className="font-bold text-sm text-[var(--text)]">{folder}</span>
-                    </div>
+                      <span className="text-[10px] text-[var(--text-muted)] ml-auto">{folderCollapsed ? '▶' : '▼'}</span>
+                    </button>
                   )}
-                  {Array.from(colMap.entries()).map(([col, colWords]) => {
+                  {!folderCollapsed && Array.from(colMap.entries()).map(([col, colWords]) => {
                     const colKey = `${folder}::${col}`;
                     const collapsed = collapsedCols.has(colKey);
                     return (
@@ -630,7 +635,8 @@ export default function ClassWordsPage() {
                     );
                   })}
                 </div>
-              ))}
+                );
+              })}
             </div>
           )}
 
