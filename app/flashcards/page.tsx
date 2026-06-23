@@ -1,12 +1,12 @@
 ﻿'use client';
 import { PageLoader, SectionLoader } from '@/components/Loader';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { speak, speakText } from '@/lib/speech';
 import { addXP, recordStudySession, markFlashcardComplete, getStarredWords, getHardWords, getCustomListWords, getUnitProgress, saveFlashcardProgress, getFlashcardProgress, clearFlashcardProgress, getImportedWords, getImportedWordsByCollection, getClassHWTemp } from '@/lib/storage';
 import { checkAchievements } from '@/lib/gamification';
-import { pushUnitProgressCurrentUser } from '@/lib/web-sync';
+import { pushUnitProgressCurrentUser, pushAllCurrentUser } from '@/lib/web-sync';
 import type { WordItem, WordCollection } from '@/lib/types';
 import Link from 'next/link';
 import UnitPicker from '@/components/UnitPicker';
@@ -81,6 +81,7 @@ export default function FlashcardsPage() {
   const [unknown, setUnknown] = useState(0);
   const [done, setDone] = useState(false);
   const [unknownWords, setUnknownWords] = useState<StudyWord[]>([]);
+  const cardsSinceLastPush = useRef(0);
 
   // Gate: must complete Learn before Flashcards (for unit sessions)
   const [gateUrl, setGateUrl] = useState<string | null>(null);
@@ -170,6 +171,8 @@ export default function FlashcardsPage() {
     if (!sourceClassHW) {
       const { leveledUp, newLevel, newXp } = addXP(wasKnown ? 3 : 1, 'Flashcard');
       if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
+      cardsSinceLastPush.current++;
+      if (cardsSinceLastPush.current >= 5) { cardsSinceLastPush.current = 0; pushAllCurrentUser(); }
     }
     recordStudySession();
     const newAchievements = checkAchievements();

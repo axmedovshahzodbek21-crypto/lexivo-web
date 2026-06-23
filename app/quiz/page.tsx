@@ -1,13 +1,13 @@
 ﻿'use client';
 import { PageLoader, SectionLoader } from '@/components/Loader';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { speak, speakText } from '@/lib/speech';
 import { addXP, recordStudySession, markQuizComplete, unlockAchievement, getStarredWords, getCustomListWords, getSettings, getUnitProgress, getImportedWords, getImportedWordsByCollection, getClassHWTemp } from '@/lib/storage';
 import { fireConfetti } from '@/lib/confetti';
 import { checkAchievements } from '@/lib/gamification';
-import { pushUnitProgressCurrentUser } from '@/lib/web-sync';
+import { pushUnitProgressCurrentUser, pushAllCurrentUser } from '@/lib/web-sync';
 import type { WordItem, WordCollection, QuizType } from '@/lib/types';
 import { XP_PER_QUIZ } from '@/lib/types';
 import Link from 'next/link';
@@ -120,6 +120,7 @@ export default function QuizPage() {
   const [correct, setCorrect] = useState(0);
   const [done, setDone] = useState(false);
   const [wrongQuestions, setWrongQuestions] = useState<QuizQuestion[]>([]);
+  const cardsSinceLastPush = useRef(0);
   const t = useTranslation();
   const [quizDirection, setQuizDirection] = useState<'word-to-uz' | 'uz-to-word'>('word-to-uz');
 
@@ -239,6 +240,10 @@ export default function QuizPage() {
         const { leveledUp, newLevel, newXp } = addXP(1, 'Quiz');
         if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
       }
+    }
+    if (!sourceClassHW) {
+      cardsSinceLastPush.current++;
+      if (cardsSinceLastPush.current >= 5) { cardsSinceLastPush.current = 0; pushAllCurrentUser(); }
     }
     recordStudySession();
   }, [state, current, sourceClassHW]);
