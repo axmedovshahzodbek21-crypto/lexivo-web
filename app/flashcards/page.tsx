@@ -90,6 +90,8 @@ export default function FlashcardsPage() {
   const [unknownWords, setUnknownWords] = useState<StudyWord[]>([]);
   const cardsSinceLastPush = useRef(0);
   const advancing = useRef(false);
+  const doneRef = useRef(false);
+  useEffect(() => { doneRef.current = done; }, [done]);
 
   // Gate: must complete Learn before Flashcards (for unit sessions)
   const [gateUrl, setGateUrl] = useState<string | null>(null);
@@ -167,6 +169,16 @@ export default function FlashcardsPage() {
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
   }, [current, side, focusMode]);
+
+  // Clear stale progress if user navigates away before finishing
+  useEffect(() => {
+    return () => {
+      if (!doneRef.current && collectionName && dayNumber !== undefined) {
+        clearFlashcardProgress(collectionName, dayNumber);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const advance = useCallback((wasKnown: boolean) => {
     if (advancing.current) return;
