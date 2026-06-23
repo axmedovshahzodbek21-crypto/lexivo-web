@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import type { Session, User } from '@supabase/supabase-js';
 import { supabase } from './supabase';
 import { pullAll, pushAll, startSync, stopSync } from './web-sync';
+import { clearUserData } from './storage';
 
 function dispatch(name: string) {
   if (typeof window !== 'undefined') window.dispatchEvent(new Event(name));
@@ -87,6 +88,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     stopSync();
+    clearUserData();
     await supabase.auth.signOut();
   };
 

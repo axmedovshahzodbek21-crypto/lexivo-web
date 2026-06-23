@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { getSettings, saveSettings, setUILanguage, resetOnboarded, saveNameUpdatedAt, saveLevelUpdatedAt } from '@/lib/storage';
+import { getSettings, saveSettings, setUILanguage, resetOnboarded, saveNameUpdatedAt, saveLevelUpdatedAt, clearUserData } from '@/lib/storage';
 import { getTheme, setTheme, type Theme } from '@/lib/theme';
 import { supabase } from '@/lib/supabase';
 import { stopSync } from '@/lib/web-sync';
@@ -189,6 +189,7 @@ export default function SettingsPage() {
     try {
       await supabase.rpc('delete_own_account');
       stopSync();
+      clearUserData();
       await supabase.auth.signOut();
       window.location.replace('/login');
     } catch (e) {
@@ -199,6 +200,7 @@ export default function SettingsPage() {
 
   const handleSignOut = async () => {
     stopSync();
+    clearUserData();
     await supabase.auth.signOut();
     window.location.replace('/login');
   };

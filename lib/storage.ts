@@ -719,3 +719,15 @@ export function clearFlashcardProgress(collectionName: string, dayNumber: number
   if (typeof window === 'undefined') return;
   localStorage.removeItem(`lexivo_flashcard_progress_${collectionName}_${dayNumber}`);
 }
+
+// Clear all user-specific data from localStorage on sign-out.
+// Preserves lexivo_ui_lang (device UI preference, not tied to a user account).
+export function clearUserData(): void {
+  if (typeof window === 'undefined') return;
+  const toRemove: string[] = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i)!;
+    if (k.startsWith('lexivo_') && k !== 'lexivo_ui_lang') toRemove.push(k);
+  }
+  toRemove.forEach(k => localStorage.removeItem(k));
+}
