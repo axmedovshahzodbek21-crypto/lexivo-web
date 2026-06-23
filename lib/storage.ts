@@ -201,7 +201,15 @@ export function getSRSWords(): SRSWord[] {
   const words = get<SRSWord[]>(KEYS.srs, []);
   // One-time migration: backfill id for words synced from Flutter before it was included in the data blob
   if (words.some(w => !w.id)) {
-    const fixed = words.map(w => w.id ? w : { ...w, id: `${w.collectionName}::${w.word}` });
+    const fixed = words.map(w => ({
+      ...(w.id ? w : { ...w, id: `${w.collectionName}::${w.word}` }),
+      reviewStage: Math.min(Math.max((w.reviewStage ?? 0), 0), 4),
+    }));
+    set(KEYS.srs, fixed);
+    return fixed;
+  }
+  if (words.some(w => (w.reviewStage ?? 0) < 0 || (w.reviewStage ?? 0) > 4)) {
+    const fixed = words.map(w => ({ ...w, reviewStage: Math.min(Math.max((w.reviewStage ?? 0), 0), 4) }));
     set(KEYS.srs, fixed);
     return fixed;
   }
