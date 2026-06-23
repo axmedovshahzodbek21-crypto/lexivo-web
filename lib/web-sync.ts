@@ -7,6 +7,7 @@ import {
   getProfilePicUrl, saveProfilePicUrl,
   getNameUpdatedAt, saveNameUpdatedAt,
   getLevelUpdatedAt, saveLevelUpdatedAt,
+  getSettingsUpdatedAt, saveSettingsUpdatedAt,
   getStudyDays, saveStudyDays,
   getUnlockedAchievements, getCustomLists,
   getHardWordEntries, type HardWordEntry,
@@ -24,6 +25,7 @@ interface ProfileRow {
   name_updated_at:           string | null;
   language_level:            string | null;
   language_level_updated_at: string | null;
+  settings_updated_at:       string | null;
   daily_goal:                number | null;
   default_accent:            string | null;
   auto_play_on_reveal:       boolean | null;
@@ -38,6 +40,7 @@ interface ProfileRow {
 
 interface StatsRow {
   xp:               number | null;
+  xp_updated_at:    string | null;
   today_xp:         number | null;
   today_xp_date:    string | null;
   today_count:      number | null;
@@ -66,7 +69,10 @@ function warnMissing(context: string, data: Record<string, unknown>, fields: str
 
 // localStorage key constants (mirrors KEYS in storage.ts)
 const K = {
-  xp:             'lexivo_xp',
+  xp:                  'lexivo_xp',
+  xpUpdatedAt:         'lexivo_xp_updated_at',
+  settingsUpdatedAt:   'lexivo_settings_updated_at',
+  lastLearnedPullAt:   'lexivo_last_learned_pull_at',
   todayXp:        'lexivo_today_xp',
   todayXpDate:    'lexivo_today_xp_date',
   todayCount:     'lexivo_today_count',
@@ -90,33 +96,46 @@ function ls(key: string): string | null {
 // ── Push: localStorage → Supabase ─────────────────────────────────────────────
 
 export async function pushAll(uid: string) {
+  if (typeof window !== 'undefined' && localStorage.getItem('lexivo_resetting') === '1') return;
   try {
     const settings = getSettings();
 
     const avatarUrl = getProfilePicUrl();
-    const nameUpdatedAt = getNameUpdatedAt();
-    const levelUpdatedAt = getLevelUpdatedAt();
+    const nameUpdatedAt     = getNameUpdatedAt();
+    const levelUpdatedAt    = getLevelUpdatedAt();
+    const localSettingsTs   = getSettingsUpdatedAt();
+    // Only push settings when local timestamp is at least as recent as the cloud
+    // timestamp cached from the preceding pullAll — same pattern as XP.
+    const pushSettings = !localSettingsTs || !_lastPulledSettingsTs || localSettingsTs >= _lastPulledSettingsTs;
     await supabase.from('profiles').upsert({
       id: uid,
       // Only push name/level when we have a timestamp — prevents overwriting a newer
       // value from another device that already set the timestamp
       ...(nameUpdatedAt  !== null && { name: settings.name, name_updated_at: nameUpdatedAt }),
       ...(levelUpdatedAt !== null && { language_level: settings.languageLevel, language_level_updated_at: levelUpdatedAt }),
-      daily_goal: settings.dailyGoal,
-      default_accent: settings.defaultAccent,
-      auto_play_on_reveal: settings.autoPlayOnReveal,
-      session_size: settings.sessionSize,
-      font_size: settings.fontSize,
-      study_order: settings.studyOrder,
-      quiz_direction: settings.quizDirection,
-      reduce_motion: settings.reduceMotion,
-      show_on_leaderboard: settings.showOnLeaderboard ?? true,
+      ...(pushSettings && {
+        daily_goal:          settings.dailyGoal,
+        default_accent:      settings.defaultAccent,
+        auto_play_on_reveal: settings.autoPlayOnReveal,
+        session_size:        settings.sessionSize,
+        font_size:           settings.fontSize,
+        study_order:         settings.studyOrder,
+        quiz_direction:      settings.quizDirection,
+        reduce_motion:       settings.reduceMotion,
+        show_on_leaderboard: settings.showOnLeaderboard ?? true,
+        settings_updated_at: localSettingsTs ?? new Date().toISOString(),
+      }),
       ...(avatarUrl !== null && { avatar_url: avatarUrl }),
     });
 
+    // Only push XP when the local timestamp is at least as recent as the cloud
+    // timestamp cached during the preceding pullAll. This prevents a stale tab
+    // (lower XP, older timestamp) from overwriting a tab that just earned more.
+    const localXpTs = ls(K.xpUpdatedAt);
+    const pushXp = !localXpTs || !_lastPulledXpTs || localXpTs >= _lastPulledXpTs;
     await supabase.from('user_stats').upsert({
       id: uid,
-      xp: getXP(),
+      ...(pushXp ? { xp: getXP(), xp_updated_at: localXpTs ?? new Date().toISOString() } : {}),
       today_xp: getTodayXP(),
       today_xp_date: ls(K.todayXpDate),
       today_count: parseInt(ls(K.todayCount) ?? '0', 10),
@@ -126,7 +145,7 @@ export async function pushAll(uid: string) {
       total_days: getTotalStudyDays(),
       study_days: getStudyDays(),
       freezes: getFreezes(),
-      last_freeze_week: (() => { const v = ls(K.lastFreezeWeek); return (v && /^\d{4}-W\d{1,2}$/.test(JSON.parse(v))) ? JSON.parse(v) : null; })(),
+      last_freeze_week: (() => { try { const v = ls(K.lastFreezeWeek); return (v && /^\d{4}-W\d{1,2}$/.test(JSON.parse(v))) ? JSON.parse(v) : null; } catch { return null; } })(),
     });
 
     // learned_words — deduplicate by word
@@ -251,7 +270,8 @@ export async function pushAll(uid: string) {
       if (isNaN(dayNumber)) continue;
       const raw = localStorage.getItem(key);
       if (!raw) continue;
-      const p = JSON.parse(raw);
+      let p: { learnDone?: boolean; flashcardDone?: boolean; quizDone?: boolean; completedAt?: string | null };
+      try { p = JSON.parse(raw); } catch { continue; }
       localRows.push({
         collection_name: collectionName, day_number: dayNumber,
         learn_done: p.learnDone ?? false,
@@ -305,7 +325,8 @@ export async function pushUnitProgressCurrentUser(collectionName: string, dayNum
     const keyOld = `lexivo_unit_progress_${collectionName}_${dayNumber}`;
     const raw = typeof window !== 'undefined' ? (localStorage.getItem(key) ?? localStorage.getItem(keyOld)) : null;
     if (!raw) return;
-    const p = JSON.parse(raw);
+    let p: { learnDone?: boolean; flashcardDone?: boolean; quizDone?: boolean; completedAt?: string | null };
+    try { p = JSON.parse(raw); } catch { return; }
     const learnDone     = p.learnDone     ?? false;
     const flashcardDone = p.flashcardDone ?? false;
     const quizDone      = p.quizDone      ?? false;
@@ -343,6 +364,7 @@ export async function pushUnitProgressCurrentUser(collectionName: string, dayNum
 // ── Pull: Supabase → localStorage ─────────────────────────────────────────────
 
 export async function pullAll(uid: string) {
+  if (typeof window !== 'undefined' && localStorage.getItem('lexivo_resetting') === '1') return;
   const SNAPSHOT_KEY = 'lexivo_pull_snapshot';
 
   // Snapshot current localStorage state so we can rollback if pullAll throws mid-write
@@ -393,6 +415,7 @@ export async function pullAll(uid: string) {
       warnMissing('profiles', p as unknown as Record<string, unknown>, [
         'name','daily_goal','default_accent','auto_play_on_reveal','session_size',
         'font_size','study_order','quiz_direction','reduce_motion','show_on_leaderboard',
+        'settings_updated_at',
       ]);
       // Record reset_at so checkAndHandleReset won't re-fire on fresh browser sessions
       const resetAt = p.reset_at;
@@ -407,23 +430,32 @@ export async function pullAll(uid: string) {
       const localLevelTs  = getLevelUpdatedAt();
       const useRemoteLevel = remoteLevelTs !== null && (localLevelTs === null || remoteLevelTs > localLevelTs);
 
+      // Cache for the subsequent pushAll check in this sync cycle.
+      const remoteSettingsTs = p.settings_updated_at;
+      _lastPulledSettingsTs  = remoteSettingsTs;
+      const localSettingsTs  = ls(K.settingsUpdatedAt);
+      // Keep local only when both timestamps exist and local is strictly newer.
+      // When either is missing we default to remote so new devices inherit cloud settings.
+      const useRemoteSettings = localSettingsTs === null || remoteSettingsTs === null || remoteSettingsTs >= localSettingsTs;
+
       saveSettings({
-        name:             useRemoteName  ? (p.name           ?? 'Learner') : existing.name,
-        languageLevel:    useRemoteLevel ? (p.language_level ?? 'B1')      : existing.languageLevel,
-        dailyGoal:        p.daily_goal       ?? 10,
-        defaultAccent:    p.default_accent   ?? 'us',
-        autoPlayOnReveal: p.auto_play_on_reveal ?? true,
-        sessionSize:      p.session_size     ?? 20,
-        fontSize:         p.font_size        ?? 'normal',
-        studyOrder:       p.study_order      ?? 'random',
-        quizDirection:    p.quiz_direction   ?? 'word-to-uz',
-        reduceMotion:     p.reduce_motion    ?? false,
-        showOnLeaderboard:p.show_on_leaderboard ?? true,
+        name:             useRemoteName     ? (p.name                  ?? 'Learner')      : existing.name,
+        languageLevel:    useRemoteLevel    ? (p.language_level        ?? 'B1')           : existing.languageLevel,
+        dailyGoal:        useRemoteSettings ? (p.daily_goal            ?? 10)             : existing.dailyGoal,
+        defaultAccent:    useRemoteSettings ? (p.default_accent        ?? 'us')           : existing.defaultAccent,
+        autoPlayOnReveal: useRemoteSettings ? (p.auto_play_on_reveal   ?? true)           : existing.autoPlayOnReveal,
+        sessionSize:      useRemoteSettings ? (p.session_size          ?? 20)             : existing.sessionSize,
+        fontSize:         useRemoteSettings ? (p.font_size             ?? 'normal')       : existing.fontSize,
+        studyOrder:       useRemoteSettings ? (p.study_order           ?? 'random')       : existing.studyOrder,
+        quizDirection:    useRemoteSettings ? (p.quiz_direction        ?? 'word-to-uz')   : existing.quizDirection,
+        reduceMotion:     useRemoteSettings ? (p.reduce_motion         ?? false)          : existing.reduceMotion,
+        showOnLeaderboard:useRemoteSettings ? (p.show_on_leaderboard   ?? true)           : existing.showOnLeaderboard,
         uiLanguage:       existing.uiLanguage,
       });
       setOnboarded();
-      if (useRemoteName && remoteNameTs) saveNameUpdatedAt(remoteNameTs);
-      if (useRemoteLevel && remoteLevelTs) saveLevelUpdatedAt(remoteLevelTs);
+      if (useRemoteName     && remoteNameTs)     saveNameUpdatedAt(remoteNameTs);
+      if (useRemoteLevel    && remoteLevelTs)    saveLevelUpdatedAt(remoteLevelTs);
+      if (useRemoteSettings && remoteSettingsTs) saveSettingsUpdatedAt(remoteSettingsTs);
       if (p.avatar_url) saveProfilePicUrl(p.avatar_url);
     }
 
@@ -432,11 +464,17 @@ export async function pullAll(uid: string) {
     if (stats) {
       const s = stats as unknown as StatsRow;
       warnMissing('user_stats', s as unknown as Record<string, unknown>, [
-        'xp','streak','freezes','total_days','today_xp','today_xp_date',
+        'xp','xp_updated_at','streak','freezes','total_days','today_xp','today_xp_date',
         'today_count','today_count_date','last_study_date','last_freeze_week','study_days',
       ]);
-      // Accumulating counters: take max so locally earned progress isn't overwritten by a stale cloud value
-      set(K.xp,     Math.max(parseInt(ls(K.xp)      ?? '0', 10), s.xp      ?? 0));
+      // Cache cloud xp_updated_at so pushAll can skip the XP upsert when cloud is newer
+      _lastPulledXpTs = s.xp_updated_at ?? null;
+      // Accumulating counters: take max so locally earned progress isn't overwritten by a stale cloud value.
+      // When cloud XP wins, also sync the timestamp so this tab agrees on which version is canonical.
+      const localXp = parseInt(ls(K.xp) ?? '0', 10);
+      const cloudXp = s.xp ?? 0;
+      set(K.xp, Math.max(localXp, cloudXp));
+      if (cloudXp > localXp && s.xp_updated_at) set(K.xpUpdatedAt, s.xp_updated_at);
       set(K.streak, Math.max(parseInt(ls(K.streak)  ?? '0', 10), s.streak  ?? 0));
       set(K.freezes,Math.max(parseInt(ls(K.freezes) ?? '0', 10), s.freezes ?? 0));
       set(K.totalDays, s.total_days ?? 0);
@@ -481,12 +519,14 @@ export async function pullAll(uid: string) {
       if (!w) continue;
       const key = `${w.word}_${w.collectionName}`;
       const existing = localMap.get(key);
-      const cloudStage = (w.reviewStage ?? 0);
+      // Clamp before comparing so corrupt cloud values (e.g. reviewStage: 99) cannot
+      // beat a valid local value in the merge, and never land in localStorage unclamped.
+      const cloudStage = Math.min(Math.max((w.reviewStage ?? 0), 0), 4);
       const localStage = (existing?.reviewStage ?? 0);
       const cloudWins = !existing ||
         cloudStage > localStage ||
         (cloudStage === localStage && (w.nextReviewDate ?? '') > (existing.nextReviewDate ?? ''));
-      if (cloudWins) localMap.set(key, w);
+      if (cloudWins) localMap.set(key, { ...w, reviewStage: cloudStage });
     }
     // Write if cloud responded (even empty) — backfills id for any word still missing it
     if (srsRows !== null && localMap.size > 0) {
@@ -495,15 +535,41 @@ export async function pullAll(uid: string) {
       ));
     }
 
-    // learned_words — merge: keep local, add remote words not already in local
-    const { data: learnedRows } = await supabase.from('learned_words').select('word,collection,learned_at').eq('user_id', uid);
-    if (learnedRows && learnedRows.length > 0) {
+    // learned_words — delta merge: only fetch rows newer than the last pull watermark.
+    // On the first pull (no watermark) the full table is fetched; subsequent pulls are cheap
+    // index scans returning only newly learned words, cutting bandwidth by ~99% for active users.
+    // Supabase's default page size is 1000, so we paginate to handle users with 1000+ words.
+    const lastLearnedPullAt = ls(K.lastLearnedPullAt);
+    const LEARNED_PAGE = 1000;
+    let learnedRows: { word: string; collection: string | null; learned_at: string | null }[] = [];
+    let learnedQueryOk = true;
+    for (let offset = 0; ; offset += LEARNED_PAGE) {
+      let q = supabase
+        .from('learned_words')
+        .select('word,collection,learned_at')
+        .eq('user_id', uid)
+        .range(offset, offset + LEARNED_PAGE - 1);
+      if (lastLearnedPullAt) q = q.gt('learned_at', lastLearnedPullAt);
+      const { data: page, error } = await q;
+      if (error) { learnedQueryOk = false; break; }
+      if (!page || page.length === 0) break;
+      learnedRows.push(...page);
+      if (page.length < LEARNED_PAGE) break; // last page — no need for another round-trip
+    }
+    if (learnedRows.length > 0) {
       const local = getLearnedWords();
       const localKeys = new Set(local.map(w => w.word));
       const toAdd = learnedRows
         .filter(r => !localKeys.has(r.word))
         .map(r => ({ word: r.word, collectionName: r.collection ?? '', learnedAt: r.learned_at ?? new Date().toISOString(), translation: '', topic: '', dayNumber: 0 }));
       if (toAdd.length > 0) set(K.learned, [...local, ...toAdd]);
+      // Advance the watermark to the latest learned_at in this batch
+      const maxTs = learnedRows.reduce((m, r) => ((r.learned_at ?? '') > m ? (r.learned_at ?? '') : m), '');
+      if (maxTs) set(K.lastLearnedPullAt, maxTs);
+    } else if (learnedQueryOk && !lastLearnedPullAt) {
+      // First pull returned empty (new user with no learned words) — record the baseline
+      // so future pulls use delta from this point forward
+      set(K.lastLearnedPullAt, new Date().toISOString());
     }
 
     // starred_words — authoritative replace: cloud state wins so removals propagate cross-device
@@ -545,7 +611,9 @@ export async function pullAll(uid: string) {
         for (const r of typedRows) {
           const key = `lexivo_unit_progress_${r.collection_name}§${r.day_number}`;
           const existing = localStorage.getItem(key);
-          const local = existing ? JSON.parse(existing) : { learnDone: false, flashcardDone: false, quizDone: false };
+          let local: { learnDone: boolean; flashcardDone: boolean; quizDone: boolean; completedAt?: string | null };
+          try { local = existing ? JSON.parse(existing) : { learnDone: false, flashcardDone: false, quizDone: false }; }
+          catch { local = { learnDone: false, flashcardDone: false, quizDone: false }; }
           localStorage.setItem(key, JSON.stringify({
             learnDone:     local.learnDone     || (r.learn_done      ?? false),
             flashcardDone: local.flashcardDone || (r.flashcard_done  ?? false),
@@ -559,7 +627,8 @@ export async function pullAll(uid: string) {
     // achievements — merge with local
     const { data: achievementRows } = await supabase.from('achievements').select('achievement_id').eq('user_id', uid);
     if (achievementRows && achievementRows.length > 0 && typeof window !== 'undefined') {
-      const local: string[] = JSON.parse(localStorage.getItem('lexivo_achievements') || '[]');
+      let local: string[] = [];
+      try { local = JSON.parse(localStorage.getItem('lexivo_achievements') || '[]'); } catch { local = []; }
       const merged = Array.from(new Set([...local, ...achievementRows.map(r => r.achievement_id as string)]));
       set('lexivo_achievements', merged);
     }
@@ -585,24 +654,28 @@ export async function pullAll(uid: string) {
       // Update folder map from cloud data so cross-device pulls restore folder assignments
       for (const r of importedRows) {
         if (r.folder_name && r.collection_name) {
-          updateFolderMap(r.collection_name as string, r.folder_name as string);
+          updateFolderMap(
+            (r.collection_name as string).slice(0, 200),
+            (r.folder_name as string).slice(0, 200),
+          );
         }
       }
       const cloudWords = importedRows.map(r => {
-        const key = `${(r.word as string).toLowerCase()}__${(r.collection_name ?? 'My Words').toLowerCase()}`;
+        const colName = ((r.collection_name as string) ?? 'My Words').slice(0, 200);
+        const key = `${(r.word as string).toLowerCase()}__${colName.toLowerCase()}`;
         const localMatch = localByKey.get(key);
         return {
-          word: r.word as string,
-          translation: (r.translation as string) ?? '',
-          definition: (r.definition as string) ?? '',
-          example1: (r.example1 as string) ?? '',
-          example1Translation: (r.example1_translation as string) ?? '',
-          example2: (r.example2 as string) ?? '',
-          example2Translation: (r.example2_translation as string) ?? '',
-          language: (r.language as string) ?? 'en-US',
+          word: (r.word as string).slice(0, 100),
+          translation: ((r.translation as string) ?? '').slice(0, 300),
+          definition: ((r.definition as string) ?? '').slice(0, 1000),
+          example1: ((r.example1 as string) ?? '').slice(0, 500),
+          example1Translation: ((r.example1_translation as string) ?? '').slice(0, 500),
+          example2: ((r.example2 as string) ?? '').slice(0, 500),
+          example2Translation: ((r.example2_translation as string) ?? '').slice(0, 500),
+          language: ((r.language as string) ?? 'en-US').slice(0, 20),
           addedAt: (r.added_at as number) ?? 0,
-          collectionName: (r.collection_name as string) ?? 'My Words',
-          folderName: (r.folder_name as string | null) ?? localMatch?.folderName,
+          collectionName: colName,
+          folderName: ((r.folder_name as string | null) ?? localMatch?.folderName)?.slice(0, 200),
         } as ImportedWord;
       });
       // Preserve any local-only words not yet in Supabase (just imported, push pending)
@@ -679,9 +752,15 @@ const BASE_INTERVAL_MS  = 30_000;
 const MAX_INTERVAL_MS   = 10 * 60_000; // 10 minutes
 const MAX_FAILURES      = 10;
 
-let _syncTimer:    ReturnType<typeof setTimeout> | null = null;
-let _syncStopped   = false;
-let _failureCount  = 0;
+let _syncTimer:      ReturnType<typeof setTimeout> | null = null;
+let _syncStopped     = false;
+let _failureCount    = 0;
+// Cached xp_updated_at from the last pullAll — used by pushAll to skip the xp
+// upsert when the cloud value is newer, preventing a stale tab from overwriting XP.
+let _lastPulledXpTs: string | null = null;
+// Same pattern for settings_updated_at: cache cloud timestamp so pushAll can
+// skip the settings upsert when the cloud value is newer than the local one.
+let _lastPulledSettingsTs: string | null = null;
 
 function dispatch(name: string) {
   if (typeof window !== 'undefined') window.dispatchEvent(new Event(name));
@@ -694,6 +773,21 @@ function scheduleSync(uid: string, delayMs: number) {
 
 async function runSync(uid: string) {
   if (_syncStopped) return;
+  // Skip sync entirely while a reset is in progress — pushAll would overwrite
+  // the just-cleared localStorage with zeros back to Supabase, and pullAll
+  // would restore deleted rows. The resetting tab calls stopSync() after this
+  // window, but other tabs only see the flag via localStorage.
+  if (typeof window !== 'undefined' && localStorage.getItem('lexivo_resetting') === '1') return;
+  // Refresh the JWT before any Supabase calls. If the refresh token is gone
+  // (user cleared cookies, server revoked session, etc.) stop the sync loop
+  // rather than silently failing every 30 seconds.
+  const { error: refreshError } = await supabase.auth.refreshSession();
+  if (refreshError) {
+    console.warn('[sync] Session refresh failed — stopping sync:', refreshError.message);
+    stopSync();
+    dispatch('lexivo-sync-suspended');
+    return;
+  }
   dispatch('lexivo-sync-start');
   try {
     const wasReset = await checkAndHandleReset(uid);
