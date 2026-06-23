@@ -772,16 +772,17 @@ export function getHardWordCount(collectionName: string, dayNumber: number): num
   ).length;
 }
 
-export function saveFlashcardProgress(collectionName: string, dayNumber: number, remainingWordIds: string[]): void {
-  set(`lexivo_flashcard_progress_${collectionName}_${dayNumber}`, remainingWordIds);
+export function saveFlashcardProgress(collectionName: string, dayNumber: number, index: number): void {
+  set(`lexivo_flashcard_idx_${collectionName}_${dayNumber}`, index);
 }
 
-export function getFlashcardProgress(collectionName: string, dayNumber: number): string[] | null {
-  return get<string[] | null>(`lexivo_flashcard_progress_${collectionName}_${dayNumber}`, null);
+export function getFlashcardProgress(collectionName: string, dayNumber: number): number | null {
+  return get<number | null>(`lexivo_flashcard_idx_${collectionName}_${dayNumber}`, null);
 }
 
 export function clearFlashcardProgress(collectionName: string, dayNumber: number): void {
   if (typeof window === 'undefined') return;
+  localStorage.removeItem(`lexivo_flashcard_idx_${collectionName}_${dayNumber}`);
   localStorage.removeItem(`lexivo_flashcard_progress_${collectionName}_${dayNumber}`);
 }
 

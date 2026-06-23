@@ -138,14 +138,10 @@ export default function FlashcardsPage() {
           clearFlashcardProgress(collectionName, dayNumber);
           setDeck(fullDeck);
         } else {
-          const saved = getFlashcardProgress(collectionName, dayNumber);
-          if (saved && saved.length > 0) {
-            const resumeDeck = saved
-              .map(id => fullDeck.find(w => w.word === id))
-              .filter((w): w is StudyWord => w !== undefined);
-            setDeck(resumeDeck.length > 0 ? resumeDeck : fullDeck);
-          } else {
-            setDeck(fullDeck);
+          const savedIndex = getFlashcardProgress(collectionName, dayNumber);
+          setDeck(fullDeck);
+          if (savedIndex !== null && savedIndex > 0 && savedIndex < fullDeck.length) {
+            setIndex(savedIndex);
           }
         }
       } else {
@@ -198,7 +194,7 @@ export default function FlashcardsPage() {
       setDone(true);
     } else {
       if (collectionName && dayNumber !== undefined && cardsSinceLastPush.current === 0) {
-        saveFlashcardProgress(collectionName, dayNumber, deck.slice(index + 1).map(w => w.word));
+        saveFlashcardProgress(collectionName, dayNumber, index + 1);
       }
       setIndex(i => i + 1);
       setSide('front');
