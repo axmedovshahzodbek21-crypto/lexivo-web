@@ -187,7 +187,7 @@ function LearnInner() {
     }
   }, [revealed]); // intentionally only on revealed change
 
-  const advanceCard = useCallback(() => {
+  const advanceCard = useCallback(async () => {
     if (!current) return;
     if (hardOnly) removeHardWord(current.word);
     const isNew = saveLearnedWord({
@@ -210,7 +210,7 @@ function LearnInner() {
       if (collectionName && words.length > 0) {
         markLearningComplete(collectionName, words[0].dayNumber);
         clearLearnProgress(collectionName, words[0].dayNumber);
-        pushUnitProgressCurrentUser(collectionName, words[0].dayNumber);
+        await pushUnitProgressCurrentUser(collectionName, words[0].dayNumber);
       }
       setDone(true);
     } else {
