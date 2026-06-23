@@ -164,54 +164,62 @@ export async function pushAll(uid: string) {
         );
     }
 
-    // unit_progress — fetch remote first and OR-merge so false never overwrites true
-    if (typeof window !== 'undefined') {
-      const localRows: {
-        collection_name: string; day_number: number;
-        learn_done: boolean; flashcard_done: boolean; quiz_done: boolean;
-      }[] = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (!key?.startsWith('lexivo_unit_progress_')) continue;
-        const suffix = key.slice('lexivo_unit_progress_'.length);
-        const lastUnderscore = suffix.lastIndexOf('_');
-        if (lastUnderscore === -1) continue;
-        const collectionName = suffix.slice(0, lastUnderscore);
-        const dayNumber = parseInt(suffix.slice(lastUnderscore + 1), 10);
-        if (isNaN(dayNumber)) continue;
-        const raw = localStorage.getItem(key);
-        if (!raw) continue;
-        const p = JSON.parse(raw);
-        localRows.push({
-          collection_name: collectionName, day_number: dayNumber,
-          learn_done: p.learnDone ?? false,
-          flashcard_done: p.flashcardDone ?? false,
-          quiz_done: p.quizDone ?? false,
-        });
-      }
-      for (const r of localRows) {
-        try {
-          const allDone = r.learn_done && r.flashcard_done && r.quiz_done;
-          const completedAt = allDone ? new Date().toISOString() : null;
-          const { data: updated } = await supabase
-            .from('unit_progress')
-            .update({ learn_done: r.learn_done, flashcard_done: r.flashcard_done, quiz_done: r.quiz_done, completed_at: completedAt })
-            .eq('user_id', uid)
-            .eq('collection_name', r.collection_name)
-            .eq('day_number', r.day_number)
-            .select('id');
-          if (!updated || updated.length === 0) {
-            await supabase.from('unit_progress').insert({
-              user_id: uid, collection_name: r.collection_name, day_number: r.day_number,
-              learn_done: r.learn_done, flashcard_done: r.flashcard_done, quiz_done: r.quiz_done,
-              completed_at: completedAt,
-            });
-          }
-        } catch (_) {}
-      }
-    }
   } catch (e) {
     console.error('pushAll error:', e);
+  }
+
+  // unit_progress — outside the outer try-catch so it always runs even if
+  // an earlier push step throws (e.g. a network error on imported_words).
+  if (typeof window !== 'undefined') {
+    const localRows: {
+      collection_name: string; day_number: number;
+      learn_done: boolean; flashcard_done: boolean; quiz_done: boolean;
+    }[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (!key?.startsWith('lexivo_unit_progress_')) continue;
+      const suffix = key.slice('lexivo_unit_progress_'.length);
+      const lastUnderscore = suffix.lastIndexOf('_');
+      if (lastUnderscore === -1) continue;
+      const collectionName = suffix.slice(0, lastUnderscore);
+      const dayNumber = parseInt(suffix.slice(lastUnderscore + 1), 10);
+      if (isNaN(dayNumber)) continue;
+      const raw = localStorage.getItem(key);
+      if (!raw) continue;
+      const p = JSON.parse(raw);
+      localRows.push({
+        collection_name: collectionName, day_number: dayNumber,
+        learn_done: p.learnDone ?? false,
+        flashcard_done: p.flashcardDone ?? false,
+        quiz_done: p.quizDone ?? false,
+      });
+    }
+    console.log('[unit_progress] periodic push: found', localRows.length, 'local rows');
+    for (const r of localRows) {
+      try {
+        const allDone = r.learn_done && r.flashcard_done && r.quiz_done;
+        const completedAt = allDone ? new Date().toISOString() : null;
+        const { data: updated, error: updateErr } = await supabase
+          .from('unit_progress')
+          .update({ learn_done: r.learn_done, flashcard_done: r.flashcard_done, quiz_done: r.quiz_done, completed_at: completedAt })
+          .eq('user_id', uid)
+          .eq('collection_name', r.collection_name)
+          .eq('day_number', r.day_number)
+          .select('id');
+        if (updateErr) console.warn('[unit_progress] update error for', r.collection_name, r.day_number, updateErr);
+        if (!updated || updated.length === 0) {
+          const { error: insertErr } = await supabase.from('unit_progress').insert({
+            user_id: uid, collection_name: r.collection_name, day_number: r.day_number,
+            learn_done: r.learn_done, flashcard_done: r.flashcard_done, quiz_done: r.quiz_done,
+            completed_at: completedAt,
+          });
+          if (insertErr) console.error('[unit_progress] insert error for', r.collection_name, r.day_number, insertErr);
+          else console.log('[unit_progress] inserted', r.collection_name, r.day_number);
+        }
+      } catch (e) {
+        console.error('[unit_progress] unexpected error for', r.collection_name, r.day_number, e);
+      }
+    }
   }
 }
 
@@ -242,9 +250,9 @@ export async function pushUnitProgressCurrentUser(collectionName: string, dayNum
       .eq('collection_name', collectionName)
       .eq('day_number', dayNumber)
       .select('id');
-    if (updateErr) { console.error('[unit_progress] update error:', updateErr); return; }
+    if (updateErr) console.error('[unit_progress] update error:', updateErr);
 
-    // No existing row — INSERT
+    // No existing row (or update failed) — INSERT
     if (!updated || updated.length === 0) {
       const { error: insertErr } = await supabase.from('unit_progress').insert({
         user_id: user.id,
