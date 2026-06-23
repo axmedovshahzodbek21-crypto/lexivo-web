@@ -70,7 +70,7 @@ export default function LeaderboardPage() {
   const load = async () => {
     setLoading(true);
     setError('');
-    const { data, error: err } = await supabase.rpc('get_leaderboard');
+    const { data, error: err } = await supabase.rpc('get_leaderboard').limit(500);
     if (err) {
       setError('Could not load leaderboard. Please try again.');
     } else {
