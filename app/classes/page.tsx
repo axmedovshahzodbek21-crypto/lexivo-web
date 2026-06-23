@@ -375,109 +375,6 @@ export default function ClassesPage() {
           <SectionLoader />
         ) : (
           <>
-            {/* My Classes (Teacher) */}
-            <section>
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="font-bold text-[var(--text)]">My Classes</h2>
-                <button onClick={() => setShowCreate(true)} className="btn-primary text-sm px-3 py-1.5">+ Create</button>
-              </div>
-              {myClasses.length === 0 ? (
-                <div className="card py-8 px-6 space-y-6">
-                  <div className="text-center space-y-2">
-                    <div className="w-16 h-16 rounded-2xl bg-[var(--primary-bg)] flex items-center justify-center text-3xl mx-auto">👩‍🏫</div>
-                    <h3 className="font-bold text-lg text-[var(--text)]">Set up your first class</h3>
-                    <p className="text-sm text-[var(--text-muted)]">Track every student&apos;s progress — words learned, streaks, quiz scores, and more.</p>
-                  </div>
-                  <div className="space-y-3">
-                    {([
-                      { icon: '✏️', title: 'Create a class', desc: 'Give it a name — a unique join code is generated automatically.' },
-                      { icon: '📤', title: 'Share the code', desc: 'Students enter it in the app to join your class instantly.' },
-                      { icon: '📊', title: 'Watch their progress', desc: 'See XP, streaks, units completed, quiz results, and more.' },
-                    ] as { icon: string; title: string; desc: string }[]).map((step, i) => (
-                      <div key={i} className="flex items-start gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-[var(--primary-bg)] flex items-center justify-center text-lg shrink-0">{step.icon}</div>
-                        <div>
-                          <p className="text-sm font-semibold text-[var(--text)]">{step.title}</p>
-                          <p className="text-xs text-[var(--text-muted)] mt-0.5">{step.desc}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <button onClick={() => setShowCreate(true)} className="btn-primary w-full py-3 text-sm">
-                    Create your first class →
-                  </button>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {myClasses.map(cls => (
-                    <div key={cls.id} className="card">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex-1 min-w-0">
-                          {renamingId === cls.id ? (
-                            <div className="flex items-center gap-2">
-                              <input
-                                autoFocus
-                                value={renameText}
-                                onChange={e => setRenameText(e.target.value)}
-                                onKeyDown={e => { if (e.key === 'Enter') saveRename(cls.id); if (e.key === 'Escape') setRenamingId(null); }}
-                                className="flex-1 px-2 py-1 rounded-lg border border-[var(--primary)] bg-[var(--surface-2)] text-[var(--text)] text-sm font-bold focus:outline-none"
-                              />
-                              <button onClick={() => saveRename(cls.id)} disabled={renaming || !renameText.trim()} className="text-xs font-bold text-[var(--primary)] disabled:opacity-50" aria-label="Save rename">✓</button>
-                              <button onClick={() => setRenamingId(null)} className="text-xs text-[var(--text-muted)]" aria-label="Cancel rename">✕</button>
-                            </div>
-                          ) : (
-                            <div className="flex items-center gap-1.5">
-                              <p className="font-bold text-[var(--text)]">{cls.name}</p>
-                              <button onClick={() => startRename(cls)} className="text-[var(--text-muted)] hover:text-[var(--primary)] transition-colors text-xs" aria-label="Rename class">✏️</button>
-                            </div>
-                          )}
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className="text-xs text-[var(--text-muted)]">Code:</span>
-                            <code className="text-xs font-bold text-[var(--primary)] bg-[var(--primary-bg)] px-2 py-0.5 rounded-lg">{cls.join_code}</code>
-                            <button onClick={() => copyCode(cls.join_code, cls.id)} className="text-sm hover:scale-110 transition-transform" aria-label="Copy join code">
-                              {copiedId === cls.id ? '✅' : '📋'}
-                            </button>
-                          </div>
-                          <button
-                            onClick={() => copyLink(cls.join_code, cls.id)}
-                            className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-[var(--text-muted)] hover:text-[var(--primary)] transition-colors"
-                          >
-                            {copiedLinkId === cls.id ? '✅ Link copied!' : '🔗 Copy invite link'}
-                          </button>
-                          <p className="text-xs text-[var(--text-muted)] mt-1">👥 {cls.member_count} student{cls.member_count !== 1 ? 's' : ''}</p>
-                        </div>
-                        <div className="flex flex-col gap-2 shrink-0">
-                          <button onClick={() => router.push(`/classes/${cls.id}`)} className="btn-primary text-xs px-3 py-1.5">Dashboard →</button>
-                          <button onClick={() => deleteClass(cls.id)} className="btn-danger-ghost">Delete</button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </section>
-
-            {/* Join a Class */}
-            <section>
-              <h2 className="font-bold text-[var(--text)] mb-3">Join a Class</h2>
-              <div className="card space-y-3">
-                <p className="text-sm text-[var(--text-muted)]">Enter the code your teacher gave you</p>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="e.g. LEXI-8X2K"
-                    value={joinCode}
-                    onChange={e => setJoinCode(e.target.value.toUpperCase())}
-                    onKeyDown={e => e.key === 'Enter' && joinClass()}
-                    className="flex-1 px-4 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm font-mono focus:outline-none focus:border-[var(--primary)]"
-                    maxLength={9}
-                  />
-                  <button onClick={joinClass} className="btn-primary text-sm px-4">Join</button>
-                </div>
-                {joinError && <p className="text-xs text-[var(--danger)]">{joinError}</p>}
-              </div>
-            </section>
-
             {/* Classes I'm a student in */}
             {joinedClasses.length > 0 && (
               <section>
@@ -723,6 +620,109 @@ export default function ClassesPage() {
                 </div>
               </section>
             )}
+
+            {/* My Classes (Teacher) */}
+            <section>
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="font-bold text-[var(--text)]">My Classes</h2>
+                <button onClick={() => setShowCreate(true)} className="btn-primary text-sm px-3 py-1.5">+ Create</button>
+              </div>
+              {myClasses.length === 0 ? (
+                <div className="card py-8 px-6 space-y-6">
+                  <div className="text-center space-y-2">
+                    <div className="w-16 h-16 rounded-2xl bg-[var(--primary-bg)] flex items-center justify-center text-3xl mx-auto">👩‍🏫</div>
+                    <h3 className="font-bold text-lg text-[var(--text)]">Set up your first class</h3>
+                    <p className="text-sm text-[var(--text-muted)]">Track every student&apos;s progress — words learned, streaks, quiz scores, and more.</p>
+                  </div>
+                  <div className="space-y-3">
+                    {([
+                      { icon: '✏️', title: 'Create a class', desc: 'Give it a name — a unique join code is generated automatically.' },
+                      { icon: '📤', title: 'Share the code', desc: 'Students enter it in the app to join your class instantly.' },
+                      { icon: '📊', title: 'Watch their progress', desc: 'See XP, streaks, units completed, quiz results, and more.' },
+                    ] as { icon: string; title: string; desc: string }[]).map((step, i) => (
+                      <div key={i} className="flex items-start gap-3">
+                        <div className="w-9 h-9 rounded-xl bg-[var(--primary-bg)] flex items-center justify-center text-lg shrink-0">{step.icon}</div>
+                        <div>
+                          <p className="text-sm font-semibold text-[var(--text)]">{step.title}</p>
+                          <p className="text-xs text-[var(--text-muted)] mt-0.5">{step.desc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <button onClick={() => setShowCreate(true)} className="btn-primary w-full py-3 text-sm">
+                    Create your first class →
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {myClasses.map(cls => (
+                    <div key={cls.id} className="card">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          {renamingId === cls.id ? (
+                            <div className="flex items-center gap-2">
+                              <input
+                                autoFocus
+                                value={renameText}
+                                onChange={e => setRenameText(e.target.value)}
+                                onKeyDown={e => { if (e.key === 'Enter') saveRename(cls.id); if (e.key === 'Escape') setRenamingId(null); }}
+                                className="flex-1 px-2 py-1 rounded-lg border border-[var(--primary)] bg-[var(--surface-2)] text-[var(--text)] text-sm font-bold focus:outline-none"
+                              />
+                              <button onClick={() => saveRename(cls.id)} disabled={renaming || !renameText.trim()} className="text-xs font-bold text-[var(--primary)] disabled:opacity-50" aria-label="Save rename">✓</button>
+                              <button onClick={() => setRenamingId(null)} className="text-xs text-[var(--text-muted)]" aria-label="Cancel rename">✕</button>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-1.5">
+                              <p className="font-bold text-[var(--text)]">{cls.name}</p>
+                              <button onClick={() => startRename(cls)} className="text-[var(--text-muted)] hover:text-[var(--primary)] transition-colors text-xs" aria-label="Rename class">✏️</button>
+                            </div>
+                          )}
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-xs text-[var(--text-muted)]">Code:</span>
+                            <code className="text-xs font-bold text-[var(--primary)] bg-[var(--primary-bg)] px-2 py-0.5 rounded-lg">{cls.join_code}</code>
+                            <button onClick={() => copyCode(cls.join_code, cls.id)} className="text-sm hover:scale-110 transition-transform" aria-label="Copy join code">
+                              {copiedId === cls.id ? '✅' : '📋'}
+                            </button>
+                          </div>
+                          <button
+                            onClick={() => copyLink(cls.join_code, cls.id)}
+                            className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-[var(--text-muted)] hover:text-[var(--primary)] transition-colors"
+                          >
+                            {copiedLinkId === cls.id ? '✅ Link copied!' : '🔗 Copy invite link'}
+                          </button>
+                          <p className="text-xs text-[var(--text-muted)] mt-1">👥 {cls.member_count} student{cls.member_count !== 1 ? 's' : ''}</p>
+                        </div>
+                        <div className="flex flex-col gap-2 shrink-0">
+                          <button onClick={() => router.push(`/classes/${cls.id}`)} className="btn-primary text-xs px-3 py-1.5">Dashboard →</button>
+                          <button onClick={() => deleteClass(cls.id)} className="btn-danger-ghost">Delete</button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+
+            {/* Join a Class */}
+            <section>
+              <h2 className="font-bold text-[var(--text)] mb-3">Join a Class</h2>
+              <div className="card space-y-3">
+                <p className="text-sm text-[var(--text-muted)]">Enter the code your teacher gave you</p>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="e.g. LEXI-8X2K"
+                    value={joinCode}
+                    onChange={e => setJoinCode(e.target.value.toUpperCase())}
+                    onKeyDown={e => e.key === 'Enter' && joinClass()}
+                    className="flex-1 px-4 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm font-mono focus:outline-none focus:border-[var(--primary)]"
+                    maxLength={9}
+                  />
+                  <button onClick={joinClass} className="btn-primary text-sm px-4">Join</button>
+                </div>
+                {joinError && <p className="text-xs text-[var(--danger)]">{joinError}</p>}
+              </div>
+            </section>
           </>
         )}
       </div>
