@@ -6,6 +6,7 @@ import { speak, speakText } from '@/lib/speech';
 import { getDueWords, updateSRSWord, addXP, recordStudySession, unlockAchievement, getSRSWords, removeSRSWord, resetSRSWord } from '@/lib/storage';
 import { stageLabel, stageColor } from '@/lib/srs';
 import { checkAchievements } from '@/lib/gamification';
+import { pushAllCurrentUser } from '@/lib/web-sync';
 import { XP_PER_SRS } from '@/lib/types';
 import type { SRSWord } from '@/lib/types';
 import Link from 'next/link';
@@ -83,6 +84,7 @@ export default function SRSReviewPage() {
       unlockAchievement('srs_first');
     }
     recordStudySession();
+    pushAllCurrentUser();
     setResults(r => [...r, { id: current.id, success }]);
     const newAchievements = checkAchievements();
     newAchievements.forEach(pushAchievement);
