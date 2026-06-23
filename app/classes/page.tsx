@@ -56,6 +56,8 @@ interface ClassWord {
   example1_translation: string | null;
   example2: string | null;
   example2_translation: string | null;
+  folder_name: string | null;
+  collection_name: string | null;
 }
 
 interface Announcement {
@@ -109,7 +111,7 @@ export default function ClassesPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [classWords, setClassWords] = useState<Record<string, ClassWord[]>>({});
   const [learnedWordIds, setLearnedWordIds] = useState<Set<string>>(new Set<string>());
-  const [flashcard, setFlashcard] = useState<{ classId: string; index: number; flipped: boolean } | null>(null);
+  const [flashcard, setFlashcard] = useState<{ words: ClassWord[]; label: string; index: number; flipped: boolean } | null>(null);
 
   const loadAnnouncements = async (classIds: string[]) => {
     const { data } = await supabase
@@ -164,7 +166,7 @@ export default function ClassesPage() {
     if (classIds.length === 0) return;
     const { data: wordData } = await supabase
       .from('class_words')
-      .select('id, class_id, word, translation, definition, example1, example1_translation, example2, example2_translation')
+      .select('id, class_id, word, translation, definition, example1, example1_translation, example2, example2_translation, folder_name, collection_name')
       .in('class_id', classIds)
       .order('created_at', { ascending: true });
     if (wordData) {
@@ -352,9 +354,8 @@ export default function ClassesPage() {
     );
   }
 
-  const fcWords = flashcard ? (classWords[flashcard.classId] ?? []) : [];
+  const fcWords = flashcard?.words ?? [];
   const fcWord = flashcard && fcWords.length > 0 ? (fcWords[flashcard.index] ?? null) : null;
-  const fcClass = flashcard ? joinedClasses.find(c => c.id === flashcard.classId) ?? null : null;
   const fcLearnedCount = fcWords.filter(w => learnedWordIds.has(w.id)).length;
   const fcIsLearned = fcWord ? learnedWordIds.has(fcWord.id) : false;
 
@@ -489,9 +490,6 @@ export default function ClassesPage() {
                     const activeTargets = targets.filter(t => !t.completed_at);
                     const doneTargets = targets.filter(t => t.completed_at);
                     const hw = classWords[cls.id] ?? [];
-                    const hwLearnedCount = hw.filter(w => learnedWordIds.has(w.id)).length;
-                    const hwPct = hw.length === 0 ? 0 : (hwLearnedCount / hw.length) * 100;
-                    const hwAllDone = hw.length > 0 && hwLearnedCount === hw.length;
 
                     return (
                       <div key={cls.id} className="card space-y-3">
@@ -650,53 +648,75 @@ export default function ClassesPage() {
                           </div>
                         )}
 
-                        {/* Homework words */}
-                        {hw.length > 0 && (
-                          <div className="space-y-2 border-t border-[var(--border)] pt-3">
-                            <div className="flex items-center justify-between gap-2">
+                        {/* Homework words — grouped by folder → unit */}
+                        {hw.length > 0 && (() => {
+                          // Build folder → collection → words hierarchy
+                          const grouped: Record<string, Record<string, ClassWord[]>> = {};
+                          for (const w of hw) {
+                            const folder = w.folder_name ?? '';
+                            const col = w.collection_name ?? '';
+                            if (!grouped[folder]) grouped[folder] = {};
+                            if (!grouped[folder][col]) grouped[folder][col] = [];
+                            grouped[folder][col].push(w);
+                          }
+                          const studyBtns = (words: ClassWord[], label: string) => (
+                            <div className="flex gap-1.5 shrink-0">
+                              <button
+                                onClick={() => {
+                                  const firstUnlearned = words.findIndex(w => !learnedWordIds.has(w.id));
+                                  setFlashcard({ words, label, index: firstUnlearned >= 0 ? firstUnlearned : 0, flipped: false });
+                                }}
+                                className="text-xs font-semibold px-2.5 py-1 rounded-xl bg-[var(--primary)] text-white"
+                              >Study →</button>
+                              <button
+                                onClick={() => { saveClassHWTemp(words.map(w => ({ word: w.word, translation: w.translation, definition: w.definition ?? '', example1: w.example1 ?? '', example1Translation: w.example1_translation ?? '', example2: w.example2 ?? '', example2Translation: w.example2_translation ?? '', className: label }))); router.push('/flashcards?source=class-hw'); }}
+                                className="text-xs font-semibold px-2.5 py-1 rounded-xl text-white" style={{ background: '#FF6B35' }}
+                              >🃏</button>
+                              <button
+                                onClick={() => { saveClassHWTemp(words.map(w => ({ word: w.word, translation: w.translation, definition: w.definition ?? '', example1: w.example1 ?? '', example1Translation: w.example1_translation ?? '', example2: w.example2 ?? '', example2Translation: w.example2_translation ?? '', className: label }))); router.push('/quiz?source=class-hw'); }}
+                                className="text-xs font-semibold px-2.5 py-1 rounded-xl text-white" style={{ background: '#F59E0B' }}
+                              >❓</button>
+                            </div>
+                          );
+                          const progressBar = (words: ClassWord[]) => {
+                            const learned = words.filter(w => learnedWordIds.has(w.id)).length;
+                            const pct = (learned / words.length) * 100;
+                            const done = learned === words.length;
+                            return (
+                              <div>
+                                <div className="flex items-center justify-between mb-1">
+                                  <span className="text-xs text-[var(--text-muted)]">{learned}/{words.length} learned</span>
+                                  {done && <span className="text-[10px] font-bold" style={{ color: 'var(--success)' }}>All done! 🎉</span>}
+                                </div>
+                                <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
+                                  <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: done ? 'var(--success)' : 'var(--primary)' }} />
+                                </div>
+                              </div>
+                            );
+                          };
+                          return (
+                            <div className="space-y-3 border-t border-[var(--border)] pt-3">
                               <p className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-wide">📝 Homework</p>
-                              <div className="flex gap-1.5 shrink-0">
-                                <button
-                                  onClick={() => {
-                                    const firstUnlearned = hw.findIndex(w => !learnedWordIds.has(w.id));
-                                    setFlashcard({ classId: cls.id, index: firstUnlearned >= 0 ? firstUnlearned : 0, flipped: false });
-                                  }}
-                                  className="text-xs font-semibold px-2.5 py-1 rounded-xl bg-[var(--primary)] text-white"
-                                >Study →</button>
-                                <button
-                                  onClick={() => {
-                                    saveClassHWTemp(hw.map(w => ({ word: w.word, translation: w.translation, definition: w.definition ?? '', example1: w.example1 ?? '', example1Translation: w.example1_translation ?? '', example2: w.example2 ?? '', example2Translation: w.example2_translation ?? '', className: cls.name })));
-                                    router.push('/flashcards?source=class-hw');
-                                  }}
-                                  className="text-xs font-semibold px-2.5 py-1 rounded-xl text-white"
-                                  style={{ background: '#FF6B35' }}
-                                >🃏</button>
-                                <button
-                                  onClick={() => {
-                                    saveClassHWTemp(hw.map(w => ({ word: w.word, translation: w.translation, definition: w.definition ?? '', example1: w.example1 ?? '', example1Translation: w.example1_translation ?? '', example2: w.example2 ?? '', example2Translation: w.example2_translation ?? '', className: cls.name })));
-                                    router.push('/quiz?source=class-hw');
-                                  }}
-                                  className="text-xs font-semibold px-2.5 py-1 rounded-xl text-white"
-                                  style={{ background: '#F59E0B' }}
-                                >❓</button>
-                              </div>
+                              {Object.entries(grouped).map(([folder, colMap]) => (
+                                <div key={folder} className="space-y-2">
+                                  {folder && <p className="text-xs font-bold text-[var(--text)] flex items-center gap-1">📁 {folder}</p>}
+                                  {Object.entries(colMap).map(([col, words]) => {
+                                    const label = [folder, col].filter(Boolean).join(' · ') || cls.name;
+                                    return (
+                                      <div key={col} className="rounded-xl p-3 space-y-2" style={{ background: 'var(--surface-2)' }}>
+                                        <div className="flex items-center justify-between gap-2">
+                                          <p className="text-xs font-semibold text-[var(--text)] truncate">{col ? `📖 ${col}` : cls.name} <span className="text-[var(--text-muted)] font-normal">· {words.length} words</span></p>
+                                          {studyBtns(words, label)}
+                                        </div>
+                                        {progressBar(words)}
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              ))}
                             </div>
-                            <div>
-                              <div className="flex items-center justify-between mb-1">
-                                <span className="text-xs text-[var(--text-muted)]">{hwLearnedCount}/{hw.length} items learned</span>
-                                {hwAllDone && (
-                                  <span className="text-[10px] font-bold" style={{ color: 'var(--success)' }}>All done! 🎉</span>
-                                )}
-                              </div>
-                              <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
-                                <div
-                                  className="h-full rounded-full transition-all"
-                                  style={{ width: `${hwPct}%`, background: hwAllDone ? 'var(--success)' : 'var(--primary)' }}
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        )}
+                          );
+                        })()}
                       </div>
                     );
                   })}
@@ -720,7 +740,7 @@ export default function ClassesPage() {
               ✕
             </button>
             <div className="flex-1 min-w-0">
-              <p className="font-bold text-[var(--text)] truncate">{fcClass?.name ?? ''}</p>
+              <p className="font-bold text-[var(--text)] truncate">{flashcard?.label ?? ''}</p>
               <p className="text-xs text-[var(--text-muted)]">{fcLearnedCount}/{fcWords.length} learned</p>
             </div>
             <p className="text-sm font-bold text-[var(--text-muted)] shrink-0">{flashcard.index + 1} / {fcWords.length}</p>
