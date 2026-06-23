@@ -154,7 +154,9 @@ function LearnInner() {
       const sliced = (dayNumber !== undefined || hardOnly) ? list : list.slice(0, sessionSize);
       setWords(sliced);
       if (startIndex > 0 && !startIndexApplied) {
-        setIndex(Math.min(startIndex, sliced.length - 1));
+        if (sliced.length > 0) {
+          setIndex(Math.min(Math.max(0, startIndex), sliced.length - 1));
+        }
         setStartIndexApplied(true);
       } else if (collectionName && dayNumber !== undefined && !startIndexApplied) {
         const saved = getLearnProgress(collectionName, dayNumber);
