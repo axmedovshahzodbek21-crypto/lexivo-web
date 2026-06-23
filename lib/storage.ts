@@ -222,7 +222,12 @@ export function localDateStr(d = new Date()): string {
 
 export function getDueWords(): SRSWord[] {
   const today = localDateStr();
-  return getSRSWords().filter(w => w.nextReviewDate <= today && w.reviewStage < 4);
+  return getSRSWords().filter(w => {
+    if (w.reviewStage >= 4) return false;
+    const d = new Date(w.nextReviewDate);
+    if (!isFinite(d.getTime())) return false;
+    return w.nextReviewDate <= today;
+  });
 }
 
 export function updateSRSWord(id: string, success: boolean) {

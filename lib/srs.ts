@@ -35,9 +35,14 @@ export function stageColor(stage: number): string {
 }
 
 export function daysUntilReview(word: SRSWord): number {
-  const today = localDateStr();
-  const next = new Date(word.nextReviewDate);
-  const now = new Date(today);
-  const diff = Math.ceil((next.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-  return Math.max(diff, 0);
+  try {
+    const today = localDateStr();
+    const next = new Date(word.nextReviewDate);
+    const now = new Date(today);
+    const diff = Math.ceil((next.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    if (!isFinite(diff)) return 999;
+    return Math.max(diff, 0);
+  } catch {
+    return 999;
+  }
 }
