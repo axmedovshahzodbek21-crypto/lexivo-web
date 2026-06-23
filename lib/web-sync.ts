@@ -189,30 +189,24 @@ export async function pushAll(uid: string) {
           quiz_done: p.quizDone ?? false,
         });
       }
-      if (localRows.length > 0) {
+      for (const r of localRows) {
         try {
-          const { data: remoteRows } = await supabase
+          const allDone = r.learn_done && r.flashcard_done && r.quiz_done;
+          const completedAt = allDone ? new Date().toISOString() : null;
+          const { data: updated } = await supabase
             .from('unit_progress')
-            .select('collection_name,day_number,learn_done,flashcard_done,quiz_done,completed_at')
-            .eq('user_id', uid);
-          const remoteMap = new Map((remoteRows ?? []).map(r => [`${r.collection_name}_${r.day_number}`, r]));
-          const upRows = localRows.map(r => {
-            const remote = remoteMap.get(`${r.collection_name}_${r.day_number}`);
-            const mergedLearn = r.learn_done || (remote?.learn_done ?? false);
-            const mergedFlash = r.flashcard_done || (remote?.flashcard_done ?? false);
-            const mergedQuiz = r.quiz_done || (remote?.quiz_done ?? false);
-            const allDone = mergedLearn && mergedFlash && mergedQuiz;
-            return {
-              user_id: uid,
-              collection_name: r.collection_name,
-              day_number: r.day_number,
-              learn_done: mergedLearn,
-              flashcard_done: mergedFlash,
-              quiz_done: mergedQuiz,
-              completed_at: remote?.completed_at ?? (allDone ? new Date().toISOString() : null),
-            };
-          });
-          await supabase.from('unit_progress').upsert(upRows, { onConflict: 'user_id,collection_name,day_number' });
+            .update({ learn_done: r.learn_done, flashcard_done: r.flashcard_done, quiz_done: r.quiz_done, completed_at: completedAt })
+            .eq('user_id', uid)
+            .eq('collection_name', r.collection_name)
+            .eq('day_number', r.day_number)
+            .select('id');
+          if (!updated || updated.length === 0) {
+            await supabase.from('unit_progress').insert({
+              user_id: uid, collection_name: r.collection_name, day_number: r.day_number,
+              learn_done: r.learn_done, flashcard_done: r.flashcard_done, quiz_done: r.quiz_done,
+              completed_at: completedAt,
+            });
+          }
         } catch (_) {}
       }
     }
