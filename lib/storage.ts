@@ -643,12 +643,33 @@ export function getCollectionsByFolder(folderName: string): ImportedCollection[]
     .sort((a, b) => b.addedAt - a.addedAt);
 }
 
+const MAX_IMPORTED_WORDS = 10_000;
+
+function sanitizeImportedWord(w: ImportedWord): ImportedWord {
+  const trunc = (s: string | undefined, max: number) => (s ?? '').slice(0, max);
+  return {
+    ...w,
+    word:               trunc(w.word, 100),
+    translation:        trunc(w.translation, 200),
+    definition:         trunc(w.definition, 500),
+    example1:           trunc(w.example1, 300),
+    example1Translation:trunc(w.example1Translation, 300),
+    example2:           trunc(w.example2, 300),
+    example2Translation:trunc(w.example2Translation, 300),
+    collectionName:     trunc(w.collectionName, 100),
+    folderName:         w.folderName ? trunc(w.folderName, 100) : undefined,
+  };
+}
+
 export function addImportedWords(words: ImportedWord[], collectionName: string, folderName?: string) {
   const existing = getImportedWords();
+  const slots = Math.max(0, MAX_IMPORTED_WORDS - existing.length);
+  if (slots === 0) return;
   const existingSet = new Set(existing.map(w => w.word.toLowerCase().trim()));
   const fresh = words
-    .filter(w => !existingSet.has(w.word.toLowerCase().trim()))
-    .map(w => ({ ...w, collectionName, ...(folderName ? { folderName } : {}) }));
+    .filter(w => w.word?.trim() && !existingSet.has(w.word.toLowerCase().trim()))
+    .slice(0, slots)
+    .map(w => sanitizeImportedWord({ ...w, collectionName, ...(folderName ? { folderName } : {}) }));
   set(IMPORTED_KEY, [...existing, ...fresh]);
   if (folderName) updateFolderMap(collectionName, folderName);
 }
@@ -672,7 +693,7 @@ export function deleteImportedFolder(folderName: string) {
 }
 
 export function saveImportedWords(words: ImportedWord[]) {
-  set(IMPORTED_KEY, words);
+  set(IMPORTED_KEY, words.slice(0, MAX_IMPORTED_WORDS).map(sanitizeImportedWord));
 }
 
 export function addWordToList(listId: string, word: string) {
