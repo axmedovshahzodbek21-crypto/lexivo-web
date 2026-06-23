@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
+import { saveClassHWTemp } from '@/lib/storage';
 
 function generateCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -652,17 +653,33 @@ export default function ClassesPage() {
                         {/* Homework words */}
                         {hw.length > 0 && (
                           <div className="space-y-2 border-t border-[var(--border)] pt-3">
-                            <div className="flex items-center justify-between">
+                            <div className="flex items-center justify-between gap-2">
                               <p className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-wide">📝 Homework</p>
-                              <button
-                                onClick={() => {
-                                  const firstUnlearned = hw.findIndex(w => !learnedWordIds.has(w.id));
-                                  setFlashcard({ classId: cls.id, index: firstUnlearned >= 0 ? firstUnlearned : 0, flipped: false });
-                                }}
-                                className="text-xs font-semibold px-3 py-1 rounded-xl bg-[var(--primary)] text-white"
-                              >
-                                Study →
-                              </button>
+                              <div className="flex gap-1.5 shrink-0">
+                                <button
+                                  onClick={() => {
+                                    const firstUnlearned = hw.findIndex(w => !learnedWordIds.has(w.id));
+                                    setFlashcard({ classId: cls.id, index: firstUnlearned >= 0 ? firstUnlearned : 0, flipped: false });
+                                  }}
+                                  className="text-xs font-semibold px-2.5 py-1 rounded-xl bg-[var(--primary)] text-white"
+                                >Study →</button>
+                                <button
+                                  onClick={() => {
+                                    saveClassHWTemp(hw.map(w => ({ word: w.word, translation: w.translation, definition: w.definition ?? '', example1: w.example1 ?? '', example1Translation: w.example1_translation ?? '', example2: w.example2 ?? '', example2Translation: w.example2_translation ?? '', className: cls.name })));
+                                    router.push('/flashcards?source=class-hw');
+                                  }}
+                                  className="text-xs font-semibold px-2.5 py-1 rounded-xl text-white"
+                                  style={{ background: '#FF6B35' }}
+                                >🃏</button>
+                                <button
+                                  onClick={() => {
+                                    saveClassHWTemp(hw.map(w => ({ word: w.word, translation: w.translation, definition: w.definition ?? '', example1: w.example1 ?? '', example1Translation: w.example1_translation ?? '', example2: w.example2 ?? '', example2Translation: w.example2_translation ?? '', className: cls.name })));
+                                    router.push('/quiz?source=class-hw');
+                                  }}
+                                  className="text-xs font-semibold px-2.5 py-1 rounded-xl text-white"
+                                  style={{ background: '#F59E0B' }}
+                                >❓</button>
+                              </div>
                             </div>
                             <div>
                               <div className="flex items-center justify-between mb-1">

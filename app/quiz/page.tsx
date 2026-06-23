@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { speak, speakText } from '@/lib/speech';
-import { addXP, recordStudySession, markQuizComplete, unlockAchievement, getStarredWords, getCustomListWords, getSettings, getUnitProgress, getImportedWords, getImportedWordsByCollection } from '@/lib/storage';
+import { addXP, recordStudySession, markQuizComplete, unlockAchievement, getStarredWords, getCustomListWords, getSettings, getUnitProgress, getImportedWords, getImportedWordsByCollection, getClassHWTemp } from '@/lib/storage';
 import { fireConfetti } from '@/lib/confetti';
 import { checkAchievements } from '@/lib/gamification';
 import type { WordItem, WordCollection, QuizType } from '@/lib/types';
@@ -107,6 +107,7 @@ export default function QuizPage() {
   const starredOnly = sp.get('starred') === 'true';
   const listId      = sp.get('list') ?? undefined;
   const sourceMyWords = sp.get('source') === 'my-words';
+  const sourceClassHW = sp.get('source') === 'class-hw';
   const myCollection = sp.get('myCollection') ?? undefined;
   const myFolder     = sp.get('myFolder') ?? undefined;
   const { collections, collectionsLoaded, pushAchievement, setPendingLevelUp } = useAppStore();
@@ -139,6 +140,33 @@ export default function QuizPage() {
   }, [collectionName, dayNumber]);
 
   useEffect(() => {
+    if (sourceClassHW) {
+      const hw = getClassHWTemp();
+      const allWords: QuizWord[] = hw.map(w => ({
+        word: w.word, partOfSpeech: '', pronunciation: '',
+        translation: w.translation, definition: w.definition,
+        example1: w.example1, example1Situation: '', example1Translation: w.example1Translation,
+        example2: w.example2, example2Situation: '', example2Translation: w.example2Translation,
+        example3: '', example3Translation: '', example3Situation: '',
+        collectionName: 'class-hw', topic: w.className, dayNumber: 0,
+      }));
+      const words = shuffle(allWords);
+      const types: QuizType[] = ['word_to_translation', 'translation_to_word', 'definition_to_word'];
+      const qs: QuizQuestion[] = words.map((word, i): QuizQuestion => {
+        const type = types[i % 3];
+        let prompt = '';
+        let correct = '';
+        if (type === 'word_to_translation') { prompt = word.word; correct = word.translation; }
+        else if (type === 'translation_to_word') { prompt = word.translation; correct = word.word; }
+        else { prompt = word.definition || word.word; correct = word.word; }
+        const pool = allWords.filter(w => w.word !== word.word).map(w => type === 'word_to_translation' ? w.translation : w.word);
+        const wrongs = shuffle([...new Set(pool)]).slice(0, 3);
+        const options = shuffle([correct, ...wrongs]);
+        return { word, type, prompt, correct, options };
+      });
+      setQuestions(qs);
+      return;
+    }
     if (sourceMyWords) {
       const imported = myCollection ? getImportedWordsByCollection(myCollection, myFolder) : getImportedWords();
       const allWords: QuizWord[] = imported.map(w => ({
@@ -170,7 +198,7 @@ export default function QuizPage() {
     if (collectionsLoaded && collections.length > 0) {
       setQuestions(buildQuiz(collections, collectionName, dayNumber, starredOnly, listId, quizDirection));
     }
-  }, [collectionsLoaded, collections, collectionName, dayNumber, starredOnly, listId, quizDirection, sourceMyWords, myCollection, myFolder]);
+  }, [collectionsLoaded, collections, collectionName, dayNumber, starredOnly, listId, quizDirection, sourceMyWords, sourceClassHW, myCollection, myFolder]);
 
   const current = questions[index];
 
@@ -200,15 +228,19 @@ export default function QuizPage() {
     setState('answered');
     if (option === current?.correct) {
       setCorrect(c => c + 1);
-      const { leveledUp, newLevel, newXp } = addXP(XP_PER_QUIZ, 'Quiz');
-      if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
+      if (!sourceClassHW) {
+        const { leveledUp, newLevel, newXp } = addXP(XP_PER_QUIZ, 'Quiz');
+        if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
+      }
     } else {
       if (current) setWrongQuestions(prev => [...prev, current]);
-      const { leveledUp, newLevel, newXp } = addXP(1, 'Quiz');
-      if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
+      if (!sourceClassHW) {
+        const { leveledUp, newLevel, newXp } = addXP(1, 'Quiz');
+        if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
+      }
     }
     recordStudySession();
-  }, [state, current]);
+  }, [state, current, sourceClassHW]);
 
   const next = useCallback(() => {
     if (index + 1 >= questions.length) {
@@ -235,7 +267,7 @@ export default function QuizPage() {
     }
   }, [index, questions, correct, selected, current, collectionName, pushAchievement, setPendingLevelUp]);
 
-  if (!collectionName && !starredOnly && !listId && !sourceMyWords) return <UnitPicker mode="quiz" />;
+  if (!collectionName && !starredOnly && !listId && !sourceMyWords && !sourceClassHW) return <UnitPicker mode="quiz" />;
 
   if (gateInfo) {
     return (
@@ -266,7 +298,7 @@ export default function QuizPage() {
 
   if (done) {
     const score = Math.round((correct / questions.length) * 100);
-    const backUrl = starredOnly ? '/starred' : sourceMyWords ? (myCollection ? (myFolder ? `/my-words/${encodeURIComponent(myFolder)}/${encodeURIComponent(myCollection)}` : `/my-words/${encodeURIComponent(myCollection)}`) : '/my-words') : collectionName ? `/collections/${encodeURIComponent(collectionName)}` : '/';
+    const backUrl = starredOnly ? '/starred' : sourceClassHW ? '/classes' : sourceMyWords ? (myCollection ? (myFolder ? `/my-words/${encodeURIComponent(myFolder)}/${encodeURIComponent(myCollection)}` : `/my-words/${encodeURIComponent(myCollection)}`) : '/my-words') : collectionName ? `/collections/${encodeURIComponent(collectionName)}` : '/';
     return (
       <div className="p-6 text-center flex flex-col items-center justify-center min-h-screen animate-fade-in">
         <div className="text-6xl mb-4">{score === 100 ? '🏆' : score >= 80 ? '🎉' : score >= 50 ? '👍' : '💪'}</div>
@@ -289,7 +321,7 @@ export default function QuizPage() {
           )}
           <div className="flex gap-3">
             <button
-              onClick={() => { setIndex(0); setSelected(null); setState('idle'); setCorrect(0); setWrongQuestions([]); setDone(false); if (!sourceMyWords) setQuestions(buildQuiz(collections, collectionName, dayNumber, starredOnly, listId)); }}
+              onClick={() => { setIndex(0); setSelected(null); setState('idle'); setCorrect(0); setWrongQuestions([]); setDone(false); if (!sourceMyWords && !sourceClassHW) setQuestions(buildQuiz(collections, collectionName, dayNumber, starredOnly, listId)); }}
               className="btn-secondary flex-1"
             >{t.common.retry}</button>
             <Link href={backUrl} className="btn-primary flex-1 text-center">{t.common.back}</Link>

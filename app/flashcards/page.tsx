@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { speak, speakText } from '@/lib/speech';
-import { addXP, recordStudySession, markFlashcardComplete, getStarredWords, getHardWords, getCustomListWords, getUnitProgress, saveFlashcardProgress, getFlashcardProgress, clearFlashcardProgress, getImportedWords, getImportedWordsByCollection } from '@/lib/storage';
+import { addXP, recordStudySession, markFlashcardComplete, getStarredWords, getHardWords, getCustomListWords, getUnitProgress, saveFlashcardProgress, getFlashcardProgress, clearFlashcardProgress, getImportedWords, getImportedWordsByCollection, getClassHWTemp } from '@/lib/storage';
 import { checkAchievements } from '@/lib/gamification';
 import type { WordItem, WordCollection } from '@/lib/types';
 import Link from 'next/link';
@@ -67,6 +67,7 @@ export default function FlashcardsPage() {
   const listId      = sp.get('list') ?? undefined;
   const fresh       = sp.get('fresh') === 'true';
   const sourceMyWords = sp.get('source') === 'my-words';
+  const sourceClassHW = sp.get('source') === 'class-hw';
   const myCollection = sp.get('myCollection') ?? undefined;
   const myFolder     = sp.get('myFolder') ?? undefined;
   const { collections, collectionsLoaded, pushAchievement, setPendingLevelUp, focusMode, setFocusMode } = useAppStore();
@@ -91,6 +92,20 @@ export default function FlashcardsPage() {
   }, [collectionName, dayNumber]);
 
   useEffect(() => {
+    if (sourceClassHW) {
+      const hw = getClassHWTemp();
+      const list: StudyWord[] = hw.map(w => ({
+        word: w.word, partOfSpeech: '', pronunciation: '',
+        translation: w.translation, definition: w.definition,
+        example1: w.example1, example1Situation: '', example1Translation: w.example1Translation,
+        example2: w.example2, example2Situation: '', example2Translation: w.example2Translation,
+        example3: '', example3Translation: '', example3Situation: '',
+        collectionName: 'class-hw', topic: w.className, dayNumber: 0,
+      }));
+      for (let i = list.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [list[i], list[j]] = [list[j], list[i]]; }
+      setDeck(list);
+      return;
+    }
     if (sourceMyWords) {
       const imported = myCollection ? getImportedWordsByCollection(myCollection, myFolder) : getImportedWords();
       const list: StudyWord[] = imported.map(w => ({
@@ -127,7 +142,7 @@ export default function FlashcardsPage() {
         setDeck(fullDeck);
       }
     }
-  }, [collectionsLoaded, collections, collectionName, dayNumber, starredOnly, hardOnly, listId, fresh, sourceMyWords, myCollection, myFolder]);
+  }, [collectionsLoaded, collections, collectionName, dayNumber, starredOnly, hardOnly, listId, fresh, sourceMyWords, sourceClassHW, myCollection, myFolder]);
 
   const current = deck[index];
 
@@ -151,8 +166,10 @@ export default function FlashcardsPage() {
     const card = deck[index];
     if (wasKnown) setKnown(k => k + 1);
     else { setUnknown(u => u + 1); if (card) setUnknownWords(prev => [...prev, card]); }
-    const { leveledUp, newLevel, newXp } = addXP(wasKnown ? 3 : 1, 'Flashcard');
-    if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
+    if (!sourceClassHW) {
+      const { leveledUp, newLevel, newXp } = addXP(wasKnown ? 3 : 1, 'Flashcard');
+      if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
+    }
     recordStudySession();
     const newAchievements = checkAchievements();
     newAchievements.forEach(pushAchievement);
@@ -170,12 +187,12 @@ export default function FlashcardsPage() {
       setIndex(i => i + 1);
       setSide('front');
     }
-  }, [index, deck, collectionName, dayNumber, pushAchievement, setPendingLevelUp]);
+  }, [index, deck, collectionName, dayNumber, sourceClassHW, pushAchievement, setPendingLevelUp]);
 
   const markKnown = () => advance(true);
   const markUnknown = () => advance(false);
 
-  if (!collectionName && !starredOnly && !hardOnly && !listId && !sourceMyWords) return <UnitPicker mode="flashcards" />;
+  if (!collectionName && !starredOnly && !hardOnly && !listId && !sourceMyWords && !sourceClassHW) return <UnitPicker mode="flashcards" />;
 
   if (gateUrl) {
     return (
@@ -240,7 +257,7 @@ export default function FlashcardsPage() {
           )}
           <div className="flex gap-3">
             <button onClick={() => { setIndex(0); setSide('front'); setKnown(0); setUnknown(0); setUnknownWords([]); setDone(false); }} className="btn-secondary flex-1">{t.common.again}</button>
-            <Link href={starredOnly ? '/starred' : hardOnly ? '/hard-words' : sourceMyWords ? (myCollection ? (myFolder ? `/my-words/${encodeURIComponent(myFolder)}/${encodeURIComponent(myCollection)}` : `/my-words/${encodeURIComponent(myCollection)}`) : '/my-words') : collectionName ? `/collections/${encodeURIComponent(collectionName)}` : '/'} className="btn-primary flex-1 text-center">{t.common.back}</Link>
+            <Link href={starredOnly ? '/starred' : hardOnly ? '/hard-words' : sourceClassHW ? '/classes' : sourceMyWords ? (myCollection ? (myFolder ? `/my-words/${encodeURIComponent(myFolder)}/${encodeURIComponent(myCollection)}` : `/my-words/${encodeURIComponent(myCollection)}`) : '/my-words') : collectionName ? `/collections/${encodeURIComponent(collectionName)}` : '/'} className="btn-primary flex-1 text-center">{t.common.back}</Link>
           </div>
         </div>
       </div>
