@@ -176,6 +176,8 @@ export default function ClassWordsPage() {
   const [loading, setLoading] = useState(true);
   const [words, setWords] = useState<ClassWord[]>([]);
   const [tab, setTab] = useState<InputTab>('manual');
+  const [collapsedCols, setCollapsedCols] = useState<Set<string>>(new Set());
+  const toggleCol = (key: string) => setCollapsedCols(prev => { const s = new Set(prev); s.has(key) ? s.delete(key) : s.add(key); return s; });
 
   // Shared folder/collection for both manual and AI import
   const [folderInput, setFolderInput] = useState('');
@@ -596,17 +598,21 @@ export default function ClassWordsPage() {
                       <span className="font-bold text-sm text-[var(--text)]">{folder}</span>
                     </div>
                   )}
-                  {Array.from(colMap.entries()).map(([col, colWords]) => (
+                  {Array.from(colMap.entries()).map(([col, colWords]) => {
+                    const colKey = `${folder}::${col}`;
+                    const collapsed = collapsedCols.has(colKey);
+                    return (
                     <div key={col} className={folder ? 'ml-4 space-y-1.5' : 'space-y-1.5'}>
                       {/* Collection header */}
                       {col && (
-                        <div className="flex items-center gap-2 px-1">
+                        <button onClick={() => toggleCol(colKey)} className="flex items-center gap-2 px-1 w-full text-left">
                           <span className="text-sm">📖</span>
                           <span className="font-semibold text-xs text-[var(--text-muted)]">{col}</span>
                           <span className="text-[10px] text-[var(--text-muted)]">· {colWords.length} item{colWords.length !== 1 ? 's' : ''}</span>
-                        </div>
+                          <span className="text-[10px] text-[var(--text-muted)] ml-auto">{collapsed ? '▶' : '▼'}</span>
+                        </button>
                       )}
-                      {colWords.map(w => (
+                      {!collapsed && colWords.map(w => (
                         <div key={w.id} className={`card flex items-start gap-3 ${folder ? 'border-l-2 border-[var(--primary)] border-opacity-30' : ''}`}>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
@@ -621,7 +627,8 @@ export default function ClassWordsPage() {
                         </div>
                       ))}
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ))}
             </div>
