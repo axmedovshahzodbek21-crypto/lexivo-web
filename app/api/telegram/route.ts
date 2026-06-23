@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-const OWNER_ID  = process.env.TELEGRAM_OWNER_ID ?? '8639830756';
+const BOT_TOKEN      = process.env.TELEGRAM_BOT_TOKEN;
+const OWNER_ID       = process.env.TELEGRAM_OWNER_ID ?? '8639830756';
+const WEBHOOK_SECRET = process.env.TELEGRAM_WEBHOOK_SECRET;
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -21,8 +22,18 @@ async function sendMessage(chatId: string | number, text: string) {
 export async function POST(req: NextRequest) {
   if (!BOT_TOKEN) {
     console.error('TELEGRAM_BOT_TOKEN env var is not set');
-    return NextResponse.json({ ok: true }); // Return 200 so Telegram doesn't retry
+    return NextResponse.json({ ok: true });
   }
+
+  // Verify the request is genuinely from Telegram
+  if (WEBHOOK_SECRET) {
+    const incoming = req.headers.get('x-telegram-bot-api-secret-token');
+    if (incoming !== WEBHOOK_SECRET) {
+      console.warn('Telegram webhook: invalid secret token');
+      return NextResponse.json({ ok: true }); // Return 200 so attacker learns nothing
+    }
+  }
+
   try {
     const body = await req.json();
     const message = body?.message;
