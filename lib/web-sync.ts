@@ -14,6 +14,56 @@ import {
   localDateStr,
 } from './storage';
 
+// ── Supabase response interfaces ─────────────────────────────────────────────
+// These serve as compile-time contracts and runtime validation targets.
+// If a DB column is removed, warnMissing() will log the discrepancy.
+
+interface ProfileRow {
+  reset_at:                  string | null;
+  name:                      string | null;
+  name_updated_at:           string | null;
+  language_level:            string | null;
+  language_level_updated_at: string | null;
+  daily_goal:                number | null;
+  default_accent:            string | null;
+  auto_play_on_reveal:       boolean | null;
+  session_size:              number | null;
+  font_size:                 string | null;
+  study_order:               string | null;
+  quiz_direction:            string | null;
+  reduce_motion:             boolean | null;
+  show_on_leaderboard:       boolean | null;
+  avatar_url:                string | null;
+}
+
+interface StatsRow {
+  xp:               number | null;
+  today_xp:         number | null;
+  today_xp_date:    string | null;
+  today_count:      number | null;
+  today_count_date: string | null;
+  streak:           number | null;
+  last_study_date:  string | null;
+  total_days:       number | null;
+  study_days:       string[] | null;
+  freezes:          number | null;
+  last_freeze_week: string | null;
+}
+
+interface UnitProgressRow {
+  collection_name: string;
+  day_number:      number;
+  learn_done:      boolean | null;
+  flashcard_done:  boolean | null;
+  quiz_done:       boolean | null;
+  completed_at:    string | null;
+}
+
+function warnMissing(context: string, data: Record<string, unknown>, fields: string[]) {
+  const missing = fields.filter(f => !(f in data));
+  if (missing.length > 0) console.warn(`[sync] ${context}: missing DB columns: ${missing.join(', ')}`);
+}
+
 // localStorage key constants (mirrors KEYS in storage.ts)
 const K = {
   xp:             'lexivo_xp',
@@ -330,75 +380,85 @@ export async function pullAll(uid: string) {
     // profiles → settings
     const { data: profile } = await supabase.from('profiles').select().eq('id', uid).maybeSingle();
     if (profile) {
+      const p = profile as unknown as ProfileRow;
+      warnMissing('profiles', p as unknown as Record<string, unknown>, [
+        'name','daily_goal','default_accent','auto_play_on_reveal','session_size',
+        'font_size','study_order','quiz_direction','reduce_motion','show_on_leaderboard',
+      ]);
       // Record reset_at so checkAndHandleReset won't re-fire on fresh browser sessions
-      const resetAt = profile.reset_at as string | null;
+      const resetAt = p.reset_at;
       if (resetAt && typeof window !== 'undefined') localStorage.setItem('lexivo_last_seen_reset_at', resetAt);
 
       const existing = getSettings();
-      const remoteNameTs = profile.name_updated_at as string | null;
+      const remoteNameTs = p.name_updated_at;
       const localNameTs  = getNameUpdatedAt();
       const useRemoteName = remoteNameTs !== null && (localNameTs === null || remoteNameTs > localNameTs);
 
-      const remoteLevelTs = profile.language_level_updated_at as string | null;
+      const remoteLevelTs = p.language_level_updated_at;
       const localLevelTs  = getLevelUpdatedAt();
       const useRemoteLevel = remoteLevelTs !== null && (localLevelTs === null || remoteLevelTs > localLevelTs);
 
       saveSettings({
-        name:            useRemoteName  ? (profile.name           ?? 'Learner') : existing.name,
-        languageLevel:   useRemoteLevel ? (profile.language_level ?? 'B1')      : existing.languageLevel,
-        dailyGoal:       profile.daily_goal       ?? 10,
-        defaultAccent:   profile.default_accent   ?? 'us',
-        autoPlayOnReveal:profile.auto_play_on_reveal ?? true,
-        sessionSize:     profile.session_size     ?? 20,
-        fontSize:        profile.font_size        ?? 'normal',
-        studyOrder:      profile.study_order      ?? 'random',
-        quizDirection:   profile.quiz_direction   ?? 'word-to-uz',
-        reduceMotion:         profile.reduce_motion         ?? false,
-        showOnLeaderboard:    profile.show_on_leaderboard   ?? true,
-        uiLanguage:           existing.uiLanguage,
+        name:             useRemoteName  ? (p.name           ?? 'Learner') : existing.name,
+        languageLevel:    useRemoteLevel ? (p.language_level ?? 'B1')      : existing.languageLevel,
+        dailyGoal:        p.daily_goal       ?? 10,
+        defaultAccent:    p.default_accent   ?? 'us',
+        autoPlayOnReveal: p.auto_play_on_reveal ?? true,
+        sessionSize:      p.session_size     ?? 20,
+        fontSize:         p.font_size        ?? 'normal',
+        studyOrder:       p.study_order      ?? 'random',
+        quizDirection:    p.quiz_direction   ?? 'word-to-uz',
+        reduceMotion:     p.reduce_motion    ?? false,
+        showOnLeaderboard:p.show_on_leaderboard ?? true,
+        uiLanguage:       existing.uiLanguage,
       });
       setOnboarded();
       if (useRemoteName && remoteNameTs) saveNameUpdatedAt(remoteNameTs);
       if (useRemoteLevel && remoteLevelTs) saveLevelUpdatedAt(remoteLevelTs);
-      if (profile.avatar_url) saveProfilePicUrl(profile.avatar_url);
+      if (p.avatar_url) saveProfilePicUrl(p.avatar_url);
     }
 
     // user_stats
     const { data: stats } = await supabase.from('user_stats').select().eq('id', uid).maybeSingle();
     if (stats) {
+      const s = stats as unknown as StatsRow;
+      warnMissing('user_stats', s as unknown as Record<string, unknown>, [
+        'xp','streak','freezes','total_days','today_xp','today_xp_date',
+        'today_count','today_count_date','last_study_date','last_freeze_week','study_days',
+      ]);
       // Accumulating counters: take max so locally earned progress isn't overwritten by a stale cloud value
-      set(K.xp,     Math.max(parseInt(ls(K.xp)      ?? '0', 10), stats.xp      ?? 0));
-      set(K.streak, Math.max(parseInt(ls(K.streak)  ?? '0', 10), stats.streak  ?? 0));
-      set(K.freezes,Math.max(parseInt(ls(K.freezes) ?? '0', 10), stats.freezes ?? 0));
-      set(K.totalDays, stats.total_days ?? 0);
+      set(K.xp,     Math.max(parseInt(ls(K.xp)      ?? '0', 10), s.xp      ?? 0));
+      set(K.streak, Math.max(parseInt(ls(K.streak)  ?? '0', 10), s.streak  ?? 0));
+      set(K.freezes,Math.max(parseInt(ls(K.freezes) ?? '0', 10), s.freezes ?? 0));
+      set(K.totalDays, s.total_days ?? 0);
 
       // today_xp / today_count: only sync if the cloud value is from today (avoids resetting today's progress with yesterday's cloud data)
       const todayStr = localDateStr();
-      const cloudXpDate    = stats.today_xp_date    as string | null;
-      const cloudCountDate = stats.today_count_date as string | null;
+      const cloudXpDate    = s.today_xp_date;
+      const cloudCountDate = s.today_count_date;
       if (cloudXpDate === todayStr) {
         const localXp = parseInt(ls(K.todayXp) ?? '0', 10);
-        set(K.todayXp,    ls(K.todayXpDate) === todayStr ? Math.max(localXp, stats.today_xp ?? 0) : (stats.today_xp ?? 0));
+        set(K.todayXp,    ls(K.todayXpDate) === todayStr ? Math.max(localXp, s.today_xp ?? 0) : (s.today_xp ?? 0));
         set(K.todayXpDate, cloudXpDate);
       }
       if (cloudCountDate === todayStr) {
         const localCount = parseInt(ls(K.todayCount) ?? '0', 10);
-        set(K.todayCount,    ls(K.todayCountDate) === todayStr ? Math.max(localCount, stats.today_count ?? 0) : (stats.today_count ?? 0));
+        set(K.todayCount,    ls(K.todayCountDate) === todayStr ? Math.max(localCount, s.today_count ?? 0) : (s.today_count ?? 0));
         set(K.todayCountDate, cloudCountDate);
       }
 
       // last_study_date: take the more recent of local and cloud
-      const cloudLastStudy = stats.last_study_date as string | null;
+      const cloudLastStudy = s.last_study_date;
       const localLastStudy = ls(K.lastStudy);
       if (cloudLastStudy && (!localLastStudy || cloudLastStudy > localLastStudy)) {
         set(K.lastStudy, cloudLastStudy);
       }
       // Validate freeze week looks like "YYYY-Wnn" before writing (guards against corrupt 100KB+ values)
-      const fwVal = stats.last_freeze_week as string | null;
+      const fwVal = s.last_freeze_week;
       if (fwVal && /^\d{4}-W\d{1,2}$/.test(fwVal)) set(K.lastFreezeWeek, fwVal);
-      if (Array.isArray(stats.study_days) && stats.study_days.length > 0) {
+      if (Array.isArray(s.study_days) && s.study_days.length > 0) {
         const local = getStudyDays();
-        const merged = Array.from(new Set([...local, ...stats.study_days])).sort();
+        const merged = Array.from(new Set([...local, ...s.study_days])).sort();
         saveStudyDays(merged);
       }
     }
@@ -472,7 +532,8 @@ export async function pullAll(uid: string) {
         .select('collection_name,day_number,learn_done,flashcard_done,quiz_done,completed_at')
         .eq('user_id', uid);
       if (typeof window !== 'undefined' && upRows && upRows.length > 0) {
-        for (const r of upRows) {
+        const typedRows = upRows as unknown as UnitProgressRow[];
+        for (const r of typedRows) {
           const key = `lexivo_unit_progress_${r.collection_name}_${r.day_number}`;
           const existing = localStorage.getItem(key);
           const local = existing ? JSON.parse(existing) : { learnDone: false, flashcardDone: false, quizDone: false };
