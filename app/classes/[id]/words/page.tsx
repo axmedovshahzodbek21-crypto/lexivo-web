@@ -1,6 +1,6 @@
 'use client';
 import { SectionLoader } from '@/components/Loader';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
@@ -180,6 +180,20 @@ export default function ClassWordsPage() {
   const toggleCol = (key: string) => setCollapsedCols(prev => { const s = new Set(prev); s.has(key) ? s.delete(key) : s.add(key); return s; });
   const [collapsedFolders, setCollapsedFolders] = useState<Set<string>>(new Set());
   const toggleFolder = (key: string) => setCollapsedFolders(prev => { const s = new Set(prev); s.has(key) ? s.delete(key) : s.add(key); return s; });
+  const collapseInitialized = useRef(false);
+
+  useEffect(() => {
+    if (collapseInitialized.current || words.length === 0) return;
+    collapseInitialized.current = true;
+    const folders = new Set<string>();
+    const cols = new Set<string>();
+    for (const w of words) {
+      if (w.folder_name) folders.add(w.folder_name);
+      cols.add(`${w.folder_name ?? ''}::${w.collection_name ?? ''}`);
+    }
+    setCollapsedFolders(folders);
+    setCollapsedCols(cols);
+  }, [words]);
 
   // Shared folder/collection for both manual and AI import
   const [folderInput, setFolderInput] = useState('');
