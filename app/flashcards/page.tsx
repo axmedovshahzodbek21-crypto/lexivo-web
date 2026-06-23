@@ -89,6 +89,7 @@ export default function FlashcardsPage() {
   const [done, setDone] = useState(false);
   const [unknownWords, setUnknownWords] = useState<StudyWord[]>([]);
   const cardsSinceLastPush = useRef(0);
+  const advancing = useRef(false);
 
   // Gate: must complete Learn before Flashcards (for unit sessions)
   const [gateUrl, setGateUrl] = useState<string | null>(null);
@@ -172,6 +173,9 @@ export default function FlashcardsPage() {
   }, [current, side, focusMode]);
 
   const advance = useCallback((wasKnown: boolean) => {
+    if (advancing.current) return;
+    advancing.current = true;
+    setTimeout(() => { advancing.current = false; }, 100);
     const card = deck[index];
     if (wasKnown) setKnown(k => k + 1);
     else { setUnknown(u => u + 1); if (card) setUnknownWords(prev => [...prev, card]); }

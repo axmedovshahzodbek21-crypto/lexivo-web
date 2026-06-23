@@ -121,6 +121,7 @@ export default function QuizPage() {
   const [done, setDone] = useState(false);
   const [wrongQuestions, setWrongQuestions] = useState<QuizQuestion[]>([]);
   const cardsSinceLastPush = useRef(0);
+  const selecting = useRef(false);
   const t = useTranslation();
   const [quizDirection, setQuizDirection] = useState<'word-to-uz' | 'uz-to-word'>('word-to-uz');
 
@@ -225,7 +226,9 @@ export default function QuizPage() {
   }, [current, state]);
 
   const handleSelect = useCallback((option: string) => {
-    if (state === 'answered') return;
+    if (state === 'answered' || selecting.current) return;
+    selecting.current = true;
+    setTimeout(() => { selecting.current = false; }, 100);
     setSelected(option);
     setState('answered');
     if (option === current?.correct) {
