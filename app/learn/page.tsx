@@ -155,7 +155,7 @@ function LearnInner() {
         }
       }
     }
-  }, [collectionsLoaded, collections, collectionName, dayNumber, hardOnly, sourceMyWords, myCollection]);
+  }, [collectionsLoaded, collections, collectionName, dayNumber, hardOnly, sourceMyWords, myCollection, myFolder]);
 
   const current = words[index];
 

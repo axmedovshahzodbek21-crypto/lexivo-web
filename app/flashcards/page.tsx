@@ -127,7 +127,7 @@ export default function FlashcardsPage() {
         setDeck(fullDeck);
       }
     }
-  }, [collectionsLoaded, collections, collectionName, dayNumber, starredOnly, hardOnly, listId, fresh, sourceMyWords, myCollection]);
+  }, [collectionsLoaded, collections, collectionName, dayNumber, starredOnly, hardOnly, listId, fresh, sourceMyWords, myCollection, myFolder]);
 
   const current = deck[index];
 

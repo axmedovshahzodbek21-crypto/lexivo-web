@@ -170,7 +170,7 @@ export default function QuizPage() {
     if (collectionsLoaded && collections.length > 0) {
       setQuestions(buildQuiz(collections, collectionName, dayNumber, starredOnly, listId, quizDirection));
     }
-  }, [collectionsLoaded, collections, collectionName, dayNumber, starredOnly, listId, quizDirection, sourceMyWords, myCollection]);
+  }, [collectionsLoaded, collections, collectionName, dayNumber, starredOnly, listId, quizDirection, sourceMyWords, myCollection, myFolder]);
 
   const current = questions[index];
 
