@@ -12,6 +12,13 @@ const withPWA = withPWAInit({
     clientsClaim: true,
     cleanupOutdatedCaches: true,
     cacheId: "lexivo-v3",
+    runtimeCaching: [
+      {
+        urlPattern: ({ sameOrigin, url }: { sameOrigin: boolean; url: URL }) =>
+          sameOrigin && url.pathname.startsWith('/api/auth/'),
+        handler: 'NetworkOnly' as const,
+      },
+    ],
   },
 });
 
