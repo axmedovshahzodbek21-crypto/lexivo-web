@@ -245,7 +245,7 @@ export async function pushUnitProgressCurrentUser(collectionName: string, dayNum
     const flashcardDone = p.flashcardDone ?? false;
     const quizDone      = p.quizDone      ?? false;
     const allDone       = learnDone && flashcardDone && quizDone;
-    const completedAt   = allDone ? new Date().toISOString() : null;
+    const completedAt   = allDone ? (p.completedAt ?? new Date().toISOString()) : null;
 
     // Try UPDATE first — avoids needing a unique constraint for ON CONFLICT
     const { data: updated, error: updateErr } = await supabase

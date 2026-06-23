@@ -420,19 +420,31 @@ export function getUnitProgress(collectionName: string, dayNumber: number): Unit
 export function markLearningComplete(collectionName: string, dayNumber: number) {
   const key = `${KEYS.unitProgress}_${collectionName}_${dayNumber}`;
   const p = getUnitProgress(collectionName, dayNumber);
-  set(key, { ...p, learnDone: true });
+  const updated = { ...p, learnDone: true };
+  if (updated.learnDone && updated.flashcardDone && updated.quizDone && !updated.completedAt) {
+    updated.completedAt = new Date().toISOString();
+  }
+  set(key, updated);
 }
 
 export function markFlashcardComplete(collectionName: string, dayNumber: number) {
   const key = `${KEYS.unitProgress}_${collectionName}_${dayNumber}`;
   const p = getUnitProgress(collectionName, dayNumber);
-  set(key, { ...p, flashcardDone: true });
+  const updated = { ...p, flashcardDone: true };
+  if (updated.learnDone && updated.flashcardDone && updated.quizDone && !updated.completedAt) {
+    updated.completedAt = new Date().toISOString();
+  }
+  set(key, updated);
 }
 
 export function markQuizComplete(collectionName: string, dayNumber: number) {
   const key = `${KEYS.unitProgress}_${collectionName}_${dayNumber}`;
   const p = getUnitProgress(collectionName, dayNumber);
-  set(key, { ...p, quizDone: true });
+  const updated = { ...p, quizDone: true };
+  if (updated.learnDone && updated.flashcardDone && updated.quizDone && !updated.completedAt) {
+    updated.completedAt = new Date().toISOString();
+  }
+  set(key, updated);
 }
 
 // ─── Starred words ───────────────────────────────────────────────────────────

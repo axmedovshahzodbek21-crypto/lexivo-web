@@ -54,6 +54,7 @@ export interface UnitProgress {
   learnDone: boolean;
   flashcardDone: boolean;
   quizDone: boolean;
+  completedAt?: string;
 }
 
 export interface Achievement {
