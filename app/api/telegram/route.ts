@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN ?? '8582829798:AAFMuhQZBOBva-9rZx5q65DTNCctQKX6AiM';
-const OWNER_ID  = '8639830756';
+const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const OWNER_ID  = process.env.TELEGRAM_OWNER_ID ?? '8639830756';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -19,6 +19,10 @@ async function sendMessage(chatId: string | number, text: string) {
 }
 
 export async function POST(req: NextRequest) {
+  if (!BOT_TOKEN) {
+    console.error('TELEGRAM_BOT_TOKEN env var is not set');
+    return NextResponse.json({ ok: true }); // Return 200 so Telegram doesn't retry
+  }
   try {
     const body = await req.json();
     const message = body?.message;
@@ -60,16 +64,45 @@ export async function POST(req: NextRequest) {
 
     if (isOwner && text.startsWith('/broadcast ')) {
       const broadcastText = text.slice('/broadcast '.length).trim();
-      if (broadcastText) {
-        const { data: users } = await supabase.from('bot_users').select('chat_id');
-        const targets = (users ?? []).filter(u => String(u.chat_id) !== OWNER_ID);
-        let sent = 0;
-        for (const u of targets) {
-          const r = await sendMessage(u.chat_id, broadcastText);
-          if (r.ok) sent++;
-        }
-        await sendMessage(OWNER_ID, `✅ Broadcast sent to ${sent} user${sent !== 1 ? 's' : ''}.`);
+      if (!broadcastText) return NextResponse.json({ ok: true });
+
+      // Rate limit: max 1 broadcast per 5 minutes
+      const { data: ownerRow } = await supabase
+        .from('bot_users')
+        .select('last_broadcast_at')
+        .eq('chat_id', fromId)
+        .maybeSingle();
+      const lastBroadcast = ownerRow?.last_broadcast_at ? new Date(ownerRow.last_broadcast_at) : null;
+      const minutesSinceLast = lastBroadcast ? (Date.now() - lastBroadcast.getTime()) / 60000 : 999;
+      if (minutesSinceLast < 5) {
+        const remaining = Math.ceil(5 - minutesSinceLast);
+        await sendMessage(OWNER_ID, `⏳ Rate limit: wait ${remaining} more minute${remaining !== 1 ? 's' : ''} before next broadcast.`);
+        return NextResponse.json({ ok: true });
       }
+
+      // Fetch targets and send with delay to respect Telegram's 30 msg/sec limit
+      const { data: users } = await supabase.from('bot_users').select('chat_id');
+      const targets = (users ?? []).filter(u => String(u.chat_id) !== OWNER_ID);
+      let sent = 0;
+      for (const u of targets) {
+        const r = await sendMessage(u.chat_id, broadcastText);
+        if (r.ok) sent++;
+        await new Promise(resolve => setTimeout(resolve, 50)); // 20 msgs/sec — under Telegram's 30/sec limit
+      }
+
+      // Record timestamp and log
+      await supabase
+        .from('bot_users')
+        .update({ last_broadcast_at: new Date().toISOString() })
+        .eq('chat_id', fromId);
+      await supabase.from('bot_broadcasts').insert({
+        sent_by: fromId,
+        message: broadcastText,
+        recipient_count: sent,
+        sent_at: new Date().toISOString(),
+      }).throwOnError().catch(() => {}); // Log if table exists, silently skip if not
+
+      await sendMessage(OWNER_ID, `✅ Broadcast sent to ${sent} user${sent !== 1 ? 's' : ''}.`);
       return NextResponse.json({ ok: true });
     }
 
@@ -100,7 +133,7 @@ export async function POST(req: NextRequest) {
         `🛠 Admin Commands\n\n` +
         `/stats — total number of users\n` +
         `/users — list of last 20 users\n` +
-        `/broadcast <message> — send to all users\n` +
+        `/broadcast <message> — send to all users (max once per 5 min)\n` +
         `Reply to a message — send reply to that user`
       );
       return NextResponse.json({ ok: true });
@@ -118,6 +151,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error('Telegram webhook error:', err);
-    return NextResponse.json({ ok: false }, { status: 500 });
+    return NextResponse.json({ ok: true }); // Always 200 — non-200 causes Telegram to retry infinitely
   }
 }
