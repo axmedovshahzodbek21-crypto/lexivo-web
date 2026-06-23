@@ -61,6 +61,7 @@ function LearnInner() {
   const sp = useSearchParams();
   const sourceMyWords = sp.get('source') === 'my-words';
   const myCollection = sp.get('myCollection') ?? undefined;
+  const myFolder     = sp.get('myFolder') ?? undefined;
   const collectionName = sp.get('collection') ?? undefined;
   const dayParam = sp.get('day');
   const dayNumber = dayParam ? parseInt(dayParam) : undefined;
@@ -113,7 +114,7 @@ function LearnInner() {
 
   useEffect(() => {
     if (sourceMyWords) {
-      const imported = myCollection ? getImportedWordsByCollection(myCollection) : getImportedWords();
+      const imported = myCollection ? getImportedWordsByCollection(myCollection, myFolder) : getImportedWords();
       const list: StudyWord[] = imported.map(w => ({
         word: w.word,
         partOfSpeech: '',
@@ -274,7 +275,7 @@ function LearnInner() {
   }
 
   if (done) {
-    const backUrl = hardOnly ? '/hard-words' : sourceMyWords ? (myCollection ? `/my-words/${encodeURIComponent(myCollection)}` : '/my-words') : collectionName ? `/collections/${encodeURIComponent(collectionName)}` : '/';
+    const backUrl = hardOnly ? '/hard-words' : sourceMyWords ? (myCollection ? (myFolder ? `/my-words/${encodeURIComponent(myFolder)}/${encodeURIComponent(myCollection)}` : `/my-words/${encodeURIComponent(myCollection)}`) : '/my-words') : collectionName ? `/collections/${encodeURIComponent(collectionName)}` : '/';
     return (
       <SessionDone
         sessionCount={sessionCount}

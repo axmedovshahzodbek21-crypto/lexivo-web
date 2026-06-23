@@ -68,6 +68,7 @@ export default function FlashcardsPage() {
   const fresh       = sp.get('fresh') === 'true';
   const sourceMyWords = sp.get('source') === 'my-words';
   const myCollection = sp.get('myCollection') ?? undefined;
+  const myFolder     = sp.get('myFolder') ?? undefined;
   const { collections, collectionsLoaded, pushAchievement, setPendingLevelUp, focusMode, setFocusMode } = useAppStore();
 
   const t = useTranslation();
@@ -91,7 +92,7 @@ export default function FlashcardsPage() {
 
   useEffect(() => {
     if (sourceMyWords) {
-      const imported = myCollection ? getImportedWordsByCollection(myCollection) : getImportedWords();
+      const imported = myCollection ? getImportedWordsByCollection(myCollection, myFolder) : getImportedWords();
       const list: StudyWord[] = imported.map(w => ({
         word: w.word, partOfSpeech: '', pronunciation: '',
         translation: w.translation, definition: w.definition,
@@ -239,7 +240,7 @@ export default function FlashcardsPage() {
           )}
           <div className="flex gap-3">
             <button onClick={() => { setIndex(0); setSide('front'); setKnown(0); setUnknown(0); setUnknownWords([]); setDone(false); }} className="btn-secondary flex-1">{t.common.again}</button>
-            <Link href={starredOnly ? '/starred' : hardOnly ? '/hard-words' : sourceMyWords ? (myCollection ? `/my-words/${encodeURIComponent(myCollection)}` : '/my-words') : collectionName ? `/collections/${encodeURIComponent(collectionName)}` : '/'} className="btn-primary flex-1 text-center">{t.common.back}</Link>
+            <Link href={starredOnly ? '/starred' : hardOnly ? '/hard-words' : sourceMyWords ? (myCollection ? (myFolder ? `/my-words/${encodeURIComponent(myFolder)}/${encodeURIComponent(myCollection)}` : `/my-words/${encodeURIComponent(myCollection)}`) : '/my-words') : collectionName ? `/collections/${encodeURIComponent(collectionName)}` : '/'} className="btn-primary flex-1 text-center">{t.common.back}</Link>
           </div>
         </div>
       </div>

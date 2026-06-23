@@ -108,6 +108,7 @@ export default function QuizPage() {
   const listId      = sp.get('list') ?? undefined;
   const sourceMyWords = sp.get('source') === 'my-words';
   const myCollection = sp.get('myCollection') ?? undefined;
+  const myFolder     = sp.get('myFolder') ?? undefined;
   const { collections, collectionsLoaded, pushAchievement, setPendingLevelUp } = useAppStore();
 
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
@@ -139,7 +140,7 @@ export default function QuizPage() {
 
   useEffect(() => {
     if (sourceMyWords) {
-      const imported = myCollection ? getImportedWordsByCollection(myCollection) : getImportedWords();
+      const imported = myCollection ? getImportedWordsByCollection(myCollection, myFolder) : getImportedWords();
       const allWords: QuizWord[] = imported.map(w => ({
         word: w.word, partOfSpeech: '', pronunciation: '',
         translation: w.translation, definition: w.definition,
@@ -265,7 +266,7 @@ export default function QuizPage() {
 
   if (done) {
     const score = Math.round((correct / questions.length) * 100);
-    const backUrl = starredOnly ? '/starred' : sourceMyWords ? (myCollection ? `/my-words/${encodeURIComponent(myCollection)}` : '/my-words') : collectionName ? `/collections/${encodeURIComponent(collectionName)}` : '/';
+    const backUrl = starredOnly ? '/starred' : sourceMyWords ? (myCollection ? (myFolder ? `/my-words/${encodeURIComponent(myFolder)}/${encodeURIComponent(myCollection)}` : `/my-words/${encodeURIComponent(myCollection)}`) : '/my-words') : collectionName ? `/collections/${encodeURIComponent(collectionName)}` : '/';
     return (
       <div className="p-6 text-center flex flex-col items-center justify-center min-h-screen animate-fade-in">
         <div className="text-6xl mb-4">{score === 100 ? '🏆' : score >= 80 ? '🎉' : score >= 50 ? '👍' : '💪'}</div>
