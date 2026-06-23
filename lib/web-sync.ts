@@ -398,7 +398,7 @@ export async function pullAll(uid: string) {
       if (fwVal && /^\d{4}-W\d{1,2}$/.test(fwVal)) set(K.lastFreezeWeek, fwVal);
       if (Array.isArray(stats.study_days) && stats.study_days.length > 0) {
         const local = getStudyDays();
-        const merged = Array.from(new Set([...local, ...stats.study_days]));
+        const merged = Array.from(new Set([...local, ...stats.study_days])).sort();
         saveStudyDays(merged);
       }
     }
