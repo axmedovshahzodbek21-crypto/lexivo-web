@@ -238,17 +238,33 @@ export async function pushUnitProgressCurrentUser(collectionName: string, dayNum
     const flashcardDone = p.flashcardDone ?? false;
     const quizDone      = p.quizDone      ?? false;
     const allDone       = learnDone && flashcardDone && quizDone;
-    await supabase.from('unit_progress').upsert({
-      user_id: user.id,
-      collection_name: collectionName,
-      day_number: dayNumber,
-      learn_done: learnDone,
-      flashcard_done: flashcardDone,
-      quiz_done: quizDone,
-      completed_at: allDone ? new Date().toISOString() : null,
-    }, { onConflict: 'user_id,collection_name,day_number' });
+    const completedAt   = allDone ? new Date().toISOString() : null;
+
+    // Try UPDATE first — avoids needing a unique constraint for ON CONFLICT
+    const { data: updated, error: updateErr } = await supabase
+      .from('unit_progress')
+      .update({ learn_done: learnDone, flashcard_done: flashcardDone, quiz_done: quizDone, completed_at: completedAt })
+      .eq('user_id', user.id)
+      .eq('collection_name', collectionName)
+      .eq('day_number', dayNumber)
+      .select('id');
+    if (updateErr) { console.error('[unit_progress] update error:', updateErr); return; }
+
+    // No existing row — INSERT
+    if (!updated || updated.length === 0) {
+      const { error: insertErr } = await supabase.from('unit_progress').insert({
+        user_id: user.id,
+        collection_name: collectionName,
+        day_number: dayNumber,
+        learn_done: learnDone,
+        flashcard_done: flashcardDone,
+        quiz_done: quizDone,
+        completed_at: completedAt,
+      });
+      if (insertErr) console.error('[unit_progress] insert error:', insertErr);
+    }
   } catch (e) {
-    console.error('pushUnitProgressCurrentUser error:', e);
+    console.error('[unit_progress] unexpected error:', e);
   }
 }
 
