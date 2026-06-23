@@ -140,16 +140,23 @@ function ProgressBar({ done, total, color }: { done: number; total: number; colo
   );
 }
 
+const _topicsCache: Record<string, Record<number, string>> = {};
+
 async function fetchTopics(collectionName: string): Promise<Record<number, string>> {
+  if (_topicsCache[collectionName]) return _topicsCache[collectionName];
   try {
     const fileMap: Record<string, string> = { A1: '/data/a1_collection.json', A2: '/data/a2_collection.json', B1: '/data/b1_collection.json', Advanced: '/data/advanced_collection.json' };
+    let result: Record<number, string>;
     if (fileMap[collectionName]) {
       const data = await (await fetch(fileMap[collectionName])).json();
-      return Object.fromEntries((data.days as { dayNumber: number; topic: string }[]).map(d => [d.dayNumber, d.topic]));
+      result = Object.fromEntries((data.days as { dayNumber: number; topic: string }[]).map(d => [d.dayNumber, d.topic]));
+    } else {
+      const data = await (await fetch('/data/word_data.json')).json();
+      const col = (data as { name: string; days: { dayNumber: number; topic: string }[] }[]).find(c => c.name === collectionName);
+      result = col ? Object.fromEntries(col.days.map(d => [d.dayNumber, d.topic])) : {};
     }
-    const data = await (await fetch('/data/word_data.json')).json();
-    const col = (data as { name: string; days: { dayNumber: number; topic: string }[] }[]).find(c => c.name === collectionName);
-    return col ? Object.fromEntries(col.days.map(d => [d.dayNumber, d.topic])) : {};
+    _topicsCache[collectionName] = result;
+    return result;
   } catch { return {}; }
 }
 
