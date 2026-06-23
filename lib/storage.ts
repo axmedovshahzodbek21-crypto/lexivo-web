@@ -486,21 +486,53 @@ export function unlockAchievement(id: string): boolean {
 
 // ─── Hard words (too hard) ───────────────────────────────────────────────────
 
+export type HardWordEntry = { word: string; addedAt: string; removedAt?: string };
+
+function getHardWordEntries(): HardWordEntry[] {
+  if (typeof window === 'undefined') return [];
+  const raw = localStorage.getItem(KEYS.hardWords);
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    // Migrate from old string[] format
+    if (Array.isArray(parsed) && (parsed.length === 0 || typeof parsed[0] === 'string')) {
+      return (parsed as string[]).map(w => ({ word: w, addedAt: new Date(0).toISOString() }));
+    }
+    return parsed as HardWordEntry[];
+  } catch { return []; }
+}
+
+export { getHardWordEntries };
+
 export function getHardWords(): string[] {
-  return get<string[]>('lexivo_hard_words', []);
+  return getHardWordEntries()
+    .filter(e => !e.removedAt || e.addedAt > e.removedAt)
+    .map(e => e.word);
 }
 
 export function addHardWord(word: string) {
-  const hard = getHardWords();
-  if (!hard.includes(word)) {
-    hard.push(word);
-    set('lexivo_hard_words', hard);
+  const entries = getHardWordEntries();
+  const idx = entries.findIndex(e => e.word === word);
+  const now = new Date().toISOString();
+  if (idx === -1) {
+    entries.push({ word, addedAt: now });
+  } else {
+    entries[idx] = { word, addedAt: now }; // re-add: clear any removedAt
   }
+  set(KEYS.hardWords, entries);
 }
 
 export function removeHardWord(word: string) {
-  const hard = getHardWords().filter(w => w !== word);
-  set('lexivo_hard_words', hard);
+  const entries = getHardWordEntries();
+  const idx = entries.findIndex(e => e.word === word);
+  const now = new Date().toISOString();
+  if (idx === -1) {
+    // Word wasn't tracked locally — add a tombstone so the deletion propagates cross-device
+    entries.push({ word, addedAt: new Date(0).toISOString(), removedAt: now });
+  } else {
+    entries[idx] = { ...entries[idx], removedAt: now };
+  }
+  set(KEYS.hardWords, entries);
 }
 
 // ─── Custom lists ────────────────────────────────────────────────────────────

@@ -9,7 +9,7 @@ import {
   getLevelUpdatedAt, saveLevelUpdatedAt,
   getStudyDays, saveStudyDays,
   getUnlockedAchievements, getCustomLists,
-  getHardWords,
+  getHardWordEntries, type HardWordEntry,
   getImportedWords, saveImportedWords,
   localDateStr,
 } from './storage';
@@ -115,11 +115,17 @@ export async function pushAll(uid: string) {
       await supabase.from('starred_words').insert(starred.map(w => ({ user_id: uid, word: w })));
     }
 
-    // hard_words — full replace so removals propagate
-    const hard = getHardWords();
-    await supabase.from('hard_words').delete().eq('user_id', uid);
-    if (hard.length > 0) {
-      await supabase.from('hard_words').insert(hard.map(w => ({ user_id: uid, word: w })));
+    // hard_words — upsert with timestamps so cross-device removals propagate via tombstones
+    const hardEntries = getHardWordEntries();
+    if (hardEntries.length > 0) {
+      await supabase.from('hard_words').upsert(
+        hardEntries.map(e => ({
+          user_id: uid, word: e.word,
+          added_at: e.addedAt,
+          removed_at: e.removedAt ?? null,
+        })),
+        { onConflict: 'user_id,word' },
+      );
     }
 
     // achievements — upsert all
@@ -437,10 +443,27 @@ export async function pullAll(uid: string) {
       set(K.starred, starredRows.map(r => r.word as string));
     }
 
-    // hard_words — authoritative replace
-    const { data: hardRows } = await supabase.from('hard_words').select('word').eq('user_id', uid);
+    // hard_words — timestamp merge: most-recent action (addedAt vs removedAt) wins per word
+    const { data: hardRows } = await supabase.from('hard_words').select('word,added_at,removed_at').eq('user_id', uid);
     if (hardRows !== null) {
-      set(K.hardWords, hardRows.map(r => r.word as string));
+      const localEntries = getHardWordEntries();
+      const merged = new Map<string, HardWordEntry>(localEntries.map(e => [e.word, e]));
+      for (const r of hardRows) {
+        const cloudEntry: HardWordEntry = {
+          word: r.word as string,
+          addedAt: (r.added_at as string) ?? new Date(0).toISOString(),
+          ...(r.removed_at ? { removedAt: r.removed_at as string } : {}),
+        };
+        const local = merged.get(cloudEntry.word);
+        if (!local) {
+          merged.set(cloudEntry.word, cloudEntry);
+        } else {
+          const cloudLast = cloudEntry.removedAt ?? cloudEntry.addedAt;
+          const localLast = local.removedAt ?? local.addedAt;
+          if (cloudLast > localLast) merged.set(cloudEntry.word, cloudEntry);
+        }
+      }
+      set(K.hardWords, [...merged.values()]);
     }
 
     // unit_progress — OR-merge: remote true always wins, local true never erased
