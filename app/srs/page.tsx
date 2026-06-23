@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { speak, speakText } from '@/lib/speech';
@@ -23,6 +23,7 @@ export default function SRSReviewPage() {
   const [done, setDone] = useState(false);
   const [managing, setManaging] = useState(false);
   const [allWords, setAllWords] = useState<SRSWord[]>([]);
+  const grading = useRef(false);
 
   const loadWords = useCallback(() => {
     const due = getDueWords();
@@ -76,7 +77,9 @@ export default function SRSReviewPage() {
   }, [current, revealed, managing]);
 
   const grade = useCallback((success: boolean) => {
-    if (!current) return;
+    if (!current || grading.current) return;
+    grading.current = true;
+    setTimeout(() => { grading.current = false; }, 100);
     updateSRSWord(current.id, success);
     if (success) {
       const { leveledUp, newLevel, newXp } = addXP(XP_PER_SRS, 'SRS Review');
