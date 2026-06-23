@@ -10,6 +10,7 @@ import {
   getHardWords, removeHardWord, getSettings, getStreak, getTodayLearnedCount,
   saveLearnProgress, clearLearnProgress, getLearnProgress,
 } from '@/lib/storage';
+import { pushAllCurrentUser } from '@/lib/web-sync';
 import { createSRSWord } from '@/lib/srs';
 import { addSRSWord as storeSRSWord } from '@/lib/storage';
 import type { Accent } from '@/lib/speech';
@@ -202,6 +203,7 @@ function LearnInner() {
       if (collectionName && words.length > 0) {
         markLearningComplete(collectionName, words[0].dayNumber);
         clearLearnProgress(collectionName, words[0].dayNumber);
+        pushAllCurrentUser();
       }
       setDone(true);
     } else {

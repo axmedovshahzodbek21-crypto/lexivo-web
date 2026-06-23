@@ -221,6 +221,11 @@ export async function pushAll(uid: string) {
   }
 }
 
+export async function pushAllCurrentUser() {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user) await pushAll(user.id);
+}
+
 // ── Pull: Supabase → localStorage ─────────────────────────────────────────────
 
 export async function pullAll(uid: string) {
