@@ -236,10 +236,18 @@ export async function pushAll(uid: string) {
       const key = localStorage.key(i);
       if (!key?.startsWith('lexivo_unit_progress_')) continue;
       const suffix = key.slice('lexivo_unit_progress_'.length);
-      const lastUnderscore = suffix.lastIndexOf('_');
-      if (lastUnderscore === -1) continue;
-      const collectionName = suffix.slice(0, lastUnderscore);
-      const dayNumber = parseInt(suffix.slice(lastUnderscore + 1), 10);
+      let collectionName: string;
+      let dayNumber: number;
+      if (suffix.includes('§')) {
+        const sepIdx = suffix.indexOf('§');
+        collectionName = suffix.slice(0, sepIdx);
+        dayNumber = parseInt(suffix.slice(sepIdx + 1), 10);
+      } else {
+        const lastUnderscore = suffix.lastIndexOf('_');
+        if (lastUnderscore === -1) continue;
+        collectionName = suffix.slice(0, lastUnderscore);
+        dayNumber = parseInt(suffix.slice(lastUnderscore + 1), 10);
+      }
       if (isNaN(dayNumber)) continue;
       const raw = localStorage.getItem(key);
       if (!raw) continue;
@@ -293,8 +301,9 @@ export async function pushUnitProgressCurrentUser(collectionName: string, dayNum
   try {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
-    const key = `lexivo_unit_progress_${collectionName}_${dayNumber}`;
-    const raw = typeof window !== 'undefined' ? localStorage.getItem(key) : null;
+    const key    = `lexivo_unit_progress_${collectionName}§${dayNumber}`;
+    const keyOld = `lexivo_unit_progress_${collectionName}_${dayNumber}`;
+    const raw = typeof window !== 'undefined' ? (localStorage.getItem(key) ?? localStorage.getItem(keyOld)) : null;
     if (!raw) return;
     const p = JSON.parse(raw);
     const learnDone     = p.learnDone     ?? false;
@@ -534,7 +543,7 @@ export async function pullAll(uid: string) {
       if (typeof window !== 'undefined' && upRows && upRows.length > 0) {
         const typedRows = upRows as unknown as UnitProgressRow[];
         for (const r of typedRows) {
-          const key = `lexivo_unit_progress_${r.collection_name}_${r.day_number}`;
+          const key = `lexivo_unit_progress_${r.collection_name}§${r.day_number}`;
           const existing = localStorage.getItem(key);
           const local = existing ? JSON.parse(existing) : { learnDone: false, flashcardDone: false, quizDone: false };
           localStorage.setItem(key, JSON.stringify({
