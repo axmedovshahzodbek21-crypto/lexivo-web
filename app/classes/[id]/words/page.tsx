@@ -317,6 +317,7 @@ export default function ClassWordsPage() {
   );
 
   const grouped = groupWords(words);
+  const existingFolders = [...new Set(words.map(w => w.folder_name).filter((f): f is string => !!f))].sort();
 
   // Folder/collection shared input card (shown in both tabs)
   const FolderCollectionCard = (
@@ -344,6 +345,20 @@ export default function ClassWordsPage() {
           />
         </div>
       </div>
+      {existingFolders.length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {existingFolders.map(f => (
+            <button
+              key={f}
+              onClick={() => setFolderInput(f)}
+              className="text-xs font-semibold px-2.5 py-1 rounded-full transition-colors"
+              style={folderInput.trim() === f
+                ? { background: 'var(--primary)', color: 'white' }
+                : { background: 'var(--primary-bg)', color: 'var(--primary)' }}
+            >📁 {f}</button>
+          ))}
+        </div>
+      )}
       {(folderInput.trim() || collectionInput.trim()) && (
         <p className="text-xs text-[var(--text-muted)]">
           {folderInput.trim() && <><span className="text-[var(--primary)] font-medium">📁 {folderInput.trim()}</span>{collectionInput.trim() ? ' › ' : ''}</>}
