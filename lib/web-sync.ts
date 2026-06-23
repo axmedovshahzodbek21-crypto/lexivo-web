@@ -278,6 +278,23 @@ export async function pushUnitProgressCurrentUser(collectionName: string, dayNum
 // ── Pull: Supabase → localStorage ─────────────────────────────────────────────
 
 export async function pullAll(uid: string) {
+  const SNAPSHOT_KEY = 'lexivo_pull_snapshot';
+
+  // Snapshot current localStorage state so we can rollback if pullAll throws mid-write
+  if (typeof window !== 'undefined') {
+    try {
+      const snap: Record<string, string> = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i)!;
+        if (k.startsWith('lexivo_') && k !== SNAPSHOT_KEY) {
+          const v = localStorage.getItem(k);
+          if (v !== null) snap[k] = v;
+        }
+      }
+      localStorage.setItem(SNAPSHOT_KEY, JSON.stringify(snap));
+    } catch { /* snapshot write failed (localStorage full) — proceed without rollback */ }
+  }
+
   try {
     const set = (key: string, val: unknown) => {
       if (typeof window === 'undefined') return;
@@ -506,10 +523,31 @@ export async function pullAll(uid: string) {
     }
 
     if (typeof window !== 'undefined') {
+      localStorage.removeItem(SNAPSHOT_KEY); // All writes succeeded — discard rollback snapshot
       window.dispatchEvent(new Event('lexivo-sync'));
     }
   } catch (e) {
     console.error('pullAll error:', e);
+    // Rollback: restore the pre-sync localStorage state to avoid partially-written data
+    if (typeof window !== 'undefined') {
+      const raw = localStorage.getItem(SNAPSHOT_KEY);
+      if (raw) {
+        try {
+          const snap: Record<string, string> = JSON.parse(raw);
+          // Remove any keys written during the failed sync
+          const toRemove: string[] = [];
+          for (let i = 0; i < localStorage.length; i++) {
+            const k = localStorage.key(i)!;
+            if (k.startsWith('lexivo_') && k !== SNAPSHOT_KEY) toRemove.push(k);
+          }
+          toRemove.forEach(k => localStorage.removeItem(k));
+          // Restore snapshotted values
+          for (const [k, v] of Object.entries(snap)) localStorage.setItem(k, v);
+          console.warn('pullAll: rolled back localStorage to pre-sync state');
+        } catch { /* snapshot corrupt — leave state as-is */ }
+      }
+      localStorage.removeItem(SNAPSHOT_KEY);
+    }
   }
 }
 
