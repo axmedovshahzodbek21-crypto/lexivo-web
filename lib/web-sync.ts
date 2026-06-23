@@ -226,6 +226,32 @@ export async function pushAllCurrentUser() {
   if (user) await pushAll(user.id);
 }
 
+export async function pushUnitProgressCurrentUser(collectionName: string, dayNumber: number) {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const key = `lexivo_unit_progress_${collectionName}_${dayNumber}`;
+    const raw = typeof window !== 'undefined' ? localStorage.getItem(key) : null;
+    if (!raw) return;
+    const p = JSON.parse(raw);
+    const learnDone     = p.learnDone     ?? false;
+    const flashcardDone = p.flashcardDone ?? false;
+    const quizDone      = p.quizDone      ?? false;
+    const allDone       = learnDone && flashcardDone && quizDone;
+    await supabase.from('unit_progress').upsert({
+      user_id: user.id,
+      collection_name: collectionName,
+      day_number: dayNumber,
+      learn_done: learnDone,
+      flashcard_done: flashcardDone,
+      quiz_done: quizDone,
+      completed_at: allDone ? new Date().toISOString() : null,
+    }, { onConflict: 'user_id,collection_name,day_number' });
+  } catch (e) {
+    console.error('pushUnitProgressCurrentUser error:', e);
+  }
+}
+
 // ── Pull: Supabase → localStorage ─────────────────────────────────────────────
 
 export async function pullAll(uid: string) {

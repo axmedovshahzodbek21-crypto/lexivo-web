@@ -7,7 +7,7 @@ import { speak, speakText } from '@/lib/speech';
 import { addXP, recordStudySession, markQuizComplete, unlockAchievement, getStarredWords, getCustomListWords, getSettings, getUnitProgress, getImportedWords, getImportedWordsByCollection, getClassHWTemp } from '@/lib/storage';
 import { fireConfetti } from '@/lib/confetti';
 import { checkAchievements } from '@/lib/gamification';
-import { pushAllCurrentUser } from '@/lib/web-sync';
+import { pushUnitProgressCurrentUser } from '@/lib/web-sync';
 import type { WordItem, WordCollection, QuizType } from '@/lib/types';
 import { XP_PER_QUIZ } from '@/lib/types';
 import Link from 'next/link';
@@ -255,7 +255,7 @@ export default function QuizPage() {
       if (collectionName) {
         const qDayNumber = dayNumber ?? questions[0]?.word.dayNumber ?? 1;
         markQuizComplete(collectionName, qDayNumber);
-        pushAllCurrentUser();
+        pushUnitProgressCurrentUser(collectionName, qDayNumber);
         const p = getUnitProgress(collectionName, qDayNumber);
         if (p.learnDone && p.flashcardDone && p.quizDone) fireConfetti();
       }

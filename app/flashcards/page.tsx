@@ -6,7 +6,7 @@ import { useAppStore } from '@/lib/store';
 import { speak, speakText } from '@/lib/speech';
 import { addXP, recordStudySession, markFlashcardComplete, getStarredWords, getHardWords, getCustomListWords, getUnitProgress, saveFlashcardProgress, getFlashcardProgress, clearFlashcardProgress, getImportedWords, getImportedWordsByCollection, getClassHWTemp } from '@/lib/storage';
 import { checkAchievements } from '@/lib/gamification';
-import { pushAllCurrentUser } from '@/lib/web-sync';
+import { pushUnitProgressCurrentUser } from '@/lib/web-sync';
 import type { WordItem, WordCollection } from '@/lib/types';
 import Link from 'next/link';
 import UnitPicker from '@/components/UnitPicker';
@@ -179,7 +179,7 @@ export default function FlashcardsPage() {
         const qDay = dayNumber ?? deck[0]?.dayNumber ?? 1;
         markFlashcardComplete(collectionName, qDay);
         clearFlashcardProgress(collectionName, qDay);
-        pushAllCurrentUser();
+        pushUnitProgressCurrentUser(collectionName, qDay);
       }
       setDone(true);
     } else {
