@@ -217,8 +217,7 @@ export function addSRSWord(word: SRSWord) {
 }
 
 export function localDateStr(d = new Date()): string {
-  const shifted = new Date(d.getTime() - 2 * 60 * 60 * 1000);
-  return `${shifted.getFullYear()}-${String(shifted.getMonth() + 1).padStart(2, '0')}-${String(shifted.getDate()).padStart(2, '0')}`;
+  return d.toLocaleDateString('en-CA'); // yields YYYY-MM-DD in the user's local timezone
 }
 
 export function getDueWords(): SRSWord[] {
