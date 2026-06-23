@@ -603,29 +603,58 @@ async function checkAndHandleReset(uid: string): Promise<boolean> {
   }
 }
 
-// ── Periodic sync ─────────────────────────────────────────────────────────────
+// ── Periodic sync with exponential backoff + circuit breaker ─────────────────
 
-let _syncInterval: ReturnType<typeof setInterval> | null = null;
+const BASE_INTERVAL_MS  = 30_000;
+const MAX_INTERVAL_MS   = 10 * 60_000; // 10 minutes
+const MAX_FAILURES      = 10;
+
+let _syncTimer:    ReturnType<typeof setTimeout> | null = null;
+let _syncStopped   = false;
+let _failureCount  = 0;
 
 function dispatch(name: string) {
   if (typeof window !== 'undefined') window.dispatchEvent(new Event(name));
 }
 
+function scheduleSync(uid: string, delayMs: number) {
+  if (_syncStopped) return;
+  _syncTimer = setTimeout(() => runSync(uid), delayMs);
+}
+
+async function runSync(uid: string) {
+  if (_syncStopped) return;
+  dispatch('lexivo-sync-start');
+  try {
+    const wasReset = await checkAndHandleReset(uid);
+    await pullAll(uid);
+    if (!wasReset) await pushAll(uid);
+    _failureCount = 0;
+    dispatch('lexivo-sync-done');
+    scheduleSync(uid, BASE_INTERVAL_MS);
+  } catch {
+    _failureCount++;
+    dispatch('lexivo-sync-error');
+    if (_failureCount >= MAX_FAILURES) {
+      console.warn(`[sync] ${MAX_FAILURES} consecutive failures — suspending sync`);
+      dispatch('lexivo-sync-suspended');
+      _syncStopped = true;
+      return;
+    }
+    // Exponential backoff: 30s, 60s, 120s, …, capped at 10 min
+    const backoff = Math.min(BASE_INTERVAL_MS * 2 ** (_failureCount - 1), MAX_INTERVAL_MS);
+    scheduleSync(uid, backoff);
+  }
+}
+
 export function startSync(uid: string) {
   stopSync();
-  _syncInterval = setInterval(async () => {
-    dispatch('lexivo-sync-start');
-    try {
-      const wasReset = await checkAndHandleReset(uid);
-      await pullAll(uid);
-      if (!wasReset) await pushAll(uid);
-      dispatch('lexivo-sync-done');
-    } catch {
-      dispatch('lexivo-sync-error');
-    }
-  }, 30_000);
+  _syncStopped  = false;
+  _failureCount = 0;
+  scheduleSync(uid, BASE_INTERVAL_MS);
 }
 
 export function stopSync() {
-  if (_syncInterval) { clearInterval(_syncInterval); _syncInterval = null; }
+  _syncStopped = true;
+  if (_syncTimer) { clearTimeout(_syncTimer); _syncTimer = null; }
 }
