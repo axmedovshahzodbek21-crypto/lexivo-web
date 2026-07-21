@@ -143,31 +143,55 @@ export default function ReadingPage() {
   }
 
   // ── Step 2: reading mode ──────────────────────────────────────────────────
+  const paragraphs = passage.split('\n').map(p => p.trim()).filter(Boolean);
+  const wordCount = passage.split(/\s+/).filter(Boolean).length;
+  const readingTime = Math.max(1, Math.ceil(wordCount / 200));
+
   return (
-    <div className="max-w-2xl mx-auto pb-28">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 sticky top-0 z-10 bg-[var(--bg)] border-b border-[var(--border)]">
-        <button
-          onClick={() => { setReading(false); setWordList([]); setSelectedText(''); setSelectionRect(null); }}
-          className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors"
-        >
-          ← Back
-        </button>
-        <span className="text-xs text-[var(--text-muted)]">
-          {wordList.length > 0
-            ? `${wordList.length} word${wordList.length !== 1 ? 's' : ''} collected`
-            : 'Select words to collect them'}
-        </span>
+    <div className="max-w-[72ch] mx-auto pb-28">
+      {/* Sticky header with progress bar */}
+      <div className="sticky top-0 z-10 bg-[var(--bg)] border-b border-[var(--border)]">
+        <div className="flex items-center justify-between px-4 py-3">
+          <button
+            onClick={() => { setReading(false); setWordList([]); setSelectedText(''); setSelectionRect(null); }}
+            className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors"
+          >
+            ← Back
+          </button>
+          <span className="text-xs text-[var(--text-muted)]">~{readingTime} min read</span>
+        </div>
       </div>
 
-      {/* Passage — clean reading view */}
-      <div
-        ref={passageRef}
-        className="px-6 py-8 text-[var(--text)] text-[17px] leading-[1.85] select-text cursor-text"
-        style={{ userSelect: 'text', WebkitUserSelect: 'text' }}
-      >
-        {passage}
+      {/* Passage card */}
+      <div className="mx-4 mt-6 mb-4 rounded-2xl bg-[var(--surface)] border border-[var(--border)] overflow-hidden">
+        {/* Reading meta */}
+        <div className="px-8 pt-6 pb-2 border-b border-[var(--border)]">
+          <p className="text-xs text-[var(--text-muted)]">
+            Select any word or phrase → tap <strong className="text-[var(--primary)]">+ Add</strong> to collect it
+          </p>
+        </div>
+
+        {/* Paragraphs */}
+        <div
+          ref={passageRef}
+          className="px-8 py-6 text-[var(--text)] text-[17px] leading-[1.85] select-text cursor-text space-y-5"
+          style={{ userSelect: 'text', WebkitUserSelect: 'text' }}
+        >
+          {paragraphs.map((para, i) => (
+            <p key={i}>{para}</p>
+          ))}
+        </div>
       </div>
+
+      {/* Floating word count badge */}
+      {wordList.length > 0 && (
+        <div className="fixed bottom-24 right-4 z-40 sm:bottom-6">
+          <div className="flex items-center gap-1.5 px-3 py-2 rounded-full bg-[var(--primary)] text-white text-xs font-bold shadow-lg">
+            <span>📝</span>
+            <span>{wordList.length} word{wordList.length !== 1 ? 's' : ''}</span>
+          </div>
+        </div>
+      )}
 
       {/* Floating "Add" pill */}
       {selectedText && selectionRect && (
