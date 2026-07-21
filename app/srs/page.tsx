@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { speak, speakText } from '@/lib/speech';
@@ -16,6 +16,7 @@ export default function SRSReviewPage() {
   const router = useRouter();
   const t = useTranslation();
   const { pushAchievement, setPendingLevelUp } = useAppStore();
+  const collections = useAppStore(s => s.collections);
   const [queue, setQueue] = useState<SRSWord[]>([]);
   const [index, setIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
@@ -58,6 +59,15 @@ export default function SRSReviewPage() {
   }, []);
 
   const current = queue[index];
+
+  const openInUnitHref = useMemo(() => {
+    if (!current || !current.collectionName || current.collectionName === 'my-words') return null;
+    const col = collections.find(c => c.name === current.collectionName);
+    if (!col) return `/learn?collection=${encodeURIComponent(current.collectionName)}&day=${current.dayNumber}`;
+    const day = col.days.find(d => d.dayNumber === current.dayNumber);
+    const wi = day ? day.words.findIndex(w => w.word === current.word) : -1;
+    return `/learn?collection=${encodeURIComponent(current.collectionName)}&day=${current.dayNumber}&startIndex=${wi >= 0 ? wi : 0}`;
+  }, [current, collections]);
 
   const buildChoices = useCallback((idx: number, q: SRSWord[]): string[] | null => {
     if (!q[idx]) return null;
@@ -356,14 +366,21 @@ export default function SRSReviewPage() {
                   <p className="text-xs italic text-[var(--text-muted)]">"{ex}"</p>
                 </div>
               ))}
-              {current.collectionName !== 'my-words' && (
-                <Link
-                  href={`/word/${encodeURIComponent(current.word)}`}
-                  className="text-xs text-[var(--primary)] font-medium hover:underline text-right block"
-                >
-                  {t.srs.fullDetails}
-                </Link>
-              )}
+              <div className="flex items-center justify-between gap-2">
+                {openInUnitHref && (
+                  <Link href={openInUnitHref} className="text-xs text-[var(--primary)] font-medium hover:underline">
+                    Open in unit →
+                  </Link>
+                )}
+                {current.collectionName !== 'my-words' && (
+                  <Link
+                    href={`/word/${encodeURIComponent(current.word)}`}
+                    className="text-xs text-[var(--primary)] font-medium hover:underline ml-auto"
+                  >
+                    {t.srs.fullDetails}
+                  </Link>
+                )}
+              </div>
             </div>
           ) : choices === null ? (
             <button onClick={() => setRevealed(true)} className="mt-4 btn-secondary w-full">
