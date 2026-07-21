@@ -279,7 +279,7 @@ function LearnInner() {
       switch (e.key) {
         case 's': case 'S': if (current) { current.language ? speakText(current.word, current.language) : speakAccent(current.word, defaultAccent); } break;
         case 'f': case 'F': setFocusMode(!focusMode); break;
-        case 'k': case 'K': if (!revealed) skipWord(); break;
+        case 'k': case 'K': if (marks[index] == null) skipWord(); break;
         case 'h': case 'H':
           if (!revealed) setShowHint(true);
           else markTooHard();
@@ -295,7 +295,7 @@ function LearnInner() {
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [current, done, focusMode, revealed, advanceCard, markTooHard, skipWord, dismissSkipTip]);
+  }, [current, done, focusMode, revealed, marks, index, advanceCard, markTooHard, skipWord, dismissSkipTip]);
 
   // No unit selected → show picker
   if (!collectionName && !hardOnly && !sourceMyWords) return <UnitPicker mode="learn" />;
