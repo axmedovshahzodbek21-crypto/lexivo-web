@@ -304,9 +304,11 @@ export default function SRSReviewPage() {
                 <p className="text-lg font-semibold text-[var(--primary)]">{current.translation}</p>
               </div>
               <p className="text-sm text-[var(--text)]">{current.definition}</p>
-              <div className="bg-[var(--surface-2)] rounded-xl p-3">
-                <p className="text-xs italic text-[var(--text-muted)]">"{current.example1}"</p>
-              </div>
+              {[current.example1, current.example2, current.example3].filter(Boolean).map((ex, i) => (
+                <div key={i} className="bg-[var(--surface-2)] rounded-xl p-3">
+                  <p className="text-xs italic text-[var(--text-muted)]">"{ex}"</p>
+                </div>
+              ))}
               {current.collectionName !== 'my-words' && (
                 <Link
                   href={`/word/${encodeURIComponent(current.word)}`}
