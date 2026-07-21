@@ -103,6 +103,7 @@ function LearnInner() {
   const [skipped, setSkipped] = useState<StudyWord[]>([]);
   const [pureSkipped, setPureSkipped] = useState<StudyWord[]>([]);
   const [marks, setMarks] = useState<('learned' | 'skipped' | 'too-hard' | null)[]>([]);
+  const [maxReached, setMaxReached] = useState(0);
   const [done, setDone] = useState(false);
   const [sessionCount, setSessionCount] = useState(0);
   const [starred, setStarredState] = useState(false);
@@ -240,6 +241,7 @@ function LearnInner() {
       setDone(true);
     } else {
       setIndex(i => i + 1);
+      setMaxReached(m => Math.max(m, index + 1));
     }
   }, [current, index, words, collectionName, pushAchievement, setPendingLevelUp, hardOnly]);
 
@@ -249,7 +251,7 @@ function LearnInner() {
     setSkipped(s => [...s, current]);
     setMarks(m => { const n = [...m]; n[index] = 'too-hard'; return n; });
     if (index + 1 >= words.length) setDone(true);
-    else setIndex(i => i + 1);
+    else { setIndex(i => i + 1); setMaxReached(m => Math.max(m, index + 1)); }
   }, [current, index, words]);
 
   const dismissSkipTip = useCallback(() => {
@@ -263,7 +265,7 @@ function LearnInner() {
     setPureSkipped(s => [...s, current]);
     setMarks(m => { const n = [...m]; n[index] = 'skipped'; return n; });
     if (index + 1 >= words.length) setDone(true);
-    else setIndex(i => i + 1);
+    else { setIndex(i => i + 1); setMaxReached(m => Math.max(m, index + 1)); }
   }, [current, index, words, dismissSkipTip]);
 
   const handleStar = () => {
@@ -323,7 +325,7 @@ function LearnInner() {
         xpEarned={sessionCount * XP_PER_LEARN}
         streak={getStreak()}
         todayCount={getTodayLearnedCount()}
-        onRestart={() => { setIndex(0); setDone(false); setSessionCount(0); setSkipped([]); setPureSkipped([]); setMarks(new Array(words.length).fill(null)); }}
+        onRestart={() => { setIndex(0); setMaxReached(0); setDone(false); setSessionCount(0); setSkipped([]); setPureSkipped([]); setMarks(new Array(words.length).fill(null)); }}
       />
     );
   }
@@ -358,6 +360,7 @@ function LearnInner() {
               });
               setMarks(newMarks);
               setIndex(resumePrompt.savedIndex);
+              setMaxReached(resumePrompt.savedIndex);
               setResumePrompt(null);
             }}
           >
@@ -405,7 +408,7 @@ function LearnInner() {
             </span>
             <div className="flex items-center shrink-0 ml-2">
               <button
-                onClick={() => setIndex(i => Math.max(0, i - 1))}
+                onClick={() => { setIndex(i => Math.max(0, i - 1)); setRevealed(false); }}
                 disabled={index === 0}
                 className="w-6 h-6 flex items-center justify-center text-[var(--primary)] disabled:opacity-30 text-lg font-bold"
                 aria-label="Previous card"
@@ -414,8 +417,8 @@ function LearnInner() {
                 {index + 1} <span className="text-[var(--text-muted)] font-normal">/ {words.length}</span>
               </span>
               <button
-                onClick={() => { if ((marks[index] ?? null) != null && index < words.length - 1) setIndex(i => i + 1); }}
-                disabled={(marks[index] ?? null) == null || index >= words.length - 1}
+                onClick={() => { setIndex(i => Math.min(maxReached, i + 1)); setRevealed(false); }}
+                disabled={index >= maxReached}
                 className="w-6 h-6 flex items-center justify-center text-[var(--primary)] disabled:opacity-30 text-lg font-bold"
                 aria-label="Next card"
               >›</button>
@@ -461,9 +464,14 @@ function LearnInner() {
           onClick={!showBack ? () => { setRevealed(true); dismissSkipTip(); } : undefined}
         >
           {isMarked && (
-            <div className="mb-3 px-3 py-1.5 rounded-full text-xs font-bold text-white w-fit" style={{ background: 'rgba(255,255,255,0.25)' }}>
-              {mark === 'learned' ? '✓ Already marked as Learned' : mark === 'too-hard' ? '😤 Too Hard' : '⏭ Skipped — still counts!'}
-            </div>
+            <button
+              onClick={e => { e.stopPropagation(); setMarks(m => { const n = [...m]; n[index] = null; return n; }); setRevealed(false); }}
+              className="mb-3 px-3 py-1.5 rounded-full text-xs font-bold text-white w-fit hover:opacity-80 active:scale-95 transition-all cursor-pointer"
+              style={{ background: 'rgba(255,255,255,0.25)' }}
+              title="Click to undo this mark"
+            >
+              {mark === 'learned' ? '✓ Already marked as Learned' : mark === 'too-hard' ? '😤 Too Hard' : '⏭ Skipped — still counts!'} ✕
+            </button>
           )}
           {/* Topic + audio */}
           <div className="flex items-center justify-between mb-3">
