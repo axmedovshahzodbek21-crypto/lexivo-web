@@ -61,25 +61,6 @@ export default function SRSReviewPage() {
     if (current && autoPlay) { current.language ? speakText(current.word, current.language) : speak(current.word); }
   }, [current, autoPlay]);
 
-  // Keyboard shortcuts
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement) return;
-      if (managing) { if (e.key === 'Escape') setManaging(false); return; }
-      if (!current) return;
-      switch (e.key) {
-        case ' ': case 'Enter': e.preventDefault(); if (!revealed) setRevealed(true); break;
-        case 'ArrowRight': case 'k': case 'K': if (revealed) grade('knew'); break;
-        case 'h': case 'H': if (revealed) grade('hard'); break;
-        case 'ArrowLeft': case 'j': case 'J': if (revealed) grade('forgot'); break;
-        case 's': case 'S': current.language ? speakText(current.word, current.language) : speak(current.word); break;
-        case 'Backspace': case 'b': case 'B': e.preventDefault(); goBack(); break;
-      }
-    };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [current, revealed, managing, goBack]);
-
   const applyGrades = useCallback((finalResults: { id: string; grade: 'knew' | 'hard' | 'forgot' }[]) => {
     if (gradesApplied.current) return;
     gradesApplied.current = true;
@@ -127,6 +108,25 @@ export default function SRSReviewPage() {
     setResults(r => r.slice(0, -1));
     setRevealed(false);
   }, [index]);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement) return;
+      if (managing) { if (e.key === 'Escape') setManaging(false); return; }
+      if (!current) return;
+      switch (e.key) {
+        case ' ': case 'Enter': e.preventDefault(); if (!revealed) setRevealed(true); break;
+        case 'ArrowRight': case 'k': case 'K': if (revealed) grade('knew'); break;
+        case 'h': case 'H': if (revealed) grade('hard'); break;
+        case 'ArrowLeft': case 'j': case 'J': if (revealed) grade('forgot'); break;
+        case 's': case 'S': current.language ? speakText(current.word, current.language) : speak(current.word); break;
+        case 'Backspace': case 'b': case 'B': e.preventDefault(); goBack(); break;
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [current, revealed, managing, grade, goBack]);
 
   const handleRemove = (id: string) => {
     removeSRSWord(id);
