@@ -180,156 +180,143 @@ export default function ReadingPage() {
         </div>
       </div>
 
-      {/* Two-column grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-4 px-4 mt-6">
-
-        {/* Left: Passage */}
-        <div>
-          <div className="rounded-2xl bg-[var(--surface)] border border-[var(--border)] overflow-hidden">
-            <div className="px-8 pt-5 pb-2 border-b border-[var(--border)]">
-              <p className="text-xs text-[var(--text-muted)]">
-                Select any word or phrase → tap <strong className="text-[var(--primary)]">+ Add</strong> to collect it
-              </p>
-            </div>
-            <div
-              ref={passageRef}
-              className="px-8 py-6 text-[var(--text)] text-[17px] leading-[1.85] select-text cursor-text space-y-5"
-              style={{ userSelect: 'text', WebkitUserSelect: 'text' }}
-            >
-              {paragraphs.map((para, i) => (
-                <p key={i}>{highlightParagraph(para, wordList)}</p>
-              ))}
-            </div>
-          </div>
+      {/* Passage card */}
+      <div className="mx-4 mt-6 mb-4 rounded-2xl bg-[var(--surface)] border border-[var(--border)] overflow-hidden">
+        <div className="px-8 pt-5 pb-2 border-b border-[var(--border)]">
+          <p className="text-xs text-[var(--text-muted)]">
+            Select any word or phrase → tap <strong className="text-[var(--primary)]">+ Add</strong> to collect it
+          </p>
         </div>
-
-        {/* Right: Sticky sidebar */}
-        <div className="space-y-4 lg:sticky lg:top-[57px] lg:self-start lg:max-h-[calc(100vh-57px)] lg:overflow-y-auto pb-4">
-
-          {wordList.length === 0 ? (
-            <div className="hidden lg:flex flex-col items-center justify-center rounded-2xl bg-[var(--surface)] border border-[var(--border)] p-8 text-center">
-              <p className="text-3xl mb-3">📝</p>
-              <p className="text-sm text-[var(--text-muted)] leading-relaxed">Select words in the passage to collect them here.</p>
-            </div>
-          ) : (
-            <>
-              {/* Collected words */}
-              <div className="card space-y-1">
-                <div className="flex items-center justify-between mb-2">
-                  <h2 className="font-semibold text-sm text-[var(--text)]">Collected words</h2>
-                  <button onClick={() => setWordList([])} className="text-xs text-[var(--danger)] hover:underline">
-                    Clear all
-                  </button>
-                </div>
-                {wordList.map((w, i) => (
-                  <div key={i} className="flex items-center gap-2 py-1.5 border-b border-[var(--border)] last:border-0">
-                    <span className="text-xs text-[var(--text-muted)] w-5 shrink-0 text-right">{i + 1}.</span>
-                    <span className="flex-1 text-sm text-[var(--text)] font-medium">{w}</span>
-                    <button
-                      onClick={() => removeWord(i)}
-                      className="text-[var(--text-muted)] hover:text-[var(--danger)] text-xs px-1 transition-colors"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                ))}
-              </div>
-
-              {/* AI Prompt */}
-              <div className="card space-y-3">
-                <div className="flex items-center justify-between">
-                  <h2 className="font-semibold text-sm text-[var(--text)]">AI Prompt</h2>
-                  <span className="text-xs text-[var(--text-muted)]">Copy → paste into ChatGPT</span>
-                </div>
-                <pre className="text-xs text-[var(--text-muted)] bg-[var(--surface-2)] rounded-xl p-3 whitespace-pre-wrap font-mono leading-relaxed max-h-44 overflow-y-auto">
-                  {prompt}
-                </pre>
-                <button
-                  onClick={copyPrompt}
-                  className={`w-full py-3 rounded-xl font-semibold text-sm transition-all ${copied ? 'bg-green-500 text-white' : 'btn-primary'}`}
-                >
-                  {copied ? '✓ Copied!' : '📋 Copy Prompt'}
-                </button>
-              </div>
-
-              {/* Import AI result */}
-              <div className="card space-y-3">
-                <button
-                  onClick={() => setShowImport(v => !v)}
-                  className="w-full flex items-center justify-between text-sm font-semibold text-[var(--text)]"
-                >
-                  <span>📥 Import AI result</span>
-                  <span className="text-[var(--text-muted)] text-xs">{showImport ? '▲' : '▼'}</span>
-                </button>
-
-                {showImport && (
-                  <div className="space-y-3">
-                    <p className="text-xs text-[var(--text-muted)]">
-                      Paste the AI response below exactly as received, then click Parse.
-                    </p>
-                    <textarea
-                      className="w-full h-40 p-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-xs text-[var(--text)] font-mono resize-none focus:outline-none focus:border-[var(--primary)] transition-colors leading-relaxed"
-                      placeholder="Paste AI response here…"
-                      value={importText}
-                      onChange={e => { setImportText(e.target.value); setParsedWords(null); }}
-                    />
-                    <button
-                      onClick={handleParse}
-                      disabled={!importText.trim()}
-                      className="btn-secondary w-full disabled:opacity-40"
-                    >
-                      Parse
-                    </button>
-
-                    {parsedWords !== null && parsedWords.length === 0 && (
-                      <p className="text-xs text-[var(--danger)] text-center">
-                        Could not parse any words. Make sure the AI followed the exact format.
-                      </p>
-                    )}
-
-                    {parsedWords !== null && parsedWords.length > 0 && (
-                      <div className="space-y-2">
-                        <p className="text-xs text-[var(--text-muted)]">
-                          {parsedWords.length} word{parsedWords.length !== 1 ? 's' : ''} ready to import:
-                        </p>
-                        <div className="max-h-48 overflow-y-auto divide-y divide-[var(--border)]">
-                          {parsedWords.map((w, i) => (
-                            <div key={i} className="flex items-start gap-3 py-2">
-                              <span className="text-xs text-[var(--text-muted)] w-4 shrink-0 pt-0.5">{i + 1}.</span>
-                              <div className="flex-1 min-w-0">
-                                <p className="text-sm font-semibold text-[var(--text)]">{w.word}</p>
-                                <p className="text-xs text-[var(--primary)] font-medium">{w.translation}</p>
-                                <p className="text-xs text-[var(--text-muted)] truncate">{w.definition}</p>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                        <button onClick={handleImport} className="btn-primary w-full">
-                          Add {parsedWords.length} word{parsedWords.length !== 1 ? 's' : ''} to My Words
-                        </button>
-                      </div>
-                    )}
-
-                    {importDone && (
-                      <p className="text-sm text-green-600 font-semibold text-center animate-fade-in">
-                        ✓ Words added to My Words!
-                      </p>
-                    )}
-                  </div>
-                )}
-              </div>
-            </>
-          )}
+        <div
+          ref={passageRef}
+          className="px-8 py-6 text-[var(--text)] text-[17px] leading-[1.85] select-text cursor-text space-y-5"
+          style={{ userSelect: 'text', WebkitUserSelect: 'text' }}
+        >
+          {paragraphs.map((para, i) => (
+            <p key={i}>{highlightParagraph(para, wordList)}</p>
+          ))}
         </div>
       </div>
 
-      {/* Floating word count badge — mobile only */}
+      {/* Floating word count badge */}
       {wordList.length > 0 && (
-        <div className="fixed bottom-24 right-4 z-40 sm:bottom-6 lg:hidden">
+        <div className="fixed bottom-24 right-4 z-40 sm:bottom-6">
           <div className="flex items-center gap-1.5 px-3 py-2 rounded-full bg-[var(--primary)] text-white text-xs font-bold shadow-lg">
             <span>📝</span>
             <span>{wordList.length} word{wordList.length !== 1 ? 's' : ''}</span>
           </div>
+        </div>
+      )}
+
+      {/* Collected words */}
+      {wordList.length > 0 && (
+        <div className="card mx-4 space-y-1">
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="font-semibold text-sm text-[var(--text)]">Collected words</h2>
+            <button onClick={() => setWordList([])} className="text-xs text-[var(--danger)] hover:underline">
+              Clear all
+            </button>
+          </div>
+          {wordList.map((w, i) => (
+            <div key={i} className="flex items-center gap-2 py-1.5 border-b border-[var(--border)] last:border-0">
+              <span className="text-xs text-[var(--text-muted)] w-5 shrink-0 text-right">{i + 1}.</span>
+              <span className="flex-1 text-sm text-[var(--text)] font-medium">{w}</span>
+              <button
+                onClick={() => removeWord(i)}
+                className="text-[var(--text-muted)] hover:text-[var(--danger)] text-xs px-1 transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* AI Prompt */}
+      {wordList.length > 0 && (
+        <div className="card mx-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="font-semibold text-sm text-[var(--text)]">AI Prompt</h2>
+            <span className="text-xs text-[var(--text-muted)]">Copy → paste into ChatGPT or Claude</span>
+          </div>
+          <pre className="text-xs text-[var(--text-muted)] bg-[var(--surface-2)] rounded-xl p-3 whitespace-pre-wrap font-mono leading-relaxed max-h-52 overflow-y-auto">
+            {prompt}
+          </pre>
+          <button
+            onClick={copyPrompt}
+            className={`w-full py-3 rounded-xl font-semibold text-sm transition-all ${copied ? 'bg-green-500 text-white' : 'btn-primary'}`}
+          >
+            {copied ? '✓ Copied!' : '📋 Copy Prompt'}
+          </button>
+        </div>
+      )}
+
+      {/* Import AI result */}
+      {wordList.length > 0 && (
+        <div className="card mx-4 mb-4 space-y-3">
+          <button
+            onClick={() => setShowImport(v => !v)}
+            className="w-full flex items-center justify-between text-sm font-semibold text-[var(--text)]"
+          >
+            <span>📥 Import AI result → My Words</span>
+            <span className="text-[var(--text-muted)] text-xs">{showImport ? '▲' : '▼'}</span>
+          </button>
+
+          {showImport && (
+            <div className="space-y-3">
+              <p className="text-xs text-[var(--text-muted)]">
+                Paste the AI response below exactly as received, then click Parse.
+              </p>
+              <textarea
+                className="w-full h-40 p-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-xs text-[var(--text)] font-mono resize-none focus:outline-none focus:border-[var(--primary)] transition-colors leading-relaxed"
+                placeholder="Paste AI response here…"
+                value={importText}
+                onChange={e => { setImportText(e.target.value); setParsedWords(null); }}
+              />
+              <button
+                onClick={handleParse}
+                disabled={!importText.trim()}
+                className="btn-secondary w-full disabled:opacity-40"
+              >
+                Parse
+              </button>
+
+              {parsedWords !== null && parsedWords.length === 0 && (
+                <p className="text-xs text-[var(--danger)] text-center">
+                  Could not parse any words. Make sure the AI followed the exact format.
+                </p>
+              )}
+
+              {parsedWords !== null && parsedWords.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-xs text-[var(--text-muted)]">
+                    {parsedWords.length} word{parsedWords.length !== 1 ? 's' : ''} ready to import:
+                  </p>
+                  <div className="max-h-52 overflow-y-auto divide-y divide-[var(--border)]">
+                    {parsedWords.map((w, i) => (
+                      <div key={i} className="flex items-start gap-3 py-2">
+                        <span className="text-xs text-[var(--text-muted)] w-4 shrink-0 pt-0.5">{i + 1}.</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-[var(--text)]">{w.word}</p>
+                          <p className="text-xs text-[var(--primary)] font-medium">{w.translation}</p>
+                          <p className="text-xs text-[var(--text-muted)] truncate">{w.definition}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <button onClick={handleImport} className="btn-primary w-full">
+                    Add {parsedWords.length} word{parsedWords.length !== 1 ? 's' : ''} to My Words
+                  </button>
+                </div>
+              )}
+
+              {importDone && (
+                <p className="text-sm text-green-600 font-semibold text-center animate-fade-in">
+                  ✓ Words added to My Words!
+                </p>
+              )}
+            </div>
+          )}
         </div>
       )}
 
