@@ -3,6 +3,24 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { addImportedWords } from '@/lib/storage';
 import type { ImportedWord } from '@/lib/types';
 
+function highlightParagraph(text: string, collected: string[]): React.ReactNode {
+  if (collected.length === 0) return text;
+  const sorted = [...collected].sort((a, b) => b.length - a.length);
+  const escaped = sorted.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  const regex = new RegExp(`(${escaped.join('|')})`, 'gi');
+  const parts = text.split(regex);
+  return parts.map((part, i) => {
+    if (collected.some(w => w.toLowerCase() === part.toLowerCase())) {
+      return (
+        <mark key={i} className="bg-[var(--primary)] text-white rounded-sm px-0.5 not-italic">
+          {part}
+        </mark>
+      );
+    }
+    return part;
+  });
+}
+
 const buildPrompt = (words: string[]) =>
 `I have a list of English words I want to learn. For each word, provide the translation in Uzbek, a short definition in English, and 2 example sentences in English with their Uzbek translations.
 
@@ -178,7 +196,7 @@ export default function ReadingPage() {
           style={{ userSelect: 'text', WebkitUserSelect: 'text' }}
         >
           {paragraphs.map((para, i) => (
-            <p key={i}>{para}</p>
+            <p key={i}>{highlightParagraph(para, wordList)}</p>
           ))}
         </div>
       </div>
