@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { speak, speakText } from '@/lib/speech';
-import { getDueWords, updateSRSWord, hardSRSWord, addXP, recordStudySession, unlockAchievement, getSRSWords, removeSRSWord, resetSRSWord } from '@/lib/storage';
+import { getDueWords, updateSRSWord, hardSRSWord, addXP, recordStudySession, unlockAchievement, getSRSWords, getLearnedWords, removeSRSWord, resetSRSWord } from '@/lib/storage';
 import { stageLabel, stageColor } from '@/lib/srs';
 import { checkAchievements } from '@/lib/gamification';
 import { pushAllCurrentUser } from '@/lib/web-sync';
@@ -24,8 +24,11 @@ export default function SRSReviewPage() {
   const [managing, setManaging] = useState(false);
   const [allWords, setAllWords] = useState<SRSWord[]>([]);
   const [autoPlay, setAutoPlay] = useState(true);
+  const [tappedChoice, setTappedChoice] = useState<string | null>(null);
+  const [choices, setChoices] = useState<string[] | null>(null);
   const grading = useRef(false);
   const gradesApplied = useRef(false);
+  const autoAdvanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const loadWords = useCallback(() => {
     const due = getDueWords();
@@ -56,10 +59,29 @@ export default function SRSReviewPage() {
 
   const current = queue[index];
 
+  const buildChoices = useCallback((idx: number, q: SRSWord[]): string[] | null => {
+    if (!q[idx]) return null;
+    const correct = q[idx].translation;
+    const pool = new Set<string>();
+    q.forEach((w, i) => { if (i !== idx && w.translation !== correct) pool.add(w.translation); });
+    if (pool.size < 2) {
+      for (const lw of getLearnedWords()) {
+        if (lw.translation !== correct) pool.add(lw.translation);
+        if (pool.size >= 2) break;
+      }
+    }
+    if (pool.size < 2) return null;
+    const wrong = [...pool].sort(() => Math.random() - 0.5).slice(0, 2);
+    return [correct, ...wrong].sort(() => Math.random() - 0.5);
+  }, []);
+
   useEffect(() => {
+    if (autoAdvanceTimer.current) clearTimeout(autoAdvanceTimer.current);
+    setTappedChoice(null);
     setRevealed(false);
+    setChoices(buildChoices(index, queue));
     if (current && autoPlay) { current.language ? speakText(current.word, current.language) : speak(current.word); }
-  }, [current, autoPlay]);
+  }, [current, autoPlay, buildChoices]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const applyGrades = useCallback((finalResults: { id: string; grade: 'knew' | 'hard' | 'forgot' }[]) => {
     if (gradesApplied.current) return;
@@ -89,10 +111,12 @@ export default function SRSReviewPage() {
 
   const grade = useCallback((g: 'knew' | 'hard' | 'forgot') => {
     if (!current || grading.current) return;
+    if (autoAdvanceTimer.current) clearTimeout(autoAdvanceTimer.current);
     grading.current = true;
     setTimeout(() => { grading.current = false; }, 100);
     const newResults = [...results, { id: current.id, grade: g }];
     setResults(newResults);
+    setTappedChoice(null);
     if (index + 1 >= queue.length) {
       applyGrades(newResults);
       setDone(true);
@@ -103,11 +127,23 @@ export default function SRSReviewPage() {
 
   const goBack = useCallback(() => {
     if (index === 0) return;
+    if (autoAdvanceTimer.current) clearTimeout(autoAdvanceTimer.current);
     grading.current = false;
+    setTappedChoice(null);
     setIndex(i => i - 1);
     setResults(r => r.slice(0, -1));
     setRevealed(false);
   }, [index]);
+
+  const handleChoiceTap = useCallback((choice: string) => {
+    if (tappedChoice || !current) return;
+    if (autoAdvanceTimer.current) clearTimeout(autoAdvanceTimer.current);
+    setTappedChoice(choice);
+    setRevealed(true);
+    if (choice === current.translation) {
+      autoAdvanceTimer.current = setTimeout(() => grade('knew'), 1500);
+    }
+  }, [tappedChoice, current, grade]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -329,38 +365,57 @@ export default function SRSReviewPage() {
                 </Link>
               )}
             </div>
-          ) : (
+          ) : choices === null ? (
             <button onClick={() => setRevealed(true)} className="mt-4 btn-secondary w-full">
               {t.srs.reveal}
             </button>
-          )}
+          ) : null}
         </div>
 
-        {/* Grade buttons */}
-        {revealed && (
-          <div className="flex gap-2 animate-slide-up">
-            <button
-              onClick={() => grade('forgot')}
-              className="flex-1 py-4 rounded-xl border-2 border-[var(--danger)] text-[var(--danger)] font-bold text-sm hover:bg-red-50 transition-colors flex flex-col items-center gap-1"
-            >
-              <span>✗</span>
-              <span className="text-xs font-normal">{t.srs.forgot}</span>
-            </button>
-            <button
-              onClick={() => grade('hard')}
-              className="flex-1 py-4 rounded-xl border-2 border-amber-500 text-amber-600 font-bold text-sm hover:bg-amber-50 transition-colors flex flex-col items-center gap-1"
-            >
-              <span>~</span>
-              <span className="text-xs font-normal">Hard</span>
-            </button>
-            <button
-              onClick={() => grade('knew')}
-              className="flex-1 py-4 rounded-xl border-2 border-[var(--success)] text-[var(--success)] font-bold text-sm hover:bg-green-50 transition-colors flex flex-col items-center gap-1"
-            >
-              <span>✓</span>
-              <span className="text-xs font-normal">{t.srs.knewIt}</span>
-            </button>
+        {/* Quiz mode: choice buttons */}
+        {choices !== null ? (
+          <div className="flex flex-col gap-2 animate-slide-up">
+            {choices.map((choice) => {
+              const answered = tappedChoice !== null;
+              const isCorrect = choice === current.translation;
+              const isTapped = choice === tappedChoice;
+              let cls = 'w-full py-4 px-4 rounded-xl border-2 font-semibold text-base text-left transition-all duration-200';
+              if (!answered) cls += ' border-[var(--border)] text-[var(--text)] bg-[var(--surface)] hover:border-[var(--primary)] cursor-pointer';
+              else if (isCorrect) cls += ' border-[var(--success)] bg-[var(--success)] text-white';
+              else if (isTapped) cls += ' border-[var(--danger)] bg-[var(--danger)] text-white';
+              else cls += ' border-[var(--border)] text-[var(--text-muted)] opacity-40';
+              return (
+                <button key={choice} className={cls} onClick={() => handleChoiceTap(choice)} disabled={answered}>
+                  {choice}
+                </button>
+              );
+            })}
+            {tappedChoice && tappedChoice !== current.translation && (
+              <div className="flex gap-2 mt-1">
+                <button onClick={() => grade('forgot')} className="flex-1 py-3 rounded-xl border-2 border-[var(--danger)] text-[var(--danger)] font-bold text-sm hover:bg-red-50 transition-colors">
+                  {t.srs.forgot}
+                </button>
+                <button onClick={() => grade('hard')} className="flex-1 py-3 rounded-xl border-2 border-amber-500 text-amber-600 font-bold text-sm hover:bg-amber-50 transition-colors">
+                  Hard
+                </button>
+              </div>
+            )}
           </div>
+        ) : (
+          /* Flip mode: Forgot / Hard / Knew */
+          revealed && (
+            <div className="flex gap-2 animate-slide-up">
+              <button onClick={() => grade('forgot')} className="flex-1 py-4 rounded-xl border-2 border-[var(--danger)] text-[var(--danger)] font-bold text-sm hover:bg-red-50 transition-colors flex flex-col items-center gap-1">
+                <span>✗</span><span className="text-xs font-normal">{t.srs.forgot}</span>
+              </button>
+              <button onClick={() => grade('hard')} className="flex-1 py-4 rounded-xl border-2 border-amber-500 text-amber-600 font-bold text-sm hover:bg-amber-50 transition-colors flex flex-col items-center gap-1">
+                <span>~</span><span className="text-xs font-normal">Hard</span>
+              </button>
+              <button onClick={() => grade('knew')} className="flex-1 py-4 rounded-xl border-2 border-[var(--success)] text-[var(--success)] font-bold text-sm hover:bg-green-50 transition-colors flex flex-col items-center gap-1">
+                <span>✓</span><span className="text-xs font-normal">{t.srs.knewIt}</span>
+              </button>
+            </div>
+          )
         )}
 
         {/* SRS progress info */}
