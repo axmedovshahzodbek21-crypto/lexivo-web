@@ -295,7 +295,7 @@ export default function ClassesPage() {
     setExpandedLeaderboard(classId);
     if (classLeaderboards[classId]) return;
     setLeaderboardLoading(classId);
-    const { data } = await supabase.rpc('get_class_leaderboard', { p_class_id: classId });
+    const { data } = await supabase.rpc('get_class_leaderboard', { p_class_id: classId }).limit(200);
     setClassLeaderboards(prev => ({ ...prev, [classId]: (data as LeaderboardRow[]) ?? [] }));
     setLeaderboardLoading(null);
   };

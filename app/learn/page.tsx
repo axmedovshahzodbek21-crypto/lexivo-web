@@ -1,6 +1,6 @@
 ﻿'use client';
 import { PageLoader, SectionLoader } from '@/components/Loader';
-import { useEffect, useState, useCallback, Suspense } from 'react';
+import { useEffect, useState, useCallback, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { useShallow } from 'zustand/react/shallow';
@@ -10,8 +10,9 @@ import {
   markLearningComplete, toggleStarred, isStarred, addHardWord,
   getHardWords, removeHardWord, getSettings, getStreak, getTodayLearnedCount,
   saveLearnProgress, clearLearnProgress, getLearnProgress,
+  saveLearnMarks, getLearnMarks,
 } from '@/lib/storage';
-import { pushUnitProgressCurrentUser } from '@/lib/web-sync';
+import { pushUnitProgressCurrentUser, pushAllCurrentUser } from '@/lib/web-sync';
 import { createSRSWord } from '@/lib/srs';
 import { addSRSWord as storeSRSWord } from '@/lib/storage';
 import type { Accent } from '@/lib/speech';
@@ -64,7 +65,7 @@ function LearnInner() {
   const sourceMyWords = sp.get('source') === 'my-words';
   const myCollection = sp.get('myCollection') ?? undefined;
   const myFolder     = sp.get('myFolder') ?? undefined;
-  const collectionName = sp.get('collection') ?? undefined;
+  const rawCollectionName = sp.get('collection') ?? undefined;
   const dayParam = sp.get('day');
   const dayNumber = dayParam ? parseInt(dayParam) : undefined;
   const hardOnly = sp.get('hard') === 'true';
@@ -79,10 +80,19 @@ function LearnInner() {
     }))
   );
 
+  // Validate the URL param against known collection names so arbitrary strings
+  // cannot corrupt localStorage keys or reach Supabase queries. Before collections
+  // are loaded we pass the raw value through unchanged so no flash of <UnitPicker>.
+  const collectionName = useMemo(() => {
+    if (!collectionsLoaded) return rawCollectionName;
+    if (!rawCollectionName) return undefined;
+    return collections.some(c => c.name === rawCollectionName) ? rawCollectionName : undefined;
+  }, [rawCollectionName, collections, collectionsLoaded]);
+
   const [words, setWords] = useState<StudyWord[]>([]);
   const [index, setIndex] = useState(0);
   const [startIndexApplied, setStartIndexApplied] = useState(false);
-  const [resumePrompt, setResumePrompt] = useState<{ savedIndex: number; total: number } | null>(null);
+  const [resumePrompt, setResumePrompt] = useState<{ savedIndex: number; total: number; tooHard: string[]; skipped: string[] } | null>(null);
   const [revealed, setRevealed] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const [showEx1Translation, setShowEx1Translation] = useState(false);
@@ -161,7 +171,13 @@ function LearnInner() {
       } else if (collectionName && dayNumber !== undefined && !startIndexApplied) {
         const saved = getLearnProgress(collectionName, dayNumber);
         if (saved && saved > 0 && saved < sliced.length) {
-          setResumePrompt({ savedIndex: saved, total: sliced.length });
+          const savedMarks = getLearnMarks(collectionName, dayNumber);
+          setResumePrompt({
+            savedIndex: saved,
+            total: sliced.length,
+            tooHard: savedMarks?.tooHard ?? [],
+            skipped: savedMarks?.skipped ?? [],
+          });
         }
       }
     }
@@ -207,7 +223,9 @@ function LearnInner() {
     if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
     recordStudySession();
     setSessionCount(c => c + 1);
-    checkAchievements().forEach(pushAchievement);
+    const newAch = checkAchievements();
+    newAch.forEach(pushAchievement);
+    if (newAch.length > 0) pushAllCurrentUser();
     if (index + 1 >= words.length) {
       if (collectionName && words.length > 0) {
         markLearningComplete(collectionName, words[0].dayNumber);
@@ -318,7 +336,14 @@ function LearnInner() {
         <div className="flex flex-col gap-3 w-full max-w-xs">
           <button
             className="btn-primary"
-            onClick={() => { setIndex(resumePrompt.savedIndex); setResumePrompt(null); }}
+            onClick={() => {
+              setIndex(resumePrompt.savedIndex);
+              const tooHardSet = new Set(resumePrompt.tooHard);
+              const skippedSet = new Set(resumePrompt.skipped);
+              setSkipped(words.filter(w => tooHardSet.has(w.word)));
+              setPureSkipped(words.filter(w => skippedSet.has(w.word)));
+              setResumePrompt(null);
+            }}
           >
             Resume from word {resumePrompt.savedIndex + 1}
           </button>
@@ -344,6 +369,7 @@ function LearnInner() {
           onClick={() => {
             if (index > 0 && !done && collectionName && dayNumber !== undefined) {
               saveLearnProgress(collectionName, dayNumber, index);
+              saveLearnMarks(collectionName, dayNumber, skipped.map(w => w.word), pureSkipped.map(w => w.word));
             }
             router.back();
           }}

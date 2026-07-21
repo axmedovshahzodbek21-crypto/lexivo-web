@@ -140,10 +140,13 @@ export default function FlashcardsPage() {
           clearFlashcardProgress(collectionName, dayNumber);
           setDeck(fullDeck);
         } else {
-          const savedIndex = getFlashcardProgress(collectionName, dayNumber);
-          setDeck(fullDeck);
-          if (savedIndex !== null && savedIndex > 0 && savedIndex < fullDeck.length) {
-            setIndex(savedIndex);
+          const savedWords = getFlashcardProgress(collectionName, dayNumber);
+          if (savedWords && savedWords.length > 0) {
+            const remainingSet = new Set(savedWords);
+            const resumeDeck = fullDeck.filter(w => remainingSet.has(w.word));
+            setDeck(resumeDeck.length > 0 ? resumeDeck : fullDeck);
+          } else {
+            setDeck(fullDeck);
           }
         }
       } else {
@@ -206,7 +209,7 @@ export default function FlashcardsPage() {
       setDone(true);
     } else {
       if (collectionName && dayNumber !== undefined && cardsSinceLastPush.current === 0) {
-        saveFlashcardProgress(collectionName, dayNumber, index + 1);
+        saveFlashcardProgress(collectionName, dayNumber, deck.slice(index + 1).map(w => w.word));
       }
       setIndex(i => i + 1);
       setSide('front');

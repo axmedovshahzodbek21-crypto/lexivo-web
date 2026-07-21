@@ -8,8 +8,8 @@ import { addXP, recordStudySession, markQuizComplete, unlockAchievement, getStar
 import { fireConfetti } from '@/lib/confetti';
 import { checkAchievements } from '@/lib/gamification';
 import { pushUnitProgressCurrentUser, pushAllCurrentUser } from '@/lib/web-sync';
+import { supabase } from '@/lib/supabase';
 import type { WordItem, WordCollection, QuizType } from '@/lib/types';
-import { XP_PER_QUIZ } from '@/lib/types';
 import Link from 'next/link';
 import UnitPicker from '@/components/UnitPicker';
 import TiltCard from '@/components/TiltCard';
@@ -89,7 +89,7 @@ function buildQuiz(
     const pool = allWords
       .filter(w => w.word !== word.word)
       .map(w => type === 'word_to_translation' ? w.translation : w.word);
-    const wrongs = shuffle([...new Set(pool)]).slice(0, 3);
+    const wrongs = shuffle([...new Set(pool)].filter(w => w !== correct)).slice(0, 3);
 
     const options = shuffle([correct, ...wrongs]);
     return { word, type, prompt, correct, options };
@@ -120,7 +120,6 @@ export default function QuizPage() {
   const [correct, setCorrect] = useState(0);
   const [done, setDone] = useState(false);
   const [wrongQuestions, setWrongQuestions] = useState<QuizQuestion[]>([]);
-  const cardsSinceLastPush = useRef(0);
   const selecting = useRef(false);
   const t = useTranslation();
   const [quizDirection, setQuizDirection] = useState<'word-to-uz' | 'uz-to-word'>('word-to-uz');
@@ -163,7 +162,7 @@ export default function QuizPage() {
         else if (type === 'translation_to_word') { prompt = word.translation; correct = word.word; }
         else { prompt = word.definition || word.word; correct = word.word; }
         const pool = allWords.filter(w => w.word !== word.word).map(w => type === 'word_to_translation' ? w.translation : w.word);
-        const wrongs = shuffle([...new Set(pool)]).slice(0, 3);
+        const wrongs = shuffle([...new Set(pool)].filter(w => w !== correct)).slice(0, 3);
         const options = shuffle([correct, ...wrongs]);
         return { word, type, prompt, correct, options };
       });
@@ -191,7 +190,7 @@ export default function QuizPage() {
         else if (type === 'translation_to_word') { prompt = word.translation; correct = word.word; }
         else { prompt = word.definition || word.word; correct = word.word; }
         const pool = allWords.filter(w => w.word !== word.word).map(w => type === 'word_to_translation' ? w.translation : w.word);
-        const wrongs = shuffle([...new Set(pool)]).slice(0, 3);
+        const wrongs = shuffle([...new Set(pool)].filter(w => w !== correct)).slice(0, 3);
         const options = shuffle([correct, ...wrongs]);
         return { word, type, prompt, correct, options };
       });
@@ -233,23 +232,11 @@ export default function QuizPage() {
     setState('answered');
     if (option === current?.correct) {
       setCorrect(c => c + 1);
-      if (!sourceClassHW) {
-        const { leveledUp, newLevel, newXp } = addXP(XP_PER_QUIZ, 'Quiz');
-        if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
-      }
     } else {
       if (current) setWrongQuestions(prev => [...prev, current]);
-      if (!sourceClassHW) {
-        const { leveledUp, newLevel, newXp } = addXP(1, 'Quiz');
-        if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
-      }
-    }
-    if (!sourceClassHW) {
-      cardsSinceLastPush.current++;
-      if (cardsSinceLastPush.current >= 5) { cardsSinceLastPush.current = 0; pushAllCurrentUser(); }
     }
     recordStudySession();
-  }, [state, current, sourceClassHW]);
+  }, [state, current]);
 
   const next = useCallback(() => {
     if (index + 1 >= questions.length) {
@@ -269,13 +256,37 @@ export default function QuizPage() {
       }
       const newAchievements = checkAchievements();
       newAchievements.forEach(pushAchievement);
+
+      // Award XP server-side — prevents arbitrary addXP() calls from DevTools
+      if (!sourceClassHW) {
+        const finalCorrect = correct + (selected === current?.correct ? 1 : 0);
+        const totalCount = questions.length;
+        (async () => {
+          try {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session?.access_token) return;
+            const res = await fetch('/api/quiz/complete', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+              body: JSON.stringify({ correctCount: finalCorrect, totalCount }),
+            });
+            if (!res.ok) return;
+            const { xpAwarded } = await res.json() as { xpAwarded: number };
+            if (typeof xpAwarded !== 'number') return;
+            const { leveledUp, newLevel, newXp } = addXP(xpAwarded, 'Quiz');
+            if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
+            pushAllCurrentUser();
+          } catch { /* silent fail — XP syncs on next cycle */ }
+        })();
+      }
+
       setDone(true);
     } else {
       setIndex(i => i + 1);
       setSelected(null);
       setState('idle');
     }
-  }, [index, questions, correct, selected, current, collectionName, pushAchievement, setPendingLevelUp]);
+  }, [index, questions, correct, selected, current, collectionName, sourceClassHW, pushAchievement, setPendingLevelUp]);
 
   if (!collectionName && !starredOnly && !listId && !sourceMyWords && !sourceClassHW) return <UnitPicker mode="quiz" />;
 

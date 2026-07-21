@@ -93,6 +93,22 @@ function ls(key: string): string | null {
   return localStorage.getItem(key);
 }
 
+async function upsertUserStats(payload: Record<string, unknown>) {
+  const optionalColumns = ['xp_updated_at', 'study_days'];
+  let current = { ...payload };
+
+  for (let attempt = 0; attempt <= optionalColumns.length; attempt++) {
+    const { error } = await supabase.from('user_stats').upsert(current);
+    if (!error) return;
+
+    const column = optionalColumns[attempt];
+    if (!column || !(column in current)) throw error;
+    console.warn(`[sync] user_stats upsert failed; retrying without ${column}:`, error.message);
+    const { [column]: _removed, ...rest } = current;
+    current = rest;
+  }
+}
+
 // ── Push: localStorage → Supabase ─────────────────────────────────────────────
 
 export async function pushAll(uid: string) {
@@ -133,7 +149,7 @@ export async function pushAll(uid: string) {
     // (lower XP, older timestamp) from overwriting a tab that just earned more.
     const localXpTs = ls(K.xpUpdatedAt);
     const pushXp = !localXpTs || !_lastPulledXpTs || localXpTs >= _lastPulledXpTs;
-    await supabase.from('user_stats').upsert({
+    await upsertUserStats({
       id: uid,
       ...(pushXp ? { xp: getXP(), xp_updated_at: localXpTs ?? new Date().toISOString() } : {}),
       today_xp: getTodayXP(),

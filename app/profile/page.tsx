@@ -103,14 +103,25 @@ export default function ProfilePage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Keep base64 locally as offline fallback
+    // Allowlist raster formats only — SVG/HTML can execute scripts when served from storage
+    const allowed = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!allowed.includes(file.type)) {
+      alert('Only JPEG, PNG, and WebP images are allowed.');
+      e.target.value = '';
+      return;
+    }
+
+    // compressImage re-encodes via canvas → always a clean JPEG regardless of input
     const base64 = await compressImage(file);
     saveProfilePic(base64);
 
     if (user) {
+      // Upload the re-encoded JPEG blob — never the original file — so no SVG or embedded
+      // scripts can reach storage even if file.type is spoofed.
+      const blob = await fetch(base64).then(r => r.blob());
       const { error } = await supabase.storage
         .from('avatars')
-        .upload(`${user.id}/avatar.jpg`, file, { upsert: true, contentType: file.type });
+        .upload(`${user.id}/avatar.jpg`, blob, { upsert: true, contentType: 'image/jpeg' });
       if (!error) {
         const { data: { publicUrl } } = supabase.storage
           .from('avatars')
@@ -218,7 +229,7 @@ export default function ProfilePage() {
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/*"
+            accept="image/jpeg,image/png,image/webp"
             className="hidden"
             onChange={handlePickPhoto}
           />

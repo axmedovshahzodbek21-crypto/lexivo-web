@@ -87,10 +87,10 @@ export default function SRSReviewPage() {
       unlockAchievement('srs_first');
     }
     recordStudySession();
-    pushAllCurrentUser();
-    setResults(r => [...r, { id: current.id, success }]);
     const newAchievements = checkAchievements();
     newAchievements.forEach(pushAchievement);
+    pushAllCurrentUser();
+    setResults(r => [...r, { id: current.id, success }]);
     if (index + 1 >= queue.length) setDone(true);
     else setIndex(i => i + 1);
   }, [current, index, queue, pushAchievement, setPendingLevelUp]);

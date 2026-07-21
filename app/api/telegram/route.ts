@@ -10,6 +10,19 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
 );
 
+// In-memory dedup: ignore retried updates from Telegram within the same instance lifetime.
+// Cross-instance retries are harmless because we always return 200 — Telegram's 48-hour
+// retry window only fires when it sees non-200, which the catch block below prevents.
+const _seen = new Set<number>();
+const MAX_SEEN = 2000;
+
+function markSeen(id: number): boolean {
+  if (_seen.has(id)) return false; // already processed
+  _seen.add(id);
+  if (_seen.size > MAX_SEEN) _seen.delete(_seen.values().next().value as number);
+  return true;
+}
+
 async function sendMessage(chatId: string | number, text: string) {
   const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
     method: 'POST',
@@ -38,6 +51,12 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const message = body?.message;
     if (!message) return NextResponse.json({ ok: true });
+
+    // Deduplicate: Telegram may deliver the same update more than once.
+    // Return 200 immediately so it never retries; markSeen returns false if we've seen this id.
+    if (message.message_id != null && !markSeen(message.message_id as number)) {
+      return NextResponse.json({ ok: true });
+    }
 
     const fromId   = message.from?.id;
     const fromName = [message.from?.first_name, message.from?.last_name].filter(Boolean).join(' ') || 'Unknown';
@@ -91,29 +110,35 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ ok: true });
       }
 
-      // Fetch targets and send with delay to respect Telegram's 30 msg/sec limit
+      // Fetch targets and stamp rate limit BEFORE sending — prevents duplicate
+      // broadcasts even if Telegram retries (dedup guard above catches the retry,
+      // but stamping here ensures the window is closed regardless).
       const { data: users } = await supabase.from('bot_users').select('chat_id');
       const targets = (users ?? []).filter(u => String(u.chat_id) !== OWNER_ID);
-      let sent = 0;
-      for (const u of targets) {
-        const r = await sendMessage(u.chat_id, broadcastText);
-        if (r.ok) sent++;
-        await new Promise(resolve => setTimeout(resolve, 50)); // 20 msgs/sec — under Telegram's 30/sec limit
-      }
+      await supabase.from('bot_users').update({ last_broadcast_at: new Date().toISOString() }).eq('chat_id', fromId);
 
-      // Record timestamp and log
-      await supabase
-        .from('bot_users')
-        .update({ last_broadcast_at: new Date().toISOString() })
-        .eq('chat_id', fromId);
-      await supabase.from('bot_broadcasts').insert({
-        sent_by: fromId,
-        message: broadcastText,
-        recipient_count: sent,
-        sent_at: new Date().toISOString(),
-      }).throwOnError().catch(() => {}); // Log if table exists, silently skip if not
+      // Queue the send loop as a background job so we can return 200 immediately.
+      // Telegram stops retrying once it receives 200, so this must happen before
+      // the long loop. The function stays alive until the Promise settles.
+      const broadcastJob = (async () => {
+        let sent = 0;
+        for (const u of targets) {
+          const r = await sendMessage(u.chat_id, broadcastText);
+          if (r.ok) sent++;
+          await new Promise(resolve => setTimeout(resolve, 34)); // ≈29 msgs/sec
+        }
+        await supabase.from('bot_broadcasts').insert({
+          sent_by: fromId,
+          message: broadcastText,
+          recipient_count: sent,
+          sent_at: new Date().toISOString(),
+        }).throwOnError().catch(() => {});
+        await sendMessage(OWNER_ID, `✅ Broadcast sent to ${sent} user${sent !== 1 ? 's' : ''}.`);
+      })();
+      broadcastJob.catch(err => console.error('[broadcast]', err));
 
-      await sendMessage(OWNER_ID, `✅ Broadcast sent to ${sent} user${sent !== 1 ? 's' : ''}.`);
+      // Acknowledge immediately so the owner knows the job started
+      await sendMessage(OWNER_ID, `📤 Broadcasting to ${targets.length} user${targets.length !== 1 ? 's' : ''}…`);
       return NextResponse.json({ ok: true });
     }
 

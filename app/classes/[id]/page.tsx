@@ -401,6 +401,16 @@ export default function ClassDashboardPage() {
     load();
   };
 
+  const openNoteModal = async (s: StudentRow) => {
+    setNoteTarget(s);
+    setNoteText('');
+    const unread = (studentNotes[s.student_id] ?? []).filter(n => !n.read_at);
+    if (unread.length > 0) {
+      await supabase.from('class_notes').update({ read_at: new Date().toISOString() }).in('id', unread.map(n => n.id));
+      await loadNotes();
+    }
+  };
+
   const sendNote = async () => {
     if (!user || !noteTarget || !noteText.trim()) return;
     setSending(true);
@@ -677,7 +687,7 @@ export default function ClassDashboardPage() {
                     </div>
 
                     <div className="flex items-center gap-4 pl-8">
-                      <button onClick={() => { setNoteTarget(s); setNoteText(''); }} className="flex items-center gap-1.5 text-xs font-semibold text-[var(--primary)] hover:opacity-70 transition-opacity">
+                      <button onClick={() => openNoteModal(s)} className="flex items-center gap-1.5 text-xs font-semibold text-[var(--primary)] hover:opacity-70 transition-opacity">
                         ✉️ Note
                         {unreadNotes > 0 && <span className="bg-[var(--primary)] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">{unreadNotes}</span>}
                       </button>

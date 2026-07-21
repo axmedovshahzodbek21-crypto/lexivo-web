@@ -31,6 +31,9 @@ const KEYS = {
   lastFreezeWeek: 'lexivo_last_freeze_week',
   studyDays: 'lexivo_study_days',
   xpHistory: 'lexivo_xp_history',
+  xpUpdatedAt:       'lexivo_xp_updated_at',
+  settingsUpdatedAt: 'lexivo_settings_updated_at',
+  hardWords:         'lexivo_hard_words',
 };
 
 function get<T>(key: string, fallback: T): T {
@@ -152,6 +155,16 @@ export function getLevelUpdatedAt(): string | null {
 export function saveLevelUpdatedAt(ts: string) {
   if (typeof window === 'undefined') return;
   localStorage.setItem(KEYS.levelUpdatedAt, ts);
+}
+
+export function getSettingsUpdatedAt(): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem(KEYS.settingsUpdatedAt) ?? null;
+}
+
+export function saveSettingsUpdatedAt(ts: string) {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(KEYS.settingsUpdatedAt, ts);
 }
 
 // ─── Learned words ───────────────────────────────────────────────────────────
@@ -401,6 +414,7 @@ export function addXP(amount: number, reason = 'Study'): { leveledUp: boolean; n
   const oldXp = get<number>(KEYS.xp, 0);
   const newXp = oldXp + amount;
   set(KEYS.xp, newXp);
+  set(KEYS.xpUpdatedAt, new Date().toISOString());
 
   const date = localDateStr();
   const storedDate = get<string>(KEYS.todayXpDate, '');
@@ -764,6 +778,15 @@ export function getLearnProgress(collectionName: string, dayNumber: number): num
 export function clearLearnProgress(collectionName: string, dayNumber: number): void {
   if (typeof window === 'undefined') return;
   localStorage.removeItem(`lexivo_learn_progress_${collectionName}_${dayNumber}`);
+  localStorage.removeItem(`lexivo_learn_marks_${collectionName}_${dayNumber}`);
+}
+
+export function saveLearnMarks(collectionName: string, dayNumber: number, tooHard: string[], skipped: string[]): void {
+  set(`lexivo_learn_marks_${collectionName}_${dayNumber}`, { tooHard, skipped });
+}
+
+export function getLearnMarks(collectionName: string, dayNumber: number): { tooHard: string[]; skipped: string[] } | null {
+  return get<{ tooHard: string[]; skipped: string[] } | null>(`lexivo_learn_marks_${collectionName}_${dayNumber}`, null);
 }
 
 export function getHardWordCount(collectionName: string, dayNumber: number): number {
@@ -772,12 +795,15 @@ export function getHardWordCount(collectionName: string, dayNumber: number): num
   ).length;
 }
 
-export function saveFlashcardProgress(collectionName: string, dayNumber: number, index: number): void {
-  set(`lexivo_flashcard_idx_${collectionName}_${dayNumber}`, index);
+export function saveFlashcardProgress(collectionName: string, dayNumber: number, remainingWords: string[]): void {
+  set(`lexivo_flashcard_idx_${collectionName}_${dayNumber}`, remainingWords);
 }
 
-export function getFlashcardProgress(collectionName: string, dayNumber: number): number | null {
-  return get<number | null>(`lexivo_flashcard_idx_${collectionName}_${dayNumber}`, null);
+export function getFlashcardProgress(collectionName: string, dayNumber: number): string[] | null {
+  const val = get<unknown>(`lexivo_flashcard_idx_${collectionName}_${dayNumber}`, null);
+  // Older saves stored a numeric index — treat as no progress (one-time migration loss is acceptable).
+  if (Array.isArray(val) && val.length > 0) return val as string[];
+  return null;
 }
 
 export function clearFlashcardProgress(collectionName: string, dayNumber: number): void {
