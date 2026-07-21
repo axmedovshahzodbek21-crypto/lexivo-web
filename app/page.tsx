@@ -164,78 +164,21 @@ export default function HomePage() {
         </Link>
       )}
 
-      {/* ── Collections (most important, lifted to top) ── */}
-      <div>
-        <h2 className="font-semibold text-[var(--text)] text-base mb-3">{t.home.collections}</h2>
-        <div className="space-y-3">
-          {/* My Words — always shown so new users can discover import */}
-          <TiltCard className="card overflow-hidden hover:border-[var(--primary)] transition-colors" intensity={6}>
-            <Link href="/my-words" className="flex items-center gap-4" style={{ margin: '-20px', padding: '20px' }}>
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0 animate-float-icon" style={{ background: 'rgba(108,99,255,0.12)' }}>
-                ✍️
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="font-bold text-[var(--text)] text-sm">{t.myWords.title}</div>
-                <div className="text-xs text-[var(--text-muted)] mt-0.5">{t.myWords.subtitle}</div>
-                <div className="text-xs text-[var(--text-muted)] mt-1">
-                  {importedCount > 0 ? t.myWords.wordCount(importedCount) : t.myWords.addWords}
-                </div>
-              </div>
-              <span className="flex-shrink-0 text-sm font-semibold" style={{ color: 'var(--primary)' }}>
-                {importedCount > 0 ? '→' : '+'}
-              </span>
-            </Link>
-          </TiltCard>
-
-          {/* Curated collections first */}
-          {mainCollections.map(col => {
-            const meta = COLLECTION_META[col.name] ?? { icon: '📖', color: 'var(--primary)', desc: col.description };
-            const enc = encodeURIComponent(col.name);
-            const wordCount = col.days.reduce((a, d) => a + d.words.length, 0);
-            return (
-              <TiltCard
-                key={col.name}
-                className="card overflow-hidden hover:border-[var(--primary)] transition-colors"
-                style={{ boxShadow: `0 4px 14px ${meta.color}22` }}
-                intensity={6}
-              >
-                <Link href={`/collections/${enc}`} className="flex items-center gap-4" style={{ margin: '-20px', padding: '20px' }}>
-                  <div
-                    className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0 animate-float-icon"
-                    style={{ background: `${meta.color}18` }}
-                  >
-                    {meta.icon}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-bold text-[var(--text)] text-sm truncate">{col.name}</div>
-                    <div className="text-xs text-[var(--text-muted)] mt-0.5 truncate">{meta.desc}</div>
-                    <div className="text-xs text-[var(--text-muted)] mt-1">{col.days.length} units · {wordCount} words</div>
-                  </div>
-                  <span className="flex-shrink-0 text-sm font-semibold" style={{ color: meta.color }}>→</span>
-                </Link>
-              </TiltCard>
-            );
-          })}
-
-          {/* Leveled Words — last */}
-          <TiltCard
-            className="overflow-hidden rounded-2xl border-2 cursor-pointer"
-            style={{ background: 'rgba(46,204,113,0.06)', borderColor: 'rgba(46,204,113,0.35)' }}
-            intensity={5}
-          >
-            <Link href="/leveled-words" className="flex items-center gap-4 p-4 block">
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0 animate-float-icon" style={{ background: 'rgba(46,204,113,0.12)' }}>
-                📚
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="font-bold text-sm" style={{ color: '#27AE60' }}>{t.home.leveledWords}</div>
-                <div className="text-xs mt-0.5" style={{ color: '#2ECC71' }}>A1 → C2 vocabulary by CEFR level</div>
-              </div>
-              <span className="text-sm flex-shrink-0" style={{ color: '#2ECC71' }}>→</span>
-            </Link>
-          </TiltCard>
-        </div>
-      </div>
+      {/* ── Collections (single button) ── */}
+      <TiltCard className="card overflow-hidden hover:border-[var(--primary)] transition-colors" intensity={6}>
+        <Link href="/collections" className="flex items-center gap-4" style={{ margin: '-20px', padding: '20px' }}>
+          <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0 animate-float-icon" style={{ background: 'rgba(108,99,255,0.12)' }}>
+            📚
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="font-bold text-[var(--text)] text-sm">{t.home.collections}</div>
+            <div className="text-xs text-[var(--text-muted)] mt-0.5">
+              {mainCollections.length + 2} collections · My Words, Leveled &amp; more
+            </div>
+          </div>
+          <span className="flex-shrink-0 text-sm font-semibold" style={{ color: 'var(--primary)' }}>→</span>
+        </Link>
+      </TiltCard>
 
       {/* Stats row */}
       <div className="grid grid-cols-3 gap-3">

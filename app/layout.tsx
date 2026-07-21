@@ -40,11 +40,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <div className="sm:flex sm:min-h-screen">
           <Navigation />
           <div className="flex-1 min-w-0">
-            <div className="max-w-2xl mx-auto">
-              <main className="min-h-screen pb-20 sm:pb-8">
-                {children}
-              </main>
-            </div>
+            <main className="min-h-screen pb-20 sm:pb-8">
+              {children}
+            </main>
           </div>
         </div>
         <PomodoroWidget />
