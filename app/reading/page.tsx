@@ -117,15 +117,15 @@ export default function ReadingPage() {
   // ── Step 1: paste passage ─────────────────────────────────────────────────
   if (!reading) {
     return (
-      <div className="max-w-2xl mx-auto p-6 space-y-5 pb-24">
+      <div className="max-w-xl mx-auto px-6 py-10 space-y-6 pb-24">
         <div>
-          <h1 className="text-2xl font-bold text-[var(--text)] mb-1">📰 Reading</h1>
-          <p className="text-sm text-[var(--text-muted)]">
-            Paste any English text. Highlight words you want to learn — we collect them and generate a ready-to-use AI prompt.
+          <h1 className="text-3xl font-bold text-[var(--text)] mb-2">Reading</h1>
+          <p className="text-sm text-[var(--text-muted)] leading-relaxed">
+            Paste any English text. Select words as you read — we collect them and build an AI prompt to create vocabulary cards.
           </p>
         </div>
         <textarea
-          className="w-full h-64 p-4 rounded-2xl border-2 border-[var(--border)] bg-[var(--surface)] text-[var(--text)] text-base resize-none focus:outline-none focus:border-[var(--primary)] transition-colors leading-relaxed"
+          className="w-full h-56 p-4 rounded-2xl border-2 border-[var(--border)] bg-[var(--surface)] text-[var(--text)] text-base resize-none focus:outline-none focus:border-[var(--primary)] transition-colors leading-relaxed"
           placeholder="Paste your reading passage here…"
           value={passage}
           onChange={e => setPassage(e.target.value)}
@@ -144,30 +144,26 @@ export default function ReadingPage() {
 
   // ── Step 2: reading mode ──────────────────────────────────────────────────
   return (
-    <div className="max-w-2xl mx-auto p-4 pb-28 space-y-4">
+    <div className="max-w-2xl mx-auto pb-28">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between px-4 py-3 sticky top-0 z-10 bg-[var(--bg)] border-b border-[var(--border)]">
         <button
           onClick={() => { setReading(false); setWordList([]); setSelectedText(''); setSelectionRect(null); }}
-          className="btn-icon text-sm"
+          className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors"
         >
           ← Back
         </button>
-        <h1 className="font-bold text-[var(--text)]">Reading</h1>
-        <span className="text-xs text-[var(--text-muted)] font-medium">
-          {wordList.length} word{wordList.length !== 1 ? 's' : ''}
+        <span className="text-xs text-[var(--text-muted)]">
+          {wordList.length > 0
+            ? `${wordList.length} word${wordList.length !== 1 ? 's' : ''} collected`
+            : 'Select words to collect them'}
         </span>
       </div>
 
-      {/* Tip */}
-      <div className="bg-[var(--primary-bg)] rounded-xl px-4 py-2.5 text-xs text-[var(--primary)] font-medium">
-        Select any word or phrase in the passage, then tap <strong>+ Add</strong>
-      </div>
-
-      {/* Passage */}
+      {/* Passage — clean reading view */}
       <div
         ref={passageRef}
-        className="card text-[var(--text)] text-base leading-9 select-text cursor-text"
+        className="px-6 py-8 text-[var(--text)] text-[17px] leading-[1.85] select-text cursor-text"
         style={{ userSelect: 'text', WebkitUserSelect: 'text' }}
       >
         {passage}
@@ -200,7 +196,7 @@ export default function ReadingPage() {
 
       {/* Collected word list */}
       {wordList.length > 0 && (
-        <div className="card space-y-1">
+        <div className="card mx-4 space-y-1">
           <div className="flex items-center justify-between mb-2">
             <h2 className="font-semibold text-sm text-[var(--text)]">Collected words</h2>
             <button onClick={() => setWordList([])} className="text-xs text-[var(--danger)] hover:underline">
@@ -224,7 +220,7 @@ export default function ReadingPage() {
 
       {/* AI Prompt */}
       {wordList.length > 0 && (
-        <div className="card space-y-3">
+        <div className="card mx-4 space-y-3">
           <div className="flex items-center justify-between">
             <h2 className="font-semibold text-sm text-[var(--text)]">AI Prompt</h2>
             <span className="text-xs text-[var(--text-muted)]">Copy → paste into ChatGPT or Claude</span>
@@ -243,7 +239,7 @@ export default function ReadingPage() {
 
       {/* Import AI result */}
       {wordList.length > 0 && (
-        <div className="card space-y-3">
+        <div className="card mx-4 mb-4 space-y-3">
           <button
             onClick={() => setShowImport(v => !v)}
             className="w-full flex items-center justify-between text-sm font-semibold text-[var(--text)]"
