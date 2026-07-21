@@ -538,14 +538,14 @@ function LearnInner() {
               </div>
             </div>
           ) : (
-            /* ── Back: translation + definition + examples ── */
+            /* ── Back: definition + translation + examples ── */
             <div className="mt-4 space-y-3 animate-fade-in">
+              <p className="text-base font-semibold text-[var(--text)] leading-relaxed">{current.definition}</p>
+
               <div className="bg-[var(--primary-bg)] rounded-xl p-3">
                 <p className="text-xs font-semibold text-[var(--primary)] mb-1">🇺🇿 O'zbek tarjimasi</p>
-                <p className="text-xl font-bold text-[var(--primary)]">{current.translation}</p>
+                <p className="text-sm text-[var(--primary)]">{current.translation}</p>
               </div>
-
-              <p className="text-sm text-[var(--text)] leading-relaxed">{current.definition}</p>
 
               {current.definitionUz && (
                 <div>
