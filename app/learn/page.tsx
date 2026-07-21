@@ -417,8 +417,8 @@ function LearnInner() {
                 {index + 1} <span className="text-[var(--text-muted)] font-normal">/ {words.length}</span>
               </span>
               <button
-                onClick={() => { setIndex(i => Math.min(maxReached, i + 1)); setRevealed(false); }}
-                disabled={index >= maxReached}
+                onClick={() => { setIndex(i => Math.min(words.length - 1, i + 1)); setRevealed(false); }}
+                disabled={index >= words.length - 1}
                 className="w-6 h-6 flex items-center justify-center text-[var(--primary)] disabled:opacity-30 text-lg font-bold"
                 aria-label="Next card"
               >›</button>
@@ -597,9 +597,9 @@ function LearnInner() {
         </div>
         </TiltCard>
 
-        {/* Hint + Skip — only before reveal on unvisited cards */}
-        {!showBack && (
-          <div className="no-focus space-y-2">
+        {/* Hint — only before reveal on unvisited cards */}
+        {!showBack && !isMarked && (
+          <div className="no-focus">
             <div className="text-center">
               {!showHint ? (
                 <button
@@ -615,6 +615,28 @@ function LearnInner() {
                 </div>
               )}
             </div>
+          </div>
+        )}
+
+        {/* Action buttons — after reveal or on unvisited card before reveal */}
+        {!isMarked && (
+          <div className="no-focus space-y-2">
+            {showBack && (
+              <div className="flex gap-3 animate-fade-in">
+                <button
+                  onClick={markTooHard}
+                  className="flex-1 py-3.5 rounded-xl border-2 border-[var(--danger)] text-[var(--danger)] font-semibold text-sm hover:bg-red-50 transition-colors press-3d"
+                >
+                  {t.learn.tooHard} <kbd className="ml-1 opacity-60 text-xs">H</kbd>
+                </button>
+                <button
+                  onClick={advanceCard}
+                  className="flex-[2] btn-primary py-3.5 text-center press-3d"
+                >
+                  {t.learn.gotIt} <kbd className="ml-1 opacity-60 text-xs">Space</kbd>
+                </button>
+              </div>
+            )}
             <button
               onClick={skipWord}
               className="w-full py-3 rounded-xl border-2 border-[var(--border)] text-[var(--text-muted)] font-semibold text-sm hover:border-orange-300 hover:text-orange-500 transition-colors press-3d"
@@ -631,24 +653,6 @@ function LearnInner() {
                 <button onClick={dismissSkipTip} className="text-orange-400 hover:text-orange-600 text-sm font-bold shrink-0 mt-0.5" aria-label="Dismiss tip">✕</button>
               </div>
             )}
-          </div>
-        )}
-
-        {/* Action buttons — after reveal, only on unvisited cards */}
-        {showBack && !isMarked && (
-          <div className="flex gap-3 animate-fade-in no-focus">
-            <button
-              onClick={markTooHard}
-              className="flex-1 py-3.5 rounded-xl border-2 border-[var(--danger)] text-[var(--danger)] font-semibold text-sm hover:bg-red-50 transition-colors press-3d"
-            >
-              {t.learn.tooHard} <kbd className="ml-1 opacity-60 text-xs">H</kbd>
-            </button>
-            <button
-              onClick={advanceCard}
-              className="flex-[2] btn-primary py-3.5 text-center press-3d"
-            >
-              {t.learn.gotIt} <kbd className="ml-1 opacity-60 text-xs">Space</kbd>
-            </button>
           </div>
         )}
 
