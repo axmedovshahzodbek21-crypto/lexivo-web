@@ -380,8 +380,8 @@ function LearnInner() {
   const mark = marks[index] ?? null;
   const isMarked = mark != null;
   const showBack = revealed || isMarked;
-  const cardBg = mark === 'learned' ? '#22c55e' : mark === 'too-hard' ? '#ef4444' : mark === 'skipped' ? '#f97316' : undefined;
-  const cardCssVars = cardBg ? { '--text': '#fff', '--text-muted': 'rgba(255,255,255,0.7)', '--primary': '#fff', '--primary-bg': 'rgba(255,255,255,0.2)', '--surface-2': 'rgba(255,255,255,0.15)', '--surface': 'rgba(255,255,255,0.08)', '--border': 'rgba(255,255,255,0.25)' } as React.CSSProperties : {};
+  const cardBg = mark === 'learned' ? '#15803d' : mark === 'too-hard' ? '#b91c1c' : mark === 'skipped' ? '#c2410c' : undefined;
+  const cardCssVars = cardBg ? { '--text': '#fff', '--text-muted': 'rgba(255,255,255,0.85)', '--primary': '#fff', '--primary-bg': 'rgba(255,255,255,0.2)', '--surface-2': 'rgba(255,255,255,0.12)', '--surface': 'rgba(255,255,255,0.08)', '--border': 'rgba(255,255,255,0.2)' } as React.CSSProperties : {};
 
   return (
     <div className={`flex flex-col min-h-screen ${focusMode ? 'focus-container' : ''}`}>
