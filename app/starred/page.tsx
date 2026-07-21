@@ -135,19 +135,57 @@ export default function StarredPage() {
             </p>
             <Link href="/learn" className="btn-primary inline-block">{t.starred.startLearning}</Link>
           </div>
-        ) : filtered.length === 0 ? (
-          <div className="text-center py-8 text-[var(--text-muted)]">{t.starred.noResults(search)}</div>
+        ) : search.trim() ? (
+          filtered.length === 0 ? (
+            <div className="text-center py-8 text-[var(--text-muted)]">{t.starred.noResults(search)}</div>
+          ) : (
+            <div className="space-y-3">
+              {filtered.map(w => (
+                <WordCard
+                  key={w.word}
+                  word={w}
+                  expanded={expanded.has(w.word)}
+                  onToggle={() => toggleExpand(w.word)}
+                  onUnstar={() => handleUnstar(w.word)}
+                />
+              ))}
+            </div>
+          )
         ) : (
           <div className="space-y-3">
-            {filtered.map(w => (
-              <WordCard
-                key={w.word}
-                word={w}
-                expanded={expanded.has(w.word)}
-                onToggle={() => toggleExpand(w.word)}
-                onUnstar={() => handleUnstar(w.word)}
-              />
-            ))}
+            {Array.from({ length: Math.ceil(words.length / 30) }, (_, i) => {
+              const unitWords = words.slice(i * 30, (i + 1) * 30);
+              const isLast = i === Math.ceil(words.length / 30) - 1;
+              const remaining = 30 - unitWords.length;
+              return (
+                <div key={i} className="card">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">⭐</span>
+                      <span className="font-bold text-[var(--text)] text-base">Unit {i + 1}</span>
+                    </div>
+                    <span className="badge">{unitWords.length} / 30</span>
+                  </div>
+                  {isLast && remaining > 0 && (
+                    <p className="text-xs text-[var(--text-muted)] mb-3">{remaining} more to complete this unit</p>
+                  )}
+                  <div className="flex gap-2">
+                    <Link
+                      href={`/learn?source=starred&unit=${i + 1}`}
+                      className="flex-1 btn-primary text-center text-sm py-2"
+                    >
+                      📖 Learn
+                    </Link>
+                    <Link
+                      href={`/flashcards?starred=true&unit=${i + 1}`}
+                      className="flex-1 btn-secondary text-center text-sm py-2"
+                    >
+                      🃏 Flashcard
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>

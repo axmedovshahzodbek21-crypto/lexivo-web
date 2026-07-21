@@ -26,17 +26,21 @@ function buildDeck(
   starredOnly?: boolean,
   hardOnly?: boolean,
   listId?: string,
+  starredUnitIndex?: number,
 ): StudyWord[] {
   if (listId) {
     const ws = getCustomListWords(listId, collections);
     for (let i = ws.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [ws[i], ws[j]] = [ws[j], ws[i]]; }
     return ws;
   }
-  const filterSet = starredOnly
-    ? new Set(getStarredWords())
-    : hardOnly
-    ? new Set(getHardWords())
-    : null;
+  let filterSet: Set<string> | null = null;
+  if (starredOnly) {
+    const all = getStarredWords();
+    const unit = starredUnitIndex !== undefined ? all.slice(starredUnitIndex * 30, (starredUnitIndex + 1) * 30) : all;
+    filterSet = new Set(unit);
+  } else if (hardOnly) {
+    filterSet = new Set(getHardWords());
+  }
   const words: StudyWord[] = [];
   for (const col of collections) {
     if (collectionName && col.name !== collectionName) continue;
@@ -65,6 +69,8 @@ export default function FlashcardsPage() {
   const dayParam = sp.get('day');
   const dayNumber = dayParam ? parseInt(dayParam) : undefined;
   const starredOnly = sp.get('starred') === 'true';
+  const starredUnitParam = sp.get('unit');
+  const starredUnitIndex = starredUnitParam ? parseInt(starredUnitParam) - 1 : undefined;
   const hardOnly    = sp.get('hard') === 'true';
   const listId      = sp.get('list') ?? undefined;
   const fresh       = sp.get('fresh') === 'true';
@@ -134,7 +140,7 @@ export default function FlashcardsPage() {
       return;
     }
     if (collectionsLoaded && collections.length > 0) {
-      const fullDeck = buildDeck(collections, collectionName, dayNumber, starredOnly, hardOnly, listId);
+      const fullDeck = buildDeck(collections, collectionName, dayNumber, starredOnly, hardOnly, listId, starredUnitIndex);
       if (collectionName && dayNumber !== undefined) {
         if (fresh) {
           clearFlashcardProgress(collectionName, dayNumber);

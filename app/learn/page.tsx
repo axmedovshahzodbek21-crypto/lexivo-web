@@ -10,7 +10,7 @@ import {
   markLearningComplete, toggleStarred, isStarred, addHardWord,
   getHardWords, removeHardWord, getSettings, getStreak, getTodayLearnedCount,
   saveLearnProgress, clearLearnProgress, getLearnProgress,
-  saveLearnMarks, getLearnMarks,
+  saveLearnMarks, getLearnMarks, getStarredWords,
 } from '@/lib/storage';
 import { pushUnitProgressCurrentUser, pushAllCurrentUser } from '@/lib/web-sync';
 import { createSRSWord } from '@/lib/srs';
@@ -63,6 +63,8 @@ function LearnInner() {
   const router = useRouter();
   const sp = useSearchParams();
   const sourceMyWords = sp.get('source') === 'my-words';
+  const sourceStarred = sp.get('source') === 'starred';
+  const starredUnitIndex = parseInt(sp.get('unit') ?? '1') - 1; // 0-based
   const myCollection = sp.get('myCollection') ?? undefined;
   const myFolder     = sp.get('myFolder') ?? undefined;
   const rawCollectionName = sp.get('collection') ?? undefined;
@@ -133,6 +135,25 @@ function LearnInner() {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
+    if (sourceStarred && collectionsLoaded && collections.length > 0) {
+      const starredList = getStarredWords();
+      const unitWords = starredList.slice(starredUnitIndex * 30, (starredUnitIndex + 1) * 30);
+      const unitSet = new Set(unitWords);
+      const list: StudyWord[] = [];
+      for (const col of collections) {
+        for (const day of col.days) {
+          for (const word of day.words) {
+            if (unitSet.has(word.word)) {
+              list.push({ ...word, collectionName: 'starred_words', topic: `Unit ${starredUnitIndex + 1}`, dayNumber: starredUnitIndex + 1 });
+            }
+          }
+        }
+      }
+      list.sort((a, b) => unitWords.indexOf(a.word) - unitWords.indexOf(b.word));
+      setWords(list);
+      setMarks(new Array(list.length).fill(null));
+      return;
+    }
     if (sourceMyWords) {
       const imported = myCollection ? getImportedWordsByCollection(myCollection, myFolder) : getImportedWords();
       const list: StudyWord[] = imported.map(w => ({
@@ -186,7 +207,7 @@ function LearnInner() {
         }
       }
     }
-  }, [collectionsLoaded, collections, collectionName, dayNumber, hardOnly, sourceMyWords, myCollection, myFolder]);
+  }, [collectionsLoaded, collections, collectionName, dayNumber, hardOnly, sourceMyWords, sourceStarred, starredUnitIndex, myCollection, myFolder]);
 
   const current = words[index];
 
@@ -298,7 +319,7 @@ function LearnInner() {
   }, [current, done, focusMode, revealed, marks, index, advanceCard, markTooHard, skipWord, dismissSkipTip]);
 
   // No unit selected → show picker
-  if (!collectionName && !hardOnly && !sourceMyWords) return <UnitPicker mode="learn" />;
+  if (!collectionName && !hardOnly && !sourceMyWords && !sourceStarred) return <UnitPicker mode="learn" />;
 
   if (!collectionsLoaded) return <LoadingState />;
 
