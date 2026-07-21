@@ -23,6 +23,7 @@ export default function SRSReviewPage() {
   const [done, setDone] = useState(false);
   const [managing, setManaging] = useState(false);
   const [allWords, setAllWords] = useState<SRSWord[]>([]);
+  const [autoPlay, setAutoPlay] = useState(true);
   const grading = useRef(false);
 
   const loadWords = useCallback(() => {
@@ -56,8 +57,8 @@ export default function SRSReviewPage() {
 
   useEffect(() => {
     setRevealed(false);
-    if (current) { current.language ? speakText(current.word, current.language) : speak(current.word); }
-  }, [current]);
+    if (current && autoPlay) { current.language ? speakText(current.word, current.language) : speak(current.word); }
+  }, [current, autoPlay]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -212,13 +213,23 @@ export default function SRSReviewPage() {
           <div className="font-semibold text-sm">{t.srs.title}</div>
           <div className="text-xs text-[var(--text-muted)]">{index + 1} / {queue.length}</div>
         </div>
-        <button
-          onClick={() => { setAllWords(getSRSWords()); setManaging(true); }}
-          className="btn-icon text-sm"
-          aria-label="Manage deck"
-        >
-          ⚙️
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => setAutoPlay(p => !p)}
+            className="btn-icon text-base"
+            aria-label={autoPlay ? 'Auto-play on' : 'Auto-play off'}
+            title={autoPlay ? 'Auto-play on' : 'Auto-play off'}
+          >
+            {autoPlay ? '🔊' : '🔇'}
+          </button>
+          <button
+            onClick={() => { setAllWords(getSRSWords()); setManaging(true); }}
+            className="btn-icon text-sm"
+            aria-label="Manage deck"
+          >
+            ⚙️
+          </button>
+        </div>
       </div>
 
       {/* Progress */}
