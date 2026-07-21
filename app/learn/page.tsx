@@ -102,6 +102,7 @@ function LearnInner() {
   const [showMoreExamples, setShowMoreExamples] = useState(false);
   const [skipped, setSkipped] = useState<StudyWord[]>([]);
   const [pureSkipped, setPureSkipped] = useState<StudyWord[]>([]);
+  const [marks, setMarks] = useState<('learned' | 'skipped' | 'too-hard' | null)[]>([]);
   const [done, setDone] = useState(false);
   const [sessionCount, setSessionCount] = useState(0);
   const [starred, setStarredState] = useState(false);
@@ -156,13 +157,16 @@ function LearnInner() {
       const shuffled = studyOrder === 'random'
         ? [...list].sort(() => Math.random() - 0.5)
         : list;
-      setWords(shuffled.slice(0, sessionSize));
+      const mySlice = shuffled.slice(0, sessionSize);
+      setWords(mySlice);
+      setMarks(new Array(mySlice.length).fill(null));
       return;
     }
     if (collectionsLoaded && collections.length > 0) {
       const list = buildStudyList(collections, collectionName, dayNumber, hardOnly, studyOrder);
       const sliced = (dayNumber !== undefined || hardOnly) ? list : list.slice(0, sessionSize);
       setWords(sliced);
+      setMarks(new Array(sliced.length).fill(null));
       if (startIndex > 0 && !startIndexApplied) {
         if (sliced.length > 0) {
           setIndex(Math.min(Math.max(0, startIndex), sliced.length - 1));
@@ -223,6 +227,7 @@ function LearnInner() {
     if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
     recordStudySession();
     setSessionCount(c => c + 1);
+    setMarks(m => { const n = [...m]; n[index] = 'learned'; return n; });
     const newAch = checkAchievements();
     newAch.forEach(pushAchievement);
     if (newAch.length > 0) pushAllCurrentUser();
@@ -242,6 +247,7 @@ function LearnInner() {
     if (!current) return;
     addHardWord(current.word);
     setSkipped(s => [...s, current]);
+    setMarks(m => { const n = [...m]; n[index] = 'too-hard'; return n; });
     if (index + 1 >= words.length) setDone(true);
     else setIndex(i => i + 1);
   }, [current, index, words]);
@@ -255,6 +261,7 @@ function LearnInner() {
     if (!current) return;
     dismissSkipTip();
     setPureSkipped(s => [...s, current]);
+    setMarks(m => { const n = [...m]; n[index] = 'skipped'; return n; });
     if (index + 1 >= words.length) setDone(true);
     else setIndex(i => i + 1);
   }, [current, index, words, dismissSkipTip]);
@@ -316,7 +323,7 @@ function LearnInner() {
         xpEarned={sessionCount * XP_PER_LEARN}
         streak={getStreak()}
         todayCount={getTodayLearnedCount()}
-        onRestart={() => { setIndex(0); setDone(false); setSessionCount(0); setSkipped([]); setPureSkipped([]); }}
+        onRestart={() => { setIndex(0); setDone(false); setSessionCount(0); setSkipped([]); setPureSkipped([]); setMarks(new Array(words.length).fill(null)); }}
       />
     );
   }
@@ -337,11 +344,20 @@ function LearnInner() {
           <button
             className="btn-primary"
             onClick={() => {
-              setIndex(resumePrompt.savedIndex);
               const tooHardSet = new Set(resumePrompt.tooHard);
               const skippedSet = new Set(resumePrompt.skipped);
               setSkipped(words.filter(w => tooHardSet.has(w.word)));
               setPureSkipped(words.filter(w => skippedSet.has(w.word)));
+              const newMarks: ('learned' | 'skipped' | 'too-hard' | null)[] = new Array(words.length).fill(null);
+              words.forEach((w, i) => {
+                if (i < resumePrompt.savedIndex) {
+                  if (tooHardSet.has(w.word)) newMarks[i] = 'too-hard';
+                  else if (skippedSet.has(w.word)) newMarks[i] = 'skipped';
+                  else newMarks[i] = 'learned';
+                }
+              });
+              setMarks(newMarks);
+              setIndex(resumePrompt.savedIndex);
               setResumePrompt(null);
             }}
           >
@@ -360,6 +376,12 @@ function LearnInner() {
       </div>
     );
   }
+
+  const mark = marks[index] ?? null;
+  const isMarked = mark != null;
+  const showBack = revealed || isMarked;
+  const cardBg = mark === 'learned' ? '#22c55e' : mark === 'too-hard' ? '#ef4444' : mark === 'skipped' ? '#f97316' : undefined;
+  const cardCssVars = cardBg ? { '--text': '#fff', '--text-muted': 'rgba(255,255,255,0.7)', '--primary': '#fff', '--primary-bg': 'rgba(255,255,255,0.2)', '--surface-2': 'rgba(255,255,255,0.15)', '--surface': 'rgba(255,255,255,0.08)', '--border': 'rgba(255,255,255,0.25)' } as React.CSSProperties : {};
 
   return (
     <div className={`flex flex-col min-h-screen ${focusMode ? 'focus-container' : ''}`}>
@@ -381,12 +403,43 @@ function LearnInner() {
             <span className="text-xs font-medium text-[var(--text-muted)] truncate">
               {collectionName ? collectionName.split(' ').slice(0, 2).join(' ') : 'All Collections'}
             </span>
-            <span className="text-xs font-bold text-[var(--primary)] shrink-0 ml-2">
-              {index + 1} <span className="text-[var(--text-muted)] font-normal">/ {words.length}</span>
-            </span>
+            <div className="flex items-center shrink-0 ml-2">
+              <button
+                onClick={() => setIndex(i => Math.max(0, i - 1))}
+                disabled={index === 0}
+                className="w-6 h-6 flex items-center justify-center text-[var(--primary)] disabled:opacity-30 text-lg font-bold"
+                aria-label="Previous card"
+              >‹</button>
+              <span className="text-xs font-bold text-[var(--primary)] px-1">
+                {index + 1} <span className="text-[var(--text-muted)] font-normal">/ {words.length}</span>
+              </span>
+              <button
+                onClick={() => { if ((marks[index] ?? null) != null && index < words.length - 1) setIndex(i => i + 1); }}
+                disabled={(marks[index] ?? null) == null || index >= words.length - 1}
+                className="w-6 h-6 flex items-center justify-center text-[var(--primary)] disabled:opacity-30 text-lg font-bold"
+                aria-label="Next card"
+              >›</button>
+            </div>
           </div>
-          <div className="progress-bar">
-            <div className="progress-bar-fill" style={{ width: `${((index + 1) / words.length) * 100}%` }} />
+          <div className="flex gap-0.5">
+            {words.map((_, i) => (
+              <div
+                key={i}
+                className="flex-1 rounded-full transition-colors duration-200"
+                style={{
+                  height: 4,
+                  backgroundColor: i === index
+                    ? 'var(--primary)'
+                    : marks[i] === 'learned'
+                    ? '#22c55e'
+                    : marks[i] === 'too-hard'
+                    ? '#ef4444'
+                    : marks[i] === 'skipped'
+                    ? '#f97316'
+                    : 'var(--border)',
+                }}
+              />
+            ))}
           </div>
         </div>
         <div className="flex gap-2 shrink-0">
@@ -403,10 +456,15 @@ function LearnInner() {
         {/* Word card */}
         <TiltCard className="flex-1 animate-slide-up" intensity={5} glare={false}>
         <div
-          className={`card h-full transition-all ${!revealed ? 'cursor-pointer hover:border-[var(--primary)]' : ''}`}
-          style={{ minHeight: 300 }}
-          onClick={!revealed ? () => { setRevealed(true); dismissSkipTip(); } : undefined}
+          className={`card h-full transition-all ${!showBack ? 'cursor-pointer hover:border-[var(--primary)]' : ''}`}
+          style={{ minHeight: 300, ...(cardBg ? { background: cardBg, borderColor: 'transparent' } : {}), ...cardCssVars }}
+          onClick={!showBack ? () => { setRevealed(true); dismissSkipTip(); } : undefined}
         >
+          {isMarked && (
+            <div className="mb-3 px-3 py-1.5 rounded-full text-xs font-bold text-white w-fit" style={{ background: 'rgba(255,255,255,0.25)' }}>
+              {mark === 'learned' ? '✓ Already marked as Learned' : mark === 'too-hard' ? '😤 Too Hard' : '⏭ Skipped — still counts!'}
+            </div>
+          )}
           {/* Topic + audio */}
           <div className="flex items-center justify-between mb-3">
             <span className="badge">{current.topic}</span>
@@ -438,7 +496,7 @@ function LearnInner() {
             <span className="italic">{current.partOfSpeech}</span> · {current.pronunciation}
           </p>
 
-          {!revealed ? (
+          {!showBack ? (
             /* ── Front: tap-to-reveal ── */
             <div className="mt-8 mb-4 flex flex-col items-center gap-3 select-none">
               <div className="text-5xl">🤔</div>
@@ -531,8 +589,8 @@ function LearnInner() {
         </div>
         </TiltCard>
 
-        {/* Hint + Skip — only before reveal */}
-        {!revealed && (
+        {/* Hint + Skip — only before reveal on unvisited cards */}
+        {!showBack && (
           <div className="no-focus space-y-2">
             <div className="text-center">
               {!showHint ? (
@@ -568,8 +626,8 @@ function LearnInner() {
           </div>
         )}
 
-        {/* Action buttons — only after reveal */}
-        {revealed && (
+        {/* Action buttons — after reveal, only on unvisited cards */}
+        {showBack && !isMarked && (
           <div className="flex gap-3 animate-fade-in no-focus">
             <button
               onClick={markTooHard}
