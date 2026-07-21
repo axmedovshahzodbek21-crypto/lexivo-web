@@ -25,6 +25,7 @@ export default function SRSReviewPage() {
   const [allWords, setAllWords] = useState<SRSWord[]>([]);
   const [autoPlay, setAutoPlay] = useState(true);
   const grading = useRef(false);
+  const gradesApplied = useRef(false);
 
   const loadWords = useCallback(() => {
     const due = getDueWords();
@@ -71,30 +72,53 @@ export default function SRSReviewPage() {
         case 'ArrowRight': case 'k': case 'K': if (revealed) grade(true); break;
         case 'ArrowLeft': case 'j': case 'J': if (revealed) grade(false); break;
         case 's': case 'S': current.language ? speakText(current.word, current.language) : speak(current.word); break;
+        case 'Backspace': case 'b': case 'B': e.preventDefault(); goBack(); break;
       }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [current, revealed, managing]);
+  }, [current, revealed, managing, goBack]);
+
+  const applyGrades = useCallback((finalResults: { id: string; success: boolean }[]) => {
+    if (gradesApplied.current) return;
+    gradesApplied.current = true;
+    finalResults.forEach(r => {
+      updateSRSWord(r.id, r.success);
+      if (r.success) {
+        const { leveledUp, newLevel, newXp } = addXP(XP_PER_SRS, 'SRS Review');
+        if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
+        unlockAchievement('srs_first');
+      }
+    });
+    if (finalResults.length > 0) {
+      recordStudySession();
+      const newAchievements = checkAchievements();
+      newAchievements.forEach(pushAchievement);
+      pushAllCurrentUser();
+    }
+  }, [pushAchievement, setPendingLevelUp]);
 
   const grade = useCallback((success: boolean) => {
     if (!current || grading.current) return;
     grading.current = true;
     setTimeout(() => { grading.current = false; }, 100);
-    updateSRSWord(current.id, success);
-    if (success) {
-      const { leveledUp, newLevel, newXp } = addXP(XP_PER_SRS, 'SRS Review');
-      if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
-      unlockAchievement('srs_first');
+    const newResults = [...results, { id: current.id, success }];
+    setResults(newResults);
+    if (index + 1 >= queue.length) {
+      applyGrades(newResults);
+      setDone(true);
+    } else {
+      setIndex(i => i + 1);
     }
-    recordStudySession();
-    const newAchievements = checkAchievements();
-    newAchievements.forEach(pushAchievement);
-    pushAllCurrentUser();
-    setResults(r => [...r, { id: current.id, success }]);
-    if (index + 1 >= queue.length) setDone(true);
-    else setIndex(i => i + 1);
-  }, [current, index, queue, pushAchievement, setPendingLevelUp]);
+  }, [current, index, queue, results, applyGrades]);
+
+  const goBack = useCallback(() => {
+    if (index === 0) return;
+    grading.current = false;
+    setIndex(i => i - 1);
+    setResults(r => r.slice(0, -1));
+    setRevealed(false);
+  }, [index]);
 
   const handleRemove = (id: string) => {
     removeSRSWord(id);
@@ -208,7 +232,7 @@ export default function SRSReviewPage() {
     <div className="flex flex-col min-h-screen">
       {/* Header */}
       <div className="flex items-center justify-between p-4">
-        <button onClick={() => router.back()} className="btn-icon" aria-label="Go back">←</button>
+        <button onClick={() => { applyGrades(results); router.back(); }} className="btn-icon" aria-label="Go back">✕</button>
         <div className="text-center">
           <div className="font-semibold text-sm">{t.srs.title}</div>
           <div className="text-xs text-[var(--text-muted)]">{index + 1} / {queue.length}</div>
@@ -240,8 +264,17 @@ export default function SRSReviewPage() {
       </div>
 
       <div className="flex-1 p-4 flex flex-col gap-4">
-        {/* Stage badge */}
-        <div className="flex justify-end">
+        {/* Stage badge + back button */}
+        <div className="flex items-center justify-between">
+          <button
+            onClick={goBack}
+            disabled={index === 0}
+            className="btn-icon text-sm disabled:opacity-30"
+            aria-label="Previous word"
+            title="Previous word (B / Backspace)"
+          >
+            ←
+          </button>
           <div
             className="badge text-xs"
             style={{ background: `${stageColor(current.reviewStage)}20`, color: stageColor(current.reviewStage) }}
