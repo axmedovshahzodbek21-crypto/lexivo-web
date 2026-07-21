@@ -273,6 +273,20 @@ export function getMasteredCount(): number {
   return getSRSWords().filter(w => w.reviewStage >= 4).length;
 }
 
+export function hardSRSWord(id: string) {
+  const words = getSRSWords();
+  const idx = words.findIndex(w => w.id === id);
+  if (idx === -1) return;
+  const word = words[idx];
+  word.reviewStage = Math.min(word.reviewStage + 1, 4);
+  const fullInterval = SRS_INTERVALS[Math.min(word.reviewStage, SRS_INTERVALS.length - 1)] ?? 14;
+  const next = new Date();
+  next.setDate(next.getDate() + Math.ceil(fullInterval / 2));
+  word.nextReviewDate = localDateStr(next);
+  words[idx] = word;
+  set(KEYS.srs, words);
+}
+
 export function removeSRSWord(id: string) {
   set(KEYS.srs, getSRSWords().filter(w => w.id !== id));
 }

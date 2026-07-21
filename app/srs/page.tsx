@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { speak, speakText } from '@/lib/speech';
-import { getDueWords, updateSRSWord, addXP, recordStudySession, unlockAchievement, getSRSWords, removeSRSWord, resetSRSWord } from '@/lib/storage';
+import { getDueWords, updateSRSWord, hardSRSWord, addXP, recordStudySession, unlockAchievement, getSRSWords, removeSRSWord, resetSRSWord } from '@/lib/storage';
 import { stageLabel, stageColor } from '@/lib/srs';
 import { checkAchievements } from '@/lib/gamification';
 import { pushAllCurrentUser } from '@/lib/web-sync';
@@ -19,7 +19,7 @@ export default function SRSReviewPage() {
   const [queue, setQueue] = useState<SRSWord[]>([]);
   const [index, setIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
-  const [results, setResults] = useState<{ id: string; success: boolean }[]>([]);
+  const [results, setResults] = useState<{ id: string; grade: 'knew' | 'hard' | 'forgot' }[]>([]);
   const [done, setDone] = useState(false);
   const [managing, setManaging] = useState(false);
   const [allWords, setAllWords] = useState<SRSWord[]>([]);
@@ -69,8 +69,9 @@ export default function SRSReviewPage() {
       if (!current) return;
       switch (e.key) {
         case ' ': case 'Enter': e.preventDefault(); if (!revealed) setRevealed(true); break;
-        case 'ArrowRight': case 'k': case 'K': if (revealed) grade(true); break;
-        case 'ArrowLeft': case 'j': case 'J': if (revealed) grade(false); break;
+        case 'ArrowRight': case 'k': case 'K': if (revealed) grade('knew'); break;
+        case 'h': case 'H': if (revealed) grade('hard'); break;
+        case 'ArrowLeft': case 'j': case 'J': if (revealed) grade('forgot'); break;
         case 's': case 'S': current.language ? speakText(current.word, current.language) : speak(current.word); break;
         case 'Backspace': case 'b': case 'B': e.preventDefault(); goBack(); break;
       }
@@ -79,15 +80,22 @@ export default function SRSReviewPage() {
     return () => window.removeEventListener('keydown', handler);
   }, [current, revealed, managing, goBack]);
 
-  const applyGrades = useCallback((finalResults: { id: string; success: boolean }[]) => {
+  const applyGrades = useCallback((finalResults: { id: string; grade: 'knew' | 'hard' | 'forgot' }[]) => {
     if (gradesApplied.current) return;
     gradesApplied.current = true;
     finalResults.forEach(r => {
-      updateSRSWord(r.id, r.success);
-      if (r.success) {
+      if (r.grade === 'knew') {
+        updateSRSWord(r.id, true);
         const { leveledUp, newLevel, newXp } = addXP(XP_PER_SRS, 'SRS Review');
         if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
         unlockAchievement('srs_first');
+      } else if (r.grade === 'hard') {
+        hardSRSWord(r.id);
+        const { leveledUp, newLevel, newXp } = addXP(Math.ceil(XP_PER_SRS / 2), 'SRS Review Hard');
+        if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
+        unlockAchievement('srs_first');
+      } else {
+        updateSRSWord(r.id, false);
       }
     });
     if (finalResults.length > 0) {
@@ -98,11 +106,11 @@ export default function SRSReviewPage() {
     }
   }, [pushAchievement, setPendingLevelUp]);
 
-  const grade = useCallback((success: boolean) => {
+  const grade = useCallback((g: 'knew' | 'hard' | 'forgot') => {
     if (!current || grading.current) return;
     grading.current = true;
     setTimeout(() => { grading.current = false; }, 100);
-    const newResults = [...results, { id: current.id, success }];
+    const newResults = [...results, { id: current.id, grade: g }];
     setResults(newResults);
     if (index + 1 >= queue.length) {
       applyGrades(newResults);
@@ -201,16 +209,19 @@ export default function SRSReviewPage() {
 
   // ── Session done ──────────────────────────────────────────────────────────
   if (done) {
-    const correctCount = results.filter(r => r.success).length;
-    const score = Math.round((correctCount / results.length) * 100);
+    const knewCount = results.filter(r => r.grade === 'knew').length;
+    const hardCount = results.filter(r => r.grade === 'hard').length;
+    const forgotCount = results.filter(r => r.grade === 'forgot').length;
+    const score = Math.round(((knewCount + hardCount) / results.length) * 100);
     return (
       <div className="p-6 text-center flex flex-col items-center justify-center min-h-screen animate-fade-in">
         <div className="text-6xl mb-4">{score >= 80 ? '🧠' : '💪'}</div>
         <h2 className="text-2xl font-bold mb-2">{t.srs.reviewComplete}</h2>
-        <p className="text-[var(--text-muted)] mb-6">{correctCount}/{results.length} correct · +{correctCount * XP_PER_SRS} XP</p>
-        <div className="grid grid-cols-3 gap-3 w-full mb-6">
-          <div className="card text-center"><div className="text-xl font-bold text-[var(--success)]">{correctCount}</div><div className="text-xs text-[var(--text-muted)]">{t.srs.correct}</div></div>
-          <div className="card text-center"><div className="text-xl font-bold text-[var(--danger)]">{results.length - correctCount}</div><div className="text-xs text-[var(--text-muted)]">{t.srs.incorrect}</div></div>
+        <p className="text-[var(--text-muted)] mb-6">{knewCount}/{results.length} knew · +{knewCount * XP_PER_SRS + hardCount * Math.ceil(XP_PER_SRS / 2)} XP</p>
+        <div className="grid grid-cols-4 gap-2 w-full mb-6">
+          <div className="card text-center"><div className="text-xl font-bold text-[var(--success)]">{knewCount}</div><div className="text-xs text-[var(--text-muted)]">{t.srs.correct}</div></div>
+          <div className="card text-center"><div className="text-xl font-bold text-amber-500">{hardCount}</div><div className="text-xs text-[var(--text-muted)]">Hard</div></div>
+          <div className="card text-center"><div className="text-xl font-bold text-[var(--danger)]">{forgotCount}</div><div className="text-xs text-[var(--text-muted)]">{t.srs.incorrect}</div></div>
           <div className="card text-center"><div className="text-xl font-bold text-[var(--primary)]">{score}%</div><div className="text-xs text-[var(--text-muted)]">{t.srs.score}</div></div>
         </div>
         <div className="flex gap-3 w-full mb-3">
@@ -327,17 +338,24 @@ export default function SRSReviewPage() {
 
         {/* Grade buttons */}
         {revealed && (
-          <div className="flex gap-3 animate-slide-up">
+          <div className="flex gap-2 animate-slide-up">
             <button
-              onClick={() => grade(false)}
-              className="flex-1 py-4 rounded-xl border-2 border-[var(--danger)] text-[var(--danger)] font-bold text-base hover:bg-red-50 transition-colors flex flex-col items-center gap-1"
+              onClick={() => grade('forgot')}
+              className="flex-1 py-4 rounded-xl border-2 border-[var(--danger)] text-[var(--danger)] font-bold text-sm hover:bg-red-50 transition-colors flex flex-col items-center gap-1"
             >
               <span>✗</span>
               <span className="text-xs font-normal">{t.srs.forgot}</span>
             </button>
             <button
-              onClick={() => grade(true)}
-              className="flex-1 py-4 rounded-xl border-2 border-[var(--success)] text-[var(--success)] font-bold text-base hover:bg-green-50 transition-colors flex flex-col items-center gap-1"
+              onClick={() => grade('hard')}
+              className="flex-1 py-4 rounded-xl border-2 border-amber-500 text-amber-600 font-bold text-sm hover:bg-amber-50 transition-colors flex flex-col items-center gap-1"
+            >
+              <span>~</span>
+              <span className="text-xs font-normal">Hard</span>
+            </button>
+            <button
+              onClick={() => grade('knew')}
+              className="flex-1 py-4 rounded-xl border-2 border-[var(--success)] text-[var(--success)] font-bold text-sm hover:bg-green-50 transition-colors flex flex-col items-center gap-1"
             >
               <span>✓</span>
               <span className="text-xs font-normal">{t.srs.knewIt}</span>
