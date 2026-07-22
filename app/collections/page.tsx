@@ -41,13 +41,13 @@ function CollectionCard({
   return (
     <Link href={href} className="block group">
       <div
-        className="rounded-3xl p-7 flex flex-col items-center text-center gap-4 transition-all duration-200 group-hover:-translate-y-2"
+        className="rounded-3xl p-5 flex flex-col items-center text-center gap-3 transition-all duration-200 group-hover:-translate-y-2"
         style={{
           background: meta.gradient,
           boxShadow: `0 10px 0 ${meta.edge}, 0 16px 40px ${meta.glow}`,
         }}
       >
-        <div className="text-7xl drop-shadow-lg">{icon}</div>
+        <div className="text-5xl drop-shadow-lg">{icon}</div>
         <div>
           <div className="font-black text-white text-lg leading-tight">{title}</div>
           <div className="text-white/70 text-sm mt-1 leading-snug">{desc}</div>
@@ -76,7 +76,7 @@ export default function CollectionsPage() {
     <div className="px-6 py-8 pb-28">
       <h1 className="text-3xl font-black text-[var(--text)] mb-8">Collections</h1>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
         {/* My Words */}
         <CollectionCard
           href="/my-words"
