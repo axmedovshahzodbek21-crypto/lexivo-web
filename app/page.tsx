@@ -164,24 +164,8 @@ export default function HomePage() {
         </Link>
       )}
 
-      {/* ── Collections (single button) ── */}
-      <TiltCard className="card overflow-hidden hover:border-[var(--primary)] transition-colors" intensity={6}>
-        <Link href="/collections" className="flex items-center gap-4" style={{ margin: '-20px', padding: '20px' }}>
-          <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0 animate-float-icon" style={{ background: 'rgba(108,99,255,0.12)' }}>
-            📚
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="font-bold text-[var(--text)] text-sm">{t.home.collections}</div>
-            <div className="text-xs text-[var(--text-muted)] mt-0.5">
-              {mainCollections.length + 2} collections · My Words, Leveled &amp; more
-            </div>
-          </div>
-          <span className="flex-shrink-0 text-sm font-semibold" style={{ color: 'var(--primary)' }}>→</span>
-        </Link>
-      </TiltCard>
-
-      {/* Stats row */}
-      <div className="grid grid-cols-3 gap-3">
+      {/* Stats + quick nav row */}
+      <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
         <Link href="/progress?tab=calendar">
           <StatCard icon="🔥" value={streak} label={t.home.dayStreak} color="#FF6B35" />
         </Link>
@@ -190,6 +174,12 @@ export default function HomePage() {
         </button>
         <Link href="/progress">
           <StatCard icon="📚" value={learnedCount} label={t.home.words} color="var(--success)" />
+        </Link>
+        <Link href="/collections" className="hidden sm:block">
+          <StatCard icon="🗂️" value={mainCollections.length + 2} label={t.home.collections} color="var(--primary)" />
+        </Link>
+        <Link href="/reading" className="hidden sm:block">
+          <StatCard icon="📰" value="→" label="Reading" color="#8B5CF6" />
         </Link>
       </div>
 
@@ -358,7 +348,7 @@ export default function HomePage() {
   );
 }
 
-function StatCard({ icon, value, label, color, glow }: { icon: string; value: number; label: string; color: string; glow?: boolean }) {
+function StatCard({ icon, value, label, color, glow }: { icon: string; value: number | string; label: string; color: string; glow?: boolean }) {
   return (
     <TiltCard className={`card text-center py-3 px-2${glow ? ' animate-glow-pulse' : ''}`} intensity={5}>
       <div className="text-2xl mb-1 animate-float-icon">{icon}</div>
