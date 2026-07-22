@@ -164,8 +164,47 @@ export default function HomePage() {
         </Link>
       )}
 
-      {/* Stats + quick nav row */}
-      <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
+      {/* Stats bento — desktop: Day Streak big center, 4 smaller on sides */}
+      <div className="hidden sm:grid gap-3" style={{ gridTemplateColumns: '1fr 1.5fr 1fr' }}>
+        {/* Left top: Collections */}
+        <Link href="/collections" style={{ gridColumn: 1, gridRow: 1 }} className="block">
+          <StatCard icon="🗂️" value={mainCollections.length + 2} label={t.home.collections}
+            gradient="linear-gradient(135deg, #d97706, #fbbf24)" edge="#92400e" glowColor="rgba(217,119,6,0.4)" />
+        </Link>
+        {/* Center: Day Streak big */}
+        <Link href="/progress?tab=calendar" style={{ gridColumn: 2, gridRow: '1 / 3' }} className="block">
+          <div
+            className="rounded-2xl px-8 py-10 flex flex-col items-center justify-center text-center gap-4 transition-all duration-200 hover:-translate-y-2 h-full"
+            style={{
+              background: 'linear-gradient(135deg, #FF6B35, #ff9f7f)',
+              boxShadow: '0 10px 0 #b84a1a, 0 16px 36px rgba(255,107,53,0.45)',
+              textShadow: '0 1px 4px rgba(0,0,0,0.4)',
+            }}
+          >
+            <div className="text-7xl">🔥</div>
+            <div className="text-6xl font-black text-white leading-none">{streak}</div>
+            <div className="text-base text-white/85 font-semibold">{t.home.dayStreak}</div>
+          </div>
+        </Link>
+        {/* Right top: Total XP */}
+        <button onClick={() => setShowXpModal(true)} style={{ gridColumn: 3, gridRow: 1 }} className="text-left w-full">
+          <StatCard icon="⚡" value={xp} label={t.home.totalXp}
+            gradient="linear-gradient(135deg, #6c63ff, #a78bfa)" edge="#3f38cc" glowColor="rgba(108,99,255,0.4)" />
+        </button>
+        {/* Left bottom: Reading */}
+        <Link href="/reading" style={{ gridColumn: 1, gridRow: 2 }} className="block">
+          <StatCard icon="📰" value="→" label="Reading"
+            gradient="linear-gradient(135deg, #7c3aed, #a855f7)" edge="#4c1d95" glowColor="rgba(124,58,237,0.4)" />
+        </Link>
+        {/* Right bottom: Words */}
+        <Link href="/progress" style={{ gridColumn: 3, gridRow: 2 }} className="block">
+          <StatCard icon="📚" value={learnedCount} label={t.home.words}
+            gradient="linear-gradient(135deg, #0284c7, #38bdf8)" edge="#0369a1" glowColor="rgba(2,132,199,0.4)" />
+        </Link>
+      </div>
+
+      {/* Stats — mobile: simple 3-col */}
+      <div className="grid sm:hidden grid-cols-3 gap-3">
         <Link href="/progress?tab=calendar">
           <StatCard icon="🔥" value={streak} label={t.home.dayStreak}
             gradient="linear-gradient(135deg, #FF6B35, #ff9f7f)" edge="#b84a1a" glowColor="rgba(255,107,53,0.4)" />
@@ -177,14 +216,6 @@ export default function HomePage() {
         <Link href="/progress">
           <StatCard icon="📚" value={learnedCount} label={t.home.words}
             gradient="linear-gradient(135deg, #0284c7, #38bdf8)" edge="#0369a1" glowColor="rgba(2,132,199,0.4)" />
-        </Link>
-        <Link href="/collections" className="hidden sm:block">
-          <StatCard icon="🗂️" value={mainCollections.length + 2} label={t.home.collections}
-            gradient="linear-gradient(135deg, #d97706, #fbbf24)" edge="#92400e" glowColor="rgba(217,119,6,0.4)" />
-        </Link>
-        <Link href="/reading" className="hidden sm:block">
-          <StatCard icon="📰" value="→" label="Reading"
-            gradient="linear-gradient(135deg, #7c3aed, #a855f7)" edge="#4c1d95" glowColor="rgba(124,58,237,0.4)" />
         </Link>
       </div>
 
