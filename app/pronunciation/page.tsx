@@ -1,5 +1,5 @@
 ﻿'use client';
-import { PageLoader, SectionLoader } from '@/components/Loader';
+import { PageLoader } from '@/components/Loader';
 import { Suspense } from 'react';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -408,16 +408,19 @@ function PronunciationInner() {
 
         {/* Mic permission denied */}
         {micError === 'blocked' && phase === 'ready' && (
-          <div className="w-full max-w-sm card border border-[var(--danger)] bg-red-50 space-y-3 text-center animate-fade-in">
+          <div className="w-full max-w-sm card border border-[var(--danger)] bg-red-50 dark:bg-red-950/20 space-y-3 text-center animate-fade-in">
             <div className="text-4xl">🎙️🚫</div>
             <p className="font-bold text-[var(--danger)]">Microphone Blocked</p>
-            <p className="text-sm text-[var(--text-muted)]">Allow microphone access and try again:</p>
-            <ol className="text-sm text-[var(--text)] text-left space-y-1 list-decimal list-inside">
-              <li>Click the <strong>🔒 lock icon</strong> in the address bar</li>
+            <p className="text-sm text-[var(--text-muted)]">Allow microphone access in your browser:</p>
+            <ol className="text-sm text-[var(--text)] text-left space-y-1.5 list-decimal list-inside">
+              <li>Click the <strong>🔒 lock icon</strong> next to the URL</li>
               <li>Find <strong>Microphone</strong> → set to <strong>Allow</strong></li>
-              <li>Refresh, then tap the mic again</li>
+              <li>Come back here and tap <strong>Try again</strong></li>
             </ol>
-            <button onClick={() => window.location.reload()} className="btn-primary w-full">Refresh page</button>
+            <div className="flex flex-col gap-2 pt-1">
+              <button onClick={() => setMicError('')} className="btn-primary w-full">Try again</button>
+              <button onClick={() => window.location.reload()} className="text-xs text-[var(--text-muted)] hover:text-[var(--text)] underline transition-colors">Or refresh the page</button>
+            </div>
           </div>
         )}
 
