@@ -380,42 +380,50 @@ const TASK_COLORS = {
   words:  { bg: '#059669', shadow: '#064e3b' },
 } as const;
 
-function MiniCalendar({ title, color, days, year, month }: {
-  title: string; color: string; days: string[]; year: number; month: number;
-}) {
-  const cells = buildMonthGrid(year, month);
+function TaskHeatmap({ title, color, days }: { title: string; color: string; days: string[] }) {
   const todayStr = localDateStr(new Date());
-  const mm = String(month + 1).padStart(2, '0');
-  const monthCount = days.filter(d => d.startsWith(`${year}-${mm}`)).length;
+
+  // Last 28 days grouped into 4 weeks
+  const weeks: string[][] = [[], [], [], []];
+  for (let i = 27; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    weeks[Math.floor((27 - i) / 7)].push(localDateStr(d));
+  }
+
+  const doneCount = weeks.flat().filter(d => days.includes(d)).length;
+
   return (
-    <div className="flex flex-col gap-1 flex-1 min-w-0">
-      <div className="flex items-center gap-1 mb-0.5">
-        <div className="w-2 h-2 rounded-full shrink-0" style={{ background: color }} />
-        <span className="text-[10px] font-bold truncate" style={{ color: 'var(--text)' }}>{title}</span>
+    <div className="rounded-2xl p-4" style={{ background: 'var(--surface-2)', border: `1px solid ${color}33` }}>
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 rounded-full" style={{ background: color, boxShadow: `0 0 6px ${color}` }} />
+          <span className="text-sm font-bold" style={{ color: 'var(--text)' }}>{title}</span>
+        </div>
+        <span className="text-xs font-bold" style={{ color }}>
+          {doneCount}<span className="font-normal" style={{ color: 'var(--text-muted)' }}> / 28 days</span>
+        </span>
       </div>
-      <div className="grid grid-cols-7 gap-px">
-        {['M','T','W','T','F','S','S'].map((d, i) => (
-          <div key={i} className="flex items-center justify-center text-[7px] font-bold py-0.5" style={{ color: 'var(--text-muted)' }}>{d}</div>
+      <div className="flex gap-2">
+        {weeks.map((week, wi) => (
+          <div key={wi} className="flex gap-1 flex-1">
+            {week.map(dateStr => {
+              const done = days.includes(dateStr);
+              const isToday = dateStr === todayStr;
+              return (
+                <div key={dateStr} className="flex-1 aspect-square rounded-full"
+                  style={{
+                    background: done ? color : 'var(--border)',
+                    outline: isToday ? `2.5px solid ${color}` : 'none',
+                    outlineOffset: '2px',
+                    boxShadow: done ? `0 0 8px ${color}90` : 'none',
+                  }}
+                />
+              );
+            })}
+          </div>
         ))}
-        {cells.map((day, i) => {
-          if (!day) return <div key={i} className="aspect-square" />;
-          const dateStr = `${year}-${mm}-${String(day).padStart(2, '0')}`;
-          const done = days.includes(dateStr);
-          const isToday = dateStr === todayStr;
-          const isFuture = dateStr > todayStr;
-          return (
-            <div key={i} className="aspect-square rounded-full"
-              style={{
-                background: done ? color : 'var(--surface-2)',
-                outline: isToday ? `2px solid ${color}` : 'none',
-                outlineOffset: '1px',
-                opacity: isFuture ? 0.2 : 1,
-              }}
-            />
-          );
-        })}
       </div>
-      <span className="text-[9px] mt-0.5" style={{ color: 'var(--text-muted)' }}>{monthCount} days</span>
     </div>
   );
 }
@@ -624,11 +632,11 @@ function StudyCalendar({
                 ))}
               </div>
 
-              {/* Three mini-calendars */}
-              <div className="flex gap-3">
-                <MiniCalendar title="Unit" color={TASK_COLORS.unit.bg}   days={unitDoneDays} year={viewYear} month={viewMonth} />
-                <MiniCalendar title="SRS"  color={TASK_COLORS.review.bg} days={reviewDays}   year={viewYear} month={viewMonth} />
-                <MiniCalendar title={`Words (${dailyGoal})`} color={TASK_COLORS.words.bg} days={wordGoalDays} year={viewYear} month={viewMonth} />
+              {/* Task heatmaps — last 28 days */}
+              <div className="space-y-2.5">
+                <TaskHeatmap title="Unit Complete"               color={TASK_COLORS.unit.bg}   days={unitDoneDays} />
+                <TaskHeatmap title="SRS Review"                  color={TASK_COLORS.review.bg} days={reviewDays} />
+                <TaskHeatmap title={`Daily Words (${dailyGoal})`} color={TASK_COLORS.words.bg} days={wordGoalDays} />
               </div>
             </div>
           </div>
