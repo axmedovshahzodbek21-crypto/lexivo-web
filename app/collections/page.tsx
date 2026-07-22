@@ -4,15 +4,63 @@ import { useAppStore } from '@/lib/store';
 import { useShallow } from 'zustand/react/shallow';
 import { getImportedWords } from '@/lib/storage';
 import { useEffect, useState } from 'react';
-import TiltCard from '@/components/TiltCard';
 
-const COLLECTION_META: Record<string, { icon: string; color: string; desc: string }> = {
-  '30 Days of Powerful Words': { icon: '🏆', color: 'var(--primary)', desc: 'Essential IELTS vocabulary by topic' },
-  '24 Vocabulary Challenge':   { icon: '💡', color: '#FF6584', desc: 'Idioms and phrases for fluent speakers' },
-  'Word Mastery':              { icon: '🎯', color: '#2ECC71', desc: 'High-level C1 & B2 collocations' },
+const COLLECTION_META: Record<string, { icon: string; gradient: string; edge: string; glow: string; desc: string }> = {
+  '30 Days of Powerful Words': {
+    icon: '🏆',
+    gradient: 'linear-gradient(135deg, #6c63ff 0%, #9b8fff 100%)',
+    edge: '#3f38cc',
+    glow: 'rgba(108,99,255,0.45)',
+    desc: 'Essential IELTS vocabulary by topic',
+  },
+  '24 Vocabulary Challenge': {
+    icon: '💡',
+    gradient: 'linear-gradient(135deg, #FF6584 0%, #ff9eb5 100%)',
+    edge: '#cc3355',
+    glow: 'rgba(255,101,132,0.45)',
+    desc: 'Idioms and phrases for fluent speakers',
+  },
+  'Word Mastery': {
+    icon: '🎯',
+    gradient: 'linear-gradient(135deg, #2ECC71 0%, #5ef0a0 100%)',
+    edge: '#1a9a50',
+    glow: 'rgba(46,204,113,0.45)',
+    desc: 'High-level C1 & B2 collocations',
+  },
 };
 
 const LEVELED_NAMES = new Set(['A1', 'A2', 'B1', 'Advanced']);
+
+function CollectionCard({
+  href, icon, title, desc, meta, wordCount, units,
+}: {
+  href: string; icon: string; title: string; desc: string;
+  meta: { gradient: string; edge: string; glow: string };
+  wordCount?: number; units?: number;
+}) {
+  return (
+    <Link href={href} className="block group">
+      <div
+        className="rounded-3xl p-7 flex flex-col items-center text-center gap-4 transition-all duration-200 group-hover:-translate-y-2"
+        style={{
+          background: meta.gradient,
+          boxShadow: `0 10px 0 ${meta.edge}, 0 16px 40px ${meta.glow}`,
+        }}
+      >
+        <div className="text-7xl drop-shadow-lg">{icon}</div>
+        <div>
+          <div className="font-black text-white text-lg leading-tight">{title}</div>
+          <div className="text-white/70 text-sm mt-1 leading-snug">{desc}</div>
+          {(units !== undefined && wordCount !== undefined) && (
+            <div className="mt-2 inline-block text-xs font-bold text-white/90 bg-black/20 rounded-full px-3 py-1">
+              {units} units · {wordCount} words
+            </div>
+          )}
+        </div>
+      </div>
+    </Link>
+  );
+}
 
 export default function CollectionsPage() {
   const { collections } = useAppStore(useShallow(s => ({ collections: s.collections })));
@@ -25,75 +73,52 @@ export default function CollectionsPage() {
   const mainCollections = collections.filter(c => !LEVELED_NAMES.has(c.name));
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6 space-y-4 pb-24">
-      <h1 className="text-2xl font-bold text-[var(--text)]">Collections</h1>
+    <div className="px-6 py-8 pb-28">
+      <h1 className="text-3xl font-black text-[var(--text)] mb-8">Collections</h1>
 
-      {/* My Words */}
-      <TiltCard className="card overflow-hidden hover:border-[var(--primary)] transition-colors" intensity={6}>
-        <Link href="/my-words" className="flex items-center gap-4" style={{ margin: '-20px', padding: '20px' }}>
-          <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0 animate-float-icon" style={{ background: 'rgba(108,99,255,0.12)' }}>
-            ✍️
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="font-bold text-[var(--text)] text-sm">My Words</div>
-            <div className="text-xs text-[var(--text-muted)] mt-0.5">Your personal word list</div>
-            <div className="text-xs text-[var(--text-muted)] mt-1">
-              {importedCount > 0 ? `${importedCount} words` : 'Add your first word'}
-            </div>
-          </div>
-          <span className="flex-shrink-0 text-sm font-semibold" style={{ color: 'var(--primary)' }}>
-            {importedCount > 0 ? '→' : '+'}
-          </span>
-        </Link>
-      </TiltCard>
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+        {/* My Words */}
+        <CollectionCard
+          href="/my-words"
+          icon="✍️"
+          title="My Words"
+          desc={importedCount > 0 ? `${importedCount} words · your personal list` : 'Your personal word list — add your first word'}
+          meta={{ gradient: 'linear-gradient(135deg, #6c63ff 0%, #a78bfa 100%)', edge: '#3f38cc', glow: 'rgba(108,99,255,0.45)' }}
+        />
 
-      {/* Curated collections */}
-      {mainCollections.map(col => {
-        const meta = COLLECTION_META[col.name] ?? { icon: '📖', color: 'var(--primary)', desc: col.description };
-        const enc = encodeURIComponent(col.name);
-        const wordCount = col.days.reduce((a, d) => a + d.words.length, 0);
-        return (
-          <TiltCard
-            key={col.name}
-            className="card overflow-hidden hover:border-[var(--primary)] transition-colors"
-            style={{ boxShadow: `0 4px 14px ${meta.color}22` }}
-            intensity={6}
-          >
-            <Link href={`/collections/${enc}`} className="flex items-center gap-4" style={{ margin: '-20px', padding: '20px' }}>
-              <div
-                className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0 animate-float-icon"
-                style={{ background: `${meta.color}18` }}
-              >
-                {meta.icon}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="font-bold text-[var(--text)] text-sm truncate">{col.name}</div>
-                <div className="text-xs text-[var(--text-muted)] mt-0.5 truncate">{meta.desc}</div>
-                <div className="text-xs text-[var(--text-muted)] mt-1">{col.days.length} units · {wordCount} words</div>
-              </div>
-              <span className="flex-shrink-0 text-sm font-semibold" style={{ color: meta.color }}>→</span>
-            </Link>
-          </TiltCard>
-        );
-      })}
+        {/* Curated collections */}
+        {mainCollections.map(col => {
+          const meta = COLLECTION_META[col.name] ?? {
+            icon: '📖',
+            gradient: 'linear-gradient(135deg, #6c63ff, #8b5cf6)',
+            edge: '#3f38cc',
+            glow: 'rgba(108,99,255,0.4)',
+            desc: col.description ?? '',
+          };
+          const wc = col.days.reduce((a, d) => a + d.words.length, 0);
+          return (
+            <CollectionCard
+              key={col.name}
+              href={`/collections/${encodeURIComponent(col.name)}`}
+              icon={meta.icon}
+              title={col.name}
+              desc={meta.desc}
+              meta={meta}
+              units={col.days.length}
+              wordCount={wc}
+            />
+          );
+        })}
 
-      {/* Leveled Words */}
-      <TiltCard
-        className="overflow-hidden rounded-2xl border-2 cursor-pointer"
-        style={{ background: 'rgba(46,204,113,0.06)', borderColor: 'rgba(46,204,113,0.35)' }}
-        intensity={5}
-      >
-        <Link href="/leveled-words" className="flex items-center gap-4 p-4 block">
-          <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0 animate-float-icon" style={{ background: 'rgba(46,204,113,0.12)' }}>
-            📚
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="font-bold text-sm" style={{ color: '#27AE60' }}>Leveled Words</div>
-            <div className="text-xs mt-0.5" style={{ color: '#2ECC71' }}>A1 → C2 vocabulary by CEFR level</div>
-          </div>
-          <span className="text-sm flex-shrink-0" style={{ color: '#2ECC71' }}>→</span>
-        </Link>
-      </TiltCard>
+        {/* Leveled Words */}
+        <CollectionCard
+          href="/leveled-words"
+          icon="📚"
+          title="Leveled Words"
+          desc="A1 → C2 vocabulary by CEFR level"
+          meta={{ gradient: 'linear-gradient(135deg, #2ECC71 0%, #5ef0a0 100%)', edge: '#1a9a50', glow: 'rgba(46,204,113,0.45)' }}
+        />
+      </div>
     </div>
   );
 }
