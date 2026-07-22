@@ -388,19 +388,17 @@ function MiniCalendar({ title, color, days, year, month }: {
   const mm = String(month + 1).padStart(2, '0');
   const monthCount = days.filter(d => d.startsWith(`${year}-${mm}`)).length;
   return (
-    <div className="rounded-2xl p-4" style={{ background: 'var(--surface-2)', border: `1px solid ${color}33` }}>
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full" style={{ background: color, boxShadow: `0 0 6px ${color}` }} />
-          <span className="text-sm font-bold" style={{ color: 'var(--text)' }}>{title}</span>
+    <div className="rounded-2xl p-3" style={{ background: 'var(--surface-2)', border: `1px solid ${color}33` }}>
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-1.5 min-w-0">
+          <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: color, boxShadow: `0 0 5px ${color}` }} />
+          <span className="text-xs font-bold truncate" style={{ color: 'var(--text)' }}>{title}</span>
         </div>
-        <span className="text-xs font-bold" style={{ color }}>
-          {monthCount}<span className="font-normal" style={{ color: 'var(--text-muted)' }}> days this month</span>
-        </span>
+        <span className="text-[10px] font-bold ml-1 shrink-0" style={{ color }}>{monthCount}</span>
       </div>
-      <div className="grid grid-cols-7 gap-1">
+      <div className="grid grid-cols-7 gap-0.5">
         {['M','T','W','T','F','S','S'].map((d, i) => (
-          <div key={i} className="flex items-center justify-center text-[10px] font-bold pb-1" style={{ color: 'var(--text-muted)' }}>{d}</div>
+          <div key={i} className="flex items-center justify-center text-[8px] font-bold pb-0.5" style={{ color: 'var(--text-muted)' }}>{d}</div>
         ))}
         {cells.map((day, i) => {
           if (!day) return <div key={i} className="aspect-square" />;
@@ -630,10 +628,10 @@ function StudyCalendar({
               </div>
 
               {/* Three mini-calendars */}
-              <div className="space-y-3">
-                <MiniCalendar title="Unit Complete"               color={TASK_COLORS.unit.bg}   days={unitDoneDays} year={viewYear} month={viewMonth} />
-                <MiniCalendar title="SRS Review"                  color={TASK_COLORS.review.bg} days={reviewDays}   year={viewYear} month={viewMonth} />
-                <MiniCalendar title={`Daily Words (${dailyGoal})`} color={TASK_COLORS.words.bg} days={wordGoalDays} year={viewYear} month={viewMonth} />
+              <div className="grid grid-cols-3 gap-3">
+                <MiniCalendar title="Unit"                        color={TASK_COLORS.unit.bg}   days={unitDoneDays} year={viewYear} month={viewMonth} />
+                <MiniCalendar title="SRS"                         color={TASK_COLORS.review.bg} days={reviewDays}   year={viewYear} month={viewMonth} />
+                <MiniCalendar title={`Words (${dailyGoal})`}      color={TASK_COLORS.words.bg} days={wordGoalDays} year={viewYear} month={viewMonth} />
               </div>
             </div>
           </div>
