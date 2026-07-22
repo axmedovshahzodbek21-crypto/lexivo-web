@@ -393,7 +393,7 @@ function MiniCalendar({ title, color, days, year, month }: {
         <span className="text-xs font-bold text-[var(--text)]">{title}</span>
         <span className="text-[10px] text-[var(--text-muted)] ml-auto">{days.filter(d => d.startsWith(`${year}-${mm}`)).length} days this month</span>
       </div>
-      <div className="grid grid-cols-7 gap-0.5">
+      <div className="grid grid-cols-7 gap-0.5 w-fit">
         {['M','T','W','T','F','S','S'].map((d, i) => (
           <div key={i} className="w-8 h-5 flex items-center justify-center text-[9px] font-bold text-[var(--text-muted)]">{d}</div>
         ))}
@@ -568,9 +568,9 @@ function StudyCalendar({
 
       {/* Bottom sheet */}
       {selectedDay && sheetTasks && (
-        <div className="fixed inset-0 z-50 flex items-end" style={{ background: 'rgba(0,0,0,0.5)' }}
+        <div className="fixed inset-0 z-50 flex items-end justify-center" style={{ background: 'rgba(0,0,0,0.5)' }}
           onClick={() => setSelectedDay(null)}>
-          <div className="w-full rounded-t-3xl max-h-[90vh] overflow-y-auto"
+          <div className="w-full max-w-lg rounded-t-3xl max-h-[90vh] overflow-y-auto"
             style={{ background: 'var(--bg)' }}
             onClick={e => e.stopPropagation()}>
             {/* Handle */}
