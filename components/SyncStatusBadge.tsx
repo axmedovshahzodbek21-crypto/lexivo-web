@@ -42,13 +42,15 @@ export default function SyncStatusBadge() {
     suspended: { icon: '✕', label: 'Sync paused — reload',   bg: 'color-mix(in srgb, var(--danger)  20%, transparent)', color: 'var(--danger)',     spin: false },
   }[state];
 
+  const Tag = state === 'suspended' ? 'button' : 'div';
   return (
-    <div
+    <Tag
       className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all"
       style={{ background: config.bg, color: config.color }}
+      {...(state === 'suspended' ? { onClick: () => window.location.reload() } : {})}
     >
       <span className={config.spin ? 'animate-spin inline-block' : ''}>{config.icon}</span>
       {config.label}
-    </div>
+    </Tag>
   );
 }
