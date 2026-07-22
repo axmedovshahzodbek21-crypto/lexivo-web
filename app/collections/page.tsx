@@ -70,23 +70,30 @@ export default function CollectionsPage() {
     setImportedCount(getImportedWords().length);
   }, []);
 
-  const mainCollections = collections.filter(c => !LEVELED_NAMES.has(c.name));
+  const CURATED_ORDER = ['30 Days of Powerful Words', '24 Vocabulary Challenge', 'Word Mastery'];
+  const mainCollections = collections
+    .filter(c => !LEVELED_NAMES.has(c.name))
+    .sort((a, b) => {
+      const ai = CURATED_ORDER.indexOf(a.name);
+      const bi = CURATED_ORDER.indexOf(b.name);
+      return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
+    });
 
   return (
     <div className="px-6 py-8 pb-28">
       <h1 className="text-3xl font-black text-[var(--text)] mb-8">Collections</h1>
 
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-        {/* My Words */}
+        {/* 1. Leveled Words — best starting point */}
         <CollectionCard
-          href="/my-words"
-          icon="✍️"
-          title="My Words"
-          desc={importedCount > 0 ? `${importedCount} words · your personal list` : 'Your personal word list — add your first word'}
-          meta={{ gradient: 'linear-gradient(135deg, #6c63ff 0%, #a78bfa 100%)', edge: '#3f38cc', glow: 'rgba(108,99,255,0.45)' }}
+          href="/leveled-words"
+          icon="📚"
+          title="Leveled Words"
+          desc="A1 → C2 vocabulary by CEFR level"
+          meta={{ gradient: 'linear-gradient(135deg, #2ECC71 0%, #5ef0a0 100%)', edge: '#1a9a50', glow: 'rgba(46,204,113,0.45)' }}
         />
 
-        {/* Curated collections */}
+        {/* 2-4. Curated collections in progression order */}
         {mainCollections.map(col => {
           const meta = COLLECTION_META[col.name] ?? {
             icon: '📖',
@@ -110,13 +117,13 @@ export default function CollectionsPage() {
           );
         })}
 
-        {/* Leveled Words */}
+        {/* 5. My Words — personal list last */}
         <CollectionCard
-          href="/leveled-words"
-          icon="📚"
-          title="Leveled Words"
-          desc="A1 → C2 vocabulary by CEFR level"
-          meta={{ gradient: 'linear-gradient(135deg, #2ECC71 0%, #5ef0a0 100%)', edge: '#1a9a50', glow: 'rgba(46,204,113,0.45)' }}
+          href="/my-words"
+          icon="✍️"
+          title="My Words"
+          desc={importedCount > 0 ? `${importedCount} words · your personal list` : 'Your personal word list — add your first word'}
+          meta={{ gradient: 'linear-gradient(135deg, #6c63ff 0%, #a78bfa 100%)', edge: '#3f38cc', glow: 'rgba(108,99,255,0.45)' }}
         />
       </div>
     </div>
