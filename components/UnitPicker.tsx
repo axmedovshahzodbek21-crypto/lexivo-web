@@ -140,13 +140,13 @@ function UnitList({
 }
 
 const COLLECTION_META: Record<string, { icon: string; gradient: string; edge: string; glow: string }> = {
-  '30 Days of Powerful Words': { icon: '🏆', gradient: 'linear-gradient(135deg, #6c63ff 0%, #9b8fff 100%)', edge: '#3f38cc', glow: 'rgba(108,99,255,0.45)' },
-  '24 Vocabulary Challenge':   { icon: '💡', gradient: 'linear-gradient(135deg, #FF6584 0%, #ff9eb5 100%)', edge: '#cc3355', glow: 'rgba(255,101,132,0.45)' },
-  'Word Mastery':              { icon: '🎯', gradient: 'linear-gradient(135deg, #1a9a50 0%, #2ECC71 100%)', edge: '#0f6634', glow: 'rgba(46,204,113,0.45)'  },
-  'A1':                        { icon: '🌱', gradient: 'linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%)', edge: '#0369a1', glow: 'rgba(14,165,233,0.45)'  },
-  'A2':                        { icon: '🌿', gradient: 'linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)', edge: '#6d28d9', glow: 'rgba(139,92,246,0.45)' },
-  'B1':                        { icon: '📘', gradient: 'linear-gradient(135deg, #f59e0b 0%, #fcd34d 100%)', edge: '#b45309', glow: 'rgba(245,158,11,0.45)'  },
-  'Advanced':                  { icon: '🎓', gradient: 'linear-gradient(135deg, #ef4444 0%, #f87171 100%)', edge: '#dc2626', glow: 'rgba(239,68,68,0.45)'   },
+  '30 Days of Powerful Words': { icon: '🏆', gradient: 'linear-gradient(135deg, #3730a3 0%, #4f46e5 100%)', edge: '#312e81', glow: 'rgba(55,48,163,0.45)'  },
+  '24 Vocabulary Challenge':   { icon: '💡', gradient: 'linear-gradient(135deg, #9f1239 0%, #be185d 100%)', edge: '#881337', glow: 'rgba(159,18,57,0.45)'  },
+  'Word Mastery':              { icon: '🎯', gradient: 'linear-gradient(135deg, #14532d 0%, #166534 100%)', edge: '#052e16', glow: 'rgba(20,83,45,0.45)'   },
+  'A1':                        { icon: '🌱', gradient: 'linear-gradient(135deg, #075985 0%, #0369a1 100%)', edge: '#0c4a6e', glow: 'rgba(7,89,133,0.45)'   },
+  'A2':                        { icon: '🌿', gradient: 'linear-gradient(135deg, #5b21b6 0%, #6d28d9 100%)', edge: '#4c1d95', glow: 'rgba(91,33,182,0.45)'  },
+  'B1':                        { icon: '📘', gradient: 'linear-gradient(135deg, #78350f 0%, #92400e 100%)', edge: '#431407', glow: 'rgba(120,53,15,0.45)'  },
+  'Advanced':                  { icon: '🎓', gradient: 'linear-gradient(135deg, #991b1b 0%, #b91c1c 100%)', edge: '#7f1d1d', glow: 'rgba(153,27,27,0.45)'  },
 };
 
 // ── Collection list (top level) ───────────────────────────────────────────────
