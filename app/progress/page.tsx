@@ -393,26 +393,26 @@ function MiniCalendar({ title, color, days, year, month }: {
         <span className="text-xs font-bold text-[var(--text)]">{title}</span>
         <span className="text-[10px] text-[var(--text-muted)] ml-auto">{days.filter(d => d.startsWith(`${year}-${mm}`)).length} days this month</span>
       </div>
-      <div className="grid grid-cols-7 gap-0.5 w-fit">
+      <div className="grid grid-cols-7 gap-1 w-fit">
         {['M','T','W','T','F','S','S'].map((d, i) => (
-          <div key={i} className="w-8 h-5 flex items-center justify-center text-[9px] font-bold text-[var(--text-muted)]">{d}</div>
+          <div key={i} className="w-9 h-6 flex items-center justify-center text-[10px] font-bold text-[var(--text-muted)]">{d}</div>
         ))}
         {cells.map((day, i) => {
-          if (!day) return <div key={i} className="w-8 h-8" />;
+          if (!day) return <div key={i} className="w-9 h-9" />;
           const dateStr = `${year}-${mm}-${String(day).padStart(2, '0')}`;
           const done = days.includes(dateStr);
           const isToday = dateStr === todayStr;
           const isFuture = dateStr > todayStr;
           return (
-            <div key={i} className="w-8 h-8 rounded-full flex items-center justify-center"
+            <div key={i} className="w-9 h-9 rounded-full flex items-center justify-center"
               style={{
-                background: done ? color : 'transparent',
-                outline: isToday ? `2px solid ${color}` : 'none',
-                outlineOffset: '1px',
+                background: done ? color : 'var(--surface-2)',
+                outline: isToday ? `2.5px solid ${color}` : 'none',
+                outlineOffset: '2px',
                 opacity: isFuture ? 0.2 : 1,
               }}
             >
-              <span className="text-[10px] font-bold" style={{ color: done ? '#fff' : 'var(--text-muted)' }}>{day}</span>
+              <span className="text-xs font-bold" style={{ color: done ? '#fff' : 'var(--text-muted)' }}>{day}</span>
             </div>
           );
         })}
@@ -568,7 +568,7 @@ function StudyCalendar({
 
       {/* Bottom sheet */}
       {selectedDay && sheetTasks && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center" style={{ background: 'rgba(0,0,0,0.5)' }}
+        <div className="fixed inset-0 z-50 flex items-end justify-center" style={{ background: 'rgba(0,0,0,0.8)' }}
           onClick={() => setSelectedDay(null)}>
           <div className="w-full max-w-lg rounded-t-3xl max-h-[90vh] overflow-y-auto"
             style={{ background: 'var(--bg)' }}
