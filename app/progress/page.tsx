@@ -7,7 +7,7 @@ import Link from 'next/link';
 import {
   getLearnedWords, getSRSWords, getStreak, getXP, getTotalStudyDays,
   getTodayXP, getTodayLearnedCount, getDueWords, getStarredWords, getHardWords,
-  getStudyHistory, getXPHistory, localDateStr,
+  getStudyHistory, getStudyDays, getXPHistory, localDateStr,
 } from '@/lib/storage';
 import type { XpEntry } from '@/lib/storage';
 import { getLevelInfo, ALL_ACHIEVEMENTS } from '@/lib/gamification';
@@ -39,6 +39,7 @@ function ProgressPage() {
   const [hardCount, setHardCount] = useState(0);
   const [unlockedIds, setUnlockedIds] = useState<string[]>([]);
   const [studyHistory, setStudyHistory] = useState<Record<string, number>>({});
+  const [studyDays, setStudyDays] = useState<string[]>([]);
   const [xpHistory, setXpHistory] = useState<XpEntry[]>([]);
   const [tab, setTab] = useState<'overview' | 'srs' | 'achievements' | 'calendar'>(tabParam ?? 'overview');
 
@@ -56,6 +57,7 @@ function ProgressPage() {
       setHardCount(getHardWords().length);
       setUnlockedIds(getUnlockedAchievements());
       setStudyHistory(getStudyHistory());
+      setStudyDays(getStudyDays());
       setXpHistory(getXPHistory());
     };
     load();
@@ -154,8 +156,8 @@ function ProgressPage() {
         )}
 
         {tab === 'calendar' && (
-          <div className="animate-fade-in">
-            <StudyCalendar history={studyHistory} streak={streak} totalDays={totalDays} />
+          <div className="animate-fade-in max-w-lg mx-auto">
+            <StudyCalendar history={studyHistory} streak={streak} totalDays={totalDays} studyDays={studyDays} />
           </div>
         )}
 
@@ -329,10 +331,10 @@ function XpHistorySection({ entries }: { entries: XpEntry[] }) {
 
 const MONTH_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-function calcLongestStreak(history: Record<string, number>): number {
-  const dates = Object.keys(history).filter(d => history[d] > 0).sort();
+function calcLongestStreak(days: string[]): number {
+  const sorted = [...days].sort();
   let longest = 0, current = 0, prev = '';
-  for (const d of dates) {
+  for (const d of sorted) {
     if (prev) {
       const diff = (new Date(d).getTime() - new Date(prev).getTime()) / 86400000;
       current = diff === 1 ? current + 1 : 1;
@@ -360,11 +362,12 @@ function buildMonthGrid(year: number, month: number) {
 }
 
 function StudyCalendar({
-  history, streak,
+  history, streak, studyDays,
 }: {
   history: Record<string, number>;
   streak: number;
   totalDays: number;
+  studyDays: string[];
 }) {
   const t = useTranslation();
   const now = new Date();
@@ -373,7 +376,7 @@ function StudyCalendar({
   const [selected, setSelected] = useState<string | null>(null);
 
   const todayStr = localDateStr(now);
-  const longestStreak = calcLongestStreak(history);
+  const longestStreak = calcLongestStreak(studyDays);
   const activeDays = Object.values(history).filter(c => c > 0).length;
 
   const cells = buildMonthGrid(viewYear, viewMonth);
