@@ -230,8 +230,8 @@ export default function HomePage() {
 
       {showXpModal && <XpModal xp={xp} onClose={() => setShowXpModal(false)} />}
 
-      {/* Daily goal + Level — side by side */}
-      <div className="grid grid-cols-[3fr_2fr] gap-3">
+      {/* Daily goal + Level + Word of Day */}
+      <div className="grid gap-3" style={{ gridTemplateColumns: wod ? '3fr 2fr 2fr' : '3fr 2fr' }}>
         {/* Daily goal card */}
         <div
           className="rounded-2xl p-5 transition-all duration-200"
@@ -323,6 +323,51 @@ export default function HomePage() {
             )}
           </div>
         </button>
+
+        {/* Word of the Day card */}
+        {wod && (
+          <div
+            className="rounded-2xl p-5 flex flex-col justify-between transition-all duration-200"
+            style={{
+              background: 'linear-gradient(135deg, #a21caf, #e879f9)',
+              boxShadow: '0 8px 0 #701a75, 0 12px 28px rgba(162,28,175,0.4)',
+              textShadow: '0 1px 3px rgba(0,0,0,0.3)',
+            }}
+          >
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex-1 min-w-0">
+                <div className="text-[10px] font-bold text-white/60 uppercase tracking-wider mb-1">{t.home.wordOfDay}</div>
+                <div className="text-xl font-black text-white leading-tight">{wod.word}</div>
+                <div className="text-xs text-white/70 mt-0.5">{wod.partOfSpeech} · {wod.pronunciation}</div>
+                <div className="text-sm font-semibold text-white/90 mt-1">{wod.translation}</div>
+              </div>
+              <button
+                onClick={() => speak(wod.word)}
+                className="shrink-0 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-sm hover:bg-white/30 transition-colors"
+                style={{ textShadow: 'none' }}
+                aria-label="Listen to pronunciation"
+              >
+                🔊
+              </button>
+            </div>
+            {wodRevealed ? (
+              <div className="mt-3 space-y-1.5 animate-fade-in">
+                <p className="text-xs text-white/85 leading-snug">{wod.definition}</p>
+                <div className="bg-white/15 rounded-xl p-2">
+                  <p className="text-xs italic text-white/80">&ldquo;{wod.example1}&rdquo;</p>
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={() => setWodRevealed(true)}
+                className="mt-3 text-xs font-semibold text-white bg-white/20 hover:bg-white/30 rounded-xl px-3 py-1.5 transition-colors self-start"
+                style={{ textShadow: 'none' }}
+              >
+                {t.home.showDefinition} →
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Quick actions */}
@@ -348,40 +393,6 @@ export default function HomePage() {
         <ActionCard href="/leaderboard" icon="🏆" title="Leaderboard" subtitle="See top learners"
           gradient="linear-gradient(135deg, #d97706, #fbbf24)" edge="#92400e" glow="rgba(217,119,6,0.4)" />
       </div>
-
-      {/* Word of the Day */}
-      {wod && (
-        <TiltCard className="card" intensity={3}>
-          <div className="flex items-center justify-between mb-3">
-            <span className="badge">{t.home.wordOfDay}</span>
-            <button
-              onClick={() => speak(wod.word)}
-              className="w-8 h-8 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-sm hover:bg-[var(--primary)] hover:text-white transition-colors"
-              aria-label="Listen to pronunciation"
-            >
-              🔊
-            </button>
-          </div>
-          <h2 className="text-2xl font-bold text-[var(--text)]">{wod.word}</h2>
-          <p className="text-sm text-[var(--text-muted)] mb-1">{wod.partOfSpeech} · {wod.pronunciation}</p>
-          <p className="text-base font-medium text-[var(--primary)]">{wod.translation}</p>
-          {wodRevealed ? (
-            <div className="mt-3 space-y-2 animate-fade-in">
-              <p className="text-sm text-[var(--text)]">{wod.definition}</p>
-              <div className="bg-[var(--primary-bg)] rounded-xl p-3">
-                <p className="text-sm italic text-[var(--text)]">"{wod.example1}"</p>
-              </div>
-            </div>
-          ) : (
-            <button
-              onClick={() => setWodRevealed(true)}
-              className="mt-3 text-sm text-[var(--primary)] font-medium hover:underline"
-            >
-              {t.home.showDefinition}
-            </button>
-          )}
-        </TiltCard>
-      )}
 
       {/* Shortcuts */}
       <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
