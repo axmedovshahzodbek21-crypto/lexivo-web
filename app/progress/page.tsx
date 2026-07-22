@@ -416,7 +416,7 @@ function MiniCalendar({ title, color, days, year, month }: {
                 boxShadow: done ? `0 0 6px ${color}80` : 'none',
               }}
             >
-              <span className="text-[9px] font-bold leading-none" style={{ color: done ? '#fff' : 'var(--text-muted)' }}>{day}</span>
+              <span className="text-[11px] font-bold leading-none" style={{ color: done ? '#fff' : 'var(--text-muted)' }}>{day}</span>
             </div>
           );
         })}
@@ -575,14 +575,14 @@ function StudyCalendar({
       {selectedDay && sheetTasks && (
         <div className="fixed inset-0 z-50 flex items-end justify-center" style={{ background: 'rgba(0,0,0,0.8)' }}
           onClick={() => setSelectedDay(null)}>
-          <div className="w-full max-w-2xl rounded-t-3xl max-h-[90vh] overflow-y-auto"
+          <div className="w-full max-w-4xl rounded-t-3xl max-h-[90vh] overflow-y-auto"
             style={{ background: 'var(--bg)' }}
             onClick={e => e.stopPropagation()}>
             {/* Handle */}
             <div className="flex justify-center pt-3 pb-1">
               <div className="w-10 h-1 rounded-full" style={{ background: 'var(--border)' }} />
             </div>
-            <div className="px-5 pt-2 pb-8">
+            <div className="px-4 pt-2 pb-8">
               {/* Header */}
               <div className="flex items-start justify-between mb-4">
                 <div>
