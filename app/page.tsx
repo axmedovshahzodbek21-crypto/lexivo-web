@@ -47,7 +47,6 @@ export default function HomePage() {
   const [hideGoalLevel, setHideGoalLevel] = useState(false);
   const [hideWod, setHideWod] = useState(false);
   const [hideActions, setHideActions] = useState(false);
-  const [hideShortcuts, setHideShortcuts] = useState(false);
   const [showCustomize, setShowCustomize] = useState(false);
   const [sectionOrder, setSectionOrder] = useState(['stats', 'goal', 'actions', 'shortcuts']);
   const [hideFlashcards, setHideFlashcards] = useState(false);
@@ -102,9 +101,8 @@ export default function HomePage() {
     setHideGoalLevel(localStorage.getItem('home_hide_goal_level') === '1');
     setHideWod(localStorage.getItem('home_hide_wod') === '1');
     setHideActions(localStorage.getItem('home_hide_actions') === '1');
-    setHideShortcuts(localStorage.getItem('home_hide_shortcuts') === '1');
     const savedOrder = localStorage.getItem('home_section_order');
-    setSectionOrder(savedOrder ? savedOrder.split(',') : ['stats', 'goal', 'actions', 'shortcuts']);
+    setSectionOrder(savedOrder ? savedOrder.split(',').filter(s => s !== 'shortcuts') : ['stats', 'goal', 'actions']);
     setHideFlashcards(localStorage.getItem('home_hide_flashcards') === '1');
     setHideQuiz(localStorage.getItem('home_hide_quiz') === '1');
     setHideMatch(localStorage.getItem('home_hide_match') === '1');
@@ -376,41 +374,39 @@ export default function HomePage() {
           </div>
         );
         if (sId === 'actions' && !hideActions) return (
-          <div key="actions" className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <ActionCard href="/learn" icon="📖" title={t.home.learnTitle} subtitle={t.home.learnSub}
-              gradient="linear-gradient(135deg, #4338ca, #818cf8)" edge="#312e81" glow="rgba(67,56,202,0.4)" />
-            {!hideFlashcards && <ActionCard href="/flashcards" icon="🃏" title={t.home.flashcardsTitle} subtitle={t.home.flashcardsSub}
-              gradient="linear-gradient(135deg, #b45309, #fcd34d)" edge="#78350f" glow="rgba(180,83,9,0.4)" />}
-            <ActionCard href="/srs" icon="🔄" title={t.home.srsTitle}
-              subtitle={dueCount > 0 ? t.home.srsDue(dueCount) : t.home.srsAllCaughtUp}
-              gradient={dueCount > 0 ? 'linear-gradient(135deg, #ef4444, #f87171)' : 'linear-gradient(135deg, #1a9a50, #2ECC71)'}
-              edge={dueCount > 0 ? '#b91c1c' : '#0f6634'}
-              glow={dueCount > 0 ? 'rgba(239,68,68,0.4)' : 'rgba(46,204,113,0.4)'}
-              badge={dueCount > 0 ? String(dueCount) : undefined} />
-            {!hideQuiz && <ActionCard href="/quiz" icon="❓" title={t.home.quizTitle} subtitle={t.home.quizSub}
-              gradient="linear-gradient(135deg, #4d7c0f, #a3e635)" edge="#365314" glow="rgba(77,124,15,0.4)" />}
-            {!hideStarred && <ActionCard href="/starred" icon="⭐" title={t.home.starredTitle} subtitle={t.home.starredSub}
-              gradient="linear-gradient(135deg, #92400e, #d97706)" edge="#451a03" glow="rgba(146,64,14,0.4)" />}
-
-            {!hideMatch && <ActionCard href="/matching" icon="🎯" title={t.home.matchTitle} subtitle={t.home.matchSub}
-              gradient="linear-gradient(135deg, #ec4899, #f472b6)" edge="#9d174d" glow="rgba(236,72,153,0.4)" />}
-            {!hidePomodoro && <ActionCard href="/pomodoro" icon="🍅" title={t.home.pomodoroTitle} subtitle={t.home.pomodoroSub}
-              gradient="linear-gradient(135deg, #7f1d1d, #b91c1c)" edge="#450a0a" glow="rgba(127,29,29,0.4)" />}
-            {!hideLeaderboard && <ActionCard href="/leaderboard" icon="🏆" title="Leaderboard" subtitle="See top learners"
-              gradient="linear-gradient(135deg, #d97706, #fbbf24)" edge="#92400e" glow="rgba(217,119,6,0.4)" />}
-          </div>
-        );
-        if (sId === 'shortcuts' && !hideShortcuts) return (
-          <div key="shortcuts" className="grid grid-cols-3 sm:grid-cols-5 gap-3">
-
-            {!hideHardWords && <ShortcutCard href="/hard-words" icon="😓" label={t.home.hardTitle} sub={t.home.hardSub}
-              gradient="linear-gradient(135deg, #dc2626, #ef4444)" edge="#991b1b" glow="rgba(220,38,38,0.35)" />}
-            {!hideLists && <ShortcutCard href="/lists" icon="📋" label={t.home.listsTitle} sub={t.home.listsSub}
-              gradient="linear-gradient(135deg, #7c3aed, #8b5cf6)" edge="#4c1d95" glow="rgba(124,58,237,0.35)" />}
-            {!hideGrammar && <ShortcutCard href="/grammar-tips" icon="📚" label={t.home.grammarTitle} sub={t.home.grammarSub}
-              gradient="linear-gradient(135deg, #1a9a50, #2ECC71)" edge="#0f6634" glow="rgba(46,204,113,0.35)" />}
-            {!hideClasses && <ShortcutCard href="/classes" icon="👩‍🏫" label={t.home.classesTitle} sub={t.home.classesSub}
-              gradient="linear-gradient(135deg, #0284c7, #38bdf8)" edge="#0369a1" glow="rgba(2,132,199,0.35)" />}
+          <div key="actions" className="flex flex-wrap justify-center gap-4">
+            {[
+              <ActionCard key="learn" href="/learn" icon="📖" title={t.home.learnTitle} subtitle={t.home.learnSub}
+                gradient="linear-gradient(135deg, #4338ca, #818cf8)" edge="#312e81" glow="rgba(67,56,202,0.4)" />,
+              !hideFlashcards && <ActionCard key="fc" href="/flashcards" icon="🃏" title={t.home.flashcardsTitle} subtitle={t.home.flashcardsSub}
+                gradient="linear-gradient(135deg, #b45309, #fcd34d)" edge="#78350f" glow="rgba(180,83,9,0.4)" />,
+              <ActionCard key="srs" href="/srs" icon="🔄" title={t.home.srsTitle}
+                subtitle={dueCount > 0 ? t.home.srsDue(dueCount) : t.home.srsAllCaughtUp}
+                gradient={dueCount > 0 ? 'linear-gradient(135deg, #ef4444, #f87171)' : 'linear-gradient(135deg, #1a9a50, #2ECC71)'}
+                edge={dueCount > 0 ? '#b91c1c' : '#0f6634'}
+                glow={dueCount > 0 ? 'rgba(239,68,68,0.4)' : 'rgba(46,204,113,0.4)'}
+                badge={dueCount > 0 ? String(dueCount) : undefined} />,
+              !hideQuiz && <ActionCard key="quiz" href="/quiz" icon="❓" title={t.home.quizTitle} subtitle={t.home.quizSub}
+                gradient="linear-gradient(135deg, #4d7c0f, #a3e635)" edge="#365314" glow="rgba(77,124,15,0.4)" />,
+              !hideStarred && <ActionCard key="starred" href="/starred" icon="⭐" title={t.home.starredTitle} subtitle={t.home.starredSub}
+                gradient="linear-gradient(135deg, #92400e, #d97706)" edge="#451a03" glow="rgba(146,64,14,0.4)" />,
+              !hideMatch && <ActionCard key="match" href="/matching" icon="🎯" title={t.home.matchTitle} subtitle={t.home.matchSub}
+                gradient="linear-gradient(135deg, #ec4899, #f472b6)" edge="#9d174d" glow="rgba(236,72,153,0.4)" />,
+              !hidePomodoro && <ActionCard key="pom" href="/pomodoro" icon="🍅" title={t.home.pomodoroTitle} subtitle={t.home.pomodoroSub}
+                gradient="linear-gradient(135deg, #7f1d1d, #b91c1c)" edge="#450a0a" glow="rgba(127,29,29,0.4)" />,
+              !hideLeaderboard && <ActionCard key="lb" href="/leaderboard" icon="🏆" title="Leaderboard" subtitle="See top learners"
+                gradient="linear-gradient(135deg, #d97706, #fbbf24)" edge="#92400e" glow="rgba(217,119,6,0.4)" />,
+              !hideHardWords && <ActionCard key="hard" href="/hard-words" icon="😓" title={t.home.hardTitle} subtitle={t.home.hardSub}
+                gradient="linear-gradient(135deg, #dc2626, #ef4444)" edge="#991b1b" glow="rgba(220,38,38,0.4)" />,
+              !hideLists && <ActionCard key="lists" href="/lists" icon="📋" title={t.home.listsTitle} subtitle={t.home.listsSub}
+                gradient="linear-gradient(135deg, #7c3aed, #8b5cf6)" edge="#4c1d95" glow="rgba(124,58,237,0.4)" />,
+              !hideGrammar && <ActionCard key="grammar" href="/grammar-tips" icon="📚" title={t.home.grammarTitle} subtitle={t.home.grammarSub}
+                gradient="linear-gradient(135deg, #1a9a50, #2ECC71)" edge="#0f6634" glow="rgba(46,204,113,0.4)" />,
+              !hideClasses && <ActionCard key="classes" href="/classes" icon="👩‍🏫" title={t.home.classesTitle} subtitle={t.home.classesSub}
+                gradient="linear-gradient(135deg, #0284c7, #38bdf8)" edge="#0369a1" glow="rgba(2,132,199,0.4)" />,
+            ].filter(Boolean).map((card, idx) => (
+              <div key={idx} className="w-[calc(50%-8px)] sm:w-[calc(25%-12px)]">{card}</div>
+            ))}
           </div>
         );
         return null;
@@ -437,14 +433,13 @@ export default function HomePage() {
             </div>
             <div className="overflow-y-auto flex-1 px-6">
               {sectionOrder.map((sId, i) => {
-                const labels: Record<string, string> = { stats: 'Stats Row', goal: 'Daily Goal & Level', actions: 'Quick Actions', shortcuts: 'Shortcuts' };
-                const icons: Record<string, string> = { stats: '📊', goal: '🎯', actions: '▶️', shortcuts: '⭐' };
-                const hidden = sId === 'stats' ? hideStats : sId === 'goal' ? hideGoalLevel : sId === 'actions' ? hideActions : hideShortcuts;
+                const labels: Record<string, string> = { stats: 'Stats Row', goal: 'Daily Goal & Level', actions: 'Quick Actions' };
+                const icons: Record<string, string> = { stats: '📊', goal: '🎯', actions: '▶️' };
+                const hidden = sId === 'stats' ? hideStats : sId === 'goal' ? hideGoalLevel : hideActions;
                 const toggle = () => {
                   if (sId === 'stats') { setHideStats(!hidden); localStorage.setItem('home_hide_stats', !hidden ? '1' : '0'); }
                   else if (sId === 'goal') { setHideGoalLevel(!hidden); localStorage.setItem('home_hide_goal_level', !hidden ? '1' : '0'); }
-                  else if (sId === 'actions') { setHideActions(!hidden); localStorage.setItem('home_hide_actions', !hidden ? '1' : '0'); }
-                  else { setHideShortcuts(!hidden); localStorage.setItem('home_hide_shortcuts', !hidden ? '1' : '0'); }
+                  else { setHideActions(!hidden); localStorage.setItem('home_hide_actions', !hidden ? '1' : '0'); }
                 };
                 const moveUp = () => {
                   if (i === 0) return;
@@ -515,8 +510,6 @@ export default function HomePage() {
                         onToggle={() => { setHideLeaderboard(!hideLeaderboard); localStorage.setItem('home_hide_leaderboard', !hideLeaderboard ? '1' : '0'); }} />
                       <SubToggle icon="⭐" label="Starred Words" value={!hideStarred}
                         onToggle={() => { setHideStarred(!hideStarred); localStorage.setItem('home_hide_starred', !hideStarred ? '1' : '0'); }} />
-                    </>}
-                    {sId === 'shortcuts' && <>
                       <SubToggle icon="😓" label="Hard Words" value={!hideHardWords}
                         onToggle={() => { setHideHardWords(!hideHardWords); localStorage.setItem('home_hide_hard_words', !hideHardWords ? '1' : '0'); }} />
                       <SubToggle icon="📋" label="Lists" value={!hideLists}
@@ -533,14 +526,13 @@ export default function HomePage() {
             <div className="px-6 py-4 shrink-0 flex justify-end border-t border-[var(--border)]">
               <button
                 onClick={() => {
-                  const def = ['stats', 'goal', 'actions', 'shortcuts'];
+                  const def = ['stats', 'goal', 'actions'];
                   setSectionOrder(def);
                   localStorage.setItem('home_section_order', def.join(','));
                   setHideStats(false); localStorage.removeItem('home_hide_stats');
                   setHideGoalLevel(false); localStorage.removeItem('home_hide_goal_level');
                   setHideWod(false); localStorage.removeItem('home_hide_wod');
                   setHideActions(false); localStorage.removeItem('home_hide_actions');
-                  setHideShortcuts(false); localStorage.removeItem('home_hide_shortcuts');
                   setHideFlashcards(false); localStorage.removeItem('home_hide_flashcards');
                   setHideQuiz(false); localStorage.removeItem('home_hide_quiz');
                   setHideMatch(false); localStorage.removeItem('home_hide_match');
