@@ -337,8 +337,8 @@ export async function pushUnitProgressCurrentUser(collectionName: string, dayNum
   try {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
-    const key    = `lexivo_unit_progress_${collectionName}§${dayNumber}`;
-    const keyOld = `lexivo_unit_progress_${collectionName}_${dayNumber}`;
+    const key    = `lexivo_unit_progress_${collectionName}_${dayNumber}`;
+    const keyOld = `lexivo_unit_progress_${collectionName}§${dayNumber}`; // legacy § key
     const raw = typeof window !== 'undefined' ? (localStorage.getItem(key) ?? localStorage.getItem(keyOld)) : null;
     if (!raw) return;
     let p: { learnDone?: boolean; flashcardDone?: boolean; quizDone?: boolean; completedAt?: string | null };
@@ -625,8 +625,12 @@ export async function pullAll(uid: string) {
       if (typeof window !== 'undefined' && upRows && upRows.length > 0) {
         const typedRows = upRows as unknown as UnitProgressRow[];
         for (const r of typedRows) {
-          const key = `lexivo_unit_progress_${r.collection_name}§${r.day_number}`;
-          const existing = localStorage.getItem(key);
+          // Use _ separator to match what storage.ts's getUnitProgress reads.
+          // Old pullAll wrote § keys — remove any legacy key so pushAll doesn't double-push.
+          const key = `lexivo_unit_progress_${r.collection_name}_${r.day_number}`;
+          const legacyKey = `lexivo_unit_progress_${r.collection_name}§${r.day_number}`;
+          const existing = localStorage.getItem(key) ?? localStorage.getItem(legacyKey);
+          localStorage.removeItem(legacyKey);
           let local: { learnDone: boolean; flashcardDone: boolean; quizDone: boolean; completedAt?: string | null };
           try { local = existing ? JSON.parse(existing) : { learnDone: false, flashcardDone: false, quizDone: false }; }
           catch { local = { learnDone: false, flashcardDone: false, quizDone: false }; }
