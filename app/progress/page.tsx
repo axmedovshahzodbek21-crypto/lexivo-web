@@ -573,7 +573,7 @@ function StudyCalendar({
         <span className="text-xl shrink-0">💡</span>
         <div className="space-y-1.5">
           <p className="text-sm font-bold" style={{ color: 'var(--text)' }}>How to mark a day</p>
-          <div className="flex flex-wrap gap-x-4 gap-y-1">
+          <div className="flex flex-col gap-1">
             <span className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--text-muted)' }}>
               <span className="w-2.5 h-2.5 rounded-full shrink-0 inline-block" style={{ background: TASK_COLORS.unit.bg }} />
               Finish Learn + Flashcards + Quiz for any unit
