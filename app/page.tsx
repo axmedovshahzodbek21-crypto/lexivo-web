@@ -167,19 +167,24 @@ export default function HomePage() {
       {/* Stats + quick nav row */}
       <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
         <Link href="/progress?tab=calendar">
-          <StatCard icon="🔥" value={streak} label={t.home.dayStreak} color="#FF6B35" />
+          <StatCard icon="🔥" value={streak} label={t.home.dayStreak}
+            gradient="linear-gradient(135deg, #FF6B35, #ff9f7f)" edge="#b84a1a" glowColor="rgba(255,107,53,0.4)" />
         </Link>
         <button onClick={() => setShowXpModal(true)} className="text-left w-full">
-          <StatCard icon="⚡" value={xp} label={t.home.totalXp} color="var(--primary)" glow />
+          <StatCard icon="⚡" value={xp} label={t.home.totalXp}
+            gradient="linear-gradient(135deg, #6c63ff, #a78bfa)" edge="#3f38cc" glowColor="rgba(108,99,255,0.4)" />
         </button>
         <Link href="/progress">
-          <StatCard icon="📚" value={learnedCount} label={t.home.words} color="var(--success)" />
+          <StatCard icon="📚" value={learnedCount} label={t.home.words}
+            gradient="linear-gradient(135deg, #0284c7, #38bdf8)" edge="#0369a1" glowColor="rgba(2,132,199,0.4)" />
         </Link>
         <Link href="/collections" className="hidden sm:block">
-          <StatCard icon="🗂️" value={mainCollections.length + 2} label={t.home.collections} color="var(--primary)" />
+          <StatCard icon="🗂️" value={mainCollections.length + 2} label={t.home.collections}
+            gradient="linear-gradient(135deg, #d97706, #fbbf24)" edge="#92400e" glowColor="rgba(217,119,6,0.4)" />
         </Link>
         <Link href="/reading" className="hidden sm:block">
-          <StatCard icon="📰" value="→" label="Reading" color="#8B5CF6" />
+          <StatCard icon="📰" value="→" label="Reading"
+            gradient="linear-gradient(135deg, #7c3aed, #a855f7)" edge="#4c1d95" glowColor="rgba(124,58,237,0.4)" />
         </Link>
       </div>
 
@@ -357,13 +362,23 @@ export default function HomePage() {
   );
 }
 
-function StatCard({ icon, value, label, color, glow }: { icon: string; value: number | string; label: string; color: string; glow?: boolean }) {
+function StatCard({ icon, value, label, gradient, edge, glowColor }: {
+  icon: string; value: number | string; label: string;
+  gradient: string; edge: string; glowColor: string;
+}) {
   return (
-    <TiltCard className={`card text-center py-3 px-2${glow ? ' animate-glow-pulse' : ''}`} intensity={5}>
-      <div className="text-2xl mb-1 animate-float-icon">{icon}</div>
-      <div className="text-xl font-bold" style={{ color }}>{value}</div>
-      <div className="text-xs text-[var(--text-muted)]">{label}</div>
-    </TiltCard>
+    <div
+      className="rounded-2xl p-4 flex flex-col items-center text-center gap-1 transition-all duration-200 hover:-translate-y-1 w-full h-full"
+      style={{
+        background: gradient,
+        boxShadow: `0 7px 0 ${edge}, 0 10px 24px ${glowColor}`,
+        textShadow: '0 1px 3px rgba(0,0,0,0.35)',
+      }}
+    >
+      <div className="text-3xl">{icon}</div>
+      <div className="text-xl font-black text-white">{value}</div>
+      <div className="text-xs text-white/80 font-medium">{label}</div>
+    </div>
   );
 }
 
