@@ -123,7 +123,7 @@ export default function HomePage() {
   const mainCollections = collections.filter(c => !LEVELED_NAMES.has(c.name));
 
   return (
-    <div className="p-4 space-y-5 animate-fade-in">
+    <div className="p-4 space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between pt-2">
         <div>
@@ -205,7 +205,7 @@ export default function HomePage() {
 
       {sectionOrder.map(sId => {
         if (sId === 'stats' && !hideStats) return (
-          <div key="stats" className="contents">
+          <div key="stats">
             {/* Stats bento — desktop */}
             <div className="hidden sm:grid gap-3" style={{ gridTemplateColumns: '1fr 1.5fr 1fr' }}>
               <Link href="/collections" style={{ gridColumn: 1, gridRow: 1 }} className="block">
