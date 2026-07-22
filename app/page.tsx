@@ -356,7 +356,7 @@ export default function HomePage() {
           </div>
         );
         if (sId === 'actions' && !hideActions) return (
-          <div key="actions" className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div key="actions" className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <ActionCard href="/learn" icon="📖" title={t.home.learnTitle} subtitle={t.home.learnSub}
               gradient="linear-gradient(135deg, #4338ca, #818cf8)" edge="#312e81" glow="rgba(67,56,202,0.4)" />
             <ActionCard href="/flashcards" icon="🃏" title={t.home.flashcardsTitle} subtitle={t.home.flashcardsSub}
