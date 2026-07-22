@@ -568,6 +568,29 @@ function StudyCalendar({
         </div>
       </div>
 
+      {/* How days get marked */}
+      <div className="rounded-2xl p-4 flex gap-3" style={{ background: 'var(--surface-2)' }}>
+        <span className="text-xl shrink-0">💡</span>
+        <div className="space-y-1.5">
+          <p className="text-sm font-bold" style={{ color: 'var(--text)' }}>How to mark a day</p>
+          <div className="flex flex-wrap gap-x-4 gap-y-1">
+            <span className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--text-muted)' }}>
+              <span className="w-2.5 h-2.5 rounded-full shrink-0 inline-block" style={{ background: TASK_COLORS.unit.bg }} />
+              Finish Learn + Flashcards + Quiz for any unit
+            </span>
+            <span className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--text-muted)' }}>
+              <span className="w-2.5 h-2.5 rounded-full shrink-0 inline-block" style={{ background: TASK_COLORS.review.bg }} />
+              Complete an SRS review session
+            </span>
+            <span className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--text-muted)' }}>
+              <span className="w-2.5 h-2.5 rounded-full shrink-0 inline-block" style={{ background: TASK_COLORS.words.bg }} />
+              Reach your {dailyGoal}-word daily goal
+            </span>
+          </div>
+          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Each task fills ⅓ of the day circle. Complete all 3 to fully mark a day.</p>
+        </div>
+      </div>
+
       {/* Monthly breakdown */}
       <MonthlyBreakdown history={history} />
 
