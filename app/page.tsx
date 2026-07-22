@@ -52,7 +52,6 @@ export default function HomePage() {
   const [sectionOrder, setSectionOrder] = useState(['stats', 'goal', 'actions', 'shortcuts']);
   const [hideFlashcards, setHideFlashcards] = useState(false);
   const [hideQuiz, setHideQuiz] = useState(false);
-  const [hidePronunciation, setHidePronunciation] = useState(false);
   const [hideMatch, setHideMatch] = useState(false);
   const [hidePomodoro, setHidePomodoro] = useState(false);
   const [hideLeaderboard, setHideLeaderboard] = useState(false);
@@ -108,7 +107,6 @@ export default function HomePage() {
     setSectionOrder(savedOrder ? savedOrder.split(',') : ['stats', 'goal', 'actions', 'shortcuts']);
     setHideFlashcards(localStorage.getItem('home_hide_flashcards') === '1');
     setHideQuiz(localStorage.getItem('home_hide_quiz') === '1');
-    setHidePronunciation(localStorage.getItem('home_hide_pronunciation') === '1');
     setHideMatch(localStorage.getItem('home_hide_match') === '1');
     setHidePomodoro(localStorage.getItem('home_hide_pomodoro') === '1');
     setHideLeaderboard(localStorage.getItem('home_hide_leaderboard') === '1');
@@ -391,8 +389,7 @@ export default function HomePage() {
               badge={dueCount > 0 ? String(dueCount) : undefined} />
             {!hideQuiz && <ActionCard href="/quiz" icon="❓" title={t.home.quizTitle} subtitle={t.home.quizSub}
               gradient="linear-gradient(135deg, #4d7c0f, #a3e635)" edge="#365314" glow="rgba(77,124,15,0.4)" />}
-            {!hidePronunciation && <ActionCard href="/pronunciation" icon="🎙️" title={t.home.pronounceTitle} subtitle={t.home.pronounceSub}
-              gradient="linear-gradient(135deg, #0369a1, #7dd3fc)" edge="#0c4a6e" glow="rgba(3,105,161,0.4)" />}
+
             {!hideMatch && <ActionCard href="/matching" icon="🎯" title={t.home.matchTitle} subtitle={t.home.matchSub}
               gradient="linear-gradient(135deg, #ec4899, #f472b6)" edge="#9d174d" glow="rgba(236,72,153,0.4)" />}
             {!hidePomodoro && <ActionCard href="/pomodoro" icon="🍅" title={t.home.pomodoroTitle} subtitle={t.home.pomodoroSub}
@@ -508,8 +505,7 @@ export default function HomePage() {
                       <SubToggle icon="🔄" label="SRS Review" value={true} onToggle={() => {}} locked />
                       <SubToggle icon="❓" label="Quiz" value={!hideQuiz}
                         onToggle={() => { setHideQuiz(!hideQuiz); localStorage.setItem('home_hide_quiz', !hideQuiz ? '1' : '0'); }} />
-                      <SubToggle icon="🎙️" label="Pronunciation" value={!hidePronunciation}
-                        onToggle={() => { setHidePronunciation(!hidePronunciation); localStorage.setItem('home_hide_pronunciation', !hidePronunciation ? '1' : '0'); }} />
+
                       <SubToggle icon="🎯" label="Match" value={!hideMatch}
                         onToggle={() => { setHideMatch(!hideMatch); localStorage.setItem('home_hide_match', !hideMatch ? '1' : '0'); }} />
                       <SubToggle icon="🍅" label="Pomodoro" value={!hidePomodoro}
@@ -546,7 +542,6 @@ export default function HomePage() {
                   setHideShortcuts(false); localStorage.removeItem('home_hide_shortcuts');
                   setHideFlashcards(false); localStorage.removeItem('home_hide_flashcards');
                   setHideQuiz(false); localStorage.removeItem('home_hide_quiz');
-                  setHidePronunciation(false); localStorage.removeItem('home_hide_pronunciation');
                   setHideMatch(false); localStorage.removeItem('home_hide_match');
                   setHidePomodoro(false); localStorage.removeItem('home_hide_pomodoro');
                   setHideLeaderboard(false); localStorage.removeItem('home_hide_leaderboard');

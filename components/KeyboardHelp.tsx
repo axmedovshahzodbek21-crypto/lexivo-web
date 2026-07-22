@@ -40,13 +40,7 @@ const PAGE_SHORTCUTS: Record<string, { label: string; rows: { keys: string[]; ac
       { keys: ['S'], action: 'Speak word' },
     ],
   },
-  '/pronunciation': {
-    label: 'Pronunciation',
-    rows: [
-      { keys: ['R'], action: 'Start / stop recording' },
-      { keys: ['S'], action: 'Play target audio' },
-    ],
-  },
+
 };
 
 const GLOBAL_ROWS = [

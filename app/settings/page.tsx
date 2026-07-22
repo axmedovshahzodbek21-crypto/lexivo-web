@@ -467,9 +467,9 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* Pronunciation */}
+      {/* Voice */}
       <div className="card space-y-4">
-        <h2 className="font-semibold">{t.settings.pronunciation}</h2>
+        <h2 className="font-semibold">{t.settings.voice}</h2>
 
         <div className="flex items-center justify-between gap-4">
           <div>
