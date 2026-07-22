@@ -169,7 +169,7 @@ function ProgressPage() {
             <StudyCalendar
               history={studyHistory} streak={streak} totalDays={totalDays} studyDays={studyDays}
               unitDoneDays={unitDoneDays} reviewDays={reviewDays} wordGoalDays={wordGoalDays}
-              dailyGoal={dailyGoal}
+              dailyGoal={dailyGoal} dueCount={dueCount}
             />
           </div>
         )}
@@ -422,7 +422,7 @@ function MiniCalendar({ title, color, days, year, month }: {
 }
 
 function StudyCalendar({
-  history, streak, studyDays, unitDoneDays, reviewDays, wordGoalDays, dailyGoal,
+  history, streak, studyDays, unitDoneDays, reviewDays, wordGoalDays, dailyGoal, dueCount,
 }: {
   history: Record<string, number>;
   streak: number;
@@ -432,6 +432,7 @@ function StudyCalendar({
   reviewDays: string[];
   wordGoalDays: string[];
   dailyGoal: number;
+  dueCount: number;
 }) {
   const t = useTranslation();
   const now = new Date();
@@ -458,9 +459,12 @@ function StudyCalendar({
     else setViewMonth(m => m + 1);
   }
 
+  // If nothing is due for review today, treat the review task as N/A (auto-satisfied)
+  const reviewNA = dueCount === 0;
+
   const sheetTasks = selectedDay ? {
     unit:   unitDoneDays.includes(selectedDay),
-    review: reviewDays.includes(selectedDay),
+    review: reviewDays.includes(selectedDay) || (selectedDay === todayStr && reviewNA),
     words:  wordGoalDays.includes(selectedDay),
   } : null;
   const sheetIsToday = selectedDay === todayStr;
@@ -514,7 +518,7 @@ function StudyCalendar({
               const isFuture = dateStr > todayStr;
               const isSelected = selectedDay === dateStr;
               const unit   = unitDoneDays.includes(dateStr);
-              const review = reviewDays.includes(dateStr);
+              const review = reviewDays.includes(dateStr) || (isToday && reviewNA);
               const words  = wordGoalDays.includes(dateStr);
               const taskCount = (unit ? 1 : 0) + (review ? 1 : 0) + (words ? 1 : 0);
               const anyDone = taskCount > 0;
@@ -597,17 +601,19 @@ function StudyCalendar({
               <div className="space-y-2 mb-6">
                 {([
                   { key: 'unit',   label: 'Unit Complete',                       done: sheetTasks.unit,   href: '/learn', btnLabel: 'Pick a Unit', color: TASK_COLORS.unit.bg },
-                  { key: 'review', label: 'SRS Review',                          done: sheetTasks.review, href: '/srs',   btnLabel: 'Go to Review', color: TASK_COLORS.review.bg },
+                  { key: 'review', label: 'SRS Review',                          done: sheetTasks.review, href: '/srs',   btnLabel: reviewNA ? 'All caught up ✓' : 'Go to Review', color: TASK_COLORS.review.bg, na: sheetIsToday && reviewNA && !reviewDays.includes(todayStr) },
                   { key: 'words',  label: `Daily Words (${dailyGoal} goal)`,     done: sheetTasks.words,  href: '/learn', btnLabel: 'Learn Words',  color: TASK_COLORS.words.bg },
                 ] as const).map(task => (
                   <div key={task.key} className="flex items-center gap-3 rounded-2xl p-3"
                     style={{ background: 'var(--surface-2)' }}>
                     <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0"
-                      style={{ background: task.done ? task.color : 'var(--border)' }}>
-                      <span className="text-xs font-black text-white">{task.done ? '✓' : ''}</span>
+                      style={{ background: ('na' in task && task.na) ? 'var(--border)' : task.done ? task.color : 'var(--border)' }}>
+                      <span className="text-xs font-black text-white">{('na' in task && task.na) ? '–' : task.done ? '✓' : ''}</span>
                     </div>
                     <span className="text-sm font-semibold flex-1" style={{ color: 'var(--text)' }}>{task.label}</span>
-                    {sheetIsToday && !task.done ? (
+                    {('na' in task && task.na) ? (
+                      <span className="text-xs font-semibold" style={{ color: 'var(--text-muted)' }}>All caught up ✓</span>
+                    ) : sheetIsToday && !task.done ? (
                       <Link href={task.href} onClick={() => setSelectedDay(null)}
                         className="text-xs font-bold px-3 py-1.5 rounded-full text-white whitespace-nowrap"
                         style={{ background: task.color }}>
