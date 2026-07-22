@@ -389,6 +389,8 @@ export default function HomePage() {
               badge={dueCount > 0 ? String(dueCount) : undefined} />
             {!hideQuiz && <ActionCard href="/quiz" icon="❓" title={t.home.quizTitle} subtitle={t.home.quizSub}
               gradient="linear-gradient(135deg, #4d7c0f, #a3e635)" edge="#365314" glow="rgba(77,124,15,0.4)" />}
+            {!hideStarred && <ActionCard href="/starred" icon="⭐" title={t.home.starredTitle} subtitle={t.home.starredSub}
+              gradient="linear-gradient(135deg, #92400e, #d97706)" edge="#451a03" glow="rgba(146,64,14,0.4)" />}
 
             {!hideMatch && <ActionCard href="/matching" icon="🎯" title={t.home.matchTitle} subtitle={t.home.matchSub}
               gradient="linear-gradient(135deg, #ec4899, #f472b6)" edge="#9d174d" glow="rgba(236,72,153,0.4)" />}
@@ -400,8 +402,7 @@ export default function HomePage() {
         );
         if (sId === 'shortcuts' && !hideShortcuts) return (
           <div key="shortcuts" className="grid grid-cols-3 sm:grid-cols-5 gap-3">
-            {!hideStarred && <ShortcutCard href="/starred" icon="⭐" label={t.home.starredTitle} sub={t.home.starredSub}
-              gradient="linear-gradient(135deg, #d97706, #f59e0b)" edge="#92400e" glow="rgba(217,119,6,0.35)" />}
+
             {!hideHardWords && <ShortcutCard href="/hard-words" icon="😓" label={t.home.hardTitle} sub={t.home.hardSub}
               gradient="linear-gradient(135deg, #dc2626, #ef4444)" edge="#991b1b" glow="rgba(220,38,38,0.35)" />}
             {!hideLists && <ShortcutCard href="/lists" icon="📋" label={t.home.listsTitle} sub={t.home.listsSub}
@@ -512,10 +513,10 @@ export default function HomePage() {
                         onToggle={() => { setHidePomodoro(!hidePomodoro); localStorage.setItem('home_hide_pomodoro', !hidePomodoro ? '1' : '0'); }} />
                       <SubToggle icon="🏆" label="Leaderboard" value={!hideLeaderboard}
                         onToggle={() => { setHideLeaderboard(!hideLeaderboard); localStorage.setItem('home_hide_leaderboard', !hideLeaderboard ? '1' : '0'); }} />
-                    </>}
-                    {sId === 'shortcuts' && <>
                       <SubToggle icon="⭐" label="Starred Words" value={!hideStarred}
                         onToggle={() => { setHideStarred(!hideStarred); localStorage.setItem('home_hide_starred', !hideStarred ? '1' : '0'); }} />
+                    </>}
+                    {sId === 'shortcuts' && <>
                       <SubToggle icon="😓" label="Hard Words" value={!hideHardWords}
                         onToggle={() => { setHideHardWords(!hideHardWords); localStorage.setItem('home_hide_hard_words', !hideHardWords ? '1' : '0'); }} />
                       <SubToggle icon="📋" label="Lists" value={!hideLists}
