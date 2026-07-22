@@ -264,7 +264,7 @@ export default function HomePage() {
           }}>
             {!hideGoalLevel && (
               <div
-                className="rounded-2xl p-5 transition-all duration-200"
+                className="rounded-2xl p-5 flex flex-col justify-between h-full transition-all duration-200"
                 style={{
                   background: 'linear-gradient(135deg, #5b21b6, #8b5cf6)',
                   boxShadow: '0 8px 0 #3b0764, 0 12px 28px rgba(91,33,182,0.4)',
@@ -308,7 +308,7 @@ export default function HomePage() {
             )}
             {!hideGoalLevel && (
               <button onClick={() => setShowXpModal(true)}
-                className="rounded-2xl p-5 flex flex-col justify-between text-left transition-all duration-200 hover:-translate-y-1 w-full"
+                className="rounded-2xl p-5 flex flex-col justify-between text-left transition-all duration-200 hover:-translate-y-1 w-full h-full"
                 style={{ background: 'linear-gradient(135deg, #be123c, #fb7185)', boxShadow: '0 8px 0 #881337, 0 12px 28px rgba(190,18,60,0.4)', textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}
               >
                 <div>
@@ -325,7 +325,7 @@ export default function HomePage() {
               </button>
             )}
             {!hideWod && wod && (
-              <div className="rounded-2xl p-5 flex flex-col justify-between transition-all duration-200"
+              <div className="rounded-2xl p-5 flex flex-col justify-between h-full transition-all duration-200"
                 style={{ background: 'linear-gradient(135deg, #a21caf, #e879f9)', boxShadow: '0 8px 0 #701a75, 0 12px 28px rgba(162,28,175,0.4)', textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}
               >
                 <div className="flex items-start justify-between gap-2">
