@@ -50,6 +50,17 @@ export default function HomePage() {
   const [hideShortcuts, setHideShortcuts] = useState(false);
   const [showCustomize, setShowCustomize] = useState(false);
   const [sectionOrder, setSectionOrder] = useState(['stats', 'goal', 'actions', 'shortcuts']);
+  const [hideFlashcards, setHideFlashcards] = useState(false);
+  const [hideQuiz, setHideQuiz] = useState(false);
+  const [hidePronunciation, setHidePronunciation] = useState(false);
+  const [hideMatch, setHideMatch] = useState(false);
+  const [hidePomodoro, setHidePomodoro] = useState(false);
+  const [hideLeaderboard, setHideLeaderboard] = useState(false);
+  const [hideStarred, setHideStarred] = useState(false);
+  const [hideHardWords, setHideHardWords] = useState(false);
+  const [hideLists, setHideLists] = useState(false);
+  const [hideGrammar, setHideGrammar] = useState(false);
+  const [hideClasses, setHideClasses] = useState(false);
 
   useEffect(() => {
     if (!isOnboarded()) { router.replace('/onboarding'); return; }
@@ -95,6 +106,17 @@ export default function HomePage() {
     setHideShortcuts(localStorage.getItem('home_hide_shortcuts') === '1');
     const savedOrder = localStorage.getItem('home_section_order');
     setSectionOrder(savedOrder ? savedOrder.split(',') : ['stats', 'goal', 'actions', 'shortcuts']);
+    setHideFlashcards(localStorage.getItem('home_hide_flashcards') === '1');
+    setHideQuiz(localStorage.getItem('home_hide_quiz') === '1');
+    setHidePronunciation(localStorage.getItem('home_hide_pronunciation') === '1');
+    setHideMatch(localStorage.getItem('home_hide_match') === '1');
+    setHidePomodoro(localStorage.getItem('home_hide_pomodoro') === '1');
+    setHideLeaderboard(localStorage.getItem('home_hide_leaderboard') === '1');
+    setHideStarred(localStorage.getItem('home_hide_starred') === '1');
+    setHideHardWords(localStorage.getItem('home_hide_hard_words') === '1');
+    setHideLists(localStorage.getItem('home_hide_lists') === '1');
+    setHideGrammar(localStorage.getItem('home_hide_grammar') === '1');
+    setHideClasses(localStorage.getItem('home_hide_classes') === '1');
   }, [router]);
 
   useEffect(() => {
@@ -359,38 +381,38 @@ export default function HomePage() {
           <div key="actions" className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <ActionCard href="/learn" icon="📖" title={t.home.learnTitle} subtitle={t.home.learnSub}
               gradient="linear-gradient(135deg, #4338ca, #818cf8)" edge="#312e81" glow="rgba(67,56,202,0.4)" />
-            <ActionCard href="/flashcards" icon="🃏" title={t.home.flashcardsTitle} subtitle={t.home.flashcardsSub}
-              gradient="linear-gradient(135deg, #b45309, #fcd34d)" edge="#78350f" glow="rgba(180,83,9,0.4)" />
+            {!hideFlashcards && <ActionCard href="/flashcards" icon="🃏" title={t.home.flashcardsTitle} subtitle={t.home.flashcardsSub}
+              gradient="linear-gradient(135deg, #b45309, #fcd34d)" edge="#78350f" glow="rgba(180,83,9,0.4)" />}
             <ActionCard href="/srs" icon="🔄" title={t.home.srsTitle}
               subtitle={dueCount > 0 ? t.home.srsDue(dueCount) : t.home.srsAllCaughtUp}
               gradient={dueCount > 0 ? 'linear-gradient(135deg, #ef4444, #f87171)' : 'linear-gradient(135deg, #1a9a50, #2ECC71)'}
               edge={dueCount > 0 ? '#b91c1c' : '#0f6634'}
               glow={dueCount > 0 ? 'rgba(239,68,68,0.4)' : 'rgba(46,204,113,0.4)'}
               badge={dueCount > 0 ? String(dueCount) : undefined} />
-            <ActionCard href="/quiz" icon="❓" title={t.home.quizTitle} subtitle={t.home.quizSub}
-              gradient="linear-gradient(135deg, #4d7c0f, #a3e635)" edge="#365314" glow="rgba(77,124,15,0.4)" />
-            <ActionCard href="/pronunciation" icon="🎙️" title={t.home.pronounceTitle} subtitle={t.home.pronounceSub}
-              gradient="linear-gradient(135deg, #0369a1, #7dd3fc)" edge="#0c4a6e" glow="rgba(3,105,161,0.4)" />
-            <ActionCard href="/matching" icon="🎯" title={t.home.matchTitle} subtitle={t.home.matchSub}
-              gradient="linear-gradient(135deg, #ec4899, #f472b6)" edge="#9d174d" glow="rgba(236,72,153,0.4)" />
-            <ActionCard href="/pomodoro" icon="🍅" title={t.home.pomodoroTitle} subtitle={t.home.pomodoroSub}
-              gradient="linear-gradient(135deg, #7f1d1d, #b91c1c)" edge="#450a0a" glow="rgba(127,29,29,0.4)" />
-            <ActionCard href="/leaderboard" icon="🏆" title="Leaderboard" subtitle="See top learners"
-              gradient="linear-gradient(135deg, #d97706, #fbbf24)" edge="#92400e" glow="rgba(217,119,6,0.4)" />
+            {!hideQuiz && <ActionCard href="/quiz" icon="❓" title={t.home.quizTitle} subtitle={t.home.quizSub}
+              gradient="linear-gradient(135deg, #4d7c0f, #a3e635)" edge="#365314" glow="rgba(77,124,15,0.4)" />}
+            {!hidePronunciation && <ActionCard href="/pronunciation" icon="🎙️" title={t.home.pronounceTitle} subtitle={t.home.pronounceSub}
+              gradient="linear-gradient(135deg, #0369a1, #7dd3fc)" edge="#0c4a6e" glow="rgba(3,105,161,0.4)" />}
+            {!hideMatch && <ActionCard href="/matching" icon="🎯" title={t.home.matchTitle} subtitle={t.home.matchSub}
+              gradient="linear-gradient(135deg, #ec4899, #f472b6)" edge="#9d174d" glow="rgba(236,72,153,0.4)" />}
+            {!hidePomodoro && <ActionCard href="/pomodoro" icon="🍅" title={t.home.pomodoroTitle} subtitle={t.home.pomodoroSub}
+              gradient="linear-gradient(135deg, #7f1d1d, #b91c1c)" edge="#450a0a" glow="rgba(127,29,29,0.4)" />}
+            {!hideLeaderboard && <ActionCard href="/leaderboard" icon="🏆" title="Leaderboard" subtitle="See top learners"
+              gradient="linear-gradient(135deg, #d97706, #fbbf24)" edge="#92400e" glow="rgba(217,119,6,0.4)" />}
           </div>
         );
         if (sId === 'shortcuts' && !hideShortcuts) return (
           <div key="shortcuts" className="grid grid-cols-3 sm:grid-cols-5 gap-3">
-            <ShortcutCard href="/starred"      icon="⭐" label={t.home.starredTitle}  sub={t.home.starredSub}
-              gradient="linear-gradient(135deg, #d97706, #f59e0b)" edge="#92400e" glow="rgba(217,119,6,0.35)" />
-            <ShortcutCard href="/hard-words"   icon="😓" label={t.home.hardTitle}    sub={t.home.hardSub}
-              gradient="linear-gradient(135deg, #dc2626, #ef4444)" edge="#991b1b" glow="rgba(220,38,38,0.35)" />
-            <ShortcutCard href="/lists"        icon="📋" label={t.home.listsTitle}   sub={t.home.listsSub}
-              gradient="linear-gradient(135deg, #7c3aed, #8b5cf6)" edge="#4c1d95" glow="rgba(124,58,237,0.35)" />
-            <ShortcutCard href="/grammar-tips" icon="📚" label={t.home.grammarTitle} sub={t.home.grammarSub}
-              gradient="linear-gradient(135deg, #1a9a50, #2ECC71)" edge="#0f6634" glow="rgba(46,204,113,0.35)" />
-            <ShortcutCard href="/classes"      icon="👩‍🏫" label={t.home.classesTitle} sub={t.home.classesSub}
-              gradient="linear-gradient(135deg, #0284c7, #38bdf8)" edge="#0369a1" glow="rgba(2,132,199,0.35)" />
+            {!hideStarred && <ShortcutCard href="/starred" icon="⭐" label={t.home.starredTitle} sub={t.home.starredSub}
+              gradient="linear-gradient(135deg, #d97706, #f59e0b)" edge="#92400e" glow="rgba(217,119,6,0.35)" />}
+            {!hideHardWords && <ShortcutCard href="/hard-words" icon="😓" label={t.home.hardTitle} sub={t.home.hardSub}
+              gradient="linear-gradient(135deg, #dc2626, #ef4444)" edge="#991b1b" glow="rgba(220,38,38,0.35)" />}
+            {!hideLists && <ShortcutCard href="/lists" icon="📋" label={t.home.listsTitle} sub={t.home.listsSub}
+              gradient="linear-gradient(135deg, #7c3aed, #8b5cf6)" edge="#4c1d95" glow="rgba(124,58,237,0.35)" />}
+            {!hideGrammar && <ShortcutCard href="/grammar-tips" icon="📚" label={t.home.grammarTitle} sub={t.home.grammarSub}
+              gradient="linear-gradient(135deg, #1a9a50, #2ECC71)" edge="#0f6634" glow="rgba(46,204,113,0.35)" />}
+            {!hideClasses && <ShortcutCard href="/classes" icon="👩‍🏫" label={t.home.classesTitle} sub={t.home.classesSub}
+              gradient="linear-gradient(135deg, #0284c7, #38bdf8)" edge="#0369a1" glow="rgba(2,132,199,0.35)" />}
           </div>
         );
         return null;
@@ -401,19 +423,21 @@ export default function HomePage() {
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" onClick={() => setShowCustomize(false)}>
           <div className="absolute inset-0 bg-black/50" />
           <div
-            className="relative w-full sm:max-w-sm bg-[var(--surface)] rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl"
+            className="relative w-full sm:max-w-sm bg-[var(--surface)] rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col max-h-[85vh]"
             onClick={e => e.stopPropagation()}
           >
-            <div className="w-10 h-1 rounded-full bg-[var(--border)] mx-auto mb-5 sm:hidden" />
-            <div className="flex items-center justify-between mb-1">
-              <h2 className="text-lg font-bold text-[var(--text)]">Customize Home</h2>
-              <button
-                onClick={() => setShowCustomize(false)}
-                className="w-8 h-8 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors"
-              >✕</button>
+            <div className="px-6 pt-6 pb-3 shrink-0">
+              <div className="w-10 h-1 rounded-full bg-[var(--border)] mx-auto mb-5 sm:hidden" />
+              <div className="flex items-center justify-between mb-1">
+                <h2 className="text-lg font-bold text-[var(--text)]">Customize Home</h2>
+                <button
+                  onClick={() => setShowCustomize(false)}
+                  className="w-8 h-8 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors"
+                >✕</button>
+              </div>
+              <p className="text-xs text-[var(--text-muted)]">Reorder sections · toggle to show/hide</p>
             </div>
-            <p className="text-xs text-[var(--text-muted)] mb-4">Drag ▲▼ to reorder · toggle to show/hide</p>
-            <div>
+            <div className="overflow-y-auto flex-1 px-6">
               {sectionOrder.map((sId, i) => {
                 const labels: Record<string, string> = { stats: 'Stats Row', goal: 'Daily Goal & Level', actions: 'Quick Actions', shortcuts: 'Shortcuts' };
                 const icons: Record<string, string> = { stats: '📊', goal: '🎯', actions: '▶️', shortcuts: '⭐' };
@@ -438,6 +462,22 @@ export default function HomePage() {
                   setSectionOrder(next);
                   localStorage.setItem('home_section_order', next.join(','));
                 };
+                const SubToggle = ({ icon, label, value, onToggle, locked }: { icon: string; label: string; value: boolean; onToggle: () => void; locked?: boolean }) => (
+                  <div className={`flex items-center gap-2 py-2 pl-10 border-b border-[var(--border)] ${locked ? 'opacity-40' : ''}`}>
+                    <span className="text-sm mr-0.5">{icon}</span>
+                    <span className="flex-1 text-sm text-[var(--text-muted)]">{label}</span>
+                    {locked
+                      ? <span className="text-[10px] text-[var(--text-muted)] font-medium">always on</span>
+                      : <button onClick={onToggle}
+                          className="relative w-10 h-5 rounded-full transition-colors shrink-0"
+                          style={{ background: value ? 'var(--primary)' : 'var(--border)' }}
+                        >
+                          <div className="absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform"
+                            style={{ transform: value ? 'translateX(22px)' : 'translateX(2px)' }} />
+                        </button>
+                    }
+                  </div>
+                );
                 return (
                   <div key={sId}>
                     <div className="flex items-center gap-2 py-2.5 border-b border-[var(--border)]">
@@ -457,25 +497,43 @@ export default function HomePage() {
                           style={{ transform: !hidden ? 'translateX(26px)' : 'translateX(2px)' }} />
                       </button>
                     </div>
-                    {sId === 'goal' && (
-                      <div className="flex items-center gap-2 py-2 pl-10 border-b border-[var(--border)]">
-                        <span className="text-base mr-0.5">✨</span>
-                        <span className="flex-1 text-sm text-[var(--text-muted)]">Word of the Day</span>
-                        <button
-                          onClick={() => { setHideWod(!hideWod); localStorage.setItem('home_hide_wod', !hideWod ? '1' : '0'); }}
-                          className="relative w-12 h-6 rounded-full transition-colors shrink-0"
-                          style={{ background: !hideWod ? 'var(--primary)' : 'var(--border)' }}
-                        >
-                          <div className="absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform"
-                            style={{ transform: !hideWod ? 'translateX(26px)' : 'translateX(2px)' }} />
-                        </button>
-                      </div>
-                    )}
+                    {sId === 'goal' && <>
+                      <SubToggle icon="✨" label="Word of the Day" value={!hideWod}
+                        onToggle={() => { setHideWod(!hideWod); localStorage.setItem('home_hide_wod', !hideWod ? '1' : '0'); }} />
+                    </>}
+                    {sId === 'actions' && <>
+                      <SubToggle icon="📖" label="Learn" value={true} onToggle={() => {}} locked />
+                      <SubToggle icon="🃏" label="Flashcards" value={!hideFlashcards}
+                        onToggle={() => { setHideFlashcards(!hideFlashcards); localStorage.setItem('home_hide_flashcards', !hideFlashcards ? '1' : '0'); }} />
+                      <SubToggle icon="🔄" label="SRS Review" value={true} onToggle={() => {}} locked />
+                      <SubToggle icon="❓" label="Quiz" value={!hideQuiz}
+                        onToggle={() => { setHideQuiz(!hideQuiz); localStorage.setItem('home_hide_quiz', !hideQuiz ? '1' : '0'); }} />
+                      <SubToggle icon="🎙️" label="Pronunciation" value={!hidePronunciation}
+                        onToggle={() => { setHidePronunciation(!hidePronunciation); localStorage.setItem('home_hide_pronunciation', !hidePronunciation ? '1' : '0'); }} />
+                      <SubToggle icon="🎯" label="Match" value={!hideMatch}
+                        onToggle={() => { setHideMatch(!hideMatch); localStorage.setItem('home_hide_match', !hideMatch ? '1' : '0'); }} />
+                      <SubToggle icon="🍅" label="Pomodoro" value={!hidePomodoro}
+                        onToggle={() => { setHidePomodoro(!hidePomodoro); localStorage.setItem('home_hide_pomodoro', !hidePomodoro ? '1' : '0'); }} />
+                      <SubToggle icon="🏆" label="Leaderboard" value={!hideLeaderboard}
+                        onToggle={() => { setHideLeaderboard(!hideLeaderboard); localStorage.setItem('home_hide_leaderboard', !hideLeaderboard ? '1' : '0'); }} />
+                    </>}
+                    {sId === 'shortcuts' && <>
+                      <SubToggle icon="⭐" label="Starred Words" value={!hideStarred}
+                        onToggle={() => { setHideStarred(!hideStarred); localStorage.setItem('home_hide_starred', !hideStarred ? '1' : '0'); }} />
+                      <SubToggle icon="😓" label="Hard Words" value={!hideHardWords}
+                        onToggle={() => { setHideHardWords(!hideHardWords); localStorage.setItem('home_hide_hard_words', !hideHardWords ? '1' : '0'); }} />
+                      <SubToggle icon="📋" label="Lists" value={!hideLists}
+                        onToggle={() => { setHideLists(!hideLists); localStorage.setItem('home_hide_lists', !hideLists ? '1' : '0'); }} />
+                      <SubToggle icon="📚" label="Grammar Tips" value={!hideGrammar}
+                        onToggle={() => { setHideGrammar(!hideGrammar); localStorage.setItem('home_hide_grammar', !hideGrammar ? '1' : '0'); }} />
+                      <SubToggle icon="👩‍🏫" label="Classes" value={!hideClasses}
+                        onToggle={() => { setHideClasses(!hideClasses); localStorage.setItem('home_hide_classes', !hideClasses ? '1' : '0'); }} />
+                    </>}
                   </div>
                 );
               })}
             </div>
-            <div className="mt-4 flex justify-end">
+            <div className="px-6 py-4 shrink-0 flex justify-end border-t border-[var(--border)]">
               <button
                 onClick={() => {
                   const def = ['stats', 'goal', 'actions', 'shortcuts'];
@@ -486,6 +544,17 @@ export default function HomePage() {
                   setHideWod(false); localStorage.removeItem('home_hide_wod');
                   setHideActions(false); localStorage.removeItem('home_hide_actions');
                   setHideShortcuts(false); localStorage.removeItem('home_hide_shortcuts');
+                  setHideFlashcards(false); localStorage.removeItem('home_hide_flashcards');
+                  setHideQuiz(false); localStorage.removeItem('home_hide_quiz');
+                  setHidePronunciation(false); localStorage.removeItem('home_hide_pronunciation');
+                  setHideMatch(false); localStorage.removeItem('home_hide_match');
+                  setHidePomodoro(false); localStorage.removeItem('home_hide_pomodoro');
+                  setHideLeaderboard(false); localStorage.removeItem('home_hide_leaderboard');
+                  setHideStarred(false); localStorage.removeItem('home_hide_starred');
+                  setHideHardWords(false); localStorage.removeItem('home_hide_hard_words');
+                  setHideLists(false); localStorage.removeItem('home_hide_lists');
+                  setHideGrammar(false); localStorage.removeItem('home_hide_grammar');
+                  setHideClasses(false); localStorage.removeItem('home_hide_classes');
                 }}
                 className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors"
               >Reset to default</button>
