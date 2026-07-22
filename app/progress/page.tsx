@@ -407,7 +407,7 @@ function MiniCalendar({ title, color, days, year, month }: {
           const isToday = dateStr === todayStr;
           const isFuture = dateStr > todayStr;
           return (
-            <div key={i} className="aspect-square rounded-full"
+            <div key={i} className="aspect-square rounded-full flex items-center justify-center"
               style={{
                 background: done ? color : 'var(--border)',
                 outline: isToday ? `2.5px solid ${color}` : 'none',
@@ -415,7 +415,9 @@ function MiniCalendar({ title, color, days, year, month }: {
                 opacity: isFuture ? 0.2 : 1,
                 boxShadow: done ? `0 0 6px ${color}80` : 'none',
               }}
-            />
+            >
+              <span className="text-[9px] font-bold leading-none" style={{ color: done ? '#fff' : 'var(--text-muted)' }}>{day}</span>
+            </div>
           );
         })}
       </div>
