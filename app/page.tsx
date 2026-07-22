@@ -230,100 +230,100 @@ export default function HomePage() {
 
       {showXpModal && <XpModal xp={xp} onClose={() => setShowXpModal(false)} />}
 
-      {/* Daily goal — prominent */}
-      <TiltCard className="card" intensity={3}>
-        <div className="flex items-center gap-4">
-          {/* Ring */}
-          <div className="relative shrink-0" style={{ width: 64, height: 64 }}>
-            <svg width="64" height="64" style={{ transform: 'rotate(-90deg)' }}>
-              <circle cx="32" cy="32" r="26" fill="none" stroke="var(--border)" strokeWidth="6" />
-              <circle
-                cx="32" cy="32" r="26" fill="none"
-                stroke={dailyProgress >= 100 ? 'var(--success)' : 'var(--primary)'}
-                strokeWidth="6"
-                strokeLinecap="round"
-                strokeDasharray={`${Math.min(dailyProgress, 100) / 100 * 163.4} 163.4`}
-                style={{ transition: 'stroke-dasharray 0.5s ease' }}
-              />
-            </svg>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-lg font-black" style={{ color: dailyProgress >= 100 ? 'var(--success)' : 'var(--primary)' }}>
-                {dailyProgress >= 100 ? '✓' : todayCount}
-              </span>
+      {/* Daily goal + Level — side by side */}
+      <div className="grid grid-cols-[3fr_2fr] gap-3">
+        {/* Daily goal card */}
+        <div
+          className="rounded-2xl p-5 transition-all duration-200"
+          style={{
+            background: 'linear-gradient(135deg, #6c63ff, #a78bfa)',
+            boxShadow: '0 8px 0 #3f38cc, 0 12px 28px rgba(108,99,255,0.4)',
+          }}
+        >
+          <div className="flex items-center gap-4">
+            {/* Ring */}
+            <div className="relative shrink-0" style={{ width: 64, height: 64 }}>
+              <svg width="64" height="64" style={{ transform: 'rotate(-90deg)' }}>
+                <circle cx="32" cy="32" r="26" fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="6" />
+                <circle
+                  cx="32" cy="32" r="26" fill="none"
+                  stroke="white"
+                  strokeWidth="6"
+                  strokeLinecap="round"
+                  strokeDasharray={`${Math.min(dailyProgress, 100) / 100 * 163.4} 163.4`}
+                  style={{ transition: 'stroke-dasharray 0.5s ease' }}
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-lg font-black text-white">
+                  {dailyProgress >= 100 ? '✓' : todayCount}
+                </span>
+              </div>
+            </div>
+            {/* Text */}
+            <div className="flex-1 min-w-0" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
+              <div className="flex items-baseline gap-1.5 mb-1.5">
+                <span className="text-2xl font-black text-white">{todayCount}</span>
+                <span className="text-sm text-white/75 font-medium">/ {settings.dailyGoal} {t.home.dailyGoal.toLowerCase()}</span>
+              </div>
+              <div className="h-2 rounded-full bg-white/25 overflow-hidden mb-1.5">
+                <div
+                  className="h-full rounded-full bg-white transition-all duration-500"
+                  style={{ width: `${Math.min(dailyProgress, 100)}%` }}
+                />
+              </div>
+              <p className="text-xs text-white/75">
+                {dailyProgress >= 100 ? `${t.home.goalReached} · ${todayXp} XP today` : `${todayXp} XP today · ${Math.max(0, settings.dailyGoal - todayCount)} to go`}
+              </p>
             </div>
           </div>
-          {/* Text */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-2xl font-black text-[var(--text)]">{todayCount}</span>
-              <span className="text-sm text-[var(--text-muted)] font-medium">/ {settings.dailyGoal} {t.home.dailyGoal.toLowerCase()}</span>
-            </div>
-            <div className="mt-1.5 h-2 rounded-full bg-[var(--border)] overflow-hidden">
+          {/* Freeze / risk badge */}
+          <div className="mt-3 flex items-center gap-2 bg-white/15 rounded-xl px-3 py-1.5 text-xs text-white/90" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.25)' }}>
+            <span>
+              {streakRisk === 'at-risk' ? '⚠️' : streakRisk === 'freeze-saves' ? '⚠️' : '🧊'}
+            </span>
+            <span>
+              {streakRisk === 'at-risk' && streak > 0
+                ? `${streak}-day streak at risk — study now!`
+                : streakRisk === 'freeze-saves'
+                ? `🧊 Freeze will protect your ${streak}-day streak`
+                : freezes === 0
+                ? 'No freezes — earn one after 7 days'
+                : freezes === 1 ? t.home.freezeSingle : t.home.freezeMulti(freezes)}
+            </span>
+          </div>
+        </div>
+
+        {/* Level progress card */}
+        <button
+          onClick={() => setShowXpModal(true)}
+          className="rounded-2xl p-5 flex flex-col justify-between text-left transition-all duration-200 hover:-translate-y-1 w-full"
+          style={{
+            background: 'linear-gradient(135deg, #d97706, #fbbf24)',
+            boxShadow: '0 8px 0 #92400e, 0 12px 28px rgba(217,119,6,0.4)',
+            textShadow: '0 1px 3px rgba(0,0,0,0.3)',
+          }}
+        >
+          <div>
+            <div className="text-3xl mb-1">⭐</div>
+            <div className="text-xl font-black text-white leading-tight">{levelInfo.level}</div>
+            <div className="text-xs text-white/75 mt-0.5">{xp} XP</div>
+          </div>
+          <div className="mt-4">
+            <div className="h-2.5 rounded-full bg-white/25 overflow-hidden">
               <div
-                className="h-full rounded-full transition-all duration-500"
-                style={{ width: `${Math.min(dailyProgress, 100)}%`, background: dailyProgress >= 100 ? 'var(--success)' : 'var(--primary)' }}
+                className="h-full rounded-full bg-white transition-all duration-500"
+                style={{ width: `${levelInfo.progress}%` }}
               />
             </div>
-            <p className="text-xs mt-1" style={{ color: dailyProgress >= 100 ? 'var(--success)' : 'var(--text-muted)' }}>
-              {dailyProgress >= 100 ? `${t.home.goalReached} · ${todayXp} XP today` : `${todayXp} XP today · ${Math.max(0, settings.dailyGoal - todayCount)} words to go`}
-            </p>
+            {levelInfo.next && (
+              <p className="text-[11px] text-white/75 mt-1.5">
+                {levelInfo.xpToNext} XP → {levelInfo.next}
+              </p>
+            )}
           </div>
-        </div>
-      </TiltCard>
-
-      {/* Streak at risk warning */}
-      {streakRisk === 'freeze-saves' && (
-        <div className="flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm font-medium"
-          style={{ background: 'rgba(251,191,36,0.12)', border: '1px solid rgba(251,191,36,0.4)', color: '#B45309' }}>
-          <span className="text-base">⚠️</span>
-          <span>Study today — a 🧊 freeze will protect your {streak}-day streak!</span>
-        </div>
-      )}
-      {streakRisk === 'at-risk' && streak > 0 && (
-        <div className="flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm font-medium"
-          style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.35)', color: '#DC2626' }}>
-          <span className="text-base">🔥</span>
-          <span>Your {streak}-day streak is at risk! Study something today.</span>
-        </div>
-      )}
-
-      {/* Streak freeze indicator */}
-      <div
-        className="flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm font-medium"
-        style={{
-          background: freezes > 0 ? 'rgba(99,179,237,0.12)' : 'rgba(148,163,184,0.08)',
-          border: `1px solid ${freezes > 0 ? 'rgba(99,179,237,0.35)' : 'rgba(148,163,184,0.2)'}`,
-          color: freezes > 0 ? '#3B82F6' : 'var(--text-muted)',
-        }}
-      >
-        <span className="text-base">🧊</span>
-        <span className="flex-1">
-          {freezes === 0
-            ? 'No streak freezes — earn one by studying 7 days in a row'
-            : freezes === 1 ? t.home.freezeSingle : t.home.freezeMulti(freezes)}
-        </span>
-        {freezes > 0 && (
-          <span className="text-xs opacity-60">auto-applies if you miss a day</span>
-        )}
-      </div>
-
-      {/* Level progress */}
-      <TiltCard className="card overflow-hidden hover:border-[var(--primary)] transition-colors cursor-pointer animate-glow-pulse" intensity={4}>
-        <button onClick={() => setShowXpModal(true)} className="w-full text-left" style={{ margin: '-20px', padding: '20px' }}>
-          <div className="flex justify-between items-center mb-2">
-            <span className="font-semibold text-[var(--text)]">⭐ {levelInfo.level}</span>
-            <span className="text-sm text-[var(--text-muted)]">{xp} XP {levelInfo.next && `→ ${levelInfo.next}`}</span>
-          </div>
-          <div className="progress-bar">
-            <div className="progress-bar-fill" style={{ width: `${levelInfo.progress}%` }} />
-          </div>
-          {levelInfo.next && (
-            <p className="text-[11px] text-[var(--text-muted)] mt-1.5 text-right">
-              {levelInfo.xpToNext} XP to {levelInfo.next} · tap for details
-            </p>
-          )}
         </button>
-      </TiltCard>
+      </div>
 
       {/* Quick actions */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
