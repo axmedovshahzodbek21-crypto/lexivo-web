@@ -12,6 +12,13 @@ import type { SRSWord } from '@/lib/types';
 import Link from 'next/link';
 import { useTranslation } from '@/lib/useTranslation';
 
+const TILE_COLORS = [
+  { bg: '#e21b3c', shadow: '#a01328', shape: '▲' },
+  { bg: '#1368ce', shadow: '#0d4fa0', shape: '◆' },
+  { bg: '#d89e00', shadow: '#a07500', shape: '●' },
+  { bg: '#26890c', shadow: '#1c6409', shape: '■' },
+] as const;
+
 export default function SRSReviewPage() {
   const router = useRouter();
   const t = useTranslation();
@@ -74,14 +81,14 @@ export default function SRSReviewPage() {
     const correct = q[idx].translation;
     const pool = new Set<string>();
     q.forEach((w, i) => { if (i !== idx && w.translation !== correct) pool.add(w.translation); });
-    if (pool.size < 2) {
+    if (pool.size < 3) {
       for (const lw of getLearnedWords()) {
         if (lw.translation !== correct) pool.add(lw.translation);
-        if (pool.size >= 2) break;
+        if (pool.size >= 3) break;
       }
     }
     if (pool.size < 2) return null;
-    const wrong = [...pool].sort(() => Math.random() - 0.5).slice(0, 2);
+    const wrong = [...pool].sort(() => Math.random() - 0.5).slice(0, Math.min(3, pool.size));
     return [correct, ...wrong].sort(() => Math.random() - 0.5);
   }, []);
 
@@ -341,7 +348,7 @@ export default function SRSReviewPage() {
         </div>
 
         {/* Word card */}
-        <div className="card animate-slide-up flex flex-col gap-3" style={{ minHeight: 280 }}>
+        <div className="card animate-slide-up flex flex-col gap-3" style={{ minHeight: choices !== null ? 'auto' : 280 }}>
           <div className="flex items-center justify-between">
             <span className="badge text-xs">{current.topic}</span>
             <button
@@ -389,26 +396,42 @@ export default function SRSReviewPage() {
           ) : null}
         </div>
 
-        {/* Quiz mode: choice buttons */}
+        {/* Quiz mode: Kahoot-style 2×2 colored tiles */}
         {choices !== null ? (
-          <div className="flex flex-col gap-2 animate-slide-up">
-            {choices.map((choice) => {
-              const answered = tappedChoice !== null;
-              const isCorrect = choice === current.translation;
-              const isTapped = choice === tappedChoice;
-              let cls = 'w-full py-4 px-4 rounded-xl border-2 font-semibold text-base text-left transition-all duration-200';
-              if (!answered) cls += ' border-[var(--border)] text-[var(--text)] bg-[var(--surface)] hover:border-[var(--primary)] cursor-pointer';
-              else if (isCorrect) cls += ' border-[var(--success)] bg-[var(--success)] text-white';
-              else if (isTapped) cls += ' border-[var(--danger)] bg-[var(--danger)] text-white';
-              else cls += ' border-[var(--border)] text-[var(--text-muted)] opacity-40';
-              return (
-                <button key={choice} className={cls} onClick={() => handleChoiceTap(choice)} disabled={answered}>
-                  {choice}
-                </button>
-              );
-            })}
+          <div className="animate-slide-up space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              {choices.map((choice, i) => {
+                const tile = TILE_COLORS[i % 4];
+                const answered = tappedChoice !== null;
+                const isCorrect = choice === current.translation;
+                const isTapped = choice === tappedChoice;
+                const isLast = choices.length === 3 && i === 2;
+                let bgColor = tile.bg;
+                let shadowColor = tile.shadow;
+                let opacity = 1;
+                if (answered) {
+                  if (isCorrect) { bgColor = '#26890c'; shadowColor = '#1c6409'; }
+                  else if (isTapped) { bgColor = '#e21b3c'; shadowColor = '#a01328'; }
+                  else { opacity = 0.35; }
+                }
+                return (
+                  <button
+                    key={choice}
+                    onClick={() => handleChoiceTap(choice)}
+                    disabled={answered}
+                    className={`relative rounded-2xl p-4 flex flex-col gap-2 min-h-[100px] transition-all duration-200 text-left active:translate-y-1${isLast ? ' col-span-2' : ''}`}
+                    style={{ backgroundColor: bgColor, boxShadow: `0 4px 0 ${shadowColor}`, opacity }}
+                  >
+                    <span className="text-xl text-white/70 leading-none">{tile.shape}</span>
+                    <span className="text-white font-bold text-sm leading-snug" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.4)' }}>{choice}</span>
+                    {answered && isCorrect && <span className="absolute top-3 right-3 text-white text-lg font-black">✓</span>}
+                    {answered && isTapped && !isCorrect && <span className="absolute top-3 right-3 text-white text-lg font-black">✗</span>}
+                  </button>
+                );
+              })}
+            </div>
             {tappedChoice && tappedChoice !== current.translation && (
-              <div className="flex gap-2 mt-1">
+              <div className="flex gap-2">
                 <button onClick={() => grade('forgot')} className="flex-1 py-3 rounded-xl border-2 border-[var(--danger)] text-[var(--danger)] font-bold text-sm hover:bg-red-50 transition-colors">
                   {t.srs.forgot}
                 </button>
