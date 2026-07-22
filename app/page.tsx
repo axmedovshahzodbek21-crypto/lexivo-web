@@ -178,7 +178,7 @@ export default function HomePage() {
         {/* Left top: Collections */}
         <Link href="/collections" style={{ gridColumn: 1, gridRow: 1 }} className="block">
           <StatCard icon="🗂️" value={mainCollections.length + 2} label={t.home.collections}
-            gradient="linear-gradient(135deg, #d97706, #fbbf24)" edge="#92400e" glowColor="rgba(217,119,6,0.4)" />
+            gradient="linear-gradient(135deg, #1d4ed8, #60a5fa)" edge="#1e3a8a" glowColor="rgba(29,78,216,0.4)" />
         </Link>
         {/* Center: Day Streak big */}
         <Link href="/progress?tab=calendar" style={{ gridColumn: 2, gridRow: '1 / 3' }} className="block">
@@ -198,12 +198,12 @@ export default function HomePage() {
         {/* Right top: Total XP */}
         <button onClick={() => setShowXpModal(true)} style={{ gridColumn: 3, gridRow: 1 }} className="text-left w-full">
           <StatCard icon="⚡" value={xp} label={t.home.totalXp}
-            gradient="linear-gradient(135deg, #6c63ff, #a78bfa)" edge="#3f38cc" glowColor="rgba(108,99,255,0.4)" />
+            gradient="linear-gradient(135deg, #d97706, #fbbf24)" edge="#92400e" glowColor="rgba(217,119,6,0.4)" />
         </button>
         {/* Left bottom: Reading */}
         <Link href="/reading" style={{ gridColumn: 1, gridRow: 2 }} className="block">
           <StatCard icon="📰" value="→" label="Reading"
-            gradient="linear-gradient(135deg, #7c3aed, #a855f7)" edge="#4c1d95" glowColor="rgba(124,58,237,0.4)" />
+            gradient="linear-gradient(135deg, #047857, #34d399)" edge="#064e3b" glowColor="rgba(4,120,87,0.4)" />
         </Link>
         {/* Right bottom: Words */}
         <Link href="/progress" style={{ gridColumn: 3, gridRow: 2 }} className="block">
@@ -220,7 +220,7 @@ export default function HomePage() {
         </Link>
         <button onClick={() => setShowXpModal(true)} className="text-left w-full">
           <StatCard icon="⚡" value={xp} label={t.home.totalXp}
-            gradient="linear-gradient(135deg, #6c63ff, #a78bfa)" edge="#3f38cc" glowColor="rgba(108,99,255,0.4)" />
+            gradient="linear-gradient(135deg, #d97706, #fbbf24)" edge="#92400e" glowColor="rgba(217,119,6,0.4)" />
         </button>
         <Link href="/progress">
           <StatCard icon="📚" value={learnedCount} label={t.home.words}
@@ -236,8 +236,8 @@ export default function HomePage() {
         <div
           className="rounded-2xl p-5 transition-all duration-200"
           style={{
-            background: 'linear-gradient(135deg, #6c63ff, #a78bfa)',
-            boxShadow: '0 8px 0 #3f38cc, 0 12px 28px rgba(108,99,255,0.4)',
+            background: 'linear-gradient(135deg, #5b21b6, #8b5cf6)',
+            boxShadow: '0 8px 0 #3b0764, 0 12px 28px rgba(91,33,182,0.4)',
           }}
         >
           <div className="flex items-center gap-4">
@@ -299,8 +299,8 @@ export default function HomePage() {
           onClick={() => setShowXpModal(true)}
           className="rounded-2xl p-5 flex flex-col justify-between text-left transition-all duration-200 hover:-translate-y-1 w-full"
           style={{
-            background: 'linear-gradient(135deg, #d97706, #fbbf24)',
-            boxShadow: '0 8px 0 #92400e, 0 12px 28px rgba(217,119,6,0.4)',
+            background: 'linear-gradient(135deg, #be123c, #fb7185)',
+            boxShadow: '0 8px 0 #881337, 0 12px 28px rgba(190,18,60,0.4)',
             textShadow: '0 1px 3px rgba(0,0,0,0.3)',
           }}
         >
@@ -328,9 +328,9 @@ export default function HomePage() {
       {/* Quick actions */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <ActionCard href="/learn" icon="📖" title={t.home.learnTitle} subtitle={t.home.learnSub}
-          gradient="linear-gradient(135deg, #6c63ff, #a78bfa)" edge="#3f38cc" glow="rgba(108,99,255,0.4)" />
+          gradient="linear-gradient(135deg, #4338ca, #818cf8)" edge="#312e81" glow="rgba(67,56,202,0.4)" />
         <ActionCard href="/flashcards" icon="🃏" title={t.home.flashcardsTitle} subtitle={t.home.flashcardsSub}
-          gradient="linear-gradient(135deg, #FF6B35, #ff9f7f)" edge="#b84a1a" glow="rgba(255,107,53,0.4)" />
+          gradient="linear-gradient(135deg, #b45309, #fcd34d)" edge="#78350f" glow="rgba(180,83,9,0.4)" />
         <ActionCard href="/srs" icon="🔄" title={t.home.srsTitle}
           subtitle={dueCount > 0 ? t.home.srsDue(dueCount) : t.home.srsAllCaughtUp}
           gradient={dueCount > 0 ? 'linear-gradient(135deg, #ef4444, #f87171)' : 'linear-gradient(135deg, #1a9a50, #2ECC71)'}
@@ -338,13 +338,13 @@ export default function HomePage() {
           glow={dueCount > 0 ? 'rgba(239,68,68,0.4)' : 'rgba(46,204,113,0.4)'}
           badge={dueCount > 0 ? String(dueCount) : undefined} />
         <ActionCard href="/quiz" icon="❓" title={t.home.quizTitle} subtitle={t.home.quizSub}
-          gradient="linear-gradient(135deg, #f59e0b, #fcd34d)" edge="#a16207" glow="rgba(245,158,11,0.4)" />
+          gradient="linear-gradient(135deg, #4d7c0f, #a3e635)" edge="#365314" glow="rgba(77,124,15,0.4)" />
         <ActionCard href="/pronunciation" icon="🎙️" title={t.home.pronounceTitle} subtitle={t.home.pronounceSub}
-          gradient="linear-gradient(135deg, #7c3aed, #a855f7)" edge="#4c1d95" glow="rgba(124,58,237,0.4)" />
+          gradient="linear-gradient(135deg, #0369a1, #7dd3fc)" edge="#0c4a6e" glow="rgba(3,105,161,0.4)" />
         <ActionCard href="/matching" icon="🎯" title={t.home.matchTitle} subtitle={t.home.matchSub}
           gradient="linear-gradient(135deg, #ec4899, #f472b6)" edge="#9d174d" glow="rgba(236,72,153,0.4)" />
         <ActionCard href="/pomodoro" icon="🍅" title={t.home.pomodoroTitle} subtitle={t.home.pomodoroSub}
-          gradient="linear-gradient(135deg, #dc2626, #ef4444)" edge="#991b1b" glow="rgba(220,38,38,0.4)" />
+          gradient="linear-gradient(135deg, #7f1d1d, #b91c1c)" edge="#450a0a" glow="rgba(127,29,29,0.4)" />
         <ActionCard href="/leaderboard" icon="🏆" title="Leaderboard" subtitle="See top learners"
           gradient="linear-gradient(135deg, #d97706, #fbbf24)" edge="#92400e" glow="rgba(217,119,6,0.4)" />
       </div>
