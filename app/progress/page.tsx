@@ -1,5 +1,5 @@
 ﻿'use client';
-import { PageLoader, SectionLoader } from '@/components/Loader';
+import { PageLoader } from '@/components/Loader';
 import { Suspense } from 'react';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
@@ -92,25 +92,33 @@ function ProgressPage() {
         {tab === 'overview' && (
           <div className="space-y-4 animate-fade-in">
             {/* Level card */}
-            <div className="card">
-              <div className="flex justify-between items-center mb-2">
-                <span className="font-bold text-lg">⭐ {levelInfo.level}</span>
-                <span className="text-sm text-[var(--text-muted)]">{xp} XP</span>
+            <div
+              className="rounded-3xl p-5 flex flex-col gap-3"
+              style={{
+                background: 'linear-gradient(135deg, #4338ca 0%, #7c3aed 100%)',
+                boxShadow: '0 5px 0 #312e81',
+              }}
+            >
+              <div className="flex justify-between items-center">
+                <span className="font-black text-white text-xl">⭐ {levelInfo.level}</span>
+                <span className="text-white/60 text-sm font-semibold">{xp} XP</span>
               </div>
-              <div className="progress-bar mb-1">
-                <div className="progress-bar-fill" style={{ width: `${levelInfo.progress}%` }} />
+              <div>
+                <div className="h-2.5 rounded-full bg-white/25 overflow-hidden">
+                  <div className="h-full rounded-full bg-white transition-all" style={{ width: `${levelInfo.progress}%` }} />
+                </div>
+                {levelInfo.next && <p className="text-white/50 text-xs mt-1.5">Next: {levelInfo.next}</p>}
               </div>
-              {levelInfo.next && <p className="text-xs text-[var(--text-muted)]">Next: {levelInfo.next}</p>}
             </div>
 
             {/* Stats grid */}
             <div className="grid grid-cols-2 gap-3">
-              <StatBlock icon="🔥" label={t.progress.currentStreak} value={`${streak} ${t.progress.days}`} color="#FF6B35" />
-              <StatBlock icon="📅" label={t.progress.studyDays} value={`${totalDays} ${t.progress.days}`} color="var(--primary)" />
-              <StatBlock icon="📚" label={t.progress.wordsLearned} value={learnedCount} color="var(--success)" />
-              <StatBlock icon="🧠" label={t.progress.srsMastered} value={masteredCount} color="#8B5CF6" />
-              <StatBlock icon="⚡" label={t.progress.todayXp} value={`+${todayXp}`} color="var(--warning)" />
-              <StatBlock icon="🎯" label={t.progress.todayWords} value={todayCount} color="#EC4899" />
+              <StatBlock icon="🔥" label={t.progress.currentStreak} value={`${streak} ${t.progress.days}`} bg="#c2410c" shadow="#7c2d12" />
+              <StatBlock icon="📅" label={t.progress.studyDays} value={`${totalDays} ${t.progress.days}`} bg="#4338ca" shadow="#312e81" />
+              <StatBlock icon="📚" label={t.progress.wordsLearned} value={learnedCount} bg="#059669" shadow="#064e3b" />
+              <StatBlock icon="🧠" label={t.progress.srsMastered} value={masteredCount} bg="#7c3aed" shadow="#4c1d95" />
+              <StatBlock icon="⚡" label={t.progress.todayXp} value={`+${todayXp}`} bg="#b45309" shadow="#78350f" />
+              <StatBlock icon="🎯" label={t.progress.todayWords} value={todayCount} bg="#be185d" shadow="#831843" />
             </div>
 
             {/* Due reviews */}
@@ -218,12 +226,17 @@ function ProgressPage() {
   );
 }
 
-function StatBlock({ icon, label, value, color }: { icon: string; label: string; value: string | number; color: string }) {
+function StatBlock({ icon, label, value, bg, shadow }: { icon: string; label: string; value: string | number; bg: string; shadow: string }) {
   return (
-    <div className="card py-3">
-      <div className="text-2xl mb-1">{icon}</div>
-      <div className="font-bold text-lg" style={{ color }}>{value}</div>
-      <div className="text-xs text-[var(--text-muted)]">{label}</div>
+    <div
+      className="rounded-2xl p-4 flex flex-col justify-between min-h-[110px]"
+      style={{ background: bg, boxShadow: `0 4px 0 ${shadow}` }}
+    >
+      <span className="text-2xl">{icon}</span>
+      <div>
+        <div className="text-2xl font-black text-white leading-tight">{value}</div>
+        <div className="text-xs text-white/70 font-medium mt-0.5">{label}</div>
+      </div>
     </div>
   );
 }
