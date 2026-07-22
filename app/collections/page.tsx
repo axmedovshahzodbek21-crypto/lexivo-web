@@ -22,8 +22,8 @@ const COLLECTION_META: Record<string, { icon: string; gradient: string; edge: st
   },
   'Word Mastery': {
     icon: '🎯',
-    gradient: 'linear-gradient(135deg, #2ECC71 0%, #5ef0a0 100%)',
-    edge: '#1a9a50',
+    gradient: 'linear-gradient(135deg, #1a9a50 0%, #2ECC71 100%)',
+    edge: '#0f6634',
     glow: 'rgba(46,204,113,0.45)',
     desc: 'High-level C1 & B2 collocations',
   },
@@ -47,12 +47,12 @@ function CollectionCard({
           boxShadow: `0 10px 0 ${meta.edge}, 0 16px 40px ${meta.glow}`,
         }}
       >
-        <div className="text-5xl drop-shadow-lg">{icon}</div>
-        <div>
+        <div className="text-5xl" style={{ filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.35))' }}>{icon}</div>
+        <div style={{ textShadow: '0 1px 4px rgba(0,0,0,0.45)' }}>
           <div className="font-black text-white text-lg leading-tight">{title}</div>
-          <div className="text-white/70 text-sm mt-1 leading-snug">{desc}</div>
+          <div className="text-white/90 text-sm mt-1 leading-snug">{desc}</div>
           {(units !== undefined && wordCount !== undefined) && (
-            <div className="mt-2 inline-block text-xs font-bold text-white/90 bg-black/20 rounded-full px-3 py-1">
+            <div className="mt-2 inline-block text-xs font-bold text-white bg-black/25 rounded-full px-3 py-1">
               {units} units · {wordCount} words
             </div>
           )}
@@ -90,7 +90,7 @@ export default function CollectionsPage() {
           icon="📚"
           title="Leveled Words"
           desc="A1 → C2 vocabulary by CEFR level"
-          meta={{ gradient: 'linear-gradient(135deg, #2ECC71 0%, #5ef0a0 100%)', edge: '#1a9a50', glow: 'rgba(46,204,113,0.45)' }}
+          meta={{ gradient: 'linear-gradient(135deg, #1fa85c 0%, #2ECC71 100%)', edge: '#136e3c', glow: 'rgba(46,204,113,0.45)' }}
         />
 
         {/* 2-4. Curated collections in progression order */}
