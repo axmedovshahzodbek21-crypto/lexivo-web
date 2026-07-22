@@ -42,6 +42,7 @@ export default function HomePage() {
   const [theme, setThemeState] = useState<Theme>('light');
   const [showXpModal, setShowXpModal] = useState(false);
   const [showBanner, setShowBanner] = useState(false);
+  const [showReviewBanner, setShowReviewBanner] = useState(true);
 
   useEffect(() => {
     if (!isOnboarded()) { router.replace('/onboarding'); return; }
@@ -149,19 +150,27 @@ export default function HomePage() {
       )}
 
       {/* ── Review reminder banner ── */}
-      {dueCount > 0 && (
-        <Link href="/srs" className="flex items-center gap-4 p-4 rounded-2xl border-2 transition-colors hover:opacity-90"
+      {dueCount > 0 && showReviewBanner && (
+        <div className="flex items-center gap-4 p-4 rounded-2xl border-2"
           style={{ background: 'rgba(239,68,68,0.08)', borderColor: 'rgba(239,68,68,0.35)' }}>
-          <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
-            style={{ background: 'rgba(239,68,68,0.15)' }}>🔔</div>
-          <div className="flex-1 min-w-0">
-            <div className="font-bold text-sm" style={{ color: 'var(--danger)' }}>
-              {dueCount} {dueCount === 1 ? 'word' : 'words'} due for review!
+          <Link href="/srs" className="flex items-center gap-4 flex-1 min-w-0 hover:opacity-90 transition-opacity">
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
+              style={{ background: 'rgba(239,68,68,0.15)' }}>🔔</div>
+            <div className="flex-1 min-w-0">
+              <div className="font-bold text-sm" style={{ color: 'var(--danger)' }}>
+                {dueCount} {dueCount === 1 ? 'word' : 'words'} due for review!
+              </div>
+              <div className="text-xs mt-0.5 text-[var(--text-muted)]">Complete your reviews for best results.</div>
             </div>
-            <div className="text-xs mt-0.5 text-[var(--text-muted)]">Complete your reviews for best results.</div>
-          </div>
-          <span className="text-sm font-bold flex-shrink-0" style={{ color: 'var(--danger)' }}>→</span>
-        </Link>
+            <span className="text-sm font-bold flex-shrink-0 mr-1" style={{ color: 'var(--danger)' }}>→</span>
+          </Link>
+          <button
+            onClick={() => setShowReviewBanner(false)}
+            className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs text-[var(--text-muted)] hover:text-[var(--danger)] hover:bg-[var(--surface-2)] transition-colors"
+          >
+            ✕
+          </button>
+        </div>
       )}
 
       {/* Stats bento — desktop: Day Streak big center, 4 smaller on sides */}
