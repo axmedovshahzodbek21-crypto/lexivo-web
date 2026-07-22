@@ -470,17 +470,17 @@ function StudyCalendar({
     <div className="space-y-4">
       {/* Stat tiles */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="rounded-2xl p-3 flex flex-col gap-1" style={{ background: '#c2410c', boxShadow: '0 3px 0 #7c2d12' }}>
+        <div className="rounded-2xl p-3 flex flex-col gap-1" style={{ background: '#be123c', boxShadow: '0 3px 0 #881337' }}>
           <span className="text-xl">🔥</span>
           <div className="text-2xl font-black text-white leading-tight">{streak}</div>
           <div className="text-[10px] text-white/70 font-semibold leading-tight">{t.progress.currentStreak}</div>
         </div>
-        <div className="rounded-2xl p-3 flex flex-col gap-1" style={{ background: '#4338ca', boxShadow: '0 3px 0 #312e81' }}>
+        <div className="rounded-2xl p-3 flex flex-col gap-1" style={{ background: '#0369a1', boxShadow: '0 3px 0 #0c4a6e' }}>
           <span className="text-xl">⚡</span>
           <div className="text-2xl font-black text-white leading-tight">{longestStreak}</div>
           <div className="text-[10px] text-white/70 font-semibold leading-tight">{t.progress.longestStreak}</div>
         </div>
-        <div className="rounded-2xl p-3 flex flex-col gap-1" style={{ background: '#059669', boxShadow: '0 3px 0 #064e3b' }}>
+        <div className="rounded-2xl p-3 flex flex-col gap-1" style={{ background: '#b45309', boxShadow: '0 3px 0 #78350f' }}>
           <span className="text-xl">🏆</span>
           <div className="text-2xl font-black text-white leading-tight">{activeDays}</div>
           <div className="text-[10px] text-white/70 font-semibold leading-tight">Full days</div>
