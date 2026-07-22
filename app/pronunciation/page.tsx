@@ -9,8 +9,8 @@ import { speakAccent, type Accent } from '@/lib/speech';
 import { addXP, getHardWords, getStarredWords, getCustomListWords, getSettings } from '@/lib/storage';
 import { checkAchievements } from '@/lib/gamification';
 import {
-  isRecordingSupported,
-  createWhisperRecognizer,
+  isRecognitionSupported,
+  createRecognizer,
   scoreMatch,
   scoreSentenceMatch,
   diffWords,
@@ -112,7 +112,7 @@ function PronunciationInner() {
   const hardParam       = searchParams.get('hard') === 'true';
   const listId          = searchParams.get('list') ?? undefined;
 
-  const [supported]  = useState(() => isRecordingSupported());
+  const [supported]  = useState(() => isRecognitionSupported());
   const [mode, setMode]             = useState<PracticeMode>('words');
   const [accent, setAccent]         = useState<Accent>(() => getSettings().defaultAccent);
   const [autoPlay, setAutoPlay]     = useState(true);
@@ -170,8 +170,8 @@ function PronunciationInner() {
     setMicError('');
     setHeardText('');
 
-    const rec = createWhisperRecognizer(
-      (transcripts) => {
+    const rec = createRecognizer(
+      (transcripts: string[]) => {
         const best = transcripts[0] ?? '';
         setHeardText(best);
         const s = mode === 'sentences'
@@ -182,19 +182,19 @@ function PronunciationInner() {
         setPhase('result');
       },
       () => { setPhase(prev => prev === 'listening' ? 'result' : prev); },
-      (err) => {
+      (err: string) => {
         setMicError(
           err === 'not-allowed' ? 'blocked'
-          : err === 'no-api-key' ? 'no-api-key'
           : err === 'network'   ? 'network'
           : `Mic error: ${err}`,
         );
         setPhase('ready');
       },
       () => { setPhase('listening'); },
-      () => { setPhase('processing'); },
+      accent === 'us' ? 'en-US' : 'en-GB',
     );
 
+    if (!rec) return;
     recognizerRef.current = rec;
     rec.start();
   }, [currentText, mode, accent]);
@@ -225,7 +225,7 @@ function PronunciationInner() {
         <div className="text-6xl">🎙️</div>
         <h2 className="text-xl font-bold text-[var(--text)]">Microphone not supported</h2>
         <p className="text-sm text-[var(--text-muted)] max-w-xs mx-auto leading-relaxed">
-          Try opening this page in <strong>Chrome</strong>, <strong>Firefox</strong>, or <strong>Safari</strong> on a modern device.
+          Try opening this page in <strong>Chrome</strong>, <strong>Edge</strong>, or <strong>Safari</strong> on a modern device.
         </p>
         <button onClick={() => router.back()} className="btn-secondary">← Go back</button>
       </div>
@@ -421,18 +421,6 @@ function PronunciationInner() {
               <button onClick={() => setMicError('')} className="btn-primary w-full">Try again</button>
               <button onClick={() => window.location.reload()} className="text-xs text-[var(--text-muted)] hover:text-[var(--text)] underline transition-colors">Or refresh the page</button>
             </div>
-          </div>
-        )}
-
-        {/* API key not configured */}
-        {micError === 'no-api-key' && phase === 'ready' && (
-          <div className="w-full max-w-sm card border border-amber-400 bg-amber-50 space-y-2 text-center animate-fade-in">
-            <div className="text-4xl">🔑</div>
-            <p className="font-bold text-amber-700">Speech service not set up</p>
-            <p className="text-sm text-[var(--text-muted)]">
-              Add <code className="bg-amber-100 px-1 rounded text-xs">OPENAI_API_KEY</code> to your Vercel environment variables to enable pronunciation checking.
-            </p>
-            <button onClick={() => setMicError('')} className="btn-secondary w-full">Dismiss</button>
           </div>
         )}
 
