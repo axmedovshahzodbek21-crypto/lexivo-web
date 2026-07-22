@@ -459,12 +459,9 @@ function StudyCalendar({
     else setViewMonth(m => m + 1);
   }
 
-  // If nothing is due for review today, treat the review task as N/A (auto-satisfied)
-  const reviewNA = dueCount === 0;
-
   const sheetTasks = selectedDay ? {
     unit:   unitDoneDays.includes(selectedDay),
-    review: reviewDays.includes(selectedDay) || (selectedDay === todayStr && reviewNA),
+    review: reviewDays.includes(selectedDay),
     words:  wordGoalDays.includes(selectedDay),
   } : null;
   const sheetIsToday = selectedDay === todayStr;
@@ -518,7 +515,7 @@ function StudyCalendar({
               const isFuture = dateStr > todayStr;
               const isSelected = selectedDay === dateStr;
               const unit   = unitDoneDays.includes(dateStr);
-              const review = reviewDays.includes(dateStr) || (isToday && reviewNA);
+              const review = reviewDays.includes(dateStr);
               const words  = wordGoalDays.includes(dateStr);
               const taskCount = (unit ? 1 : 0) + (review ? 1 : 0) + (words ? 1 : 0);
               const anyDone = taskCount > 0;
@@ -601,18 +598,18 @@ function StudyCalendar({
               <div className="space-y-2 mb-6">
                 {([
                   { key: 'unit',   label: 'Unit Complete',                       done: sheetTasks.unit,   href: '/learn', btnLabel: 'Pick a Unit', color: TASK_COLORS.unit.bg },
-                  { key: 'review', label: 'SRS Review',                          done: sheetTasks.review, href: '/srs',   btnLabel: reviewNA ? 'All caught up ✓' : 'Go to Review', color: TASK_COLORS.review.bg, na: sheetIsToday && reviewNA && !reviewDays.includes(todayStr) },
+                  { key: 'review', label: 'SRS Review',                          done: sheetTasks.review, href: '/srs',   btnLabel: 'Go to Review', color: TASK_COLORS.review.bg, nothingDue: sheetIsToday && dueCount === 0 && !sheetTasks.review },
                   { key: 'words',  label: `Daily Words (${dailyGoal} goal)`,     done: sheetTasks.words,  href: '/learn', btnLabel: 'Learn Words',  color: TASK_COLORS.words.bg },
                 ] as const).map(task => (
                   <div key={task.key} className="flex items-center gap-3 rounded-2xl p-3"
                     style={{ background: 'var(--surface-2)' }}>
                     <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0"
-                      style={{ background: ('na' in task && task.na) ? 'var(--border)' : task.done ? task.color : 'var(--border)' }}>
-                      <span className="text-xs font-black text-white">{('na' in task && task.na) ? '–' : task.done ? '✓' : ''}</span>
+                      style={{ background: task.done ? task.color : 'var(--border)' }}>
+                      <span className="text-xs font-black text-white">{task.done ? '✓' : ''}</span>
                     </div>
                     <span className="text-sm font-semibold flex-1" style={{ color: 'var(--text)' }}>{task.label}</span>
-                    {('na' in task && task.na) ? (
-                      <span className="text-xs font-semibold" style={{ color: 'var(--text-muted)' }}>All caught up ✓</span>
+                    {('nothingDue' in task && task.nothingDue) ? (
+                      <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Nothing due</span>
                     ) : sheetIsToday && !task.done ? (
                       <Link href={task.href} onClick={() => setSelectedDay(null)}
                         className="text-xs font-bold px-3 py-1.5 rounded-full text-white whitespace-nowrap"
