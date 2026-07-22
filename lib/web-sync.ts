@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import type { ImportedWord } from './types';
+import type { ImportedWord, UserSettings } from './types';
 import {
   getSettings, saveSettings, setOnboarded, updateFolderMap,
   getLearnedWords, getSRSWords, getStarredWords,
@@ -455,17 +455,17 @@ export async function pullAll(uid: string) {
       const useRemoteSettings = localSettingsTs === null || remoteSettingsTs === null || remoteSettingsTs >= localSettingsTs;
 
       saveSettings({
-        name:             useRemoteName     ? (p.name                  ?? 'Learner')      : existing.name,
-        languageLevel:    useRemoteLevel    ? (p.language_level        ?? 'B1')           : existing.languageLevel,
-        dailyGoal:        useRemoteSettings ? (p.daily_goal            ?? 10)             : existing.dailyGoal,
-        defaultAccent:    useRemoteSettings ? (p.default_accent        ?? 'us')           : existing.defaultAccent,
-        autoPlayOnReveal: useRemoteSettings ? (p.auto_play_on_reveal   ?? true)           : existing.autoPlayOnReveal,
-        sessionSize:      useRemoteSettings ? (p.session_size          ?? 20)             : existing.sessionSize,
-        fontSize:         useRemoteSettings ? (p.font_size             ?? 'normal')       : existing.fontSize,
-        studyOrder:       useRemoteSettings ? (p.study_order           ?? 'random')       : existing.studyOrder,
-        quizDirection:    useRemoteSettings ? (p.quiz_direction        ?? 'word-to-uz')   : existing.quizDirection,
-        reduceMotion:     useRemoteSettings ? (p.reduce_motion         ?? false)          : existing.reduceMotion,
-        showOnLeaderboard:useRemoteSettings ? (p.show_on_leaderboard   ?? true)           : existing.showOnLeaderboard,
+        name:             useRemoteName     ? (p.name                  ?? 'Learner')                                          : existing.name,
+        languageLevel:    useRemoteLevel    ? (p.language_level        ?? 'B1')           as UserSettings['languageLevel']    : existing.languageLevel,
+        dailyGoal:        useRemoteSettings ? (p.daily_goal            ?? 10)                                                 : existing.dailyGoal,
+        defaultAccent:    useRemoteSettings ? (p.default_accent        ?? 'us')           as UserSettings['defaultAccent']    : existing.defaultAccent,
+        autoPlayOnReveal: useRemoteSettings ? (p.auto_play_on_reveal   ?? true)                                               : existing.autoPlayOnReveal,
+        sessionSize:      useRemoteSettings ? (p.session_size          ?? 20)                                                 : existing.sessionSize,
+        fontSize:         useRemoteSettings ? (p.font_size             ?? 'normal')       as UserSettings['fontSize']         : existing.fontSize,
+        studyOrder:       useRemoteSettings ? (p.study_order           ?? 'random')       as UserSettings['studyOrder']       : existing.studyOrder,
+        quizDirection:    useRemoteSettings ? (p.quiz_direction        ?? 'word-to-uz')   as UserSettings['quizDirection']    : existing.quizDirection,
+        reduceMotion:     useRemoteSettings ? (p.reduce_motion         ?? false)                                              : existing.reduceMotion,
+        showOnLeaderboard:useRemoteSettings ? (p.show_on_leaderboard   ?? true)                                               : existing.showOnLeaderboard,
         uiLanguage:       existing.uiLanguage,
       });
       setOnboarded();
