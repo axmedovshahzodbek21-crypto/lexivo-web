@@ -570,7 +570,7 @@ function StudyCalendar({
       {selectedDay && sheetTasks && (
         <div className="fixed inset-0 z-50 flex items-end justify-center" style={{ background: 'rgba(0,0,0,0.8)' }}
           onClick={() => setSelectedDay(null)}>
-          <div className="w-full max-w-lg rounded-t-3xl max-h-[90vh] overflow-y-auto"
+          <div className="w-full max-w-2xl rounded-t-3xl max-h-[90vh] overflow-y-auto"
             style={{ background: 'var(--bg)' }}
             onClick={e => e.stopPropagation()}>
             {/* Handle */}
@@ -594,7 +594,7 @@ function StudyCalendar({
               </div>
 
               {/* Task rows */}
-              <div className="space-y-2 mb-6">
+              <div className="space-y-2 mb-3">
                 {([
                   { key: 'unit',   label: 'Unit Complete',                       done: sheetTasks.unit,   href: '/learn', btnLabel: 'Pick a Unit', color: TASK_COLORS.unit.bg },
                   { key: 'review', label: 'SRS Review',                          done: sheetTasks.review, href: '/srs',   btnLabel: 'Go to Review', color: TASK_COLORS.review.bg, nothingDue: sheetIsToday && dueCount === 0 && !sheetTasks.review },
