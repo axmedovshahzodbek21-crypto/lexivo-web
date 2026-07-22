@@ -396,7 +396,7 @@ function MiniCalendar({ title, color, days, year, month }: {
         </div>
         <span className="text-[10px] font-bold ml-1 shrink-0" style={{ color }}>{monthCount}</span>
       </div>
-      <div className="grid grid-cols-7 gap-0.5">
+      <div className="grid grid-cols-7 gap-1">
         {['M','T','W','T','F','S','S'].map((d, i) => (
           <div key={i} className="flex items-center justify-center text-[8px] font-bold pb-0.5" style={{ color: 'var(--text-muted)' }}>{d}</div>
         ))}
@@ -416,7 +416,7 @@ function MiniCalendar({ title, color, days, year, month }: {
                 boxShadow: done ? `0 0 6px ${color}80` : 'none',
               }}
             >
-              <span className="text-[11px] font-bold leading-none" style={{ color: done ? '#fff' : 'var(--text-muted)' }}>{day}</span>
+              <span className="text-xs font-bold leading-none" style={{ color: done ? '#fff' : 'var(--text-muted)' }}>{day}</span>
             </div>
           );
         })}
@@ -575,7 +575,7 @@ function StudyCalendar({
       {selectedDay && sheetTasks && (
         <div className="fixed inset-0 z-50 flex items-end justify-center" style={{ background: 'rgba(0,0,0,0.8)' }}
           onClick={() => setSelectedDay(null)}>
-          <div className="w-full max-w-4xl rounded-t-3xl max-h-[90vh] overflow-y-auto"
+          <div className="w-full rounded-t-3xl max-h-[90vh] overflow-y-auto"
             style={{ background: 'var(--bg)' }}
             onClick={e => e.stopPropagation()}>
             {/* Handle */}
