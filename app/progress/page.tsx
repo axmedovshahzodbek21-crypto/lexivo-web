@@ -386,37 +386,36 @@ function MiniCalendar({ title, color, days, year, month }: {
   const cells = buildMonthGrid(year, month);
   const todayStr = localDateStr(new Date());
   const mm = String(month + 1).padStart(2, '0');
+  const monthCount = days.filter(d => d.startsWith(`${year}-${mm}`)).length;
   return (
-    <div>
-      <div className="flex items-center gap-2 mb-2">
-        <div className="w-2.5 h-2.5 rounded-full" style={{ background: color }} />
-        <span className="text-xs font-bold text-[var(--text)]">{title}</span>
-        <span className="text-[10px] text-[var(--text-muted)] ml-auto">{days.filter(d => d.startsWith(`${year}-${mm}`)).length} days this month</span>
+    <div className="flex flex-col gap-1 flex-1 min-w-0">
+      <div className="flex items-center gap-1 mb-0.5">
+        <div className="w-2 h-2 rounded-full shrink-0" style={{ background: color }} />
+        <span className="text-[10px] font-bold truncate" style={{ color: 'var(--text)' }}>{title}</span>
       </div>
-      <div className="grid grid-cols-7 gap-1 w-fit">
+      <div className="grid grid-cols-7 gap-px">
         {['M','T','W','T','F','S','S'].map((d, i) => (
-          <div key={i} className="w-9 h-6 flex items-center justify-center text-[10px] font-bold text-[var(--text-muted)]">{d}</div>
+          <div key={i} className="flex items-center justify-center text-[7px] font-bold py-0.5" style={{ color: 'var(--text-muted)' }}>{d}</div>
         ))}
         {cells.map((day, i) => {
-          if (!day) return <div key={i} className="w-9 h-9" />;
+          if (!day) return <div key={i} className="aspect-square" />;
           const dateStr = `${year}-${mm}-${String(day).padStart(2, '0')}`;
           const done = days.includes(dateStr);
           const isToday = dateStr === todayStr;
           const isFuture = dateStr > todayStr;
           return (
-            <div key={i} className="w-9 h-9 rounded-full flex items-center justify-center"
+            <div key={i} className="aspect-square rounded-full"
               style={{
                 background: done ? color : 'var(--surface-2)',
-                outline: isToday ? `2.5px solid ${color}` : 'none',
-                outlineOffset: '2px',
+                outline: isToday ? `2px solid ${color}` : 'none',
+                outlineOffset: '1px',
                 opacity: isFuture ? 0.2 : 1,
               }}
-            >
-              <span className="text-xs font-bold" style={{ color: done ? '#fff' : 'var(--text-muted)' }}>{day}</span>
-            </div>
+            />
           );
         })}
       </div>
+      <span className="text-[9px] mt-0.5" style={{ color: 'var(--text-muted)' }}>{monthCount} days</span>
     </div>
   );
 }
@@ -626,10 +625,10 @@ function StudyCalendar({
               </div>
 
               {/* Three mini-calendars */}
-              <div className="space-y-5">
-                <MiniCalendar title="Unit Complete" color={TASK_COLORS.unit.bg}   days={unitDoneDays} year={viewYear} month={viewMonth} />
-                <MiniCalendar title="SRS Review"    color={TASK_COLORS.review.bg} days={reviewDays}   year={viewYear} month={viewMonth} />
-                <MiniCalendar title={`Daily Words (${dailyGoal})`} color={TASK_COLORS.words.bg} days={wordGoalDays} year={viewYear} month={viewMonth} />
+              <div className="flex gap-3">
+                <MiniCalendar title="Unit" color={TASK_COLORS.unit.bg}   days={unitDoneDays} year={viewYear} month={viewMonth} />
+                <MiniCalendar title="SRS"  color={TASK_COLORS.review.bg} days={reviewDays}   year={viewYear} month={viewMonth} />
+                <MiniCalendar title={`Words (${dailyGoal})`} color={TASK_COLORS.words.bg} days={wordGoalDays} year={viewYear} month={viewMonth} />
               </div>
             </div>
           </div>
