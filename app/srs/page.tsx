@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { speak, speakText } from '@/lib/speech';
-import { getDueWords, updateSRSWord, hardSRSWord, addXP, recordStudySession, unlockAchievement, getSRSWords, getLearnedWords, removeSRSWord, resetSRSWord } from '@/lib/storage';
+import { getDueWords, updateSRSWord, hardSRSWord, addXP, recordStudySession, recordReviewDay, unlockAchievement, getSRSWords, getLearnedWords, removeSRSWord, resetSRSWord } from '@/lib/storage';
 import { stageLabel, stageColor } from '@/lib/srs';
 import { checkAchievements } from '@/lib/gamification';
 import { pushAllCurrentUser } from '@/lib/web-sync';
@@ -120,6 +120,7 @@ export default function SRSReviewPage() {
     });
     if (finalResults.length > 0) {
       recordStudySession();
+      recordReviewDay();
       const newAchievements = checkAchievements();
       newAchievements.forEach(pushAchievement);
       pushAllCurrentUser();

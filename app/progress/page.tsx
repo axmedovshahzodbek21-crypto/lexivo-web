@@ -7,7 +7,8 @@ import Link from 'next/link';
 import {
   getLearnedWords, getSRSWords, getStreak, getXP, getTotalStudyDays,
   getTodayXP, getTodayLearnedCount, getDueWords, getStarredWords, getHardWords,
-  getStudyHistory, getStudyDays, getXPHistory, localDateStr,
+  getStudyHistory, getStudyDays, getUnitDoneDays, getReviewDays, getWordGoalDays,
+  getSettings, getXPHistory, localDateStr,
 } from '@/lib/storage';
 import type { XpEntry } from '@/lib/storage';
 import { getLevelInfo, ALL_ACHIEVEMENTS } from '@/lib/gamification';
@@ -40,6 +41,10 @@ function ProgressPage() {
   const [unlockedIds, setUnlockedIds] = useState<string[]>([]);
   const [studyHistory, setStudyHistory] = useState<Record<string, number>>({});
   const [studyDays, setStudyDays] = useState<string[]>([]);
+  const [unitDoneDays, setUnitDoneDays] = useState<string[]>([]);
+  const [reviewDays, setReviewDays] = useState<string[]>([]);
+  const [wordGoalDays, setWordGoalDays] = useState<string[]>([]);
+  const [dailyGoal, setDailyGoal] = useState(10);
   const [xpHistory, setXpHistory] = useState<XpEntry[]>([]);
   const [tab, setTab] = useState<'overview' | 'srs' | 'achievements' | 'calendar'>(tabParam ?? 'overview');
 
@@ -58,6 +63,10 @@ function ProgressPage() {
       setUnlockedIds(getUnlockedAchievements());
       setStudyHistory(getStudyHistory());
       setStudyDays(getStudyDays());
+      setUnitDoneDays(getUnitDoneDays());
+      setReviewDays(getReviewDays());
+      setWordGoalDays(getWordGoalDays());
+      setDailyGoal(getSettings().dailyGoal);
       setXpHistory(getXPHistory());
     };
     load();
@@ -157,7 +166,11 @@ function ProgressPage() {
 
         {tab === 'calendar' && (
           <div className="animate-fade-in max-w-lg mx-auto">
-            <StudyCalendar history={studyHistory} streak={streak} totalDays={totalDays} studyDays={studyDays} />
+            <StudyCalendar
+              history={studyHistory} streak={streak} totalDays={totalDays} studyDays={studyDays}
+              unitDoneDays={unitDoneDays} reviewDays={reviewDays} wordGoalDays={wordGoalDays}
+              dailyGoal={dailyGoal}
+            />
           </div>
         )}
 
@@ -361,23 +374,75 @@ function buildMonthGrid(year: number, month: number) {
   return cells;
 }
 
+const TASK_COLORS = {
+  unit:   { bg: '#ea580c', shadow: '#9a3412' },
+  review: { bg: '#4338ca', shadow: '#312e81' },
+  words:  { bg: '#059669', shadow: '#064e3b' },
+} as const;
+
+function MiniCalendar({ title, color, days, year, month }: {
+  title: string; color: string; days: string[]; year: number; month: number;
+}) {
+  const cells = buildMonthGrid(year, month);
+  const todayStr = localDateStr(new Date());
+  const mm = String(month + 1).padStart(2, '0');
+  return (
+    <div>
+      <div className="flex items-center gap-2 mb-2">
+        <div className="w-2.5 h-2.5 rounded-full" style={{ background: color }} />
+        <span className="text-xs font-bold text-[var(--text)]">{title}</span>
+        <span className="text-[10px] text-[var(--text-muted)] ml-auto">{days.filter(d => d.startsWith(`${year}-${mm}`)).length} days this month</span>
+      </div>
+      <div className="grid grid-cols-7 gap-0.5">
+        {['M','T','W','T','F','S','S'].map((d, i) => (
+          <div key={i} className="w-8 h-5 flex items-center justify-center text-[9px] font-bold text-[var(--text-muted)]">{d}</div>
+        ))}
+        {cells.map((day, i) => {
+          if (!day) return <div key={i} className="w-8 h-8" />;
+          const dateStr = `${year}-${mm}-${String(day).padStart(2, '0')}`;
+          const done = days.includes(dateStr);
+          const isToday = dateStr === todayStr;
+          const isFuture = dateStr > todayStr;
+          return (
+            <div key={i} className="w-8 h-8 rounded-full flex items-center justify-center"
+              style={{
+                background: done ? color : 'transparent',
+                outline: isToday ? `2px solid ${color}` : 'none',
+                outlineOffset: '1px',
+                opacity: isFuture ? 0.2 : 1,
+              }}
+            >
+              <span className="text-[10px] font-bold" style={{ color: done ? '#fff' : 'var(--text-muted)' }}>{day}</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function StudyCalendar({
-  history, streak, studyDays,
+  history, streak, studyDays, unitDoneDays, reviewDays, wordGoalDays, dailyGoal,
 }: {
   history: Record<string, number>;
   streak: number;
   totalDays: number;
   studyDays: string[];
+  unitDoneDays: string[];
+  reviewDays: string[];
+  wordGoalDays: string[];
+  dailyGoal: number;
 }) {
   const t = useTranslation();
   const now = new Date();
   const [viewYear, setViewYear] = useState(now.getFullYear());
   const [viewMonth, setViewMonth] = useState(now.getMonth());
-  const [selected, setSelected] = useState<string | null>(null);
+  const [selectedDay, setSelectedDay] = useState<string | null>(null);
 
   const todayStr = localDateStr(now);
   const longestStreak = calcLongestStreak(studyDays);
-  const activeDays = Object.values(history).filter(c => c > 0).length;
+  const completeDays = unitDoneDays.filter(d => reviewDays.includes(d) && wordGoalDays.includes(d));
+  const activeDays = completeDays.length;
 
   const cells = buildMonthGrid(viewYear, viewMonth);
   const monthName = new Date(viewYear, viewMonth, 1).toLocaleString('default', { month: 'long', year: 'numeric' });
@@ -386,14 +451,19 @@ function StudyCalendar({
   function prevMonth() {
     if (viewMonth === 0) { setViewYear(y => y - 1); setViewMonth(11); }
     else setViewMonth(m => m - 1);
-    setSelected(null);
   }
   function nextMonth() {
     if (!canGoNext) return;
     if (viewMonth === 11) { setViewYear(y => y + 1); setViewMonth(0); }
     else setViewMonth(m => m + 1);
-    setSelected(null);
   }
+
+  const sheetTasks = selectedDay ? {
+    unit:   unitDoneDays.includes(selectedDay),
+    review: reviewDays.includes(selectedDay),
+    words:  wordGoalDays.includes(selectedDay),
+  } : null;
+  const sheetIsToday = selectedDay === todayStr;
 
   return (
     <div className="space-y-4">
@@ -410,9 +480,9 @@ function StudyCalendar({
           <div className="text-[10px] text-white/70 font-semibold leading-tight">{t.progress.longestStreak}</div>
         </div>
         <div className="rounded-2xl p-3 flex flex-col gap-1" style={{ background: '#059669', boxShadow: '0 3px 0 #064e3b' }}>
-          <span className="text-xl">📅</span>
+          <span className="text-xl">🏆</span>
           <div className="text-2xl font-black text-white leading-tight">{activeDays}</div>
-          <div className="text-[10px] text-white/70 font-semibold leading-tight">{t.progress.activeDays}</div>
+          <div className="text-[10px] text-white/70 font-semibold leading-tight">Full days</div>
         </div>
       </div>
 
@@ -433,90 +503,135 @@ function StudyCalendar({
             ))}
           </div>
 
-          {/* Day circles */}
+          {/* Day circles — partial fill: bottom=unit(orange), mid=review(indigo), top=words(green) */}
           <div className="grid grid-cols-7 gap-y-1.5">
             {cells.map((day, i) => {
               if (!day) return <div key={i} className="w-10 h-10" />;
               const mm = String(viewMonth + 1).padStart(2, '0');
               const dd = String(day).padStart(2, '0');
               const dateStr = `${viewYear}-${mm}-${dd}`;
-              const count = history[dateStr] ?? 0;
               const isToday = dateStr === todayStr;
               const isFuture = dateStr > todayStr;
-              const isSelected = selected === dateStr;
-              const studied = count > 0;
-
-              const bg = studied
-                ? count >= 20 ? '#3730a3'
-                : count >= 10 ? '#4f46e5'
-                : '#818cf8'
-                : isToday ? 'var(--surface-2)' : 'transparent';
+              const isSelected = selectedDay === dateStr;
+              const unit   = unitDoneDays.includes(dateStr);
+              const review = reviewDays.includes(dateStr);
+              const words  = wordGoalDays.includes(dateStr);
+              const taskCount = (unit ? 1 : 0) + (review ? 1 : 0) + (words ? 1 : 0);
+              const anyDone = taskCount > 0;
 
               return (
                 <button
                   key={dateStr}
-                  onClick={() => !isFuture && setSelected(isSelected ? null : dateStr)}
+                  onClick={() => !isFuture && setSelectedDay(isSelected ? null : dateStr)}
                   disabled={isFuture}
-                  className="w-10 h-10 rounded-full flex flex-col items-center justify-center transition-all disabled:opacity-20"
+                  className="w-10 h-10 rounded-full relative overflow-hidden flex items-center justify-center transition-all disabled:opacity-20"
                   style={{
-                    background: bg,
+                    background: anyDone ? 'var(--surface-2)' : 'transparent',
                     outline: (isToday || isSelected) ? '2.5px solid #6366f1' : 'none',
                     outlineOffset: '2px',
-                    transform: isSelected ? 'scale(1.15)' : 'scale(1)',
+                    transform: isSelected ? 'scale(1.12)' : 'scale(1)',
                   }}
                 >
-                  <span className="text-xs font-bold leading-none" style={{ color: studied ? '#fff' : isToday ? 'var(--text)' : 'var(--text-muted)' }}>
+                  {unit   && <div className="absolute bottom-0 left-0 right-0" style={{ height: '33.34%', background: TASK_COLORS.unit.bg }} />}
+                  {review && <div className="absolute left-0 right-0" style={{ bottom: '33.34%', height: '33.33%', background: TASK_COLORS.review.bg }} />}
+                  {words  && <div className="absolute top-0 left-0 right-0" style={{ height: '33.34%', background: TASK_COLORS.words.bg }} />}
+                  <span className="relative z-10 text-xs font-bold leading-none"
+                    style={{ color: anyDone ? '#fff' : isToday ? 'var(--text)' : 'var(--text-muted)' }}>
                     {day}
                   </span>
-                  {studied && (
-                    <span className="text-[8px] leading-none mt-0.5" style={{ color: 'rgba(255,255,255,0.75)' }}>{count}</span>
-                  )}
                 </button>
               );
             })}
           </div>
         </div>
 
-        {/* Selected day info */}
-        {selected && (() => {
-          const count = history[selected] ?? 0;
-          const dateLabel = new Date(selected + 'T12:00:00').toLocaleDateString('default', { weekday: 'long', month: 'long', day: 'numeric' });
-          return (
-            <div className="mt-4 pt-3 border-t border-[var(--border)] animate-fade-in flex items-center gap-3">
-              <span className="text-2xl">{count > 0 ? '✅' : '😴'}</span>
-              <div>
-                <p className="font-semibold text-[var(--text)] text-sm">{dateLabel}</p>
-                <p className="text-[var(--text-muted)] text-xs mt-0.5">
-                  {count > 0 ? `${count} word${count !== 1 ? 's' : ''} learned` : 'No activity'}
-                </p>
-              </div>
-            </div>
-          );
-        })()}
-
         {/* Legend */}
-        <div className="flex items-center gap-3 mt-4 pt-3 border-t border-[var(--border)] flex-wrap">
+        <div className="flex items-center gap-3 mt-5 pt-3 border-t border-[var(--border)] flex-wrap">
           <div className="flex items-center gap-1.5">
-            <div className="w-4 h-4 rounded-full bg-[#818cf8]" />
-            <span className="text-[10px] text-[var(--text-muted)]">1–9 words</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-4 h-4 rounded-full bg-[#4f46e5]" />
-            <span className="text-[10px] text-[var(--text-muted)]">10–19</span>
+            <div className="w-3.5 h-3.5 rounded-full" style={{ background: TASK_COLORS.unit.bg }} />
+            <span className="text-[10px] text-[var(--text-muted)]">Unit done</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-4 h-4 rounded-full bg-[#3730a3]" />
-            <span className="text-[10px] text-[var(--text-muted)]">20+</span>
+            <div className="w-3.5 h-3.5 rounded-full" style={{ background: TASK_COLORS.review.bg }} />
+            <span className="text-[10px] text-[var(--text-muted)]">SRS review</span>
           </div>
-          <div className="flex items-center gap-1.5 ml-auto">
-            <div className="w-4 h-4 rounded-full border-2 border-[#6366f1]" style={{ background: 'var(--surface-2)' }} />
-            <span className="text-[10px] text-[var(--text-muted)]">Today</span>
+          <div className="flex items-center gap-1.5">
+            <div className="w-3.5 h-3.5 rounded-full" style={{ background: TASK_COLORS.words.bg }} />
+            <span className="text-[10px] text-[var(--text-muted)]">{dailyGoal} words</span>
           </div>
+          <span className="text-[10px] text-[var(--text-muted)] ml-auto">Tap a day for details</span>
         </div>
       </div>
 
       {/* Monthly breakdown */}
       <MonthlyBreakdown history={history} />
+
+      {/* Bottom sheet */}
+      {selectedDay && sheetTasks && (
+        <div className="fixed inset-0 z-50 flex items-end" style={{ background: 'rgba(0,0,0,0.5)' }}
+          onClick={() => setSelectedDay(null)}>
+          <div className="w-full rounded-t-3xl max-h-[90vh] overflow-y-auto"
+            style={{ background: 'var(--bg)' }}
+            onClick={e => e.stopPropagation()}>
+            {/* Handle */}
+            <div className="flex justify-center pt-3 pb-1">
+              <div className="w-10 h-1 rounded-full" style={{ background: 'var(--border)' }} />
+            </div>
+            <div className="px-5 pt-2 pb-8">
+              {/* Header */}
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <p className="text-xs font-semibold" style={{ color: 'var(--text-muted)' }}>
+                    {new Date(selectedDay + 'T12:00:00').toLocaleDateString('default', { weekday: 'long' })}
+                  </p>
+                  <p className="text-xl font-black" style={{ color: 'var(--text)' }}>
+                    {new Date(selectedDay + 'T12:00:00').toLocaleDateString('default', { month: 'long', day: 'numeric', year: 'numeric' })}
+                  </p>
+                </div>
+                <button onClick={() => setSelectedDay(null)}
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold"
+                  style={{ background: 'var(--surface-2)', color: 'var(--text-muted)' }}>✕</button>
+              </div>
+
+              {/* Task rows */}
+              <div className="space-y-2 mb-6">
+                {([
+                  { key: 'unit',   label: 'Unit Complete',                       done: sheetTasks.unit,   href: '/learn', btnLabel: 'Pick a Unit', color: TASK_COLORS.unit.bg },
+                  { key: 'review', label: 'SRS Review',                          done: sheetTasks.review, href: '/srs',   btnLabel: 'Go to Review', color: TASK_COLORS.review.bg },
+                  { key: 'words',  label: `Daily Words (${dailyGoal} goal)`,     done: sheetTasks.words,  href: '/learn', btnLabel: 'Learn Words',  color: TASK_COLORS.words.bg },
+                ] as const).map(task => (
+                  <div key={task.key} className="flex items-center gap-3 rounded-2xl p-3"
+                    style={{ background: 'var(--surface-2)' }}>
+                    <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0"
+                      style={{ background: task.done ? task.color : 'var(--border)' }}>
+                      <span className="text-xs font-black text-white">{task.done ? '✓' : ''}</span>
+                    </div>
+                    <span className="text-sm font-semibold flex-1" style={{ color: 'var(--text)' }}>{task.label}</span>
+                    {sheetIsToday && !task.done ? (
+                      <Link href={task.href} onClick={() => setSelectedDay(null)}
+                        className="text-xs font-bold px-3 py-1.5 rounded-full text-white whitespace-nowrap"
+                        style={{ background: task.color }}>
+                        {task.btnLabel} →
+                      </Link>
+                    ) : task.done ? (
+                      <span className="text-xs font-bold" style={{ color: task.color }}>Done ✓</span>
+                    ) : (
+                      <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Not done</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Three mini-calendars */}
+              <div className="space-y-5">
+                <MiniCalendar title="Unit Complete" color={TASK_COLORS.unit.bg}   days={unitDoneDays} year={viewYear} month={viewMonth} />
+                <MiniCalendar title="SRS Review"    color={TASK_COLORS.review.bg} days={reviewDays}   year={viewYear} month={viewMonth} />
+                <MiniCalendar title={`Daily Words (${dailyGoal})`} color={TASK_COLORS.words.bg} days={wordGoalDays} year={viewYear} month={viewMonth} />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

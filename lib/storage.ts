@@ -29,7 +29,10 @@ const KEYS = {
   onboarded: 'lexivo_onboarded',
   freezes: 'lexivo_freezes',
   lastFreezeWeek: 'lexivo_last_freeze_week',
-  studyDays: 'lexivo_study_days',
+  studyDays:    'lexivo_study_days',
+  unitDoneDays: 'lexivo_unit_done_days',
+  reviewDays:   'lexivo_review_days',
+  wordGoalDays: 'lexivo_word_goal_days',
   xpHistory: 'lexivo_xp_history',
   xpUpdatedAt:       'lexivo_xp_updated_at',
   settingsUpdatedAt: 'lexivo_settings_updated_at',
@@ -204,8 +207,10 @@ export function incrementTodayCount() {
   const date = localDateStr();
   const storedDate = get<string>(KEYS.todayCountDate, '');
   const count = storedDate === date ? get<number>(KEYS.todayCount, 0) : 0;
-  set(KEYS.todayCount, count + 1);
+  const newCount = count + 1;
+  set(KEYS.todayCount, newCount);
   set(KEYS.todayCountDate, date);
+  if (newCount >= getSettings().dailyGoal) recordWordGoalDay();
 }
 
 // ─── SRS ─────────────────────────────────────────────────────────────────────
@@ -405,6 +410,40 @@ export function getTotalStudyDays(): number {
   return get<number>(KEYS.totalDays, 0);
 }
 
+// ─── Daily Task Tracking (unit done / SRS review / word goal) ────────────────
+
+export function getUnitDoneDays(): string[] { return get<string[]>(KEYS.unitDoneDays, []); }
+export function saveUnitDoneDays(days: string[]) { set(KEYS.unitDoneDays, days); }
+export function recordUnitDoneDay() {
+  const today = localDateStr();
+  const days = getUnitDoneDays();
+  if (!days.includes(today)) { days.push(today); set(KEYS.unitDoneDays, days); }
+}
+
+export function getReviewDays(): string[] { return get<string[]>(KEYS.reviewDays, []); }
+export function saveReviewDays(days: string[]) { set(KEYS.reviewDays, days); }
+export function recordReviewDay() {
+  const today = localDateStr();
+  const days = getReviewDays();
+  if (!days.includes(today)) { days.push(today); set(KEYS.reviewDays, days); }
+}
+
+export function getWordGoalDays(): string[] { return get<string[]>(KEYS.wordGoalDays, []); }
+export function saveWordGoalDays(days: string[]) { set(KEYS.wordGoalDays, days); }
+export function recordWordGoalDay() {
+  const today = localDateStr();
+  const days = getWordGoalDays();
+  if (!days.includes(today)) { days.push(today); set(KEYS.wordGoalDays, days); }
+}
+
+export function getDayTasks(dateStr: string): { unit: boolean; review: boolean; words: boolean } {
+  return {
+    unit:   getUnitDoneDays().includes(dateStr),
+    review: getReviewDays().includes(dateStr),
+    words:  getWordGoalDays().includes(dateStr),
+  };
+}
+
 // ─── XP ──────────────────────────────────────────────────────────────────────
 
 export function getXP(): number {
@@ -463,6 +502,7 @@ export function markLearningComplete(collectionName: string, dayNumber: number) 
   const updated = { ...p, learnDone: true };
   if (updated.learnDone && updated.flashcardDone && updated.quizDone && !updated.completedAt) {
     updated.completedAt = new Date().toISOString();
+    recordUnitDoneDay();
   }
   set(key, updated);
 }
@@ -473,6 +513,7 @@ export function markFlashcardComplete(collectionName: string, dayNumber: number)
   const updated = { ...p, flashcardDone: true };
   if (updated.learnDone && updated.flashcardDone && updated.quizDone && !updated.completedAt) {
     updated.completedAt = new Date().toISOString();
+    recordUnitDoneDay();
   }
   set(key, updated);
 }
@@ -483,6 +524,7 @@ export function markQuizComplete(collectionName: string, dayNumber: number) {
   const updated = { ...p, quizDone: true };
   if (updated.learnDone && updated.flashcardDone && updated.quizDone && !updated.completedAt) {
     updated.completedAt = new Date().toISOString();
+    recordUnitDoneDay();
   }
   set(key, updated);
 }
