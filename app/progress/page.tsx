@@ -378,7 +378,6 @@ function StudyCalendar({
 
   const cells = buildMonthGrid(viewYear, viewMonth);
   const monthName = new Date(viewYear, viewMonth, 1).toLocaleString('default', { month: 'long', year: 'numeric' });
-
   const canGoNext = viewYear < now.getFullYear() || (viewYear === now.getFullYear() && viewMonth < now.getMonth());
 
   function prevMonth() {
@@ -395,89 +394,121 @@ function StudyCalendar({
 
   return (
     <div className="space-y-4">
-      {/* Summary stats */}
+      {/* Stat tiles */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="card text-center py-3">
-          <div className="text-2xl font-bold text-[var(--danger)]">🔥 {streak}</div>
-          <div className="text-xs text-[var(--text-muted)] mt-1">{t.progress.currentStreak}</div>
+        <div className="rounded-2xl p-3 flex flex-col gap-1" style={{ background: '#c2410c', boxShadow: '0 3px 0 #7c2d12' }}>
+          <span className="text-xl">🔥</span>
+          <div className="text-2xl font-black text-white leading-tight">{streak}</div>
+          <div className="text-[10px] text-white/70 font-semibold leading-tight">{t.progress.currentStreak}</div>
         </div>
-        <div className="card text-center py-3">
-          <div className="text-2xl font-bold text-[var(--primary)]">{longestStreak}</div>
-          <div className="text-xs text-[var(--text-muted)] mt-1">{t.progress.longestStreak}</div>
+        <div className="rounded-2xl p-3 flex flex-col gap-1" style={{ background: '#4338ca', boxShadow: '0 3px 0 #312e81' }}>
+          <span className="text-xl">⚡</span>
+          <div className="text-2xl font-black text-white leading-tight">{longestStreak}</div>
+          <div className="text-[10px] text-white/70 font-semibold leading-tight">{t.progress.longestStreak}</div>
         </div>
-        <div className="card text-center py-3">
-          <div className="text-2xl font-bold text-[var(--success)]">{activeDays}</div>
-          <div className="text-xs text-[var(--text-muted)] mt-1">{t.progress.activeDays}</div>
+        <div className="rounded-2xl p-3 flex flex-col gap-1" style={{ background: '#059669', boxShadow: '0 3px 0 #064e3b' }}>
+          <span className="text-xl">📅</span>
+          <div className="text-2xl font-black text-white leading-tight">{activeDays}</div>
+          <div className="text-[10px] text-white/70 font-semibold leading-tight">{t.progress.activeDays}</div>
         </div>
       </div>
 
-      {/* Calendar */}
+      {/* Calendar card */}
       <div className="card">
-        {/* Month navigation */}
-        <div className="flex items-center justify-between mb-4">
-          <button onClick={prevMonth} className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[var(--surface-2)] transition-colors text-[var(--text)]" aria-label="Previous month">‹</button>
-          <span className="font-semibold text-sm text-[var(--text)]">{monthName}</span>
-          <button onClick={nextMonth} disabled={!canGoNext} className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[var(--surface-2)] transition-colors text-[var(--text)] disabled:opacity-30" aria-label="Next month">›</button>
+        {/* Month nav */}
+        <div className="flex items-center justify-between mb-5">
+          <button onClick={prevMonth} aria-label="Previous month" className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-[var(--surface-2)] transition-colors text-[var(--text)] text-xl font-bold">‹</button>
+          <span className="font-bold text-[var(--text)]">{monthName}</span>
+          <button onClick={nextMonth} disabled={!canGoNext} aria-label="Next month" className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-[var(--surface-2)] transition-colors text-[var(--text)] text-xl font-bold disabled:opacity-30">›</button>
         </div>
 
-        {/* Day headers */}
-        <div className="grid grid-cols-7 mb-2">
-          {MONTH_DAYS.map(d => (
-            <div key={d} className="text-center text-[10px] font-semibold text-[var(--text-muted)] py-1">{d}</div>
-          ))}
-        </div>
+        <div className="max-w-[308px] mx-auto">
+          {/* Day headers */}
+          <div className="grid grid-cols-7 mb-1">
+            {MONTH_DAYS.map(d => (
+              <div key={d} className="w-10 h-7 flex items-center justify-center text-[10px] font-bold text-[var(--text-muted)]">{d}</div>
+            ))}
+          </div>
 
-        {/* Day cells */}
-        <div className="grid grid-cols-7 gap-y-1">
-          {cells.map((day, i) => {
-            if (!day) return <div key={i} />;
-            const mm = String(viewMonth + 1).padStart(2, '0');
-            const dd = String(day).padStart(2, '0');
-            const dateStr = `${viewYear}-${mm}-${dd}`;
-            const count = history[dateStr] ?? 0;
-            const isToday = dateStr === todayStr;
-            const isFuture = dateStr > todayStr;
-            const isSelected = selected === dateStr;
-            const studied = count > 0;
+          {/* Day circles */}
+          <div className="grid grid-cols-7 gap-y-1.5">
+            {cells.map((day, i) => {
+              if (!day) return <div key={i} className="w-10 h-10" />;
+              const mm = String(viewMonth + 1).padStart(2, '0');
+              const dd = String(day).padStart(2, '0');
+              const dateStr = `${viewYear}-${mm}-${dd}`;
+              const count = history[dateStr] ?? 0;
+              const isToday = dateStr === todayStr;
+              const isFuture = dateStr > todayStr;
+              const isSelected = selected === dateStr;
+              const studied = count > 0;
 
-            return (
-              <button
-                key={dateStr}
-                onClick={() => setSelected(isSelected ? null : dateStr)}
-                disabled={isFuture}
-                className="flex flex-col items-center justify-center aspect-square rounded-xl transition-all disabled:opacity-25"
-                style={{
-                  background: studied ? 'var(--primary)' : isToday ? 'var(--surface-2)' : 'transparent',
-                  border: isToday && !studied ? '2px solid var(--primary)' : isSelected ? '2px solid var(--primary)' : '2px solid transparent',
-                  transform: isSelected ? 'scale(1.1)' : 'scale(1)',
-                }}
-              >
-                <span className="text-xs font-semibold" style={{ color: studied ? '#fff' : 'var(--text)' }}>{day}</span>
-                {studied && <span className="text-[8px] mt-0.5" style={{ color: 'rgba(255,255,255,0.8)' }}>{count}</span>}
-              </button>
-            );
-          })}
+              const bg = studied
+                ? count >= 20 ? '#3730a3'
+                : count >= 10 ? '#4f46e5'
+                : '#818cf8'
+                : isToday ? 'var(--surface-2)' : 'transparent';
+
+              return (
+                <button
+                  key={dateStr}
+                  onClick={() => !isFuture && setSelected(isSelected ? null : dateStr)}
+                  disabled={isFuture}
+                  className="w-10 h-10 rounded-full flex flex-col items-center justify-center transition-all disabled:opacity-20"
+                  style={{
+                    background: bg,
+                    outline: (isToday || isSelected) ? '2.5px solid #6366f1' : 'none',
+                    outlineOffset: '2px',
+                    transform: isSelected ? 'scale(1.15)' : 'scale(1)',
+                  }}
+                >
+                  <span className="text-xs font-bold leading-none" style={{ color: studied ? '#fff' : isToday ? 'var(--text)' : 'var(--text-muted)' }}>
+                    {day}
+                  </span>
+                  {studied && (
+                    <span className="text-[8px] leading-none mt-0.5" style={{ color: 'rgba(255,255,255,0.75)' }}>{count}</span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Selected day info */}
-        {selected && (
-          <div className="mt-4 pt-3 border-t border-[var(--border)] text-sm animate-fade-in">
-            {(() => {
-              const count = history[selected] ?? 0;
-              const dateLabel = new Date(selected).toLocaleDateString('default', { weekday: 'long', month: 'long', day: 'numeric' });
-              return count > 0
-                ? <p className="text-[var(--text)]">📅 <strong>{dateLabel}</strong> — {count} word{count !== 1 ? 's' : ''} learned</p>
-                : <p className="text-[var(--text-muted)]">📅 <strong>{dateLabel}</strong> — No activity</p>;
-            })()}
-          </div>
-        )}
+        {selected && (() => {
+          const count = history[selected] ?? 0;
+          const dateLabel = new Date(selected + 'T12:00:00').toLocaleDateString('default', { weekday: 'long', month: 'long', day: 'numeric' });
+          return (
+            <div className="mt-4 pt-3 border-t border-[var(--border)] animate-fade-in flex items-center gap-3">
+              <span className="text-2xl">{count > 0 ? '✅' : '😴'}</span>
+              <div>
+                <p className="font-semibold text-[var(--text)] text-sm">{dateLabel}</p>
+                <p className="text-[var(--text-muted)] text-xs mt-0.5">
+                  {count > 0 ? `${count} word${count !== 1 ? 's' : ''} learned` : 'No activity'}
+                </p>
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Legend */}
-        <div className="flex items-center gap-2 mt-4 pt-3 border-t border-[var(--border)]">
-          <div className="w-5 h-5 rounded-md bg-[var(--surface-2)] border-2 border-[var(--primary)]" />
-          <span className="text-[11px] text-[var(--text-muted)] mr-3">Today</span>
-          <div className="w-5 h-5 rounded-md" style={{ background: 'var(--primary)' }} />
-          <span className="text-[11px] text-[var(--text-muted)]">Studied</span>
+        <div className="flex items-center gap-3 mt-4 pt-3 border-t border-[var(--border)] flex-wrap">
+          <div className="flex items-center gap-1.5">
+            <div className="w-4 h-4 rounded-full bg-[#818cf8]" />
+            <span className="text-[10px] text-[var(--text-muted)]">1–9 words</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-4 h-4 rounded-full bg-[#4f46e5]" />
+            <span className="text-[10px] text-[var(--text-muted)]">10–19</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-4 h-4 rounded-full bg-[#3730a3]" />
+            <span className="text-[10px] text-[var(--text-muted)]">20+</span>
+          </div>
+          <div className="flex items-center gap-1.5 ml-auto">
+            <div className="w-4 h-4 rounded-full border-2 border-[#6366f1]" style={{ background: 'var(--surface-2)' }} />
+            <span className="text-[10px] text-[var(--text-muted)]">Today</span>
+          </div>
         </div>
       </div>
 
