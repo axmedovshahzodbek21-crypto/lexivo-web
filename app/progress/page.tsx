@@ -598,25 +598,27 @@ function StudyCalendar({
                   style={{ background: 'var(--surface-2)', color: 'var(--text-muted)' }}>✕</button>
               </div>
 
-              {/* Task rows */}
-              <div className="space-y-2 mb-3">
+              {/* Task cards */}
+              <div className="grid grid-cols-3 gap-3 mb-3">
                 {([
-                  { key: 'unit',   label: 'Unit Complete',                       done: sheetTasks.unit,   href: '/learn', btnLabel: 'Pick a Unit', color: TASK_COLORS.unit.bg },
-                  { key: 'review', label: 'SRS Review',                          done: sheetTasks.review, href: '/srs',   btnLabel: 'Go to Review', color: TASK_COLORS.review.bg, nothingDue: sheetIsToday && dueCount === 0 && !sheetTasks.review },
-                  { key: 'words',  label: `Daily Words (${dailyGoal} goal)`,     done: sheetTasks.words,  href: '/learn', btnLabel: 'Learn Words',  color: TASK_COLORS.words.bg },
+                  { key: 'unit',   label: 'Unit Complete',              done: sheetTasks.unit,   href: '/learn', btnLabel: 'Pick a Unit', color: TASK_COLORS.unit.bg },
+                  { key: 'review', label: 'SRS Review',                 done: sheetTasks.review, href: '/srs',   btnLabel: 'Go to Review', color: TASK_COLORS.review.bg, nothingDue: sheetIsToday && dueCount === 0 && !sheetTasks.review },
+                  { key: 'words',  label: `Words (${dailyGoal} goal)`,  done: sheetTasks.words,  href: '/learn', btnLabel: 'Learn Words',  color: TASK_COLORS.words.bg },
                 ] as const).map(task => (
-                  <div key={task.key} className="flex items-center gap-3 rounded-2xl p-3"
-                    style={{ background: 'var(--surface-2)' }}>
-                    <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0"
-                      style={{ background: task.done ? task.color : 'var(--border)' }}>
-                      <span className="text-xs font-black text-white">{task.done ? '✓' : ''}</span>
+                  <div key={task.key} className="rounded-2xl p-4 flex flex-col gap-3"
+                    style={{ background: 'var(--surface-2)', border: `1px solid ${task.color}33` }}>
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0"
+                        style={{ background: task.done ? task.color : 'var(--border)', boxShadow: task.done ? `0 0 8px ${task.color}80` : 'none' }}>
+                        <span className="text-[11px] font-black text-white">{task.done ? '✓' : ''}</span>
+                      </div>
+                      <span className="text-sm font-bold leading-tight" style={{ color: 'var(--text)' }}>{task.label}</span>
                     </div>
-                    <span className="text-sm font-semibold flex-1" style={{ color: 'var(--text)' }}>{task.label}</span>
                     {('nothingDue' in task && task.nothingDue) ? (
-                      <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Nothing due</span>
+                      <span className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>Nothing due</span>
                     ) : sheetIsToday && !task.done ? (
                       <Link href={task.href} onClick={() => setSelectedDay(null)}
-                        className="text-xs font-bold px-3 py-1.5 rounded-full text-white whitespace-nowrap"
+                        className="text-xs font-bold px-3 py-2 rounded-xl text-white text-center"
                         style={{ background: task.color }}>
                         {task.btnLabel} →
                       </Link>
