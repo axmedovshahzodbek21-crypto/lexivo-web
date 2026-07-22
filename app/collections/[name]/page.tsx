@@ -165,7 +165,6 @@ function UnitCard({ unit, collectionName }: { unit: UnitRow; collectionName: str
   const learnUrl = `/learn?collection=${enc}&day=${unit.dayNumber}`;
   const flashUrl = `/flashcards?collection=${enc}&day=${unit.dayNumber}`;
   const quizUrl  = `/quiz?collection=${enc}&day=${unit.dayNumber}`;
-  const pronUrl  = `/pronunciation?collection=${enc}&day=${unit.dayNumber}`;
   const matchUrl = `/matching?collection=${enc}&day=${unit.dayNumber}`;
 
   return (
@@ -236,8 +235,7 @@ function UnitCard({ unit, collectionName }: { unit: UnitRow; collectionName: str
       </div>
 
       {/* Extra activities */}
-      <div className="grid grid-cols-2 gap-2">
-        <ModeButton href={pronUrl}  icon="🎙️" label="Speak" done={false} color="#8B5CF6" />
+      <div className="grid grid-cols-1 gap-2">
         <ModeButton href={matchUrl} icon="🎯" label="Match" done={false} color="#EC4899" />
       </div>
 

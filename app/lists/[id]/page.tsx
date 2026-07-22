@@ -171,7 +171,6 @@ export default function ListDetailPage({ params }: { params: Promise<{ id: strin
             <StudyBtn href={`/flashcards?list=${enc}`} icon="🃏" label="Cards" disabled={!hasEnough} />
             <StudyBtn href={`/quiz?list=${enc}`}       icon="❓" label="Quiz"  disabled={!hasForQuiz} />
             <StudyBtn href={`/matching?list=${enc}`}   icon="🎯" label="Match" disabled={!hasEnough} />
-            <StudyBtn href={`/pronunciation?list=${enc}`} icon="🎙️" label="Speak" disabled={!hasEnough} />
           </div>
         )}
       </div>
