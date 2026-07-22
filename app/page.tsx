@@ -281,23 +281,27 @@ export default function HomePage() {
       </TiltCard>
 
       {/* Quick actions */}
-      <div className="grid grid-cols-2 gap-3">
-        <ActionCard href="/learn"         icon="📖" title={t.home.learnTitle}     subtitle={t.home.learnSub}          color="var(--primary)" depthClass="depth-in-1" />
-        <ActionCard href="/flashcards"    icon="🃏" title={t.home.flashcardsTitle} subtitle={t.home.flashcardsSub}     color="#FF6B35" depthClass="depth-in-2" />
-        <ActionCard
-          href="/srs"
-          icon="🔄"
-          title={t.home.srsTitle}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <ActionCard href="/learn" icon="📖" title={t.home.learnTitle} subtitle={t.home.learnSub}
+          gradient="linear-gradient(135deg, #6c63ff, #a78bfa)" edge="#3f38cc" glow="rgba(108,99,255,0.4)" />
+        <ActionCard href="/flashcards" icon="🃏" title={t.home.flashcardsTitle} subtitle={t.home.flashcardsSub}
+          gradient="linear-gradient(135deg, #FF6B35, #ff9f7f)" edge="#b84a1a" glow="rgba(255,107,53,0.4)" />
+        <ActionCard href="/srs" icon="🔄" title={t.home.srsTitle}
           subtitle={dueCount > 0 ? t.home.srsDue(dueCount) : t.home.srsAllCaughtUp}
-          color={dueCount > 0 ? 'var(--danger)' : 'var(--success)'}
-          badge={dueCount > 0 ? String(dueCount) : undefined}
-          depthClass="depth-in-3"
-        />
-        <ActionCard href="/quiz"          icon="❓" title={t.home.quizTitle}       subtitle={t.home.quizSub}           color="var(--warning)" depthClass="depth-in-4" />
-        <ActionCard href="/pronunciation" icon="🎙️" title={t.home.pronounceTitle}  subtitle={t.home.pronounceSub}      color="#8B5CF6" depthClass="depth-in-5" />
-        <ActionCard href="/matching"      icon="🎯" title={t.home.matchTitle}       subtitle={t.home.matchSub}          color="#EC4899" depthClass="depth-in-6" />
-        <ActionCard href="/pomodoro"      icon="🍅" title={t.home.pomodoroTitle}    subtitle={t.home.pomodoroSub}       color="var(--danger)" depthClass="depth-in-7" />
-        <ActionCard href="/leaderboard"   icon="🏆" title="Leaderboard"             subtitle="See top learners"          color="var(--warning)" depthClass="depth-in-8" />
+          gradient={dueCount > 0 ? 'linear-gradient(135deg, #ef4444, #f87171)' : 'linear-gradient(135deg, #1a9a50, #2ECC71)'}
+          edge={dueCount > 0 ? '#b91c1c' : '#0f6634'}
+          glow={dueCount > 0 ? 'rgba(239,68,68,0.4)' : 'rgba(46,204,113,0.4)'}
+          badge={dueCount > 0 ? String(dueCount) : undefined} />
+        <ActionCard href="/quiz" icon="❓" title={t.home.quizTitle} subtitle={t.home.quizSub}
+          gradient="linear-gradient(135deg, #f59e0b, #fcd34d)" edge="#a16207" glow="rgba(245,158,11,0.4)" />
+        <ActionCard href="/pronunciation" icon="🎙️" title={t.home.pronounceTitle} subtitle={t.home.pronounceSub}
+          gradient="linear-gradient(135deg, #7c3aed, #a855f7)" edge="#4c1d95" glow="rgba(124,58,237,0.4)" />
+        <ActionCard href="/matching" icon="🎯" title={t.home.matchTitle} subtitle={t.home.matchSub}
+          gradient="linear-gradient(135deg, #ec4899, #f472b6)" edge="#9d174d" glow="rgba(236,72,153,0.4)" />
+        <ActionCard href="/pomodoro" icon="🍅" title={t.home.pomodoroTitle} subtitle={t.home.pomodoroSub}
+          gradient="linear-gradient(135deg, #dc2626, #ef4444)" edge="#991b1b" glow="rgba(220,38,38,0.4)" />
+        <ActionCard href="/leaderboard" icon="🏆" title="Leaderboard" subtitle="See top learners"
+          gradient="linear-gradient(135deg, #d97706, #fbbf24)" edge="#92400e" glow="rgba(217,119,6,0.4)" />
       </div>
 
       {/* Word of the Day */}
@@ -334,13 +338,18 @@ export default function HomePage() {
         </TiltCard>
       )}
 
-      {/* Shortcuts — 2 rows of 3 */}
-      <div className="grid grid-cols-3 gap-2">
-        <ShortcutCard href="/starred"      icon="⭐" label={t.home.starredTitle}  sub={t.home.starredSub}  accent="var(--primary)" />
-        <ShortcutCard href="/hard-words"   icon="😓" label={t.home.hardTitle}    sub={t.home.hardSub}     accent="var(--danger)"  />
-        <ShortcutCard href="/lists"        icon="📋" label={t.home.listsTitle}   sub={t.home.listsSub}    accent="#8B5CF6"        />
-        <ShortcutCard href="/grammar-tips" icon="📚" label={t.home.grammarTitle} sub={t.home.grammarSub}  accent="var(--success)" />
-        <ShortcutCard href="/classes"      icon="👩‍🏫" label={t.home.classesTitle} sub={t.home.classesSub} accent="#0EA5E9"        />
+      {/* Shortcuts */}
+      <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
+        <ShortcutCard href="/starred"      icon="⭐" label={t.home.starredTitle}  sub={t.home.starredSub}
+          gradient="linear-gradient(135deg, #d97706, #f59e0b)" edge="#92400e" glow="rgba(217,119,6,0.35)" />
+        <ShortcutCard href="/hard-words"   icon="😓" label={t.home.hardTitle}    sub={t.home.hardSub}
+          gradient="linear-gradient(135deg, #dc2626, #ef4444)" edge="#991b1b" glow="rgba(220,38,38,0.35)" />
+        <ShortcutCard href="/lists"        icon="📋" label={t.home.listsTitle}   sub={t.home.listsSub}
+          gradient="linear-gradient(135deg, #7c3aed, #8b5cf6)" edge="#4c1d95" glow="rgba(124,58,237,0.35)" />
+        <ShortcutCard href="/grammar-tips" icon="📚" label={t.home.grammarTitle} sub={t.home.grammarSub}
+          gradient="linear-gradient(135deg, #1a9a50, #2ECC71)" edge="#0f6634" glow="rgba(46,204,113,0.35)" />
+        <ShortcutCard href="/classes"      icon="👩‍🏫" label={t.home.classesTitle} sub={t.home.classesSub}
+          gradient="linear-gradient(135deg, #0284c7, #38bdf8)" edge="#0369a1" glow="rgba(2,132,199,0.35)" />
       </div>
 
       <div className="pb-4" />
@@ -359,40 +368,54 @@ function StatCard({ icon, value, label, color, glow }: { icon: string; value: nu
 }
 
 function ActionCard({
-  href, icon, title, subtitle, color, badge, depthClass
+  href, icon, title, subtitle, gradient, edge, glow, badge,
 }: {
-  href: string; icon: string; title: string; subtitle: string; color: string; badge?: string; depthClass?: string;
+  href: string; icon: string; title: string; subtitle: string;
+  gradient: string; edge: string; glow: string; badge?: string;
 }) {
   return (
-    <div className={`relative${depthClass ? ` ${depthClass}` : ''}`}>
+    <Link href={href} className="block relative group">
       {badge && (
-        <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[var(--danger)] text-white text-xs flex items-center justify-center font-bold z-10">
+        <div className="absolute -top-1.5 -right-1.5 min-w-[22px] h-[22px] rounded-full bg-white text-[var(--danger)] text-[10px] flex items-center justify-center font-black z-10 shadow px-1">
           {parseInt(badge) > 9 ? '9+' : badge}
         </div>
       )}
-      <TiltCard className="card flex items-center gap-3 cursor-pointer" intensity={6}>
-        <Link href={href} className="flex items-center gap-3 w-full" style={{ margin: '-20px', padding: '20px' }}>
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0 animate-float-icon" style={{ background: `${color}20` }}>
-            {icon}
-          </div>
-          <div>
-            <div className="font-semibold text-[var(--text)] text-sm">{title}</div>
-            <div className="text-xs text-[var(--text-muted)]">{subtitle}</div>
-          </div>
-        </Link>
-      </TiltCard>
-    </div>
+      <div
+        className="rounded-2xl p-5 flex flex-col items-center text-center gap-2 transition-all duration-200 group-hover:-translate-y-1.5 h-full"
+        style={{
+          background: gradient,
+          boxShadow: `0 8px 0 ${edge}, 0 12px 28px ${glow}`,
+          textShadow: '0 1px 3px rgba(0,0,0,0.35)',
+        }}
+      >
+        <div className="text-4xl">{icon}</div>
+        <div>
+          <div className="font-bold text-white text-sm leading-tight">{title}</div>
+          <div className="text-white/85 text-xs mt-0.5">{subtitle}</div>
+        </div>
+      </div>
+    </Link>
   );
 }
 
-function ShortcutCard({ href, icon, label, sub }: { href: string; icon: string; label: string; sub: string; accent: string }) {
+function ShortcutCard({ href, icon, label, sub, gradient, edge, glow }: {
+  href: string; icon: string; label: string; sub: string;
+  gradient: string; edge: string; glow: string;
+}) {
   return (
-    <TiltCard className="card overflow-hidden flex flex-col items-center gap-1.5 py-3 cursor-pointer text-center" intensity={7}>
-      <Link href={href} className="flex flex-col items-center gap-1.5 w-full" style={{ margin: '-20px', padding: '20px' }}>
-        <div className="text-2xl animate-float-icon">{icon}</div>
-        <div className="font-semibold text-[var(--text)] text-xs">{label}</div>
-        <div className="text-xs text-[var(--text-muted)]">{sub}</div>
-      </Link>
-    </TiltCard>
+    <Link href={href} className="block group">
+      <div
+        className="rounded-2xl p-4 flex flex-col items-center text-center gap-1.5 transition-all duration-200 group-hover:-translate-y-1"
+        style={{
+          background: gradient,
+          boxShadow: `0 6px 0 ${edge}, 0 10px 20px ${glow}`,
+          textShadow: '0 1px 3px rgba(0,0,0,0.35)',
+        }}
+      >
+        <div className="text-3xl">{icon}</div>
+        <div className="font-bold text-white text-xs leading-tight">{label}</div>
+        <div className="text-white/80 text-[10px]">{sub}</div>
+      </div>
+    </Link>
   );
 }
