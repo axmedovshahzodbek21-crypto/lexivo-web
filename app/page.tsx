@@ -43,6 +43,12 @@ export default function HomePage() {
   const [showXpModal, setShowXpModal] = useState(false);
   const [showBanner, setShowBanner] = useState(false);
   const [showReviewBanner, setShowReviewBanner] = useState(true);
+  const [hideStats, setHideStats] = useState(false);
+  const [hideGoalLevel, setHideGoalLevel] = useState(false);
+  const [hideWod, setHideWod] = useState(false);
+  const [hideActions, setHideActions] = useState(false);
+  const [hideShortcuts, setHideShortcuts] = useState(false);
+  const [showCustomize, setShowCustomize] = useState(false);
 
   useEffect(() => {
     if (!isOnboarded()) { router.replace('/onboarding'); return; }
@@ -81,6 +87,11 @@ export default function HomePage() {
       localStorage.setItem('android_banner_seen', '1');
       setShowBanner(true);
     }
+    setHideStats(localStorage.getItem('home_hide_stats') === '1');
+    setHideGoalLevel(localStorage.getItem('home_hide_goal_level') === '1');
+    setHideWod(localStorage.getItem('home_hide_wod') === '1');
+    setHideActions(localStorage.getItem('home_hide_actions') === '1');
+    setHideShortcuts(localStorage.getItem('home_hide_shortcuts') === '1');
   }, [router]);
 
   useEffect(() => {
@@ -123,6 +134,20 @@ export default function HomePage() {
             aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
           >
             {theme === 'dark' ? '☀️' : '🌙'}
+          </button>
+          <button
+            onClick={() => setShowCustomize(true)}
+            className="w-10 h-10 rounded-full bg-[var(--surface-2)] flex items-center justify-center hover:bg-[var(--primary-bg)] transition-colors text-[var(--text-muted)]"
+            aria-label="Customize home"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              <line x1="4" y1="6" x2="20" y2="6"/>
+              <line x1="4" y1="12" x2="20" y2="12"/>
+              <line x1="4" y1="18" x2="20" y2="18"/>
+              <circle cx="9" cy="6" r="2.5" fill="currentColor" stroke="none"/>
+              <circle cx="15" cy="12" r="2.5" fill="currentColor" stroke="none"/>
+              <circle cx="9" cy="18" r="2.5" fill="currentColor" stroke="none"/>
+            </svg>
           </button>
           <Link href="/settings" className="w-10 h-10 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-lg">
             ⚙️
@@ -174,6 +199,7 @@ export default function HomePage() {
       )}
 
       {/* Stats bento — desktop: Day Streak big center, 4 smaller on sides */}
+      {!hideStats && (<>
       <div className="hidden sm:grid gap-3" style={{ gridTemplateColumns: '1fr 1.5fr 1fr' }}>
         {/* Left top: Collections */}
         <Link href="/collections" style={{ gridColumn: 1, gridRow: 1 }} className="block">
@@ -227,186 +253,239 @@ export default function HomePage() {
             gradient="linear-gradient(135deg, #0284c7, #38bdf8)" edge="#0369a1" glowColor="rgba(2,132,199,0.4)" />
         </Link>
       </div>
+      </>)}
 
       {showXpModal && <XpModal xp={xp} onClose={() => setShowXpModal(false)} />}
 
       {/* Daily goal + Level + Word of Day */}
-      <div className="grid gap-3" style={{ gridTemplateColumns: wod ? '3fr 2fr 2fr' : '3fr 2fr' }}>
-        {/* Daily goal card */}
-        <div
-          className="rounded-2xl p-5 transition-all duration-200"
-          style={{
-            background: 'linear-gradient(135deg, #5b21b6, #8b5cf6)',
-            boxShadow: '0 8px 0 #3b0764, 0 12px 28px rgba(91,33,182,0.4)',
-          }}
-        >
-          <div className="flex items-center gap-4">
-            {/* Ring */}
-            <div className="relative shrink-0" style={{ width: 64, height: 64 }}>
-              <svg width="64" height="64" style={{ transform: 'rotate(-90deg)' }}>
-                <circle cx="32" cy="32" r="26" fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="6" />
-                <circle
-                  cx="32" cy="32" r="26" fill="none"
-                  stroke="white"
-                  strokeWidth="6"
-                  strokeLinecap="round"
-                  strokeDasharray={`${Math.min(dailyProgress, 100) / 100 * 163.4} 163.4`}
-                  style={{ transition: 'stroke-dasharray 0.5s ease' }}
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-lg font-black text-white">
-                  {dailyProgress >= 100 ? '✓' : todayCount}
+      {(!hideGoalLevel || (!hideWod && wod)) && (
+        <div className="grid gap-3" style={{
+          gridTemplateColumns:
+            !hideGoalLevel && !hideWod && wod ? '3fr 2fr 2fr' :
+            !hideGoalLevel ? '3fr 2fr' : '1fr',
+        }}>
+          {/* Daily goal card */}
+          {!hideGoalLevel && (
+            <div
+              className="rounded-2xl p-5 transition-all duration-200"
+              style={{
+                background: 'linear-gradient(135deg, #5b21b6, #8b5cf6)',
+                boxShadow: '0 8px 0 #3b0764, 0 12px 28px rgba(91,33,182,0.4)',
+              }}
+            >
+              <div className="flex items-center gap-4">
+                <div className="relative shrink-0" style={{ width: 64, height: 64 }}>
+                  <svg width="64" height="64" style={{ transform: 'rotate(-90deg)' }}>
+                    <circle cx="32" cy="32" r="26" fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="6" />
+                    <circle
+                      cx="32" cy="32" r="26" fill="none"
+                      stroke="white"
+                      strokeWidth="6"
+                      strokeLinecap="round"
+                      strokeDasharray={`${Math.min(dailyProgress, 100) / 100 * 163.4} 163.4`}
+                      style={{ transition: 'stroke-dasharray 0.5s ease' }}
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-lg font-black text-white">
+                      {dailyProgress >= 100 ? '✓' : todayCount}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex-1 min-w-0" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
+                  <div className="flex items-baseline gap-1.5 mb-1.5">
+                    <span className="text-2xl font-black text-white">{todayCount}</span>
+                    <span className="text-sm text-white/75 font-medium">/ {settings.dailyGoal} {t.home.dailyGoal.toLowerCase()}</span>
+                  </div>
+                  <div className="h-2 rounded-full bg-white/25 overflow-hidden mb-1.5">
+                    <div
+                      className="h-full rounded-full bg-white transition-all duration-500"
+                      style={{ width: `${Math.min(dailyProgress, 100)}%` }}
+                    />
+                  </div>
+                  <p className="text-xs text-white/75">
+                    {dailyProgress >= 100 ? `${t.home.goalReached} · ${todayXp} XP today` : `${todayXp} XP today · ${Math.max(0, settings.dailyGoal - todayCount)} to go`}
+                  </p>
+                </div>
+              </div>
+              <div className="mt-3 flex items-center gap-2 bg-white/15 rounded-xl px-3 py-1.5 text-xs text-white/90" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.25)' }}>
+                <span>{streakRisk === 'at-risk' ? '⚠️' : streakRisk === 'freeze-saves' ? '⚠️' : '🧊'}</span>
+                <span>
+                  {streakRisk === 'at-risk' && streak > 0
+                    ? `${streak}-day streak at risk — study now!`
+                    : streakRisk === 'freeze-saves'
+                    ? `🧊 Freeze will protect your ${streak}-day streak`
+                    : freezes === 0
+                    ? 'No freezes — earn one after 7 days'
+                    : freezes === 1 ? t.home.freezeSingle : t.home.freezeMulti(freezes)}
                 </span>
               </div>
             </div>
-            {/* Text */}
-            <div className="flex-1 min-w-0" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
-              <div className="flex items-baseline gap-1.5 mb-1.5">
-                <span className="text-2xl font-black text-white">{todayCount}</span>
-                <span className="text-sm text-white/75 font-medium">/ {settings.dailyGoal} {t.home.dailyGoal.toLowerCase()}</span>
-              </div>
-              <div className="h-2 rounded-full bg-white/25 overflow-hidden mb-1.5">
-                <div
-                  className="h-full rounded-full bg-white transition-all duration-500"
-                  style={{ width: `${Math.min(dailyProgress, 100)}%` }}
-                />
-              </div>
-              <p className="text-xs text-white/75">
-                {dailyProgress >= 100 ? `${t.home.goalReached} · ${todayXp} XP today` : `${todayXp} XP today · ${Math.max(0, settings.dailyGoal - todayCount)} to go`}
-              </p>
-            </div>
-          </div>
-          {/* Freeze / risk badge */}
-          <div className="mt-3 flex items-center gap-2 bg-white/15 rounded-xl px-3 py-1.5 text-xs text-white/90" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.25)' }}>
-            <span>
-              {streakRisk === 'at-risk' ? '⚠️' : streakRisk === 'freeze-saves' ? '⚠️' : '🧊'}
-            </span>
-            <span>
-              {streakRisk === 'at-risk' && streak > 0
-                ? `${streak}-day streak at risk — study now!`
-                : streakRisk === 'freeze-saves'
-                ? `🧊 Freeze will protect your ${streak}-day streak`
-                : freezes === 0
-                ? 'No freezes — earn one after 7 days'
-                : freezes === 1 ? t.home.freezeSingle : t.home.freezeMulti(freezes)}
-            </span>
-          </div>
-        </div>
+          )}
 
-        {/* Level progress card */}
-        <button
-          onClick={() => setShowXpModal(true)}
-          className="rounded-2xl p-5 flex flex-col justify-between text-left transition-all duration-200 hover:-translate-y-1 w-full"
-          style={{
-            background: 'linear-gradient(135deg, #be123c, #fb7185)',
-            boxShadow: '0 8px 0 #881337, 0 12px 28px rgba(190,18,60,0.4)',
-            textShadow: '0 1px 3px rgba(0,0,0,0.3)',
-          }}
-        >
-          <div>
-            <div className="text-3xl mb-1">⭐</div>
-            <div className="text-xl font-black text-white leading-tight">{levelInfo.level}</div>
-            <div className="text-xs text-white/75 mt-0.5">{xp} XP</div>
-          </div>
-          <div className="mt-4">
-            <div className="h-2.5 rounded-full bg-white/25 overflow-hidden">
-              <div
-                className="h-full rounded-full bg-white transition-all duration-500"
-                style={{ width: `${levelInfo.progress}%` }}
-              />
-            </div>
-            {levelInfo.next && (
-              <p className="text-[11px] text-white/75 mt-1.5">
-                {levelInfo.xpToNext} XP → {levelInfo.next}
-              </p>
-            )}
-          </div>
-        </button>
-
-        {/* Word of the Day card */}
-        {wod && (
-          <div
-            className="rounded-2xl p-5 flex flex-col justify-between transition-all duration-200"
-            style={{
-              background: 'linear-gradient(135deg, #a21caf, #e879f9)',
-              boxShadow: '0 8px 0 #701a75, 0 12px 28px rgba(162,28,175,0.4)',
-              textShadow: '0 1px 3px rgba(0,0,0,0.3)',
-            }}
-          >
-            <div className="flex items-start justify-between gap-2">
-              <div className="flex-1 min-w-0">
-                <div className="text-[10px] font-bold text-white/60 uppercase tracking-wider mb-1">{t.home.wordOfDay}</div>
-                <div className="text-xl font-black text-white leading-tight">{wod.word}</div>
-                <div className="text-xs text-white/70 mt-0.5">{wod.partOfSpeech} · {wod.pronunciation}</div>
-                <div className="text-sm font-semibold text-white/90 mt-1">{wod.translation}</div>
+          {/* Level progress card */}
+          {!hideGoalLevel && (
+            <button
+              onClick={() => setShowXpModal(true)}
+              className="rounded-2xl p-5 flex flex-col justify-between text-left transition-all duration-200 hover:-translate-y-1 w-full"
+              style={{
+                background: 'linear-gradient(135deg, #be123c, #fb7185)',
+                boxShadow: '0 8px 0 #881337, 0 12px 28px rgba(190,18,60,0.4)',
+                textShadow: '0 1px 3px rgba(0,0,0,0.3)',
+              }}
+            >
+              <div>
+                <div className="text-3xl mb-1">⭐</div>
+                <div className="text-xl font-black text-white leading-tight">{levelInfo.level}</div>
+                <div className="text-xs text-white/75 mt-0.5">{xp} XP</div>
               </div>
-              <button
-                onClick={() => speak(wod.word)}
-                className="shrink-0 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-sm hover:bg-white/30 transition-colors"
-                style={{ textShadow: 'none' }}
-                aria-label="Listen to pronunciation"
-              >
-                🔊
-              </button>
-            </div>
-            {wodRevealed ? (
-              <div className="mt-3 space-y-1.5 animate-fade-in">
-                <p className="text-xs text-white/85 leading-snug">{wod.definition}</p>
-                <div className="bg-white/15 rounded-xl p-2">
-                  <p className="text-xs italic text-white/80">&ldquo;{wod.example1}&rdquo;</p>
+              <div className="mt-4">
+                <div className="h-2.5 rounded-full bg-white/25 overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-white transition-all duration-500"
+                    style={{ width: `${levelInfo.progress}%` }}
+                  />
                 </div>
+                {levelInfo.next && (
+                  <p className="text-[11px] text-white/75 mt-1.5">
+                    {levelInfo.xpToNext} XP → {levelInfo.next}
+                  </p>
+                )}
               </div>
-            ) : (
-              <button
-                onClick={() => setWodRevealed(true)}
-                className="mt-3 text-xs font-semibold text-white bg-white/20 hover:bg-white/30 rounded-xl px-3 py-1.5 transition-colors self-start"
-                style={{ textShadow: 'none' }}
-              >
-                {t.home.showDefinition} →
-              </button>
-            )}
-          </div>
-        )}
-      </div>
+            </button>
+          )}
+
+          {/* Word of the Day card */}
+          {!hideWod && wod && (
+            <div
+              className="rounded-2xl p-5 flex flex-col justify-between transition-all duration-200"
+              style={{
+                background: 'linear-gradient(135deg, #a21caf, #e879f9)',
+                boxShadow: '0 8px 0 #701a75, 0 12px 28px rgba(162,28,175,0.4)',
+                textShadow: '0 1px 3px rgba(0,0,0,0.3)',
+              }}
+            >
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex-1 min-w-0">
+                  <div className="text-[10px] font-bold text-white/60 uppercase tracking-wider mb-1">{t.home.wordOfDay}</div>
+                  <div className="text-xl font-black text-white leading-tight">{wod.word}</div>
+                  <div className="text-xs text-white/70 mt-0.5">{wod.partOfSpeech} · {wod.pronunciation}</div>
+                  <div className="text-sm font-semibold text-white/90 mt-1">{wod.translation}</div>
+                </div>
+                <button
+                  onClick={() => speak(wod.word)}
+                  className="shrink-0 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-sm hover:bg-white/30 transition-colors"
+                  style={{ textShadow: 'none' }}
+                  aria-label="Listen to pronunciation"
+                >
+                  🔊
+                </button>
+              </div>
+              {wodRevealed ? (
+                <div className="mt-3 space-y-1.5 animate-fade-in">
+                  <p className="text-xs text-white/85 leading-snug">{wod.definition}</p>
+                  <div className="bg-white/15 rounded-xl p-2">
+                    <p className="text-xs italic text-white/80">&ldquo;{wod.example1}&rdquo;</p>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setWodRevealed(true)}
+                  className="mt-3 text-xs font-semibold text-white bg-white/20 hover:bg-white/30 rounded-xl px-3 py-1.5 transition-colors self-start"
+                  style={{ textShadow: 'none' }}
+                >
+                  {t.home.showDefinition} →
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Quick actions */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <ActionCard href="/learn" icon="📖" title={t.home.learnTitle} subtitle={t.home.learnSub}
-          gradient="linear-gradient(135deg, #4338ca, #818cf8)" edge="#312e81" glow="rgba(67,56,202,0.4)" />
-        <ActionCard href="/flashcards" icon="🃏" title={t.home.flashcardsTitle} subtitle={t.home.flashcardsSub}
-          gradient="linear-gradient(135deg, #b45309, #fcd34d)" edge="#78350f" glow="rgba(180,83,9,0.4)" />
-        <ActionCard href="/srs" icon="🔄" title={t.home.srsTitle}
-          subtitle={dueCount > 0 ? t.home.srsDue(dueCount) : t.home.srsAllCaughtUp}
-          gradient={dueCount > 0 ? 'linear-gradient(135deg, #ef4444, #f87171)' : 'linear-gradient(135deg, #1a9a50, #2ECC71)'}
-          edge={dueCount > 0 ? '#b91c1c' : '#0f6634'}
-          glow={dueCount > 0 ? 'rgba(239,68,68,0.4)' : 'rgba(46,204,113,0.4)'}
-          badge={dueCount > 0 ? String(dueCount) : undefined} />
-        <ActionCard href="/quiz" icon="❓" title={t.home.quizTitle} subtitle={t.home.quizSub}
-          gradient="linear-gradient(135deg, #4d7c0f, #a3e635)" edge="#365314" glow="rgba(77,124,15,0.4)" />
-        <ActionCard href="/pronunciation" icon="🎙️" title={t.home.pronounceTitle} subtitle={t.home.pronounceSub}
-          gradient="linear-gradient(135deg, #0369a1, #7dd3fc)" edge="#0c4a6e" glow="rgba(3,105,161,0.4)" />
-        <ActionCard href="/matching" icon="🎯" title={t.home.matchTitle} subtitle={t.home.matchSub}
-          gradient="linear-gradient(135deg, #ec4899, #f472b6)" edge="#9d174d" glow="rgba(236,72,153,0.4)" />
-        <ActionCard href="/pomodoro" icon="🍅" title={t.home.pomodoroTitle} subtitle={t.home.pomodoroSub}
-          gradient="linear-gradient(135deg, #7f1d1d, #b91c1c)" edge="#450a0a" glow="rgba(127,29,29,0.4)" />
-        <ActionCard href="/leaderboard" icon="🏆" title="Leaderboard" subtitle="See top learners"
-          gradient="linear-gradient(135deg, #d97706, #fbbf24)" edge="#92400e" glow="rgba(217,119,6,0.4)" />
-      </div>
+      {!hideActions && (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <ActionCard href="/learn" icon="📖" title={t.home.learnTitle} subtitle={t.home.learnSub}
+            gradient="linear-gradient(135deg, #4338ca, #818cf8)" edge="#312e81" glow="rgba(67,56,202,0.4)" />
+          <ActionCard href="/flashcards" icon="🃏" title={t.home.flashcardsTitle} subtitle={t.home.flashcardsSub}
+            gradient="linear-gradient(135deg, #b45309, #fcd34d)" edge="#78350f" glow="rgba(180,83,9,0.4)" />
+          <ActionCard href="/srs" icon="🔄" title={t.home.srsTitle}
+            subtitle={dueCount > 0 ? t.home.srsDue(dueCount) : t.home.srsAllCaughtUp}
+            gradient={dueCount > 0 ? 'linear-gradient(135deg, #ef4444, #f87171)' : 'linear-gradient(135deg, #1a9a50, #2ECC71)'}
+            edge={dueCount > 0 ? '#b91c1c' : '#0f6634'}
+            glow={dueCount > 0 ? 'rgba(239,68,68,0.4)' : 'rgba(46,204,113,0.4)'}
+            badge={dueCount > 0 ? String(dueCount) : undefined} />
+          <ActionCard href="/quiz" icon="❓" title={t.home.quizTitle} subtitle={t.home.quizSub}
+            gradient="linear-gradient(135deg, #4d7c0f, #a3e635)" edge="#365314" glow="rgba(77,124,15,0.4)" />
+          <ActionCard href="/pronunciation" icon="🎙️" title={t.home.pronounceTitle} subtitle={t.home.pronounceSub}
+            gradient="linear-gradient(135deg, #0369a1, #7dd3fc)" edge="#0c4a6e" glow="rgba(3,105,161,0.4)" />
+          <ActionCard href="/matching" icon="🎯" title={t.home.matchTitle} subtitle={t.home.matchSub}
+            gradient="linear-gradient(135deg, #ec4899, #f472b6)" edge="#9d174d" glow="rgba(236,72,153,0.4)" />
+          <ActionCard href="/pomodoro" icon="🍅" title={t.home.pomodoroTitle} subtitle={t.home.pomodoroSub}
+            gradient="linear-gradient(135deg, #7f1d1d, #b91c1c)" edge="#450a0a" glow="rgba(127,29,29,0.4)" />
+          <ActionCard href="/leaderboard" icon="🏆" title="Leaderboard" subtitle="See top learners"
+            gradient="linear-gradient(135deg, #d97706, #fbbf24)" edge="#92400e" glow="rgba(217,119,6,0.4)" />
+        </div>
+      )}
 
       {/* Shortcuts */}
-      <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
-        <ShortcutCard href="/starred"      icon="⭐" label={t.home.starredTitle}  sub={t.home.starredSub}
-          gradient="linear-gradient(135deg, #d97706, #f59e0b)" edge="#92400e" glow="rgba(217,119,6,0.35)" />
-        <ShortcutCard href="/hard-words"   icon="😓" label={t.home.hardTitle}    sub={t.home.hardSub}
-          gradient="linear-gradient(135deg, #dc2626, #ef4444)" edge="#991b1b" glow="rgba(220,38,38,0.35)" />
-        <ShortcutCard href="/lists"        icon="📋" label={t.home.listsTitle}   sub={t.home.listsSub}
-          gradient="linear-gradient(135deg, #7c3aed, #8b5cf6)" edge="#4c1d95" glow="rgba(124,58,237,0.35)" />
-        <ShortcutCard href="/grammar-tips" icon="📚" label={t.home.grammarTitle} sub={t.home.grammarSub}
-          gradient="linear-gradient(135deg, #1a9a50, #2ECC71)" edge="#0f6634" glow="rgba(46,204,113,0.35)" />
-        <ShortcutCard href="/classes"      icon="👩‍🏫" label={t.home.classesTitle} sub={t.home.classesSub}
-          gradient="linear-gradient(135deg, #0284c7, #38bdf8)" edge="#0369a1" glow="rgba(2,132,199,0.35)" />
-      </div>
+      {!hideShortcuts && (
+        <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
+          <ShortcutCard href="/starred"      icon="⭐" label={t.home.starredTitle}  sub={t.home.starredSub}
+            gradient="linear-gradient(135deg, #d97706, #f59e0b)" edge="#92400e" glow="rgba(217,119,6,0.35)" />
+          <ShortcutCard href="/hard-words"   icon="😓" label={t.home.hardTitle}    sub={t.home.hardSub}
+            gradient="linear-gradient(135deg, #dc2626, #ef4444)" edge="#991b1b" glow="rgba(220,38,38,0.35)" />
+          <ShortcutCard href="/lists"        icon="📋" label={t.home.listsTitle}   sub={t.home.listsSub}
+            gradient="linear-gradient(135deg, #7c3aed, #8b5cf6)" edge="#4c1d95" glow="rgba(124,58,237,0.35)" />
+          <ShortcutCard href="/grammar-tips" icon="📚" label={t.home.grammarTitle} sub={t.home.grammarSub}
+            gradient="linear-gradient(135deg, #1a9a50, #2ECC71)" edge="#0f6634" glow="rgba(46,204,113,0.35)" />
+          <ShortcutCard href="/classes"      icon="👩‍🏫" label={t.home.classesTitle} sub={t.home.classesSub}
+            gradient="linear-gradient(135deg, #0284c7, #38bdf8)" edge="#0369a1" glow="rgba(2,132,199,0.35)" />
+        </div>
+      )}
+
+      {/* Customize home modal */}
+      {showCustomize && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" onClick={() => setShowCustomize(false)}>
+          <div className="absolute inset-0 bg-black/50" />
+          <div
+            className="relative w-full sm:max-w-sm bg-[var(--surface)] rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="w-10 h-1 rounded-full bg-[var(--border)] mx-auto mb-5 sm:hidden" />
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-lg font-bold text-[var(--text)]">Customize Home</h2>
+              <button
+                onClick={() => setShowCustomize(false)}
+                className="w-8 h-8 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors"
+              >✕</button>
+            </div>
+            <div>
+              {([
+                { label: 'Stats Row', key: 'home_hide_stats', hidden: hideStats, set: setHideStats },
+                { label: 'Daily Goal & Level', key: 'home_hide_goal_level', hidden: hideGoalLevel, set: setHideGoalLevel },
+                { label: 'Word of the Day', key: 'home_hide_wod', hidden: hideWod, set: setHideWod },
+                { label: 'Quick Actions', key: 'home_hide_actions', hidden: hideActions, set: setHideActions },
+                { label: 'Shortcuts', key: 'home_hide_shortcuts', hidden: hideShortcuts, set: setHideShortcuts },
+              ] as { label: string; key: string; hidden: boolean; set: (v: boolean) => void }[]).map(({ label, key, hidden, set }) => (
+                <div key={key} className="flex items-center justify-between py-3 border-b border-[var(--border)] last:border-0">
+                  <span className="text-sm font-medium text-[var(--text)]">{label}</span>
+                  <button
+                    onClick={() => { const next = !hidden; set(next); localStorage.setItem(key, next ? '1' : '0'); }}
+                    className="relative w-12 h-6 rounded-full transition-colors"
+                    style={{ background: !hidden ? 'var(--primary)' : 'var(--border)' }}
+                  >
+                    <div
+                      className="absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform"
+                      style={{ transform: !hidden ? 'translateX(26px)' : 'translateX(2px)' }}
+                    />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="pb-4" />
     </div>
