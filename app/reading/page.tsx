@@ -107,6 +107,9 @@ export default function ReadingPage() {
   const [importText, setImportText] = useState('');
   const [parsedWords, setParsedWords] = useState<ImportedWord[] | null>(null);
   const [importDone, setImportDone] = useState(false);
+  const [urlInput, setUrlInput] = useState('');
+  const [fetching, setFetching] = useState(false);
+  const [fetchError, setFetchError] = useState('');
   const passageRef = useRef<HTMLDivElement>(null);
   const [autoCollect, setAutoCollect] = useState(false);
   const [quickDef, setQuickDef] = useState<{ pos: string; def: string; phonetic?: string } | null>(null);
@@ -214,6 +217,26 @@ export default function ReadingPage() {
 
   const removeWord = (i: number) => setWordList(prev => prev.filter((_, idx) => idx !== i));
 
+  const fetchArticle = async () => {
+    if (!urlInput.trim()) return;
+    setFetching(true); setFetchError('');
+    try {
+      const res = await fetch('/api/fetch-article', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: urlInput.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setFetchError(data.error ?? 'Failed to fetch'); return; }
+      setPassage(data.text);
+      setUrlInput('');
+    } catch {
+      setFetchError('Could not reach the URL');
+    } finally {
+      setFetching(false);
+    }
+  };
+
   const copyPrompt = async () => {
     await navigator.clipboard.writeText(prompt);
     setCopied(true);
@@ -244,6 +267,34 @@ export default function ReadingPage() {
             Paste any English text. Select words as you read — we collect them and build an AI prompt to create vocabulary cards.
           </p>
         </div>
+        {/* URL fetch */}
+        <div className="space-y-2">
+          <div className="flex gap-2">
+            <input
+              type="url"
+              value={urlInput}
+              onChange={e => { setUrlInput(e.target.value); setFetchError(''); }}
+              onKeyDown={e => { if (e.key === 'Enter') fetchArticle(); }}
+              placeholder="Or paste a URL to fetch article text…"
+              className="flex-1 px-4 py-3 rounded-2xl border-2 border-[var(--border)] bg-[var(--surface)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)] transition-colors"
+            />
+            <button
+              onClick={fetchArticle}
+              disabled={!urlInput.trim() || fetching}
+              className="btn-secondary px-5 disabled:opacity-40 whitespace-nowrap shrink-0"
+            >
+              {fetching ? '…' : 'Fetch'}
+            </button>
+          </div>
+          {fetchError && <p className="text-xs px-1" style={{ color: 'var(--danger)' }}>{fetchError}</p>}
+        </div>
+
+        <div className="flex items-center gap-3">
+          <div className="flex-1 h-px" style={{ background: 'var(--border)' }} />
+          <span className="text-xs" style={{ color: 'var(--text-muted)' }}>or paste text directly</span>
+          <div className="flex-1 h-px" style={{ background: 'var(--border)' }} />
+        </div>
+
         <textarea
           className="w-full h-56 p-4 rounded-2xl border-2 border-[var(--border)] bg-[var(--surface)] text-[var(--text)] text-base resize-none focus:outline-none focus:border-[var(--primary)] transition-colors leading-relaxed"
           placeholder="Paste your reading passage here…"
