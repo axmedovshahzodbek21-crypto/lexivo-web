@@ -1,5 +1,5 @@
 ﻿'use client';
-import { PageLoader, SectionLoader } from '@/components/Loader';
+import { SectionLoader } from '@/components/Loader';
 import { Suspense } from 'react';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -356,12 +356,6 @@ function MatchingInner() {
         </div>
       </div>
 
-      {/* Column headers */}
-      <div className="grid grid-cols-2 gap-3 px-4 pt-3 pb-1 flex-shrink-0">
-        <p className="text-xs font-semibold text-[var(--text-muted)] text-center tracking-wide uppercase">English</p>
-        <p className="text-xs font-semibold text-[var(--text-muted)] text-center tracking-wide uppercase">Translation</p>
-      </div>
-
       {/* Game grid */}
       <div className="flex-1 px-4 pb-4 overflow-y-auto">
         <div className="grid grid-cols-2 gap-3">
@@ -420,19 +414,19 @@ function MatchCard({
       onClick={onClick}
       disabled={matched}
       className={`
-        w-full min-h-[56px] rounded-xl border-2 px-2 py-2.5 text-sm font-medium text-center
+        w-full min-h-[60px] rounded-2xl border-2 px-3 py-3 text-sm font-semibold text-center
         transition-all duration-150 leading-tight break-words
         ${matched
-          ? 'border-[var(--success)] bg-green-50 text-[var(--success)] cursor-default'
+          ? 'border-transparent bg-[var(--surface-2)] text-[var(--text)] opacity-20 cursor-default'
           : selected
-          ? 'border-[var(--primary)] bg-[var(--primary-bg)] text-[var(--primary)] scale-[1.04] shadow-md'
+          ? 'border-[var(--primary)] bg-[var(--primary)] text-white scale-[1.04] shadow-lg'
           : wrong
-          ? 'border-[var(--danger)] bg-red-50 text-[var(--danger)] animate-shake'
-          : 'border-[var(--border)] bg-[var(--surface)] text-[var(--text)] hover:border-[var(--primary)] hover:bg-[var(--primary-bg)] active:scale-95'
+          ? 'border-red-500 bg-red-500/20 text-red-400 animate-shake'
+          : 'border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] hover:border-[var(--primary)]/60 hover:bg-[var(--primary-bg)] active:scale-95'
         }
       `}
     >
-      {matched ? '✓' : text}
+      {text}
     </button>
   );
 }
