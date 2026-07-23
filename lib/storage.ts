@@ -594,7 +594,6 @@ export function markLearningComplete(collectionName: string, dayNumber: number) 
   const updated = { ...p, learnDone: true };
   if (updated.learnDone && updated.flashcardDone && updated.quizDone && !updated.completedAt) {
     updated.completedAt = new Date().toISOString();
-    recordUnitDoneDay();
   }
   set(key, updated);
 }
@@ -605,7 +604,6 @@ export function markFlashcardComplete(collectionName: string, dayNumber: number)
   const updated = { ...p, flashcardDone: true };
   if (updated.learnDone && updated.flashcardDone && updated.quizDone && !updated.completedAt) {
     updated.completedAt = new Date().toISOString();
-    recordUnitDoneDay();
   }
   set(key, updated);
 }
@@ -616,7 +614,6 @@ export function markQuizComplete(collectionName: string, dayNumber: number) {
   const updated = { ...p, quizDone: true };
   if (updated.learnDone && updated.flashcardDone && updated.quizDone && !updated.completedAt) {
     updated.completedAt = new Date().toISOString();
-    recordUnitDoneDay();
   }
   set(key, updated);
 }
