@@ -109,6 +109,8 @@ export default function ReadingPage() {
   const [importDone, setImportDone] = useState(false);
   const passageRef = useRef<HTMLDivElement>(null);
   const [autoCollect, setAutoCollect] = useState(false);
+  const [quickDef, setQuickDef] = useState<{ pos: string; def: string; phonetic?: string } | null>(null);
+  const [defLoading, setDefLoading] = useState(false);
   const FONT_SIZES = [15, 17, 19, 22];
   const [fontSizeIdx, setFontSizeIdx] = useState(1);
 
@@ -163,6 +165,31 @@ export default function ReadingPage() {
       document.removeEventListener('touchend', handleSelection);
     };
   }, [handleSelection]);
+
+  // Quick definition lookup — single words only
+  useEffect(() => {
+    const word = selectedText.trim();
+    if (!word || word.includes(' ') || word.length < 2) {
+      setQuickDef(null); setDefLoading(false); return;
+    }
+    setDefLoading(true); setQuickDef(null);
+    const ctrl = new AbortController();
+    fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word.toLowerCase())}`, { signal: ctrl.signal })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (!data?.[0]) { setQuickDef(null); setDefLoading(false); return; }
+        const entry = data[0];
+        const meaning = entry.meanings?.[0];
+        setQuickDef({
+          pos: meaning?.partOfSpeech ?? '',
+          def: meaning?.definitions?.[0]?.definition ?? '',
+          phonetic: entry.phonetic ?? entry.phonetics?.find((p: { text?: string }) => p.text)?.text,
+        });
+        setDefLoading(false);
+      })
+      .catch(() => { setQuickDef(null); setDefLoading(false); });
+    return () => ctrl.abort();
+  }, [selectedText]);
 
   const addWord = useCallback(() => {
     if (!selectedText) return;
@@ -424,21 +451,49 @@ export default function ReadingPage() {
         </div>
       )}
 
-      {/* Floating "+ Add" pill */}
+      {/* Floating definition card + Add pill */}
       {selectedText && selectionRect && !autoCollect && (
         <div
-          className="fixed z-50 pointer-events-none"
+          className="fixed z-50 pointer-events-none flex flex-col items-center"
           style={{
-            top: Math.max(selectionRect.top - 44, 8),
+            bottom: window.innerHeight - Math.max(selectionRect.top - 8, 60),
             left: Math.min(
-              Math.max(selectionRect.left + selectionRect.width / 2, 60),
-              (typeof window !== 'undefined' ? window.innerWidth : 400) - 60,
+              Math.max(selectionRect.left + selectionRect.width / 2, 100),
+              window.innerWidth - 100,
             ),
             transform: 'translateX(-50%)',
           }}
         >
+          {/* Quick definition */}
+          {(defLoading || quickDef) && (
+            <div
+              className="pointer-events-auto mb-2 rounded-2xl shadow-xl px-4 py-3 w-64 max-w-[calc(100vw-32px)] animate-fade-in"
+              style={{ background: 'var(--bg)', border: '1px solid var(--border)' }}
+            >
+              {defLoading ? (
+                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Looking up…</p>
+              ) : quickDef ? (
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {quickDef.phonetic && (
+                      <span className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>{quickDef.phonetic}</span>
+                    )}
+                    {quickDef.pos && (
+                      <span className="text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-full" style={{ background: 'var(--primary-bg)', color: 'var(--primary)' }}>
+                        {quickDef.pos}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs leading-snug" style={{ color: 'var(--text)' }}>{quickDef.def}</p>
+                </div>
+              ) : null}
+            </div>
+          )}
+
+          {/* Add pill */}
           <button
-            className="pointer-events-auto flex items-center gap-1.5 px-4 py-2 rounded-full bg-[var(--primary)] text-white text-sm font-bold shadow-xl"
+            className="pointer-events-auto flex items-center gap-1.5 px-4 py-2 rounded-full text-white text-sm font-bold shadow-xl"
+            style={{ background: 'var(--primary)' }}
             onMouseDown={e => e.preventDefault()}
             onTouchStart={e => e.preventDefault()}
             onTouchEnd={e => { e.preventDefault(); addWord(); }}
