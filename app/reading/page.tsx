@@ -52,7 +52,7 @@ function AutoCollectParagraph({ text, collected, onAdd }: {
 }
 
 const buildPrompt = (words: string[]) =>
-`I have a list of English words I want to learn. For each word, provide the translation in Uzbek, a short definition in English, and 2 example sentences in English with their Uzbek translations.
+`I have a list of English words I want to learn. For each word, provide the translation in Uzbek, a short definition in English, and 5 example sentences in English with their Uzbek translations.
 
 Format EXACTLY like this for every word. Use plain text only — no markdown, no bold, no asterisks, no extra formatting:
 
@@ -65,6 +65,12 @@ example1: The enormous building towered above the city.
 example1Translation: Ulkan bino shahar ustida baland turardi.
 example2: She faced an enormous challenge at work.
 example2Translation: U ishda ulkan muammoga duch keldi.
+example3: The storm caused enormous damage to the coastline.
+example3Translation: Bo'ron qirg'oqqa ulkan zarar yetkazdi.
+example4: He made an enormous effort to finish the project on time.
+example4Translation: U loyihani o'z vaqtida tugatish uchun ulkan harakat qildi.
+example5: The discovery had an enormous impact on modern science.
+example5Translation: Bu kashfiyot zamonaviy fanga ulkan ta'sir ko'rsatdi.
 ---
 
 Important: the example above uses English/Uzbek only to show the format. In your actual response, write the definition and examples in English, and the translations in Uzbek.
@@ -90,6 +96,12 @@ function parseAIResponse(text: string): ImportedWord[] {
       example1Translation: get('example1Translation') || undefined,
       example2: get('example2') || '',
       example2Translation: get('example2Translation') || undefined,
+      example3: get('example3') || undefined,
+      example3Translation: get('example3Translation') || undefined,
+      example4: get('example4') || undefined,
+      example4Translation: get('example4Translation') || undefined,
+      example5: get('example5') || undefined,
+      example5Translation: get('example5Translation') || undefined,
       language: 'en-US',
       addedAt: Date.now(),
     } satisfies ImportedWord];

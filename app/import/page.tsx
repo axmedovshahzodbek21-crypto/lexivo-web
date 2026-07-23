@@ -51,7 +51,7 @@ const LANGUAGES = [
 ];
 
 function buildPrompt1(wordLang: string, transLang: string): string {
-  return `I have a list of ${wordLang} words I want to learn. For each word, provide the translation in ${transLang}, a short definition in ${wordLang}, and 2 example sentences in ${wordLang} with their ${transLang} translations.
+  return `I have a list of ${wordLang} words I want to learn. For each word, provide the translation in ${transLang}, a short definition in ${wordLang}, and 5 example sentences in ${wordLang} with their ${transLang} translations.
 
 Format EXACTLY like this for every word. Use plain text only — no markdown, no bold, no asterisks, no extra formatting:
 
@@ -62,6 +62,12 @@ example1: The enormous building towered above the city.
 example1Translation: Ulkan bino shahar ustida baland turardi.
 example2: She faced an enormous challenge at work.
 example2Translation: U ishda ulkan muammoga duch keldi.
+example3: The storm caused enormous damage to the coastline.
+example3Translation: Bo'ron qirg'oqqa ulkan zarar yetkazdi.
+example4: He made an enormous effort to finish the project on time.
+example4Translation: U loyihani o'z vaqtida tugatish uchun ulkan harakat qildi.
+example5: The discovery had an enormous impact on modern science.
+example5Translation: Bu kashfiyot zamonaviy fanga ulkan ta'sir ko'rsatdi.
 ---
 
 Important: the example above uses English/Uzbek only to show the format. In your actual response, write the definition and examples in ${wordLang}, and the translations in ${transLang}.
@@ -71,7 +77,7 @@ Here are my words:
 }
 
 function buildPrompt2(wordLang: string, transLang: string): string {
-  return `I have ${wordLang}-${transLang} word pairs. For each pair, keep my translation exactly as written. Add a short definition in ${wordLang} and 2 example sentences in ${wordLang} with their ${transLang} translations.
+  return `I have ${wordLang}-${transLang} word pairs. For each pair, keep my translation exactly as written. Add a short definition in ${wordLang} and 5 example sentences in ${wordLang} with their ${transLang} translations.
 
 Format EXACTLY like this for every word. Use plain text only — no markdown, no bold, no asterisks, no extra formatting:
 
@@ -82,6 +88,12 @@ example1: The enormous building towered above the city.
 example1Translation: Ulkan bino shahar ustida baland turardi.
 example2: She faced an enormous challenge at work.
 example2Translation: U ishda ulkan muammoga duch keldi.
+example3: The storm caused enormous damage to the coastline.
+example3Translation: Bo'ron qirg'oqqa ulkan zarar yetkazdi.
+example4: He made an enormous effort to finish the project on time.
+example4Translation: U loyihani o'z vaqtida tugatish uchun ulkan harakat qildi.
+example5: The discovery had an enormous impact on modern science.
+example5Translation: Bu kashfiyot zamonaviy fanga ulkan ta'sir ko'rsatdi.
 ---
 
 Important: the example above uses English/Uzbek only to show the format. In your actual response, write the definition and examples in ${wordLang}, and the translations in ${transLang}.
@@ -154,6 +166,12 @@ function parseOutput(text: string, langCode: string): ParseResult {
       example1Translation: fields.example1translation ?? '',
       example2: fields.example2 ?? '',
       example2Translation: fields.example2translation ?? '',
+      example3: fields.example3 || undefined,
+      example3Translation: fields.example3translation || undefined,
+      example4: fields.example4 || undefined,
+      example4Translation: fields.example4translation || undefined,
+      example5: fields.example5 || undefined,
+      example5Translation: fields.example5translation || undefined,
       language: langCode,
       addedAt: Date.now(),
     });
@@ -375,6 +393,7 @@ function ImportPageInner() {
                 <div><span className="text-[var(--text-muted)]">example1Translation:</span><span className="text-[var(--text)]"> Ulkan bino shahar ustida baland turardi.</span><span className="ml-2 text-[var(--text-muted)] font-sans text-[10px]">optional</span></div>
                 <div><span className="text-[var(--text-muted)]">example2:</span><span className="text-[var(--text)]"> She faced an enormous challenge at work.</span><span className="ml-2 text-[var(--text-muted)] font-sans text-[10px]">optional</span></div>
                 <div><span className="text-[var(--text-muted)]">example2Translation:</span><span className="text-[var(--text)]"> U ishda ulkan muammoga duch keldi.</span><span className="ml-2 text-[var(--text-muted)] font-sans text-[10px]">optional</span></div>
+                <div><span className="text-[var(--text-muted)]">example3 … example5:</span><span className="text-[var(--text-muted)] italic"> (same pattern)</span><span className="ml-2 text-[var(--text-muted)] font-sans text-[10px]">optional</span></div>
                 <div className="pt-1 text-[var(--text-muted)]">---</div>
                 <div className="pt-1 text-[var(--text-muted)] italic">next word block goes here...</div>
               </div>
@@ -456,6 +475,12 @@ function ImportPageInner() {
                     {w.example1Translation && <p className="text-xs text-[var(--text-muted)] pl-2">↳ {w.example1Translation}</p>}
                     {w.example2 && <p className="text-xs italic text-[var(--text)]">"{w.example2}"</p>}
                     {w.example2Translation && <p className="text-xs text-[var(--text-muted)] pl-2">↳ {w.example2Translation}</p>}
+                    {w.example3 && <p className="text-xs italic text-[var(--text)]">"{w.example3}"</p>}
+                    {w.example3Translation && <p className="text-xs text-[var(--text-muted)] pl-2">↳ {w.example3Translation}</p>}
+                    {w.example4 && <p className="text-xs italic text-[var(--text)]">"{w.example4}"</p>}
+                    {w.example4Translation && <p className="text-xs text-[var(--text-muted)] pl-2">↳ {w.example4Translation}</p>}
+                    {w.example5 && <p className="text-xs italic text-[var(--text)]">"{w.example5}"</p>}
+                    {w.example5Translation && <p className="text-xs text-[var(--text-muted)] pl-2">↳ {w.example5Translation}</p>}
                   </div>
                 ))}
               </div>

@@ -111,6 +111,12 @@ export default function FolderCollectionPage({ params }: Props) {
                       {w.example1Translation && <p className="text-xs text-[var(--text-muted)] pl-2">↳ {w.example1Translation}</p>}
                       {w.example2 && <p className="text-xs italic text-[var(--text)] mt-0.5">"{w.example2}"</p>}
                       {w.example2Translation && <p className="text-xs text-[var(--text-muted)] pl-2">↳ {w.example2Translation}</p>}
+                      {w.example3 && <p className="text-xs italic text-[var(--text)] mt-0.5">"{w.example3}"</p>}
+                      {w.example3Translation && <p className="text-xs text-[var(--text-muted)] pl-2">↳ {w.example3Translation}</p>}
+                      {w.example4 && <p className="text-xs italic text-[var(--text)] mt-0.5">"{w.example4}"</p>}
+                      {w.example4Translation && <p className="text-xs text-[var(--text-muted)] pl-2">↳ {w.example4Translation}</p>}
+                      {w.example5 && <p className="text-xs italic text-[var(--text)] mt-0.5">"{w.example5}"</p>}
+                      {w.example5Translation && <p className="text-xs text-[var(--text-muted)] pl-2">↳ {w.example5Translation}</p>}
                     </div>
                     <button onClick={() => handleDelete(w.word)} className="text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors text-sm shrink-0 mt-0.5" aria-label="Delete word">🗑️</button>
                   </div>

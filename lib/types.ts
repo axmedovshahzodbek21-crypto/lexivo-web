@@ -97,6 +97,12 @@ export interface ImportedWord {
   example1Translation?: string;
   example2: string;
   example2Translation?: string;
+  example3?: string;
+  example3Translation?: string;
+  example4?: string;
+  example4Translation?: string;
+  example5?: string;
+  example5Translation?: string;
   language: string; // BCP-47 e.g. 'en-US', 'ru-RU'
   addedAt: number;
   collectionName?: string; // optional for backward compat; defaults to 'My Words'
