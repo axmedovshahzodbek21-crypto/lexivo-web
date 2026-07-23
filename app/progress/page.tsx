@@ -7,7 +7,7 @@ import Link from 'next/link';
 import {
   getLearnedWords, getSRSWords, getStreak, getXP, getTotalStudyDays,
   getTodayXP, getTodayLearnedCount, getDueWords, getStarredWords, getHardWords,
-  getStudyHistory, getStudyDays, getUnitDoneDays, getReviewDays, getWordGoalDays,
+  getStudyHistory, getStudyDays, getReviewDays, getWordGoalDays,
   getSettings, getXPHistory, localDateStr, getReviewLog, getGraduatedCount,
 } from '@/lib/storage';
 import type { XpEntry } from '@/lib/storage';
@@ -42,7 +42,6 @@ function ProgressPage() {
   const [unlockedIds, setUnlockedIds] = useState<string[]>([]);
   const [studyHistory, setStudyHistory] = useState<Record<string, number>>({});
   const [studyDays, setStudyDays] = useState<string[]>([]);
-  const [unitDoneDays, setUnitDoneDays] = useState<string[]>([]);
   const [reviewDays, setReviewDays] = useState<string[]>([]);
   const [wordGoalDays, setWordGoalDays] = useState<string[]>([]);
   const [dailyGoal, setDailyGoal] = useState(10);
@@ -64,7 +63,6 @@ function ProgressPage() {
       setUnlockedIds(getUnlockedAchievements());
       setStudyHistory(getStudyHistory());
       setStudyDays(getStudyDays());
-      setUnitDoneDays(getUnitDoneDays());
       setReviewDays(getReviewDays());
       setWordGoalDays(getWordGoalDays());
       setDailyGoal(getSettings().dailyGoal);
@@ -170,7 +168,7 @@ function ProgressPage() {
           <div className="animate-fade-in max-w-lg mx-auto">
             <StudyCalendar
               history={studyHistory} streak={streak} totalDays={totalDays} studyDays={studyDays}
-              unitDoneDays={unitDoneDays} reviewDays={reviewDays} wordGoalDays={wordGoalDays}
+              reviewDays={reviewDays} wordGoalDays={wordGoalDays}
               dailyGoal={dailyGoal} dueCount={dueCount}
             />
           </div>
@@ -431,13 +429,12 @@ function MiniCalendar({ title, color, days, year, month }: {
 }
 
 function StudyCalendar({
-  history, streak, studyDays, unitDoneDays, reviewDays, wordGoalDays, dailyGoal, dueCount,
+  history, streak, studyDays, reviewDays, wordGoalDays, dailyGoal, dueCount,
 }: {
   history: Record<string, number>;
   streak: number;
   totalDays: number;
   studyDays: string[];
-  unitDoneDays: string[];
   reviewDays: string[];
   wordGoalDays: string[];
   dailyGoal: number;
@@ -451,7 +448,7 @@ function StudyCalendar({
 
   const todayStr = localDateStr(now);
   const longestStreak = calcLongestStreak(studyDays);
-  const completeDays = unitDoneDays.filter(d => reviewDays.includes(d) && wordGoalDays.includes(d));
+  const completeDays = reviewDays.filter(d => wordGoalDays.includes(d));
   const activeDays = completeDays.length;
 
   const cells = buildMonthGrid(viewYear, viewMonth);
@@ -469,7 +466,6 @@ function StudyCalendar({
   }
 
   const sheetTasks = selectedDay ? {
-    unit:   unitDoneDays.includes(selectedDay),
     review: reviewDays.includes(selectedDay),
     words:  wordGoalDays.includes(selectedDay),
   } : null;
@@ -513,7 +509,7 @@ function StudyCalendar({
             ))}
           </div>
 
-          {/* Day circles — partial fill: bottom=unit(orange), mid=review(indigo), top=words(green) */}
+          {/* Day circles — partial fill: bottom=review(indigo), top=words(green) */}
           <div className="grid grid-cols-7 gap-y-1.5">
             {cells.map((day, i) => {
               if (!day) return <div key={i} className="w-10 h-10" />;
@@ -523,11 +519,9 @@ function StudyCalendar({
               const isToday = dateStr === todayStr;
               const isFuture = dateStr > todayStr;
               const isSelected = selectedDay === dateStr;
-              const unit   = unitDoneDays.includes(dateStr);
               const review = reviewDays.includes(dateStr);
               const words  = wordGoalDays.includes(dateStr);
-              const taskCount = (unit ? 1 : 0) + (review ? 1 : 0) + (words ? 1 : 0);
-              const anyDone = taskCount > 0;
+              const anyDone = review || words;
 
               return (
                 <button
@@ -542,9 +536,8 @@ function StudyCalendar({
                     transform: isSelected ? 'scale(1.12)' : 'scale(1)',
                   }}
                 >
-                  {unit   && <div className="absolute bottom-0 left-0 right-0" style={{ height: '33.34%', background: TASK_COLORS.unit.bg }} />}
-                  {review && <div className="absolute left-0 right-0" style={{ bottom: '33.34%', height: '33.33%', background: TASK_COLORS.review.bg }} />}
-                  {words  && <div className="absolute top-0 left-0 right-0" style={{ height: '33.34%', background: TASK_COLORS.words.bg }} />}
+                  {review && <div className="absolute bottom-0 left-0 right-0" style={{ height: '50%', background: TASK_COLORS.review.bg }} />}
+                  {words  && <div className="absolute top-0 left-0 right-0" style={{ height: '50%', background: TASK_COLORS.words.bg }} />}
                   <span className="relative z-10 text-xs font-bold leading-none"
                     style={{ color: anyDone ? '#fff' : isToday ? 'var(--text)' : 'var(--text-muted)' }}>
                     {day}
@@ -557,10 +550,6 @@ function StudyCalendar({
 
         {/* Legend */}
         <div className="flex items-center gap-3 mt-5 pt-3 border-t border-[var(--border)] flex-wrap">
-          <div className="flex items-center gap-1.5">
-            <div className="w-3.5 h-3.5 rounded-full" style={{ background: TASK_COLORS.unit.bg }} />
-            <span className="text-[10px] text-[var(--text-muted)]">Unit done</span>
-          </div>
           <div className="flex items-center gap-1.5">
             <div className="w-3.5 h-3.5 rounded-full" style={{ background: TASK_COLORS.review.bg }} />
             <span className="text-[10px] text-[var(--text-muted)]">SRS review</span>
@@ -580,10 +569,6 @@ function StudyCalendar({
           <p className="text-sm font-bold" style={{ color: 'var(--text)' }}>How to mark a day</p>
           <div className="flex flex-col gap-1">
             <span className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--text-muted)' }}>
-              <span className="w-2.5 h-2.5 rounded-full shrink-0 inline-block" style={{ background: TASK_COLORS.unit.bg }} />
-              Finish Learn + Flashcards + Quiz for any unit
-            </span>
-            <span className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--text-muted)' }}>
               <span className="w-2.5 h-2.5 rounded-full shrink-0 inline-block" style={{ background: TASK_COLORS.review.bg }} />
               Complete an SRS review session
             </span>
@@ -592,7 +577,7 @@ function StudyCalendar({
               Reach your {dailyGoal}-word daily goal
             </span>
           </div>
-          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Each task fills ⅓ of the day circle. Complete all 3 to fully mark a day.</p>
+          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Each task fills half the day circle. Complete both to fully mark a day.</p>
         </div>
       </div>
 
@@ -627,11 +612,10 @@ function StudyCalendar({
               </div>
 
               {/* Task cards */}
-              <div className="grid grid-cols-3 gap-3 mb-3">
+              <div className="grid grid-cols-2 gap-3 mb-3">
                 {([
-                  { key: 'unit',   label: 'Unit Complete',              done: sheetTasks.unit,   href: '/learn', btnLabel: 'Pick a Unit', color: TASK_COLORS.unit.bg },
-                  { key: 'review', label: 'SRS Review',                 done: sheetTasks.review, href: '/srs',   btnLabel: 'Go to Review', color: TASK_COLORS.review.bg, nothingDue: sheetIsToday && dueCount === 0 && !sheetTasks.review },
-                  { key: 'words',  label: `Words (${dailyGoal} goal)`,  done: sheetTasks.words,  href: '/learn', btnLabel: 'Learn Words',  color: TASK_COLORS.words.bg },
+                  { key: 'review', label: 'SRS Review',                done: sheetTasks.review, href: '/srs',   btnLabel: 'Go to Review', color: TASK_COLORS.review.bg, nothingDue: sheetIsToday && dueCount === 0 && !sheetTasks.review },
+                  { key: 'words',  label: `Words (${dailyGoal} goal)`, done: sheetTasks.words,  href: '/learn', btnLabel: 'Learn Words',  color: TASK_COLORS.words.bg },
                 ] as const).map(task => (
                   <div key={task.key} className="rounded-2xl p-4 flex flex-col gap-3"
                     style={{ background: 'var(--surface-2)', border: `1px solid ${task.color}33` }}>
@@ -659,11 +643,10 @@ function StudyCalendar({
                 ))}
               </div>
 
-              {/* Three mini-calendars */}
-              <div className="grid grid-cols-3 gap-3">
-                <MiniCalendar title="Unit"                        color={TASK_COLORS.unit.bg}   days={unitDoneDays} year={viewYear} month={viewMonth} />
-                <MiniCalendar title="SRS"                         color={TASK_COLORS.review.bg} days={reviewDays}   year={viewYear} month={viewMonth} />
-                <MiniCalendar title={`Words (${dailyGoal})`}      color={TASK_COLORS.words.bg} days={wordGoalDays} year={viewYear} month={viewMonth} />
+              {/* Two mini-calendars */}
+              <div className="grid grid-cols-2 gap-3">
+                <MiniCalendar title="SRS"                    color={TASK_COLORS.review.bg} days={reviewDays}   year={viewYear} month={viewMonth} />
+                <MiniCalendar title={`Words (${dailyGoal})`} color={TASK_COLORS.words.bg}  days={wordGoalDays} year={viewYear} month={viewMonth} />
               </div>
             </div>
           </div>
