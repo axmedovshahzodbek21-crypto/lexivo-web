@@ -117,6 +117,7 @@ export default function ReadingPage() {
   const FONT_SIZES = [15, 17, 19, 22];
   const [fontSizeIdx, setFontSizeIdx] = useState(1);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [wordHistory, setWordHistory] = useState<string[][]>([]);
 
   useEffect(() => {
     if (!reading) { setScrollProgress(0); return; }
@@ -206,16 +207,46 @@ export default function ReadingPage() {
     return () => ctrl.abort();
   }, [selectedText]);
 
+  const addToList = useCallback((word: string) => {
+    setWordList(prev => {
+      if (prev.includes(word)) return prev;
+      setWordHistory(h => [...h.slice(-29), prev]);
+      return [...prev, word];
+    });
+  }, []);
+
   const addWord = useCallback(() => {
     if (!selectedText) return;
-    const cleaned = selectedText.replace(/\s+/g, ' ').trim();
-    setWordList(prev => prev.includes(cleaned) ? prev : [...prev, cleaned]);
+    addToList(selectedText.replace(/\s+/g, ' ').trim());
     window.getSelection()?.removeAllRanges();
     setSelectedText('');
     setSelectionRect(null);
-  }, [selectedText]);
+  }, [selectedText, addToList]);
 
-  const removeWord = (i: number) => setWordList(prev => prev.filter((_, idx) => idx !== i));
+  const removeWord = useCallback((i: number) => {
+    setWordList(prev => {
+      setWordHistory(h => [...h.slice(-29), prev]);
+      return prev.filter((_, idx) => idx !== i);
+    });
+  }, []);
+
+  const undo = useCallback(() => {
+    setWordHistory(prev => {
+      if (prev.length === 0) return prev;
+      setWordList(prev[prev.length - 1]);
+      return prev.slice(0, -1);
+    });
+  }, []);
+
+  // Ctrl+Z / Cmd+Z undo
+  useEffect(() => {
+    if (!reading) return;
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); undo(); }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [reading, undo]);
 
   const fetchArticle = async () => {
     if (!urlInput.trim()) return;
@@ -388,7 +419,7 @@ export default function ReadingPage() {
           {paragraphs.map((para, i) => (
             <p key={i}>
               {autoCollect
-                ? <AutoCollectParagraph text={para} collected={wordList} onAdd={w => setWordList(prev => prev.includes(w) ? prev : [...prev, w])} />
+                ? <AutoCollectParagraph text={para} collected={wordList} onAdd={addToList} />
                 : highlightParagraph(para, wordList)
               }
             </p>
@@ -411,9 +442,18 @@ export default function ReadingPage() {
         <div className="card mx-4 space-y-1">
           <div className="flex items-center justify-between mb-2">
             <h2 className="font-semibold text-sm text-[var(--text)]">Collected words</h2>
-            <button onClick={() => setWordList([])} className="text-xs text-[var(--danger)] hover:underline">
-              Clear all
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={undo}
+                disabled={wordHistory.length === 0}
+                className="text-xs text-[var(--primary)] hover:underline disabled:opacity-30 disabled:cursor-default"
+              >
+                ↩ Undo
+              </button>
+              <button onClick={() => { setWordHistory(h => [...h.slice(-29), wordList]); setWordList([]); }} className="text-xs text-[var(--danger)] hover:underline">
+                Clear all
+              </button>
+            </div>
           </div>
           {wordList.map((w, i) => (
             <div key={i} className="flex items-center gap-2 py-1.5 border-b border-[var(--border)] last:border-0">
