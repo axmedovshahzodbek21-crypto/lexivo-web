@@ -22,6 +22,35 @@ function highlightParagraph(text: string, collected: string[]): React.ReactNode 
   });
 }
 
+function AutoCollectParagraph({ text, collected, onAdd }: {
+  text: string;
+  collected: string[];
+  onAdd: (w: string) => void;
+}) {
+  const tokens = text.split(/(\b[a-zA-Z]+(?:[''][a-zA-Z]+)*\b)/g);
+  return (
+    <>
+      {tokens.map((token, i) => {
+        if (!/^[a-zA-Z]/.test(token)) return <span key={i}>{token}</span>;
+        const isCollected = collected.some(w => w.toLowerCase() === token.toLowerCase());
+        return (
+          <span
+            key={i}
+            onClick={() => onAdd(token)}
+            className={`cursor-pointer rounded px-0.5 transition-colors duration-100 select-none ${
+              isCollected
+                ? 'bg-[var(--primary)] text-white'
+                : 'hover:bg-[var(--primary-bg)] hover:text-[var(--primary)] active:scale-95'
+            }`}
+          >
+            {token}
+          </span>
+        );
+      })}
+    </>
+  );
+}
+
 const buildPrompt = (words: string[]) =>
 `I have a list of English words I want to learn. For each word, provide the translation in Uzbek, a short definition in English, and 2 example sentences in English with their Uzbek translations.
 
@@ -79,6 +108,7 @@ export default function ReadingPage() {
   const [parsedWords, setParsedWords] = useState<ImportedWord[] | null>(null);
   const [importDone, setImportDone] = useState(false);
   const passageRef = useRef<HTMLDivElement>(null);
+  const [autoCollect, setAutoCollect] = useState(false);
 
   const prompt = buildPrompt(wordList);
 
@@ -180,7 +210,17 @@ export default function ReadingPage() {
           >
             ← Back
           </button>
-          <span className="text-xs text-[var(--text-muted)]">~{readingTime} min read</span>
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-[var(--text-muted)]">~{readingTime} min read</span>
+            <button
+              onClick={() => setAutoCollect(v => !v)}
+              className={`text-xs font-semibold px-3 py-1.5 rounded-full transition-all ${
+                autoCollect ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface-2)] text-[var(--text-muted)]'
+              }`}
+            >
+              ⚡ Auto-collect
+            </button>
+          </div>
         </div>
       </div>
 
@@ -188,7 +228,10 @@ export default function ReadingPage() {
       <div className="mx-4 mt-6 mb-4 rounded-2xl bg-[var(--surface)] border border-[var(--border)] overflow-hidden">
         <div className="px-8 pt-5 pb-2 border-b border-[var(--border)]">
           <p className="text-xs text-[var(--text-muted)]">
-            Select any word or phrase → tap <strong className="text-[var(--primary)]">+ Add</strong> to collect it
+            {autoCollect
+              ? <>⚡ <strong className="text-[var(--primary)]">Auto-collect on</strong> — tap any word to instantly collect it</>
+              : <>Select any word or phrase → tap <strong className="text-[var(--primary)]">+ Add</strong> to collect it</>
+            }
           </p>
         </div>
         <div
@@ -197,7 +240,12 @@ export default function ReadingPage() {
           style={{ userSelect: 'text', WebkitUserSelect: 'text' }}
         >
           {paragraphs.map((para, i) => (
-            <p key={i}>{highlightParagraph(para, wordList)}</p>
+            <p key={i}>
+              {autoCollect
+                ? <AutoCollectParagraph text={para} collected={wordList} onAdd={w => setWordList(prev => prev.includes(w) ? prev : [...prev, w])} />
+                : highlightParagraph(para, wordList)
+              }
+            </p>
           ))}
         </div>
       </div>
@@ -325,7 +373,7 @@ export default function ReadingPage() {
       )}
 
       {/* Floating "+ Add" pill */}
-      {selectedText && selectionRect && (
+      {selectedText && selectionRect && !autoCollect && (
         <div
           className="fixed z-50 pointer-events-none"
           style={{
