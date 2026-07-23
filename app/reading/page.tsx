@@ -112,6 +112,33 @@ export default function ReadingPage() {
   const FONT_SIZES = [15, 17, 19, 22];
   const [fontSizeIdx, setFontSizeIdx] = useState(1);
 
+  const SK = { passage: 'lexivo_reading_passage', words: 'lexivo_reading_words' };
+
+  // Restore on mount
+  useEffect(() => {
+    const p = localStorage.getItem(SK.passage);
+    const w = localStorage.getItem(SK.words);
+    if (p) setPassage(p);
+    if (w) { try { setWordList(JSON.parse(w)); } catch {} }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Auto-save
+  useEffect(() => {
+    if (passage) localStorage.setItem(SK.passage, passage);
+    else localStorage.removeItem(SK.passage);
+  }, [passage]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (wordList.length > 0) localStorage.setItem(SK.words, JSON.stringify(wordList));
+    else localStorage.removeItem(SK.words);
+  }, [wordList]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const clearSession = () => {
+    setPassage(''); setWordList([]);
+    localStorage.removeItem(SK.passage); localStorage.removeItem(SK.words);
+  };
+
   const prompt = buildPrompt(wordList);
 
   const handleSelection = useCallback(() => {
@@ -185,12 +212,23 @@ export default function ReadingPage() {
           onChange={e => setPassage(e.target.value)}
           autoFocus
         />
+        {passage.trim() && (
+          <div className="flex items-center justify-between rounded-2xl px-4 py-3" style={{ background: 'var(--surface-2)' }}>
+            <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--text-muted)' }}>
+              <span>📖</span>
+              <span>Saved session{wordList.length > 0 ? ` · ${wordList.length} word${wordList.length !== 1 ? 's' : ''} collected` : ''}</span>
+            </div>
+            <button onClick={clearSession} className="text-xs font-semibold hover:underline" style={{ color: 'var(--danger)' }}>
+              Clear
+            </button>
+          </div>
+        )}
         <button
           onClick={() => { if (passage.trim()) setReading(true); }}
           disabled={!passage.trim()}
           className="btn-primary w-full disabled:opacity-40"
         >
-          Start Reading →
+          {wordList.length > 0 ? 'Resume Reading →' : 'Start Reading →'}
         </button>
       </div>
     );
