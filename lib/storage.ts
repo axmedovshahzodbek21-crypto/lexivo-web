@@ -334,9 +334,29 @@ function migrateReviewLogIfNeeded() {
   set(KEYS.reviewLog, log);
 }
 
+// Checks all SRS batches and unlearns any that are 2+ days overdue.
+// Called automatically by getDueWords() but also exported for explicit use.
+export function checkAndUnlearn(today: string = localDateStr()): void {
+  const srsWords = getSRSWords();
+  const log = getReviewLog();
+
+  const byDate = new Map<string, true>();
+  for (const w of srsWords) byDate.set(w.learnedAt, true);
+
+  for (const date of byDate.keys()) {
+    const completed = log[date] ?? [];
+    const nextInterval = SRS_INTERVALS.find(i => !completed.includes(i));
+    if (nextInterval === undefined) continue; // graduated
+
+    const dueDate = addDaysToDateStr(date, nextInterval);
+    if (daysBetweenDateStrs(dueDate, today) >= 2) unlearnDate(date);
+  }
+}
+
 export function getDueWords(): DueSRSWord[] {
   migrateReviewLogIfNeeded();
   const today = localDateStr();
+  checkAndUnlearn(today);
   const srsWords = getSRSWords();
   const log = getReviewLog();
 
@@ -352,16 +372,10 @@ export function getDueWords(): DueSRSWord[] {
   for (const [date, words] of byDate) {
     const completed = log[date] ?? [];
     const nextInterval = SRS_INTERVALS.find(i => !completed.includes(i));
-    if (nextInterval === undefined) continue; // all 5 intervals done — graduated
+    if (nextInterval === undefined) continue; // graduated
 
     const dueDate = addDaysToDateStr(date, nextInterval);
     if (dueDate > today) continue; // not yet due
-
-    // 3-day unlearn rule: today − dueDate ≥ 2 days overdue
-    if (daysBetweenDateStrs(dueDate, today) >= 2) {
-      unlearnDate(date);
-      continue;
-    }
 
     result.push(...words.map(w => ({ ...w, dueInterval: nextInterval })));
   }
