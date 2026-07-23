@@ -257,7 +257,7 @@ export default function ReadingPage() {
   // ── Step 1: paste passage ─────────────────────────────────────────────────
   if (!reading) {
     return (
-      <div className="max-w-3xl mx-auto px-6 py-10 space-y-6 pb-24">
+      <div className="max-w-5xl mx-auto px-6 py-10 space-y-6 pb-24">
         <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
           ← Back
         </Link>
