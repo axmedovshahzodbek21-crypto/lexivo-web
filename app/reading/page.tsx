@@ -113,6 +113,18 @@ export default function ReadingPage() {
   const [defLoading, setDefLoading] = useState(false);
   const FONT_SIZES = [15, 17, 19, 22];
   const [fontSizeIdx, setFontSizeIdx] = useState(1);
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  useEffect(() => {
+    if (!reading) { setScrollProgress(0); return; }
+    const onScroll = () => {
+      const el = document.documentElement;
+      const scrollable = el.scrollHeight - el.clientHeight;
+      setScrollProgress(scrollable > 0 ? Math.min(100, (window.scrollY / scrollable) * 100) : 0);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [reading]);
 
   const SK = { passage: 'lexivo_reading_passage', words: 'lexivo_reading_words' };
 
@@ -270,6 +282,10 @@ export default function ReadingPage() {
     <div className="max-w-6xl mx-auto pb-28">
       {/* Sticky header */}
       <div className="sticky top-0 z-10 bg-[var(--bg)] border-b border-[var(--border)]">
+        {/* Reading progress bar */}
+        <div className="absolute bottom-0 left-0 right-0 h-0.5" style={{ background: 'var(--border)' }}>
+          <div className="h-full transition-[width] duration-75" style={{ width: `${scrollProgress}%`, background: 'var(--primary)' }} />
+        </div>
         <div className="flex items-center justify-between px-4 py-3">
           <button
             onClick={() => { setReading(false); setWordList([]); setSelectedText(''); setSelectionRect(null); }}
