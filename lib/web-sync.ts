@@ -52,6 +52,7 @@ interface StatsRow {
   study_days:       string[] | null;
   freezes:          number | null;
   last_freeze_week: string | null;
+  review_log:       Record<string, number[]> | null;
 }
 
 interface UnitProgressRow {

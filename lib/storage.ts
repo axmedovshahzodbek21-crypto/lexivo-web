@@ -938,8 +938,9 @@ export function getLearnMarks(collectionName: string, dayNumber: number): { tooH
 }
 
 export function getHardWordCount(collectionName: string, dayNumber: number): number {
+  // Graduated words are removed from SRS, so any remaining word is still in progress
   return getSRSWords().filter(
-    w => w.collectionName === collectionName && w.dayNumber === dayNumber && w.reviewStage < 4
+    w => w.collectionName === collectionName && w.dayNumber === dayNumber
   ).length;
 }
 
