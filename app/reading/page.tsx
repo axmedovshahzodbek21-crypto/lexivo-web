@@ -109,6 +109,8 @@ export default function ReadingPage() {
   const [importDone, setImportDone] = useState(false);
   const passageRef = useRef<HTMLDivElement>(null);
   const [autoCollect, setAutoCollect] = useState(false);
+  const FONT_SIZES = [15, 17, 19, 22];
+  const [fontSizeIdx, setFontSizeIdx] = useState(1);
 
   const prompt = buildPrompt(wordList);
 
@@ -210,15 +212,27 @@ export default function ReadingPage() {
           >
             ← Back
           </button>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <span className="text-xs text-[var(--text-muted)]">~{readingTime} min read</span>
+            <div className="flex items-center gap-1 bg-[var(--surface-2)] rounded-full px-1 py-1">
+              <button
+                onClick={() => setFontSizeIdx(i => Math.max(0, i - 1))}
+                disabled={fontSizeIdx === 0}
+                className="w-7 h-7 rounded-full text-xs font-bold text-[var(--text-muted)] hover:text-[var(--text)] disabled:opacity-30 transition-colors"
+              >A−</button>
+              <button
+                onClick={() => setFontSizeIdx(i => Math.min(FONT_SIZES.length - 1, i + 1))}
+                disabled={fontSizeIdx === FONT_SIZES.length - 1}
+                className="w-7 h-7 rounded-full text-sm font-bold text-[var(--text-muted)] hover:text-[var(--text)] disabled:opacity-30 transition-colors"
+              >A+</button>
+            </div>
             <button
               onClick={() => setAutoCollect(v => !v)}
               className={`text-xs font-semibold px-3 py-1.5 rounded-full transition-all ${
                 autoCollect ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface-2)] text-[var(--text-muted)]'
               }`}
             >
-              ⚡ Auto-collect
+              ⚡ Auto
             </button>
           </div>
         </div>
@@ -236,8 +250,8 @@ export default function ReadingPage() {
         </div>
         <div
           ref={passageRef}
-          className="px-8 py-6 text-[var(--text)] text-[17px] leading-[1.85] select-text cursor-text space-y-5"
-          style={{ userSelect: 'text', WebkitUserSelect: 'text' }}
+          className="px-8 py-6 text-[var(--text)] leading-[1.85] select-text cursor-text space-y-5 transition-[font-size] duration-150"
+          style={{ fontSize: FONT_SIZES[fontSizeIdx], userSelect: 'text', WebkitUserSelect: 'text' }}
         >
           {paragraphs.map((para, i) => (
             <p key={i}>
