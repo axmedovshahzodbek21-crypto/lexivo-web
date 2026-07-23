@@ -165,7 +165,7 @@ function ProgressPage() {
         )}
 
         {tab === 'calendar' && (
-          <div className="animate-fade-in max-w-lg mx-auto">
+          <div className="animate-fade-in">
             <StudyCalendar
               history={studyHistory} streak={streak} totalDays={totalDays} studyDays={studyDays}
               reviewDays={reviewDays} wordGoalDays={wordGoalDays}
@@ -472,7 +472,11 @@ function StudyCalendar({
   const sheetIsToday = selectedDay === todayStr;
 
   return (
-    <div className="space-y-4">
+    <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6 items-start">
+
+      {/* ── Left column: stats + calendar ── */}
+      <div className="space-y-4">
+
       {/* Stat tiles */}
       <div className="grid grid-cols-3 gap-3">
         <div className="rounded-2xl p-3 flex flex-col gap-1" style={{ background: '#be123c', boxShadow: '0 3px 0 #881337' }}>
@@ -561,30 +565,36 @@ function StudyCalendar({
           <span className="text-[10px] text-[var(--text-muted)] ml-auto">Tap a day for details</span>
         </div>
       </div>
+      </div> {/* end left column */}
 
-      {/* How days get marked */}
-      <div className="rounded-2xl p-4 flex gap-3" style={{ background: 'var(--surface-2)' }}>
-        <span className="text-xl shrink-0">💡</span>
-        <div className="space-y-1.5">
-          <p className="text-sm font-bold" style={{ color: 'var(--text)' }}>How to mark a day</p>
-          <div className="flex flex-col gap-1">
-            <span className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--text-muted)' }}>
-              <span className="w-2.5 h-2.5 rounded-full shrink-0 inline-block" style={{ background: TASK_COLORS.review.bg }} />
-              Complete an SRS review session
-            </span>
-            <span className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--text-muted)' }}>
-              <span className="w-2.5 h-2.5 rounded-full shrink-0 inline-block" style={{ background: TASK_COLORS.words.bg }} />
-              Reach your {dailyGoal}-word daily goal
-            </span>
+      {/* ── Right column: info + monthly summary ── */}
+      <div className="space-y-4">
+
+        {/* How days get marked */}
+        <div className="rounded-2xl p-4 flex gap-3" style={{ background: 'var(--surface-2)' }}>
+          <span className="text-xl shrink-0">💡</span>
+          <div className="space-y-1.5">
+            <p className="text-sm font-bold" style={{ color: 'var(--text)' }}>How to mark a day</p>
+            <div className="flex flex-col gap-1">
+              <span className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--text-muted)' }}>
+                <span className="w-2.5 h-2.5 rounded-full shrink-0 inline-block" style={{ background: TASK_COLORS.review.bg }} />
+                Complete an SRS review session
+              </span>
+              <span className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--text-muted)' }}>
+                <span className="w-2.5 h-2.5 rounded-full shrink-0 inline-block" style={{ background: TASK_COLORS.words.bg }} />
+                Reach your {dailyGoal}-word daily goal
+              </span>
+            </div>
+            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Each task fills half the day circle. Complete both to fully mark a day.</p>
           </div>
-          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Each task fills half the day circle. Complete both to fully mark a day.</p>
         </div>
-      </div>
 
-      {/* Monthly breakdown */}
-      <MonthlyBreakdown history={history} />
+        {/* Monthly breakdown */}
+        <MonthlyBreakdown history={history} />
 
-      {/* Bottom sheet */}
+      </div> {/* end right column */}
+
+      {/* Bottom sheet — outside grid */}
       {selectedDay && sheetTasks && (
         <div className="fixed inset-0 z-50 flex items-end justify-center" style={{ background: 'rgba(0,0,0,0.8)' }}
           onClick={() => setSelectedDay(null)}>
