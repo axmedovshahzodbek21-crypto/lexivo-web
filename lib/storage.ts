@@ -276,6 +276,11 @@ export function markIntervalDone(learnedDate: string, interval: number) {
   if (!log[learnedDate]) log[learnedDate] = [];
   if (!log[learnedDate].includes(interval)) log[learnedDate].push(interval);
   set(KEYS.reviewLog, log);
+
+  // Graduated: all 5 intervals complete — remove from SRS store
+  if (SRS_INTERVALS.every(i => log[learnedDate].includes(i))) {
+    set(KEYS.srs, getSRSWords().filter(w => w.learnedAt !== learnedDate));
+  }
 }
 
 // Removes all words for a learning date from SRS and resets their unit progress.
@@ -288,6 +293,7 @@ function unlearnDate(learnedDate: string) {
   const allWords = getSRSWords();
   const affected = allWords.filter(w => w.learnedAt === learnedDate);
 
+  // Reset unit progress so words can be re-learned
   const unitKeys = new Set(affected.map(w => `${w.collectionName}||${w.dayNumber}`));
   for (const key of unitKeys) {
     const sep = key.indexOf('||');
@@ -296,7 +302,12 @@ function unlearnDate(learnedDate: string) {
     set(`${KEYS.unitProgress}_${col}_${day}`, { learnDone: false, flashcardDone: false, quizDone: false });
   }
 
+  // Remove from SRS store
   set(KEYS.srs, allWords.filter(w => w.learnedAt !== learnedDate));
+
+  // Remove from learned words so the user can re-learn them fresh
+  const affectedWords = new Set(affected.map(w => w.word));
+  set(KEYS.learned, getLearnedWords().filter(w => !affectedWords.has(w.word)));
 }
 
 // One-time migration: pre-populate reviewLog from old reviewStage data so
