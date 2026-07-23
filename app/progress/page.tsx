@@ -8,13 +8,14 @@ import {
   getLearnedWords, getSRSWords, getStreak, getXP, getTotalStudyDays,
   getTodayXP, getTodayLearnedCount, getDueWords, getStarredWords, getHardWords,
   getStudyHistory, getStudyDays, getUnitDoneDays, getReviewDays, getWordGoalDays,
-  getSettings, getXPHistory, localDateStr,
+  getSettings, getXPHistory, localDateStr, getReviewLog, getGraduatedCount,
 } from '@/lib/storage';
 import type { XpEntry } from '@/lib/storage';
 import { getLevelInfo, ALL_ACHIEVEMENTS } from '@/lib/gamification';
 import { getUnlockedAchievements } from '@/lib/storage';
 import { stageLabel, stageColor } from '@/lib/srs';
 import type { SRSWord } from '@/lib/types';
+import { SRS_INTERVALS } from '@/lib/types';
 import { useTranslation } from '@/lib/useTranslation';
 
 export default function ProgressPageWrapper() {
@@ -76,10 +77,11 @@ function ProgressPage() {
 
   const t = useTranslation();
   const levelInfo = getLevelInfo(xp);
-  const masteredCount = srsWords.filter(w => w.reviewStage >= 4).length;
-  const stageGroups = [0, 1, 2, 3, 4].map(stage => ({
-    stage,
-    count: srsWords.filter(w => w.reviewStage === stage).length,
+  const masteredCount = getGraduatedCount();
+  const reviewLog = getReviewLog();
+  const completionGroups = [0, 1, 2, 3, 4, 5].map(n => ({
+    completedCount: n,
+    count: srsWords.filter(w => (reviewLog[w.learnedAt] ?? []).length === n).length,
   }));
 
   return (
@@ -178,10 +180,13 @@ function ProgressPage() {
           <div className="space-y-4 animate-fade-in">
             <div className="card">
               <h3 className="font-semibold mb-3">{t.progress.srsDistribution}</h3>
-              {stageGroups.map(({ stage, count }) => (
-                <div key={stage} className="mb-3">
+              {completionGroups.map(({ completedCount, count }) => (
+                <div key={completedCount} className="mb-3">
                   <div className="flex justify-between text-sm mb-1">
-                    <span style={{ color: stageColor(stage) }} className="font-medium">{stageLabel(stage)}</span>
+                    <span style={{ color: stageColor(completedCount) }} className="font-medium">
+                      {stageLabel(completedCount)}
+                      <span className="text-[var(--text-muted)] font-normal ml-1 text-xs">({completedCount}/{SRS_INTERVALS.length})</span>
+                    </span>
                     <span className="text-[var(--text-muted)]">{count} words</span>
                   </div>
                   <div className="progress-bar">
@@ -189,7 +194,7 @@ function ProgressPage() {
                       className="progress-bar-fill"
                       style={{
                         width: srsWords.length ? `${(count / srsWords.length) * 100}%` : '0%',
-                        background: stageColor(stage),
+                        background: stageColor(completedCount),
                       }}
                     />
                   </div>

@@ -36,9 +36,11 @@ export interface SRSWord extends WordItem {
   collectionName: string;
   dayNumber: number;
   topic: string;
-  reviewStage: number; // 0-4
-  nextReviewDate: string; // ISO date string
-  learnedDate: string;
+  learnedAt: string; // "YYYY-MM-DD" — date added to SRS
+}
+
+export interface DueSRSWord extends SRSWord {
+  dueInterval: number; // which interval is being reviewed today (1|3|7|14|30)
 }
 
 export interface LearnedWord {
@@ -118,7 +120,7 @@ export interface ImportedFolder {
 export type QuizType = 'word_to_translation' | 'translation_to_word' | 'definition_to_word';
 export type FlashcardSide = 'word' | 'translation' | 'definition';
 
-export const SRS_INTERVALS = [1, 3, 7, 14]; // days per stage
+export const SRS_INTERVALS = [1, 3, 7, 14, 30]; // fixed review intervals in days
 export const XP_PER_SRS = 5;
 export const XP_PER_LEARN = 2;
 export const XP_PER_QUIZ = 3;

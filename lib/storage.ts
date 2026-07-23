@@ -1,4 +1,4 @@
-import type { SRSWord, LearnedWord, UnitProgress, UserSettings, Achievement, CustomList, WordItem, WordCollection, ImportedWord, ImportedCollection, ImportedFolder } from './types';
+import type { SRSWord, DueSRSWord, LearnedWord, UnitProgress, UserSettings, Achievement, CustomList, WordItem, WordCollection, ImportedWord, ImportedCollection, ImportedFolder } from './types';
 import { SRS_INTERVALS, LEVEL_THRESHOLDS } from './types';
 
 function levelForXp(xp: number): string {
@@ -33,6 +33,7 @@ const KEYS = {
   unitDoneDays: 'lexivo_unit_done_days',
   reviewDays:   'lexivo_review_days',
   wordGoalDays: 'lexivo_word_goal_days',
+  reviewLog:    'lexivo_review_log',
   xpHistory: 'lexivo_xp_history',
   xpUpdatedAt:       'lexivo_xp_updated_at',
   settingsUpdatedAt: 'lexivo_settings_updated_at',
@@ -215,22 +216,35 @@ export function incrementTodayCount() {
 
 // ─── SRS ─────────────────────────────────────────────────────────────────────
 
+export function localDateStr(d = new Date()): string {
+  return d.toLocaleDateString('en-CA'); // yields YYYY-MM-DD in the user's local timezone
+}
+
+export function addDaysToDateStr(dateStr: string, days: number): string {
+  const d = new Date(dateStr + 'T00:00:00');
+  d.setDate(d.getDate() + days);
+  return localDateStr(d);
+}
+
+function daysBetweenDateStrs(fromStr: string, toStr: string): number {
+  const from = new Date(fromStr + 'T00:00:00');
+  const to = new Date(toStr + 'T00:00:00');
+  return Math.round((to.getTime() - from.getTime()) / 86400000);
+}
+
 export function getSRSWords(): SRSWord[] {
-  const words = get<SRSWord[]>(KEYS.srs, []);
-  // One-time migration: backfill id for words synced from Flutter before it was included in the data blob
-  if (words.some(w => !w.id)) {
-    const fixed = words.map(w => ({
-      ...(w.id ? w : { ...w, id: `${w.collectionName}::${w.word}` }),
-      reviewStage: Math.min(Math.max((w.reviewStage ?? 0), 0), 4),
-    }));
-    set(KEYS.srs, fixed);
-    return fixed;
-  }
-  if (words.some(w => (w.reviewStage ?? 0) < 0 || (w.reviewStage ?? 0) > 4)) {
-    const fixed = words.map(w => ({ ...w, reviewStage: Math.min(Math.max((w.reviewStage ?? 0), 0), 4) }));
-    set(KEYS.srs, fixed);
-    return fixed;
-  }
+  const raw = get<any[]>(KEYS.srs, []); // eslint-disable-line @typescript-eslint/no-explicit-any
+  let needsSave = false;
+  const words: SRSWord[] = raw.map(w => {
+    const learnedAt = w.learnedAt ?? w.learnedDate ?? localDateStr();
+    if (!w.learnedAt || !w.id) needsSave = true;
+    return {
+      ...w,
+      id: w.id ?? `${w.collectionName}::${w.word}`,
+      learnedAt,
+    } as SRSWord;
+  });
+  if (needsSave) set(KEYS.srs, words);
   return words;
 }
 
@@ -242,68 +256,121 @@ export function addSRSWord(word: SRSWord) {
   }
 }
 
-export function localDateStr(d = new Date()): string {
-  return d.toLocaleDateString('en-CA'); // yields YYYY-MM-DD in the user's local timezone
-}
-
-export function getDueWords(): SRSWord[] {
-  const today = localDateStr();
-  return getSRSWords().filter(w => {
-    if (w.reviewStage >= 4) return false;
-    const d = new Date(w.nextReviewDate);
-    if (!isFinite(d.getTime())) return false;
-    return w.nextReviewDate <= today;
-  });
-}
-
-export function updateSRSWord(id: string, success: boolean) {
-  const words = getSRSWords();
-  const idx = words.findIndex(w => w.id === id);
-  if (idx === -1) return;
-  const word = words[idx];
-  if (success) {
-    word.reviewStage = Math.min(word.reviewStage + 1, 4);
-  } else {
-    word.reviewStage = Math.max(word.reviewStage - 1, 0);
-  }
-  const daysUntilNext = SRS_INTERVALS[Math.min(word.reviewStage, SRS_INTERVALS.length - 1)] ?? 14;
-  const next = new Date();
-  next.setDate(next.getDate() + daysUntilNext);
-  word.nextReviewDate = localDateStr(next);
-  words[idx] = word;
-  set(KEYS.srs, words);
-}
-
-export function getMasteredCount(): number {
-  return getSRSWords().filter(w => w.reviewStage >= 4).length;
-}
-
-export function hardSRSWord(id: string) {
-  const words = getSRSWords();
-  const idx = words.findIndex(w => w.id === id);
-  if (idx === -1) return;
-  const word = words[idx];
-  word.reviewStage = Math.min(word.reviewStage + 1, 4);
-  const fullInterval = SRS_INTERVALS[Math.min(word.reviewStage, SRS_INTERVALS.length - 1)] ?? 14;
-  const next = new Date();
-  next.setDate(next.getDate() + Math.ceil(fullInterval / 2));
-  word.nextReviewDate = localDateStr(next);
-  words[idx] = word;
-  set(KEYS.srs, words);
-}
-
 export function removeSRSWord(id: string) {
   set(KEYS.srs, getSRSWords().filter(w => w.id !== id));
 }
 
-export function resetSRSWord(id: string) {
-  const words = getSRSWords();
-  const idx = words.findIndex(w => w.id === id);
-  if (idx === -1) return;
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  words[idx] = { ...words[idx], reviewStage: 0, nextReviewDate: localDateStr(tomorrow) };
-  set(KEYS.srs, words);
+// ─── Review log ──────────────────────────────────────────────────────────────
+// reviewLog: { "2026-07-01": [1, 3, 7] } — completed intervals per learning date
+
+export function getReviewLog(): Record<string, number[]> {
+  return get<Record<string, number[]>>(KEYS.reviewLog, {});
+}
+
+export function saveReviewLog(log: Record<string, number[]>) {
+  set(KEYS.reviewLog, log);
+}
+
+export function markIntervalDone(learnedDate: string, interval: number) {
+  const log = getReviewLog();
+  if (!log[learnedDate]) log[learnedDate] = [];
+  if (!log[learnedDate].includes(interval)) log[learnedDate].push(interval);
+  set(KEYS.reviewLog, log);
+}
+
+// Removes all words for a learning date from SRS and resets their unit progress.
+// Called when the 3-day unlearn rule triggers.
+function unlearnDate(learnedDate: string) {
+  const log = getReviewLog();
+  delete log[learnedDate];
+  set(KEYS.reviewLog, log);
+
+  const allWords = getSRSWords();
+  const affected = allWords.filter(w => w.learnedAt === learnedDate);
+
+  const unitKeys = new Set(affected.map(w => `${w.collectionName}||${w.dayNumber}`));
+  for (const key of unitKeys) {
+    const sep = key.indexOf('||');
+    const col = key.slice(0, sep);
+    const day = key.slice(sep + 2);
+    set(`${KEYS.unitProgress}_${col}_${day}`, { learnDone: false, flashcardDone: false, quizDone: false });
+  }
+
+  set(KEYS.srs, allWords.filter(w => w.learnedAt !== learnedDate));
+}
+
+// One-time migration: pre-populate reviewLog from old reviewStage data so
+// existing users don't lose their progress on first run of the new system.
+function migrateReviewLogIfNeeded() {
+  if (Object.keys(getReviewLog()).length > 0) return;
+  const raw = get<any[]>(KEYS.srs, []); // eslint-disable-line @typescript-eslint/no-explicit-any
+  if (raw.length === 0) return;
+
+  const stageToIntervals: number[][] = [[], [1], [1, 3], [1, 3, 7], [1, 3, 7, 14]];
+  const byDate = new Map<string, number>();
+  for (const w of raw) {
+    const date = w.learnedAt ?? w.learnedDate;
+    if (!date) continue;
+    const stage = Math.min(Math.max(w.reviewStage ?? 0, 0), 4);
+    // take the minimum stage per date (most conservative)
+    byDate.set(date, Math.min(byDate.get(date) ?? 99, stage));
+  }
+
+  const log: Record<string, number[]> = {};
+  for (const [date, stage] of byDate) {
+    log[date] = stageToIntervals[stage] ?? [];
+  }
+  set(KEYS.reviewLog, log);
+}
+
+export function getDueWords(): DueSRSWord[] {
+  migrateReviewLogIfNeeded();
+  const today = localDateStr();
+  const srsWords = getSRSWords();
+  const log = getReviewLog();
+
+  // Group by learnedAt date
+  const byDate = new Map<string, SRSWord[]>();
+  for (const w of srsWords) {
+    if (!byDate.has(w.learnedAt)) byDate.set(w.learnedAt, []);
+    byDate.get(w.learnedAt)!.push(w);
+  }
+
+  const result: DueSRSWord[] = [];
+
+  for (const [date, words] of byDate) {
+    const completed = log[date] ?? [];
+    const nextInterval = SRS_INTERVALS.find(i => !completed.includes(i));
+    if (nextInterval === undefined) continue; // all 5 intervals done — graduated
+
+    const dueDate = addDaysToDateStr(date, nextInterval);
+    if (dueDate > today) continue; // not yet due
+
+    // 3-day unlearn rule: today − dueDate ≥ 2 days overdue
+    if (daysBetweenDateStrs(dueDate, today) >= 2) {
+      unlearnDate(date);
+      continue;
+    }
+
+    result.push(...words.map(w => ({ ...w, dueInterval: nextInterval })));
+  }
+
+  return result;
+}
+
+// Count words where all 5 intervals are completed
+export function getGraduatedCount(): number {
+  const log = getReviewLog();
+  const srsWords = getSRSWords();
+  const byDate = new Map<string, number>();
+  for (const w of srsWords) {
+    byDate.set(w.learnedAt, (byDate.get(w.learnedAt) ?? 0) + 1);
+  }
+  let count = 0;
+  for (const [date, wordCount] of byDate) {
+    if ((log[date] ?? []).length >= SRS_INTERVALS.length) count += wordCount;
+  }
+  return count;
 }
 
 // ─── Streak ───────────────────────────────────────────────────────────────────

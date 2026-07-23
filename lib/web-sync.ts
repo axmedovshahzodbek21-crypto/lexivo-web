@@ -12,6 +12,7 @@ import {
   getUnlockedAchievements, getCustomLists,
   getHardWordEntries, type HardWordEntry,
   getImportedWords, saveImportedWords,
+  getReviewLog, saveReviewLog,
   localDateStr,
 } from './storage';
 
@@ -162,6 +163,7 @@ export async function pushAll(uid: string) {
       study_days: getStudyDays(),
       freezes: getFreezes(),
       last_freeze_week: (() => { try { const v = ls(K.lastFreezeWeek); return (v && /^\d{4}-W\d{1,2}$/.test(JSON.parse(v))) ? JSON.parse(v) : null; } catch { return null; } })(),
+      review_log: getReviewLog(),
     });
 
     // learned_words — deduplicate by word
@@ -524,9 +526,19 @@ export async function pullAll(uid: string) {
         const merged = Array.from(new Set([...local, ...s.study_days])).sort();
         saveStudyDays(merged);
       }
+      // reviewLog — union merge: take all completed intervals from both cloud and local
+      if (s.review_log && typeof s.review_log === 'object') {
+        const cloudLog = s.review_log as Record<string, number[]>;
+        const localLog = getReviewLog();
+        const mergedLog: Record<string, number[]> = { ...localLog };
+        for (const [date, intervals] of Object.entries(cloudLog)) {
+          mergedLog[date] = [...new Set([...(mergedLog[date] ?? []), ...(Array.isArray(intervals) ? intervals : [])])];
+        }
+        saveReviewLog(mergedLog);
+      }
     }
 
-    // srs_words — merge: add new words, update existing if cloud has advanced further
+    // srs_words — merge: union of cloud + local words; newer learnedAt wins for same word
     const { data: srsRows } = await supabase.from('srs_words').select('data').eq('user_id', uid);
     const localSRS = getSRSWords();
     const localMap = new Map(localSRS.map(w => [`${w.word}_${w.collectionName}`, w]));
@@ -535,20 +547,14 @@ export async function pullAll(uid: string) {
       if (!w) continue;
       const key = `${w.word}_${w.collectionName}`;
       const existing = localMap.get(key);
-      // Clamp before comparing so corrupt cloud values (e.g. reviewStage: 99) cannot
-      // beat a valid local value in the merge, and never land in localStorage unclamped.
-      const cloudStage = Math.min(Math.max((w.reviewStage ?? 0), 0), 4);
-      const localStage = (existing?.reviewStage ?? 0);
-      const cloudWins = !existing ||
-        cloudStage > localStage ||
-        (cloudStage === localStage && (w.nextReviewDate ?? '') > (existing.nextReviewDate ?? ''));
-      if (cloudWins) localMap.set(key, { ...w, reviewStage: cloudStage });
+      const cloudLearnedAt = w.learnedAt ?? w.learnedDate ?? '';
+      const localLearnedAt = existing?.learnedAt ?? '';
+      if (!existing || cloudLearnedAt > localLearnedAt) {
+        localMap.set(key, { ...w, id: w.id ?? `${w.collectionName}::${w.word}`, learnedAt: cloudLearnedAt || localDateStr() });
+      }
     }
-    // Write if cloud responded (even empty) — backfills id for any word still missing it
     if (srsRows !== null && localMap.size > 0) {
-      set(K.srs, [...localMap.values()].map(
-        w => w.id ? w : { ...w, id: `${w.collectionName}::${w.word}` }
-      ));
+      set(K.srs, [...localMap.values()]);
     }
 
     // learned_words — delta merge: only fetch rows newer than the last pull watermark.

@@ -1,6 +1,5 @@
 import type { WordItem, SRSWord } from './types';
 import { ACCENT } from './colors';
-import { SRS_INTERVALS } from './types';
 import { localDateStr } from './storage';
 
 export function createSRSWord(
@@ -9,40 +8,23 @@ export function createSRSWord(
   dayNumber: number,
   topic: string
 ): SRSWord {
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + SRS_INTERVALS[0]);
-
   return {
     ...word,
     id: `${collectionName}::${word.word}`,
     collectionName,
     dayNumber,
     topic,
-    reviewStage: 0,
-    nextReviewDate: localDateStr(tomorrow),
-    learnedDate: localDateStr(),
+    learnedAt: localDateStr(),
   };
 }
 
-export function stageLabel(stage: number): string {
-  const labels = ['New', 'Learning', 'Familiar', 'Known', 'Mastered'];
-  return labels[Math.min(stage, 4)];
+// completedCount = number of intervals done (0–5); 5 = graduated
+export function stageLabel(completedCount: number): string {
+  const labels = ['New', '+1 done', '+3 done', '+7 done', '+14 done', 'Graduated'];
+  return labels[Math.min(completedCount, 5)];
 }
 
-export function stageColor(stage: number): string {
-  const colors = ['#9CA3AF', ACCENT.quiz, ACCENT.srs, ACCENT.grammar, ACCENT.learn];
-  return colors[Math.min(stage, 4)];
-}
-
-export function daysUntilReview(word: SRSWord): number {
-  try {
-    const today = localDateStr();
-    const next = new Date(word.nextReviewDate);
-    const now = new Date(today);
-    const diff = Math.ceil((next.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-    if (!isFinite(diff)) return 999;
-    return Math.max(diff, 0);
-  } catch {
-    return 999;
-  }
+export function stageColor(completedCount: number): string {
+  const colors = ['#9CA3AF', ACCENT.quiz, ACCENT.srs, ACCENT.grammar, ACCENT.learn, '#10B981'];
+  return colors[Math.min(completedCount, 5)];
 }

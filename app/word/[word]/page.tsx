@@ -8,8 +8,9 @@ import { speak } from '@/lib/speech';
 import {
   toggleStarred, isStarred, addHardWord, removeHardWord, getHardWords,
   getLearnedWords, getSRSWords, getCustomLists, addWordToList, removeWordFromList, isWordInList,
-  saveCustomList,
+  saveCustomList, getReviewLog, addDaysToDateStr,
 } from '@/lib/storage';
+import { SRS_INTERVALS } from '@/lib/types';
 import { stageLabel, stageColor } from '@/lib/srs';
 import type { WordCollection, CustomList } from '@/lib/types';
 
@@ -54,7 +55,7 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
   const [starred, setStarred] = useState(false);
   const [isHard, setIsHard] = useState(false);
   const [learnedAt, setLearnedAt] = useState<string | null>(null);
-  const [srsInfo, setSrsInfo] = useState<{ stage: number; nextReview: string } | null>(null);
+  const [srsInfo, setSrsInfo] = useState<{ completedCount: number; nextReview: string } | null>(null);
   const [customLists, setCustomLists] = useState<CustomList[]>([]);
   const [listPanelOpen, setListPanelOpen] = useState(false);
 
@@ -68,7 +69,12 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
       const learned = getLearnedWords().find(l => l.word === found.word);
       setLearnedAt(learned?.learnedAt ?? null);
       const srs = getSRSWords().find(s => s.word === found.word);
-      if (srs) setSrsInfo({ stage: srs.reviewStage, nextReview: srs.nextReviewDate });
+      if (srs) {
+        const completed = getReviewLog()[srs.learnedAt] ?? [];
+        const nextInterval = SRS_INTERVALS.find(i => !completed.includes(i));
+        const nextReview = nextInterval ? addDaysToDateStr(srs.learnedAt, nextInterval) : 'Graduated';
+        setSrsInfo({ completedCount: completed.length, nextReview });
+      }
     }
   }, [collectionsLoaded, collections, wordText]);
 
@@ -239,8 +245,8 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
                 <div className="text-2xl mb-1">🔄</div>
                 <div
                   className="text-xs font-semibold"
-                  style={{ color: stageColor(srsInfo.stage) }}
-                >{stageLabel(srsInfo.stage)}</div>
+                  style={{ color: stageColor(srsInfo.completedCount) }}
+                >{stageLabel(srsInfo.completedCount)}</div>
                 <div className="text-xs text-[var(--text-muted)] mt-0.5">
                   Review: {srsInfo.nextReview}
                 </div>

@@ -3,12 +3,15 @@ import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { speak, speakText } from '@/lib/speech';
-import { getDueWords, updateSRSWord, hardSRSWord, addXP, recordStudySession, recordReviewDay, unlockAchievement, getSRSWords, getLearnedWords, removeSRSWord, resetSRSWord } from '@/lib/storage';
+import {
+  getDueWords, markIntervalDone, addXP, recordStudySession, recordReviewDay,
+  unlockAchievement, getSRSWords, getLearnedWords, removeSRSWord, getReviewLog,
+} from '@/lib/storage';
 import { stageLabel, stageColor } from '@/lib/srs';
 import { checkAchievements } from '@/lib/gamification';
 import { pushAllCurrentUser } from '@/lib/web-sync';
-import { XP_PER_SRS } from '@/lib/types';
-import type { SRSWord } from '@/lib/types';
+import { XP_PER_SRS, SRS_INTERVALS } from '@/lib/types';
+import type { DueSRSWord, SRSWord } from '@/lib/types';
 import Link from 'next/link';
 import { useTranslation } from '@/lib/useTranslation';
 
@@ -24,7 +27,7 @@ export default function SRSReviewPage() {
   const t = useTranslation();
   const { pushAchievement, setPendingLevelUp } = useAppStore();
   const collections = useAppStore(s => s.collections);
-  const [queue, setQueue] = useState<SRSWord[]>([]);
+  const [queue, setQueue] = useState<DueSRSWord[]>([]);
   const [index, setIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [results, setResults] = useState<{ id: string; grade: 'knew' | 'hard' | 'forgot' }[]>([]);
@@ -48,7 +51,6 @@ export default function SRSReviewPage() {
 
   useEffect(() => { loadWords(); }, [loadWords]);
 
-  // Re-load when sync completes (pullAll fires 'lexivo-sync' on window)
   useEffect(() => {
     const handler = () => {
       const due = getDueWords();
@@ -76,7 +78,7 @@ export default function SRSReviewPage() {
     return `/learn?collection=${encodeURIComponent(current.collectionName)}&day=${current.dayNumber}&startIndex=${wi >= 0 ? wi : 0}`;
   }, [current, collections]);
 
-  const buildChoices = useCallback((idx: number, q: SRSWord[]): string[] | null => {
+  const buildChoices = useCallback((idx: number, q: DueSRSWord[]): string[] | null => {
     if (!q[idx]) return null;
     const correct = q[idx].translation;
     const pool = new Set<string>();
@@ -100,32 +102,32 @@ export default function SRSReviewPage() {
     if (current && autoPlay) { current.language ? speakText(current.word, current.language) : speak(current.word); }
   }, [current, autoPlay, buildChoices]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // At session end: mark each learnedAt date's interval as done, award XP
   const applyGrades = useCallback((finalResults: { id: string; grade: 'knew' | 'hard' | 'forgot' }[]) => {
     if (gradesApplied.current) return;
     gradesApplied.current = true;
-    finalResults.forEach(r => {
-      if (r.grade === 'knew') {
-        updateSRSWord(r.id, true);
-        const { leveledUp, newLevel, newXp } = addXP(XP_PER_SRS, 'SRS Review');
-        if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
-        unlockAchievement('srs_first');
-      } else if (r.grade === 'hard') {
-        hardSRSWord(r.id);
-        const { leveledUp, newLevel, newXp } = addXP(Math.ceil(XP_PER_SRS / 2), 'SRS Review Hard');
-        if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
-        unlockAchievement('srs_first');
-      } else {
-        updateSRSWord(r.id, false);
-      }
-    });
-    if (finalResults.length > 0) {
-      recordStudySession();
-      recordReviewDay();
-      const newAchievements = checkAchievements();
-      newAchievements.forEach(pushAchievement);
-      pushAllCurrentUser();
+    if (finalResults.length === 0) return;
+
+    // Mark intervals done — one call per unique learnedAt date
+    const dateIntervals = new Map<string, number>();
+    for (const word of queue) {
+      dateIntervals.set(word.learnedAt, word.dueInterval);
     }
-  }, [pushAchievement, setPendingLevelUp]);
+    for (const [date, interval] of dateIntervals) {
+      markIntervalDone(date, interval);
+    }
+
+    const reviewedCount = finalResults.filter(r => r.grade !== 'forgot').length;
+    const { leveledUp, newLevel, newXp } = addXP(reviewedCount * XP_PER_SRS, 'SRS Review');
+    if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
+
+    unlockAchievement('srs_first');
+    recordStudySession();
+    recordReviewDay();
+    const newAchievements = checkAchievements();
+    newAchievements.forEach(pushAchievement);
+    pushAllCurrentUser();
+  }, [queue, pushAchievement, setPendingLevelUp]);
 
   const grade = useCallback((g: 'knew' | 'hard' | 'forgot') => {
     if (!current || grading.current) return;
@@ -163,7 +165,6 @@ export default function SRSReviewPage() {
     }
   }, [tappedChoice, current, grade]);
 
-  // Keyboard shortcuts
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement) return;
@@ -188,15 +189,11 @@ export default function SRSReviewPage() {
     setQueue(prev => prev.filter(w => w.id !== id));
   };
 
-  const handleReset = (id: string) => {
-    resetSRSWord(id);
-    setAllWords(getSRSWords());
-  };
-
   // ── Manage deck view ────────────────────────────────────────────────────────
   if (managing) {
-    const mastered  = allWords.filter(w => w.reviewStage >= 4);
-    const learning  = allWords.filter(w => w.reviewStage < 4);
+    const log = getReviewLog();
+    const graduated = allWords.filter(w => (log[w.learnedAt] ?? []).length >= SRS_INTERVALS.length);
+    const learning  = allWords.filter(w => (log[w.learnedAt] ?? []).length < SRS_INTERVALS.length);
 
     return (
       <div className="flex flex-col min-h-screen">
@@ -217,23 +214,23 @@ export default function SRSReviewPage() {
             {learning.length > 0 && (
               <section>
                 <h2 className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-2">
-                  Learning · {learning.length}
+                  In Progress · {learning.length}
                 </h2>
                 <div className="space-y-2">
                   {learning.map(w => (
-                    <WordManageRow key={w.id} word={w} onRemove={handleRemove} onReset={handleReset} />
+                    <WordManageRow key={w.id} word={w} completedCount={(log[w.learnedAt] ?? []).length} onRemove={handleRemove} />
                   ))}
                 </div>
               </section>
             )}
-            {mastered.length > 0 && (
+            {graduated.length > 0 && (
               <section>
                 <h2 className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-2">
-                  Mastered · {mastered.length}
+                  Graduated · {graduated.length}
                 </h2>
                 <div className="space-y-2">
-                  {mastered.map(w => (
-                    <WordManageRow key={w.id} word={w} onRemove={handleRemove} onReset={handleReset} />
+                  {graduated.map(w => (
+                    <WordManageRow key={w.id} word={w} completedCount={SRS_INTERVALS.length} onRemove={handleRemove} />
                   ))}
                 </div>
               </section>
@@ -263,15 +260,15 @@ export default function SRSReviewPage() {
 
   // ── Session done ──────────────────────────────────────────────────────────
   if (done) {
-    const knewCount = results.filter(r => r.grade === 'knew').length;
-    const hardCount = results.filter(r => r.grade === 'hard').length;
+    const knewCount   = results.filter(r => r.grade === 'knew').length;
+    const hardCount   = results.filter(r => r.grade === 'hard').length;
     const forgotCount = results.filter(r => r.grade === 'forgot').length;
     const score = Math.round(((knewCount + hardCount) / results.length) * 100);
     return (
       <div className="p-6 text-center flex flex-col items-center justify-center min-h-screen animate-fade-in">
         <div className="text-6xl mb-4">{score >= 80 ? '🧠' : '💪'}</div>
         <h2 className="text-2xl font-bold mb-2">{t.srs.reviewComplete}</h2>
-        <p className="text-[var(--text-muted)] mb-6">{knewCount}/{results.length} knew · +{knewCount * XP_PER_SRS + hardCount * Math.ceil(XP_PER_SRS / 2)} XP</p>
+        <p className="text-[var(--text-muted)] mb-6">{knewCount}/{results.length} knew · +{(knewCount + hardCount) * XP_PER_SRS} XP</p>
         <div className="grid grid-cols-4 gap-2 w-full mb-6">
           <div className="card text-center"><div className="text-xl font-bold text-[var(--success)]">{knewCount}</div><div className="text-xs text-[var(--text-muted)]">{t.srs.correct}</div></div>
           <div className="card text-center"><div className="text-xl font-bold text-amber-500">{hardCount}</div><div className="text-xs text-[var(--text-muted)]">Hard</div></div>
@@ -307,7 +304,6 @@ export default function SRSReviewPage() {
             onClick={() => setAutoPlay(p => !p)}
             className="btn-icon text-base"
             aria-label={autoPlay ? 'Auto-play on' : 'Auto-play off'}
-            title={autoPlay ? 'Auto-play on' : 'Auto-play off'}
           >
             {autoPlay ? '🔊' : '🔇'}
           </button>
@@ -329,22 +325,18 @@ export default function SRSReviewPage() {
       </div>
 
       <div className="flex-1 p-4 flex flex-col gap-4">
-        {/* Stage badge + back button */}
+        {/* Back button + interval badge */}
         <div className="flex items-center justify-between">
           <button
             onClick={goBack}
             disabled={index === 0}
             className="btn-icon text-sm disabled:opacity-30"
             aria-label="Previous word"
-            title="Previous word (B / Backspace)"
           >
             ←
           </button>
-          <div
-            className="badge text-xs"
-            style={{ background: `${stageColor(current.reviewStage)}20`, color: stageColor(current.reviewStage) }}
-          >
-            {stageLabel(current.reviewStage)}
+          <div className="badge text-xs" style={{ background: '#4338ca20', color: '#4338ca' }}>
+            Day +{current.dueInterval} review
           </div>
         </div>
 
@@ -355,7 +347,7 @@ export default function SRSReviewPage() {
             <button
               onClick={() => current.language ? speakText(current.word, current.language) : speak(current.word)}
               className="w-8 h-8 rounded-full bg-[var(--primary-bg)] flex items-center justify-center hover:bg-[var(--primary)] hover:text-white transition-colors"
-              aria-label="Listen to pronunciation"
+              aria-label="Listen"
             >🔊</button>
           </div>
 
@@ -397,7 +389,7 @@ export default function SRSReviewPage() {
           ) : null}
         </div>
 
-        {/* Quiz mode: Kahoot-style 2×2 colored tiles */}
+        {/* Quiz mode: Kahoot-style tiles */}
         {choices !== null ? (
           <div className="animate-slide-up space-y-3">
             <div className="grid grid-cols-2 gap-3">
@@ -443,7 +435,6 @@ export default function SRSReviewPage() {
             )}
           </div>
         ) : (
-          /* Flip mode: Forgot / Hard / Knew */
           revealed && (
             <div className="flex gap-2 animate-slide-up">
               <button onClick={() => grade('forgot')} className="flex-1 py-4 rounded-xl border-2 border-[var(--danger)] text-[var(--danger)] font-bold text-sm hover:bg-red-50 transition-colors flex flex-col items-center gap-1">
@@ -459,10 +450,10 @@ export default function SRSReviewPage() {
           )
         )}
 
-        {/* SRS progress info */}
+        {/* Info bar */}
         <div className="card p-3 flex justify-between text-xs text-[var(--text-muted)]">
           <span>{t.srs.collection} {current.collectionName}</span>
-          <span>Next review: after {current.reviewStage < 4 ? `${[1,3,7,14][current.reviewStage]} days` : 'mastered!'}</span>
+          <span>Interval: +{current.dueInterval}d</span>
         </div>
       </div>
     </div>
@@ -470,16 +461,15 @@ export default function SRSReviewPage() {
 }
 
 // ── Word row in manage view ───────────────────────────────────────────────────
-
 function WordManageRow({
-  word, onRemove, onReset,
+  word, completedCount, onRemove,
 }: {
   word: SRSWord;
+  completedCount: number;
   onRemove: (id: string) => void;
-  onReset: (id: string) => void;
 }) {
-  const [confirming, setConfirming] = useState<'remove' | 'reset' | null>(null);
-  const mastered = word.reviewStage >= 4;
+  const [confirming, setConfirming] = useState(false);
+  const graduated = completedCount >= SRS_INTERVALS.length;
 
   return (
     <div className="card flex items-center gap-3 py-3">
@@ -489,52 +479,31 @@ function WordManageRow({
       </div>
       <span
         className="badge text-xs shrink-0"
-        style={{ background: `${stageColor(word.reviewStage)}20`, color: stageColor(word.reviewStage) }}
+        style={{ background: `${stageColor(completedCount)}20`, color: stageColor(completedCount) }}
       >
-        {mastered ? 'Mastered' : stageLabel(word.reviewStage)}
+        {graduated ? 'Graduated' : `${completedCount}/${SRS_INTERVALS.length} done`}
       </span>
 
-      {confirming === 'reset' ? (
+      {confirming ? (
         <div className="flex gap-1 shrink-0">
           <button
-            onClick={() => { onReset(word.id); setConfirming(null); }}
-            className="text-xs px-2 py-1 rounded-lg bg-amber-100 text-amber-700 font-semibold"
-          >
-            Reset
-          </button>
-          <button onClick={() => setConfirming(null)} className="text-xs px-2 py-1 rounded-lg bg-[var(--surface-2)] text-[var(--text-muted)]">
-            Cancel
-          </button>
-        </div>
-      ) : confirming === 'remove' ? (
-        <div className="flex gap-1 shrink-0">
-          <button
-            onClick={() => { onRemove(word.id); setConfirming(null); }}
+            onClick={() => { onRemove(word.id); setConfirming(false); }}
             className="text-xs px-2 py-1 rounded-lg bg-red-100 text-red-700 font-semibold"
           >
             Remove
           </button>
-          <button onClick={() => setConfirming(null)} className="text-xs px-2 py-1 rounded-lg bg-[var(--surface-2)] text-[var(--text-muted)]">
+          <button onClick={() => setConfirming(false)} className="text-xs px-2 py-1 rounded-lg bg-[var(--surface-2)] text-[var(--text-muted)]">
             Cancel
           </button>
         </div>
       ) : (
-        <div className="flex gap-1 shrink-0">
-          <button
-            onClick={() => setConfirming('reset')}
-            className="text-xs px-2 py-1 rounded-lg bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-amber-600"
-            aria-label="Reset to stage 0"
-          >
-            ↺
-          </button>
-          <button
-            onClick={() => setConfirming('remove')}
-            className="text-xs px-2 py-1 rounded-lg bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-red-500"
-            aria-label="Remove from deck"
-          >
-            ✕
-          </button>
-        </div>
+        <button
+          onClick={() => setConfirming(true)}
+          className="text-xs px-2 py-1 rounded-lg bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-red-500 shrink-0"
+          aria-label="Remove from deck"
+        >
+          ✕
+        </button>
       )}
     </div>
   );

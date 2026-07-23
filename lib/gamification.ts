@@ -1,6 +1,6 @@
 import type { Achievement } from './types';
 import { LEVEL_THRESHOLDS } from './types';
-import { getXP, getLearnedWords, getStreak, getTotalStudyDays, getUnlockedAchievements, unlockAchievement, getSRSWords } from './storage';
+import { getXP, getLearnedWords, getStreak, getTotalStudyDays, getUnlockedAchievements, unlockAchievement, getGraduatedCount } from './storage';
 
 export function getLevelInfo(xp: number) {
   const threshold = LEVEL_THRESHOLDS.find(t => xp >= t.min && xp <= t.max) ?? LEVEL_THRESHOLDS[0];
@@ -47,7 +47,7 @@ export function checkAchievements(): Achievement[] {
   const learnedCount = getLearnedWords().length;
   const streak = getStreak();
   const totalDays = getTotalStudyDays();
-  const masteredCount = getSRSWords().filter(w => w.reviewStage >= 4).length;
+  const masteredCount = getGraduatedCount();
 
   const checks: Array<[string, boolean]> = [
     ['first_word', learnedCount >= 1],
