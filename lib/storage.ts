@@ -272,27 +272,27 @@ export function saveReviewLog(log: Record<string, number[]>) {
   set(KEYS.reviewLog, log);
 }
 
-export function markIntervalDone(learnedDate: string, interval: number) {
+export function markIntervalDone(wordId: string, interval: number) {
   const log = getReviewLog();
-  if (!log[learnedDate]) log[learnedDate] = [];
-  if (!log[learnedDate].includes(interval)) log[learnedDate].push(interval);
+  if (!log[wordId]) log[wordId] = [];
+  if (!log[wordId].includes(interval)) log[wordId].push(interval);
   set(KEYS.reviewLog, log);
 
-  // Graduated: all 5 intervals complete — remove from SRS store
-  if (SRS_INTERVALS.every(i => log[learnedDate].includes(i))) {
-    set(KEYS.srs, getSRSWords().filter(w => w.learnedAt !== learnedDate));
+  // Graduated: all 5 intervals complete — remove this specific word from SRS store
+  if (SRS_INTERVALS.every(i => log[wordId].includes(i))) {
+    set(KEYS.srs, getSRSWords().filter(w => w.id !== wordId));
   }
 }
 
 // Removes all words for a learning date from SRS and resets their unit progress.
 // Called when the 3-day unlearn rule triggers.
 function unlearnDate(learnedDate: string) {
-  const log = getReviewLog();
-  delete log[learnedDate];
-  set(KEYS.reviewLog, log);
-
   const allWords = getSRSWords();
   const affected = allWords.filter(w => w.learnedAt === learnedDate);
+  const log = getReviewLog();
+  for (const w of affected) delete log[w.id];
+  delete log[learnedDate]; // clean up any old date-keyed entries too
+  set(KEYS.reviewLog, log);
 
   // Reset unit progress so words can be re-learned
   const unitKeys = new Set(affected.map(w => `${w.collectionName}||${w.dayNumber}`));
@@ -335,19 +335,44 @@ function migrateReviewLogIfNeeded() {
   set(KEYS.reviewLog, log);
 }
 
+// One-time migration: converts date-keyed log entries to per-word keys.
+// Old: { "2026-07-01": [1, 3] }  →  New: { "Collection::word": [1, 3] }
+function migrateReviewLogToPerWord() {
+  const log = getReviewLog();
+  if (Object.keys(log).length === 0) return;
+  const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+  if (!Object.keys(log).some(k => datePattern.test(k))) return; // already migrated
+
+  const words = getSRSWords();
+  const newLog: Record<string, number[]> = {};
+
+  for (const [k, v] of Object.entries(log)) {
+    if (!datePattern.test(k)) newLog[k] = v; // keep already-migrated entries
+  }
+  for (const w of words) {
+    if (newLog[w.id]) continue;
+    const intervals = log[w.learnedAt];
+    if (intervals && intervals.length > 0) newLog[w.id] = [...intervals];
+  }
+
+  set(KEYS.reviewLog, newLog);
+}
+
 // Checks all SRS batches and unlearns any that are 2+ days overdue.
 // Called automatically by getDueWords() but also exported for explicit use.
 export function checkAndUnlearn(today: string = localDateStr()): void {
   const srsWords = getSRSWords();
   const log = getReviewLog();
 
-  const byDate = new Map<string, true>();
-  for (const w of srsWords) byDate.set(w.learnedAt, true);
+  const byDate = new Map<string, SRSWord[]>();
+  for (const w of srsWords) {
+    if (!byDate.has(w.learnedAt)) byDate.set(w.learnedAt, []);
+    byDate.get(w.learnedAt)!.push(w);
+  }
 
-  for (const date of byDate.keys()) {
-    const completed = log[date] ?? [];
-    const nextInterval = SRS_INTERVALS.find(i => !completed.includes(i));
-    if (nextInterval === undefined) continue; // graduated
+  for (const [date, words] of byDate) {
+    const nextInterval = SRS_INTERVALS.find(i => words.some(w => !(log[w.id] ?? []).includes(i)));
+    if (nextInterval === undefined) continue; // all graduated
 
     const dueDate = addDaysToDateStr(date, nextInterval);
     if (daysBetweenDateStrs(dueDate, today) >= 2) unlearnDate(date);
@@ -356,29 +381,23 @@ export function checkAndUnlearn(today: string = localDateStr()): void {
 
 export function getDueWords(): DueSRSWord[] {
   migrateReviewLogIfNeeded();
+  migrateReviewLogToPerWord();
   const today = localDateStr();
   checkAndUnlearn(today);
   const srsWords = getSRSWords();
   const log = getReviewLog();
 
-  // Group by learnedAt date
-  const byDate = new Map<string, SRSWord[]>();
-  for (const w of srsWords) {
-    if (!byDate.has(w.learnedAt)) byDate.set(w.learnedAt, []);
-    byDate.get(w.learnedAt)!.push(w);
-  }
-
   const result: DueSRSWord[] = [];
 
-  for (const [date, words] of byDate) {
-    const completed = log[date] ?? [];
+  for (const w of srsWords) {
+    const completed = log[w.id] ?? [];
     const nextInterval = SRS_INTERVALS.find(i => !completed.includes(i));
     if (nextInterval === undefined) continue; // graduated
 
-    const dueDate = addDaysToDateStr(date, nextInterval);
+    const dueDate = addDaysToDateStr(w.learnedAt, nextInterval);
     if (dueDate > today) continue; // not yet due
 
-    result.push(...words.map(w => ({ ...w, dueInterval: nextInterval })));
+    result.push({ ...w, dueInterval: nextInterval });
   }
 
   return result;

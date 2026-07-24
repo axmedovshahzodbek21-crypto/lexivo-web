@@ -112,7 +112,7 @@ export default function SRSReviewPage() {
     // Only mark interval done for words the user knew — matches Flutter failSRSWord no-op
     for (let i = 0; i < finalResults.length; i++) {
       if (finalResults[i].grade === 'knew') {
-        markIntervalDone(queue[i].learnedAt, queue[i].dueInterval);
+        markIntervalDone(queue[i].id, queue[i].dueInterval);
       }
     }
 
@@ -193,8 +193,8 @@ export default function SRSReviewPage() {
   // ── Manage deck view ────────────────────────────────────────────────────────
   if (managing) {
     const log = getReviewLog();
-    const graduated = allWords.filter(w => (log[w.learnedAt] ?? []).length >= SRS_INTERVALS.length);
-    const learning  = allWords.filter(w => (log[w.learnedAt] ?? []).length < SRS_INTERVALS.length);
+    const graduated = allWords.filter(w => (log[w.id] ?? []).length >= SRS_INTERVALS.length);
+    const learning  = allWords.filter(w => (log[w.id] ?? []).length < SRS_INTERVALS.length);
 
     return (
       <div className="flex flex-col min-h-screen">
@@ -219,7 +219,7 @@ export default function SRSReviewPage() {
                 </h2>
                 <div className="space-y-2">
                   {learning.map(w => (
-                    <WordManageRow key={w.id} word={w} completedCount={(log[w.learnedAt] ?? []).length} onRemove={handleRemove} />
+                    <WordManageRow key={w.id} word={w} completedCount={(log[w.id] ?? []).length} onRemove={handleRemove} />
                   ))}
                 </div>
               </section>
@@ -231,7 +231,7 @@ export default function SRSReviewPage() {
                 </h2>
                 <div className="space-y-2">
                   {graduated.map(w => (
-                    <WordManageRow key={w.id} word={w} completedCount={SRS_INTERVALS.length} onRemove={handleRemove} />
+                    <WordManageRow key={w.id} word={w} completedCount={(log[w.id] ?? []).length} onRemove={handleRemove} />
                   ))}
                 </div>
               </section>
