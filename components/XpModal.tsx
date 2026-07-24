@@ -1,7 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { getLevelInfo } from '@/lib/gamification';
-import { LEVEL_THRESHOLDS, XP_PER_LEARN, XP_PER_QUIZ } from '@/lib/types';
+import { LEVEL_THRESHOLDS } from '@/lib/types';
+import { displayXP } from '@/lib/storage';
 
 interface Props {
   xp: number;
@@ -44,7 +45,7 @@ export default function XpModal({ xp, onClose }: Props) {
             </div>
             <div className="text-right">
               <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Total XP</p>
-              <p className="text-3xl font-black" style={{ color: 'var(--primary)' }}>{xp}</p>
+              <p className="text-3xl font-black" style={{ color: 'var(--primary)' }}>{displayXP(xp)}</p>
             </div>
           </div>
 
@@ -61,9 +62,9 @@ export default function XpModal({ xp, onClose }: Props) {
                   />
                 </div>
                 <div className="flex justify-between mt-1 text-[11px]" style={{ color: 'var(--text-muted)' }}>
-                  <span>{cur.min} XP</span>
+                  <span>{displayXP(cur.min)} XP</span>
                   <span className="font-semibold" style={{ color: 'var(--primary)' }}>{Math.round(levelInfo.progress)}% there</span>
-                  <span>{nxt.min} XP</span>
+                  <span>{displayXP(nxt.min)} XP</span>
                 </div>
               </div>
             );
@@ -74,7 +75,7 @@ export default function XpModal({ xp, onClose }: Props) {
             <div className="rounded-2xl p-4 space-y-3" style={{ background: 'var(--primary-bg)' }}>
               <div className="text-center">
                 <p className="text-4xl font-black" style={{ color: 'var(--primary)' }}>
-                  {levelInfo.xpToNext} XP
+                  {displayXP(levelInfo.xpToNext)} XP
                 </p>
                 <p className="text-sm mt-0.5" style={{ color: 'var(--text-muted)' }}>
                   to reach <strong style={{ color: 'var(--text)' }}>{levelInfo.next}</strong>
@@ -82,19 +83,19 @@ export default function XpModal({ xp, onClose }: Props) {
               </div>
               <div className="grid grid-cols-2 gap-2 text-center border-t pt-3" style={{ borderColor: 'var(--border)' }}>
                 <div className="rounded-xl py-2 px-3" style={{ background: 'var(--surface-2)' }}>
-                  <p className="text-lg font-black" style={{ color: 'var(--text)' }}>{Math.ceil(levelInfo.xpToNext / XP_PER_LEARN)}</p>
+                  <p className="text-lg font-black" style={{ color: 'var(--text)' }}>{Math.ceil(levelInfo.xpToNext / 10)}</p>
                   <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>words to learn</p>
                 </div>
                 <div className="rounded-xl py-2 px-3" style={{ background: 'var(--surface-2)' }}>
-                  <p className="text-lg font-black" style={{ color: 'var(--text)' }}>{Math.ceil(levelInfo.xpToNext / XP_PER_QUIZ)}</p>
-                  <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>quiz answers</p>
+                  <p className="text-lg font-black" style={{ color: 'var(--text)' }}>{Math.ceil(levelInfo.xpToNext / 7)}</p>
+                  <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>Day 7 reviews</p>
                 </div>
               </div>
             </div>
           ) : (
             <div className="rounded-2xl p-4 text-center" style={{ background: 'var(--primary-bg)' }}>
               <p className="text-3xl mb-1">🏆</p>
-              <p className="font-bold" style={{ color: 'var(--primary)' }}>Master Level reached!</p>
+              <p className="font-bold" style={{ color: 'var(--primary)' }}>Legend Level reached!</p>
               <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>You&apos;ve conquered all levels.</p>
             </div>
           )}
@@ -157,7 +158,7 @@ export default function XpModal({ xp, onClose }: Props) {
                         <span className="text-[11px] font-semibold" style={{
                           color: isCurrentLevel ? 'var(--primary)' : isPast ? 'var(--success)' : 'var(--text-muted)'
                         }}>
-                          {t.min} XP
+                          {displayXP(t.min)} XP
                         </span>
                         {isFuture && (
                           <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{isPeeked ? '▲' : '▼'}</span>
@@ -173,16 +174,16 @@ export default function XpModal({ xp, onClose }: Props) {
                           To reach <span style={{ color: 'var(--primary)' }}>{t.level}</span>
                         </p>
                         <p className="text-2xl font-black" style={{ color: 'var(--primary)' }}>
-                          {xpNeeded} more XP
+                          {displayXP(xpNeeded)} more XP
                         </p>
                         <div className="grid grid-cols-2 gap-2">
                           <div className="rounded-lg px-3 py-2 text-center" style={{ background: 'var(--surface)' }}>
-                            <p className="text-base font-black" style={{ color: 'var(--text)' }}>{Math.ceil(xpNeeded / XP_PER_LEARN)}</p>
+                            <p className="text-base font-black" style={{ color: 'var(--text)' }}>{Math.ceil(xpNeeded / 10)}</p>
                             <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>words to learn</p>
                           </div>
                           <div className="rounded-lg px-3 py-2 text-center" style={{ background: 'var(--surface)' }}>
-                            <p className="text-base font-black" style={{ color: 'var(--text)' }}>{Math.ceil(xpNeeded / XP_PER_QUIZ)}</p>
-                            <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>quiz answers</p>
+                            <p className="text-base font-black" style={{ color: 'var(--text)' }}>{Math.ceil(xpNeeded / 7)}</p>
+                            <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>Day 7 reviews</p>
                           </div>
                         </div>
                       </div>
