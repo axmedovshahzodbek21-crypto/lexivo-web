@@ -6,7 +6,7 @@ import { useTranslation } from '@/lib/useTranslation';
 import { useAppStore } from '@/lib/store';
 import { useShallow } from 'zustand/react/shallow';
 import { getWordOfDay } from '@/lib/data';
-import { getStreak, getXP, getTodayXP, getTodayLearnedCount, getDueWords, getLearnedWords, getSettings, isOnboarded, getFreezes, checkAndGrantWeeklyFreeze, getImportedWords, getLastStudyDate, localDateStr } from '@/lib/storage';
+import { getStreak, getXP, getTodayXP, getTodayLearnedCount, getDueWords, getLearnedWords, getSettings, isOnboarded, getFreezes, checkAndGrantWeeklyFreeze, getImportedWords, getLastStudyDate, localDateStr, displayXP } from '@/lib/storage';
 import { getLevelInfo } from '@/lib/gamification';
 import { speak } from '@/lib/speech';
 import { getTheme, toggleTheme, type Theme } from '@/lib/theme';
@@ -245,7 +245,7 @@ export default function HomePage() {
                 </div>
               </Link>
               <button onClick={() => setShowXpModal(true)} style={{ gridColumn: 3, gridRow: 1 }} className="text-left w-full">
-                <StatCard icon="⚡" value={xp} label={t.home.totalXp}
+                <StatCard icon="⚡" value={displayXP(xp)} label={t.home.totalXp}
                   gradient="linear-gradient(135deg, #d97706, #fbbf24)" edge="#92400e" glowColor="rgba(217,119,6,0.4)" />
               </button>
               <Link href="/reading" style={{ gridColumn: 1, gridRow: 2 }} className="block">
@@ -264,7 +264,7 @@ export default function HomePage() {
                   gradient="linear-gradient(135deg, #FF6B35, #ff9f7f)" edge="#b84a1a" glowColor="rgba(255,107,53,0.4)" />
               </Link>
               <button onClick={() => setShowXpModal(true)} className="text-left w-full">
-                <StatCard icon="⚡" value={xp} label={t.home.totalXp}
+                <StatCard icon="⚡" value={displayXP(xp)} label={t.home.totalXp}
                   gradient="linear-gradient(135deg, #d97706, #fbbf24)" edge="#92400e" glowColor="rgba(217,119,6,0.4)" />
               </button>
               <Link href="/progress">
@@ -309,7 +309,7 @@ export default function HomePage() {
                       <div className="h-full rounded-full bg-white transition-all duration-500" style={{ width: `${Math.min(dailyProgress, 100)}%` }} />
                     </div>
                     <p className="text-xs text-white/75">
-                      {dailyProgress >= 100 ? `${t.home.goalReached} · ${todayXp} XP today` : `${todayXp} XP today · ${Math.max(0, settings.dailyGoal - todayCount)} to go`}
+                      {dailyProgress >= 100 ? `${t.home.goalReached} · ${displayXP(todayXp)} XP today` : `${displayXP(todayXp)} XP today · ${Math.max(0, settings.dailyGoal - todayCount)} to go`}
                     </p>
                   </div>
                 </div>
@@ -332,13 +332,13 @@ export default function HomePage() {
                 <div>
                   <div className="text-3xl mb-1">⭐</div>
                   <div className="text-xl font-black text-white leading-tight">{levelInfo.level}</div>
-                  <div className="text-xs text-white/75 mt-0.5">{xp} XP</div>
+                  <div className="text-xs text-white/75 mt-0.5">{displayXP(xp)} XP</div>
                 </div>
                 <div className="mt-4">
                   <div className="h-2.5 rounded-full bg-white/25 overflow-hidden">
                     <div className="h-full rounded-full bg-white transition-all duration-500" style={{ width: `${levelInfo.progress}%` }} />
                   </div>
-                  {levelInfo.next && <p className="text-[11px] text-white/75 mt-1.5">{levelInfo.xpToNext} XP → {levelInfo.next}</p>}
+                  {levelInfo.next && <p className="text-[11px] text-white/75 mt-1.5">{displayXP(levelInfo.xpToNext)} XP → {levelInfo.next}</p>}
                 </div>
               </button>
             )}

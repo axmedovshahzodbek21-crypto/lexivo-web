@@ -7,7 +7,7 @@ import {
   getSettings, getStreak, getXP, getTodayXP, getTodayLearnedCount,
   getLearnedWords, getSRSWords, getDueWords, getUnlockedAchievements,
   getUnitProgress, getProfilePic, saveProfilePic, removeProfilePic,
-  getProfilePicUrl, saveProfilePicUrl, removeProfilePicUrl,
+  getProfilePicUrl, saveProfilePicUrl, removeProfilePicUrl, displayXP,
 } from '@/lib/storage';
 import { getLevelInfo, ALL_ACHIEVEMENTS } from '@/lib/gamification';
 import type { UserSettings } from '@/lib/types';
@@ -283,7 +283,7 @@ export default function ProfilePage() {
             </div>
             <div className="w-px h-6 bg-[var(--border)]" />
             <div className="text-center">
-              <div className="text-xl font-black text-[var(--text)]">+{todayXp}</div>
+              <div className="text-xl font-black text-[var(--text)]">+{displayXP(todayXp)}</div>
               <div className="text-[11px] text-[var(--text-muted)]">{t.profile.xpToday}</div>
             </div>
             <div className="w-px h-6 bg-[var(--border)]" />
@@ -304,7 +304,7 @@ export default function ProfilePage() {
               </div>
               <div className="text-right">
                 <p className="text-xs text-[var(--text-muted)]">{t.profile.totalXp}</p>
-                <p className="text-2xl font-black" style={{ color: 'var(--primary)' }}>{xp}</p>
+                <p className="text-2xl font-black" style={{ color: 'var(--primary)' }}>{displayXP(xp)}</p>
               </div>
             </div>
             <div className="h-3 bg-[var(--border)] rounded-full overflow-hidden">
@@ -319,7 +319,7 @@ export default function ProfilePage() {
             <div className="flex justify-between mt-1.5 text-xs text-[var(--text-muted)]">
               <span>{levelInfo.level}</span>
               {levelInfo.next
-                ? <span><strong style={{ color: levelColor }}>{levelInfo.xpToNext} XP</strong> to {levelInfo.next} · tap for details</span>
+                ? <span><strong style={{ color: levelColor }}>{displayXP(levelInfo.xpToNext)} XP</strong> to {levelInfo.next} · tap for details</span>
                 : <span className="text-[var(--success)] font-semibold">{t.profile.maxLevel}</span>
               }
             </div>

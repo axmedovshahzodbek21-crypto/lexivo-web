@@ -8,7 +8,7 @@ import {
   getLearnedWords, getSRSWords, getStreak, getXP, getTotalStudyDays,
   getTodayXP, getTodayLearnedCount, getDueWords, getStarredWords, getHardWords,
   getStudyHistory, getStudyDays, getReviewDays, getWordGoalDays,
-  getSettings, getXPHistory, localDateStr, getReviewLog, getGraduatedCount,
+  getSettings, getXPHistory, localDateStr, getReviewLog, getGraduatedCount, displayXP,
 } from '@/lib/storage';
 import type { XpEntry } from '@/lib/storage';
 import { getLevelInfo, ALL_ACHIEVEMENTS } from '@/lib/gamification';
@@ -112,7 +112,7 @@ function ProgressPage() {
             >
               <div className="flex justify-between items-center">
                 <span className="font-black text-white text-xl">⭐ {levelInfo.level}</span>
-                <span className="text-white/60 text-sm font-semibold">{xp} XP</span>
+                <span className="text-white/60 text-sm font-semibold">{displayXP(xp)} XP</span>
               </div>
               <div>
                 <div className="h-2.5 rounded-full bg-white/25 overflow-hidden">
@@ -317,7 +317,7 @@ function XpHistorySection({ entries }: { entries: XpEntry[] }) {
               <div key={i}>
                 <div className="flex justify-between text-xs text-[var(--text-muted)] font-semibold mb-2">
                   <span>{group.label}</span>
-                  <span className="text-[var(--primary)]">+{group.total} XP</span>
+                  <span className="text-[var(--primary)]">+{displayXP(group.total)} XP</span>
                 </div>
                 <div className="space-y-1">
                   {group.items.map((entry, j) => {
@@ -329,7 +329,7 @@ function XpHistorySection({ entries }: { entries: XpEntry[] }) {
                           <p className="text-sm font-medium">{entry.reason}</p>
                           <p className="text-xs text-[var(--text-muted)]">{time}</p>
                         </div>
-                        <span className="text-sm font-bold text-[var(--primary)] whitespace-nowrap">+{entry.amount} XP</span>
+                        <span className="text-sm font-bold text-[var(--primary)] whitespace-nowrap">+{displayXP(entry.amount)} XP</span>
                       </div>
                     );
                   })}
