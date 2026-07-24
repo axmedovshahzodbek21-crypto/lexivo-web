@@ -7,7 +7,7 @@ import {
   getDueWords, markIntervalDone, addXP, recordStudySession, recordReviewDay,
   unlockAchievement, getSRSWords, getLearnedWords, removeSRSWord, getReviewLog,
 } from '@/lib/storage';
-import { stageLabel, stageColor } from '@/lib/srs';
+import { stageColor } from '@/lib/srs';
 import { checkAchievements } from '@/lib/gamification';
 import { pushAllCurrentUser } from '@/lib/web-sync';
 import { XP_PER_SRS, SRS_INTERVALS } from '@/lib/types';
@@ -30,7 +30,7 @@ export default function SRSReviewPage() {
   const [queue, setQueue] = useState<DueSRSWord[]>([]);
   const [index, setIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
-  const [results, setResults] = useState<{ id: string; grade: 'knew' | 'hard' | 'forgot' }[]>([]);
+  const [results, setResults] = useState<{ id: string; grade: 'knew' | 'notYet' }[]>([]);
   const [done, setDone] = useState(false);
   const [managing, setManaging] = useState(false);
   const [allWords, setAllWords] = useState<SRSWord[]>([]);
@@ -103,22 +103,20 @@ export default function SRSReviewPage() {
   }, [current, autoPlay, buildChoices]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // At session end: mark each learnedAt date's interval as done, award XP
-  const applyGrades = useCallback((finalResults: { id: string; grade: 'knew' | 'hard' | 'forgot' }[]) => {
+  const applyGrades = useCallback((finalResults: { id: string; grade: 'knew' | 'notYet' }[]) => {
     if (gradesApplied.current) return;
     gradesApplied.current = true;
     if (finalResults.length === 0) return;
 
-    // Mark intervals done — one call per unique learnedAt date
-    const dateIntervals = new Map<string, number>();
-    for (const word of queue) {
-      dateIntervals.set(word.learnedAt, word.dueInterval);
-    }
-    for (const [date, interval] of dateIntervals) {
-      markIntervalDone(date, interval);
+    // Only mark interval done for words the user knew — matches Flutter failSRSWord no-op
+    for (let i = 0; i < finalResults.length; i++) {
+      if (finalResults[i].grade === 'knew') {
+        markIntervalDone(queue[i].learnedAt, queue[i].dueInterval);
+      }
     }
 
-    const reviewedCount = finalResults.filter(r => r.grade !== 'forgot').length;
-    const { leveledUp, newLevel, newXp } = addXP(reviewedCount * XP_PER_SRS, 'SRS Review');
+    const knewCount = finalResults.filter(r => r.grade === 'knew').length;
+    const { leveledUp, newLevel, newXp } = addXP(knewCount * XP_PER_SRS, 'SRS Review');
     if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
 
     unlockAchievement('srs_first');
@@ -129,7 +127,7 @@ export default function SRSReviewPage() {
     pushAllCurrentUser();
   }, [queue, pushAchievement, setPendingLevelUp]);
 
-  const grade = useCallback((g: 'knew' | 'hard' | 'forgot') => {
+  const grade = useCallback((g: 'knew' | 'notYet') => {
     if (!current || grading.current) return;
     if (autoAdvanceTimer.current) clearTimeout(autoAdvanceTimer.current);
     grading.current = true;
@@ -173,8 +171,7 @@ export default function SRSReviewPage() {
       switch (e.key) {
         case ' ': case 'Enter': e.preventDefault(); if (!revealed) setRevealed(true); break;
         case 'ArrowRight': case 'k': case 'K': if (revealed) grade('knew'); break;
-        case 'h': case 'H': if (revealed) grade('hard'); break;
-        case 'ArrowLeft': case 'j': case 'J': if (revealed) grade('forgot'); break;
+        case 'ArrowLeft': case 'j': case 'J': if (revealed) grade('notYet'); break;
         case 's': case 'S': current.language ? speakText(current.word, current.language) : speak(current.word); break;
         case 'Backspace': case 'b': case 'B': e.preventDefault(); goBack(); break;
       }
@@ -261,18 +258,16 @@ export default function SRSReviewPage() {
   // ── Session done ──────────────────────────────────────────────────────────
   if (done) {
     const knewCount   = results.filter(r => r.grade === 'knew').length;
-    const hardCount   = results.filter(r => r.grade === 'hard').length;
-    const forgotCount = results.filter(r => r.grade === 'forgot').length;
-    const score = Math.round(((knewCount + hardCount) / results.length) * 100);
+    const notYetCount = results.filter(r => r.grade === 'notYet').length;
+    const score = Math.round((knewCount / results.length) * 100);
     return (
       <div className="p-6 text-center flex flex-col items-center justify-center min-h-screen animate-fade-in">
         <div className="text-6xl mb-4">{score >= 80 ? '🧠' : '💪'}</div>
         <h2 className="text-2xl font-bold mb-2">{t.srs.reviewComplete}</h2>
-        <p className="text-[var(--text-muted)] mb-6">{knewCount}/{results.length} knew · +{(knewCount + hardCount) * XP_PER_SRS} XP</p>
-        <div className="grid grid-cols-4 gap-2 w-full mb-6">
+        <p className="text-[var(--text-muted)] mb-6">{knewCount}/{results.length} knew · +{knewCount * XP_PER_SRS} XP</p>
+        <div className="grid grid-cols-3 gap-2 w-full mb-6">
           <div className="card text-center"><div className="text-xl font-bold text-[var(--success)]">{knewCount}</div><div className="text-xs text-[var(--text-muted)]">{t.srs.correct}</div></div>
-          <div className="card text-center"><div className="text-xl font-bold text-amber-500">{hardCount}</div><div className="text-xs text-[var(--text-muted)]">Hard</div></div>
-          <div className="card text-center"><div className="text-xl font-bold text-[var(--danger)]">{forgotCount}</div><div className="text-xs text-[var(--text-muted)]">{t.srs.incorrect}</div></div>
+          <div className="card text-center"><div className="text-xl font-bold text-[var(--danger)]">{notYetCount}</div><div className="text-xs text-[var(--text-muted)]">{t.srs.incorrect}</div></div>
           <div className="card text-center"><div className="text-xl font-bold text-[var(--primary)]">{score}%</div><div className="text-xs text-[var(--text-muted)]">{t.srs.score}</div></div>
         </div>
         <div className="flex gap-3 w-full mb-3">
@@ -425,11 +420,8 @@ export default function SRSReviewPage() {
             </div>
             {tappedChoice && tappedChoice !== current.translation && (
               <div className="flex gap-2">
-                <button onClick={() => grade('forgot')} className="flex-1 py-3 rounded-xl border-2 border-[var(--danger)] text-[var(--danger)] font-bold text-sm hover:bg-red-50 transition-colors">
-                  {t.srs.forgot}
-                </button>
-                <button onClick={() => grade('hard')} className="flex-1 py-3 rounded-xl border-2 border-amber-500 text-amber-600 font-bold text-sm hover:bg-amber-50 transition-colors">
-                  Hard
+                <button onClick={() => grade('notYet')} className="flex-1 py-3 rounded-xl border-2 border-[var(--danger)] text-[var(--danger)] font-bold text-sm hover:bg-red-50 transition-colors">
+                  {t.srs.notYet}
                 </button>
               </div>
             )}
@@ -437,11 +429,8 @@ export default function SRSReviewPage() {
         ) : (
           revealed && (
             <div className="flex gap-2 animate-slide-up">
-              <button onClick={() => grade('forgot')} className="flex-1 py-4 rounded-xl border-2 border-[var(--danger)] text-[var(--danger)] font-bold text-sm hover:bg-red-50 transition-colors flex flex-col items-center gap-1">
-                <span>✗</span><span className="text-xs font-normal">{t.srs.forgot}</span>
-              </button>
-              <button onClick={() => grade('hard')} className="flex-1 py-4 rounded-xl border-2 border-amber-500 text-amber-600 font-bold text-sm hover:bg-amber-50 transition-colors flex flex-col items-center gap-1">
-                <span>~</span><span className="text-xs font-normal">Hard</span>
+              <button onClick={() => grade('notYet')} className="flex-1 py-4 rounded-xl border-2 border-[var(--danger)] text-[var(--danger)] font-bold text-sm hover:bg-red-50 transition-colors flex flex-col items-center gap-1">
+                <span>✗</span><span className="text-xs font-normal">{t.srs.notYet}</span>
               </button>
               <button onClick={() => grade('knew')} className="flex-1 py-4 rounded-xl border-2 border-[var(--success)] text-[var(--success)] font-bold text-sm hover:bg-green-50 transition-colors flex flex-col items-center gap-1">
                 <span>✓</span><span className="text-xs font-normal">{t.srs.knewIt}</span>

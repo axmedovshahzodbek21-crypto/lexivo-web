@@ -17,8 +17,8 @@ const PAGE_SHORTCUTS: Record<string, { label: string; rows: { keys: string[]; ac
     label: 'SRS Review',
     rows: [
       { keys: ['Space', 'Enter'], action: 'Reveal answer' },
-      { keys: ['→', 'K'], action: 'Knew it' },
-      { keys: ['←', 'J'], action: 'Forgot' },
+      { keys: ['→', 'K'], action: 'Know it' },
+      { keys: ['←', 'J'], action: 'Not yet' },
       { keys: ['S'], action: 'Speak word' },
     ],
   },
@@ -27,7 +27,7 @@ const PAGE_SHORTCUTS: Record<string, { label: string; rows: { keys: string[]; ac
     rows: [
       { keys: ['Space', 'Enter'], action: 'Flip card' },
       { keys: ['→', 'K'], action: 'Know it' },
-      { keys: ['←', 'J'], action: 'Again' },
+      { keys: ['←', 'J'], action: 'Not yet' },
       { keys: ['S'], action: 'Speak word' },
       { keys: ['F'], action: 'Toggle focus mode' },
     ],
