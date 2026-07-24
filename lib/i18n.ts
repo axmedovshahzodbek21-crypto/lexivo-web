@@ -116,8 +116,8 @@ const en = {
   flashcards: {
     title: 'Flashcards',
     tapToReveal: 'Tap to reveal · Space',
-    again: '✗ Not yet ←',
-    knowIt: '✓ Know it →',
+    again: 'Hard😑',
+    knowIt: 'Easy😮‍💨',
     done: 'Flashcards Done!',
     known: 'Known',
     review: 'Review',
@@ -551,8 +551,8 @@ const uz: typeof en = {
   flashcards: {
     title: 'Kartochkalar',
     tapToReveal: "Ko'rish uchun bosing · Space",
-    again: '✗ Hali emas ←',
-    knowIt: '✓ Bilaman →',
+    again: 'Qiyin😑',
+    knowIt: 'Oson😮‍💨',
     done: 'Kartochkalar tugadi!',
     known: "Ma'lum",
     review: 'Takror',

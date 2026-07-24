@@ -26,8 +26,8 @@ const PAGE_SHORTCUTS: Record<string, { label: string; rows: { keys: string[]; ac
     label: 'Flashcards',
     rows: [
       { keys: ['Space', 'Enter'], action: 'Flip card' },
-      { keys: ['→', 'K'], action: 'Know it' },
-      { keys: ['←', 'J'], action: 'Not yet' },
+      { keys: ['→', 'K'], action: 'Easy' },
+      { keys: ['←', 'J'], action: 'Hard' },
       { keys: ['S'], action: 'Speak word' },
       { keys: ['F'], action: 'Toggle focus mode' },
     ],
