@@ -33,7 +33,7 @@ export default function SyncStatusBadge() {
     };
   }, []);
 
-  if (state === 'idle') return null;
+  if (state === 'idle' || state === 'syncing') return null;
 
   const config = {
     syncing:   { icon: '↻', label: 'Syncing…',              bg: 'var(--border)',                                       color: 'var(--text-muted)', spin: true  },
