@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { useShallow } from 'zustand/react/shallow';
 import { speak, speakText } from '@/lib/speech';
-import { addXP, recordStudySession, markFlashcardComplete, getStarredWords, getHardWords, getCustomListWords, getUnitProgress, saveFlashcardProgress, getFlashcardProgress, clearFlashcardProgress, getImportedWords, getImportedWordsByCollection, getClassHWTemp } from '@/lib/storage';
+import { recordStudySession, markFlashcardComplete, getStarredWords, getHardWords, getCustomListWords, getUnitProgress, saveFlashcardProgress, getFlashcardProgress, clearFlashcardProgress, getImportedWords, getImportedWordsByCollection, getClassHWTemp } from '@/lib/storage';
 import { checkAchievements } from '@/lib/gamification';
 import { pushUnitProgressCurrentUser, pushAllCurrentUser } from '@/lib/web-sync';
 import type { WordItem, WordCollection } from '@/lib/types';
@@ -197,8 +197,6 @@ export default function FlashcardsPage() {
     if (wasKnown) setKnown(k => k + 1);
     else { setUnknown(u => u + 1); if (card) setUnknownWords(prev => [...prev, card]); }
     if (!sourceClassHW) {
-      const { leveledUp, newLevel, newXp } = addXP(wasKnown ? 3 : 1, 'Flashcard');
-      if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
       cardsSinceLastPush.current++;
       if (cardsSinceLastPush.current >= 5) { cardsSinceLastPush.current = 0; pushAllCurrentUser(); }
     }

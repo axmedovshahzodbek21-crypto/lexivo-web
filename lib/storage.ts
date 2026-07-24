@@ -1,5 +1,5 @@
 import type { SRSWord, DueSRSWord, LearnedWord, UnitProgress, UserSettings, Achievement, CustomList, WordItem, WordCollection, ImportedWord, ImportedCollection, ImportedFolder } from './types';
-import { SRS_INTERVALS, LEVEL_THRESHOLDS } from './types';
+import { SRS_INTERVALS, LEVEL_THRESHOLDS, LEARN_XP_TIERS, STREAK_BONUS_7, STREAK_BONUS_30 } from './types';
 
 function levelForXp(xp: number): string {
   return (LEVEL_THRESHOLDS.find(t => xp >= t.min && xp <= t.max) ?? LEVEL_THRESHOLDS[0]).level;
@@ -36,6 +36,7 @@ const KEYS = {
   reviewLog:    'lexivo_review_log',
   xpHistory: 'lexivo_xp_history',
   xpUpdatedAt:       'lexivo_xp_updated_at',
+  streakBonusDate:   'lexivo_streak_bonus_date',
   settingsUpdatedAt: 'lexivo_settings_updated_at',
   hardWords:         'lexivo_hard_words',
 };
@@ -495,6 +496,16 @@ export function recordStudySession(): { freezeUsed: boolean } {
   set(KEYS.lastStudy, today);
   set(KEYS.totalDays, get<number>(KEYS.totalDays, 0) + 1);
 
+  // Award streak bonus once per day
+  const bonusDate = get<string>(KEYS.streakBonusDate, '');
+  if (bonusDate !== today) {
+    const bonus = streak >= 30 ? STREAK_BONUS_30 : streak >= 7 ? STREAK_BONUS_7 : 0;
+    if (bonus > 0) {
+      addXP(bonus, 'Streak Bonus');
+      set(KEYS.streakBonusDate, today);
+    }
+  }
+
   return { freezeUsed };
 }
 
@@ -553,6 +564,17 @@ export interface XpEntry {
   amount: number;
   reason: string;
   timestamp: number;
+}
+
+// Stored ×10 integers; displayed value = raw ÷ 10
+export function displayXP(raw: number): string {
+  return (raw / 10).toFixed(1);
+}
+
+// Returns the XP to store (×10) based on how many words the user has ever learned
+export function getLearnXPAmount(): number {
+  const total = getLearnedWords().length;
+  return (LEARN_XP_TIERS.find(t => total < t.maxWords) ?? LEARN_XP_TIERS[LEARN_XP_TIERS.length - 1]).xp;
 }
 
 export function addXP(amount: number, reason = 'Study'): { leveledUp: boolean; newLevel: string; newXp: number } {

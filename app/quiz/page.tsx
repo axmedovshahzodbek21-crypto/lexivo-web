@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { speak, speakText } from '@/lib/speech';
-import { addXP, recordStudySession, markQuizComplete, unlockAchievement, getStarredWords, getCustomListWords, getSettings, getUnitProgress, getImportedWords, getImportedWordsByCollection, getClassHWTemp } from '@/lib/storage';
+import { recordStudySession, markQuizComplete, unlockAchievement, getStarredWords, getCustomListWords, getSettings, getUnitProgress, getImportedWords, getImportedWordsByCollection, getClassHWTemp } from '@/lib/storage';
 import { fireConfetti } from '@/lib/confetti';
 import { checkAchievements } from '@/lib/gamification';
 import { pushUnitProgressCurrentUser, pushAllCurrentUser } from '@/lib/web-sync';
@@ -257,28 +257,6 @@ export default function QuizPage() {
       const newAchievements = checkAchievements();
       newAchievements.forEach(pushAchievement);
 
-      // Award XP server-side — prevents arbitrary addXP() calls from DevTools
-      if (!sourceClassHW) {
-        const finalCorrect = correct + (selected === current?.correct ? 1 : 0);
-        const totalCount = questions.length;
-        (async () => {
-          try {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (!session?.access_token) return;
-            const res = await fetch('/api/quiz/complete', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
-              body: JSON.stringify({ correctCount: finalCorrect, totalCount }),
-            });
-            if (!res.ok) return;
-            const { xpAwarded } = await res.json() as { xpAwarded: number };
-            if (typeof xpAwarded !== 'number') return;
-            const { leveledUp, newLevel, newXp } = addXP(xpAwarded, 'Quiz');
-            if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
-            pushAllCurrentUser();
-          } catch { /* silent fail — XP syncs on next cycle */ }
-        })();
-      }
 
       setDone(true);
     } else {

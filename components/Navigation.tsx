@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { getSettings, getStreak, getXP, getProfilePic, getProfilePicUrl } from '@/lib/storage';
+import { getSettings, getStreak, getXP, getProfilePic, getProfilePicUrl, displayXP } from '@/lib/storage';
 import { getLevelInfo } from '@/lib/gamification';
 import { useAuth } from '@/lib/auth-context';
 import { useTranslation } from '@/lib/useTranslation';
@@ -196,7 +196,7 @@ export default function Navigation() {
               <div className="w-px h-3 bg-[var(--border)]" />
               <div className="flex items-center gap-1">
                 <span className="text-sm">⚡</span>
-                <span className="text-xs font-bold text-[var(--text)]">{xp}</span>
+                <span className="text-xs font-bold text-[var(--text)]">{displayXP(xp)}</span>
                 <span className="text-[10px] text-[var(--text-muted)]">XP</span>
               </div>
             </div>
@@ -218,7 +218,7 @@ export default function Navigation() {
                 </span>
                 {levelInfo.next && (
                   <span className="text-[10px] text-[var(--text-muted)]">
-                    {levelInfo.xpToNext} XP → {levelInfo.next}
+                    {displayXP(levelInfo.xpToNext)} XP → {levelInfo.next}
                   </span>
                 )}
               </div>

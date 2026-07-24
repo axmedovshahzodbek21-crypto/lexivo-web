@@ -4,13 +4,13 @@ import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { speak, speakText } from '@/lib/speech';
 import {
-  getDueWords, markIntervalDone, addXP, recordStudySession, recordReviewDay,
+  getDueWords, markIntervalDone, addXP, displayXP, recordStudySession, recordReviewDay,
   unlockAchievement, getSRSWords, getLearnedWords, removeSRSWord, getReviewLog,
 } from '@/lib/storage';
 import { stageColor } from '@/lib/srs';
 import { checkAchievements } from '@/lib/gamification';
 import { pushAllCurrentUser } from '@/lib/web-sync';
-import { XP_PER_SRS, SRS_INTERVALS } from '@/lib/types';
+import { REVIEW_XP, SRS_INTERVALS } from '@/lib/types';
 import type { DueSRSWord, SRSWord } from '@/lib/types';
 import Link from 'next/link';
 import { useTranslation } from '@/lib/useTranslation';
@@ -32,6 +32,7 @@ export default function SRSReviewPage() {
   const [revealed, setRevealed] = useState(false);
   const [results, setResults] = useState<{ id: string; grade: 'knew' | 'notYet' }[]>([]);
   const [done, setDone] = useState(false);
+  const [sessionXP, setSessionXP] = useState(0);
   const [managing, setManaging] = useState(false);
   const [allWords, setAllWords] = useState<SRSWord[]>([]);
   const [autoPlay, setAutoPlay] = useState(true);
@@ -116,8 +117,11 @@ export default function SRSReviewPage() {
     }
 
     const knewCount = finalResults.filter(r => r.grade === 'knew').length;
-    const { leveledUp, newLevel, newXp } = addXP(knewCount * XP_PER_SRS, 'SRS Review');
+    const xpTotal = finalResults.reduce((sum, r, i) =>
+      r.grade === 'knew' ? sum + (REVIEW_XP[queue[i].dueInterval] ?? 2) : sum, 0);
+    const { leveledUp, newLevel, newXp } = addXP(xpTotal, 'SRS Review');
     if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
+    setSessionXP(xpTotal);
 
     unlockAchievement('srs_first');
     recordStudySession();
@@ -264,7 +268,7 @@ export default function SRSReviewPage() {
       <div className="p-6 text-center flex flex-col items-center justify-center min-h-screen animate-fade-in">
         <div className="text-6xl mb-4">{score >= 80 ? '🧠' : '💪'}</div>
         <h2 className="text-2xl font-bold mb-2">{t.srs.reviewComplete}</h2>
-        <p className="text-[var(--text-muted)] mb-6">{knewCount}/{results.length} knew · +{knewCount * XP_PER_SRS} XP</p>
+        <p className="text-[var(--text-muted)] mb-6">{knewCount}/{results.length} knew · +{displayXP(sessionXP)} XP</p>
         <div className="grid grid-cols-3 gap-2 w-full mb-6">
           <div className="card text-center"><div className="text-xl font-bold text-[var(--success)]">{knewCount}</div><div className="text-xs text-[var(--text-muted)]">{t.srs.correct}</div></div>
           <div className="card text-center"><div className="text-xl font-bold text-[var(--danger)]">{notYetCount}</div><div className="text-xs text-[var(--text-muted)]">{t.srs.incorrect}</div></div>

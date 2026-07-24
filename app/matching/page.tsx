@@ -5,7 +5,7 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
-import { addXP, getHardWords, getStarredWords, getCustomListWords, getImportedWords, getImportedWordsByCollection } from '@/lib/storage';
+import { getHardWords, getStarredWords, getCustomListWords, getImportedWords, getImportedWordsByCollection } from '@/lib/storage';
 import { checkAchievements } from '@/lib/gamification';
 import type { WordItem, WordCollection } from '@/lib/types';
 
@@ -61,9 +61,6 @@ function formatTime(s: number) {
   return `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}`;
 }
 
-function roundXpFor(pairCount: number, mistakes: number) {
-  return pairCount * 2 + (mistakes === 0 ? 3 : 0);
-}
 
 function MatchingInner() {
   const searchParams = useSearchParams();
@@ -95,7 +92,6 @@ function MatchingInner() {
   const [phase,       setPhase]       = useState<Phase>('playing');
 
   // Session totals
-  const [totalXp,       setTotalXp]       = useState(0);
   const [totalMistakes, setTotalMistakes] = useState(0);
   const [totalTime,     setTotalTime]     = useState(0);
 
@@ -198,10 +194,7 @@ function MatchingInner() {
       if (next.size === roundWords.length) {
         // Round complete
         setTimerActive(false);
-        const xp = roundXpFor(roundWords.length, mistakes);
-        addXP(xp, 'Matching');
         checkAchievements();
-        setTotalXp(prev => prev + xp);
         setTotalMistakes(prev => prev + mistakes);
         setTotalTime(prev => prev + elapsed);
         const isLast = roundIndex + 1 >= Math.ceil(words.length / BATCH_SIZE);
@@ -251,7 +244,6 @@ function MatchingInner() {
             <div className="text-5xl">
               {totalMistakes === 0 ? '🏆' : totalMistakes <= 3 ? '🌟' : '💪'}
             </div>
-            <p className="text-2xl font-bold text-[var(--text)]">{totalXp} XP earned</p>
             <div className="grid grid-cols-3 gap-3">
               <div className="rounded-xl bg-[var(--primary-bg)] p-3">
                 <div className="text-xl font-bold text-[var(--primary)]">{words.length}</div>
@@ -276,7 +268,6 @@ function MatchingInner() {
                 const reshuffled = shuffle([...words]);
                 setWords(reshuffled);
                 setRoundIndex(0);
-                setTotalXp(0);
                 setTotalMistakes(0);
                 setTotalTime(0);
                 initRound(0, reshuffled);
@@ -296,7 +287,6 @@ function MatchingInner() {
 
   // ── Round done ──
   if (phase === 'round_done') {
-    const xp = roundXpFor(roundWords.length, mistakes);
     return (
       <div className="flex flex-col min-h-screen animate-fade-in">
         <div className="p-4 border-b border-[var(--border)]">
@@ -309,7 +299,6 @@ function MatchingInner() {
             <p className="text-[var(--text-muted)] text-sm">
               {formatTime(elapsed)} · {mistakes} mistake{mistakes !== 1 ? 's' : ''}
             </p>
-            <p className="text-xl font-bold text-[var(--primary)]">+{xp} XP</p>
           </div>
           <button
             onClick={() => {

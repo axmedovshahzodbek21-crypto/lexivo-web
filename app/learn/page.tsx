@@ -10,7 +10,7 @@ import {
   markLearningComplete, toggleStarred, isStarred, addHardWord,
   getHardWords, removeHardWord, getSettings, getStreak, getTodayLearnedCount,
   saveLearnProgress, clearLearnProgress, getLearnProgress,
-  saveLearnMarks, getLearnMarks, getStarredWords,
+  saveLearnMarks, getLearnMarks, getStarredWords, getLearnXPAmount,
 } from '@/lib/storage';
 import { pushUnitProgressCurrentUser, pushAllCurrentUser } from '@/lib/web-sync';
 import { createSRSWord } from '@/lib/srs';
@@ -18,7 +18,6 @@ import { addSRSWord as storeSRSWord } from '@/lib/storage';
 import type { Accent } from '@/lib/speech';
 import { checkAchievements } from '@/lib/gamification';
 import type { WordItem, WordCollection } from '@/lib/types';
-import { XP_PER_LEARN } from '@/lib/types';
 import { getImportedWords, getImportedWordsByCollection } from '@/lib/storage';
 import Link from 'next/link';
 import UnitPicker from '@/components/UnitPicker';
@@ -108,6 +107,7 @@ function LearnInner() {
   const [maxReached, setMaxReached] = useState(0);
   const [done, setDone] = useState(false);
   const [sessionCount, setSessionCount] = useState(0);
+  const [sessionXP, setSessionXP] = useState(0);
   const [starred, setStarredState] = useState(false);
   const [defaultAccent, setDefaultAccent] = useState<Accent>('us');
   const [autoPlayOnReveal, setAutoPlayOnReveal] = useState(true);
@@ -245,8 +245,10 @@ function LearnInner() {
     const srsWord = createSRSWord(current, current.collectionName, current.dayNumber, current.topic);
     storeSRSWord(srsWord);
     if (isNew) incrementTodayCount();
-    const { leveledUp, newLevel, newXp } = addXP(XP_PER_LEARN, 'Learn');
+    const learnXP = getLearnXPAmount();
+    const { leveledUp, newLevel, newXp } = addXP(learnXP, 'Learn');
     if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
+    setSessionXP(prev => prev + learnXP);
     recordStudySession();
     setSessionCount(c => c + 1);
     setMarks(m => { const n = [...m]; n[index] = 'learned'; return n; });
@@ -343,7 +345,7 @@ function LearnInner() {
         backUrl={backUrl}
         collectionName={collectionName}
         dayNumber={dayNumber}
-        xpEarned={sessionCount * XP_PER_LEARN}
+        xpEarned={sessionXP}
         streak={getStreak()}
         todayCount={getTodayLearnedCount()}
         onRestart={() => { setIndex(0); setMaxReached(0); setDone(false); setSessionCount(0); setSkipped([]); setPureSkipped([]); setMarks(new Array(words.length).fill(null)); }}
