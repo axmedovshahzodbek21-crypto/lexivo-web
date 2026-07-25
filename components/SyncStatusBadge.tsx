@@ -56,10 +56,10 @@ export default function SyncStatusBadge({ sidebar = false }: { sidebar?: boolean
           <button
             onClick={() => triggerSync()}
             title="Sync now"
-            className="cursor-pointer flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all hover:opacity-80 active:scale-95"
+            className="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold transition-all hover:opacity-80 active:scale-95 border"
             style={state !== 'idle'
-              ? { background: cfg.bg, color: cfg.color }
-              : { background: 'var(--surface-2)', color: 'var(--text-muted)' }}
+              ? { background: cfg.bg, color: cfg.color, borderColor: cfg.color }
+              : { background: 'var(--primary-bg)', color: 'var(--primary)', borderColor: 'var(--primary)' }}
           >
             <span className={state === 'syncing' ? 'animate-spin inline-block' : ''}>{cfg.icon}</span>
             {state !== 'idle' ? cfg.label : 'Sync'}
