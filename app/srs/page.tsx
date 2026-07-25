@@ -43,6 +43,7 @@ export default function SRSReviewPage() {
   const autoAdvanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const indexRef = useRef(0);
   const resultsLenRef = useRef(0);
+  const queueBuiltRef = useRef(false);
 
   const loadWords = useCallback(() => {
     const allDue = getDueWords();
@@ -70,6 +71,7 @@ export default function SRSReviewPage() {
     const shuffled = [...allDue].sort(() => Math.random() - 0.5);
     setQueue(shuffled);
     if (shuffled.length === 0) setDone(true);
+    queueBuiltRef.current = true;
   }, []);
 
   useEffect(() => { loadWords(); }, [loadWords]);
@@ -90,14 +92,14 @@ export default function SRSReviewPage() {
   useEffect(() => {
     const handler = () => {
       setAllWords(getSRSWords());
-      // Only rebuild the queue if the session hasn't started (no grading, still on first word).
-      // Rebuilding mid-session resets the word and disrupts the user.
-      if (indexRef.current === 0 && resultsLenRef.current === 0) {
+      // Never rebuild the queue once it's been built — rebuilding reshuffles and changes the word.
+      if (!queueBuiltRef.current) {
         const due = getDueWords();
         const shuffled = [...due].sort(() => Math.random() - 0.5);
         if (shuffled.length > 0) {
           setQueue(shuffled);
           setDone(false);
+          queueBuiltRef.current = true;
         }
       }
     };
