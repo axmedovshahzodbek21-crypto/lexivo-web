@@ -63,6 +63,7 @@ export default function SRSReviewPage() {
           setQueue(restored);
           setIndex(savedIndex ?? 0);
           setResults(savedResults ?? []);
+          queueBuiltRef.current = true;
           return;
         }
       }
