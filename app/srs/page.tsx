@@ -41,6 +41,8 @@ export default function SRSReviewPage() {
   const grading = useRef(false);
   const gradesApplied = useRef(false);
   const autoAdvanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const indexRef = useRef(0);
+  const resultsLenRef = useRef(0);
 
   const loadWords = useCallback(() => {
     const due = getDueWords();
@@ -52,16 +54,21 @@ export default function SRSReviewPage() {
 
   useEffect(() => { loadWords(); }, [loadWords]);
 
+  useEffect(() => { indexRef.current = index; }, [index]);
+  useEffect(() => { resultsLenRef.current = results.length; }, [results]);
+
   useEffect(() => {
     const handler = () => {
-      const due = getDueWords();
-      const shuffled = [...due].sort(() => Math.random() - 0.5);
       setAllWords(getSRSWords());
-      if (shuffled.length > 0) {
-        setQueue(shuffled);
-        setIndex(0);
-        setResults([]);
-        setDone(false);
+      // Only rebuild the queue if the session hasn't started (no grading, still on first word).
+      // Rebuilding mid-session resets the word and disrupts the user.
+      if (indexRef.current === 0 && resultsLenRef.current === 0) {
+        const due = getDueWords();
+        const shuffled = [...due].sort(() => Math.random() - 0.5);
+        if (shuffled.length > 0) {
+          setQueue(shuffled);
+          setDone(false);
+        }
       }
     };
     window.addEventListener('lexivo-sync', handler);
