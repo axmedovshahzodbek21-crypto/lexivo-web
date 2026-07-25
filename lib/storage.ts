@@ -277,11 +277,8 @@ export function markIntervalDone(wordId: string, interval: number) {
   if (!log[wordId]) log[wordId] = [];
   if (!log[wordId].includes(interval)) log[wordId].push(interval);
   set(KEYS.reviewLog, log);
-
-  // Graduated: all 5 intervals complete — remove this specific word from SRS store
-  if (SRS_INTERVALS.every(i => log[wordId].includes(i))) {
-    set(KEYS.srs, getSRSWords().filter(w => w.id !== wordId));
-  }
+  // Graduated words stay in lexivo_srs_words so the Manage deck can show them.
+  // getDueWords already skips them (no nextInterval found), so they won't resurface as due.
 }
 
 // Removes all words for a learning date from SRS and resets their unit progress.
