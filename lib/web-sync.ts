@@ -861,3 +861,13 @@ export function stopSync() {
   _syncStopped = true;
   if (_syncTimer) { clearTimeout(_syncTimer); _syncTimer = null; }
 }
+
+export async function triggerSync() {
+  const { data } = await supabase.auth.getSession();
+  const uid = data.session?.user?.id;
+  if (!uid) return;
+  if (_syncTimer) { clearTimeout(_syncTimer); _syncTimer = null; }
+  _syncStopped  = false;
+  _failureCount = 0;
+  runSync(uid);
+}

@@ -1,25 +1,27 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { triggerSync } from '@/lib/web-sync';
 
 type SyncState = 'idle' | 'syncing' | 'synced' | 'error' | 'suspended';
 
-export default function SyncStatusBadge() {
+const STATE_CFG = {
+  idle:      { icon: '↻', label: 'Sync',         color: 'var(--text-muted)',                                       bg: 'transparent' },
+  syncing:   { icon: '↻', label: 'Syncing…',      color: 'var(--text-muted)',                                       bg: 'var(--border)' },
+  synced:    { icon: '✓', label: 'Synced',         color: 'var(--success)',  bg: 'color-mix(in srgb, var(--success) 13%, transparent)' },
+  error:     { icon: '⚠', label: 'Sync failed',    color: 'var(--danger)',   bg: 'color-mix(in srgb, var(--danger)  13%, transparent)' },
+  suspended: { icon: '✕', label: 'Sync paused',    color: 'var(--danger)',   bg: 'color-mix(in srgb, var(--danger)  20%, transparent)' },
+};
+
+export default function SyncStatusBadge({ sidebar = false }: { sidebar?: boolean }) {
   const [state, setState] = useState<SyncState>('idle');
+  const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout>;
-
     const onStart     = () => { clearTimeout(timer); setState('syncing'); };
-    const onDone      = () => {
-      setState('synced');
-      timer = setTimeout(() => setState('idle'), 3000);
-    };
-    const onError     = () => {
-      setState('error');
-      timer = setTimeout(() => setState('idle'), 5000);
-    };
+    const onDone      = () => { setState('synced'); timer = setTimeout(() => setState('idle'), 3000); };
+    const onError     = () => { setState('error');     timer = setTimeout(() => setState('idle'), 5000); };
     const onSuspended = () => { clearTimeout(timer); setState('suspended'); };
-
     window.addEventListener('lexivo-sync-start',     onStart);
     window.addEventListener('lexivo-sync-done',      onDone);
     window.addEventListener('lexivo-sync-error',     onError);
@@ -33,24 +35,59 @@ export default function SyncStatusBadge() {
     };
   }, []);
 
-  if (state === 'idle' || state === 'syncing') return null;
+  // Re-show on actionable states so the user doesn't miss errors
+  useEffect(() => {
+    if (state === 'error' || state === 'suspended') setDismissed(false);
+  }, [state]);
 
-  const config = {
-    syncing:   { icon: '↻', label: 'Syncing…',              bg: 'var(--border)',                                       color: 'var(--text-muted)', spin: true  },
-    synced:    { icon: '✓', label: 'Synced',                 bg: 'color-mix(in srgb, var(--success) 13%, transparent)', color: 'var(--success)',    spin: false },
-    error:     { icon: '⚠', label: 'Sync failed',            bg: 'color-mix(in srgb, var(--danger)  13%, transparent)', color: 'var(--danger)',     spin: false },
-    suspended: { icon: '✕', label: 'Sync paused — reload',   bg: 'color-mix(in srgb, var(--danger)  20%, transparent)', color: 'var(--danger)',     spin: false },
-  }[state];
+  const cfg = STATE_CFG[state];
+  const showStatus = state !== 'idle' && !dismissed;
 
-  const Tag = state === 'suspended' ? 'button' : 'div';
+  // ── Sidebar mode: persistent row ────────────────────────────────────────────
+  if (sidebar) {
+    return (
+      <div className="flex items-center gap-1.5">
+        <button
+          onClick={() => triggerSync()}
+          title="Sync now"
+          className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all"
+          style={showStatus
+            ? { background: cfg.bg, color: cfg.color }
+            : { color: 'var(--text-muted)' }}
+        >
+          <span className={state === 'syncing' ? 'animate-spin inline-block' : ''}>{cfg.icon}</span>
+          {showStatus ? cfg.label : 'Sync'}
+        </button>
+        {showStatus && (
+          <button
+            onClick={() => setDismissed(true)}
+            title="Dismiss"
+            className="text-[11px] text-[var(--text-muted)] hover:text-[var(--text)] transition-colors leading-none"
+          >›</button>
+        )}
+      </div>
+    );
+  }
+
+  // ── Floating mode: pill shown only for non-idle states ───────────────────────
+  if (state === 'idle' || state === 'syncing' || dismissed) return null;
+
   return (
-    <Tag
-      className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all"
-      style={{ background: config.bg, color: config.color }}
-      {...(state === 'suspended' ? { onClick: () => window.location.reload() } : {})}
-    >
-      <span className={config.spin ? 'animate-spin inline-block' : ''}>{config.icon}</span>
-      {config.label}
-    </Tag>
+    <div className="flex items-center gap-1">
+      <button
+        onClick={() => triggerSync()}
+        className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all"
+        style={{ background: cfg.bg, color: cfg.color }}
+        title="Sync now"
+      >
+        <span>{cfg.icon}</span>
+        {cfg.label}
+      </button>
+      <button
+        onClick={() => setDismissed(true)}
+        title="Dismiss"
+        className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--text)] transition-colors"
+      >›</button>
+    </div>
   );
 }

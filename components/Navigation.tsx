@@ -140,7 +140,7 @@ export default function Navigation() {
 
         {/* Sync status */}
         <div className="px-5 pb-3">
-          <SyncStatusBadge />
+          <SyncStatusBadge sidebar />
         </div>
 
         {/* Nav links */}
