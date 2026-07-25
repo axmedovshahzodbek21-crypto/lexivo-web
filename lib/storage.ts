@@ -34,6 +34,7 @@ const KEYS = {
   reviewDays:   'lexivo_review_days',
   wordGoalDays: 'lexivo_word_goal_days',
   reviewLog:    'lexivo_review_log',
+  srsLastReview: 'lexivo_srs_last_review',
   xpHistory: 'lexivo_xp_history',
   xpUpdatedAt:       'lexivo_xp_updated_at',
   streakBonusDate:   'lexivo_streak_bonus_date',
@@ -272,11 +273,25 @@ export function saveReviewLog(log: Record<string, number[]>) {
   set(KEYS.reviewLog, log);
 }
 
+export function getSRSLastReview(): Record<string, string> {
+  return get<Record<string, string>>(KEYS.srsLastReview, {});
+}
+
+export function saveSRSLastReview(dates: Record<string, string>) {
+  set(KEYS.srsLastReview, dates);
+}
+
 export function markIntervalDone(wordId: string, interval: number) {
   const log = getReviewLog();
   if (!log[wordId]) log[wordId] = [];
   if (!log[wordId].includes(interval)) log[wordId].push(interval);
   set(KEYS.reviewLog, log);
+
+  // Record the date this review was done so getDueWords can compute the
+  // next due date from the review date (matching Flutter's behaviour).
+  const dates = getSRSLastReview();
+  dates[wordId] = localDateStr();
+  saveSRSLastReview(dates);
   // Graduated words stay in lexivo_srs_words so the Manage deck can show them.
   // getDueWords already skips them (no nextInterval found), so they won't resurface as due.
 }
@@ -383,6 +398,7 @@ export function getDueWords(): DueSRSWord[] {
   checkAndUnlearn(today);
   const srsWords = getSRSWords();
   const log = getReviewLog();
+  const lastReview = getSRSLastReview();
 
   const result: DueSRSWord[] = [];
 
@@ -391,7 +407,10 @@ export function getDueWords(): DueSRSWord[] {
     const nextInterval = SRS_INTERVALS.find(i => !completed.includes(i));
     if (nextInterval === undefined) continue; // graduated
 
-    const dueDate = addDaysToDateStr(w.learnedAt, nextInterval);
+    // Use the date the last review was done (matching Flutter's behaviour).
+    // Fall back to learnedAt for words that have never been reviewed.
+    const baseDate = lastReview[w.id] ?? w.learnedAt;
+    const dueDate = addDaysToDateStr(baseDate, nextInterval);
     if (dueDate > today) continue; // not yet due
 
     result.push({ ...w, dueInterval: nextInterval });

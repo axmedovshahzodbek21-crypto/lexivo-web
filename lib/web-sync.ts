@@ -13,7 +13,8 @@ import {
   getHardWordEntries, type HardWordEntry,
   getImportedWords, saveImportedWords,
   getReviewLog, saveReviewLog,
-  localDateStr,
+  getSRSLastReview, saveSRSLastReview,
+  localDateStr, addDaysToDateStr,
 } from './storage';
 
 // ── Supabase response interfaces ─────────────────────────────────────────────
@@ -564,14 +565,17 @@ export async function pullAll(uid: string) {
       set(K.srs, [...localMap.values()]);
     }
 
-    // Translate Flutter's reviewStage → web review_log for cross-platform SRS sync.
-    // Flutter stores progress as a reviewStage integer (0–5); the web uses a per-word
-    // array of completed intervals. Without this translation, every Flutter-learned word
-    // appears unreviewed on the web, making the due count wildly wrong.
+    // Translate Flutter's reviewStage → web review_log + lastReviewDate for
+    // cross-platform SRS sync. Flutter stores progress as reviewStage (0–5) and
+    // nextReviewDate; the web uses a completed-intervals array + a per-word last
+    // review date. Without this translation the due count is wildly wrong and the
+    // web calculates next due from learnedAt instead of from the actual review date.
     if (srsRows && srsRows.length > 0) {
       const SRS_IVLS = [1, 3, 7, 14, 30];
       const reviewLog = getReviewLog();
+      const lastReview = getSRSLastReview();
       let logChanged = false;
+      let datesChanged = false;
       for (const row of srsRows) {
         const w = row.data;
         if (!w || !(Number(w.reviewStage) > 0)) continue;
@@ -584,8 +588,19 @@ export async function pullAll(uid: string) {
           reviewLog[wordId] = [...new Set([...existing, ...flutterCompleted])];
           logChanged = true;
         }
+        // Derive lastReviewDate from Flutter's nextReviewDate − nextInterval.
+        // e.g. nextReviewDate="2026-07-28", stage=2 → nextInterval=7 → lastReview="2026-07-21"
+        if (w.nextReviewDate && stage < SRS_IVLS.length) {
+          const nextInterval = SRS_IVLS[stage];
+          const derived = addDaysToDateStr(w.nextReviewDate, -nextInterval);
+          if (!lastReview[wordId] || derived > lastReview[wordId]) {
+            lastReview[wordId] = derived;
+            datesChanged = true;
+          }
+        }
       }
       if (logChanged) saveReviewLog(reviewLog);
+      if (datesChanged) saveSRSLastReview(lastReview);
     }
 
     // learned_words — delta merge: only fetch rows newer than the last pull watermark.
