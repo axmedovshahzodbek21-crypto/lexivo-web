@@ -65,6 +65,8 @@ export default function HomePage() {
   const [hideClasses, setHideClasses] = useState(false);
   const [hideMode, setHideMode] = useState(false);
   const [hideSelection, setHideSelection] = useState<Set<string>>(new Set());
+  const [unhideMode, setUnhideMode] = useState(false);
+  const [unhideSelection, setUnhideSelection] = useState<Set<string>>(new Set());
   const [showCustomize, setShowCustomize] = useState(false);
   const [sectionOrder, setSectionOrder] = useState([
     'collections', 'reading', 'day_streak', 'total_xp', 'words',
@@ -223,6 +225,46 @@ export default function HomePage() {
     setHideSelection(new Set());
   };
 
+  const handleUnhideSave = () => {
+    const LS: Record<string, string> = {
+      collections: 'home_hide_collections', reading: 'home_hide_reading',
+      day_streak: 'home_hide_day_streak',   total_xp: 'home_hide_total_xp',
+      words: 'home_hide_words',             daily_goal: 'home_hide_daily_goal',
+      level: 'home_hide_level',             wod: 'home_hide_wod',
+      learn: 'home_hide_learn',             srs: 'home_hide_srs',
+      flashcards: 'home_hide_flashcards',   quiz: 'home_hide_quiz',
+      match: 'home_hide_match',             pomodoro: 'home_hide_pomodoro',
+      leaderboard: 'home_hide_leaderboard', starred: 'home_hide_starred',
+      hard_words: 'home_hide_hard_words',   lists: 'home_hide_lists',
+      grammar: 'home_hide_grammar',         classes: 'home_hide_classes',
+    };
+    unhideSelection.forEach(sId => {
+      if (LS[sId]) localStorage.removeItem(LS[sId]);
+      if (sId === 'collections')  setHideCollections(false);
+      else if (sId === 'reading')      setHideReading(false);
+      else if (sId === 'day_streak')   setHideDayStreak(false);
+      else if (sId === 'total_xp')     setHideTotalXp(false);
+      else if (sId === 'words')        setHideWords(false);
+      else if (sId === 'daily_goal')   setHideDailyGoal(false);
+      else if (sId === 'level')        setHideLevel(false);
+      else if (sId === 'wod')          setHideWod(false);
+      else if (sId === 'learn')        setHideLearn(false);
+      else if (sId === 'srs')          setHideSrs(false);
+      else if (sId === 'flashcards')   setHideFlashcards(false);
+      else if (sId === 'quiz')         setHideQuiz(false);
+      else if (sId === 'match')        setHideMatch(false);
+      else if (sId === 'pomodoro')     setHidePomodoro(false);
+      else if (sId === 'leaderboard')  setHideLeaderboard(false);
+      else if (sId === 'starred')      setHideStarred(false);
+      else if (sId === 'hard_words')   setHideHardWords(false);
+      else if (sId === 'lists')        setHideLists(false);
+      else if (sId === 'grammar')      setHideGrammar(false);
+      else if (sId === 'classes')      setHideClasses(false);
+    });
+    setUnhideMode(false);
+    setUnhideSelection(new Set());
+  };
+
   return (
     <div className="p-4 space-y-6 animate-fade-in">
       {/* Header */}
@@ -324,6 +366,7 @@ export default function HomePage() {
           hard_words: hideHardWords, lists: hideLists, grammar: hideGrammar, classes: hideClasses,
         };
         const visible = sectionOrder.filter(sId => !HIDE_MAP[sId]);
+        const displaySections = unhideMode ? sectionOrder : visible;
 
         type ActionDef = { href: string; icon: string; title: string; subtitle: string; gradient: string; edge: string; glow: string; badge?: string };
         const ACTION_MAP: Record<string, ActionDef> = {
@@ -495,34 +538,80 @@ export default function HomePage() {
                 </div>
               </div>
             )}
+            {unhideMode && (
+              <div className="flex items-center justify-between px-4 py-3 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)]">
+                <div>
+                  <p className="text-sm font-bold text-[var(--text)]">Tap ghost cards to unhide</p>
+                  <p className="text-xs text-[var(--text-muted)] mt-0.5">
+                    {unhideSelection.size === 0 ? 'None selected yet' : `${unhideSelection.size} selected`}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => { setUnhideMode(false); setUnhideSelection(new Set()); }}
+                    className="px-3 py-1.5 rounded-xl text-sm font-semibold bg-[var(--surface)] border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text)] transition-colors"
+                  >Discard</button>
+                  <button
+                    onClick={handleUnhideSave}
+                    disabled={unhideSelection.size === 0}
+                    className="px-3 py-1.5 rounded-xl text-sm font-bold bg-green-500 text-white disabled:opacity-40 transition-opacity"
+                  >{unhideSelection.size > 0 ? `Unhide (${unhideSelection.size})` : 'Unhide'}</button>
+                </div>
+              </div>
+            )}
             <div className="grid gap-3"
               style={{ gridTemplateColumns: 'repeat(5, 1fr)', gridTemplateRows: '140px 140px', gridAutoRows: '130px' }}>
-              {visible.map((sId, idx) => {
+              {displaySections.map((sId, idx) => {
                 const slot = FRAME_SLOTS[idx];
                 if (!slot) return null;
-                const isSelected = hideSelection.has(sId);
-                const toggleSelect = () => setHideSelection(prev => {
-                  const next = new Set(prev);
-                  if (next.has(sId)) next.delete(sId); else next.add(sId);
-                  return next;
+                const isHidden = HIDE_MAP[sId];
+                const isHideSelected = hideSelection.has(sId);
+                const toggleHideSelect = () => setHideSelection(prev => {
+                  const next = new Set(prev); if (next.has(sId)) next.delete(sId); else next.add(sId); return next;
                 });
+                const isUnhideSelected = unhideSelection.has(sId);
+                const toggleUnhideSelect = () => {
+                  if (!isHidden) return;
+                  setUnhideSelection(prev => {
+                    const next = new Set(prev); if (next.has(sId)) next.delete(sId); else next.add(sId); return next;
+                  });
+                };
+                const isInteractive = hideMode || (unhideMode && isHidden);
                 return (
                   <div
                     key={sId}
                     style={slot}
-                    className={`h-full relative ${hideMode ? 'cursor-pointer' : ''}`}
-                    onClick={hideMode ? toggleSelect : undefined}
+                    className={`h-full relative ${isInteractive ? 'cursor-pointer' : ''}`}
+                    onClick={hideMode ? toggleHideSelect : (unhideMode ? toggleUnhideSelect : undefined)}
                   >
-                    <div className={`h-full ${hideMode ? 'pointer-events-none' : ''}`}>
+                    <div className={`h-full transition-opacity duration-150
+                      ${hideMode || (unhideMode && !isHidden) ? 'pointer-events-none' : ''}
+                      ${unhideMode && isHidden ? (isUnhideSelected ? 'opacity-65 pointer-events-none' : 'opacity-25 pointer-events-none') : ''}`}>
                       {renderCard(sId, idx === 2)}
                     </div>
+
+                    {/* Hide mode overlay */}
                     {hideMode && (
                       <div className={`absolute inset-0 rounded-2xl flex items-center justify-center transition-all duration-150
-                        ${isSelected ? 'bg-black/55' : 'bg-transparent hover:bg-black/15'}`}>
-                        {isSelected ? (
+                        ${isHideSelected ? 'bg-black/55' : 'bg-transparent hover:bg-black/15'}`}>
+                        {isHideSelected ? (
                           <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center text-xl shadow-lg">✕</div>
                         ) : (
                           <div className="absolute top-2 right-2 w-5 h-5 rounded-full border-2 border-white/70 bg-black/10" />
+                        )}
+                      </div>
+                    )}
+
+                    {/* Unhide mode overlay — only on ghost (hidden) cards */}
+                    {unhideMode && isHidden && (
+                      <div className={`absolute inset-0 rounded-2xl flex items-center justify-center transition-all duration-150
+                        ${isUnhideSelected ? 'ring-2 ring-inset ring-green-400' : 'hover:bg-white/10'}`}>
+                        {isUnhideSelected ? (
+                          <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-white text-xl shadow-lg">✓</div>
+                        ) : (
+                          <div className="absolute top-2 right-2 w-5 h-5 rounded-full border-2 border-white/50 bg-black/20 flex items-center justify-center">
+                            <span className="text-white/70 text-[10px] font-bold leading-none">+</span>
+                          </div>
                         )}
                       </div>
                     )}
@@ -615,10 +704,16 @@ export default function HomePage() {
             </div>
 
             <div className="px-6 py-4 shrink-0 flex items-center justify-between border-t border-[var(--border)]">
-              <button
-                onClick={() => { setShowCustomize(false); setHideMode(true); setHideSelection(new Set()); }}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-semibold border border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--danger)] hover:text-[var(--danger)] transition-colors"
-              >🙈 Hide sections</button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => { setShowCustomize(false); setHideMode(true); setHideSelection(new Set()); }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-semibold border border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--danger)] hover:text-[var(--danger)] transition-colors"
+                >🙈 Hide</button>
+                <button
+                  onClick={() => { setShowCustomize(false); setUnhideMode(true); setUnhideSelection(new Set()); }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-semibold border border-[var(--border)] text-[var(--text-muted)] hover:border-green-500 hover:text-green-500 transition-colors"
+                >👁 Unhide</button>
+              </div>
               <button
                 onClick={() => {
                   const def = [
