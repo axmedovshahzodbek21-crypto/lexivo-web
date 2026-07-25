@@ -450,9 +450,9 @@ export default function HomePage() {
                 <div className="space-y-2">
                   {/* Main sections */}
                   {([
-                    { id: 'stats',   icon: '📊', label: 'Stats Row',           hidden: hideStats,      toggle: () => { setHideStats(h => !h);      localStorage.setItem('home_hide_stats',       (!hideStats)      ? '1' : '0'); } },
-                    { id: 'goal',    icon: '🎯', label: 'Daily Goal & Level',   hidden: hideGoalLevel,  toggle: () => { setHideGoalLevel(h => !h);  localStorage.setItem('home_hide_goal_level',  (!hideGoalLevel)  ? '1' : '0'); } },
-                    { id: 'actions', icon: '▶️', label: 'Quick Actions',        hidden: hideActions,    toggle: () => { setHideActions(h => !h);    localStorage.setItem('home_hide_actions',     (!hideActions)    ? '1' : '0'); } },
+                    { id: 'stats',   icon: '📊', label: 'Stats Row',           hidden: hideStats,      toggle: () => { setHideStats(h => !h);      localStorage.setItem('home_hide_stats',       (!hideStats)      ? '1' : '0'); setShowCustomize(false); } },
+                    { id: 'goal',    icon: '🎯', label: 'Daily Goal & Level',   hidden: hideGoalLevel,  toggle: () => { setHideGoalLevel(h => !h);  localStorage.setItem('home_hide_goal_level',  (!hideGoalLevel)  ? '1' : '0'); setShowCustomize(false); } },
+                    { id: 'actions', icon: '▶️', label: 'Quick Actions',        hidden: hideActions,    toggle: () => { setHideActions(h => !h);    localStorage.setItem('home_hide_actions',     (!hideActions)    ? '1' : '0'); setShowCustomize(false); } },
                   ] as const).map(({ id, icon, label, hidden, toggle }) => (
                     <div key={id} className={`flex items-center gap-3 p-4 rounded-2xl border-2 transition-all duration-200 ${hidden ? 'border-[var(--border)] bg-[var(--surface-2)] opacity-60' : 'border-[var(--primary)] bg-[var(--primary-bg)]'}`}>
                       <span className="text-2xl">{icon}</span>
