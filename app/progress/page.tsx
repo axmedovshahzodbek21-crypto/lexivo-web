@@ -525,8 +525,7 @@ function StudyCalendar({
               const isSelected = selectedDay === dateStr;
               const review = reviewDays.includes(dateStr);
               const words  = wordGoalDays.includes(dateStr);
-              const studied = studyDays.includes(dateStr);
-              const anyDone = review || words || studied;
+              const anyDone = review || words;
 
               return (
                 <button
@@ -541,7 +540,6 @@ function StudyCalendar({
                     transform: isSelected ? 'scale(1.12)' : 'scale(1)',
                   }}
                 >
-                  {studied && !review && !words && <div className="absolute inset-0 rounded-full" style={{ background: 'rgba(249,115,22,0.45)' }} />}
                   {review && <div className="absolute bottom-0 left-0 right-0" style={{ height: '50%', background: TASK_COLORS.review.bg }} />}
                   {words  && <div className="absolute top-0 left-0 right-0" style={{ height: '50%', background: TASK_COLORS.words.bg }} />}
                   <span className="relative z-10 text-xs font-bold leading-none"
@@ -556,10 +554,6 @@ function StudyCalendar({
 
         {/* Legend */}
         <div className="flex items-center gap-3 mt-5 pt-3 border-t border-[var(--border)] flex-wrap">
-          <div className="flex items-center gap-1.5">
-            <div className="w-3.5 h-3.5 rounded-full" style={{ background: 'rgba(249,115,22,0.55)' }} />
-            <span className="text-[10px] text-[var(--text-muted)]">Studied</span>
-          </div>
           <div className="flex items-center gap-1.5">
             <div className="w-3.5 h-3.5 rounded-full" style={{ background: TASK_COLORS.review.bg }} />
             <span className="text-[10px] text-[var(--text-muted)]">SRS review</span>
@@ -583,10 +577,6 @@ function StudyCalendar({
             <p className="text-sm font-bold" style={{ color: 'var(--text)' }}>How to mark a day</p>
             <div className="flex flex-col gap-1">
               <span className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--text-muted)' }}>
-                <span className="w-2.5 h-2.5 rounded-full shrink-0 inline-block" style={{ background: 'rgba(249,115,22,0.55)' }} />
-                Study any words (app or web)
-              </span>
-              <span className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--text-muted)' }}>
                 <span className="w-2.5 h-2.5 rounded-full shrink-0 inline-block" style={{ background: TASK_COLORS.review.bg }} />
                 Complete an SRS review session
               </span>
@@ -595,7 +585,7 @@ function StudyCalendar({
                 Reach your {dailyGoal}-word daily goal
               </span>
             </div>
-            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>SRS and word goal each fill half the circle. Both together = fully marked day.</p>
+            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Each task fills half the day circle. Complete both to fully mark a day.</p>
           </div>
         </div>
 

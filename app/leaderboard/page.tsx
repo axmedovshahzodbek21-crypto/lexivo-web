@@ -16,6 +16,8 @@ interface LeaderboardEntry {
   today_count: number;
   total_learned: number;
   study_days: string[] | null;
+  review_days: string[] | null;
+  word_goal_days: string[] | null;
 }
 
 
@@ -110,15 +112,17 @@ export default function LeaderboardPage() {
     <div className="flex flex-col min-h-screen animate-fade-in pb-24">
       {/* Profile modal */}
       {selected && (() => {
-        const studiedSet = new Set(selected.study_days ?? []);
+        const reviewSet = new Set(selected.review_days ?? []);
+        const wordsSet = new Set(selected.word_goal_days ?? []);
         const totalStudyDays = selected.study_days?.length ?? 0;
         const avgPerDay = totalStudyDays === 0 ? 0 : Math.round(selected.total_learned / totalStudyDays);
         const { year: cYear, month: cMonth } = calMonth;
         const daysInCMonth = new Date(cYear, cMonth + 1, 0).getDate();
         const activeDays = Array.from({ length: daysInCMonth }, (_, i) => {
           const d = i + 1;
-          return `${cYear}-${String(cMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-        }).filter(d => studiedSet.has(d)).length;
+          const ds = `${cYear}-${String(cMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+          return reviewSet.has(ds) || wordsSet.has(ds);
+        }).filter(Boolean).length;
         return (
           <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setSelected(null)}>
             <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-5 flex flex-col gap-4" onClick={e => e.stopPropagation()}>
@@ -191,17 +195,24 @@ export default function LeaderboardPage() {
                       {cells.map((d, i) => {
                         if (!d) return <div key={`e-${i}`} />;
                         const dateStr = `${cYear}-${String(cMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-                        const studied = studiedSet.has(dateStr);
+                        const review = reviewSet.has(dateStr);
+                        const words  = wordsSet.has(dateStr);
+                        const anyDone = review || words;
                         const isToday = dateStr === todayDate;
                         return (
                           <div key={d} className="flex items-center justify-center py-0.5">
-                            <div className="w-6 h-6 flex items-center justify-center rounded-full text-[10px] font-semibold"
+                            <div className="w-6 h-6 rounded-full relative overflow-hidden flex items-center justify-center"
                               style={{
-                                background: studied ? '#2ECC71' : 'transparent',
-                                color: studied ? 'white' : isToday ? 'var(--primary)' : 'var(--text-muted)',
-                                border: isToday && !studied ? '1.5px solid var(--primary)' : 'none',
+                                background: anyDone ? 'var(--surface-2)' : 'transparent',
+                                outline: isToday ? '1.5px solid var(--primary)' : 'none',
+                                outlineOffset: '1px',
                               }}>
-                              {d}
+                              {review && <div className="absolute bottom-0 left-0 right-0" style={{ height: '50%', background: '#4338ca' }} />}
+                              {words  && <div className="absolute top-0 left-0 right-0" style={{ height: '50%', background: '#059669' }} />}
+                              <span className="relative z-10 text-[10px] font-semibold"
+                                style={{ color: anyDone ? '#fff' : isToday ? 'var(--primary)' : 'var(--text-muted)' }}>
+                                {d}
+                              </span>
                             </div>
                           </div>
                         );
@@ -210,7 +221,8 @@ export default function LeaderboardPage() {
                   );
                 })()}
                 <div className="flex items-center gap-3 mt-2">
-                  <div className="flex items-center gap-1"><div className="w-2.5 h-2.5 rounded-full bg-[#2ECC71]" /><span className="text-[10px] text-[var(--text-muted)]">Studied</span></div>
+                  <div className="flex items-center gap-1"><div className="w-2.5 h-2.5 rounded-full" style={{ background: '#4338ca' }} /><span className="text-[10px] text-[var(--text-muted)]">SRS review</span></div>
+                  <div className="flex items-center gap-1"><div className="w-2.5 h-2.5 rounded-full" style={{ background: '#059669' }} /><span className="text-[10px] text-[var(--text-muted)]">Daily goal</span></div>
                 </div>
               </div>
               <button onClick={() => setSelected(null)} className="w-full btn-ghost py-3 text-sm">Close</button>
