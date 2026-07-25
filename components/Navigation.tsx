@@ -113,7 +113,8 @@ export default function Navigation() {
       </button>
 
       {/* ── Desktop: persistent left sidebar ── */}
-      <aside className={`hidden sm:flex flex-col shrink-0 bg-[var(--surface)] sticky top-0 h-screen z-30 transition-[width] duration-300 ${sidebarOpen ? 'w-52 border-r border-[var(--border)] overflow-y-auto' : 'w-0 overflow-hidden'}`}>
+      <aside className={`hidden sm:flex shrink-0 sticky top-0 h-screen z-30 transition-[width,padding] duration-300 ${sidebarOpen ? 'w-[224px] p-3' : 'w-0 overflow-hidden'}`}>
+        <div className={`sidebar-glass flex flex-col w-full h-full rounded-2xl overflow-y-auto ${sidebarOpen ? '' : 'hidden'}`}>
         {/* Brand + collapse button */}
         <div className="px-5 pt-6 pb-4 flex items-start justify-between gap-2">
           <div className="min-w-0">
@@ -249,6 +250,7 @@ export default function Navigation() {
               <span>{t.sidebar.signIn}</span>
             </Link>
           )}
+        </div>
         </div>
       </aside>
     </>
