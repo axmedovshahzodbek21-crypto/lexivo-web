@@ -564,6 +564,30 @@ export async function pullAll(uid: string) {
       set(K.srs, [...localMap.values()]);
     }
 
+    // Translate Flutter's reviewStage → web review_log for cross-platform SRS sync.
+    // Flutter stores progress as a reviewStage integer (0–5); the web uses a per-word
+    // array of completed intervals. Without this translation, every Flutter-learned word
+    // appears unreviewed on the web, making the due count wildly wrong.
+    if (srsRows && srsRows.length > 0) {
+      const SRS_IVLS = [1, 3, 7, 14, 30];
+      const reviewLog = getReviewLog();
+      let logChanged = false;
+      for (const row of srsRows) {
+        const w = row.data;
+        if (!w || !(Number(w.reviewStage) > 0)) continue;
+        const wordId: string = w.id ?? `${w.collectionName}::${w.word}`;
+        const stage = Math.min(Number(w.reviewStage), SRS_IVLS.length);
+        const flutterCompleted = SRS_IVLS.slice(0, stage);
+        const existing = reviewLog[wordId] ?? [];
+        // Only advance — never regress what the web already recorded
+        if (flutterCompleted.length > existing.length) {
+          reviewLog[wordId] = [...new Set([...existing, ...flutterCompleted])];
+          logChanged = true;
+        }
+      }
+      if (logChanged) saveReviewLog(reviewLog);
+    }
+
     // learned_words — delta merge: only fetch rows newer than the last pull watermark.
     // On the first pull (no watermark) the full table is fetched; subsequent pulls are cheap
     // index scans returning only newly learned words, cutting bandwidth by ~99% for active users.
