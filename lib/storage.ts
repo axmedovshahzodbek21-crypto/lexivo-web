@@ -406,14 +406,9 @@ export function getDueWords(): DueSRSWord[] {
 // Count words where all 5 intervals are completed
 export function getGraduatedCount(): number {
   const log = getReviewLog();
-  const srsWords = getSRSWords();
-  const byDate = new Map<string, number>();
-  for (const w of srsWords) {
-    byDate.set(w.learnedAt, (byDate.get(w.learnedAt) ?? 0) + 1);
-  }
   let count = 0;
-  for (const [date, wordCount] of byDate) {
-    if ((log[date] ?? []).length >= SRS_INTERVALS.length) count += wordCount;
+  for (const completed of Object.values(log)) {
+    if (SRS_INTERVALS.every(i => completed.includes(i))) count++;
   }
   return count;
 }
