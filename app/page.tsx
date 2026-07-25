@@ -736,36 +736,16 @@ export default function HomePage() {
                 return sectionOrder.map((sId, i) => {
                   const m = MODAL_META[sId];
                   if (!m) return null;
-                  const moveUp = () => {
-                    if (i === 0) return;
-                    const next = [...sectionOrder]; [next[i - 1], next[i]] = [next[i], next[i - 1]];
-                    setSectionOrder(next); localStorage.setItem('home_section_order', next.join(','));
-                  };
-                  const moveDown = () => {
-                    if (i === sectionOrder.length - 1) return;
-                    const next = [...sectionOrder]; [next[i], next[i + 1]] = [next[i + 1], next[i]];
-                    setSectionOrder(next); localStorage.setItem('home_section_order', next.join(','));
-                  };
                   return (
-                    <div key={sId} className={`flex items-center gap-3 p-3 rounded-2xl border transition-all duration-200 ${m.hidden ? 'border-[var(--border)] bg-[var(--surface-2)] opacity-55' : 'border-[var(--primary)] bg-[var(--primary-bg)]'}`}>
+                    <div key={sId} className={`flex items-center gap-3 p-3 rounded-2xl border transition-all duration-200 ${m.hidden ? 'border-[var(--border)] bg-[var(--surface-2)] opacity-50' : 'border-[var(--primary)] bg-[var(--primary-bg)]'}`}>
                       <span className="text-lg shrink-0 w-6 text-center">{m.icon}</span>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-[var(--text)] leading-tight">{m.label}</p>
                         <p className="text-xs text-[var(--text-muted)]">{m.hidden ? 'Hidden' : `Position ${i + 1}`}</p>
                       </div>
-                      {!m.hidden && (
-                        <div className="flex gap-1 shrink-0">
-                          <button onClick={moveUp} disabled={i === 0}
-                            className="w-6 h-6 rounded-lg bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center text-[10px] text-[var(--text-muted)] hover:text-[var(--primary)] hover:border-[var(--primary)] disabled:opacity-25 transition-all">▲</button>
-                          <button onClick={moveDown} disabled={i === sectionOrder.length - 1}
-                            className="w-6 h-6 rounded-lg bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center text-[10px] text-[var(--text-muted)] hover:text-[var(--primary)] hover:border-[var(--primary)] disabled:opacity-25 transition-all">▼</button>
-                        </div>
-                      )}
-                      <button
-                        onClick={() => { m.toggle(); }}
-                        className={`px-2.5 py-1 rounded-full text-xs font-bold transition-all shrink-0 ${m.hidden ? 'bg-[var(--surface)] border border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--primary)] hover:text-[var(--primary)]' : 'bg-[var(--primary)] text-white'}`}>
-                        {m.hidden ? 'Show' : 'Hide'}
-                      </button>
+                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full shrink-0 ${m.hidden ? 'bg-[var(--surface)] text-[var(--text-muted)]' : 'bg-[var(--primary-bg)] text-[var(--primary)]'}`}>
+                        {m.hidden ? 'Hidden' : 'Visible'}
+                      </span>
                     </div>
                   );
                 });
