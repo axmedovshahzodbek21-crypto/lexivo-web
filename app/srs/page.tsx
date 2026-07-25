@@ -36,6 +36,7 @@ export default function SRSReviewPage() {
   const [managing, setManaging] = useState(false);
   const [allWords, setAllWords] = useState<SRSWord[]>([]);
   const [autoPlay, setAutoPlay] = useState(true);
+  const [isShuffled, setIsShuffled] = useState(false);
   const [tappedChoice, setTappedChoice] = useState<string | null>(null);
   const [choices, setChoices] = useState<string[] | null>(null);
   const grading = useRef(false);
@@ -68,10 +69,9 @@ export default function SRSReviewPage() {
         }
       }
     } catch {}
-    // Fresh session
-    const shuffled = [...allDue].sort(() => Math.random() - 0.5);
-    setQueue(shuffled);
-    if (shuffled.length === 0) setDone(true);
+    // Fresh session — natural order by default
+    setQueue([...allDue]);
+    if (allDue.length === 0) setDone(true);
     queueBuiltRef.current = true;
   }, []);
 
@@ -96,9 +96,8 @@ export default function SRSReviewPage() {
       // Never rebuild the queue once it's been built — rebuilding reshuffles and changes the word.
       if (!queueBuiltRef.current) {
         const due = getDueWords();
-        const shuffled = [...due].sort(() => Math.random() - 0.5);
-        if (shuffled.length > 0) {
-          setQueue(shuffled);
+        if (due.length > 0) {
+          setQueue([...due]);
           setDone(false);
           queueBuiltRef.current = true;
         }
@@ -142,6 +141,18 @@ export default function SRSReviewPage() {
     setChoices(buildChoices(index, queue));
     if (current && autoPlay) { current.language ? speakText(current.word, current.language) : speak(current.word); }
   }, [current, autoPlay, buildChoices]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const toggleShuffle = useCallback(() => {
+    const due = getDueWords();
+    const next = !isShuffled;
+    setIsShuffled(next);
+    setQueue(next ? [...due].sort(() => Math.random() - 0.5) : [...due]);
+    setIndex(0);
+    setResults([]);
+    setRevealed(false);
+    setTappedChoice(null);
+    sessionStorage.removeItem('srs_session');
+  }, [isShuffled]);
 
   // At session end: mark each learnedAt date's interval as done, award XP
   const applyGrades = useCallback((finalResults: { id: string; grade: 'knew' | 'notYet' }[]) => {
@@ -338,6 +349,14 @@ export default function SRSReviewPage() {
           <div className="text-xs text-[var(--text-muted)]">{index + 1} / {queue.length}</div>
         </div>
         <div className="flex items-center gap-1">
+          <button
+            onClick={toggleShuffle}
+            className={`btn-icon text-base ${isShuffled ? 'text-[var(--primary)]' : 'opacity-40'}`}
+            aria-label={isShuffled ? 'Shuffled' : 'In order'}
+            title={isShuffled ? 'Shuffled' : 'In order'}
+          >
+            🔀
+          </button>
           <button
             onClick={() => setAutoPlay(p => !p)}
             className="btn-icon text-base"
