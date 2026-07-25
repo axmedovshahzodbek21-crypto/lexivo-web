@@ -464,10 +464,10 @@ export default function SRSReviewPage() {
             {tappedChoice && (
               <div className="flex gap-2 animate-slide-up">
                 <button onClick={() => grade('notYet')} className="flex-1 py-3 rounded-xl border-2 border-[var(--danger)] text-[var(--danger)] font-bold text-sm hover:bg-red-50 transition-colors">
-                  ✗ {t.srs.notYet}
+                  {t.srs.notYet}
                 </button>
                 <button onClick={() => grade('knew')} className="flex-1 py-3 rounded-xl border-2 border-[var(--success)] text-[var(--success)] font-bold text-sm hover:bg-green-50 transition-colors">
-                  ✓ {t.srs.knewIt}
+                  {t.srs.knewIt}
                 </button>
               </div>
             )}
