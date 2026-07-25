@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { ALL_ACHIEVEMENTS } from '@/lib/gamification';
-import { getUnlockedAchievements, getLearnedWords, getStreak, getXP, getSRSWords } from '@/lib/storage';
+import { getUnlockedAchievements, getLearnedWords, getStreak, getXP, getGraduatedCount } from '@/lib/storage';
 import { useTranslation } from '@/lib/useTranslation';
 
 interface Stats {
@@ -50,7 +50,7 @@ export default function AchievementsPage() {
         learnedCount: getLearnedWords().length,
         streak: getStreak(),
         xp: getXP(),
-        masteredCount: getSRSWords().filter(w => w.reviewStage >= 4).length,
+        masteredCount: getGraduatedCount(),
       });
     };
     load();
