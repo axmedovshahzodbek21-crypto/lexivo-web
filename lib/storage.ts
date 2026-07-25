@@ -1020,6 +1020,66 @@ export function clearFlashcardProgress(collectionName: string, dayNumber: number
   localStorage.removeItem(`lexivo_flashcard_progress_${collectionName}_${dayNumber}`);
 }
 
+// ─── Story Unlock ────────────────────────────────────────────────────────────
+
+export interface StoryUnlockInfo {
+  story1Unlocked: boolean;
+  story2Unlocked: boolean;
+  story3Unlocked: boolean;
+  anyUnlocked: boolean;
+  unlockedCount: number;
+}
+
+const STORY_COLLECTIONS = new Set([
+  '30 Days of Powerful Words',
+  '24 Vocabulary Challenge',
+  'Word Mastery',
+]);
+
+export function getStoryUnlockInfo(
+  collectionName: string,
+  dayNumber: number,
+  totalWords: number,
+): StoryUnlockInfo {
+  const none: StoryUnlockInfo = {
+    story1Unlocked: false, story2Unlocked: false, story3Unlocked: false,
+    anyUnlocked: false, unlockedCount: 0,
+  };
+  if (!STORY_COLLECTIONS.has(collectionName)) return none;
+
+  const srsWords = getSRSWords().filter(
+    w => w.collectionName === collectionName && w.dayNumber === dayNumber,
+  );
+  if (srsWords.length === 0) return none;
+
+  const log = getReviewLog();
+  const threshold = Math.ceil(totalWords * 0.8);
+  const stage4Count = srsWords.filter(w => (log[w.id] ?? []).includes(14)).length;
+  const stage5Count = srsWords.filter(w => (log[w.id] ?? []).includes(30)).length;
+
+  const story1 = stage4Count >= threshold;
+  const story2 = stage5Count >= threshold;
+
+  let story3 = false;
+  if (story2 && typeof window !== 'undefined') {
+    const key = `lexivo_story2_unlock_${collectionName}_${dayNumber}`;
+    let unlockDate = localStorage.getItem(key);
+    if (!unlockDate) {
+      unlockDate = localDateStr();
+      localStorage.setItem(key, unlockDate);
+    }
+    const unlockDt = new Date(unlockDate);
+    unlockDt.setDate(unlockDt.getDate() + 30);
+    story3 = new Date(localDateStr()) >= unlockDt;
+  }
+
+  const count = [story1, story2, story3].filter(Boolean).length;
+  return {
+    story1Unlocked: story1, story2Unlocked: story2, story3Unlocked: story3,
+    anyUnlocked: story1 || story2 || story3, unlockedCount: count,
+  };
+}
+
 // Clear all user-specific data from localStorage on sign-out.
 // Preserves lexivo_ui_lang (device UI preference, not tied to a user account).
 export function clearUserData(): void {

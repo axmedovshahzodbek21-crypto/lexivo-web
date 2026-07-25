@@ -4,9 +4,10 @@ import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
-import { getUnitProgress, getLearnProgress, getHardWordCount, getFlashcardProgress } from '@/lib/storage';
+import { getUnitProgress, getLearnProgress, getHardWordCount, getFlashcardProgress, getStoryUnlockInfo } from '@/lib/storage';
 import type { WordCollection, UnitProgress } from '@/lib/types';
 import { useTranslation } from '@/lib/useTranslation';
+import { supabase } from '@/lib/supabase';
 
 interface UnitRow {
   dayNumber: number;
@@ -150,6 +151,11 @@ function UnitCard({ unit, collectionName }: { unit: UnitRow; collectionName: str
   const [hardCount, setHardCount] = useState(0);
   const [flashcardProgress, setFlashcardProgress] = useState(0);
   const [showInfo, setShowInfo] = useState(false);
+  const [storyInfo, setStoryInfo] = useState(() =>
+    getStoryUnlockInfo(collectionName, unit.dayNumber, unit.wordCount),
+  );
+  const [activeStory, setActiveStory] = useState<{ num: number; title: string; content: string } | null>(null);
+  const [storyLoading, setStoryLoading] = useState(false);
 
   useEffect(() => {
     setLearnProgress(getLearnProgress(collectionName, unit.dayNumber));
@@ -157,6 +163,28 @@ function UnitCard({ unit, collectionName }: { unit: UnitRow; collectionName: str
     const fp = getFlashcardProgress(collectionName, unit.dayNumber);
     setFlashcardProgress(fp ? fp.length : 0);
   }, [collectionName, unit.dayNumber]);
+
+  const openStory = async (storyNumber: number) => {
+    setStoryLoading(true);
+    setActiveStory({ num: storyNumber, title: '', content: '' });
+    const { data } = await supabase
+      .from('unit_stories')
+      .select('title, content')
+      .eq('collection_name', collectionName)
+      .eq('unit_number', unit.dayNumber)
+      .eq('story_number', storyNumber)
+      .maybeSingle();
+    setActiveStory({
+      num: storyNumber,
+      title: data?.title ?? '',
+      content: data?.content ?? '',
+    });
+    setStoryLoading(false);
+  };
+
+  const storyEmojis = ['📖', '📕', '📗'];
+  const storyLabels = ['Story 1 · Stage 4', 'Story 2 · Mastered', 'Story 3 · 30 Days Later'];
+  const storyFlags = [storyInfo.story1Unlocked, storyInfo.story2Unlocked, storyInfo.story3Unlocked];
 
   const enc = encodeURIComponent(collectionName);
   const resumeUrl = learnProgress && learnProgress > 0
@@ -186,7 +214,12 @@ function UnitCard({ unit, collectionName }: { unit: UnitRow; collectionName: str
             <StageIcon done={flashcardDone} icon="🃏" label="Cards" />
             <StageIcon done={quizDone} icon="❓" label="Quiz" />
           </div>
-          {isComplete && <span className="text-xs text-[var(--success)] font-semibold">✓</span>}
+          <div className="flex items-center gap-1">
+            {isComplete && <span className="text-xs text-[var(--success)] font-semibold">✓</span>}
+            {storyInfo.anyUnlocked && (
+              <span className="text-xs font-bold text-amber-500">📚{storyInfo.unlockedCount}</span>
+            )}
+          </div>
         </div>
       </div>
 
@@ -238,6 +271,76 @@ function UnitCard({ unit, collectionName }: { unit: UnitRow; collectionName: str
       <div className="grid grid-cols-1 gap-2">
         <ModeButton href={matchUrl} icon="🎯" label="Match" done={false} color="#EC4899" />
       </div>
+
+      {/* Stories section */}
+      {storyInfo.anyUnlocked && (
+        <div className="mt-3 pt-3 border-t border-[var(--border)]">
+          <p className="text-xs font-bold text-[var(--text)] mb-2">📚 Stories</p>
+          <div className="flex flex-col gap-1.5">
+            {storyFlags.map((unlocked, i) => (
+              <button
+                key={i}
+                disabled={!unlocked}
+                onClick={() => unlocked && openStory(i + 1)}
+                className={`flex items-center gap-2 px-3 py-2 rounded-xl text-left transition-all text-xs font-semibold ${
+                  unlocked
+                    ? 'bg-amber-50 border border-amber-200 text-amber-700 hover:bg-amber-100'
+                    : 'bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text-muted)] opacity-50 cursor-not-allowed'
+                }`}
+              >
+                <span>{storyEmojis[i]}</span>
+                <span className="flex-1">{storyLabels[i]}</span>
+                <span>{unlocked ? '→' : '🔒'}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Story reader modal */}
+      {activeStory && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+          onClick={() => setActiveStory(null)}
+        >
+          <div
+            className="card max-w-lg w-full max-h-[85vh] flex flex-col animate-slide-up"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-3 shrink-0">
+              <span className="text-sm font-bold text-[var(--text)]">
+                {storyEmojis[activeStory.num - 1]} {storyLabels[activeStory.num - 1]}
+              </span>
+              <button
+                onClick={() => setActiveStory(null)}
+                className="text-[var(--text-muted)] hover:text-[var(--text)] text-lg leading-none"
+              >×</button>
+            </div>
+            {storyLoading ? (
+              <div className="flex-1 flex items-center justify-center py-12">
+                <div className="text-2xl animate-bounce">📖</div>
+              </div>
+            ) : activeStory.content.trim() ? (
+              <div className="overflow-y-auto">
+                {activeStory.title && (
+                  <h2 className="text-lg font-bold text-[var(--text)] mb-3">{activeStory.title}</h2>
+                )}
+                <p className="text-sm text-[var(--text)] leading-relaxed whitespace-pre-wrap">
+                  {activeStory.content}
+                </p>
+              </div>
+            ) : (
+              <div className="flex-1 flex flex-col items-center justify-center py-10 text-center">
+                <span className="text-4xl mb-3">{storyEmojis[activeStory.num - 1]}</span>
+                <p className="font-semibold text-[var(--text)] mb-1">Story coming soon</p>
+                <p className="text-xs text-[var(--text-muted)]">
+                  You&apos;ve unlocked this story, but it hasn&apos;t been written yet.
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Marking info modal */}
       {showInfo && (
