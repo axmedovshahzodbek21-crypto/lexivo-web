@@ -513,7 +513,7 @@ export default function HomePage() {
               <div className="relative h-full">
                 {a.badge && (
                   <div className="absolute -top-1.5 -right-1.5 min-w-[22px] h-[22px] rounded-full bg-white text-[var(--danger)] text-[10px] flex items-center justify-center font-black z-10 shadow px-1">
-                    {parseInt(a.badge) > 9 ? '9+' : a.badge}
+                    {a.badge}
                   </div>
                 )}
                 <Link href={a.href} className="block h-full">
