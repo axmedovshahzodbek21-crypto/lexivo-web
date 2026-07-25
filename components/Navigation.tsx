@@ -107,7 +107,7 @@ export default function Navigation() {
         onClick={toggleSidebar}
         aria-label="Show sidebar"
         tabIndex={sidebarOpen ? -1 : 0}
-        className={`hidden sm:flex fixed top-4 left-2 z-50 w-7 h-7 items-center justify-center rounded-lg bg-[var(--surface)] border border-[var(--border)] shadow-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-opacity duration-300 ${sidebarOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+        className={`hidden sm:flex fixed top-4 left-2 z-50 w-7 h-7 items-center justify-center rounded-full bg-[var(--surface)] border border-[var(--border)] shadow-sm text-[var(--text-muted)] hover:text-white hover:bg-[var(--primary)] hover:border-[var(--primary)] transition-all duration-200 ${sidebarOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
       >
         ›
       </button>
@@ -118,13 +118,21 @@ export default function Navigation() {
         {/* Brand + collapse button */}
         <div className="px-5 pt-6 pb-4 flex items-start justify-between gap-2">
           <div className="min-w-0">
-            <span className="text-2xl font-black tracking-tight" style={{ color: 'var(--primary)' }}>Lexivo</span>
+            <span
+              className="text-2xl font-black tracking-tight"
+              style={{
+                background: 'linear-gradient(135deg, var(--primary), var(--primary-light))',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}
+            >Lexivo</span>
             <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{t.sidebar.tagline}</div>
           </div>
           <button
             onClick={toggleSidebar}
             aria-label="Hide sidebar"
-            className="mt-1 shrink-0 w-6 h-6 rounded-md flex items-center justify-center text-xs text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--surface-2)] border border-[var(--border)] transition-colors"
+            className="mt-1 shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs text-[var(--text-muted)] hover:text-white hover:bg-[var(--primary)] transition-all duration-200"
           >
             ‹
           </button>
@@ -144,15 +152,18 @@ export default function Navigation() {
               <Link
                 key={href}
                 href={href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-sm font-medium ${
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-semibold ${
                   active
-                    ? 'bg-[var(--primary-bg)] text-[var(--primary)]'
-                    : 'text-[var(--text-muted)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]'
+                    ? 'text-white'
+                    : 'text-[var(--text-muted)] hover:text-[var(--primary)] hover:bg-[var(--primary-bg)]'
                 }`}
+                style={active ? {
+                  background: 'linear-gradient(135deg, var(--primary), var(--primary-light))',
+                  boxShadow: '0 4px 16px rgba(108,99,255,0.38)',
+                } : undefined}
               >
-                <span className="text-lg">{icon}</span>
+                <span className={`transition-transform duration-200 ${active ? 'text-xl scale-110' : 'text-lg'}`}>{icon}</span>
                 <span>{label}</span>
-                {active && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[var(--primary)]" />}
               </Link>
             );
           })}
@@ -163,13 +174,16 @@ export default function Navigation() {
         <div className="px-3 pb-4 pt-3 border-t border-[var(--border)]">
           <Link
             href="/profile"
-            className="block rounded-2xl p-3 transition-colors hover:bg-[var(--surface-2)] group"
+            className="block rounded-2xl p-3 transition-all duration-200 hover:bg-[var(--primary-bg)] group"
           >
             {/* Top row: avatar + name + gear */}
             <div className="flex items-center gap-2.5 mb-3">
               <div
-                className="w-9 h-9 rounded-full overflow-hidden shrink-0 shadow-sm flex items-center justify-center text-white text-sm font-black"
-                style={{ background: profilePic ? undefined : `linear-gradient(135deg, var(--primary), ${levelColor})` }}
+                className="w-9 h-9 rounded-full overflow-hidden shrink-0 flex items-center justify-center text-white text-sm font-black"
+                style={{
+                  background: profilePic ? undefined : `linear-gradient(135deg, var(--primary), ${levelColor})`,
+                  boxShadow: `0 0 0 2px var(--primary), 0 0 10px rgba(108,99,255,0.3)`,
+                }}
               >
                 {profilePic
                   ? <img src={profilePic} alt="Profile" className="w-full h-full object-cover" />
