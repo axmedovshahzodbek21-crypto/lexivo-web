@@ -177,7 +177,7 @@ export default function SRSReviewPage() {
 
     unlockAchievement('srs_first');
     recordStudySession();
-    recordReviewDay();
+    if (getDueWords().length === 0) recordReviewDay();
     const newAchievements = checkAchievements();
     newAchievements.forEach(pushAchievement);
     pushAllCurrentUser();
