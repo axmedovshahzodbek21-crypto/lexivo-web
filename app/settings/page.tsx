@@ -240,23 +240,29 @@ export default function SettingsPage() {
         </button>
       </div>
 
-      <div className="card space-y-4">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center text-sm" style={{ background: 'rgba(99,102,241,0.12)' }}>👤</div>
-          <h2 className="font-bold">{t.settings.profile}</h2>
-        </div>
-
-        <div className="flex items-center gap-4 p-3 rounded-2xl" style={{ background: 'var(--surface-2)' }}>
-          <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl font-bold flex-shrink-0"
-            style={{ background: 'var(--primary-bg)', color: 'var(--primary)' }}>
+      {/* Profile hero */}
+      <div className="rounded-2xl p-5" style={{ background: 'linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%)' }}>
+        <div className="flex items-center gap-4">
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl font-bold flex-shrink-0"
+            style={{ background: 'rgba(255,255,255,0.18)', color: 'white' }}>
             {settings.name ? settings.name[0].toUpperCase() : '?'}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-bold text-base truncate">{settings.name || 'Your name'}</p>
-            <p className="text-xs text-[var(--text-muted)] mt-0.5">Level {settings.languageLevel} · Goal: {settings.dailyGoal} words/day</p>
+            <p className="text-xl font-bold text-white truncate">{settings.name || 'Your name'}</p>
+            <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold text-white"
+                style={{ background: 'rgba(255,255,255,0.22)' }}>
+                {settings.languageLevel}
+              </span>
+              <span className="text-xs" style={{ color: 'rgba(255,255,255,0.75)' }}>🎯 {settings.dailyGoal} words/day</span>
+              <span className="text-xs" style={{ color: 'rgba(255,255,255,0.75)' }}>📚 {settings.sessionSize}/session</span>
+            </div>
           </div>
         </div>
+      </div>
 
+      {/* Profile edit */}
+      <div className="card space-y-4" style={{ borderTop: '3px solid var(--primary)' }}>
         <div>
           <label className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide block mb-1.5">{t.settings.yourName}</label>
           <input
@@ -324,7 +330,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Learning preferences */}
-      <div className="card space-y-4">
+      <div className="card space-y-4" style={{ borderTop: '3px solid #10b981' }}>
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-xl flex items-center justify-center text-sm" style={{ background: 'rgba(16,185,129,0.12)' }}>📖</div>
           <h2 className="font-bold">{t.settings.learning}</h2>
@@ -377,7 +383,7 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      <div className="card space-y-4">
+      <div className="card space-y-4" style={{ borderTop: '3px solid #f59e0b' }}>
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-xl flex items-center justify-center text-sm" style={{ background: 'rgba(245,158,11,0.12)' }}>🎨</div>
           <h2 className="font-bold">{t.settings.appearance}</h2>
@@ -491,7 +497,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Voice */}
-      <div className="card space-y-4">
+      <div className="card space-y-4" style={{ borderTop: '3px solid #3b82f6' }}>
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-xl flex items-center justify-center text-sm" style={{ background: 'rgba(59,130,246,0.12)' }}>🔊</div>
           <h2 className="font-bold">{t.settings.voice}</h2>
@@ -538,7 +544,7 @@ export default function SettingsPage() {
       {notifSupported ? (
         <div className="space-y-3">
           {/* Toggle card */}
-          <div className="card">
+          <div className="card" style={{ borderTop: '3px solid #ef4444' }}>
             <div className="flex items-center gap-2.5 mb-3">
               <div className="w-8 h-8 rounded-xl flex items-center justify-center text-sm" style={{ background: 'rgba(239,68,68,0.1)' }}>🔔</div>
               <h2 className="font-bold">{t.settings.dailyReminder}</h2>
@@ -621,7 +627,7 @@ export default function SettingsPage() {
           )}
         </div>
       ) : (
-        <div className="card">
+        <div className="card" style={{ borderTop: '3px solid #ef4444' }}>
           <div className="flex items-center gap-2.5 mb-2">
             <div className="w-8 h-8 rounded-xl flex items-center justify-center text-sm" style={{ background: 'rgba(239,68,68,0.1)' }}>🔔</div>
             <h2 className="font-bold">{t.settings.dailyReminder}</h2>
@@ -631,7 +637,7 @@ export default function SettingsPage() {
       )}
 
       {/* Data backup */}
-      <div className="card space-y-4">
+      <div className="card space-y-4" style={{ borderTop: '3px solid #10b981' }}>
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-xl flex items-center justify-center text-sm" style={{ background: 'rgba(16,185,129,0.12)' }}>💾</div>
           <div>
@@ -695,7 +701,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Support */}
-      <div className="card">
+      <div className="card" style={{ borderTop: '3px solid #3b82f6' }}>
         <div className="flex items-center gap-2.5 mb-3">
           <div className="w-8 h-8 rounded-xl flex items-center justify-center text-sm" style={{ background: 'rgba(59,130,246,0.12)' }}>💬</div>
           <h2 className="font-bold">Support</h2>
@@ -715,7 +721,7 @@ export default function SettingsPage() {
         </a>
       </div>
 
-      <div className="card space-y-3">
+      <div className="card space-y-3" style={{ borderTop: '3px solid #6366f1' }}>
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-xl flex items-center justify-center text-sm" style={{ background: 'rgba(99,102,241,0.12)' }}>ℹ️</div>
           <h2 className="font-bold">{t.settings.about}</h2>
@@ -740,7 +746,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Account */}
-      <div className="card space-y-3">
+      <div className="card space-y-3" style={{ borderTop: '3px solid #6366f1' }}>
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-xl flex items-center justify-center text-sm" style={{ background: 'rgba(99,102,241,0.12)' }}>🔑</div>
           <h2 className="font-bold">{t.profile.account}</h2>
