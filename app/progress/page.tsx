@@ -79,7 +79,7 @@ function ProgressPage() {
   const reviewLog = getReviewLog();
   const completionGroups = [0, 1, 2, 3, 4, 5].map(n => ({
     completedCount: n,
-    count: srsWords.filter(w => (reviewLog[w.learnedAt] ?? []).length === n).length,
+    count: srsWords.filter(w => (reviewLog[w.id] ?? []).length === n).length,
   }));
 
   return (
