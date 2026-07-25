@@ -63,6 +63,8 @@ export default function HomePage() {
   const [hideLists, setHideLists] = useState(false);
   const [hideGrammar, setHideGrammar] = useState(false);
   const [hideClasses, setHideClasses] = useState(false);
+  const [hideMode, setHideMode] = useState(false);
+  const [hideSelection, setHideSelection] = useState<Set<string>>(new Set());
   const [showCustomize, setShowCustomize] = useState(false);
   const [sectionOrder, setSectionOrder] = useState([
     'collections', 'reading', 'day_streak', 'total_xp', 'words',
@@ -180,6 +182,46 @@ export default function HomePage() {
   const levelInfo = getLevelInfo(xp);
   const dailyProgress = Math.min((todayCount / settings.dailyGoal) * 100, 100);
   const mainCollections = collections.filter(c => !LEVELED_NAMES.has(c.name));
+
+  const handleHideSave = () => {
+    const LS: Record<string, string> = {
+      collections: 'home_hide_collections', reading: 'home_hide_reading',
+      day_streak: 'home_hide_day_streak',   total_xp: 'home_hide_total_xp',
+      words: 'home_hide_words',             daily_goal: 'home_hide_daily_goal',
+      level: 'home_hide_level',             wod: 'home_hide_wod',
+      learn: 'home_hide_learn',             srs: 'home_hide_srs',
+      flashcards: 'home_hide_flashcards',   quiz: 'home_hide_quiz',
+      match: 'home_hide_match',             pomodoro: 'home_hide_pomodoro',
+      leaderboard: 'home_hide_leaderboard', starred: 'home_hide_starred',
+      hard_words: 'home_hide_hard_words',   lists: 'home_hide_lists',
+      grammar: 'home_hide_grammar',         classes: 'home_hide_classes',
+    };
+    hideSelection.forEach(sId => {
+      if (LS[sId]) localStorage.setItem(LS[sId], '1');
+      if (sId === 'collections')  setHideCollections(true);
+      else if (sId === 'reading')      setHideReading(true);
+      else if (sId === 'day_streak')   setHideDayStreak(true);
+      else if (sId === 'total_xp')     setHideTotalXp(true);
+      else if (sId === 'words')        setHideWords(true);
+      else if (sId === 'daily_goal')   setHideDailyGoal(true);
+      else if (sId === 'level')        setHideLevel(true);
+      else if (sId === 'wod')          setHideWod(true);
+      else if (sId === 'learn')        setHideLearn(true);
+      else if (sId === 'srs')          setHideSrs(true);
+      else if (sId === 'flashcards')   setHideFlashcards(true);
+      else if (sId === 'quiz')         setHideQuiz(true);
+      else if (sId === 'match')        setHideMatch(true);
+      else if (sId === 'pomodoro')     setHidePomodoro(true);
+      else if (sId === 'leaderboard')  setHideLeaderboard(true);
+      else if (sId === 'starred')      setHideStarred(true);
+      else if (sId === 'hard_words')   setHideHardWords(true);
+      else if (sId === 'lists')        setHideLists(true);
+      else if (sId === 'grammar')      setHideGrammar(true);
+      else if (sId === 'classes')      setHideClasses(true);
+    });
+    setHideMode(false);
+    setHideSelection(new Set());
+  };
 
   return (
     <div className="p-4 space-y-6 animate-fade-in">
@@ -431,18 +473,64 @@ export default function HomePage() {
         };
 
         return (
-          <div className="grid gap-3"
-            style={{ gridTemplateColumns: 'repeat(5, 1fr)', gridTemplateRows: '140px 140px', gridAutoRows: '130px' }}>
-            {visible.map((sId, idx) => {
-              const slot = FRAME_SLOTS[idx];
-              if (!slot) return null;
-              return (
-                <div key={sId} style={slot} className="h-full">
-                  {renderCard(sId, idx === 2)}
+          <>
+            {hideMode && (
+              <div className="flex items-center justify-between px-4 py-3 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)]">
+                <div>
+                  <p className="text-sm font-bold text-[var(--text)]">Tap cards to hide</p>
+                  <p className="text-xs text-[var(--text-muted)] mt-0.5">
+                    {hideSelection.size === 0 ? 'None selected yet' : `${hideSelection.size} selected`}
+                  </p>
                 </div>
-              );
-            })}
-          </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => { setHideMode(false); setHideSelection(new Set()); }}
+                    className="px-3 py-1.5 rounded-xl text-sm font-semibold bg-[var(--surface)] border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text)] transition-colors"
+                  >Discard</button>
+                  <button
+                    onClick={handleHideSave}
+                    disabled={hideSelection.size === 0}
+                    className="px-3 py-1.5 rounded-xl text-sm font-bold bg-[var(--danger)] text-white disabled:opacity-40 transition-opacity"
+                  >{hideSelection.size > 0 ? `Hide (${hideSelection.size})` : 'Hide'}</button>
+                </div>
+              </div>
+            )}
+            <div className="grid gap-3"
+              style={{ gridTemplateColumns: 'repeat(5, 1fr)', gridTemplateRows: '140px 140px', gridAutoRows: '130px' }}>
+              {visible.map((sId, idx) => {
+                const slot = FRAME_SLOTS[idx];
+                if (!slot) return null;
+                const isSelected = hideSelection.has(sId);
+                const toggleSelect = () => setHideSelection(prev => {
+                  const next = new Set(prev);
+                  if (next.has(sId)) next.delete(sId); else next.add(sId);
+                  return next;
+                });
+                return (
+                  <div
+                    key={sId}
+                    style={slot}
+                    className={`h-full relative ${hideMode ? 'cursor-pointer' : ''}`}
+                    onClick={hideMode ? toggleSelect : undefined}
+                  >
+                    <div className={`h-full ${hideMode ? 'pointer-events-none' : ''}`}>
+                      {renderCard(sId, idx === 2)}
+                    </div>
+                    {hideMode && (
+                      <div className={`absolute inset-0 rounded-2xl flex items-center justify-center transition-all duration-150
+                        ${isSelected ? 'bg-black/55' : 'bg-transparent hover:bg-black/15'}`}>
+                        {isSelected ? (
+                          <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center text-xl shadow-lg">✕</div>
+                        ) : (
+                          <div className="absolute top-2 right-2 w-5 h-5 rounded-full border-2 border-white/70 bg-black/10" />
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </>
         );
       })()}
 
@@ -526,7 +614,11 @@ export default function HomePage() {
               })()}
             </div>
 
-            <div className="px-6 py-4 shrink-0 flex justify-end border-t border-[var(--border)]">
+            <div className="px-6 py-4 shrink-0 flex items-center justify-between border-t border-[var(--border)]">
+              <button
+                onClick={() => { setShowCustomize(false); setHideMode(true); setHideSelection(new Set()); }}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-semibold border border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--danger)] hover:text-[var(--danger)] transition-colors"
+              >🙈 Hide sections</button>
               <button
                 onClick={() => {
                   const def = [
