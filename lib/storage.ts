@@ -306,6 +306,11 @@ function unlearnDate(learnedDate: string) {
   delete log[learnedDate]; // clean up any old date-keyed entries too
   set(KEYS.reviewLog, log);
 
+  // Clean up lastReview dates for unlearned words
+  const lastReview = getSRSLastReview();
+  for (const w of affected) delete lastReview[w.id];
+  saveSRSLastReview(lastReview);
+
   // Reset unit progress so words can be re-learned
   const unitKeys = new Set(affected.map(w => `${w.collectionName}||${w.dayNumber}`));
   for (const key of unitKeys) {
@@ -370,24 +375,29 @@ function migrateReviewLogToPerWord() {
   set(KEYS.reviewLog, newLog);
 }
 
-// Checks all SRS batches and unlearns any that are 2+ days overdue.
+// Unlearns any SRS word whose next review is 3+ days overdue.
 // Called automatically by getDueWords() but also exported for explicit use.
 export function checkAndUnlearn(today: string = localDateStr()): void {
   const srsWords = getSRSWords();
   const log = getReviewLog();
+  const lastReview = getSRSLastReview();
 
-  const byDate = new Map<string, SRSWord[]>();
+  const datesToUnlearn = new Set<string>();
+
   for (const w of srsWords) {
-    if (!byDate.has(w.learnedAt)) byDate.set(w.learnedAt, []);
-    byDate.get(w.learnedAt)!.push(w);
+    const completed = log[w.id] ?? [];
+    const nextInterval = SRS_INTERVALS.find(i => !completed.includes(i));
+    if (nextInterval === undefined) continue; // graduated
+
+    const baseDate = lastReview[w.id] ?? w.learnedAt;
+    const dueDate = addDaysToDateStr(baseDate, nextInterval);
+    if (daysBetweenDateStrs(dueDate, today) >= 3) {
+      datesToUnlearn.add(w.learnedAt);
+    }
   }
 
-  for (const [date, words] of byDate) {
-    const nextInterval = SRS_INTERVALS.find(i => words.some(w => !(log[w.id] ?? []).includes(i)));
-    if (nextInterval === undefined) continue; // all graduated
-
-    const dueDate = addDaysToDateStr(date, nextInterval);
-    if (daysBetweenDateStrs(dueDate, today) >= 2) unlearnDate(date);
+  for (const date of datesToUnlearn) {
+    unlearnDate(date);
   }
 }
 
