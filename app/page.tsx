@@ -46,9 +46,10 @@ export default function HomePage() {
   const [hideStats, setHideStats] = useState(false);
   const [hideGoalLevel, setHideGoalLevel] = useState(false);
   const [hideWod, setHideWod] = useState(false);
-  const [hideActions, setHideActions] = useState(false);
+  const [hideLearn, setHideLearn] = useState(false);
+  const [hideSrs, setHideSrs] = useState(false);
   const [showCustomize, setShowCustomize] = useState(false);
-  const [sectionOrder, setSectionOrder] = useState(['stats', 'goal', 'actions', 'shortcuts']);
+  const [sectionOrder, setSectionOrder] = useState(['stats', 'goal', 'wod', 'learn', 'srs', 'flashcards', 'quiz', 'match', 'pomodoro', 'leaderboard', 'starred', 'hard_words', 'lists', 'grammar', 'classes']);
   const [hideFlashcards, setHideFlashcards] = useState(false);
   const [hideQuiz, setHideQuiz] = useState(false);
   const [hideMatch, setHideMatch] = useState(false);
@@ -100,9 +101,21 @@ export default function HomePage() {
     setHideStats(localStorage.getItem('home_hide_stats') === '1');
     setHideGoalLevel(localStorage.getItem('home_hide_goal_level') === '1');
     setHideWod(localStorage.getItem('home_hide_wod') === '1');
-    setHideActions(localStorage.getItem('home_hide_actions') === '1');
+    setHideLearn(localStorage.getItem('home_hide_learn') === '1');
+    setHideSrs(localStorage.getItem('home_hide_srs') === '1');
+    const DEFAULT_ORDER = ['stats', 'goal', 'wod', 'learn', 'srs', 'flashcards', 'quiz', 'match', 'pomodoro', 'leaderboard', 'starred', 'hard_words', 'lists', 'grammar', 'classes'];
+    const ALL_IDS = new Set(DEFAULT_ORDER);
     const savedOrder = localStorage.getItem('home_section_order');
-    setSectionOrder(savedOrder ? savedOrder.split(',').filter(s => s !== 'shortcuts') : ['stats', 'goal', 'actions']);
+    let order = savedOrder ? savedOrder.split(',') : DEFAULT_ORDER;
+    // migrate old 'actions' / 'shortcuts' entries into flat list
+    if (order.includes('actions')) {
+      const idx = order.indexOf('actions');
+      order = [...order.slice(0, idx), 'learn', 'srs', 'flashcards', 'quiz', 'match', 'pomodoro', 'leaderboard', 'starred', 'hard_words', 'lists', 'grammar', 'classes', ...order.slice(idx + 1)];
+    }
+    order = order.filter(s => s !== 'shortcuts');
+    // append any IDs missing from the saved order
+    const missing = DEFAULT_ORDER.filter(id => !order.includes(id));
+    setSectionOrder([...order.filter(id => ALL_IDS.has(id)), ...missing]);
     setHideFlashcards(localStorage.getItem('home_hide_flashcards') === '1');
     setHideQuiz(localStorage.getItem('home_hide_quiz') === '1');
     setHideMatch(localStorage.getItem('home_hide_match') === '1');
@@ -222,23 +235,17 @@ export default function HomePage() {
       {showXpModal && <XpModal xp={xp} onClose={() => setShowXpModal(false)} />}
 
       {sectionOrder.map(sId => {
+        // ── Stats bento ──
         if (sId === 'stats' && !hideStats) return (
           <div key="stats">
-            {/* Stats bento — desktop */}
             <div className="hidden sm:grid gap-3" style={{ gridTemplateColumns: '1fr 1.5fr 1fr' }}>
               <Link href="/collections" style={{ gridColumn: 1, gridRow: 1 }} className="block">
                 <StatCard icon="🗂️" value={mainCollections.length + 2} label={t.home.collections}
                   gradient="linear-gradient(135deg, #1d4ed8, #60a5fa)" edge="#1e3a8a" glowColor="rgba(29,78,216,0.4)" />
               </Link>
               <Link href="/progress?tab=calendar" style={{ gridColumn: 2, gridRow: '1 / 3' }} className="block">
-                <div
-                  className="rounded-2xl px-8 py-10 flex flex-col items-center justify-center text-center gap-4 transition-all duration-200 hover:-translate-y-2 h-full animate-heartbeat"
-                  style={{
-                    background: 'linear-gradient(135deg, #FF6B35, #ff9f7f)',
-                    boxShadow: '0 10px 0 #b84a1a, 0 16px 36px rgba(255,107,53,0.45)',
-                    textShadow: '0 1px 4px rgba(0,0,0,0.4)',
-                  }}
-                >
+                <div className="rounded-2xl px-8 py-10 flex flex-col items-center justify-center text-center gap-4 transition-all duration-200 hover:-translate-y-2 h-full animate-heartbeat"
+                  style={{ background: 'linear-gradient(135deg, #FF6B35, #ff9f7f)', boxShadow: '0 10px 0 #b84a1a, 0 16px 36px rgba(255,107,53,0.45)', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>
                   <div className="text-7xl">🔥</div>
                   <div className="text-6xl font-black text-white leading-none">{streak}</div>
                   <div className="text-base text-white/85 font-semibold">{t.home.dayStreak}</div>
@@ -257,7 +264,6 @@ export default function HomePage() {
                   gradient="linear-gradient(135deg, #0284c7, #38bdf8)" edge="#0369a1" glowColor="rgba(2,132,199,0.4)" />
               </Link>
             </div>
-            {/* Stats — mobile */}
             <div className="grid sm:hidden grid-cols-3 gap-3">
               <Link href="/progress?tab=calendar">
                 <StatCard icon="🔥" value={streak} label={t.home.dayStreak}
@@ -274,141 +280,134 @@ export default function HomePage() {
             </div>
           </div>
         );
-        if (sId === 'goal' && (!hideGoalLevel || (!hideWod && wod))) return (
-          <div key="goal" className="grid gap-3" style={{
-            gridTemplateColumns:
-              !hideGoalLevel && !hideWod && wod ? '3fr 2fr 2fr' :
-              !hideGoalLevel ? '3fr 2fr' : '1fr',
-          }}>
-            {!hideGoalLevel && (
-              <div
-                className="rounded-2xl p-5 flex flex-col justify-between h-full transition-all duration-200 animate-heartbeat"
-                style={{
-                  background: 'linear-gradient(135deg, #5b21b6, #8b5cf6)',
-                  boxShadow: '0 8px 0 #3b0764, 0 12px 28px rgba(91,33,182,0.4)',
-                }}
-              >
-                <div className="flex items-center gap-4">
-                  <div className="relative shrink-0" style={{ width: 64, height: 64 }}>
-                    <svg width="64" height="64" style={{ transform: 'rotate(-90deg)' }}>
-                      <circle cx="32" cy="32" r="26" fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="6" />
-                      <circle cx="32" cy="32" r="26" fill="none" stroke="white" strokeWidth="6" strokeLinecap="round"
-                        strokeDasharray={`${Math.min(dailyProgress, 100) / 100 * 163.4} 163.4`}
-                        style={{ transition: 'stroke-dasharray 0.5s ease' }} />
-                    </svg>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-lg font-black text-white">{dailyProgress >= 100 ? '✓' : todayCount}</span>
-                    </div>
-                  </div>
-                  <div className="flex-1 min-w-0" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
-                    <div className="flex items-baseline gap-1.5 mb-1.5">
-                      <span className="text-2xl font-black text-white">{todayCount}</span>
-                      <span className="text-sm text-white/75 font-medium">/ {settings.dailyGoal} {t.home.dailyGoal.toLowerCase()}</span>
-                    </div>
-                    <div className="h-2 rounded-full bg-white/25 overflow-hidden mb-1.5">
-                      <div className="h-full rounded-full bg-white transition-all duration-500" style={{ width: `${Math.min(dailyProgress, 100)}%` }} />
-                    </div>
-                    <p className="text-xs text-white/75">
-                      {dailyProgress >= 100 ? `${t.home.goalReached} · ${displayXP(todayXp)} XP today` : `${displayXP(todayXp)} XP today · ${Math.max(0, settings.dailyGoal - todayCount)} to go`}
-                    </p>
+
+        // ── Daily Goal + Level ──
+        if (sId === 'goal' && !hideGoalLevel) return (
+          <div key="goal" className="grid gap-3" style={{ gridTemplateColumns: '3fr 2fr' }}>
+            <div className="rounded-2xl p-5 flex flex-col justify-between h-full transition-all duration-200 animate-heartbeat"
+              style={{ background: 'linear-gradient(135deg, #5b21b6, #8b5cf6)', boxShadow: '0 8px 0 #3b0764, 0 12px 28px rgba(91,33,182,0.4)' }}>
+              <div className="flex items-center gap-4">
+                <div className="relative shrink-0" style={{ width: 64, height: 64 }}>
+                  <svg width="64" height="64" style={{ transform: 'rotate(-90deg)' }}>
+                    <circle cx="32" cy="32" r="26" fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="6" />
+                    <circle cx="32" cy="32" r="26" fill="none" stroke="white" strokeWidth="6" strokeLinecap="round"
+                      strokeDasharray={`${Math.min(dailyProgress, 100) / 100 * 163.4} 163.4`}
+                      style={{ transition: 'stroke-dasharray 0.5s ease' }} />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-lg font-black text-white">{dailyProgress >= 100 ? '✓' : todayCount}</span>
                   </div>
                 </div>
-                <div className="mt-3 flex items-center gap-2 bg-white/15 rounded-xl px-3 py-1.5 text-xs text-white/90" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.25)' }}>
-                  <span>{streakRisk === 'at-risk' ? '⚠️' : streakRisk === 'freeze-saves' ? '⚠️' : '🧊'}</span>
-                  <span>
-                    {streakRisk === 'at-risk' && streak > 0 ? `${streak}-day streak at risk — study now!`
-                      : streakRisk === 'freeze-saves' ? `🧊 Freeze will protect your ${streak}-day streak`
-                      : freezes === 0 ? 'No freezes — earn one after 7 days'
-                      : freezes === 1 ? t.home.freezeSingle : t.home.freezeMulti(freezes)}
-                  </span>
+                <div className="flex-1 min-w-0" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
+                  <div className="flex items-baseline gap-1.5 mb-1.5">
+                    <span className="text-2xl font-black text-white">{todayCount}</span>
+                    <span className="text-sm text-white/75 font-medium">/ {settings.dailyGoal} {t.home.dailyGoal.toLowerCase()}</span>
+                  </div>
+                  <div className="h-2 rounded-full bg-white/25 overflow-hidden mb-1.5">
+                    <div className="h-full rounded-full bg-white transition-all duration-500" style={{ width: `${Math.min(dailyProgress, 100)}%` }} />
+                  </div>
+                  <p className="text-xs text-white/75">
+                    {dailyProgress >= 100 ? `${t.home.goalReached} · ${displayXP(todayXp)} XP today` : `${displayXP(todayXp)} XP today · ${Math.max(0, settings.dailyGoal - todayCount)} to go`}
+                  </p>
                 </div>
               </div>
-            )}
-            {!hideGoalLevel && (
-              <button onClick={() => setShowXpModal(true)}
-                className="rounded-2xl p-5 flex flex-col justify-between text-left transition-all duration-200 hover:-translate-y-1 w-full h-full animate-heartbeat"
-                style={{ background: 'linear-gradient(135deg, #be123c, #fb7185)', boxShadow: '0 8px 0 #881337, 0 12px 28px rgba(190,18,60,0.4)', textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}
-              >
-                <div>
-                  <div className="text-3xl mb-1">⭐</div>
-                  <div className="text-xl font-black text-white leading-tight">{levelInfo.level}</div>
-                  <div className="text-xs text-white/75 mt-0.5">{displayXP(xp)} XP</div>
-                </div>
-                <div className="mt-4">
-                  <div className="h-2.5 rounded-full bg-white/25 overflow-hidden">
-                    <div className="h-full rounded-full bg-white transition-all duration-500" style={{ width: `${levelInfo.progress}%` }} />
-                  </div>
-                  {levelInfo.next && <p className="text-[11px] text-white/75 mt-1.5">{displayXP(levelInfo.xpToNext)} XP → {levelInfo.next}</p>}
-                </div>
-              </button>
-            )}
-            {!hideWod && wod && (
-              <div className="rounded-2xl p-5 flex flex-col justify-between h-full transition-all duration-200 animate-heartbeat"
-                style={{ background: 'linear-gradient(135deg, #a21caf, #e879f9)', boxShadow: '0 8px 0 #701a75, 0 12px 28px rgba(162,28,175,0.4)', textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <div className="text-[10px] font-bold text-white/60 uppercase tracking-wider mb-1">{t.home.wordOfDay}</div>
-                    <div className="text-xl font-black text-white leading-tight">{wod.word}</div>
-                    <div className="text-xs text-white/70 mt-0.5">{wod.partOfSpeech} · {wod.pronunciation}</div>
-                    <div className="text-sm font-semibold text-white/90 mt-1">{wod.translation}</div>
-                  </div>
-                  <button onClick={() => speak(wod.word)}
-                    className="shrink-0 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-sm hover:bg-white/30 transition-colors"
-                    style={{ textShadow: 'none' }} aria-label="Listen to pronunciation">🔊</button>
-                </div>
-                {wodRevealed ? (
-                  <div className="mt-3 space-y-1.5 animate-fade-in">
-                    <p className="text-xs text-white/85 leading-snug">{wod.definition}</p>
-                    <div className="bg-white/15 rounded-xl p-2">
-                      <p className="text-xs italic text-white/80">&ldquo;{wod.example1}&rdquo;</p>
-                    </div>
-                  </div>
-                ) : (
-                  <button onClick={() => setWodRevealed(true)}
-                    className="mt-3 text-xs font-semibold text-white bg-white/20 hover:bg-white/30 rounded-xl px-3 py-1.5 transition-colors self-start"
-                    style={{ textShadow: 'none' }}>{t.home.showDefinition} →</button>
-                )}
+              <div className="mt-3 flex items-center gap-2 bg-white/15 rounded-xl px-3 py-1.5 text-xs text-white/90" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.25)' }}>
+                <span>{streakRisk === 'at-risk' || streakRisk === 'freeze-saves' ? '⚠️' : '🧊'}</span>
+                <span>
+                  {streakRisk === 'at-risk' && streak > 0 ? `${streak}-day streak at risk — study now!`
+                    : streakRisk === 'freeze-saves' ? `🧊 Freeze will protect your ${streak}-day streak`
+                    : freezes === 0 ? 'No freezes — earn one after 7 days'
+                    : freezes === 1 ? t.home.freezeSingle : t.home.freezeMulti(freezes)}
+                </span>
               </div>
+            </div>
+            <button onClick={() => setShowXpModal(true)}
+              className="rounded-2xl p-5 flex flex-col justify-between text-left transition-all duration-200 hover:-translate-y-1 w-full h-full animate-heartbeat"
+              style={{ background: 'linear-gradient(135deg, #be123c, #fb7185)', boxShadow: '0 8px 0 #881337, 0 12px 28px rgba(190,18,60,0.4)', textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
+              <div>
+                <div className="text-3xl mb-1">⭐</div>
+                <div className="text-xl font-black text-white leading-tight">{levelInfo.level}</div>
+                <div className="text-xs text-white/75 mt-0.5">{displayXP(xp)} XP</div>
+              </div>
+              <div className="mt-4">
+                <div className="h-2.5 rounded-full bg-white/25 overflow-hidden">
+                  <div className="h-full rounded-full bg-white transition-all duration-500" style={{ width: `${levelInfo.progress}%` }} />
+                </div>
+                {levelInfo.next && <p className="text-[11px] text-white/75 mt-1.5">{displayXP(levelInfo.xpToNext)} XP → {levelInfo.next}</p>}
+              </div>
+            </button>
+          </div>
+        );
+
+        // ── Word of the Day (standalone) ──
+        if (sId === 'wod' && !hideWod && wod) return (
+          <div key="wod" className="rounded-2xl p-5 flex flex-col justify-between transition-all duration-200 animate-heartbeat"
+            style={{ background: 'linear-gradient(135deg, #a21caf, #e879f9)', boxShadow: '0 8px 0 #701a75, 0 12px 28px rgba(162,28,175,0.4)', textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex-1 min-w-0">
+                <div className="text-[10px] font-bold text-white/60 uppercase tracking-wider mb-1">{t.home.wordOfDay}</div>
+                <div className="text-xl font-black text-white leading-tight">{wod.word}</div>
+                <div className="text-xs text-white/70 mt-0.5">{wod.partOfSpeech} · {wod.pronunciation}</div>
+                <div className="text-sm font-semibold text-white/90 mt-1">{wod.translation}</div>
+              </div>
+              <button onClick={() => speak(wod.word)}
+                className="shrink-0 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-sm hover:bg-white/30 transition-colors"
+                style={{ textShadow: 'none' }} aria-label="Listen to pronunciation">🔊</button>
+            </div>
+            {wodRevealed ? (
+              <div className="mt-3 space-y-1.5 animate-fade-in">
+                <p className="text-xs text-white/85 leading-snug">{wod.definition}</p>
+                <div className="bg-white/15 rounded-xl p-2">
+                  <p className="text-xs italic text-white/80">&ldquo;{wod.example1}&rdquo;</p>
+                </div>
+              </div>
+            ) : (
+              <button onClick={() => setWodRevealed(true)}
+                className="mt-3 text-xs font-semibold text-white bg-white/20 hover:bg-white/30 rounded-xl px-3 py-1.5 transition-colors self-start"
+                style={{ textShadow: 'none' }}>{t.home.showDefinition} →</button>
             )}
           </div>
         );
-        if (sId === 'actions' && !hideActions) return (
-          <div key="actions" className="flex flex-wrap justify-center gap-4">
-            {[
-              <ActionCard key="learn" href="/learn" icon="📖" title={t.home.learnTitle} subtitle={t.home.learnSub}
-                gradient="linear-gradient(135deg, #4338ca, #818cf8)" edge="#312e81" glow="rgba(67,56,202,0.4)" />,
-              !hideFlashcards && <ActionCard key="fc" href="/flashcards" icon="🃏" title={t.home.flashcardsTitle} subtitle={t.home.flashcardsSub}
-                gradient="linear-gradient(135deg, #b45309, #fcd34d)" edge="#78350f" glow="rgba(180,83,9,0.4)" />,
-              <ActionCard key="srs" href="/srs" icon="🔄" title={t.home.srsTitle}
-                subtitle={dueCount > 0 ? t.home.srsDue(dueCount) : t.home.srsAllCaughtUp}
-                gradient={dueCount > 0 ? 'linear-gradient(135deg, #ef4444, #f87171)' : 'linear-gradient(135deg, #1a9a50, #2ECC71)'}
-                edge={dueCount > 0 ? '#b91c1c' : '#0f6634'}
-                glow={dueCount > 0 ? 'rgba(239,68,68,0.4)' : 'rgba(46,204,113,0.4)'}
-                badge={dueCount > 0 ? String(dueCount) : undefined} />,
-              !hideQuiz && <ActionCard key="quiz" href="/quiz" icon="❓" title={t.home.quizTitle} subtitle={t.home.quizSub}
-                gradient="linear-gradient(135deg, #4d7c0f, #a3e635)" edge="#365314" glow="rgba(77,124,15,0.4)" />,
-              !hideStarred && <ActionCard key="starred" href="/starred" icon="⭐" title={t.home.starredTitle} subtitle={t.home.starredSub}
-                gradient="linear-gradient(135deg, #92400e, #d97706)" edge="#451a03" glow="rgba(146,64,14,0.4)" />,
-              !hideMatch && <ActionCard key="match" href="/matching" icon="🎯" title={t.home.matchTitle} subtitle={t.home.matchSub}
-                gradient="linear-gradient(135deg, #ec4899, #f472b6)" edge="#9d174d" glow="rgba(236,72,153,0.4)" />,
-              !hidePomodoro && <ActionCard key="pom" href="/pomodoro" icon="🍅" title={t.home.pomodoroTitle} subtitle={t.home.pomodoroSub}
-                gradient="linear-gradient(135deg, #7f1d1d, #b91c1c)" edge="#450a0a" glow="rgba(127,29,29,0.4)" />,
-              !hideLeaderboard && <ActionCard key="lb" href="/leaderboard" icon="🏆" title="Leaderboard" subtitle="See top learners"
-                gradient="linear-gradient(135deg, #d97706, #fbbf24)" edge="#92400e" glow="rgba(217,119,6,0.4)" />,
-              !hideHardWords && <ActionCard key="hard" href="/hard-words" icon="😓" title={t.home.hardTitle} subtitle={t.home.hardSub}
-                gradient="linear-gradient(135deg, #dc2626, #ef4444)" edge="#991b1b" glow="rgba(220,38,38,0.4)" />,
-              !hideLists && <ActionCard key="lists" href="/lists" icon="📋" title={t.home.listsTitle} subtitle={t.home.listsSub}
-                gradient="linear-gradient(135deg, #7c3aed, #8b5cf6)" edge="#4c1d95" glow="rgba(124,58,237,0.4)" />,
-              !hideGrammar && <ActionCard key="grammar" href="/grammar-tips" icon="📚" title={t.home.grammarTitle} subtitle={t.home.grammarSub}
-                gradient="linear-gradient(135deg, #1a9a50, #2ECC71)" edge="#0f6634" glow="rgba(46,204,113,0.4)" />,
-              !hideClasses && <ActionCard key="classes" href="/classes" icon="👩‍🏫" title={t.home.classesTitle} subtitle={t.home.classesSub}
-                gradient="linear-gradient(135deg, #0284c7, #38bdf8)" edge="#0369a1" glow="rgba(2,132,199,0.4)" />,
-            ].filter(Boolean).map((card, idx) => (
-              <div key={idx} className="w-[calc(50%-8px)] sm:w-[calc(25%-12px)]">{card}</div>
-            ))}
-          </div>
-        );
+
+        // ── Individual action cards (each is its own slot) ──
+        type ActionDef = { href: string; icon: string; title: string; subtitle: string; gradient: string; edge: string; glow: string; hidden: boolean; badge?: string };
+        const ACTION_MAP: Record<string, ActionDef> = {
+          learn:      { href: '/learn',        icon: '📖', title: t.home.learnTitle,     subtitle: t.home.learnSub,       gradient: 'linear-gradient(135deg, #4338ca, #818cf8)', edge: '#312e81', glow: 'rgba(67,56,202,0.4)',   hidden: hideLearn },
+          srs:        { href: '/srs',          icon: '🔄', title: t.home.srsTitle,        subtitle: dueCount > 0 ? t.home.srsDue(dueCount) : t.home.srsAllCaughtUp, gradient: dueCount > 0 ? 'linear-gradient(135deg, #ef4444, #f87171)' : 'linear-gradient(135deg, #1a9a50, #2ECC71)', edge: dueCount > 0 ? '#b91c1c' : '#0f6634', glow: dueCount > 0 ? 'rgba(239,68,68,0.4)' : 'rgba(46,204,113,0.4)', hidden: hideSrs, badge: dueCount > 0 ? String(dueCount) : undefined },
+          flashcards: { href: '/flashcards',   icon: '🃏', title: t.home.flashcardsTitle, subtitle: t.home.flashcardsSub,  gradient: 'linear-gradient(135deg, #b45309, #fcd34d)', edge: '#78350f', glow: 'rgba(180,83,9,0.4)',   hidden: hideFlashcards },
+          quiz:       { href: '/quiz',         icon: '❓', title: t.home.quizTitle,       subtitle: t.home.quizSub,        gradient: 'linear-gradient(135deg, #4d7c0f, #a3e635)', edge: '#365314', glow: 'rgba(77,124,15,0.4)',  hidden: hideQuiz },
+          match:      { href: '/matching',     icon: '🎯', title: t.home.matchTitle,      subtitle: t.home.matchSub,       gradient: 'linear-gradient(135deg, #ec4899, #f472b6)', edge: '#9d174d', glow: 'rgba(236,72,153,0.4)', hidden: hideMatch },
+          pomodoro:   { href: '/pomodoro',     icon: '🍅', title: t.home.pomodoroTitle,   subtitle: t.home.pomodoroSub,    gradient: 'linear-gradient(135deg, #7f1d1d, #b91c1c)', edge: '#450a0a', glow: 'rgba(127,29,29,0.4)',  hidden: hidePomodoro },
+          leaderboard:{ href: '/leaderboard',  icon: '🏆', title: 'Leaderboard',          subtitle: 'See top learners',    gradient: 'linear-gradient(135deg, #d97706, #fbbf24)', edge: '#92400e', glow: 'rgba(217,119,6,0.4)',  hidden: hideLeaderboard },
+          starred:    { href: '/starred',      icon: '⭐', title: t.home.starredTitle,    subtitle: t.home.starredSub,     gradient: 'linear-gradient(135deg, #92400e, #d97706)', edge: '#451a03', glow: 'rgba(146,64,14,0.4)',  hidden: hideStarred },
+          hard_words: { href: '/hard-words',   icon: '😓', title: t.home.hardTitle,       subtitle: t.home.hardSub,        gradient: 'linear-gradient(135deg, #dc2626, #ef4444)', edge: '#991b1b', glow: 'rgba(220,38,38,0.4)',  hidden: hideHardWords },
+          lists:      { href: '/lists',        icon: '📋', title: t.home.listsTitle,      subtitle: t.home.listsSub,       gradient: 'linear-gradient(135deg, #7c3aed, #8b5cf6)', edge: '#4c1d95', glow: 'rgba(124,58,237,0.4)', hidden: hideLists },
+          grammar:    { href: '/grammar-tips', icon: '📚', title: t.home.grammarTitle,    subtitle: t.home.grammarSub,     gradient: 'linear-gradient(135deg, #1a9a50, #2ECC71)', edge: '#0f6634', glow: 'rgba(46,204,113,0.4)', hidden: hideGrammar },
+          classes:    { href: '/classes',      icon: '👩‍🏫', title: t.home.classesTitle,  subtitle: t.home.classesSub,     gradient: 'linear-gradient(135deg, #0284c7, #38bdf8)', edge: '#0369a1', glow: 'rgba(2,132,199,0.4)',  hidden: hideClasses },
+        };
+        if (sId in ACTION_MAP) {
+          const a = ACTION_MAP[sId];
+          if (a.hidden) return null;
+          return (
+            <div key={sId} className="relative">
+              {a.badge && (
+                <div className="absolute -top-1.5 -right-1.5 min-w-[22px] h-[22px] rounded-full bg-white text-[var(--danger)] text-[10px] flex items-center justify-center font-black z-10 shadow px-1">
+                  {parseInt(a.badge) > 9 ? '9+' : a.badge}
+                </div>
+              )}
+              <Link href={a.href} className="flex items-center gap-4 p-4 rounded-2xl transition-all duration-200 hover:-translate-y-1 animate-heartbeat"
+                style={{ background: a.gradient, boxShadow: `0 5px 0 ${a.edge}, 0 8px 20px ${a.glow}`, textShadow: '0 1px 3px rgba(0,0,0,0.35)' }}>
+                <span className="text-3xl shrink-0">{a.icon}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="font-bold text-sm text-white leading-tight">{a.title}</div>
+                  <div className="text-xs text-white/70 mt-0.5">{a.subtitle}</div>
+                </div>
+                <span className="text-white/60 text-xl shrink-0">›</span>
+              </Link>
+            </div>
+          );
+        }
+
         return null;
       })}
 
@@ -420,7 +419,6 @@ export default function HomePage() {
             className="relative w-full sm:max-w-sm bg-[var(--surface)] rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col max-h-[88vh]"
             onClick={e => e.stopPropagation()}
           >
-            {/* Header */}
             <div className="px-6 pt-6 pb-4 shrink-0">
               <div className="w-10 h-1 rounded-full bg-[var(--border)] mx-auto mb-5 sm:hidden" />
               <div className="flex items-center justify-between">
@@ -430,18 +428,28 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Content */}
-            <div className="overflow-y-auto flex-1 px-6 pb-2">
-              {/* Main sections */}
-              <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider pb-2">Sections</p>
-              <div className="space-y-2 mb-5">
-                {sectionOrder.map((sId, i) => {
-                  const meta: Record<string, { icon: string; label: string; hidden: boolean; toggle: () => void }> = {
-                    stats:   { icon: '📊', label: 'Stats Row',          hidden: hideStats,     toggle: () => { setHideStats(h => !h);     localStorage.setItem('home_hide_stats',      (!hideStats)     ? '1' : '0'); setShowCustomize(false); } },
-                    goal:    { icon: '🎯', label: 'Daily Goal & Level', hidden: hideGoalLevel, toggle: () => { setHideGoalLevel(h => !h); localStorage.setItem('home_hide_goal_level', (!hideGoalLevel) ? '1' : '0'); setShowCustomize(false); } },
-                    actions: { icon: '▶️', label: 'Quick Actions',      hidden: hideActions,   toggle: () => { setHideActions(h => !h);   localStorage.setItem('home_hide_actions',    (!hideActions)   ? '1' : '0'); setShowCustomize(false); } },
-                  };
-                  const { icon, label, hidden, toggle } = meta[sId];
+            <div className="overflow-y-auto flex-1 px-6 pb-2 space-y-2">
+              {(() => {
+                const MODAL_META: Record<string, { icon: string; label: string; hidden: boolean; toggle: () => void; closeOnToggle?: boolean }> = {
+                  stats:      { icon: '📊', label: 'Stats Row',          hidden: hideStats,      toggle: () => { setHideStats(h => !h);          localStorage.setItem('home_hide_stats',         (!hideStats)      ? '1' : '0'); }, closeOnToggle: true },
+                  goal:       { icon: '🎯', label: 'Daily Goal & Level', hidden: hideGoalLevel,  toggle: () => { setHideGoalLevel(h => !h);      localStorage.setItem('home_hide_goal_level',    (!hideGoalLevel)  ? '1' : '0'); }, closeOnToggle: true },
+                  wod:        { icon: '✨', label: 'Word of Day',        hidden: hideWod,        toggle: () => { setHideWod(h => !h);            localStorage.setItem('home_hide_wod',           (!hideWod)        ? '1' : '0'); }, closeOnToggle: true },
+                  learn:      { icon: '📖', label: 'Learn',              hidden: hideLearn,      toggle: () => { setHideLearn(h => !h);          localStorage.setItem('home_hide_learn',         (!hideLearn)      ? '1' : '0'); } },
+                  srs:        { icon: '🔄', label: 'SRS Review',         hidden: hideSrs,        toggle: () => { setHideSrs(h => !h);            localStorage.setItem('home_hide_srs',           (!hideSrs)        ? '1' : '0'); } },
+                  flashcards: { icon: '🃏', label: 'Flashcards',         hidden: hideFlashcards, toggle: () => { setHideFlashcards(h => !h);    localStorage.setItem('home_hide_flashcards',    (!hideFlashcards) ? '1' : '0'); } },
+                  quiz:       { icon: '❓', label: 'Quiz',               hidden: hideQuiz,       toggle: () => { setHideQuiz(h => !h);           localStorage.setItem('home_hide_quiz',          (!hideQuiz)       ? '1' : '0'); } },
+                  match:      { icon: '🎯', label: 'Match',              hidden: hideMatch,      toggle: () => { setHideMatch(h => !h);          localStorage.setItem('home_hide_match',         (!hideMatch)      ? '1' : '0'); } },
+                  pomodoro:   { icon: '🍅', label: 'Pomodoro',           hidden: hidePomodoro,   toggle: () => { setHidePomodoro(h => !h);      localStorage.setItem('home_hide_pomodoro',      (!hidePomodoro)   ? '1' : '0'); } },
+                  leaderboard:{ icon: '🏆', label: 'Leaderboard',        hidden: hideLeaderboard,toggle: () => { setHideLeaderboard(h => !h);  localStorage.setItem('home_hide_leaderboard',   (!hideLeaderboard)? '1' : '0'); } },
+                  starred:    { icon: '⭐', label: 'Starred Words',      hidden: hideStarred,    toggle: () => { setHideStarred(h => !h);        localStorage.setItem('home_hide_starred',       (!hideStarred)    ? '1' : '0'); } },
+                  hard_words: { icon: '😓', label: 'Hard Words',         hidden: hideHardWords,  toggle: () => { setHideHardWords(h => !h);    localStorage.setItem('home_hide_hard_words',    (!hideHardWords)  ? '1' : '0'); } },
+                  lists:      { icon: '📋', label: 'Lists',              hidden: hideLists,      toggle: () => { setHideLists(h => !h);          localStorage.setItem('home_hide_lists',         (!hideLists)      ? '1' : '0'); } },
+                  grammar:    { icon: '📚', label: 'Grammar Tips',       hidden: hideGrammar,    toggle: () => { setHideGrammar(h => !h);        localStorage.setItem('home_hide_grammar',       (!hideGrammar)    ? '1' : '0'); } },
+                  classes:    { icon: '👩‍🏫', label: 'Classes',          hidden: hideClasses,    toggle: () => { setHideClasses(h => !h);        localStorage.setItem('home_hide_classes',       (!hideClasses)    ? '1' : '0'); } },
+                };
+                return sectionOrder.map((sId, i) => {
+                  const m = MODAL_META[sId];
+                  if (!m) return null;
                   const moveUp = () => {
                     if (i === 0) return;
                     const next = [...sectionOrder]; [next[i - 1], next[i]] = [next[i], next[i - 1]];
@@ -453,67 +461,41 @@ export default function HomePage() {
                     setSectionOrder(next); localStorage.setItem('home_section_order', next.join(','));
                   };
                   return (
-                    <div key={sId} className={`flex items-center gap-3 p-3.5 rounded-2xl border transition-all duration-200 ${hidden ? 'border-[var(--border)] bg-[var(--surface-2)] opacity-60' : 'border-[var(--primary)] bg-[var(--primary-bg)]'}`}>
-                      <span className="text-xl shrink-0">{icon}</span>
+                    <div key={sId} className={`flex items-center gap-3 p-3 rounded-2xl border transition-all duration-200 ${m.hidden ? 'border-[var(--border)] bg-[var(--surface-2)] opacity-55' : 'border-[var(--primary)] bg-[var(--primary-bg)]'}`}>
+                      <span className="text-lg shrink-0 w-6 text-center">{m.icon}</span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-[var(--text)] leading-tight">{label}</p>
-                        <p className="text-xs text-[var(--text-muted)]">{hidden ? 'Hidden' : `Position ${i + 1}`}</p>
+                        <p className="text-sm font-semibold text-[var(--text)] leading-tight">{m.label}</p>
+                        <p className="text-xs text-[var(--text-muted)]">{m.hidden ? 'Hidden' : `Position ${i + 1}`}</p>
                       </div>
-                      {!hidden && (
+                      {!m.hidden && (
                         <div className="flex gap-1 shrink-0">
                           <button onClick={moveUp} disabled={i === 0}
-                            className="w-7 h-7 rounded-lg bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center text-xs text-[var(--text-muted)] hover:text-[var(--primary)] hover:border-[var(--primary)] disabled:opacity-25 transition-all">▲</button>
+                            className="w-6 h-6 rounded-lg bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center text-[10px] text-[var(--text-muted)] hover:text-[var(--primary)] hover:border-[var(--primary)] disabled:opacity-25 transition-all">▲</button>
                           <button onClick={moveDown} disabled={i === sectionOrder.length - 1}
-                            className="w-7 h-7 rounded-lg bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center text-xs text-[var(--text-muted)] hover:text-[var(--primary)] hover:border-[var(--primary)] disabled:opacity-25 transition-all">▼</button>
+                            className="w-6 h-6 rounded-lg bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center text-[10px] text-[var(--text-muted)] hover:text-[var(--primary)] hover:border-[var(--primary)] disabled:opacity-25 transition-all">▼</button>
                         </div>
                       )}
-                      <button onClick={toggle}
-                        className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all shrink-0 ${hidden ? 'bg-[var(--surface)] border border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--primary)] hover:text-[var(--primary)]' : 'bg-[var(--primary)] text-white'}`}>
-                        {hidden ? 'Show' : 'Hide'}
+                      <button
+                        onClick={() => { m.toggle(); if (m.closeOnToggle) setShowCustomize(false); }}
+                        className={`px-2.5 py-1 rounded-full text-xs font-bold transition-all shrink-0 ${m.hidden ? 'bg-[var(--surface)] border border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--primary)] hover:text-[var(--primary)]' : 'bg-[var(--primary)] text-white'}`}>
+                        {m.hidden ? 'Show' : 'Hide'}
                       </button>
                     </div>
                   );
-                })}
-              </div>
-
-              {/* Individual items */}
-              <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider pb-1">Individual items</p>
-              {([
-                { icon: '✨', label: 'Word of Day',   hidden: hideWod,         toggle: () => { setHideWod(!hideWod);                 localStorage.setItem('home_hide_wod',          !hideWod         ? '1' : '0'); } },
-                { icon: '🃏', label: 'Flashcards',    hidden: hideFlashcards,  toggle: () => { setHideFlashcards(!hideFlashcards);   localStorage.setItem('home_hide_flashcards',   !hideFlashcards  ? '1' : '0'); } },
-                { icon: '❓', label: 'Quiz',           hidden: hideQuiz,        toggle: () => { setHideQuiz(!hideQuiz);               localStorage.setItem('home_hide_quiz',         !hideQuiz        ? '1' : '0'); } },
-                { icon: '🎯', label: 'Match',          hidden: hideMatch,       toggle: () => { setHideMatch(!hideMatch);             localStorage.setItem('home_hide_match',        !hideMatch       ? '1' : '0'); } },
-                { icon: '🍅', label: 'Pomodoro',       hidden: hidePomodoro,    toggle: () => { setHidePomodoro(!hidePomodoro);       localStorage.setItem('home_hide_pomodoro',     !hidePomodoro    ? '1' : '0'); } },
-                { icon: '🏆', label: 'Leaderboard',   hidden: hideLeaderboard, toggle: () => { setHideLeaderboard(!hideLeaderboard); localStorage.setItem('home_hide_leaderboard',  !hideLeaderboard ? '1' : '0'); } },
-                { icon: '⭐', label: 'Starred Words', hidden: hideStarred,     toggle: () => { setHideStarred(!hideStarred);         localStorage.setItem('home_hide_starred',      !hideStarred     ? '1' : '0'); } },
-                { icon: '😓', label: 'Hard Words',    hidden: hideHardWords,   toggle: () => { setHideHardWords(!hideHardWords);     localStorage.setItem('home_hide_hard_words',   !hideHardWords   ? '1' : '0'); } },
-                { icon: '📋', label: 'Lists',          hidden: hideLists,       toggle: () => { setHideLists(!hideLists);             localStorage.setItem('home_hide_lists',        !hideLists       ? '1' : '0'); } },
-                { icon: '📚', label: 'Grammar Tips',  hidden: hideGrammar,     toggle: () => { setHideGrammar(!hideGrammar);         localStorage.setItem('home_hide_grammar',      !hideGrammar     ? '1' : '0'); } },
-                { icon: '👩‍🏫', label: 'Classes',      hidden: hideClasses,     toggle: () => { setHideClasses(!hideClasses);         localStorage.setItem('home_hide_classes',      !hideClasses     ? '1' : '0'); } },
-              ]).map(({ icon, label, hidden, toggle }) => (
-                <div key={label} className="flex items-center gap-3 px-1 py-2 border-b border-[var(--border)] last:border-0">
-                  <span className="text-base w-6">{icon}</span>
-                  <span className="flex-1 text-sm text-[var(--text-muted)]">{label}</span>
-                  <button onClick={toggle}
-                    className="relative w-10 h-5 rounded-full transition-colors shrink-0"
-                    style={{ background: !hidden ? 'var(--primary)' : 'var(--border)' }}>
-                    <div className="absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform"
-                      style={{ transform: !hidden ? 'translateX(22px)' : 'translateX(2px)' }} />
-                  </button>
-                </div>
-              ))}
+                });
+              })()}
             </div>
 
-            {/* Footer */}
             <div className="px-6 py-4 shrink-0 flex justify-end border-t border-[var(--border)]">
               <button
                 onClick={() => {
-                  const def = ['stats', 'goal', 'actions'];
+                  const def = ['stats', 'goal', 'wod', 'learn', 'srs', 'flashcards', 'quiz', 'match', 'pomodoro', 'leaderboard', 'starred', 'hard_words', 'lists', 'grammar', 'classes'];
                   setSectionOrder(def); localStorage.setItem('home_section_order', def.join(','));
                   setHideStats(false);       localStorage.removeItem('home_hide_stats');
                   setHideGoalLevel(false);   localStorage.removeItem('home_hide_goal_level');
                   setHideWod(false);         localStorage.removeItem('home_hide_wod');
-                  setHideActions(false);     localStorage.removeItem('home_hide_actions');
+                  setHideLearn(false);       localStorage.removeItem('home_hide_learn');
+                  setHideSrs(false);         localStorage.removeItem('home_hide_srs');
                   setHideFlashcards(false);  localStorage.removeItem('home_hide_flashcards');
                   setHideQuiz(false);        localStorage.removeItem('home_hide_quiz');
                   setHideMatch(false);       localStorage.removeItem('home_hide_match');
@@ -557,36 +539,6 @@ function StatCard({ icon, value, label, gradient, edge, glowColor }: {
   );
 }
 
-function ActionCard({
-  href, icon, title, subtitle, gradient, edge, glow, badge,
-}: {
-  href: string; icon: string; title: string; subtitle: string;
-  gradient: string; edge: string; glow: string; badge?: string;
-}) {
-  return (
-    <Link href={href} className="block relative group">
-      {badge && (
-        <div className="absolute -top-1.5 -right-1.5 min-w-[22px] h-[22px] rounded-full bg-white text-[var(--danger)] text-[10px] flex items-center justify-center font-black z-10 shadow px-1">
-          {parseInt(badge) > 9 ? '9+' : badge}
-        </div>
-      )}
-      <div
-        className="rounded-2xl p-5 flex flex-col items-center text-center gap-2 transition-all duration-200 group-hover:-translate-y-1.5 h-full animate-heartbeat"
-        style={{
-          background: gradient,
-          boxShadow: `0 8px 0 ${edge}, 0 12px 28px ${glow}`,
-          textShadow: '0 1px 3px rgba(0,0,0,0.35)',
-        }}
-      >
-        <div className="text-4xl">{icon}</div>
-        <div>
-          <div className="font-bold text-white text-sm leading-tight">{title}</div>
-          <div className="text-white/85 text-xs mt-0.5">{subtitle}</div>
-        </div>
-      </div>
-    </Link>
-  );
-}
 
 function ShortcutCard({ href, icon, label, sub, gradient, edge, glow }: {
   href: string; icon: string; label: string; sub: string;
