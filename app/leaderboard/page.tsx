@@ -329,18 +329,19 @@ export default function LeaderboardPage() {
                     </div>
                     <Avatar name={e.name} url={e.avatar_url} size={38} />
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5 flex-wrap">
+                      <div className="flex items-center gap-1.5">
                         {savedIds.has(e.user_id) && <span className="text-sm leading-none">⭐</span>}
                         <p className="font-bold text-sm truncate">{e.name}</p>
-                        {isMe && <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: 'var(--primary)', color: 'white' }}>YOU</span>}
+                        {isMe && <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0" style={{ background: 'var(--primary)', color: 'white' }}>YOU</span>}
                       </div>
-                      <p className="text-xs text-[var(--text-muted)] mt-0.5">
-                        {e.xp.toLocaleString()} XP{e.streak > 0 ? ` · 🔥 ${e.streak}` : ''}
-                      </p>
+                      {e.last_study_date === today && (
+                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(16,185,129,0.15)', color: 'var(--success)' }}>TODAY</span>
+                      )}
                     </div>
-                    {e.last_study_date === today && (
-                      <span className="text-[9px] font-bold px-2 py-1 rounded-full flex-shrink-0" style={{ background: 'rgba(16,185,129,0.15)', color: 'var(--success)' }}>TODAY</span>
-                    )}
+                    <div className="text-right flex-shrink-0">
+                      <p className="text-sm font-black" style={{ color: 'var(--primary)' }}>{e.xp.toLocaleString()} XP</p>
+                      {e.streak > 0 && <p className="text-xs text-[var(--text-muted)]">🔥 {e.streak}</p>}
+                    </div>
                   </div>
                 );
               })}
