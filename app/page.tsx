@@ -232,7 +232,7 @@ export default function HomePage() {
               </Link>
               <Link href="/progress?tab=calendar" style={{ gridColumn: 2, gridRow: '1 / 3' }} className="block">
                 <div
-                  className="rounded-2xl px-8 py-10 flex flex-col items-center justify-center text-center gap-4 transition-all duration-200 hover:-translate-y-2 h-full"
+                  className="rounded-2xl px-8 py-10 flex flex-col items-center justify-center text-center gap-4 transition-all duration-200 hover:-translate-y-2 h-full animate-heartbeat"
                   style={{
                     background: 'linear-gradient(135deg, #FF6B35, #ff9f7f)',
                     boxShadow: '0 10px 0 #b84a1a, 0 16px 36px rgba(255,107,53,0.45)',
@@ -282,7 +282,7 @@ export default function HomePage() {
           }}>
             {!hideGoalLevel && (
               <div
-                className="rounded-2xl p-5 flex flex-col justify-between h-full transition-all duration-200"
+                className="rounded-2xl p-5 flex flex-col justify-between h-full transition-all duration-200 animate-heartbeat"
                 style={{
                   background: 'linear-gradient(135deg, #5b21b6, #8b5cf6)',
                   boxShadow: '0 8px 0 #3b0764, 0 12px 28px rgba(91,33,182,0.4)',
@@ -326,7 +326,7 @@ export default function HomePage() {
             )}
             {!hideGoalLevel && (
               <button onClick={() => setShowXpModal(true)}
-                className="rounded-2xl p-5 flex flex-col justify-between text-left transition-all duration-200 hover:-translate-y-1 w-full h-full"
+                className="rounded-2xl p-5 flex flex-col justify-between text-left transition-all duration-200 hover:-translate-y-1 w-full h-full animate-heartbeat"
                 style={{ background: 'linear-gradient(135deg, #be123c, #fb7185)', boxShadow: '0 8px 0 #881337, 0 12px 28px rgba(190,18,60,0.4)', textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}
               >
                 <div>
@@ -343,7 +343,7 @@ export default function HomePage() {
               </button>
             )}
             {!hideWod && wod && (
-              <div className="rounded-2xl p-5 flex flex-col justify-between h-full transition-all duration-200"
+              <div className="rounded-2xl p-5 flex flex-col justify-between h-full transition-all duration-200 animate-heartbeat"
                 style={{ background: 'linear-gradient(135deg, #a21caf, #e879f9)', boxShadow: '0 8px 0 #701a75, 0 12px 28px rgba(162,28,175,0.4)', textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}
               >
                 <div className="flex items-start justify-between gap-2">
@@ -562,7 +562,7 @@ function StatCard({ icon, value, label, gradient, edge, glowColor }: {
 }) {
   return (
     <div
-      className="rounded-2xl p-4 flex flex-col items-center text-center gap-1 transition-all duration-200 hover:-translate-y-1 w-full h-full"
+      className="rounded-2xl p-4 flex flex-col items-center text-center gap-1 transition-all duration-200 hover:-translate-y-1 w-full h-full animate-heartbeat"
       style={{
         background: gradient,
         boxShadow: `0 7px 0 ${edge}, 0 10px 24px ${glowColor}`,
@@ -590,7 +590,7 @@ function ActionCard({
         </div>
       )}
       <div
-        className="rounded-2xl p-5 flex flex-col items-center text-center gap-2 transition-all duration-200 group-hover:-translate-y-1.5 h-full"
+        className="rounded-2xl p-5 flex flex-col items-center text-center gap-2 transition-all duration-200 group-hover:-translate-y-1.5 h-full animate-heartbeat"
         style={{
           background: gradient,
           boxShadow: `0 8px 0 ${edge}, 0 12px 28px ${glow}`,
