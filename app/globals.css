@@ -20,12 +20,13 @@
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 4px 14px rgba(120,100,60,0.10);
   --sidebar-bg: rgba(255, 253, 249, 0.82);
   --sidebar-border: rgba(180, 160, 140, 0.28);
-  /* light: soft sage-lavender-sky blend — low saturation, high restfulness */
+  /* light: amethyst — soft lavender, violet, warm amber accent */
   --bg-mesh:
-    radial-gradient(ellipse 90% 70% at 10% 15%, rgba(100, 180, 200, 0.13) 0%, transparent 72%),
-    radial-gradient(ellipse 80% 65% at 88% 12%, rgba(140, 100, 220, 0.10) 0%, transparent 68%),
-    radial-gradient(ellipse 85% 70% at 55% 92%, rgba(80,  160, 180, 0.11) 0%, transparent 70%),
-    radial-gradient(ellipse 70% 60% at 4%  80%, rgba(160, 120, 220, 0.09) 0%, transparent 65%);
+    radial-gradient(ellipse 90% 70% at 10% 15%, rgba(150,  80, 200, 0.13) 0%, transparent 72%),
+    radial-gradient(ellipse 80% 65% at 88% 12%, rgba(180, 100, 220, 0.10) 0%, transparent 68%),
+    radial-gradient(ellipse 85% 70% at 55% 92%, rgba(120,  60, 180, 0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 65% 55% at 80% 68%, rgba(200, 140,  40, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 70% 60% at 4%  80%, rgba(160,  80, 210, 0.09) 0%, transparent 65%);
 }
 
 [data-theme="dark"] {
@@ -33,25 +34,26 @@
   --primary-dark: #6C63FF;
   --primary-light: #a89fff;
   --primary-bg: #1e1d3a;
-  --background: #080d18;
-  --surface: #1a1928;
-  --surface-2: #252438;
+  --background: #0c0818;
+  --surface: #170f28;
+  --surface-2: #221838;
   --text: #eeeeff;
-  --text-muted: #9999bb;
-  --border: #2e2d45;
+  --text-muted: #9988bb;
+  --border: #2e224a;
   --success: #34d399;
   --warning: #fbbf24;
   --danger: #f87171;
   --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --sidebar-bg: rgba(12, 11, 24, 0.85);
-  --sidebar-border: rgba(255, 255, 255, 0.07);
-  /* dark: teal (most restful) + muted indigo (focus) + deep violet — all desaturated */
+  --sidebar-bg: rgba(14, 8, 28, 0.88);
+  --sidebar-border: rgba(180, 140, 255, 0.10);
+  /* dark: amethyst crystal — deep violet core, rich purple, lavender shimmer, amber vein */
   --bg-mesh:
-    radial-gradient(ellipse 90% 70% at 10% 15%, rgba(0,  110, 140, 0.32) 0%, transparent 72%),
-    radial-gradient(ellipse 80% 65% at 88% 12%, rgba(70,  40, 140, 0.26) 0%, transparent 68%),
-    radial-gradient(ellipse 85% 70% at 55% 92%, rgba(20,  80, 140, 0.24) 0%, transparent 70%),
-    radial-gradient(ellipse 70% 60% at 4%  80%, rgba(90,  20, 110, 0.20) 0%, transparent 65%);
+    radial-gradient(ellipse 85% 65% at 15% 20%, rgba(110,  35, 170, 0.50) 0%, transparent 70%),
+    radial-gradient(ellipse 75% 60% at 85% 10%, rgba(145,  65, 185, 0.40) 0%, transparent 66%),
+    radial-gradient(ellipse 90% 70% at 50% 90%, rgba( 55,   8,  95, 0.55) 0%, transparent 72%),
+    radial-gradient(ellipse 55% 45% at 78% 60%, rgba(184, 118,  22, 0.18) 0%, transparent 58%),
+    radial-gradient(ellipse 65% 55% at 5%  72%, rgba(125,  55, 165, 0.35) 0%, transparent 65%);
 }
 
 @theme inline {
