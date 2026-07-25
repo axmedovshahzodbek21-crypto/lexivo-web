@@ -67,6 +67,9 @@ export default function HomePage() {
   const [hideSelection, setHideSelection] = useState<Set<string>>(new Set());
   const [unhideMode, setUnhideMode] = useState(false);
   const [unhideSelection, setUnhideSelection] = useState<Set<string>>(new Set());
+  const [switchMode, setSwitchMode] = useState(false);
+  const [workingOrder, setWorkingOrder] = useState<string[]>([]);
+  const [switchFirst, setSwitchFirst] = useState<string | null>(null);
   const [showCustomize, setShowCustomize] = useState(false);
   const [sectionOrder, setSectionOrder] = useState([
     'collections', 'reading', 'day_streak', 'total_xp', 'words',
@@ -265,6 +268,14 @@ export default function HomePage() {
     setUnhideSelection(new Set());
   };
 
+  const handleSwitchSave = () => {
+    setSectionOrder(workingOrder);
+    localStorage.setItem('home_section_order', workingOrder.join(','));
+    setSwitchMode(false);
+    setSwitchFirst(null);
+    setWorkingOrder([]);
+  };
+
   return (
     <div className="p-4 space-y-6 animate-fade-in">
       {/* Header */}
@@ -366,7 +377,11 @@ export default function HomePage() {
           hard_words: hideHardWords, lists: hideLists, grammar: hideGrammar, classes: hideClasses,
         };
         const visible = sectionOrder.filter(sId => !HIDE_MAP[sId]);
-        const displaySections = unhideMode ? sectionOrder : visible;
+        const displaySections = unhideMode
+          ? sectionOrder
+          : switchMode
+          ? workingOrder.filter(sId => !HIDE_MAP[sId])
+          : visible;
 
         type ActionDef = { href: string; icon: string; title: string; subtitle: string; gradient: string; edge: string; glow: string; badge?: string };
         const ACTION_MAP: Record<string, ActionDef> = {
@@ -559,6 +574,30 @@ export default function HomePage() {
                 </div>
               </div>
             )}
+            {switchMode && (
+              <div className="flex items-center justify-between px-4 py-3 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)]">
+                <div>
+                  <p className="text-sm font-bold text-[var(--text)]">
+                    {switchFirst
+                      ? `Swap "${switchFirst.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}" with…`
+                      : 'Tap a card to select it'}
+                  </p>
+                  <p className="text-xs text-[var(--text-muted)] mt-0.5">
+                    {switchFirst ? 'Tap another card to swap, or same card to deselect' : 'Then tap another card to swap positions'}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => { setSwitchMode(false); setSwitchFirst(null); setWorkingOrder([]); }}
+                    className="px-3 py-1.5 rounded-xl text-sm font-semibold bg-[var(--surface)] border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text)] transition-colors"
+                  >Discard</button>
+                  <button
+                    onClick={handleSwitchSave}
+                    className="px-3 py-1.5 rounded-xl text-sm font-bold bg-[var(--primary)] text-white"
+                  >Save</button>
+                </div>
+              </div>
+            )}
             <div className="grid gap-3"
               style={{ gridTemplateColumns: 'repeat(5, 1fr)', gridTemplateRows: '140px 140px', gridAutoRows: '130px' }}>
               {displaySections.map((sId, idx) => {
@@ -576,16 +615,32 @@ export default function HomePage() {
                     const next = new Set(prev); if (next.has(sId)) next.delete(sId); else next.add(sId); return next;
                   });
                 };
-                const isInteractive = hideMode || (unhideMode && isHidden);
+                const isInteractive = hideMode || (unhideMode && isHidden) || switchMode;
+                const handleSwitchTap = () => {
+                  if (switchFirst === null) {
+                    setSwitchFirst(sId);
+                  } else if (switchFirst === sId) {
+                    setSwitchFirst(null);
+                  } else {
+                    const newOrder = [...workingOrder];
+                    const aIdx = newOrder.indexOf(switchFirst);
+                    const bIdx = newOrder.indexOf(sId);
+                    if (aIdx !== -1 && bIdx !== -1) {
+                      [newOrder[aIdx], newOrder[bIdx]] = [newOrder[bIdx], newOrder[aIdx]];
+                      setWorkingOrder(newOrder);
+                    }
+                    setSwitchFirst(null);
+                  }
+                };
                 return (
                   <div
                     key={sId}
                     style={slot}
-                    className={`h-full relative ${isInteractive ? 'cursor-pointer' : ''}`}
-                    onClick={hideMode ? toggleHideSelect : (unhideMode ? toggleUnhideSelect : undefined)}
+                    className={`h-full relative group ${isInteractive ? 'cursor-pointer' : ''}`}
+                    onClick={switchMode ? handleSwitchTap : (hideMode ? toggleHideSelect : (unhideMode ? toggleUnhideSelect : undefined))}
                   >
                     <div className={`h-full transition-opacity duration-150
-                      ${hideMode || (unhideMode && !isHidden) ? 'pointer-events-none' : ''}
+                      ${hideMode || switchMode || (unhideMode && !isHidden) ? 'pointer-events-none' : ''}
                       ${unhideMode && isHidden ? (isUnhideSelected ? 'opacity-65 pointer-events-none' : 'opacity-25 pointer-events-none') : ''}`}>
                       {renderCard(sId, idx === 2)}
                     </div>
@@ -612,6 +667,20 @@ export default function HomePage() {
                           <div className="absolute top-2 right-2 w-5 h-5 rounded-full border-2 border-white/50 bg-black/20 flex items-center justify-center">
                             <span className="text-white/70 text-[10px] font-bold leading-none">+</span>
                           </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Switch mode overlay */}
+                    {switchMode && (
+                      <div className={`absolute inset-0 rounded-2xl pointer-events-none transition-all duration-150
+                        ${sId === switchFirst ? 'ring-2 ring-inset ring-white bg-white/20' : 'group-hover:bg-white/10'}`}>
+                        {sId === switchFirst ? (
+                          <div className="flex items-center justify-center h-full">
+                            <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center text-xl shadow-lg">⇄</div>
+                          </div>
+                        ) : (
+                          <div className="absolute top-2 right-2 text-white/40 text-xs font-black">⇄</div>
                         )}
                       </div>
                     )}
@@ -713,6 +782,10 @@ export default function HomePage() {
                   onClick={() => { setShowCustomize(false); setUnhideMode(true); setUnhideSelection(new Set()); }}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-semibold border border-[var(--border)] text-[var(--text-muted)] hover:border-green-500 hover:text-green-500 transition-colors"
                 >👁 Unhide</button>
+                <button
+                  onClick={() => { setShowCustomize(false); setSwitchMode(true); setWorkingOrder([...sectionOrder]); setSwitchFirst(null); }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-semibold border border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--primary)] hover:text-[var(--primary)] transition-colors"
+                >⇄ Switch</button>
               </div>
               <button
                 onClick={() => {
