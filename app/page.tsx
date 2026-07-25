@@ -697,76 +697,33 @@ export default function HomePage() {
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" onClick={() => setShowCustomize(false)}>
           <div className="absolute inset-0 bg-black/50" />
           <div
-            className="relative w-full sm:max-w-sm bg-[var(--surface)] rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col max-h-[88vh]"
+            className="relative w-full sm:max-w-sm bg-[var(--surface)] rounded-t-3xl sm:rounded-3xl shadow-2xl"
             onClick={e => e.stopPropagation()}
           >
-            <div className="px-6 pt-6 pb-4 shrink-0">
+            <div className="px-6 pt-6 pb-4">
               <div className="w-10 h-1 rounded-full bg-[var(--border)] mx-auto mb-5 sm:hidden" />
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between mb-5">
                 <h2 className="text-lg font-bold text-[var(--text)]">Customize Home</h2>
                 <button onClick={() => setShowCustomize(false)}
                   className="w-8 h-8 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">✕</button>
               </div>
-            </div>
-
-            <div className="overflow-y-auto flex-1 px-6 pb-2 space-y-2">
-              {(() => {
-                const MODAL_META: Record<string, { icon: string; label: string; hidden: boolean; toggle: () => void }> = {
-                  collections: { icon: '🗂️', label: 'Collections',   hidden: hideCollections, toggle: () => { setHideCollections(h => !h); localStorage.setItem('home_hide_collections', (!hideCollections) ? '1' : '0'); } },
-                  reading:     { icon: '📰', label: 'Reading',        hidden: hideReading,     toggle: () => { setHideReading(h => !h);     localStorage.setItem('home_hide_reading',     (!hideReading)     ? '1' : '0'); } },
-                  day_streak:  { icon: '🔥', label: 'Day Streak',     hidden: hideDayStreak,   toggle: () => { setHideDayStreak(h => !h);   localStorage.setItem('home_hide_day_streak',  (!hideDayStreak)   ? '1' : '0'); } },
-                  total_xp:    { icon: '⚡', label: 'Total XP',       hidden: hideTotalXp,     toggle: () => { setHideTotalXp(h => !h);     localStorage.setItem('home_hide_total_xp',   (!hideTotalXp)     ? '1' : '0'); } },
-                  words:       { icon: '📚', label: 'Words',          hidden: hideWords,       toggle: () => { setHideWords(h => !h);       localStorage.setItem('home_hide_words',       (!hideWords)       ? '1' : '0'); } },
-                  daily_goal:  { icon: '🎯', label: 'Daily Goal',     hidden: hideDailyGoal,   toggle: () => { setHideDailyGoal(h => !h);   localStorage.setItem('home_hide_daily_goal',  (!hideDailyGoal)   ? '1' : '0'); } },
-                  level:       { icon: '⭐', label: 'Level',          hidden: hideLevel,       toggle: () => { setHideLevel(h => !h);       localStorage.setItem('home_hide_level',       (!hideLevel)       ? '1' : '0'); } },
-                  wod:         { icon: '✨', label: 'Word of Day',    hidden: hideWod,         toggle: () => { setHideWod(h => !h);         localStorage.setItem('home_hide_wod',         (!hideWod)         ? '1' : '0'); } },
-                  learn:       { icon: '📖', label: 'Learn',          hidden: hideLearn,       toggle: () => { setHideLearn(h => !h);       localStorage.setItem('home_hide_learn',       (!hideLearn)       ? '1' : '0'); } },
-                  flashcards:  { icon: '🃏', label: 'Flashcards',     hidden: hideFlashcards,  toggle: () => { setHideFlashcards(h => !h);  localStorage.setItem('home_hide_flashcards',  (!hideFlashcards)  ? '1' : '0'); } },
-                  srs:         { icon: '🔄', label: 'SRS Review',     hidden: hideSrs,         toggle: () => { setHideSrs(h => !h);         localStorage.setItem('home_hide_srs',         (!hideSrs)         ? '1' : '0'); } },
-                  quiz:        { icon: '❓', label: 'Quiz',           hidden: hideQuiz,        toggle: () => { setHideQuiz(h => !h);        localStorage.setItem('home_hide_quiz',        (!hideQuiz)        ? '1' : '0'); } },
-                  starred:     { icon: '⭐', label: 'Starred Words',  hidden: hideStarred,     toggle: () => { setHideStarred(h => !h);     localStorage.setItem('home_hide_starred',     (!hideStarred)     ? '1' : '0'); } },
-                  match:       { icon: '🎯', label: 'Match',          hidden: hideMatch,       toggle: () => { setHideMatch(h => !h);       localStorage.setItem('home_hide_match',       (!hideMatch)       ? '1' : '0'); } },
-                  pomodoro:    { icon: '🍅', label: 'Pomodoro',       hidden: hidePomodoro,    toggle: () => { setHidePomodoro(h => !h);    localStorage.setItem('home_hide_pomodoro',    (!hidePomodoro)    ? '1' : '0'); } },
-                  leaderboard: { icon: '🏆', label: 'Leaderboard',    hidden: hideLeaderboard, toggle: () => { setHideLeaderboard(h => !h); localStorage.setItem('home_hide_leaderboard', (!hideLeaderboard) ? '1' : '0'); } },
-                  hard_words:  { icon: '😓', label: 'Hard Words',     hidden: hideHardWords,   toggle: () => { setHideHardWords(h => !h);   localStorage.setItem('home_hide_hard_words',  (!hideHardWords)   ? '1' : '0'); } },
-                  lists:       { icon: '📋', label: 'Lists',          hidden: hideLists,       toggle: () => { setHideLists(h => !h);       localStorage.setItem('home_hide_lists',       (!hideLists)       ? '1' : '0'); } },
-                  grammar:     { icon: '📚', label: 'Grammar Tips',   hidden: hideGrammar,     toggle: () => { setHideGrammar(h => !h);     localStorage.setItem('home_hide_grammar',     (!hideGrammar)     ? '1' : '0'); } },
-                  classes:     { icon: '👩‍🏫', label: 'Classes',      hidden: hideClasses,     toggle: () => { setHideClasses(h => !h);     localStorage.setItem('home_hide_classes',     (!hideClasses)     ? '1' : '0'); } },
-                };
-                return sectionOrder.map((sId, i) => {
-                  const m = MODAL_META[sId];
-                  if (!m) return null;
-                  return (
-                    <div key={sId} className={`flex items-center gap-3 p-3 rounded-2xl border transition-all duration-200 ${m.hidden ? 'border-[var(--border)] bg-[var(--surface-2)] opacity-50' : 'border-[var(--primary)] bg-[var(--primary-bg)]'}`}>
-                      <span className="text-lg shrink-0 w-6 text-center">{m.icon}</span>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-[var(--text)] leading-tight">{m.label}</p>
-                        <p className="text-xs text-[var(--text-muted)]">{m.hidden ? 'Hidden' : `Position ${i + 1}`}</p>
-                      </div>
-                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full shrink-0 ${m.hidden ? 'bg-[var(--surface)] text-[var(--text-muted)]' : 'bg-[var(--primary-bg)] text-[var(--primary)]'}`}>
-                        {m.hidden ? 'Hidden' : 'Visible'}
-                      </span>
-                    </div>
-                  );
-                });
-              })()}
-            </div>
-
-            <div className="px-6 py-4 shrink-0 flex items-center justify-between border-t border-[var(--border)]">
-              <div className="flex gap-2">
+              <div className="grid grid-cols-3 gap-3 mb-4">
                 <button
                   onClick={() => { setShowCustomize(false); setHideMode(true); setHideSelection(new Set()); }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-semibold border border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--danger)] hover:text-[var(--danger)] transition-colors"
-                >🙈 Hide</button>
+                  className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--danger)] hover:text-[var(--danger)] hover:bg-red-500/5 transition-all"
+                ><span className="text-2xl">🙈</span><span className="text-xs font-semibold">Hide</span></button>
                 <button
                   onClick={() => { setShowCustomize(false); setUnhideMode(true); setUnhideSelection(new Set()); }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-semibold border border-[var(--border)] text-[var(--text-muted)] hover:border-green-500 hover:text-green-500 transition-colors"
-                >👁 Unhide</button>
+                  className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-[var(--border)] text-[var(--text-muted)] hover:border-green-500 hover:text-green-500 hover:bg-green-500/5 transition-all"
+                ><span className="text-2xl">👁</span><span className="text-xs font-semibold">Unhide</span></button>
                 <button
                   onClick={() => { setShowCustomize(false); setSwitchMode(true); setWorkingOrder([...sectionOrder]); setSwitchFirst(null); }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-semibold border border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--primary)] hover:text-[var(--primary)] transition-colors"
-                >⇄ Switch</button>
+                  className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--primary)] hover:text-[var(--primary)] hover:bg-[var(--primary-bg)] transition-all"
+                ><span className="text-2xl">⇄</span><span className="text-xs font-semibold">Switch</span></button>
               </div>
+            </div>
+
+            <div className="px-6 py-4 border-t border-[var(--border)] flex justify-end">
               <button
                 onClick={() => {
                   const def = [
