@@ -45,17 +45,47 @@ export default function SRSReviewPage() {
   const resultsLenRef = useRef(0);
 
   const loadWords = useCallback(() => {
-    const due = getDueWords();
-    const shuffled = [...due].sort(() => Math.random() - 0.5);
+    const allDue = getDueWords();
+    setAllWords(getSRSWords());
+    // Restore session from sessionStorage if available (survives page refresh)
+    try {
+      const raw = sessionStorage.getItem('srs_session');
+      if (raw) {
+        const { queueIds, savedIndex, savedResults } = JSON.parse(raw) as {
+          queueIds: string[];
+          savedIndex: number;
+          savedResults: { id: string; grade: 'knew' | 'notYet' }[];
+        };
+        const dueMap = new Map(allDue.map(w => [w.id, w]));
+        const restored = queueIds.map(id => dueMap.get(id)).filter(Boolean) as DueSRSWord[];
+        if (restored.length > 0) {
+          setQueue(restored);
+          setIndex(savedIndex ?? 0);
+          setResults(savedResults ?? []);
+          return;
+        }
+      }
+    } catch {}
+    // Fresh session
+    const shuffled = [...allDue].sort(() => Math.random() - 0.5);
     setQueue(shuffled);
     if (shuffled.length === 0) setDone(true);
-    setAllWords(getSRSWords());
   }, []);
 
   useEffect(() => { loadWords(); }, [loadWords]);
 
   useEffect(() => { indexRef.current = index; }, [index]);
   useEffect(() => { resultsLenRef.current = results.length; }, [results]);
+
+  // Persist session to sessionStorage so a page refresh restores the same word
+  useEffect(() => {
+    if (queue.length === 0 || done) return;
+    sessionStorage.setItem('srs_session', JSON.stringify({
+      queueIds: queue.map(w => w.id),
+      savedIndex: index,
+      savedResults: results,
+    }));
+  }, [queue, index, results, done]);
 
   useEffect(() => {
     const handler = () => {
@@ -114,6 +144,7 @@ export default function SRSReviewPage() {
   const applyGrades = useCallback((finalResults: { id: string; grade: 'knew' | 'notYet' }[]) => {
     if (gradesApplied.current) return;
     gradesApplied.current = true;
+    sessionStorage.removeItem('srs_session');
     if (finalResults.length === 0) return;
 
     // Only mark interval done for words the user knew — matches Flutter failSRSWord no-op
