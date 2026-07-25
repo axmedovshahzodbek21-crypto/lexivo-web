@@ -20,11 +20,12 @@
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 4px 14px rgba(120,100,60,0.10);
   --sidebar-bg: rgba(255, 253, 249, 0.82);
   --sidebar-border: rgba(180, 160, 140, 0.28);
+  /* light: soft sage-lavender-sky blend — low saturation, high restfulness */
   --bg-mesh:
-    radial-gradient(ellipse at 12% 18%, rgba(108, 99, 255, 0.10) 0%, transparent 52%),
-    radial-gradient(ellipse at 82% 8%,  rgba(180, 140, 255, 0.08) 0%, transparent 44%),
-    radial-gradient(ellipse at 65% 88%, rgba(99, 60, 200, 0.08)  0%, transparent 50%),
-    radial-gradient(ellipse at 6%  75%, rgba(60, 160, 220, 0.06) 0%, transparent 42%);
+    radial-gradient(ellipse 90% 70% at 10% 15%, rgba(100, 180, 200, 0.13) 0%, transparent 72%),
+    radial-gradient(ellipse 80% 65% at 88% 12%, rgba(140, 100, 220, 0.10) 0%, transparent 68%),
+    radial-gradient(ellipse 85% 70% at 55% 92%, rgba(80,  160, 180, 0.11) 0%, transparent 70%),
+    radial-gradient(ellipse 70% 60% at 4%  80%, rgba(160, 120, 220, 0.09) 0%, transparent 65%);
 }
 
 [data-theme="dark"] {
@@ -32,7 +33,7 @@
   --primary-dark: #6C63FF;
   --primary-light: #a89fff;
   --primary-bg: #1e1d3a;
-  --background: #0d0c18;
+  --background: #080d18;
   --surface: #1a1928;
   --surface-2: #252438;
   --text: #eeeeff;
@@ -43,13 +44,14 @@
   --danger: #f87171;
   --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --sidebar-bg: rgba(16, 15, 28, 0.82);
+  --sidebar-bg: rgba(12, 11, 24, 0.85);
   --sidebar-border: rgba(255, 255, 255, 0.07);
+  /* dark: teal (most restful) + muted indigo (focus) + deep violet — all desaturated */
   --bg-mesh:
-    radial-gradient(ellipse at 12% 18%, rgba(108, 99, 255, 0.22) 0%, transparent 52%),
-    radial-gradient(ellipse at 82% 8%,  rgba(80, 55, 210, 0.16)  0%, transparent 44%),
-    radial-gradient(ellipse at 65% 88%, rgba(155, 60, 220, 0.14) 0%, transparent 50%),
-    radial-gradient(ellipse at 6%  75%, rgba(45, 90, 220, 0.10)  0%, transparent 42%);
+    radial-gradient(ellipse 90% 70% at 10% 15%, rgba(0,  110, 140, 0.32) 0%, transparent 72%),
+    radial-gradient(ellipse 80% 65% at 88% 12%, rgba(70,  40, 140, 0.26) 0%, transparent 68%),
+    radial-gradient(ellipse 85% 70% at 55% 92%, rgba(20,  80, 140, 0.24) 0%, transparent 70%),
+    radial-gradient(ellipse 70% 60% at 4%  80%, rgba(90,  20, 110, 0.20) 0%, transparent 65%);
 }
 
 @theme inline {
