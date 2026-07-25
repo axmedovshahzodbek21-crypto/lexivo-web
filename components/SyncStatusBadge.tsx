@@ -14,7 +14,7 @@ const STATE_CFG = {
 
 export default function SyncStatusBadge({ sidebar = false }: { sidebar?: boolean }) {
   const [state, setState] = useState<SyncState>('idle');
-  const [dismissed, setDismissed] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout>;
@@ -35,42 +35,42 @@ export default function SyncStatusBadge({ sidebar = false }: { sidebar?: boolean
     };
   }, []);
 
-  // Re-show on actionable states so the user doesn't miss errors
+  // Auto-expand on actionable states so the user doesn't miss errors
   useEffect(() => {
-    if (state === 'error' || state === 'suspended') setDismissed(false);
+    if (state === 'error' || state === 'suspended') setExpanded(true);
   }, [state]);
 
   const cfg = STATE_CFG[state];
-  const showStatus = state !== 'idle' && !dismissed;
 
-  // ── Sidebar mode: persistent row ────────────────────────────────────────────
+  // ── Sidebar mode: collapsed arrow → expand to show sync row ─────────────────
   if (sidebar) {
     return (
       <div className="flex items-center gap-1.5">
         <button
-          onClick={() => triggerSync()}
-          title="Sync now"
-          className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all"
-          style={showStatus
-            ? { background: cfg.bg, color: cfg.color }
-            : { color: 'var(--text-muted)' }}
-        >
-          <span className={state === 'syncing' ? 'animate-spin inline-block' : ''}>{cfg.icon}</span>
-          {showStatus ? cfg.label : 'Sync'}
-        </button>
-        {showStatus && (
+          onClick={() => setExpanded(e => !e)}
+          title={expanded ? 'Hide sync' : 'Show sync'}
+          className="text-[11px] text-[var(--text-muted)] hover:text-[var(--text)] transition-all leading-none select-none"
+          style={{ transform: expanded ? 'rotate(90deg)' : 'none' }}
+        >›</button>
+        {expanded && (
           <button
-            onClick={() => setDismissed(true)}
-            title="Dismiss"
-            className="text-[11px] text-[var(--text-muted)] hover:text-[var(--text)] transition-colors leading-none"
-          >›</button>
+            onClick={() => triggerSync()}
+            title="Sync now"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all"
+            style={state !== 'idle'
+              ? { background: cfg.bg, color: cfg.color }
+              : { color: 'var(--text-muted)' }}
+          >
+            <span className={state === 'syncing' ? 'animate-spin inline-block' : ''}>{cfg.icon}</span>
+            {state !== 'idle' ? cfg.label : 'Sync'}
+          </button>
         )}
       </div>
     );
   }
 
   // ── Floating mode: pill shown only for non-idle states ───────────────────────
-  if (state === 'idle' || state === 'syncing' || dismissed) return null;
+  if (state === 'idle' || state === 'syncing' || !expanded) return null;
 
   return (
     <div className="flex items-center gap-1">
@@ -84,7 +84,7 @@ export default function SyncStatusBadge({ sidebar = false }: { sidebar?: boolean
         {cfg.label}
       </button>
       <button
-        onClick={() => setDismissed(true)}
+        onClick={() => setExpanded(false)}
         title="Dismiss"
         className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--text)] transition-colors"
       >›</button>
