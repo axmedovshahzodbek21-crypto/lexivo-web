@@ -20,13 +20,10 @@
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 4px 14px rgba(120,100,60,0.10);
   --sidebar-bg: rgba(255, 253, 249, 0.82);
   --sidebar-border: rgba(180, 160, 140, 0.28);
-  /* light: amethyst — soft lavender, violet, warm amber accent */
+  /* light: amethyst photo with soft white veil */
   --bg-mesh:
-    radial-gradient(ellipse 90% 70% at 10% 15%, rgba(150,  80, 200, 0.13) 0%, transparent 72%),
-    radial-gradient(ellipse 80% 65% at 88% 12%, rgba(180, 100, 220, 0.10) 0%, transparent 68%),
-    radial-gradient(ellipse 85% 70% at 55% 92%, rgba(120,  60, 180, 0.12) 0%, transparent 70%),
-    radial-gradient(ellipse 65% 55% at 80% 68%, rgba(200, 140,  40, 0.08) 0%, transparent 60%),
-    radial-gradient(ellipse 70% 60% at 4%  80%, rgba(160,  80, 210, 0.09) 0%, transparent 65%);
+    linear-gradient(rgba(245, 240, 255, 0.70), rgba(245, 240, 255, 0.70)),
+    url('/XV3PB.jpg');
 }
 
 [data-theme="dark"] {
@@ -47,13 +44,10 @@
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
   --sidebar-bg: rgba(14, 8, 28, 0.88);
   --sidebar-border: rgba(180, 140, 255, 0.10);
-  /* dark: amethyst crystal — deep violet core, rich purple, lavender shimmer, amber vein */
+  /* dark: amethyst photo with deep purple-black veil */
   --bg-mesh:
-    radial-gradient(ellipse 85% 65% at 15% 20%, rgba(110,  35, 170, 0.50) 0%, transparent 70%),
-    radial-gradient(ellipse 75% 60% at 85% 10%, rgba(145,  65, 185, 0.40) 0%, transparent 66%),
-    radial-gradient(ellipse 90% 70% at 50% 90%, rgba( 55,   8,  95, 0.55) 0%, transparent 72%),
-    radial-gradient(ellipse 55% 45% at 78% 60%, rgba(184, 118,  22, 0.18) 0%, transparent 58%),
-    radial-gradient(ellipse 65% 55% at 5%  72%, rgba(125,  55, 165, 0.35) 0%, transparent 65%);
+    linear-gradient(rgba(12, 8, 24, 0.62), rgba(12, 8, 24, 0.62)),
+    url('/XV3PB.jpg');
 }
 
 @theme inline {
@@ -92,6 +86,8 @@ html, body {
   background-color: var(--background);
   background-image: var(--bg-mesh);
   background-attachment: fixed;
+  background-size: cover;
+  background-position: center;
   color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
   font-size: 16px;
