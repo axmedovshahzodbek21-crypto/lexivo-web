@@ -241,9 +241,24 @@ export default function SettingsPage() {
       </div>
 
       <div className="card space-y-4">
-        <h2 className="font-semibold">{t.settings.profile}</h2>
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center text-sm" style={{ background: 'rgba(99,102,241,0.12)' }}>👤</div>
+          <h2 className="font-bold">{t.settings.profile}</h2>
+        </div>
+
+        <div className="flex items-center gap-4 p-3 rounded-2xl" style={{ background: 'var(--surface-2)' }}>
+          <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl font-bold flex-shrink-0"
+            style={{ background: 'var(--primary-bg)', color: 'var(--primary)' }}>
+            {settings.name ? settings.name[0].toUpperCase() : '?'}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-bold text-base truncate">{settings.name || 'Your name'}</p>
+            <p className="text-xs text-[var(--text-muted)] mt-0.5">Level {settings.languageLevel} · Goal: {settings.dailyGoal} words/day</p>
+          </div>
+        </div>
+
         <div>
-          <label className="text-sm font-medium text-[var(--text-muted)] block mb-1">{t.settings.yourName}</label>
+          <label className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide block mb-1.5">{t.settings.yourName}</label>
           <input
             type="text"
             value={settings.name}
@@ -254,7 +269,7 @@ export default function SettingsPage() {
         </div>
 
         <div>
-          <label className="text-sm font-medium text-[var(--text-muted)] block mb-1">{t.settings.dailyGoal}</label>
+          <label className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide block mb-1.5">{t.settings.dailyGoal}</label>
           <input
             type="number"
             min={1}
@@ -266,7 +281,7 @@ export default function SettingsPage() {
         </div>
 
         <div>
-          <label className="text-sm font-medium text-[var(--text-muted)] block mb-2">{t.settings.sessionSize}</label>
+          <label className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide block mb-2">{t.settings.sessionSize}</label>
           <div className="grid grid-cols-5 gap-2">
             {[5, 10, 15, 20, 30].map(n => (
               <button
@@ -286,7 +301,7 @@ export default function SettingsPage() {
         </div>
 
         <div>
-          <label className="text-sm font-medium text-[var(--text-muted)] block mb-2">{t.settings.languageLevel}</label>
+          <label className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide block mb-2">{t.settings.languageLevel}</label>
           <div className="grid grid-cols-3 gap-2">
             {(['A1', 'A2', 'B1', 'B2', 'C1', 'C2'] as const).map(level => (
               <button
@@ -310,10 +325,13 @@ export default function SettingsPage() {
 
       {/* Learning preferences */}
       <div className="card space-y-4">
-        <h2 className="font-semibold">{t.settings.learning}</h2>
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center text-sm" style={{ background: 'rgba(16,185,129,0.12)' }}>📖</div>
+          <h2 className="font-bold">{t.settings.learning}</h2>
+        </div>
 
         <div>
-          <p className="text-sm font-medium text-[var(--text)] mb-2">{t.settings.cardOrder}</p>
+          <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-2">{t.settings.cardOrder}</p>
           <div className="grid grid-cols-2 gap-2">
             {([
               { value: 'random',   label: t.settings.random,   icon: '🔀' },
@@ -336,7 +354,7 @@ export default function SettingsPage() {
         </div>
 
         <div>
-          <p className="text-sm font-medium text-[var(--text)] mb-2">{t.settings.quizDirection}</p>
+          <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-2">{t.settings.quizDirection}</p>
           <div className="grid grid-cols-2 gap-2">
             {([
               { value: 'word-to-uz', label: t.settings.engToUz },
@@ -360,10 +378,13 @@ export default function SettingsPage() {
       </div>
 
       <div className="card space-y-4">
-        <h2 className="font-semibold">{t.settings.appearance}</h2>
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center text-sm" style={{ background: 'rgba(245,158,11,0.12)' }}>🎨</div>
+          <h2 className="font-bold">{t.settings.appearance}</h2>
+        </div>
 
         <div>
-          <p className="text-sm font-medium text-[var(--text)] mb-2">{t.settings.theme}</p>
+          <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-2">{t.settings.theme}</p>
           <div className="grid grid-cols-3 gap-2">
             {([
               { value: 'system', label: t.settings.themeSystem, icon: '⚙️' },
@@ -387,7 +408,7 @@ export default function SettingsPage() {
         </div>
 
         <div>
-          <p className="text-sm font-medium text-[var(--text)] mb-2">{t.settings.fontSize}</p>
+          <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-2">{t.settings.fontSize}</p>
           <div className="grid grid-cols-3 gap-2">
             {([
               { value: 'compact', label: t.settings.fontCompact, sample: 'A−' },
@@ -414,7 +435,7 @@ export default function SettingsPage() {
 
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-[var(--text)]">{t.settings.interfaceLang}</p>
+            <p className="text-sm font-medium">{t.settings.interfaceLang}</p>
             <p className="text-xs text-[var(--text-muted)] mt-0.5">{t.settings.interfaceLangHelper}</p>
           </div>
           <div className="flex rounded-xl overflow-hidden border border-[var(--border)]">
@@ -438,42 +459,47 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        <div className="flex items-center justify-between">
-          <div>
-          <p className="text-sm font-medium text-[var(--text)]">{t.settings.reduceMotion}</p>
-            <p className="text-xs text-[var(--text-muted)] mt-0.5">{t.settings.reduceMotionHelper}</p>
+        <div className="divide-y divide-[var(--border)]">
+          <div className="flex items-center justify-between py-3">
+            <div>
+              <p className="text-sm font-medium">{t.settings.reduceMotion}</p>
+              <p className="text-xs text-[var(--text-muted)] mt-0.5">{t.settings.reduceMotionHelper}</p>
+            </div>
+            <button
+              onClick={() => handleReduceMotion(!settings.reduceMotion)}
+              className={`relative w-14 h-7 rounded-full transition-colors duration-300 focus:outline-none ${settings.reduceMotion ? 'bg-[var(--primary)]' : 'bg-[var(--surface-2)]'}`}
+              aria-label="Toggle reduce motion"
+            >
+              <span className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-300 ${settings.reduceMotion ? 'translate-x-7' : 'translate-x-0'}`} />
+            </button>
           </div>
-          <button
-            onClick={() => handleReduceMotion(!settings.reduceMotion)}
-            className={`relative w-14 h-7 rounded-full transition-colors duration-300 focus:outline-none ${settings.reduceMotion ? 'bg-[var(--primary)]' : 'bg-[var(--surface-2)]'}`}
-            aria-label="Toggle reduce motion"
-          >
-            <span className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-300 ${settings.reduceMotion ? 'translate-x-7' : 'translate-x-0'}`} />
-          </button>
-        </div>
 
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-[var(--text)]">Show on leaderboard</p>
-            <p className="text-xs text-[var(--text-muted)] mt-0.5">Display your name and XP in the public leaderboard</p>
+          <div className="flex items-center justify-between py-3">
+            <div>
+              <p className="text-sm font-medium">Show on leaderboard</p>
+              <p className="text-xs text-[var(--text-muted)] mt-0.5">Display your name and XP publicly</p>
+            </div>
+            <button
+              onClick={() => setSettings(s => ({ ...s, showOnLeaderboard: !s.showOnLeaderboard }))}
+              className={`relative w-14 h-7 rounded-full transition-colors duration-300 focus:outline-none ${settings.showOnLeaderboard ?? true ? 'bg-[var(--primary)]' : 'bg-[var(--surface-2)]'}`}
+              aria-label="Toggle leaderboard visibility"
+            >
+              <span className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-300 ${settings.showOnLeaderboard ?? true ? 'translate-x-7' : 'translate-x-0'}`} />
+            </button>
           </div>
-          <button
-            onClick={() => setSettings(s => ({ ...s, showOnLeaderboard: !s.showOnLeaderboard }))}
-            className={`relative w-14 h-7 rounded-full transition-colors duration-300 focus:outline-none ${settings.showOnLeaderboard ?? true ? 'bg-[var(--primary)]' : 'bg-[var(--surface-2)]'}`}
-            aria-label="Toggle leaderboard visibility"
-          >
-            <span className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-300 ${settings.showOnLeaderboard ?? true ? 'translate-x-7' : 'translate-x-0'}`} />
-          </button>
         </div>
       </div>
 
       {/* Voice */}
       <div className="card space-y-4">
-        <h2 className="font-semibold">{t.settings.voice}</h2>
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center text-sm" style={{ background: 'rgba(59,130,246,0.12)' }}>🔊</div>
+          <h2 className="font-bold">{t.settings.voice}</h2>
+        </div>
 
         <div className="flex items-center justify-between gap-4">
           <div>
-            <p className="text-sm font-medium text-[var(--text)]">{t.settings.defaultAccent}</p>
+            <p className="text-sm font-medium">{t.settings.defaultAccent}</p>
             <p className="text-xs text-[var(--text-muted)] mt-0.5">{t.settings.accentHelper}</p>
           </div>
           <div className="flex rounded-xl overflow-hidden border border-[var(--border)] shrink-0">
@@ -495,7 +521,7 @@ export default function SettingsPage() {
 
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-[var(--text)]">{t.settings.autoPlay}</p>
+            <p className="text-sm font-medium">{t.settings.autoPlay}</p>
             <p className="text-xs text-[var(--text-muted)] mt-0.5">{t.settings.autoPlayHelper}</p>
           </div>
           <button
@@ -513,7 +539,10 @@ export default function SettingsPage() {
         <div className="space-y-3">
           {/* Toggle card */}
           <div className="card">
-            <h2 className="font-semibold mb-3">{t.settings.dailyReminder}</h2>
+            <div className="flex items-center gap-2.5 mb-3">
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center text-sm" style={{ background: 'rgba(239,68,68,0.1)' }}>🔔</div>
+              <h2 className="font-bold">{t.settings.dailyReminder}</h2>
+            </div>
 
             {permission === 'denied' && (
               <div className="bg-red-50 border border-[var(--danger)] rounded-xl p-3 mb-3">
@@ -523,7 +552,7 @@ export default function SettingsPage() {
 
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-[var(--text)]">{t.settings.enableReminder}</p>
+                <p className="text-sm font-medium">{t.settings.enableReminder}</p>
                 <p className="text-xs text-[var(--text-muted)] mt-0.5">
                   {notif.enabled ? '3 daily reminders active' : t.settings.reminderOff}
                 </p>
@@ -593,16 +622,22 @@ export default function SettingsPage() {
         </div>
       ) : (
         <div className="card">
-          <h2 className="font-semibold mb-1">{t.settings.dailyReminder}</h2>
+          <div className="flex items-center gap-2.5 mb-2">
+            <div className="w-8 h-8 rounded-xl flex items-center justify-center text-sm" style={{ background: 'rgba(239,68,68,0.1)' }}>🔔</div>
+            <h2 className="font-bold">{t.settings.dailyReminder}</h2>
+          </div>
           <p className="text-sm text-[var(--text-muted)]">{t.settings.notifNotSupported}</p>
         </div>
       )}
 
       {/* Data backup */}
       <div className="card space-y-4">
-        <div>
-          <h2 className="font-semibold">{t.settings.dataBackup}</h2>
-          <p className="text-xs text-[var(--text-muted)] mt-0.5">{t.settings.dataBackupHelper}</p>
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center text-sm" style={{ background: 'rgba(16,185,129,0.12)' }}>💾</div>
+          <div>
+            <h2 className="font-bold">{t.settings.dataBackup}</h2>
+            <p className="text-xs text-[var(--text-muted)]">{t.settings.dataBackupHelper}</p>
+          </div>
         </div>
 
         {/* Export */}
@@ -661,7 +696,10 @@ export default function SettingsPage() {
 
       {/* Support */}
       <div className="card">
-        <h2 className="font-semibold mb-3">Support</h2>
+        <div className="flex items-center gap-2.5 mb-3">
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center text-sm" style={{ background: 'rgba(59,130,246,0.12)' }}>💬</div>
+          <h2 className="font-bold">Support</h2>
+        </div>
         <a
           href="https://t.me/lexivo_support_bot"
           target="_blank"
@@ -678,7 +716,10 @@ export default function SettingsPage() {
       </div>
 
       <div className="card space-y-3">
-        <h2 className="font-semibold">{t.settings.about}</h2>
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center text-sm" style={{ background: 'rgba(99,102,241,0.12)' }}>ℹ️</div>
+          <h2 className="font-bold">{t.settings.about}</h2>
+        </div>
         <p className="text-sm text-[var(--text-muted)]">
           {t.settings.aboutText}
         </p>
@@ -700,14 +741,20 @@ export default function SettingsPage() {
 
       {/* Account */}
       <div className="card space-y-3">
-        <h2 className="font-semibold">{t.profile.account}</h2>
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center text-sm" style={{ background: 'rgba(99,102,241,0.12)' }}>🔑</div>
+          <h2 className="font-bold">{t.profile.account}</h2>
+        </div>
         {userEmail ? (
           <>
             <div className="flex items-center gap-3 p-3 rounded-xl bg-[var(--surface-2)]">
-              <span className="text-xl">👤</span>
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-base flex-shrink-0"
+                style={{ background: 'var(--primary-bg)', color: 'var(--primary)' }}>
+                {userEmail[0].toUpperCase()}
+              </div>
               <div className="flex-1 min-w-0">
                 <p className="text-xs text-[var(--text-muted)]">{t.profile.signedInAs}</p>
-                <p className="text-sm font-semibold text-[var(--text)] truncate">{userEmail}</p>
+                <p className="text-sm font-semibold truncate">{userEmail}</p>
               </div>
             </div>
             <button
@@ -730,8 +777,11 @@ export default function SettingsPage() {
       </div>
 
       {/* Danger Zone */}
-      <div className="card border-2 border-[var(--danger)] space-y-3" style={{ borderColor: 'rgba(239,68,68,0.3)' }}>
-        <h2 className="font-semibold text-[var(--danger)]">{t.settings.dangerZone}</h2>
+      <div className="card space-y-3" style={{ borderColor: 'rgba(239,68,68,0.35)', borderWidth: 2 }}>
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center text-sm" style={{ background: 'rgba(239,68,68,0.1)' }}>⚠️</div>
+          <h2 className="font-bold text-[var(--danger)]">{t.settings.dangerZone}</h2>
+        </div>
 
         {/* Reset Progress */}
         {!resetConfirm ? (
