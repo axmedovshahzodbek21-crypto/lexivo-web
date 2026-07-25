@@ -1,5 +1,5 @@
 ﻿'use client';
-import { PageLoader, SectionLoader } from '@/components/Loader';
+import { SectionLoader } from '@/components/Loader';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
@@ -18,17 +18,6 @@ interface LeaderboardEntry {
   study_days: string[] | null;
 }
 
-const MEDAL = ['🥇', '🥈', '🥉'];
-const MEDAL_BG = [
-  'rgba(255,215,0,0.12)',
-  'rgba(192,192,192,0.12)',
-  'rgba(205,127,50,0.12)',
-];
-const MEDAL_BORDER = [
-  'rgba(255,215,0,0.4)',
-  'rgba(192,192,192,0.35)',
-  'rgba(205,127,50,0.35)',
-];
 
 function todayStr() {
   return localDateStr();
@@ -108,6 +97,13 @@ export default function LeaderboardPage() {
     } else {
       await supabase.from('saved_users').insert({ user_id: user.id, saved_user_id: targetId });
     }
+  };
+
+  const rankChipStyle = (rank: number, isMe: boolean) => {
+    if (isMe) return { background: 'var(--primary)', color: 'white' };
+    if (rank <= 3) return { background: 'rgba(255,215,0,0.18)', color: '#b45309' };
+    if (rank <= 10) return { background: 'var(--primary-bg)', color: 'var(--primary)' };
+    return { background: 'var(--surface-2)', color: 'var(--text-muted)' };
   };
 
   return (
@@ -222,35 +218,32 @@ export default function LeaderboardPage() {
           </div>
         );
       })()}
-      {/* Header */}
-      <div className="flex items-center gap-3 p-4 border-b border-[var(--border)]">
-        <button
-          onClick={() => router.back()}
-          className="btn-icon text-lg"
-          aria-label="Go back"
-        >←</button>
-        <div className="flex-1">
-          <h1 className="font-bold text-[var(--text)]">🏆 Leaderboard</h1>
-          <p className="text-xs text-[var(--text-muted)]">Top learners by total XP</p>
+      {/* Gradient header */}
+      <div className="px-4 pt-5 pb-5" style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)' }}>
+        <div className="flex items-center gap-3 mb-4">
+          <button onClick={() => router.back()} aria-label="Go back"
+            className="w-9 h-9 rounded-full flex items-center justify-center text-white text-lg transition-all active:scale-95"
+            style={{ background: 'rgba(255,255,255,0.2)' }}>←</button>
+          <div className="flex-1">
+            <h1 className="font-bold text-white text-lg leading-tight">🏆 Leaderboard</h1>
+            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.75)' }}>Top learners by total XP</p>
+          </div>
+          <button onClick={load} aria-label="Refresh"
+            className="w-9 h-9 rounded-full flex items-center justify-center text-white text-lg transition-all active:scale-95"
+            style={{ background: 'rgba(255,255,255,0.2)' }}>↻</button>
         </div>
-        <button
-          onClick={load}
-          className="btn-icon text-lg hover:bg-[var(--primary-bg)] transition-colors"
-          aria-label="Refresh"
-        >↻</button>
-      </div>
-
-      {/* All / Starred toggle */}
-      <div className="flex gap-2 px-4 pt-3">
-        {(['all', 'starred'] as const).map(f => (
-          <button
-            key={f}
-            onClick={() => setFilter(f)}
-            className={`px-4 py-1.5 rounded-xl text-sm font-semibold transition-colors ${filter === f ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface-2)] text-[var(--text-muted)]'}`}
-          >
-            {f === 'all' ? 'All' : '⭐ Starred'}
-          </button>
-        ))}
+        {/* All / Starred toggle inside header */}
+        <div className="flex gap-2">
+          {(['all', 'starred'] as const).map(f => (
+            <button key={f} onClick={() => setFilter(f)}
+              className="px-4 py-1.5 rounded-xl text-sm font-semibold transition-all"
+              style={filter === f
+                ? { background: 'rgba(255,255,255,0.95)', color: '#b45309' }
+                : { background: 'rgba(255,255,255,0.18)', color: 'rgba(255,255,255,0.9)' }}>
+              {f === 'all' ? 'All' : '⭐ Starred'}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="p-4 space-y-3">
@@ -288,40 +281,32 @@ export default function LeaderboardPage() {
             )}
             {/* Top 3 podium */}
             {visible.length >= 3 && (
-              <div className="grid grid-cols-3 gap-2 mb-2">
-                {[visible[1], visible[0], visible[2]].map((e, col) => {
-                  const rank = col === 0 ? 2 : col === 1 ? 1 : 3;
+              <div className="flex items-end gap-2 mb-3">
+                {([
+                  { entry: visible[1], rank: 2, medal: '🥈', avatarSize: 40, pt: 'pt-4', borderColor: 'rgba(192,192,192,0.5)', bg: 'linear-gradient(160deg,rgba(192,192,192,0.14) 0%,rgba(192,192,192,0.04) 100%)' },
+                  { entry: visible[0], rank: 1, medal: '🥇', avatarSize: 52, pt: 'pt-8', borderColor: 'rgba(255,200,0,0.6)',   bg: 'linear-gradient(160deg,rgba(255,215,0,0.18) 0%,rgba(245,158,11,0.06) 100%)' },
+                  { entry: visible[2], rank: 3, medal: '🥉', avatarSize: 40, pt: 'pt-4', borderColor: 'rgba(205,127,50,0.5)',   bg: 'linear-gradient(160deg,rgba(205,127,50,0.14) 0%,rgba(205,127,50,0.04) 100%)' },
+                ].map(({ entry: e, rank, medal, avatarSize, pt, borderColor, bg }) => {
                   const isMe = user && e.user_id === user.id;
                   return (
-                    <div
-                      key={e.user_id}
-                      onClick={() => setSelected(e)}
-                      className={`flex flex-col items-center rounded-2xl p-3 border transition-all cursor-pointer hover:opacity-80 ${col === 1 ? 'py-5' : 'py-3'}`}
-                      style={{
-                        background: MEDAL_BG[rank - 1],
-                        borderColor: isMe ? 'var(--primary)' : MEDAL_BORDER[rank - 1],
-                        boxShadow: isMe ? '0 0 0 2px var(--primary)' : undefined,
-                      }}
-                    >
-                      <div className="text-2xl mb-1">{MEDAL[rank - 1]}</div>
-                      <Avatar name={e.name} url={e.avatar_url} size={col === 1 ? 44 : 36} />
-                      <p className="text-xs font-bold text-[var(--text)] mt-2 text-center truncate w-full">
-                        {savedIds.has(e.user_id) ? '⭐ ' : ''}{e.name}{isMe ? ' 👤' : ''}
+                    <div key={e.user_id} onClick={() => setSelected(e)}
+                      className={`flex-1 flex flex-col items-center rounded-2xl pb-4 px-2 border-2 cursor-pointer transition-all hover:opacity-90 active:scale-95 ${pt}`}
+                      style={{ background: bg, borderColor: isMe ? 'var(--primary)' : borderColor, boxShadow: isMe ? '0 0 0 2px var(--primary)' : undefined }}>
+                      <div className={`text-${rank === 1 ? '3xl' : '2xl'} mb-2`}>{medal}</div>
+                      <Avatar name={e.name} url={e.avatar_url} size={avatarSize} />
+                      <p className="text-xs font-bold mt-2 text-center truncate w-full px-1" style={{ color: 'var(--text)' }}>
+                        {savedIds.has(e.user_id) ? '⭐ ' : ''}{e.name}
                       </p>
-                      <p className="text-xs font-black mt-0.5" style={{ color: 'var(--primary)' }}>
+                      <p className="text-xs font-black mt-0.5" style={{ color: rank === 1 ? '#b45309' : 'var(--primary)' }}>
                         {e.xp.toLocaleString()} XP
                       </p>
-                      {e.streak > 0 && (
-                        <p className="text-[10px] text-[var(--text-muted)]">🔥 {e.streak}</p>
-                      )}
+                      {e.streak > 0 && <p className="text-[10px] text-[var(--text-muted)] mt-0.5">🔥 {e.streak}</p>}
                       {e.last_study_date === today && (
-                        <span className="mt-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(16,185,129,0.15)', color: 'var(--success)' }}>
-                          TODAY
-                        </span>
+                        <span className="mt-1.5 text-[9px] font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(16,185,129,0.18)', color: 'var(--success)' }}>TODAY</span>
                       )}
                     </div>
                   );
-                })}
+                }))}
               </div>
             )}
 
@@ -329,33 +314,33 @@ export default function LeaderboardPage() {
             <div className="space-y-2">
               {visible.slice(visible.length >= 3 ? 3 : 0).map((e, i) => {
                 const rank = (visible.length >= 3 ? 3 : 0) + i + 1;
-                const isMe = user && e.user_id === user.id;
+                const isMe = !!(user && e.user_id === user.id);
                 return (
-                  <div
-                    key={e.user_id}
-                    onClick={() => setSelected(e)}
-                    className="flex items-center gap-3 rounded-2xl p-3 border transition-all cursor-pointer hover:opacity-80"
+                  <div key={e.user_id} onClick={() => setSelected(e)}
+                    className="flex items-center gap-3 rounded-2xl p-3 border transition-all cursor-pointer hover:opacity-80 active:scale-[0.99]"
                     style={{
                       background: isMe ? 'var(--primary-bg)' : 'var(--surface)',
                       borderColor: isMe ? 'var(--primary)' : 'var(--border)',
                       boxShadow: isMe ? '0 0 0 1.5px var(--primary)' : undefined,
-                    }}
-                  >
-                    <span className="w-7 text-center text-sm font-bold text-[var(--text-muted)]">{rank}</span>
-                    <Avatar name={e.name} url={e.avatar_url} size={36} />
+                    }}>
+                    <div className="w-8 h-8 rounded-xl flex items-center justify-center text-sm font-black flex-shrink-0"
+                      style={rankChipStyle(rank, isMe)}>
+                      {rank}
+                    </div>
+                    <Avatar name={e.name} url={e.avatar_url} size={38} />
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        {savedIds.has(e.user_id) && <span className="text-sm">⭐</span>}
-                        <p className="font-bold text-sm text-[var(--text)] truncate">{e.name}</p>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        {savedIds.has(e.user_id) && <span className="text-sm leading-none">⭐</span>}
+                        <p className="font-bold text-sm truncate">{e.name}</p>
                         {isMe && <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: 'var(--primary)', color: 'white' }}>YOU</span>}
-                        {e.last_study_date === today && (
-                          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(16,185,129,0.15)', color: 'var(--success)' }}>TODAY</span>
-                        )}
                       </div>
-                      <p className="text-xs text-[var(--text-muted)]">
+                      <p className="text-xs text-[var(--text-muted)] mt-0.5">
                         {e.xp.toLocaleString()} XP{e.streak > 0 ? ` · 🔥 ${e.streak}` : ''}
                       </p>
                     </div>
+                    {e.last_study_date === today && (
+                      <span className="text-[9px] font-bold px-2 py-1 rounded-full flex-shrink-0" style={{ background: 'rgba(16,185,129,0.15)', color: 'var(--success)' }}>TODAY</span>
+                    )}
                   </div>
                 );
               })}
