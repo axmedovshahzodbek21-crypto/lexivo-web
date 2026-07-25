@@ -598,7 +598,7 @@ export default function HomePage() {
                 </div>
               </div>
             )}
-            <div className="grid gap-3"
+            <div className="grid gap-4"
               style={{ gridTemplateColumns: 'repeat(5, 1fr)', gridTemplateRows: '140px 140px', gridAutoRows: '130px' }}>
               {displaySections.map((sId, idx) => {
                 const slot = FRAME_SLOTS[idx];
