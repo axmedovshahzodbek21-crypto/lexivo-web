@@ -246,7 +246,7 @@ export default function LeaderboardPage() {
         </div>
       </div>
 
-      <div className="p-4 space-y-3">
+      <div className="p-4 space-y-3 max-w-xl mx-auto w-full">
         {loading && (
           <div className="flex items-center justify-center py-20">
             <SectionLoader />
