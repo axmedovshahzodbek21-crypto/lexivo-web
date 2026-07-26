@@ -1,5 +1,6 @@
 import type { SRSWord, DueSRSWord, LearnedWord, UnitProgress, UserSettings, Achievement, CustomList, WordItem, WordCollection, ImportedWord, ImportedCollection, ImportedFolder } from './types';
 import { SRS_INTERVALS, LEVEL_THRESHOLDS, LEARN_XP_TIERS, STREAK_BONUS_7, STREAK_BONUS_30 } from './types';
+import { supabase } from './supabase';
 
 function levelForXp(xp: number): string {
   return (LEVEL_THRESHOLDS.find(t => xp >= t.min && xp <= t.max) ?? LEVEL_THRESHOLDS[0]).level;
@@ -627,6 +628,20 @@ export function getLearnXPAmount(): number {
   return (LEARN_XP_TIERS.find(t => total < t.maxWords) ?? LEARN_XP_TIERS[LEARN_XP_TIERS.length - 1]).xp;
 }
 
+function _pushXpEntryAsync(entry: XpEntry): void {
+  if (typeof window === 'undefined') return;
+  supabase.auth.getSession().then(({ data: { session } }) => {
+    if (!session) return;
+    Promise.resolve(supabase.from('xp_history').upsert({
+      user_id: session.user.id,
+      amount: entry.amount,
+      reason: entry.reason,
+      source: entry.source ?? null,
+      ts: entry.timestamp,
+    }, { onConflict: 'user_id,ts', ignoreDuplicates: true } as Record<string, unknown>)).catch(() => {});
+  }).catch(() => {});
+}
+
 export function addXP(amount: number, reason = 'Study', source?: string): { leveledUp: boolean; newLevel: string; newXp: number } {
   const oldXp = get<number>(KEYS.xp, 0);
   const newXp = oldXp + amount;
@@ -639,10 +654,14 @@ export function addXP(amount: number, reason = 'Study', source?: string): { leve
   set(KEYS.todayXp, todayXp + amount);
   set(KEYS.todayXpDate, date);
 
+  const ts = Date.now();
+  const entry: XpEntry = { amount, reason, timestamp: ts, ...(source ? { source } : {}) };
   const history = get<XpEntry[]>(KEYS.xpHistory, []);
-  history.push({ amount, reason, timestamp: Date.now(), ...(source ? { source } : {}) });
-  if (history.length > 200) history.splice(0, history.length - 200);
+  history.push(entry);
+  if (history.length > 500) history.splice(0, history.length - 500);
   set(KEYS.xpHistory, history);
+
+  _pushXpEntryAsync(entry);
 
   const oldLevel = levelForXp(oldXp);
   const newLevel = levelForXp(newXp);
@@ -651,6 +670,40 @@ export function addXP(amount: number, reason = 'Study', source?: string): { leve
 
 export function getXPHistory(): XpEntry[] {
   return get<XpEntry[]>(KEYS.xpHistory, []).slice().reverse();
+}
+
+export async function fetchXPHistory(): Promise<XpEntry[]> {
+  const local = get<XpEntry[]>(KEYS.xpHistory, []);
+  if (typeof window === 'undefined') return local.slice().reverse();
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return local.slice().reverse();
+    const { data } = await supabase
+      .from('xp_history')
+      .select('amount,reason,source,ts')
+      .eq('user_id', session.user.id)
+      .order('ts', { ascending: false })
+      .limit(500);
+    if (!data || data.length === 0) return local.slice().reverse();
+    const localTs = new Set(local.map(e => e.timestamp));
+    const toAdd: XpEntry[] = [];
+    for (const row of data) {
+      const ts = row.ts as number;
+      if (!localTs.has(ts)) {
+        toAdd.push({ amount: row.amount as number, reason: row.reason as string, timestamp: ts,
+          ...(row.source ? { source: row.source as string } : {}) });
+      }
+    }
+    if (toAdd.length > 0) {
+      const merged = [...local, ...toAdd].sort((a, b) => a.timestamp - b.timestamp);
+      if (merged.length > 500) merged.splice(0, merged.length - 500);
+      set(KEYS.xpHistory, merged);
+      return merged.slice().reverse();
+    }
+    return local.slice().reverse();
+  } catch {
+    return local.slice().reverse();
+  }
 }
 
 // ─── Unit Progress ───────────────────────────────────────────────────────────

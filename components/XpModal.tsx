@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { getLevelInfo } from '@/lib/gamification';
 import { LEVEL_THRESHOLDS } from '@/lib/types';
-import { displayXP, getXPHistory, type XpEntry } from '@/lib/storage';
+import { displayXP, fetchXPHistory, type XpEntry } from '@/lib/storage';
 
 interface Props {
   xp: number;
@@ -16,7 +16,7 @@ export default function XpModal({ xp, onClose }: Props) {
   const levelInfo = getLevelInfo(xp);
 
   useEffect(() => {
-    setHistory(getXPHistory());
+    fetchXPHistory().then(setHistory).catch(() => {});
   }, []);
 
   useEffect(() => {

@@ -14,6 +14,7 @@ import {
   getImportedWords, saveImportedWords,
   getReviewLog, saveReviewLog,
   getSRSLastReview, saveSRSLastReview,
+  getXPHistory, type XpEntry,
   localDateStr, addDaysToDateStr,
 } from './storage';
 
@@ -223,6 +224,21 @@ export async function pushAll(uid: string) {
       await supabase.from('achievements').upsert(
         achievements.map(id => ({ user_id: uid, achievement_id: id })),
         { onConflict: 'user_id,achievement_id' },
+      );
+    }
+
+    // xp_history — upsert recent entries (dedup by user_id,ts)
+    const xpHistory = getXPHistory().slice(0, 500); // already reversed (newest first)
+    if (xpHistory.length > 0) {
+      await supabase.from('xp_history').upsert(
+        xpHistory.map((e: XpEntry) => ({
+          user_id: uid,
+          amount: e.amount,
+          reason: e.reason,
+          source: e.source ?? null,
+          ts: e.timestamp,
+        })),
+        { onConflict: 'user_id,ts', ignoreDuplicates: true } as Record<string, unknown>,
       );
     }
 
@@ -764,6 +780,35 @@ export async function pullAll(uid: string) {
         !cloudKeySet.has(`${w.word.toLowerCase()}__${(w.collectionName ?? 'My Words').toLowerCase()}`)
       );
       saveImportedWords([...cloudWords, ...localOnly]);
+    }
+
+    // xp_history — fetch from cloud and merge into local (dedup by timestamp)
+    {
+      const { data: cloudXp } = await supabase
+        .from('xp_history')
+        .select('amount,reason,source,ts')
+        .eq('user_id', uid)
+        .order('ts', { ascending: true })
+        .limit(500);
+      if (cloudXp && cloudXp.length > 0) {
+        const KEYS_XP = 'lexivo_xp_history';
+        let local: XpEntry[] = [];
+        try { local = JSON.parse(localStorage.getItem(KEYS_XP) ?? '[]'); } catch { local = []; }
+        const localTs = new Set(local.map((e: XpEntry) => e.timestamp));
+        const toAdd: XpEntry[] = [];
+        for (const row of cloudXp) {
+          const ts = row.ts as number;
+          if (!localTs.has(ts)) {
+            toAdd.push({ amount: row.amount as number, reason: row.reason as string, timestamp: ts,
+              ...(row.source ? { source: row.source as string } : {}) });
+          }
+        }
+        if (toAdd.length > 0) {
+          const merged = [...local, ...toAdd].sort((a, b) => a.timestamp - b.timestamp);
+          if (merged.length > 500) merged.splice(0, merged.length - 500);
+          set(KEYS_XP, merged);
+        }
+      }
     }
 
     if (typeof window !== 'undefined') {
