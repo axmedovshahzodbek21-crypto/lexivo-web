@@ -132,8 +132,8 @@ export const SRS_INTERVALS = [1, 3, 7, 14, 30]; // fixed review intervals in day
 export const REVIEW_XP: Record<number, number> = { 1: 2, 3: 4, 7: 7, 14: 10, 30: 14 };
 export const LEARN_XP_TIERS = [
   { maxWords: 100,      xp: 10 }, // words   1-100  → 1.0 XP displayed
-  { maxWords: 500,      xp: 5  }, // words 101-500  → 0.5 XP displayed
-  { maxWords: Infinity, xp: 3  }, // words 501+     → 0.3 XP displayed
+  { maxWords: 500,      xp: 7  }, // words 101-500  → 0.7 XP displayed
+  { maxWords: Infinity, xp: 5  }, // words 501+     → 0.5 XP displayed
 ];
 export const STREAK_BONUS_7  = 30; // 3.0 XP displayed at 7-day streak
 export const STREAK_BONUS_30 = 70; // 7.0 XP displayed at 30-day streak
