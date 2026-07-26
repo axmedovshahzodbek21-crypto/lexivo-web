@@ -464,6 +464,7 @@ export async function pullAll(uid: string) {
       if (resetAt && typeof window !== 'undefined') {
         const lastSeen = localStorage.getItem('lexivo_last_seen_reset_at');
         if (lastSeen !== resetAt) {
+          // Wipe localStorage
           const wipeKeys = [
             'lexivo_learned_words', 'lexivo_srs_words', 'lexivo_starred',
             'lexivo_xp', 'lexivo_xp_updated_at', 'lexivo_xp_history',
@@ -482,6 +483,14 @@ export async function pullAll(uid: string) {
             if (k?.startsWith('lexivo_unit_progress_')) unitKeys.push(k);
           }
           unitKeys.forEach(k => localStorage.removeItem(k));
+          // Also delete from Supabase — covers the case where the other device's
+          // reset ran old code that didn't delete xp_history from the cloud
+          try {
+            await supabase.from('xp_history').delete().eq('user_id', uid);
+            await supabase.from('learned_words').delete().eq('user_id', uid);
+            await supabase.from('srs_words').delete().eq('user_id', uid);
+            await supabase.from('user_stats').delete().eq('id', uid);
+          } catch (_) {}
         }
         localStorage.setItem('lexivo_last_seen_reset_at', resetAt);
       }
