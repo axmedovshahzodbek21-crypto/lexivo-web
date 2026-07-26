@@ -11,7 +11,7 @@ import {
   getSettings, getXPHistory, localDateStr, getReviewLog, getGraduatedCount, displayXP,
 } from '@/lib/storage';
 import type { XpEntry } from '@/lib/storage';
-import { getLevelInfo, ALL_ACHIEVEMENTS } from '@/lib/gamification';
+import { getLevelInfo, ALL_ACHIEVEMENTS, CATEGORY_ORDER, CATEGORY_META, getAchievementProgress } from '@/lib/gamification';
 import { getUnlockedAchievements } from '@/lib/storage';
 import { stageLabel, stageColor } from '@/lib/srs';
 import type { SRSWord } from '@/lib/types';
@@ -219,26 +219,112 @@ function ProgressPage() {
           </div>
         )}
 
-        {tab === 'achievements' && (
-          <div className="space-y-3 animate-fade-in">
-            <p className="text-sm text-[var(--text-muted)]">{t.progress.unlockedOf(unlockedIds.length, ALL_ACHIEVEMENTS.length)}</p>
-            <div className="grid grid-cols-1 gap-2">
-              {ALL_ACHIEVEMENTS.map(a => {
-                const unlocked = unlockedIds.includes(a.id);
+        {tab === 'achievements' && (() => {
+          const stats = { learnedCount, streak, xp, masteredCount: 0, totalDays,
+            flashDays: 0, flashStreak: 0, quizDays: 0, quizStreak: 0 };
+          const xpEarned = ALL_ACHIEVEMENTS.filter(a => unlockedIds.includes(a.id)).reduce((s, a) => s + a.xp, 0);
+          const xpTotal  = ALL_ACHIEVEMENTS.reduce((s, a) => s + a.xp, 0);
+          const byCategory: Record<string, typeof ALL_ACHIEVEMENTS> = {};
+          for (const a of ALL_ACHIEVEMENTS) (byCategory[a.category] ??= []).push(a);
+          return (
+            <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+              {/* Summary row */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+                  {unlockedIds.length} / {ALL_ACHIEVEMENTS.length} unlocked
+                </p>
+                <p style={{ fontSize: 12, color: 'var(--primary)', fontWeight: 700 }}>✨ {xpEarned} / {xpTotal} XP</p>
+              </div>
+
+              {/* Category sections */}
+              {CATEGORY_ORDER.map(cat => {
+                const achs = byCategory[cat] ?? [];
+                if (!achs.length) return null;
+                const meta = CATEGORY_META[cat];
+                const catUnlocked = achs.filter(a => unlockedIds.includes(a.id)).length;
                 return (
-                  <div key={a.id} className={`card flex items-center gap-3 ${unlocked ? '' : 'opacity-40'}`}>
-                    <div className="text-3xl">{a.icon}</div>
-                    <div>
-                      <p className="font-semibold text-sm">{a.title} {unlocked && '✓'}</p>
-                      <p className="text-xs text-[var(--text-muted)]">{a.description}</p>
+                  <div key={cat}>
+                    {/* Category header */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10,
+                      padding: '8px 12px', borderRadius: 12,
+                      background: 'var(--surface)', border: '1px solid var(--border)' }}>
+                      <span style={{ fontSize: 14 }}>{meta.icon}</span>
+                      <span style={{ fontWeight: 700, fontSize: 12, color: 'var(--text)', flex: 1 }}>{meta.label}</span>
+                      <div style={{ height: 3, width: 40, borderRadius: 2, background: 'var(--border)', overflow: 'hidden', marginRight: 6 }}>
+                        <div style={{ height: '100%', borderRadius: 2, background: 'var(--primary)',
+                          width: `${achs.length ? (catUnlocked / achs.length) * 100 : 0}%` }} />
+                      </div>
+                      <span style={{ fontSize: 10, fontWeight: 700, color: catUnlocked > 0 ? 'var(--primary)' : 'var(--text-muted)' }}>
+                        {catUnlocked}/{achs.length}
+                      </span>
                     </div>
-                    {unlocked && <span className="ml-auto badge text-xs">✓</span>}
+
+                    {/* 2-col card grid */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                      {achs.map(a => {
+                        const isUnlocked = unlockedIds.includes(a.id);
+                        const prog = !isUnlocked ? getAchievementProgress(a.id, stats) : null;
+                        const pct = prog ? prog.current / prog.target : 0;
+                        return (
+                          <div key={a.id} style={{
+                            display: 'flex', flexDirection: 'column', padding: '10px 10px 8px',
+                            borderRadius: 14, position: 'relative', overflow: 'hidden',
+                            background: isUnlocked ? 'var(--surface)' : 'var(--surface-2)',
+                            border: `1px solid ${isUnlocked ? 'color-mix(in srgb, var(--primary) 28%, transparent)' : 'var(--border)'}`,
+                            boxShadow: isUnlocked ? '0 2px 10px color-mix(in srgb, var(--primary) 10%, transparent)' : 'none',
+                            opacity: isUnlocked ? 1 : 0.65,
+                          }}>
+                            {/* XP badge */}
+                            <div style={{ position: 'absolute', top: 7, right: 7, fontSize: 8, fontWeight: 800,
+                              padding: '2px 5px', borderRadius: 5,
+                              background: isUnlocked ? 'linear-gradient(135deg, var(--primary), var(--primary-light))' : 'var(--border)',
+                              color: isUnlocked ? 'white' : 'var(--text-muted)' }}>
+                              +{a.xp} XP
+                            </div>
+                            {/* Icon */}
+                            <div style={{ width: 38, height: 38, borderRadius: 11, marginBottom: 7,
+                              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20,
+                              background: isUnlocked ? 'color-mix(in srgb, var(--primary) 10%, var(--surface))' : 'var(--border)',
+                              filter: isUnlocked ? 'none' : 'grayscale(1)' }}>
+                              {a.icon}
+                            </div>
+                            {/* Title */}
+                            <p style={{ fontSize: 11, fontWeight: 700, margin: 0, lineHeight: 1.3,
+                              color: isUnlocked ? 'var(--text)' : 'var(--text-muted)', paddingRight: 24 }}>
+                              {a.title}
+                            </p>
+                            {/* Description hint */}
+                            <p style={{ fontSize: 9.5, margin: '2px 0 6px', lineHeight: 1.3,
+                              color: isUnlocked ? 'color-mix(in srgb, var(--primary) 75%, transparent)' : 'var(--text-muted)' }}>
+                              {a.description}
+                            </p>
+                            {/* Bottom: check or progress */}
+                            {isUnlocked ? (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                                <div style={{ width: 14, height: 14, borderRadius: '50%',
+                                  background: 'linear-gradient(135deg, var(--primary), var(--primary-light))',
+                                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                  fontSize: 8, color: 'white', fontWeight: 700 }}>✓</div>
+                                <span style={{ fontSize: 9, color: 'var(--primary)', fontWeight: 600 }}>Achieved</span>
+                              </div>
+                            ) : prog ? (
+                              <>
+                                <div style={{ height: 3, borderRadius: 2, background: 'var(--border)', overflow: 'hidden', marginBottom: 2 }}>
+                                  <div style={{ height: '100%', borderRadius: 2, width: `${pct * 100}%`, background: 'var(--primary)' }} />
+                                </div>
+                                <span style={{ fontSize: 9, color: 'var(--text-muted)' }}>{prog.current}/{prog.target} {prog.label}</span>
+                              </>
+                            ) : null}
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 );
               })}
             </div>
-          </div>
-        )}
+          );
+        })()}
       </div>
     </div>
   );
