@@ -161,10 +161,14 @@ export default function SettingsPage() {
       // Clear localStorage before touching Supabase so a stale timer push can't sneak in
       const progressKeys = [
         'lexivo_learned_words', 'lexivo_srs_words', 'lexivo_starred',
-        'lexivo_xp', 'lexivo_today_xp', 'lexivo_today_xp_date',
+        'lexivo_xp', 'lexivo_xp_updated_at', 'lexivo_xp_history',
+        'lexivo_today_xp', 'lexivo_today_xp_date',
         'lexivo_today_count', 'lexivo_today_count_date',
         'lexivo_streak', 'lexivo_last_study', 'lexivo_total_study_days',
-        'lexivo_freezes', 'lexivo_last_freeze_week',
+        'lexivo_study_days', 'lexivo_review_days', 'lexivo_word_goal_days',
+        'lexivo_unit_done_days', 'lexivo_review_log', 'lexivo_srs_last_review',
+        'lexivo_freezes', 'lexivo_last_freeze_week', 'lexivo_streak_bonus_date',
+        'lexivo_hard_words',
       ];
       progressKeys.forEach(k => localStorage.removeItem(k));
       const toRemove: string[] = [];
