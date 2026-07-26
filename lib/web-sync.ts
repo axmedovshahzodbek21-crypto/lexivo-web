@@ -15,7 +15,6 @@ import {
   getReviewLog, saveReviewLog,
   getSRSLastReview, saveSRSLastReview,
   getXPHistory, type XpEntry,
-  getTodayWordGoal, setTodayWordGoal,
   localDateStr, addDaysToDateStr,
 } from './storage';
 
@@ -48,9 +47,7 @@ interface StatsRow {
   today_xp:         number | null;
   today_xp_date:    string | null;
   today_count:      number | null;
-  today_count_date:      string | null;
-  today_word_goal:      number | null;
-  today_word_goal_date: string | null;
+  today_count_date: string | null;
   streak:               number | null;
   last_study_date:      string | null;
   total_days:           number | null;
@@ -163,8 +160,6 @@ export async function pushAll(uid: string) {
       today_xp_date: ls(K.todayXpDate),
       today_count: parseInt(ls(K.todayCount) ?? '0', 10),
       today_count_date: ls(K.todayCountDate),
-      today_word_goal: getTodayWordGoal(),
-      today_word_goal_date: ls('lexivo_today_word_goal_date'),
       streak: getStreak(),
       last_study_date: ls(K.lastStudy),
       total_days: getTotalStudyDays(),
@@ -512,8 +507,7 @@ export async function pullAll(uid: string) {
       const s = stats as unknown as StatsRow;
       warnMissing('user_stats', s as unknown as Record<string, unknown>, [
         'xp','xp_updated_at','streak','freezes','total_days','today_xp','today_xp_date',
-        'today_count','today_count_date','today_word_goal','today_word_goal_date',
-        'last_study_date','last_freeze_week','study_days',
+        'today_count','today_count_date','last_study_date','last_freeze_week','study_days',
       ]);
       // Cache cloud xp_updated_at so pushAll can skip the XP upsert when cloud is newer
       _lastPulledXpTs = s.xp_updated_at ?? null;
@@ -540,15 +534,6 @@ export async function pullAll(uid: string) {
         const localCount = parseInt(ls(K.todayCount) ?? '0', 10);
         set(K.todayCount,    ls(K.todayCountDate) === todayStr ? Math.max(localCount, s.today_count ?? 0) : (s.today_count ?? 0));
         set(K.todayCountDate, cloudCountDate);
-      }
-
-      // today_word_goal: only sync if cloud date matches today and local has no goal set yet for today
-      const cloudWordGoalDate = s.today_word_goal_date;
-      if (cloudWordGoalDate === todayStr && s.today_word_goal !== null && s.today_word_goal !== undefined) {
-        const localGoalDate = ls('lexivo_today_word_goal_date');
-        if (localGoalDate !== todayStr) {
-          setTodayWordGoal(s.today_word_goal);
-        }
       }
 
       // last_study_date: take the more recent of local and cloud

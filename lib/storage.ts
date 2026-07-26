@@ -225,8 +225,7 @@ export function incrementTodayCount() {
   const newCount = count + 1;
   set(KEYS.todayCount, newCount);
   set(KEYS.todayCountDate, date);
-  const todayGoal = getTodayWordGoal();
-  if (todayGoal !== null && newCount >= todayGoal) recordWordGoalDay();
+  if (newCount >= getSettings().dailyGoal) recordWordGoalDay();
 }
 
 // ─── SRS ─────────────────────────────────────────────────────────────────────
@@ -592,21 +591,6 @@ export function recordWordGoalDay() {
   if (!days.includes(today)) { days.push(today); set(KEYS.wordGoalDays, days); }
 }
 
-export function getTodayWordGoal(): number | null {
-  const date = get<string>(KEYS.todayWordGoalDate, '');
-  if (date !== localDateStr()) return null;
-  const goal = get<number | null>(KEYS.todayWordGoal, null);
-  return goal;
-}
-
-export function setTodayWordGoal(goal: number): void {
-  set(KEYS.todayWordGoal, goal);
-  set(KEYS.todayWordGoalDate, localDateStr());
-  const count = get<number>(KEYS.todayCount, 0);
-  const storedDate = get<string>(KEYS.todayCountDate, '');
-  const todayCount = storedDate === localDateStr() ? count : 0;
-  if (todayCount >= goal) recordWordGoalDay();
-}
 
 export function getDayTasks(dateStr: string): { unit: boolean; review: boolean; words: boolean } {
   return {
