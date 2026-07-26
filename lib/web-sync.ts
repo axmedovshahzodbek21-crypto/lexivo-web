@@ -459,9 +459,32 @@ export async function pullAll(uid: string) {
         'font_size','study_order','quiz_direction','reduce_motion','show_on_leaderboard',
         'settings_updated_at',
       ]);
-      // Record reset_at so checkAndHandleReset won't re-fire on fresh browser sessions
+      // If reset_at changed (reset triggered on another device), wipe local progress before pulling
       const resetAt = p.reset_at;
-      if (resetAt && typeof window !== 'undefined') localStorage.setItem('lexivo_last_seen_reset_at', resetAt);
+      if (resetAt && typeof window !== 'undefined') {
+        const lastSeen = localStorage.getItem('lexivo_last_seen_reset_at');
+        if (lastSeen !== resetAt) {
+          const wipeKeys = [
+            'lexivo_learned_words', 'lexivo_srs_words', 'lexivo_starred',
+            'lexivo_xp', 'lexivo_xp_updated_at', 'lexivo_xp_history',
+            'lexivo_today_xp', 'lexivo_today_xp_date',
+            'lexivo_today_count', 'lexivo_today_count_date',
+            'lexivo_streak', 'lexivo_last_study', 'lexivo_total_study_days',
+            'lexivo_study_days', 'lexivo_review_days', 'lexivo_word_goal_days',
+            'lexivo_unit_done_days', 'lexivo_review_log', 'lexivo_srs_last_review',
+            'lexivo_freezes', 'lexivo_last_freeze_week', 'lexivo_streak_bonus_date',
+            'lexivo_hard_words',
+          ];
+          wipeKeys.forEach(k => localStorage.removeItem(k));
+          const unitKeys: string[] = [];
+          for (let i = 0; i < localStorage.length; i++) {
+            const k = localStorage.key(i);
+            if (k?.startsWith('lexivo_unit_progress_')) unitKeys.push(k);
+          }
+          unitKeys.forEach(k => localStorage.removeItem(k));
+        }
+        localStorage.setItem('lexivo_last_seen_reset_at', resetAt);
+      }
 
       const existing = getSettings();
       const remoteNameTs = p.name_updated_at;
