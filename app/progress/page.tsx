@@ -9,6 +9,7 @@ import {
   getTodayXP, getTodayLearnedCount, getDueWords, getStarredWords, getHardWords,
   getStudyHistory, getStudyDays, getReviewDays, getWordGoalDays,
   getSettings, getXPHistory, localDateStr, getReviewLog, getGraduatedCount, displayXP,
+  getTodayWordGoal, setTodayWordGoal,
 } from '@/lib/storage';
 import type { XpEntry } from '@/lib/storage';
 import { getLevelInfo, ALL_ACHIEVEMENTS, CATEGORY_ORDER, CATEGORY_META, getAchievementProgress } from '@/lib/gamification';
@@ -45,6 +46,8 @@ function ProgressPage() {
   const [reviewDays, setReviewDays] = useState<string[]>([]);
   const [wordGoalDays, setWordGoalDays] = useState<string[]>([]);
   const [dailyGoal, setDailyGoal] = useState(10);
+  const [todayWordGoal, setTodayWordGoalState] = useState<number | null>(null);
+  const [todayWordsCount, setTodayWordsCount] = useState(0);
   const [xpHistory, setXpHistory] = useState<XpEntry[]>([]);
   const [tab, setTab] = useState<'overview' | 'srs' | 'achievements' | 'calendar'>(tabParam ?? 'overview');
 
@@ -66,6 +69,8 @@ function ProgressPage() {
       setReviewDays(getReviewDays());
       setWordGoalDays(getWordGoalDays());
       setDailyGoal(getSettings().dailyGoal);
+      setTodayWordGoalState(getTodayWordGoal());
+      setTodayWordsCount(getTodayLearnedCount());
       setXpHistory(getXPHistory());
     };
     load();
@@ -170,6 +175,8 @@ function ProgressPage() {
               history={studyHistory} streak={streak} totalDays={totalDays} studyDays={studyDays}
               reviewDays={reviewDays} wordGoalDays={wordGoalDays}
               dailyGoal={dailyGoal} dueCount={dueCount}
+              todayWordGoal={todayWordGoal} todayWordsCount={todayWordsCount}
+              onGoalSet={(g) => { setTodayWordGoal(g); setTodayWordGoalState(getTodayWordGoal()); setWordGoalDays(getWordGoalDays()); setTodayWordsCount(getTodayLearnedCount()); }}
             />
           </div>
         )}
@@ -516,8 +523,12 @@ function MiniCalendar({ title, color, days, year, month }: {
 
 function StudyCalendar({
   history, streak, studyDays, reviewDays, wordGoalDays, dailyGoal, dueCount,
+  todayWordGoal, todayWordsCount, onGoalSet,
 }: {
   history: Record<string, number>;
+  todayWordGoal: number | null;
+  todayWordsCount: number;
+  onGoalSet: (goal: number) => void;
   streak: number;
   totalDays: number;
   studyDays: string[];
@@ -531,6 +542,8 @@ function StudyCalendar({
   const [viewYear, setViewYear] = useState(now.getFullYear());
   const [viewMonth, setViewMonth] = useState(now.getMonth());
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
+  const [goalPickerOpen, setGoalPickerOpen] = useState(false);
+  const [pickedGoal, setPickedGoal] = useState(todayWordGoal ?? 10);
 
   const todayStr = localDateStr(now);
   const longestStreak = calcLongestStreak(studyDays);
@@ -562,6 +575,72 @@ function StudyCalendar({
 
       {/* ── Left column: stats + calendar ── */}
       <div className="space-y-4">
+
+      {/* ── Today task cards ── */}
+      {(() => {
+        const reviewToday = reviewDays.includes(todayStr);
+        const wordsToday  = wordGoalDays.includes(todayStr);
+        const goalLabel = todayWordGoal === null
+          ? 'Tap to set goal'
+          : wordsToday
+            ? `${todayWordGoal} words ✓`
+            : `${Math.min(todayWordsCount, todayWordGoal)}/${todayWordGoal} words`;
+        return (
+          <div className="grid grid-cols-2 gap-3 mb-1">
+            {/* Review card */}
+            <div className="rounded-2xl py-3 px-4 flex flex-col items-center gap-1.5 border"
+              style={{ background: reviewToday ? TASK_COLORS.review.bg : 'var(--surface)', borderColor: reviewToday ? TASK_COLORS.review.bg : 'var(--border)' }}>
+              <span style={{ fontSize: 22, color: reviewToday ? '#fff' : 'var(--text-muted)' }}>{reviewToday ? '✅' : '○'}</span>
+              <span className="text-xs font-bold" style={{ color: reviewToday ? '#fff' : 'var(--text-muted)' }}>Review</span>
+              <span className="text-[9px] font-semibold" style={{ color: reviewToday ? 'rgba(255,255,255,0.7)' : 'var(--text-muted)' }}>
+                {reviewToday ? 'All done!' : dueCount > 0 ? `${dueCount} due` : 'Nothing due'}
+              </span>
+            </div>
+            {/* Words card — tappable */}
+            <button onClick={() => { setPickedGoal(todayWordGoal ?? 10); setGoalPickerOpen(true); }}
+              className="rounded-2xl py-3 px-4 flex flex-col items-center gap-1.5 border transition-all hover:opacity-90 active:scale-95"
+              style={{ background: wordsToday ? TASK_COLORS.words.bg : 'var(--surface)', borderColor: wordsToday ? TASK_COLORS.words.bg : 'var(--border)' }}>
+              <span style={{ fontSize: 22, color: wordsToday ? '#fff' : 'var(--text-muted)' }}>{wordsToday ? '✅' : '✏️'}</span>
+              <span className="text-xs font-bold" style={{ color: wordsToday ? '#fff' : 'var(--text-muted)' }}>Words</span>
+              <span className="text-[9px] font-semibold" style={{ color: wordsToday ? 'rgba(255,255,255,0.7)' : 'var(--text-muted)' }}>{goalLabel}</span>
+            </button>
+          </div>
+        );
+      })()}
+
+      {/* ── Goal picker modal ── */}
+      {goalPickerOpen && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center" style={{ background: 'rgba(0,0,0,0.6)' }}
+          onClick={() => setGoalPickerOpen(false)}>
+          <div className="w-full max-w-sm rounded-t-3xl p-6 pb-10 space-y-5"
+            style={{ background: 'var(--surface)' }}
+            onClick={e => e.stopPropagation()}>
+            <div className="flex justify-center"><div className="w-10 h-1 rounded-full" style={{ background: 'var(--border)' }} /></div>
+            <div className="text-center space-y-1">
+              <p className="text-base font-bold" style={{ color: 'var(--text)' }}>Today&apos;s word goal</p>
+              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>How many new words do you want to learn today?</p>
+            </div>
+            <p className="text-center text-4xl font-black" style={{ color: TASK_COLORS.words.bg }}>{pickedGoal} words</p>
+            <input type="range" min={5} max={100} step={5} value={pickedGoal}
+              onChange={e => setPickedGoal(Number(e.target.value))}
+              className="w-full accent-[var(--primary)]" />
+            <div className="flex gap-2 justify-center flex-wrap">
+              {[5, 10, 15, 20, 30, 50].map(n => (
+                <button key={n} onClick={() => setPickedGoal(n)}
+                  className="px-3 py-1.5 rounded-lg text-xs font-bold transition-colors"
+                  style={{ background: pickedGoal === n ? TASK_COLORS.words.bg : 'var(--surface-2)', color: pickedGoal === n ? '#fff' : 'var(--text-muted)' }}>
+                  {n}
+                </button>
+              ))}
+            </div>
+            <button onClick={() => { onGoalSet(pickedGoal); setGoalPickerOpen(false); }}
+              className="w-full py-3 rounded-xl text-sm font-bold text-white"
+              style={{ background: TASK_COLORS.words.bg }}>
+              Set goal
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Stat tiles */}
       <div className="grid grid-cols-3 gap-3">
@@ -646,7 +725,7 @@ function StudyCalendar({
           </div>
           <div className="flex items-center gap-1.5">
             <div className="w-3.5 h-3.5 rounded-full" style={{ background: TASK_COLORS.words.bg }} />
-            <span className="text-[10px] text-[var(--text-muted)]">{dailyGoal} words</span>
+            <span className="text-[10px] text-[var(--text-muted)]">{todayWordGoal !== null ? `${todayWordGoal} words goal` : 'Words goal'}</span>
           </div>
           <span className="text-[10px] text-[var(--text-muted)] ml-auto">Tap a day for details</span>
         </div>
@@ -664,11 +743,11 @@ function StudyCalendar({
             <div className="flex flex-col gap-1">
               <span className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--text-muted)' }}>
                 <span className="w-2.5 h-2.5 rounded-full shrink-0 inline-block" style={{ background: TASK_COLORS.review.bg }} />
-                Complete an SRS review session
+                Complete all due SRS reviews
               </span>
               <span className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--text-muted)' }}>
                 <span className="w-2.5 h-2.5 rounded-full shrink-0 inline-block" style={{ background: TASK_COLORS.words.bg }} />
-                Reach your {dailyGoal}-word daily goal
+                Reach your self-set daily word goal
               </span>
             </div>
             <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Each task fills half the day circle. Complete both to fully mark a day.</p>
@@ -711,7 +790,7 @@ function StudyCalendar({
               <div className="grid grid-cols-2 gap-3 mb-3">
                 {([
                   { key: 'review', label: 'SRS Review',                done: sheetTasks.review, href: '/srs',   btnLabel: 'Go to Review', color: TASK_COLORS.review.bg, nothingDue: sheetIsToday && dueCount === 0 && !sheetTasks.review },
-                  { key: 'words',  label: `Words (${dailyGoal} goal)`, done: sheetTasks.words,  href: '/learn', btnLabel: 'Learn Words',  color: TASK_COLORS.words.bg },
+                  { key: 'words',  label: todayWordGoal !== null ? `Words (${todayWordGoal} goal)` : 'Words', done: sheetTasks.words,  href: '/learn', btnLabel: 'Learn Words',  color: TASK_COLORS.words.bg },
                 ] as const).map(task => (
                   <div key={task.key} className="rounded-2xl p-4 flex flex-col gap-3"
                     style={{ background: 'var(--surface-2)', border: `1px solid ${task.color}33` }}>
@@ -742,7 +821,7 @@ function StudyCalendar({
               {/* Two mini-calendars */}
               <div className="grid grid-cols-2 gap-3">
                 <MiniCalendar title="SRS"                    color={TASK_COLORS.review.bg} days={reviewDays}   year={viewYear} month={viewMonth} />
-                <MiniCalendar title={`Words (${dailyGoal})`} color={TASK_COLORS.words.bg}  days={wordGoalDays} year={viewYear} month={viewMonth} />
+                <MiniCalendar title={todayWordGoal !== null ? `Words (${todayWordGoal})` : 'Words'} color={TASK_COLORS.words.bg}  days={wordGoalDays} year={viewYear} month={viewMonth} />
               </div>
             </div>
           </div>

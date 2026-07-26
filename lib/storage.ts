@@ -33,7 +33,9 @@ const KEYS = {
   studyDays:    'lexivo_study_days',
   unitDoneDays: 'lexivo_unit_done_days',
   reviewDays:   'lexivo_review_days',
-  wordGoalDays: 'lexivo_word_goal_days',
+  wordGoalDays:       'lexivo_word_goal_days',
+  todayWordGoal:      'lexivo_today_word_goal',
+  todayWordGoalDate:  'lexivo_today_word_goal_date',
   reviewLog:    'lexivo_review_log',
   srsLastReview: 'lexivo_srs_last_review',
   xpHistory: 'lexivo_xp_history',
@@ -223,7 +225,8 @@ export function incrementTodayCount() {
   const newCount = count + 1;
   set(KEYS.todayCount, newCount);
   set(KEYS.todayCountDate, date);
-  if (newCount >= getSettings().dailyGoal) recordWordGoalDay();
+  const todayGoal = getTodayWordGoal();
+  if (todayGoal !== null && newCount >= todayGoal) recordWordGoalDay();
 }
 
 // ─── SRS ─────────────────────────────────────────────────────────────────────
@@ -587,6 +590,22 @@ export function recordWordGoalDay() {
   const today = localDateStr();
   const days = getWordGoalDays();
   if (!days.includes(today)) { days.push(today); set(KEYS.wordGoalDays, days); }
+}
+
+export function getTodayWordGoal(): number | null {
+  const date = get<string>(KEYS.todayWordGoalDate, '');
+  if (date !== localDateStr()) return null;
+  const goal = get<number | null>(KEYS.todayWordGoal, null);
+  return goal;
+}
+
+export function setTodayWordGoal(goal: number): void {
+  set(KEYS.todayWordGoal, goal);
+  set(KEYS.todayWordGoalDate, localDateStr());
+  const count = get<number>(KEYS.todayCount, 0);
+  const storedDate = get<string>(KEYS.todayCountDate, '');
+  const todayCount = storedDate === localDateStr() ? count : 0;
+  if (todayCount >= goal) recordWordGoalDay();
 }
 
 export function getDayTasks(dateStr: string): { unit: boolean; review: boolean; words: boolean } {
