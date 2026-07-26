@@ -156,6 +156,7 @@ function UnitCard({ unit, collectionName }: { unit: UnitRow; collectionName: str
   );
   const [activeStory, setActiveStory] = useState<{ num: number; title: string; content: string } | null>(null);
   const [storyLoading, setStoryLoading] = useState(false);
+  const [tappedWord, setTappedWord] = useState<string | null>(null);
 
   useEffect(() => {
     setLearnProgress(getLearnProgress(collectionName, unit.dayNumber));
@@ -321,13 +322,33 @@ function UnitCard({ unit, collectionName }: { unit: UnitRow; collectionName: str
                 <div className="text-2xl animate-bounce">📖</div>
               </div>
             ) : activeStory.content.trim() ? (
-              <div className="overflow-y-auto">
+              <div className="overflow-y-auto flex flex-col gap-3">
                 {activeStory.title && (
-                  <h2 className="text-lg font-bold text-[var(--text)] mb-3">{activeStory.title}</h2>
+                  <h2 className="text-lg font-bold text-[var(--text)]">{activeStory.title}</h2>
                 )}
                 <p className="text-sm text-[var(--text)] leading-relaxed whitespace-pre-wrap">
-                  {activeStory.content}
+                  {activeStory.content.split(/\[\[([^\]]+)\]\]/).map((part, i) =>
+                    i % 2 === 1 ? (
+                      <button
+                        key={i}
+                        onClick={() => setTappedWord(part)}
+                        className="inline font-semibold rounded px-0.5 transition-opacity hover:opacity-75"
+                        style={{ color: 'var(--primary)', background: 'color-mix(in srgb, var(--primary) 12%, transparent)' }}
+                      >{part}</button>
+                    ) : <span key={i}>{part}</span>
+                  )}
                 </p>
+                {tappedWord && (
+                  <div className="shrink-0 rounded-xl p-3 flex items-center gap-3" style={{ background: 'var(--primary-bg)', border: '1px solid color-mix(in srgb, var(--primary) 25%, transparent)' }}>
+                    <span className="text-base font-bold flex-1" style={{ color: 'var(--primary)' }}>📖 {tappedWord}</span>
+                    <button
+                      onClick={() => { setTappedWord(null); setActiveStory(null); }}
+                      className="text-xs font-bold px-3 py-1.5 rounded-lg text-white shrink-0"
+                      style={{ background: 'var(--primary)' }}
+                    >Go to unit</button>
+                    <button onClick={() => setTappedWord(null)} className="text-lg leading-none shrink-0" style={{ color: 'var(--text-muted)' }}>×</button>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="flex-1 flex flex-col items-center justify-center py-10 text-center">
