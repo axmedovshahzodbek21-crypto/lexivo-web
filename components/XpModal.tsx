@@ -12,6 +12,7 @@ interface Props {
 export default function XpModal({ xp, onClose }: Props) {
   const [peekLevel, setPeekLevel] = useState<string | null>(null);
   const [history, setHistory] = useState<XpEntry[]>([]);
+  const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
   const levelInfo = getLevelInfo(xp);
 
   useEffect(() => {
@@ -201,52 +202,93 @@ export default function XpModal({ xp, onClose }: Props) {
 
           {/* XP History */}
           {history.length > 0 && (() => {
+            type Session = { reason: string; source?: string; startTime: number; totalAmount: number; count: number };
+
             const grouped: Record<string, XpEntry[]> = {};
             for (const e of history) {
               const d = new Date(e.timestamp);
-              const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+              const key = `${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}/${d.getFullYear()}`;
               (grouped[key] ??= []).push(e);
             }
-            const dateKeys = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
-            const today = new Date();
-            const tk = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
-            const yest = new Date(today); yest.setDate(yest.getDate() - 1);
-            const yk = `${yest.getFullYear()}-${String(yest.getMonth()+1).padStart(2,'0')}-${String(yest.getDate()).padStart(2,'0')}`;
-            const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-            const dayLabel = (k: string) => k === tk ? 'Today' : k === yk ? 'Yesterday' : `${months[parseInt(k.split('-')[1])-1]} ${parseInt(k.split('-')[2])}`;
-            const icon = (r: string) => ({ Learn:'📖', Quiz:'🧠', Flashcard:'🃏', 'SRS Review':'🔄', 'Level Complete':'🏆' }[r] ?? '⭐');
+            const dateKeys = Object.keys(grouped).sort((a, b) => {
+              const [am,ad,ay] = a.split('/'); const [bm,bd,by] = b.split('/');
+              return new Date(+by,+bm-1,+bd).getTime() - new Date(+ay,+am-1,+ad).getTime();
+            });
+
+            const icon = (r: string) => ({ Learn:'📖', Quiz:'🧠', Flashcard:'🃏', 'SRS Review':'🔄', 'Streak Bonus':'🔥', 'Level Complete':'🏆' }[r] ?? '⭐');
             const timeFmt = (ts: number) => { const d = new Date(ts); return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
+
+            const groupSessions = (entries: XpEntry[]): Session[] => {
+              const ordered = [...entries].reverse();
+              const sessions: Session[] = [];
+              for (const e of ordered) {
+                const last = sessions[sessions.length - 1];
+                if (!last || last.reason !== e.reason || last.source !== e.source || e.timestamp - last.startTime > 3600000) {
+                  sessions.push({ reason: e.reason, source: e.source, startTime: e.timestamp, totalAmount: e.amount, count: 1 });
+                } else {
+                  last.totalAmount += e.amount;
+                  last.count++;
+                }
+              }
+              return sessions.reverse();
+            };
+
             return (
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--text-muted)' }}>XP History</p>
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {dateKeys.map(dk => {
                     const entries = grouped[dk];
                     const dayTotal = entries.reduce((s, e) => s + e.amount, 0);
+                    const isExpanded = expandedDays.has(dk);
+                    const sessions = isExpanded ? groupSessions(entries) : [];
                     return (
                       <div key={dk}>
-                        <div className="flex justify-between mb-1.5">
-                          <span className="text-xs font-semibold" style={{ color: 'var(--text-muted)' }}>{dayLabel(dk)}</span>
+                        <button
+                          onClick={() => setExpandedDays(prev => {
+                            const next = new Set(prev);
+                            if (next.has(dk)) next.delete(dk); else next.add(dk);
+                            return next;
+                          })}
+                          className="w-full flex items-center gap-2 px-3.5 py-3 rounded-xl text-left"
+                          style={{ background: 'var(--surface-2)' }}
+                        >
+                          <span className="flex-1 text-sm font-bold" style={{ color: 'var(--text)' }}>{dk}</span>
                           <span className="text-xs font-bold" style={{ color: 'var(--primary)' }}>+{displayXP(dayTotal)} XP</span>
-                        </div>
-                        <div className="rounded-xl overflow-hidden" style={{ background: 'var(--surface-2)' }}>
-                          {entries.map((e, j) => (
-                            <div key={j}>
-                              {j > 0 && <div style={{ height: 1, background: 'var(--border)', marginLeft: 44 }} />}
-                              <div className="flex items-center gap-2.5 px-3 py-2.5">
-                                <span className="text-lg w-6 text-center shrink-0">{icon(e.reason)}</span>
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-xs font-semibold truncate" style={{ color: 'var(--text)' }}>{e.reason}</p>
-                                  <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{timeFmt(e.timestamp)}</p>
+                          <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{isExpanded ? '▲' : '▼'}</span>
+                        </button>
+                        {isExpanded && (
+                          <div className="mt-1 rounded-xl overflow-hidden" style={{ background: 'var(--surface-2)' }}>
+                            {sessions.map((s, j) => {
+                              const showCount = s.count > 1 && (s.reason === 'Learn' || s.reason === 'SRS Review');
+                              return (
+                                <div key={j}>
+                                  {j > 0 && <div style={{ height: 1, background: 'var(--border)', marginLeft: 44 }} />}
+                                  <div className="flex items-center gap-2.5 px-3 py-2.5">
+                                    <span className="text-lg w-6 text-center shrink-0">{icon(s.reason)}</span>
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-center gap-1.5">
+                                        <p className="text-xs font-semibold" style={{ color: 'var(--text)' }}>{s.reason}</p>
+                                        {showCount && (
+                                          <span className="text-[10px] px-1.5 py-0.5 rounded-full" style={{ background: 'var(--border)', color: 'var(--text-muted)' }}>
+                                            {s.count} words
+                                          </span>
+                                        )}
+                                      </div>
+                                      <p className="text-[10px] truncate" style={{ color: 'var(--text-muted)' }}>
+                                        {timeFmt(s.startTime)}{s.source ? ` · ${s.source}` : ''}
+                                      </p>
+                                    </div>
+                                    <span className="text-xs font-bold px-2 py-0.5 rounded-full shrink-0"
+                                      style={{ color: 'var(--primary)', background: 'color-mix(in srgb, var(--primary) 12%, transparent)' }}>
+                                      +{displayXP(s.totalAmount)} XP
+                                    </span>
+                                  </div>
                                 </div>
-                                <span className="text-xs font-bold px-2 py-0.5 rounded-full shrink-0"
-                                  style={{ color: 'var(--primary)', background: 'color-mix(in srgb, var(--primary) 12%, transparent)' }}>
-                                  +{displayXP(e.amount)} XP
-                                </span>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
+                              );
+                            })}
+                          </div>
+                        )}
                       </div>
                     );
                   })}

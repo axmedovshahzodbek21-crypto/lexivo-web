@@ -246,7 +246,7 @@ function LearnInner() {
     storeSRSWord(srsWord);
     if (isNew) incrementTodayCount();
     const learnXP = getLearnXPAmount();
-    const { leveledUp, newLevel, newXp } = addXP(learnXP, 'Learn');
+    const { leveledUp, newLevel, newXp } = addXP(learnXP, 'Learn', `Unit ${current.dayNumber} · ${current.collectionName}`);
     if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
     setSessionXP(prev => prev + learnXP);
     recordStudySession();

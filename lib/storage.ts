@@ -604,6 +604,7 @@ export interface XpEntry {
   amount: number;
   reason: string;
   timestamp: number;
+  source?: string;
 }
 
 // Stored ×10 integers; displayed value = raw ÷ 10
@@ -617,7 +618,7 @@ export function getLearnXPAmount(): number {
   return (LEARN_XP_TIERS.find(t => total < t.maxWords) ?? LEARN_XP_TIERS[LEARN_XP_TIERS.length - 1]).xp;
 }
 
-export function addXP(amount: number, reason = 'Study'): { leveledUp: boolean; newLevel: string; newXp: number } {
+export function addXP(amount: number, reason = 'Study', source?: string): { leveledUp: boolean; newLevel: string; newXp: number } {
   const oldXp = get<number>(KEYS.xp, 0);
   const newXp = oldXp + amount;
   set(KEYS.xp, newXp);
@@ -630,7 +631,7 @@ export function addXP(amount: number, reason = 'Study'): { leveledUp: boolean; n
   set(KEYS.todayXpDate, date);
 
   const history = get<XpEntry[]>(KEYS.xpHistory, []);
-  history.push({ amount, reason, timestamp: Date.now() });
+  history.push({ amount, reason, timestamp: Date.now(), ...(source ? { source } : {}) });
   if (history.length > 200) history.splice(0, history.length - 200);
   set(KEYS.xpHistory, history);
 
