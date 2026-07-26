@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { getLevelInfo } from '@/lib/gamification';
 import { LEVEL_THRESHOLDS } from '@/lib/types';
-import { displayXP } from '@/lib/storage';
+import { displayXP, getXPHistory, type XpEntry } from '@/lib/storage';
 
 interface Props {
   xp: number;
@@ -11,7 +11,12 @@ interface Props {
 
 export default function XpModal({ xp, onClose }: Props) {
   const [peekLevel, setPeekLevel] = useState<string | null>(null);
+  const [history, setHistory] = useState<XpEntry[]>([]);
   const levelInfo = getLevelInfo(xp);
+
+  useEffect(() => {
+    setHistory(getXPHistory());
+  }, []);
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -193,6 +198,62 @@ export default function XpModal({ xp, onClose }: Props) {
               })}
             </div>
           </div>
+
+          {/* XP History */}
+          {history.length > 0 && (() => {
+            const grouped: Record<string, XpEntry[]> = {};
+            for (const e of history) {
+              const d = new Date(e.timestamp);
+              const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+              (grouped[key] ??= []).push(e);
+            }
+            const dateKeys = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
+            const today = new Date();
+            const tk = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+            const yest = new Date(today); yest.setDate(yest.getDate() - 1);
+            const yk = `${yest.getFullYear()}-${String(yest.getMonth()+1).padStart(2,'0')}-${String(yest.getDate()).padStart(2,'0')}`;
+            const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            const dayLabel = (k: string) => k === tk ? 'Today' : k === yk ? 'Yesterday' : `${months[parseInt(k.split('-')[1])-1]} ${parseInt(k.split('-')[2])}`;
+            const icon = (r: string) => ({ Learn:'📖', Quiz:'🧠', Flashcard:'🃏', 'SRS Review':'🔄', 'Level Complete':'🏆' }[r] ?? '⭐');
+            const timeFmt = (ts: number) => { const d = new Date(ts); return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
+            return (
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--text-muted)' }}>XP History</p>
+                <div className="space-y-3">
+                  {dateKeys.map(dk => {
+                    const entries = grouped[dk];
+                    const dayTotal = entries.reduce((s, e) => s + e.amount, 0);
+                    return (
+                      <div key={dk}>
+                        <div className="flex justify-between mb-1.5">
+                          <span className="text-xs font-semibold" style={{ color: 'var(--text-muted)' }}>{dayLabel(dk)}</span>
+                          <span className="text-xs font-bold" style={{ color: 'var(--primary)' }}>+{displayXP(dayTotal)} XP</span>
+                        </div>
+                        <div className="rounded-xl overflow-hidden" style={{ background: 'var(--surface-2)' }}>
+                          {entries.map((e, j) => (
+                            <div key={j}>
+                              {j > 0 && <div style={{ height: 1, background: 'var(--border)', marginLeft: 44 }} />}
+                              <div className="flex items-center gap-2.5 px-3 py-2.5">
+                                <span className="text-lg w-6 text-center shrink-0">{icon(e.reason)}</span>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-xs font-semibold truncate" style={{ color: 'var(--text)' }}>{e.reason}</p>
+                                  <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{timeFmt(e.timestamp)}</p>
+                                </div>
+                                <span className="text-xs font-bold px-2 py-0.5 rounded-full shrink-0"
+                                  style={{ color: 'var(--primary)', background: 'color-mix(in srgb, var(--primary) 12%, transparent)' }}>
+                                  +{displayXP(e.amount)} XP
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
 
           <button
             onClick={close}
