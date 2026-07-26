@@ -47,6 +47,8 @@ const KEYS = {
   quizStreak:        'lexivo_quiz_streak',
   quizLastDay:       'lexivo_quiz_last_day',
   achievementDates:  'lexivo_achievement_dates',
+  flashcardXpUnits:  'lexivo_flash_xp_units',
+  quizXpUnits:       'lexivo_quiz_xp_units',
 };
 
 function get<T>(key: string, fallback: T): T {
@@ -751,6 +753,28 @@ export function getFlashcardStreak(): number { return get<number>(KEYS.flashStre
 export function recordQuizSession() { _recordActivityDay(KEYS.quizTotalDays, KEYS.quizStreak, KEYS.quizLastDay); }
 export function getQuizTotalDays(): number { return get<number>(KEYS.quizTotalDays, 0); }
 export function getQuizStreak(): number { return get<number>(KEYS.quizStreak, 0); }
+
+// ─── One-time flashcard / quiz XP per unit ───────────────────────────────────
+
+function _unitKey(collectionName: string, dayNumber: number) { return `${collectionName}_${dayNumber}`; }
+
+export function hasFlashcardXPAwarded(collectionName: string, dayNumber: number): boolean {
+  return get<string[]>(KEYS.flashcardXpUnits, []).includes(_unitKey(collectionName, dayNumber));
+}
+export function markFlashcardXPAwarded(collectionName: string, dayNumber: number): void {
+  const list = get<string[]>(KEYS.flashcardXpUnits, []);
+  const k = _unitKey(collectionName, dayNumber);
+  if (!list.includes(k)) { list.push(k); set(KEYS.flashcardXpUnits, list); }
+}
+
+export function hasQuizXPAwarded(collectionName: string, dayNumber: number): boolean {
+  return get<string[]>(KEYS.quizXpUnits, []).includes(_unitKey(collectionName, dayNumber));
+}
+export function markQuizXPAwarded(collectionName: string, dayNumber: number): void {
+  const list = get<string[]>(KEYS.quizXpUnits, []);
+  const k = _unitKey(collectionName, dayNumber);
+  if (!list.includes(k)) { list.push(k); set(KEYS.quizXpUnits, list); }
+}
 
 // ─── Hard words (too hard) ───────────────────────────────────────────────────
 

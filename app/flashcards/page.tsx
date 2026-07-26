@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { useShallow } from 'zustand/react/shallow';
 import { speak, speakText } from '@/lib/speech';
-import { recordStudySession, markFlashcardComplete, getStarredWords, getHardWords, getCustomListWords, getUnitProgress, saveFlashcardProgress, getFlashcardProgress, clearFlashcardProgress, getImportedWords, getImportedWordsByCollection, getClassHWTemp, recordFlashcardSession } from '@/lib/storage';
+import { recordStudySession, markFlashcardComplete, getStarredWords, getHardWords, getCustomListWords, getUnitProgress, saveFlashcardProgress, getFlashcardProgress, clearFlashcardProgress, getImportedWords, getImportedWordsByCollection, getClassHWTemp, recordFlashcardSession, addXP, hasFlashcardXPAwarded, markFlashcardXPAwarded } from '@/lib/storage';
 import { checkAchievements } from '@/lib/gamification';
 import { pushUnitProgressCurrentUser, pushAllCurrentUser } from '@/lib/web-sync';
 import type { WordItem, WordCollection } from '@/lib/types';
@@ -97,6 +97,7 @@ export default function FlashcardsPage() {
   const cardsSinceLastPush = useRef(0);
   const advancing = useRef(false);
   const doneRef = useRef(false);
+  const originalWordCount = useRef(0);
   useEffect(() => { doneRef.current = done; }, [done]);
 
   // Gate: must complete Learn before Flashcards (for unit sessions)
@@ -142,6 +143,7 @@ export default function FlashcardsPage() {
     if (collectionsLoaded && collections.length > 0) {
       const fullDeck = buildDeck(collections, collectionName, dayNumber, starredOnly, hardOnly, listId, starredUnitIndex);
       if (collectionName && dayNumber !== undefined) {
+        originalWordCount.current = fullDeck.length;
         if (fresh) {
           clearFlashcardProgress(collectionName, dayNumber);
           setDeck(fullDeck);
@@ -205,6 +207,14 @@ export default function FlashcardsPage() {
     const newAchievements = checkAchievements();
     newAchievements.forEach(pushAchievement);
     if (index + 1 >= deck.length) {
+      const finalUnknown = wasKnown ? unknownWords.length : unknownWords.length + 1;
+      if (collectionName && dayNumber !== undefined && finalUnknown === 0) {
+        if (!hasFlashcardXPAwarded(collectionName, dayNumber)) {
+          const result = addXP(Math.round(originalWordCount.current * 3), 'Flashcard', `Unit ${dayNumber} · ${collectionName}`);
+          markFlashcardXPAwarded(collectionName, dayNumber);
+          if (result.leveledUp) setPendingLevelUp({ level: result.newLevel, xp: result.newXp });
+        }
+      }
       if (collectionName) {
         const qDay = dayNumber ?? deck[0]?.dayNumber ?? 1;
         markFlashcardComplete(collectionName, qDay);

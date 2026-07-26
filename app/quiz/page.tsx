@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { speak, speakText } from '@/lib/speech';
-import { recordStudySession, markQuizComplete, unlockAchievement, getStarredWords, getCustomListWords, getSettings, getUnitProgress, getImportedWords, getImportedWordsByCollection, getClassHWTemp, recordQuizSession } from '@/lib/storage';
+import { recordStudySession, markQuizComplete, unlockAchievement, getStarredWords, getCustomListWords, getSettings, getUnitProgress, getImportedWords, getImportedWordsByCollection, getClassHWTemp, recordQuizSession, addXP, hasQuizXPAwarded, markQuizXPAwarded } from '@/lib/storage';
 import { fireConfetti } from '@/lib/confetti';
 import { checkAchievements } from '@/lib/gamification';
 import { pushUnitProgressCurrentUser, pushAllCurrentUser } from '@/lib/web-sync';
@@ -240,15 +240,19 @@ export default function QuizPage() {
 
   const next = useCallback(() => {
     if (index + 1 >= questions.length) {
-      // Check perfect score
-      if (correct + (selected === current?.correct ? 1 : 0) === questions.length) {
-        unlockAchievement('quiz_perfect');
-        unlockAchievement('quiz_first');
-      } else {
-        unlockAchievement('quiz_first');
-      }
+      const finalCorrect = correct + (selected === current?.correct ? 1 : 0);
+      const isPerfect = finalCorrect === questions.length;
+      if (isPerfect) unlockAchievement('quiz_perfect');
+      unlockAchievement('quiz_first');
       if (collectionName) {
         const qDayNumber = dayNumber ?? questions[0]?.word.dayNumber ?? 1;
+        if (!hasQuizXPAwarded(collectionName, qDayNumber)) {
+          const baseXp = Math.round(questions.length * 5); // 0.5 XP per word
+          const bonus  = isPerfect ? 30 : 0;               // +3.0 XP perfect bonus
+          const result = addXP(baseXp + bonus, 'Quiz', `Unit ${qDayNumber} · ${collectionName}`);
+          markQuizXPAwarded(collectionName, qDayNumber);
+          if (result.leveledUp) setPendingLevelUp({ level: result.newLevel, xp: result.newXp });
+        }
         markQuizComplete(collectionName, qDayNumber);
         pushUnitProgressCurrentUser(collectionName, qDayNumber);
         const p = getUnitProgress(collectionName, qDayNumber);
