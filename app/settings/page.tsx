@@ -168,7 +168,7 @@ export default function SettingsPage() {
         'lexivo_study_days', 'lexivo_review_days', 'lexivo_word_goal_days',
         'lexivo_unit_done_days', 'lexivo_review_log', 'lexivo_srs_last_review',
         'lexivo_freezes', 'lexivo_last_freeze_week', 'lexivo_streak_bonus_date',
-        'lexivo_hard_words',
+        'lexivo_hard_words', 'lexivo_flash_xp_units', 'lexivo_quiz_xp_units',
       ];
       progressKeys.forEach(k => localStorage.removeItem(k));
       const toRemove: string[] = [];

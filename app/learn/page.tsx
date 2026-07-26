@@ -245,10 +245,12 @@ function LearnInner() {
     const srsWord = createSRSWord(current, current.collectionName, current.dayNumber, current.topic);
     storeSRSWord(srsWord);
     if (isNew) incrementTodayCount();
-    const learnXP = getLearnXPAmount();
-    const { leveledUp, newLevel, newXp } = addXP(learnXP, 'Learn', `Unit ${current.dayNumber} · ${current.collectionName}`);
-    if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
-    setSessionXP(prev => prev + learnXP);
+    if (isNew) {
+      const learnXP = getLearnXPAmount();
+      const { leveledUp, newLevel, newXp } = addXP(learnXP, 'Learn', `Unit ${current.dayNumber} · ${current.collectionName}`);
+      if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
+      setSessionXP(prev => prev + learnXP);
+    }
     recordStudySession();
     setSessionCount(c => c + 1);
     setMarks(m => { const n = [...m]; n[index] = 'learned'; return n; });
