@@ -65,6 +65,7 @@ export interface Achievement {
   description: string;
   icon: string;
   category: string;
+  xp: number;
   unlockedAt?: string;
 }
 

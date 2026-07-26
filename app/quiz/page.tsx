@@ -242,8 +242,8 @@ export default function QuizPage() {
     if (index + 1 >= questions.length) {
       const finalCorrect = correct + (selected === current?.correct ? 1 : 0);
       const isPerfect = finalCorrect === questions.length;
-      if (isPerfect) unlockAchievement('quiz_perfect');
-      unlockAchievement('quiz_first');
+      if (isPerfect) unlockAchievement('quiz_perfect', 100); // 10 XP
+      unlockAchievement('quiz_first', 30); // 3 XP
       if (collectionName) {
         const qDayNumber = dayNumber ?? questions[0]?.word.dayNumber ?? 1;
         if (!hasQuizXPAwarded(collectionName, qDayNumber)) {

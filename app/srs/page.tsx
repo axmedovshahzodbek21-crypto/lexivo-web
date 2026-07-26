@@ -175,7 +175,7 @@ export default function SRSReviewPage() {
     if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
     setSessionXP(xpTotal);
 
-    unlockAchievement('srs_first');
+    unlockAchievement('srs_first', 50); // 5 XP
     recordStudySession();
     if (getDueWords().length === 0) recordReviewDay();
     const newAchievements = checkAchievements();

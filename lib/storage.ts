@@ -720,13 +720,14 @@ export function getUnlockedAchievements(): string[] {
   return get<string[]>(KEYS.achievements, []);
 }
 
-export function unlockAchievement(id: string): boolean {
+export function unlockAchievement(id: string, xpRaw = 0): boolean {
   const unlocked = getUnlockedAchievements();
   if (unlocked.includes(id)) return false;
   unlocked.push(id);
   set(KEYS.achievements, unlocked);
   const dates = get<Record<string, string>>(KEYS.achievementDates, {});
   if (!dates[id]) { dates[id] = new Date().toISOString(); set(KEYS.achievementDates, dates); }
+  if (xpRaw > 0) addXP(xpRaw, 'Achievement', id);
   return true;
 }
 

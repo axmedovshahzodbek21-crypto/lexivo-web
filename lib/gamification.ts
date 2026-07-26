@@ -32,6 +32,15 @@ function icon(n: number, base: string): string {
   return base;
 }
 
+function milestoneXp(n: number): number {
+  if (n >= 107) return 25;
+  if (n >= 99)  return 20;
+  if (n >= 57)  return 15;
+  if (n >= 30)  return 10;
+  if (n >= 10)  return 5;
+  return 3;
+}
+
 function gen(prefix: string, cat: string, baseIcon: string, names: Record<number, string>, descFn: (n: number) => string): Achievement[] {
   return M.map(n => ({
     id: `${prefix}_${n}`,
@@ -39,6 +48,7 @@ function gen(prefix: string, cat: string, baseIcon: string, names: Record<number
     description: descFn(n),
     icon: icon(n, baseIcon),
     category: cat,
+    xp: milestoneXp(n),
   }));
 }
 
@@ -51,25 +61,25 @@ const quizStreakAchs  = gen('qs', 'quiz_streak',   '🧠', QS, n => `Do a quiz $
 
 export const ALL_ACHIEVEMENTS: Achievement[] = [
   // Words
-  { id: 'first_word',   title: 'First Step',         description: 'Learn your first word',   icon: '🌱', category: 'words' },
-  { id: 'words_10',     title: 'Getting Started',    description: 'Learn 10 words',           icon: '📚', category: 'words' },
-  { id: 'words_50',     title: 'Word Collector',     description: 'Learn 50 words',           icon: '📖', category: 'words' },
-  { id: 'words_100',    title: 'Centurion',          description: 'Learn 100 words',          icon: '💯', category: 'words' },
-  { id: 'words_250',    title: 'Word Master',        description: 'Learn 250 words',          icon: '🏆', category: 'words' },
-  { id: 'words_500',    title: 'Lexicon Master',     description: 'Learn 500 words',          icon: '👑', category: 'words' },
-  { id: 'words_1000',   title: 'Lexivo Legend',      description: 'Learn 1000 words',         icon: '🌍', category: 'words' },
+  { id: 'first_word',   title: 'First Step',         description: 'Learn your first word',   icon: '🌱', category: 'words',      xp: 2  },
+  { id: 'words_10',     title: 'Getting Started',    description: 'Learn 10 words',           icon: '📚', category: 'words',      xp: 5  },
+  { id: 'words_50',     title: 'Word Collector',     description: 'Learn 50 words',           icon: '📖', category: 'words',      xp: 10 },
+  { id: 'words_100',    title: 'Centurion',          description: 'Learn 100 words',          icon: '💯', category: 'words',      xp: 15 },
+  { id: 'words_250',    title: 'Word Master',        description: 'Learn 250 words',          icon: '🏆', category: 'words',      xp: 25 },
+  { id: 'words_500',    title: 'Lexicon Master',     description: 'Learn 500 words',          icon: '👑', category: 'words',      xp: 40 },
+  { id: 'words_1000',   title: 'Lexivo Legend',      description: 'Learn 1000 words',         icon: '🌍', category: 'words',      xp: 75 },
   // XP
-  { id: 'xp_100',       title: 'XP Earner',          description: 'Earn 100 XP',              icon: '✨', category: 'xp' },
-  { id: 'xp_500',       title: 'XP Hunter',          description: 'Earn 500 XP',              icon: '💎', category: 'xp' },
-  { id: 'xp_1000',      title: 'XP Legend',          description: 'Earn 1000 XP',             icon: '🚀', category: 'xp' },
-  { id: 'xp_2000',      title: 'XP Master',          description: 'Earn 2000 XP',             icon: '🏆', category: 'xp' },
+  { id: 'xp_100',       title: 'XP Earner',          description: 'Earn 100 XP',              icon: '✨', category: 'xp',         xp: 5  },
+  { id: 'xp_500',       title: 'XP Hunter',          description: 'Earn 500 XP',              icon: '💎', category: 'xp',         xp: 10 },
+  { id: 'xp_1000',      title: 'XP Legend',          description: 'Earn 1000 XP',             icon: '🚀', category: 'xp',         xp: 20 },
+  { id: 'xp_2000',      title: 'XP Master',          description: 'Earn 2000 XP',             icon: '🏆', category: 'xp',         xp: 35 },
   // SRS
-  { id: 'srs_first',        title: 'Reviewer',          description: 'Complete your first SRS review',  icon: '🔄', category: 'srs' },
-  { id: 'srs_mastered_10',  title: 'Memory Champion',   description: 'Master 10 words in SRS',          icon: '🧠', category: 'srs' },
+  { id: 'srs_first',        title: 'Reviewer',        description: 'Complete your first SRS review', icon: '🔄', category: 'srs', xp: 5  },
+  { id: 'srs_mastered_10',  title: 'Memory Champion', description: 'Master 10 words in SRS',         icon: '🧠', category: 'srs', xp: 10 },
   // Milestones
-  { id: 'flashcard_first',  title: 'Flashcard Fan',     description: 'Complete a flashcard session',    icon: '🃏', category: 'milestones' },
-  { id: 'quiz_first',       title: 'Quiz Taker',        description: 'Complete a quiz',                 icon: '❓', category: 'milestones' },
-  { id: 'quiz_perfect',     title: 'Perfect Score',     description: 'Score 100% on a quiz',            icon: '🎯', category: 'milestones' },
+  { id: 'flashcard_first',  title: 'Flashcard Fan',   description: 'Complete a flashcard session',   icon: '🃏', category: 'milestones', xp: 3  },
+  { id: 'quiz_first',       title: 'Quiz Taker',      description: 'Complete a quiz',                icon: '❓', category: 'milestones', xp: 3  },
+  { id: 'quiz_perfect',     title: 'Perfect Score',   description: 'Score 100% on a quiz',           icon: '🎯', category: 'milestones', xp: 10 },
   // Milestone categories
   ...studyDayAchs,
   ...studyStreakAchs,
@@ -119,6 +129,7 @@ export function checkAchievements(): Achievement[] {
     ['xp_1000',           xp >= 10000],
     ['xp_2000',           xp >= 20000],
     ['srs_mastered_10',   masteredCount >= 10],
+    ['flashcard_first',   flashDays     >= 1],
     ...M.map(n => [`sd_${n}`, totalDays   >= n] as [string, boolean]),
     ...M.map(n => [`ss_${n}`, streak      >= n] as [string, boolean]),
     ...M.map(n => [`fd_${n}`, flashDays   >= n] as [string, boolean]),
@@ -129,11 +140,9 @@ export function checkAchievements(): Achievement[] {
 
   for (const [id, condition] of checks) {
     if (condition) {
-      const justUnlocked = unlockAchievement(id);
-      if (justUnlocked) {
-        const achievement = ALL_ACHIEVEMENTS.find(a => a.id === id);
-        if (achievement) newlyUnlocked.push(achievement);
-      }
+      const achievement = ALL_ACHIEVEMENTS.find(a => a.id === id);
+      const justUnlocked = unlockAchievement(id, (achievement?.xp ?? 0) * 10);
+      if (justUnlocked && achievement) newlyUnlocked.push(achievement);
     }
   }
 
