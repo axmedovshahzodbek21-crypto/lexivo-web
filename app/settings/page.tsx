@@ -181,12 +181,16 @@ export default function SettingsPage() {
       // Now delete from Supabase
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        await supabase.from('srs_words').delete().eq('user_id', user.id);
-        await supabase.from('learned_words').delete().eq('user_id', user.id);
-        await supabase.from('starred_words').delete().eq('user_id', user.id);
-        await supabase.from('xp_history').delete().eq('user_id', user.id);
-        try { await supabase.from('unit_progress').delete().eq('user_id', user.id); } catch (_) {}
-        await supabase.from('user_stats').delete().eq('id', user.id);
+        const dels = await Promise.all([
+          supabase.from('srs_words').delete().eq('user_id', user.id),
+          supabase.from('learned_words').delete().eq('user_id', user.id),
+          supabase.from('starred_words').delete().eq('user_id', user.id),
+          supabase.from('xp_history').delete().eq('user_id', user.id),
+          supabase.from('unit_progress').delete().eq('user_id', user.id),
+          supabase.from('user_stats').delete().eq('id', user.id),
+        ]);
+        const failed = dels.filter(r => r.error).map(r => r.error!.message);
+        if (failed.length > 0) throw new Error(`Supabase delete failed: ${failed.join('; ')}`);
         await supabase.from('profiles').update({ reset_at: new Date().toISOString() }).eq('id', user.id);
       }
       await new Promise(r => setTimeout(r, 200));
