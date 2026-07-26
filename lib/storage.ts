@@ -40,6 +40,13 @@ const KEYS = {
   streakBonusDate:   'lexivo_streak_bonus_date',
   settingsUpdatedAt: 'lexivo_settings_updated_at',
   hardWords:         'lexivo_hard_words',
+  flashTotalDays:    'lexivo_flash_total_days',
+  flashStreak:       'lexivo_flash_streak',
+  flashLastDay:      'lexivo_flash_last_day',
+  quizTotalDays:     'lexivo_quiz_total_days',
+  quizStreak:        'lexivo_quiz_streak',
+  quizLastDay:       'lexivo_quiz_last_day',
+  achievementDates:  'lexivo_achievement_dates',
 };
 
 function get<T>(key: string, fallback: T): T {
@@ -716,8 +723,34 @@ export function unlockAchievement(id: string): boolean {
   if (unlocked.includes(id)) return false;
   unlocked.push(id);
   set(KEYS.achievements, unlocked);
+  const dates = get<Record<string, string>>(KEYS.achievementDates, {});
+  if (!dates[id]) { dates[id] = new Date().toISOString(); set(KEYS.achievementDates, dates); }
   return true;
 }
+
+export function getAchievementDate(id: string): string | null {
+  return get<Record<string, string>>(KEYS.achievementDates, {})[id] ?? null;
+}
+
+function _recordActivityDay(totalKey: string, streakKey: string, lastKey: string) {
+  const today = localDateStr();
+  const last = get<string>(lastKey, '');
+  if (last === today) return;
+  const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+  const yk = localDateStr(yesterday);
+  const streak = last === yk ? get<number>(streakKey, 0) + 1 : 1;
+  set(lastKey, today);
+  set(totalKey, get<number>(totalKey, 0) + 1);
+  set(streakKey, streak);
+}
+
+export function recordFlashcardSession() { _recordActivityDay(KEYS.flashTotalDays, KEYS.flashStreak, KEYS.flashLastDay); }
+export function getFlashcardTotalDays(): number { return get<number>(KEYS.flashTotalDays, 0); }
+export function getFlashcardStreak(): number { return get<number>(KEYS.flashStreak, 0); }
+
+export function recordQuizSession() { _recordActivityDay(KEYS.quizTotalDays, KEYS.quizStreak, KEYS.quizLastDay); }
+export function getQuizTotalDays(): number { return get<number>(KEYS.quizTotalDays, 0); }
+export function getQuizStreak(): number { return get<number>(KEYS.quizStreak, 0); }
 
 // ─── Hard words (too hard) ───────────────────────────────────────────────────
 

@@ -64,6 +64,7 @@ export interface Achievement {
   title: string;
   description: string;
   icon: string;
+  category: string;
   unlockedAt?: string;
 }
 

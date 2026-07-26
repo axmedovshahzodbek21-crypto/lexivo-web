@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { useShallow } from 'zustand/react/shallow';
 import { speak, speakText } from '@/lib/speech';
-import { recordStudySession, markFlashcardComplete, getStarredWords, getHardWords, getCustomListWords, getUnitProgress, saveFlashcardProgress, getFlashcardProgress, clearFlashcardProgress, getImportedWords, getImportedWordsByCollection, getClassHWTemp } from '@/lib/storage';
+import { recordStudySession, markFlashcardComplete, getStarredWords, getHardWords, getCustomListWords, getUnitProgress, saveFlashcardProgress, getFlashcardProgress, clearFlashcardProgress, getImportedWords, getImportedWordsByCollection, getClassHWTemp, recordFlashcardSession } from '@/lib/storage';
 import { checkAchievements } from '@/lib/gamification';
 import { pushUnitProgressCurrentUser, pushAllCurrentUser } from '@/lib/web-sync';
 import type { WordItem, WordCollection } from '@/lib/types';
@@ -201,6 +201,7 @@ export default function FlashcardsPage() {
       if (cardsSinceLastPush.current >= 5) { cardsSinceLastPush.current = 0; pushAllCurrentUser(); }
     }
     recordStudySession();
+    recordFlashcardSession();
     const newAchievements = checkAchievements();
     newAchievements.forEach(pushAchievement);
     if (index + 1 >= deck.length) {

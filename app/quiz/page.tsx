@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { speak, speakText } from '@/lib/speech';
-import { recordStudySession, markQuizComplete, unlockAchievement, getStarredWords, getCustomListWords, getSettings, getUnitProgress, getImportedWords, getImportedWordsByCollection, getClassHWTemp } from '@/lib/storage';
+import { recordStudySession, markQuizComplete, unlockAchievement, getStarredWords, getCustomListWords, getSettings, getUnitProgress, getImportedWords, getImportedWordsByCollection, getClassHWTemp, recordQuizSession } from '@/lib/storage';
 import { fireConfetti } from '@/lib/confetti';
 import { checkAchievements } from '@/lib/gamification';
 import { pushUnitProgressCurrentUser, pushAllCurrentUser } from '@/lib/web-sync';
@@ -254,6 +254,7 @@ export default function QuizPage() {
         const p = getUnitProgress(collectionName, qDayNumber);
         if (p.learnDone && p.flashcardDone && p.quizDone) fireConfetti();
       }
+      recordQuizSession();
       const newAchievements = checkAchievements();
       newAchievements.forEach(pushAchievement);
 
