@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
-import { localDateStr } from '@/lib/storage';
+import { localDateStr, displayXP } from '@/lib/storage';
 
 interface LeaderboardEntry {
   user_id: string;
@@ -310,7 +310,7 @@ export default function LeaderboardPage() {
                         {savedIds.has(e.user_id) ? '⭐ ' : ''}{e.name}
                       </p>
                       <p className="text-xs font-black mt-0.5" style={{ color: rank === 1 ? '#b45309' : 'var(--primary)' }}>
-                        {e.xp.toLocaleString()} XP
+                        {displayXP(e.xp)} XP
                       </p>
                       {e.streak > 0 && <p className="text-[10px] text-[var(--text-muted)] mt-0.5">🔥 {e.streak}</p>}
                       {e.last_study_date === today && (
@@ -351,7 +351,7 @@ export default function LeaderboardPage() {
                       )}
                     </div>
                     <div className="text-right flex-shrink-0">
-                      <p className="text-sm font-black" style={{ color: 'var(--primary)' }}>{e.xp.toLocaleString()} XP</p>
+                      <p className="text-sm font-black" style={{ color: 'var(--primary)' }}>{displayXP(e.xp)} XP</p>
                       {e.streak > 0 && <p className="text-xs text-[var(--text-muted)]">🔥 {e.streak}</p>}
                     </div>
                   </div>
