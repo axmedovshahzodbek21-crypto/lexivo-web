@@ -15,6 +15,9 @@ import {
   getReviewLog, saveReviewLog,
   getSRSLastReview, saveSRSLastReview,
   getXPHistory, type XpEntry,
+  getReviewDays, saveReviewDays,
+  getWordGoalDays, saveWordGoalDays,
+  getUnitDoneDays, saveUnitDoneDays,
   localDateStr, addDaysToDateStr,
 } from './storage';
 
@@ -55,6 +58,9 @@ interface StatsRow {
   freezes:              number | null;
   last_freeze_week:     string | null;
   review_log:           Record<string, number[]> | null;
+  review_days:          string[] | null;
+  word_goal_days:       string[] | null;
+  unit_done_days:       string[] | null;
 }
 
 interface UnitProgressRow {
@@ -100,7 +106,7 @@ function ls(key: string): string | null {
 }
 
 async function upsertUserStats(payload: Record<string, unknown>) {
-  const optionalColumns = ['xp_updated_at', 'study_days'];
+  const optionalColumns = ['xp_updated_at', 'study_days', 'review_days', 'word_goal_days', 'unit_done_days'];
   let current = { ...payload };
 
   for (let attempt = 0; attempt <= optionalColumns.length; attempt++) {
@@ -168,7 +174,10 @@ export async function pushAll(uid: string) {
       study_days: getStudyDays(),
       freezes: getFreezes(),
       last_freeze_week: (() => { try { const v = ls(K.lastFreezeWeek); return (v && /^\d{4}-W\d{1,2}$/.test(JSON.parse(v))) ? JSON.parse(v) : null; } catch { return null; } })(),
-      review_log: getReviewLog(),
+      review_log:    getReviewLog(),
+      review_days:   getReviewDays(),
+      word_goal_days: getWordGoalDays(),
+      unit_done_days: getUnitDoneDays(),
     });
 
     // learned_words — deduplicate by word
@@ -542,6 +551,7 @@ export async function pullAll(uid: string) {
       warnMissing('user_stats', s as unknown as Record<string, unknown>, [
         'xp','xp_updated_at','streak','freezes','total_days','today_xp','today_xp_date',
         'today_count','today_count_date','last_study_date','last_freeze_week','study_days',
+        'review_days','word_goal_days','unit_done_days',
       ]);
       // Cache cloud xp_updated_at so pushAll can skip the XP upsert when cloud is newer
       _lastPulledXpTs = s.xp_updated_at ?? null;
@@ -583,6 +593,19 @@ export async function pullAll(uid: string) {
         const local = getStudyDays();
         const merged = Array.from(new Set([...local, ...s.study_days])).sort();
         saveStudyDays(merged);
+      }
+      // Calendar tracking days — union merge same as study_days
+      const calendarMerges: Array<[string[] | null, () => string[], (d: string[]) => void]> = [
+        [s.review_days,    getReviewDays,    saveReviewDays],
+        [s.word_goal_days, getWordGoalDays,  saveWordGoalDays],
+        [s.unit_done_days, getUnitDoneDays,  saveUnitDoneDays],
+      ];
+      for (const [cloud, getLocal, save] of calendarMerges) {
+        if (Array.isArray(cloud) && cloud.length > 0) {
+          const local = getLocal();
+          const merged = Array.from(new Set([...local, ...cloud])).sort();
+          save(merged);
+        }
       }
       // reviewLog — union merge: take all completed intervals from both cloud and local
       if (s.review_log && typeof s.review_log === 'object') {
