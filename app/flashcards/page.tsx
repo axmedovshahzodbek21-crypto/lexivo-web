@@ -7,7 +7,6 @@ import { useShallow } from 'zustand/react/shallow';
 import { speak, speakText } from '@/lib/speech';
 import { recordStudySession, markFlashcardComplete, getStarredWords, getHardWords, getCustomListWords, getUnitProgress, saveFlashcardProgress, getFlashcardProgress, clearFlashcardProgress, getImportedWords, getImportedWordsByCollection, getClassHWTemp, recordFlashcardSession, addXP, hasFlashcardXPAwarded, markFlashcardXPAwarded } from '@/lib/storage';
 import { checkAchievements } from '@/lib/gamification';
-import { pushUnitProgressCurrentUser, pushAllCurrentUser } from '@/lib/web-sync';
 import type { WordItem, WordCollection } from '@/lib/types';
 import Link from 'next/link';
 import UnitPicker from '@/components/UnitPicker';
@@ -200,7 +199,7 @@ export default function FlashcardsPage() {
     else { setUnknown(u => u + 1); if (card) setUnknownWords(prev => [...prev, card]); }
     if (!sourceClassHW) {
       cardsSinceLastPush.current++;
-      if (cardsSinceLastPush.current >= 5) { cardsSinceLastPush.current = 0; pushAllCurrentUser(); }
+      if (cardsSinceLastPush.current >= 5) { cardsSinceLastPush.current = 0; }
     }
     recordStudySession();
     recordFlashcardSession();
@@ -219,7 +218,6 @@ export default function FlashcardsPage() {
         const qDay = dayNumber ?? deck[0]?.dayNumber ?? 1;
         markFlashcardComplete(collectionName, qDay);
         clearFlashcardProgress(collectionName, qDay);
-        pushUnitProgressCurrentUser(collectionName, qDay);
       }
       setDone(true);
     } else {

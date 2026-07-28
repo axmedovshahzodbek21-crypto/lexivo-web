@@ -2,27 +2,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import type { Session, User } from '@supabase/supabase-js';
 import { supabase } from './supabase';
-import { pullAll, pushAll, startSync, stopSync } from './web-sync';
 import { clearUserData } from './storage';
-
-function dispatch(name: string) {
-  if (typeof window !== 'undefined') window.dispatchEvent(new Event(name));
-}
-
-let _syncInProgress = false;
-
-async function syncPull(uid: string) {
-  if (_syncInProgress) return;
-  _syncInProgress = true;
-  dispatch('lexivo-sync-start');
-  try {
-    await pullAll(uid);
-    await pushAll(uid);
-    dispatch('lexivo-sync-done');
-  }
-  catch { dispatch('lexivo-sync-error'); }
-  finally { _syncInProgress = false; }
-}
 
 interface AuthCtx {
   user: User | null;
@@ -50,44 +30,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(data.session);
       setUser(data.session?.user ?? null);
       setLoading(false);
-      if (data.session?.user) {
-        syncPull(data.session.user.id).then(() => startSync(data.session!.user.id));
-      }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
-      if (event === 'SIGNED_IN' && session?.user) {
-        syncPull(session.user.id).then(() => startSync(session.user.id));
-      }
-      if (event === 'SIGNED_OUT') {
-        stopSync();
-      }
       if (event === 'PASSWORD_RECOVERY' && typeof window !== 'undefined' && !window.location.pathname.includes('update-password')) {
         window.location.replace('/update-password');
       }
     });
 
-    return () => { subscription.unsubscribe(); stopSync(); };
+    return () => { subscription.unsubscribe(); };
   }, []);
 
   const signUp = async (email: string, password: string) => {
     const { error } = await supabase.auth.signUp({ email, password });
     if (error) return { error: error.message };
-    const { data, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
-    if (data.user) { await syncPull(data.user.id); startSync(data.user.id); }
+    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
     return { error: signInError?.message ?? null };
   };
 
   const signIn = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (data.user) { await syncPull(data.user.id); startSync(data.user.id); }
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
     return { error: error?.message ?? null };
   };
 
   const signOut = async () => {
-    stopSync();
     clearUserData();
     await supabase.auth.signOut();
   };

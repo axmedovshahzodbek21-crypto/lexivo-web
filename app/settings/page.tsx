@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { getSettings, saveSettings, setUILanguage, resetOnboarded, saveNameUpdatedAt, saveLevelUpdatedAt, saveSettingsUpdatedAt, clearUserData } from '@/lib/storage';
 import { getTheme, setTheme, type Theme } from '@/lib/theme';
 import { supabase } from '@/lib/supabase';
-import { stopSync, pushAllCurrentUser } from '@/lib/web-sync';
 import {
   getNotifSettings, saveNotifSettings, requestNotifPermission,
   scheduleOrShowNotification, sendTestNotification,
@@ -147,18 +146,6 @@ export default function SettingsPage() {
     setResetLoading(true);
     setResetError('');
     try {
-      // Flush current data to Supabase before the reset so any in-flight pushAll on
-      // another tab that already read localStorage has a chance to complete before we
-      // start deleting rows. This serializes us with concurrent pushes.
-      await pushAllCurrentUser().catch(() => {});
-
-      // Now block any new syncs from starting (on this tab or others sharing the key)
-      localStorage.setItem('lexivo_resetting', '1');
-
-      // Stop the periodic timer on this tab
-      stopSync();
-
-      // Clear localStorage before touching Supabase so a stale timer push can't sneak in
       const progressKeys = [
         'lexivo_learned_words', 'lexivo_srs_words', 'lexivo_starred',
         'lexivo_xp', 'lexivo_xp_updated_at', 'lexivo_xp_history',
@@ -206,7 +193,6 @@ export default function SettingsPage() {
     setDeleteError('');
     try {
       await supabase.rpc('delete_own_account');
-      stopSync();
       clearUserData();
       await supabase.auth.signOut();
       await new Promise(r => setTimeout(r, 200));
@@ -218,7 +204,6 @@ export default function SettingsPage() {
   };
 
   const handleSignOut = async () => {
-    stopSync();
     clearUserData();
     await supabase.auth.signOut();
     window.location.replace('/login');

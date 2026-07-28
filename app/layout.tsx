@@ -10,7 +10,6 @@ import ThemeProvider from '@/components/ThemeProvider';
 import NotificationScheduler from '@/components/NotificationScheduler';
 import PomodoroWidget from '@/components/PomodoroWidget';
 import { AuthProvider } from '@/lib/auth-context';
-import SyncProvider from '@/components/SyncProvider';
 import OneSignalProvider from '@/components/OneSignalProvider';
 
 export const metadata: Metadata = {
@@ -32,7 +31,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body>
         <AuthProvider>
-        <SyncProvider />
         <ThemeProvider />
         <NotificationScheduler />
         <DataLoader />

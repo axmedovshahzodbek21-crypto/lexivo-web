@@ -7,7 +7,6 @@ import { speak, speakText } from '@/lib/speech';
 import { recordStudySession, markQuizComplete, unlockAchievement, getStarredWords, getCustomListWords, getSettings, getUnitProgress, getImportedWords, getImportedWordsByCollection, getClassHWTemp, recordQuizSession, addXP, hasQuizXPAwarded, markQuizXPAwarded } from '@/lib/storage';
 import { fireConfetti } from '@/lib/confetti';
 import { checkAchievements } from '@/lib/gamification';
-import { pushUnitProgressCurrentUser, pushAllCurrentUser } from '@/lib/web-sync';
 import { supabase } from '@/lib/supabase';
 import type { WordItem, WordCollection, QuizType } from '@/lib/types';
 import Link from 'next/link';
@@ -254,7 +253,6 @@ export default function QuizPage() {
           if (result.leveledUp) setPendingLevelUp({ level: result.newLevel, xp: result.newXp });
         }
         markQuizComplete(collectionName, qDayNumber);
-        pushUnitProgressCurrentUser(collectionName, qDayNumber);
         const p = getUnitProgress(collectionName, qDayNumber);
         if (p.learnDone && p.flashcardDone && p.quizDone) fireConfetti();
       }

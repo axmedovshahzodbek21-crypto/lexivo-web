@@ -9,7 +9,6 @@ import {
 } from '@/lib/storage';
 import { stageColor } from '@/lib/srs';
 import { checkAchievements } from '@/lib/gamification';
-import { pushAllCurrentUser } from '@/lib/web-sync';
 import { REVIEW_XP, SRS_INTERVALS } from '@/lib/types';
 import type { DueSRSWord, SRSWord } from '@/lib/types';
 import Link from 'next/link';
@@ -180,7 +179,6 @@ export default function SRSReviewPage() {
     if (getDueWords().length === 0) recordReviewDay();
     const newAchievements = checkAchievements();
     newAchievements.forEach(pushAchievement);
-    pushAllCurrentUser();
   }, [queue, pushAchievement, setPendingLevelUp]);
 
   const grade = useCallback((g: 'knew' | 'notYet') => {

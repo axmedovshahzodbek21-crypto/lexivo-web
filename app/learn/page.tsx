@@ -12,7 +12,6 @@ import {
   saveLearnProgress, clearLearnProgress, getLearnProgress,
   saveLearnMarks, getLearnMarks, getStarredWords, getLearnXPAmount,
 } from '@/lib/storage';
-import { pushUnitProgressCurrentUser, pushAllCurrentUser } from '@/lib/web-sync';
 import { createSRSWord } from '@/lib/srs';
 import { addSRSWord as storeSRSWord } from '@/lib/storage';
 import type { Accent } from '@/lib/speech';
@@ -256,12 +255,10 @@ function LearnInner() {
     setMarks(m => { const n = [...m]; n[index] = 'learned'; return n; });
     const newAch = checkAchievements();
     newAch.forEach(pushAchievement);
-    if (newAch.length > 0) pushAllCurrentUser();
     if (index + 1 >= words.length) {
       if (collectionName && words.length > 0) {
         markLearningComplete(collectionName, words[0].dayNumber);
         clearLearnProgress(collectionName, words[0].dayNumber);
-        await pushUnitProgressCurrentUser(collectionName, words[0].dayNumber);
       }
       setDone(true);
     } else {

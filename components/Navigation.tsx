@@ -7,7 +7,6 @@ import { getLevelInfo } from '@/lib/gamification';
 import { useAuth } from '@/lib/auth-context';
 import { useTranslation } from '@/lib/useTranslation';
 import { LEVEL_COLORS, LEVEL_COLORS_FALLBACK } from '@/lib/colors';
-import SyncStatusBadge from './SyncStatusBadge';
 
 const NAV_HREFS = [
   { href: '/',             icon: '🏠', key: 'home'        },
@@ -75,11 +74,6 @@ export default function Navigation() {
 
   return (
     <>
-      {/* ── Mobile: sync status pill (top-right) ── */}
-      <div className="sm:hidden fixed top-3 right-3 z-50">
-        <SyncStatusBadge />
-      </div>
-
       {/* ── Mobile: fixed bottom tab bar ── */}
       <nav
         className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-[var(--surface)] border-t border-[var(--border)] flex justify-around items-center py-2 px-1 shadow-lg"
@@ -136,11 +130,6 @@ export default function Navigation() {
           >
             ‹
           </button>
-        </div>
-
-        {/* Sync status */}
-        <div className="px-5 pb-3">
-          <SyncStatusBadge sidebar />
         </div>
 
         {/* Nav links */}
