@@ -224,7 +224,10 @@ export async function pullAll(): Promise<void> {
       const local = lsJSON<HardWordEntry[]>('lexivo_hard_words', []);
       const localMap = new Map(local.map((e: HardWordEntry) => [e.word, e]));
       let changed = false;
-      for (const ce of row.hard_words as HardWordEntry[]) {
+      for (const raw of row.hard_words as (HardWordEntry | string)[]) {
+        const ce: HardWordEntry = typeof raw === 'string'
+          ? { word: raw, addedAt: '1970-01-01T00:00:00.000Z' }
+          : raw;
         const le = localMap.get(ce.word);
         if (!le || (ce.addedAt ?? '') > (le.addedAt ?? '')) {
           localMap.set(ce.word, ce);
