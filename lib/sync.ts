@@ -137,6 +137,23 @@ export async function pullAll(): Promise<void> {
       return;
     }
 
+    // Cross-device reset: cloud carries a newer reset_at — clear local data
+    // instead of pushing old data back overtop the reset.
+    const cloudResetAt = (row.reset_at as string) ?? '';
+    const localResetAt = lsGet('lexivo_last_reset_at');
+    if (cloudResetAt && cloudResetAt > localResetAt) {
+      const toRemove: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i)!;
+        if (k.startsWith('lexivo_') && k !== 'lexivo_ui_lang' && k !== 'lexivo_last_reset_at') {
+          toRemove.push(k);
+        }
+      }
+      toRemove.forEach(k => localStorage.removeItem(k));
+      lsSet('lexivo_last_reset_at', cloudResetAt);
+      return;
+    }
+
     // Row exists but was created empty (other platform pushed before having data).
     // Push local state on top so real data wins.
     if (!row.stats_updated_at && !row.lists_updated_at) {
