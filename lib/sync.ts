@@ -87,7 +87,7 @@ export async function pushSettings(): Promise<void> {
       show_on_leaderboard: s.showOnLeaderboard,
       user_name:           s.name,
       language_level:      s.languageLevel,
-      avatar_url:          getProfilePicUrl() || null,
+      ...(getProfilePicUrl() ? { avatar_url: getProfilePicUrl() } : {}),
       settings_updated_at: ts,
     });
     lsSet(S.settingsTs, ts);

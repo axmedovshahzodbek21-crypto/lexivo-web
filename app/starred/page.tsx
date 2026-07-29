@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
 import { getStarredWords, toggleStarred } from '@/lib/storage';
+import { pushLists } from '@/lib/sync';
 import { speak } from '@/lib/speech';
 import type { WordItem, WordCollection } from '@/lib/types';
 import { useTranslation } from '@/lib/useTranslation';
@@ -54,6 +55,7 @@ export default function StarredPage() {
 
   const handleUnstar = (word: string) => {
     toggleStarred(word);
+    pushLists();
     reload();
   };
 

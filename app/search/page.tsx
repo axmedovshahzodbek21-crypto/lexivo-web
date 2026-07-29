@@ -4,6 +4,7 @@ import { useAppStore } from '@/lib/store';
 import { searchWords } from '@/lib/data';
 import { speak } from '@/lib/speech';
 import { toggleStarred, isStarred } from '@/lib/storage';
+import { pushLists } from '@/lib/sync';
 import Link from 'next/link';
 import type { WordItem } from '@/lib/types';
 import { useTranslation } from '@/lib/useTranslation';
@@ -42,6 +43,7 @@ export default function SearchPage() {
   const handleStar = (word: string) => {
     const nowStarred = toggleStarred(word);
     setStarredMap(m => ({ ...m, [word]: nowStarred }));
+    pushLists();
   };
 
   return (

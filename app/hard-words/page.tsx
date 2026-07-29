@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
 import { getHardWords, removeHardWord, saveLearnedWord, addSRSWord as storeSRSWord } from '@/lib/storage';
+import { pushLists } from '@/lib/sync';
 import { createSRSWord } from '@/lib/srs';
 import { speak } from '@/lib/speech';
 import type { WordItem, WordCollection } from '@/lib/types';
@@ -54,6 +55,7 @@ export default function HardWordsPage() {
 
   const handleRemove = (word: string) => {
     removeHardWord(word);
+    pushLists();
     reload();
   };
 
@@ -68,6 +70,7 @@ export default function HardWordsPage() {
     });
     storeSRSWord(createSRSWord(w, w.collectionName, w.dayNumber, w.topic));
     removeHardWord(w.word);
+    pushLists();
     setLearned(prev => new Set(prev).add(w.word));
     reload();
   };

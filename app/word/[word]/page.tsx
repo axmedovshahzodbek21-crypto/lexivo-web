@@ -10,6 +10,7 @@ import {
   getLearnedWords, getSRSWords, getCustomLists, addWordToList, removeWordFromList, isWordInList,
   saveCustomList, getReviewLog, addDaysToDateStr,
 } from '@/lib/storage';
+import { pushLists } from '@/lib/sync';
 import { SRS_INTERVALS } from '@/lib/types';
 import { stageLabel, stageColor } from '@/lib/srs';
 import type { WordCollection, CustomList } from '@/lib/types';
@@ -81,12 +82,14 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
   const handleStar = () => {
     if (!word) return;
     setStarred(toggleStarred(word.word));
+    pushLists();
   };
 
   const handleHardToggle = () => {
     if (!word) return;
     if (isHard) { removeHardWord(word.word); setIsHard(false); }
     else { addHardWord(word.word); setIsHard(true); }
+    pushLists();
   };
 
   const reloadLists = () => setCustomLists(getCustomLists());
