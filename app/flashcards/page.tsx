@@ -6,6 +6,7 @@ import { useAppStore } from '@/lib/store';
 import { useShallow } from 'zustand/react/shallow';
 import { speak, speakText } from '@/lib/speech';
 import { recordStudySession, markFlashcardComplete, getStarredWords, getHardWords, getCustomListWords, getUnitProgress, saveFlashcardProgress, getFlashcardProgress, clearFlashcardProgress, getImportedWords, getImportedWordsByCollection, getClassHWTemp, recordFlashcardSession, addXP, hasFlashcardXPAwarded, markFlashcardXPAwarded } from '@/lib/storage';
+import { pushLists, pushStats } from '@/lib/sync';
 import { checkAchievements } from '@/lib/gamification';
 import type { WordItem, WordCollection } from '@/lib/types';
 import Link from 'next/link';
@@ -219,6 +220,8 @@ export default function FlashcardsPage() {
         markFlashcardComplete(collectionName, qDay);
         clearFlashcardProgress(collectionName, qDay);
       }
+      pushLists();
+      pushStats();
       setDone(true);
     } else {
       if (collectionName && dayNumber !== undefined && cardsSinceLastPush.current === 0) {

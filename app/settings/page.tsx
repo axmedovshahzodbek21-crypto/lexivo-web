@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getSettings, saveSettings, setUILanguage, resetOnboarded, saveNameUpdatedAt, saveLevelUpdatedAt, saveSettingsUpdatedAt, clearUserData } from '@/lib/storage';
+import { pushSettings } from '@/lib/sync';
 import { getTheme, setTheme, type Theme } from '@/lib/theme';
 import { supabase } from '@/lib/supabase';
 import {
@@ -215,6 +216,7 @@ export default function SettingsPage() {
     saveNameUpdatedAt(now);
     saveLevelUpdatedAt(now);
     saveSettingsUpdatedAt(now);
+    pushSettings();
     setSaved(true);
     setTimeout(() => { setSaved(false); router.back(); }, 1000);
   };

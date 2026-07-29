@@ -7,6 +7,7 @@ import {
   getDueWords, markIntervalDone, addXP, displayXP, recordStudySession, recordReviewDay,
   unlockAchievement, getSRSWords, getLearnedWords, removeSRSWord, getReviewLog,
 } from '@/lib/storage';
+import { pushLists, pushStats } from '@/lib/sync';
 import { stageColor } from '@/lib/srs';
 import { checkAchievements } from '@/lib/gamification';
 import { REVIEW_XP, SRS_INTERVALS } from '@/lib/types';
@@ -157,6 +158,8 @@ export default function SRSReviewPage() {
     const { leveledUp, newLevel, newXp } = addXP(xpTotal, 'SRS Review');
     if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
     setSessionXP(xpTotal);
+    pushLists();
+    pushStats();
 
     unlockAchievement('srs_first', 50); // 5 XP
     recordStudySession();

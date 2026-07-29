@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import type { Session, User } from '@supabase/supabase-js';
 import { supabase } from './supabase';
 import { clearUserData } from './storage';
+import { pullAll } from './sync';
 
 interface AuthCtx {
   user: User | null;
@@ -47,11 +48,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { error } = await supabase.auth.signUp({ email, password });
     if (error) return { error: error.message };
     const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+    if (!signInError) pullAll();
     return { error: signInError?.message ?? null };
   };
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (!error) pullAll();
     return { error: error?.message ?? null };
   };
 

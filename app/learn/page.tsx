@@ -12,6 +12,7 @@ import {
   saveLearnProgress, clearLearnProgress, getLearnProgress,
   saveLearnMarks, getLearnMarks, getStarredWords, getLearnXPAmount,
 } from '@/lib/storage';
+import { pushLists, pushStats } from '@/lib/sync';
 import { createSRSWord } from '@/lib/srs';
 import { addSRSWord as storeSRSWord } from '@/lib/storage';
 import type { Accent } from '@/lib/speech';
@@ -260,6 +261,8 @@ function LearnInner() {
         markLearningComplete(collectionName, words[0].dayNumber);
         clearLearnProgress(collectionName, words[0].dayNumber);
       }
+      pushLists();
+      pushStats();
       setDone(true);
     } else {
       setIndex(i => i + 1);

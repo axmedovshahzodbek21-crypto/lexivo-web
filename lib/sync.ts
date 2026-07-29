@@ -1,0 +1,308 @@
+import { supabase } from './supabase';
+import type { UserSettings, LearnedWord, SRSWord, UnitProgress } from './types';
+import { getSettings, saveSettings, getLearnedWords, saveLearnedWord, getSRSWords, localDateStr } from './storage';
+import type { HardWordEntry } from './storage';
+
+const S = {
+  statTs: 'lexivo_sync_stat_ts',
+  settingsTs: 'lexivo_sync_settings_ts',
+  listsTs: 'lexivo_sync_lists_ts',
+};
+
+function lsGet(key: string): string {
+  if (typeof window === 'undefined') return '';
+  return localStorage.getItem(key) ?? '';
+}
+
+function lsSet(key: string, val: string) {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(key, val);
+}
+
+function lsJSON<T>(key: string, fallback: T): T {
+  if (typeof window === 'undefined') return fallback;
+  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+  catch { return fallback; }
+}
+
+function getAllUnitProgress(): Record<string, UnitProgress> {
+  if (typeof window === 'undefined') return {};
+  const result: Record<string, UnitProgress> = {};
+  const prefix = 'lexivo_unit_progress_';
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k?.startsWith(prefix)) {
+      try { const v = localStorage.getItem(k); if (v) result[k.slice(prefix.length)] = JSON.parse(v); }
+      catch {}
+    }
+  }
+  return result;
+}
+
+async function getUid(): Promise<string | null> {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    return session?.user.id ?? null;
+  } catch { return null; }
+}
+
+// ── Push ─────────────────────────────────────────────────────────────────────
+
+export async function pushStats(): Promise<void> {
+  const uid = await getUid();
+  if (!uid) return;
+  try {
+    const ts = new Date().toISOString();
+    const today = localDateStr();
+    const todayXpDate = lsGet('lexivo_today_xp_date');
+    const todayCountDate = lsGet('lexivo_today_count_date');
+    await supabase.from('user_data').upsert({
+      id: uid,
+      total_xp:            lsJSON<number>('lexivo_xp', 0),
+      streak:              lsJSON<number>('lexivo_streak', 0),
+      streak_freezes:      lsJSON<number>('lexivo_freezes', 0),
+      last_study_date:     lsGet('lexivo_last_study') || null,
+      last_freeze_week:    lsGet('lexivo_last_freeze_week') || null,
+      today_xp:            todayXpDate === today ? lsJSON<number>('lexivo_today_xp', 0) : 0,
+      today_xp_date:       todayXpDate === today ? today : null,
+      daily_words_learned: todayCountDate === today ? lsJSON<number>('lexivo_today_count', 0) : 0,
+      daily_words_date:    todayCountDate === today ? today : null,
+      stats_updated_at:    ts,
+    });
+    lsSet(S.statTs, ts);
+  } catch {}
+}
+
+export async function pushSettings(): Promise<void> {
+  const uid = await getUid();
+  if (!uid) return;
+  try {
+    const s = getSettings();
+    const ts = new Date().toISOString();
+    await supabase.from('user_data').upsert({
+      id: uid,
+      daily_word_goal:     s.dailyGoal,
+      quiz_direction:      s.quizDirection,
+      reduce_motion:       s.reduceMotion,
+      show_on_leaderboard: s.showOnLeaderboard,
+      user_name:           s.name,
+      settings_updated_at: ts,
+    });
+    lsSet(S.settingsTs, ts);
+  } catch {}
+}
+
+export async function pushLists(): Promise<void> {
+  const uid = await getUid();
+  if (!uid) return;
+  try {
+    const ts = new Date().toISOString();
+    await supabase.from('user_data').upsert({
+      id: uid,
+      learned_words:    getLearnedWords(),
+      srs_words:        getSRSWords(),
+      starred_words:    lsJSON<string[]>('lexivo_starred', []),
+      hard_words:       lsJSON<HardWordEntry[]>('lexivo_hard_words', []),
+      study_days:       lsJSON<string[]>('lexivo_study_days', []),
+      review_days:      lsJSON<string[]>('lexivo_review_days', []),
+      word_goal_days:   lsJSON<string[]>('lexivo_word_goal_days', []),
+      unit_done_days:   lsJSON<string[]>('lexivo_unit_done_days', []),
+      xp_history:       lsJSON<unknown[]>('lexivo_xp_history', []),
+      unit_progress:    getAllUnitProgress(),
+      review_log:       lsJSON<Record<string, number[]>>('lexivo_review_log', {}),
+      imported_words:   lsJSON<unknown[]>('lexivo_imported_words', []),
+      lists_updated_at: ts,
+    });
+    lsSet(S.listsTs, ts);
+  } catch {}
+}
+
+export async function pushAll(): Promise<void> {
+  await Promise.all([pushStats(), pushSettings(), pushLists()]);
+}
+
+// ── Pull ─────────────────────────────────────────────────────────────────────
+
+export async function pullAll(): Promise<void> {
+  const uid = await getUid();
+  if (!uid) return;
+  try {
+    const { data: row } = await supabase.from('user_data').select().eq('id', uid).maybeSingle();
+
+    if (!row) {
+      await pushAll();
+      return;
+    }
+
+    // ── Stats ────────────────────────────────────────────────────────────────
+    const cloudStatsTs = (row.stats_updated_at as string) ?? '';
+    const localStatsTs = lsGet(S.statTs);
+    const cloudStatsNewer = cloudStatsTs > localStatsTs;
+
+    // Accumulators: always take max
+    lsSet('lexivo_xp', JSON.stringify(Math.max(lsJSON<number>('lexivo_xp', 0), row.total_xp ?? 0)));
+    lsSet('lexivo_streak', JSON.stringify(Math.max(lsJSON<number>('lexivo_streak', 0), row.streak ?? 0)));
+    lsSet('lexivo_freezes', JSON.stringify(Math.max(lsJSON<number>('lexivo_freezes', 0), row.streak_freezes ?? 0)));
+
+    if (cloudStatsNewer) {
+      const today = localDateStr();
+      if (row.last_study_date && row.last_study_date >= (lsGet('lexivo_last_study') || '')) {
+        lsSet('lexivo_last_study', row.last_study_date);
+      }
+      if (row.last_freeze_week) lsSet('lexivo_last_freeze_week', row.last_freeze_week);
+
+      if (row.today_xp_date === today) {
+        const localTodayXp = lsGet('lexivo_today_xp_date') === today ? lsJSON<number>('lexivo_today_xp', 0) : 0;
+        lsSet('lexivo_today_xp', JSON.stringify(Math.max(row.today_xp ?? 0, localTodayXp)));
+        lsSet('lexivo_today_xp_date', today);
+      }
+      if (row.daily_words_date === today) {
+        const localCount = lsGet('lexivo_today_count_date') === today ? lsJSON<number>('lexivo_today_count', 0) : 0;
+        lsSet('lexivo_today_count', JSON.stringify(Math.max(row.daily_words_learned ?? 0, localCount)));
+        lsSet('lexivo_today_count_date', today);
+      }
+      lsSet(S.statTs, cloudStatsTs);
+    }
+
+    // ── Settings ─────────────────────────────────────────────────────────────
+    const cloudSettingsTs = (row.settings_updated_at as string) ?? '';
+    const localSettingsTs = lsGet(S.settingsTs);
+    if (cloudSettingsTs > localSettingsTs) {
+      const current = getSettings();
+      const merged: UserSettings = {
+        ...current,
+        ...(row.daily_word_goal != null  && { dailyGoal: row.daily_word_goal }),
+        ...(row.quiz_direction != null   && { quizDirection: row.quiz_direction }),
+        ...(row.reduce_motion != null    && { reduceMotion: row.reduce_motion }),
+        ...(row.show_on_leaderboard != null && { showOnLeaderboard: row.show_on_leaderboard }),
+        ...(row.user_name != null        && { name: row.user_name }),
+      };
+      saveSettings(merged);
+      lsSet(S.settingsTs, cloudSettingsTs);
+    }
+
+    // ── Lists (union-merge) ──────────────────────────────────────────────────
+
+    // learned_words
+    if (Array.isArray(row.learned_words) && row.learned_words.length > 0) {
+      const local = getLearnedWords();
+      const localKeys = new Set(local.map((w: LearnedWord) => `${w.word}_${w.collectionName}`));
+      for (const w of row.learned_words as LearnedWord[]) {
+        if (!localKeys.has(`${w.word}_${w.collectionName}`)) saveLearnedWord(w);
+      }
+    }
+
+    // srs_words: add new, take higher reviewStage for existing
+    if (Array.isArray(row.srs_words) && row.srs_words.length > 0) {
+      const local = getSRSWords();
+      const localMap = new Map(local.map((w: SRSWord) => [`${w.collectionName}::${w.word}`, w]));
+      let changed = false;
+      for (const cw of row.srs_words as Record<string, unknown>[]) {
+        const key = `${cw['collectionName']}::${cw['word']}`;
+        if (!localMap.has(key)) {
+          // Add new word from cloud; reviewLog tracks its progress independently
+          localMap.set(key, { ...cw, id: cw['id'] ?? key } as unknown as SRSWord);
+          changed = true;
+        }
+      }
+      if (changed) lsSet('lexivo_srs_words', JSON.stringify([...localMap.values()]));
+    }
+
+    // starred_words (web stores as string[], cloud pushes as string[])
+    if (Array.isArray(row.starred_words) && row.starred_words.length > 0) {
+      const local = lsJSON<string[]>('lexivo_starred', []);
+      const localSet = new Set(local);
+      let changed = false;
+      for (const w of row.starred_words as string[]) {
+        if (!localSet.has(w)) { local.push(w); localSet.add(w); changed = true; }
+      }
+      if (changed) lsSet('lexivo_starred', JSON.stringify(local));
+    }
+
+    // hard_words (HardWordEntry[])
+    if (Array.isArray(row.hard_words) && row.hard_words.length > 0) {
+      const local = lsJSON<HardWordEntry[]>('lexivo_hard_words', []);
+      const localMap = new Map(local.map((e: HardWordEntry) => [e.word, e]));
+      let changed = false;
+      for (const ce of row.hard_words as HardWordEntry[]) {
+        const le = localMap.get(ce.word);
+        if (!le || (ce.addedAt ?? '') > (le.addedAt ?? '')) {
+          localMap.set(ce.word, ce);
+          changed = true;
+        }
+      }
+      if (changed) lsSet('lexivo_hard_words', JSON.stringify([...localMap.values()]));
+    }
+
+    // day sets
+    for (const [cloudKey, localKey] of [
+      ['study_days', 'lexivo_study_days'],
+      ['review_days', 'lexivo_review_days'],
+      ['word_goal_days', 'lexivo_word_goal_days'],
+      ['unit_done_days', 'lexivo_unit_done_days'],
+    ] as const) {
+      if (Array.isArray(row[cloudKey]) && row[cloudKey].length > 0) {
+        const local = lsJSON<string[]>(localKey, []);
+        const merged = [...new Set([...local, ...row[cloudKey] as string[]])];
+        if (merged.length > local.length) lsSet(localKey, JSON.stringify(merged));
+      }
+    }
+
+    // xp_history: union by timestamp
+    if (Array.isArray(row.xp_history) && row.xp_history.length > 0) {
+      const local = lsJSON<{timestamp: number}[]>('lexivo_xp_history', []);
+      const localTs = new Set(local.map(e => e.timestamp));
+      const toAdd = (row.xp_history as {timestamp: number}[]).filter(e => !localTs.has(e.timestamp));
+      if (toAdd.length > 0) {
+        const merged = [...local, ...toAdd].sort((a, b) => a.timestamp - b.timestamp);
+        if (merged.length > 500) merged.splice(0, merged.length - 500);
+        lsSet('lexivo_xp_history', JSON.stringify(merged));
+      }
+    }
+
+    // unit_progress: per-key, OR flags
+    if (row.unit_progress && typeof row.unit_progress === 'object') {
+      const prefix = 'lexivo_unit_progress_';
+      for (const [unitKey, cp] of Object.entries(row.unit_progress as Record<string, UnitProgress>)) {
+        const lsKey = prefix + unitKey;
+        const existing = localStorage.getItem(lsKey);
+        if (!existing) {
+          lsSet(lsKey, JSON.stringify(cp));
+        } else {
+          const lp: UnitProgress = JSON.parse(existing);
+          const merged: UnitProgress = {
+            learnDone:     lp.learnDone     || cp.learnDone,
+            flashcardDone: lp.flashcardDone || cp.flashcardDone,
+            quizDone:      lp.quizDone      || cp.quizDone,
+            completedAt:   lp.completedAt   ?? cp.completedAt,
+          };
+          lsSet(lsKey, JSON.stringify(merged));
+        }
+      }
+    }
+
+    // review_log: per-word union merge
+    if (row.review_log && typeof row.review_log === 'object') {
+      const local = lsJSON<Record<string, number[]>>('lexivo_review_log', {});
+      let changed = false;
+      for (const [wordKey, intervals] of Object.entries(row.review_log as Record<string, number[]>)) {
+        const localIntervals = local[wordKey] ?? [];
+        const merged = [...new Set([...localIntervals, ...intervals])];
+        if (merged.length > localIntervals.length) { local[wordKey] = merged; changed = true; }
+      }
+      if (changed) lsSet('lexivo_review_log', JSON.stringify(local));
+    }
+
+    // imported_words
+    if (Array.isArray(row.imported_words) && row.imported_words.length > 0) {
+      const local = lsJSON<Record<string, unknown>[]>('lexivo_imported_words', []);
+      const localKeys = new Set(local.map(w => `${w['word']}__${w['collectionName'] ?? ''}__${w['folderName'] ?? ''}`));
+      let changed = false;
+      for (const w of row.imported_words as Record<string, unknown>[]) {
+        const key = `${w['word']}__${w['collectionName'] ?? ''}__${w['folderName'] ?? ''}`;
+        if (!localKeys.has(key)) { local.push(w); localKeys.add(key); changed = true; }
+      }
+      if (changed) lsSet('lexivo_imported_words', JSON.stringify(local));
+    }
+  } catch {}
+}

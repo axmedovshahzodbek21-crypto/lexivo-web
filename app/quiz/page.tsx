@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { speak, speakText } from '@/lib/speech';
 import { recordStudySession, markQuizComplete, unlockAchievement, getStarredWords, getCustomListWords, getSettings, getUnitProgress, getImportedWords, getImportedWordsByCollection, getClassHWTemp, recordQuizSession, addXP, hasQuizXPAwarded, markQuizXPAwarded } from '@/lib/storage';
+import { pushLists, pushStats } from '@/lib/sync';
 import { fireConfetti } from '@/lib/confetti';
 import { checkAchievements } from '@/lib/gamification';
 import { supabase } from '@/lib/supabase';
@@ -256,6 +257,8 @@ export default function QuizPage() {
         const p = getUnitProgress(collectionName, qDayNumber);
         if (p.learnDone && p.flashcardDone && p.quizDone) fireConfetti();
       }
+      pushLists();
+      pushStats();
       recordQuizSession();
       const newAchievements = checkAchievements();
       newAchievements.forEach(pushAchievement);

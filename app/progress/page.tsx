@@ -9,8 +9,10 @@ import {
   getTodayXP, getTodayLearnedCount, getDueWords, getStarredWords, getHardWords,
   getStudyHistory, getStudyDays, getReviewDays, getWordGoalDays,
   getSettings, getXPHistory, localDateStr, getReviewLog, getGraduatedCount, displayXP,
+  getUnitProgress,
 } from '@/lib/storage';
 import type { XpEntry } from '@/lib/storage';
+import { useAppStore } from '@/lib/store';
 import { getLevelInfo, ALL_ACHIEVEMENTS, CATEGORY_ORDER, CATEGORY_META, getAchievementProgress } from '@/lib/gamification';
 import { getUnlockedAchievements } from '@/lib/storage';
 import { stageLabel, stageColor } from '@/lib/srs';
@@ -47,6 +49,21 @@ function ProgressPage() {
   const [dailyGoal, setDailyGoal] = useState(10);
   const [xpHistory, setXpHistory] = useState<XpEntry[]>([]);
   const [tab, setTab] = useState<'overview' | 'srs' | 'achievements' | 'calendar'>(tabParam ?? 'overview');
+  const [foundationDone, setFoundationDone] = useState<Record<string, { done: number; total: number }>>({});
+
+  const { collections } = useAppStore();
+
+  useEffect(() => {
+    if (!collections.length) return;
+    const result: Record<string, { done: number; total: number }> = {};
+    for (const name of ['A1', 'A2', 'B1']) {
+      const col = collections.find(c => c.name === name);
+      if (!col) { result[name] = { done: 0, total: 0 }; continue; }
+      const done = col.days.filter(d => !!getUnitProgress(name, d.dayNumber).completedAt).length;
+      result[name] = { done, total: col.days.length };
+    }
+    setFoundationDone(result);
+  }, [collections]);
 
   useEffect(() => {
     const load = () => {
@@ -74,6 +91,28 @@ function ProgressPage() {
   const t = useTranslation();
   const levelInfo = getLevelInfo(xp);
   const masteredCount = getGraduatedCount();
+
+  // Weekly activity (last 7 days)
+  const weeklyActivity = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - (6 - i));
+    const dateStr = localDateStr(d);
+    const label = i === 6 ? 'Today' : i === 5 ? 'Yes' :
+      d.toLocaleDateString('default', { weekday: 'short' }).slice(0, 3);
+    return { dateStr, label, active: studyDays.includes(dateStr) };
+  });
+  const activeThisWeek = weeklyActivity.filter(d => d.active).length;
+
+  // Averages
+  const wordsPerDay = totalDays > 0 ? (learnedCount / totalDays).toFixed(1) : '—';
+  const xpPerDay = totalDays > 0 ? Math.round(xp / totalDays) : '—';
+
+  // Foundation meta
+  const LEVEL_META = [
+    { name: 'A1', color: '#2ECC71' },
+    { name: 'A2', color: '#27AE60' },
+    { name: 'B1', color: '#3498DB' },
+  ];
   const reviewLog = getReviewLog();
   const completionGroups = [0, 1, 2, 3, 4, 5].map(n => ({
     completedCount: n,
@@ -155,6 +194,67 @@ function ProgressPage() {
                 </div>
               </div>
             </div>
+
+            {/* Weekly Activity */}
+            <div className="card">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-semibold">📅 This Week</h3>
+                <span className="text-sm font-bold text-[var(--primary)]">{activeThisWeek} / 7 days</span>
+              </div>
+              <div className="flex gap-1.5">
+                {weeklyActivity.map((day, i) => (
+                  <div key={i} className="flex flex-col items-center gap-1 flex-1">
+                    <div
+                      className="w-full aspect-square rounded-xl flex items-center justify-center text-xs font-bold"
+                      style={{ background: day.active ? 'var(--primary)' : 'var(--surface-2)', color: day.active ? '#fff' : 'var(--text-muted)' }}
+                    >
+                      {day.active ? '✓' : '·'}
+                    </div>
+                    <span className="text-[9px] font-medium text-[var(--text-muted)]">{day.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Averages */}
+            <div className="card">
+              <h3 className="font-semibold mb-3">📊 Averages</h3>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-[var(--text-muted)]">Words per study day</span>
+                  <span className="font-bold text-[var(--primary)]">{wordsPerDay}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-[var(--text-muted)]">XP per study day</span>
+                  <span className="font-bold text-[var(--primary)]">{xpPerDay}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Foundation Progress */}
+            {LEVEL_META.some(l => foundationDone[l.name]?.total > 0) && (
+              <div className="card">
+                <h3 className="font-semibold mb-3">🌱 Foundation Progress</h3>
+                <div className="space-y-3">
+                  {LEVEL_META.map(({ name, color }) => {
+                    const fd = foundationDone[name];
+                    if (!fd || fd.total === 0) return null;
+                    const pct = fd.done / fd.total;
+                    return (
+                      <div key={name}>
+                        <div className="flex justify-between text-sm mb-1.5">
+                          <span className="font-semibold" style={{ color }}>{name}</span>
+                          <span className="text-[var(--text-muted)] text-xs">{fd.done} / {fd.total} units</span>
+                        </div>
+                        <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--surface-2)' }}>
+                          <div className="h-full rounded-full transition-all" style={{ width: `${pct * 100}%`, background: color }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* XP History */}
             <XpHistorySection entries={xpHistory} />
