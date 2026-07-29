@@ -137,6 +137,13 @@ export async function pullAll(): Promise<void> {
       return;
     }
 
+    // Row exists but was created empty (other platform pushed before having data).
+    // Push local state on top so real data wins.
+    if (!row.stats_updated_at && !row.lists_updated_at) {
+      await pushAll();
+      return;
+    }
+
     // ── Stats ────────────────────────────────────────────────────────────────
     const cloudStatsTs = (row.stats_updated_at as string) ?? '';
     const localStatsTs = lsGet(S.statTs);
