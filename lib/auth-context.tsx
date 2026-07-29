@@ -42,7 +42,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     });
 
-    return () => { subscription.unsubscribe(); };
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') pullAll();
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      subscription.unsubscribe();
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
   }, []);
 
   const signUp = async (email: string, password: string) => {
