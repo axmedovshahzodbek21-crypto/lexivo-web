@@ -95,8 +95,6 @@ export default function ProfilePage() {
       setProfilePic(getProfilePicUrl() ?? getProfilePic());
     };
     load();
-    window.addEventListener('lexivo-sync', load);
-    return () => window.removeEventListener('lexivo-sync', load);
   }, []);
 
   async function handlePickPhoto(e: React.ChangeEvent<HTMLInputElement>) {

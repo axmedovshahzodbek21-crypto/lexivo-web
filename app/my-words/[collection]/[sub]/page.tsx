@@ -23,8 +23,6 @@ export default function FolderCollectionPage({ params }: Props) {
   useEffect(() => {
     const load = () => setWords(getImportedWordsByCollection(collectionName, folder));
     load();
-    window.addEventListener('lexivo-sync', load);
-    return () => window.removeEventListener('lexivo-sync', load);
   }, [folder, collectionName]);
 
   function handleDelete(word: string) {

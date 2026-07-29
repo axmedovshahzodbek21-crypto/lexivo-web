@@ -770,7 +770,7 @@ export default function SettingsPage() {
             <span className="text-xl">🔑</span>
             <div>
               <p className="text-sm font-semibold text-[var(--primary)]">{t.sidebar.signIn}</p>
-              <p className="text-xs text-[var(--text-muted)]">{settings.uiLanguage === 'uz' ? "Qurilmalar bo'ylab sinxronlash" : 'Sync your progress across devices'}</p>
+              <p className="text-xs text-[var(--text-muted)]">{settings.uiLanguage === 'uz' ? "Taraqqiyotingizni saqlash uchun kiring" : 'Sign in to save your progress'}</p>
             </div>
           </Link>
         )}

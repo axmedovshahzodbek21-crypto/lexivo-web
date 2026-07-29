@@ -92,8 +92,6 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
   const reloadLists = () => setCustomLists(getCustomLists());
   useEffect(() => {
     reloadLists();
-    window.addEventListener('lexivo-sync', reloadLists);
-    return () => window.removeEventListener('lexivo-sync', reloadLists);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

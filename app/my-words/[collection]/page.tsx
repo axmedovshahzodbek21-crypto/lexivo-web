@@ -20,8 +20,6 @@ export default function FolderPage({ params }: Props) {
   useEffect(() => {
     const load = () => setCollections(getCollectionsByFolder(folder));
     load();
-    window.addEventListener('lexivo-sync', load);
-    return () => window.removeEventListener('lexivo-sync', load);
   }, [folder]);
 
   function handleDeleteFolder() {

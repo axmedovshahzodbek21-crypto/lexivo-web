@@ -89,22 +89,6 @@ export default function SRSReviewPage() {
     }));
   }, [queue, index, results, done]);
 
-  useEffect(() => {
-    const handler = () => {
-      setAllWords(getSRSWords());
-      // Never rebuild the queue once it's been built — rebuilding reshuffles and changes the word.
-      if (!queueBuiltRef.current) {
-        const due = getDueWords();
-        if (due.length > 0) {
-          setQueue([...due]);
-          setDone(false);
-          queueBuiltRef.current = true;
-        }
-      }
-    };
-    window.addEventListener('lexivo-sync', handler);
-    return () => window.removeEventListener('lexivo-sync', handler);
-  }, []);
 
   const current = queue[index];
 

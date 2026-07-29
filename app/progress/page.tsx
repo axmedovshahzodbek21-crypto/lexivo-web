@@ -69,8 +69,6 @@ function ProgressPage() {
       setXpHistory(getXPHistory());
     };
     load();
-    window.addEventListener('lexivo-sync', load);
-    return () => window.removeEventListener('lexivo-sync', load);
   }, []);
 
   const t = useTranslation();

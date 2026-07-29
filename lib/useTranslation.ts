@@ -14,10 +14,8 @@ export function useTranslation(): Translations {
     const update = () => setT(translations[getLang()] ?? translations.en);
     update();
     window.addEventListener('lexivo-lang-change', update);
-    window.addEventListener('lexivo-sync', update);
     return () => {
       window.removeEventListener('lexivo-lang-change', update);
-      window.removeEventListener('lexivo-sync', update);
     };
   }, []);
 

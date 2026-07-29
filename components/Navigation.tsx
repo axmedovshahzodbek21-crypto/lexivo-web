@@ -59,8 +59,6 @@ export default function Navigation() {
       setProfilePic(getProfilePicUrl() ?? getProfilePic());
     };
     refresh();
-    window.addEventListener('lexivo-sync', refresh);
-    return () => window.removeEventListener('lexivo-sync', refresh);
   }, [pathname]);
 
   const levelInfo  = getLevelInfo(xp);

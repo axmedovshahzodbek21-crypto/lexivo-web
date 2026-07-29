@@ -21,8 +21,6 @@ export default function MyWordsPage() {
       setOrphaned(getImportedCollections());
     };
     load();
-    window.addEventListener('lexivo-sync', load);
-    return () => window.removeEventListener('lexivo-sync', load);
   }, []);
 
   useEffect(() => {

@@ -908,8 +908,7 @@ const IMPORTED_KEY = 'lexivo_imported_words';
 const FOLDER_MAP_KEY = 'lexivo_folder_map';
 const DEFAULT_COLLECTION = 'My Words';
 
-// Stores collection→folder mapping as a backup. Survives any pullAll wipe that
-// strips folderName from word objects, because no sync code touches this key.
+// Stores collection→folder mapping as a backup.
 function getFolderMap(): Record<string, string> {
   if (typeof window === 'undefined') return {};
   try { return JSON.parse(localStorage.getItem(FOLDER_MAP_KEY) ?? '{}'); } catch { return {}; }

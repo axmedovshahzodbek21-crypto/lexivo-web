@@ -52,11 +52,6 @@ export default function StarredPage() {
 
   useEffect(() => { reload(); }, [reload]);
 
-  useEffect(() => {
-    window.addEventListener('lexivo-sync', reload);
-    return () => window.removeEventListener('lexivo-sync', reload);
-  }, [reload]);
-
   const handleUnstar = (word: string) => {
     toggleStarred(word);
     reload();

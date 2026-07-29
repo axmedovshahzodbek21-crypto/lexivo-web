@@ -52,11 +52,6 @@ export default function HardWordsPage() {
 
   useEffect(() => { reload(); }, [reload]);
 
-  useEffect(() => {
-    window.addEventListener('lexivo-sync', reload);
-    return () => window.removeEventListener('lexivo-sync', reload);
-  }, [reload]);
-
   const handleRemove = (word: string) => {
     removeHardWord(word);
     reload();

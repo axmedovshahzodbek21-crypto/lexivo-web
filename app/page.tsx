@@ -169,19 +169,6 @@ export default function HomePage() {
     }
   }, [collectionsLoaded, collections]);
 
-  useEffect(() => {
-    const handleSync = () => {
-      setStreak(getStreak());
-      setXp(getXP());
-      setTodayXp(getTodayXP());
-      setTodayCount(getTodayLearnedCount());
-      setDueCount(getDueWords().length);
-      setLearnedCount(getLearnedWords().length);
-      setSettings(getSettings());
-    };
-    window.addEventListener('lexivo-sync', handleSync);
-    return () => window.removeEventListener('lexivo-sync', handleSync);
-  }, []);
 
   const t = useTranslation();
   const levelInfo = getLevelInfo(xp);

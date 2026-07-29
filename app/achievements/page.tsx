@@ -54,8 +54,6 @@ export default function AchievementsPage() {
       });
     };
     load();
-    window.addEventListener('lexivo-sync', load);
-    return () => window.removeEventListener('lexivo-sync', load);
   }, []);
 
   const total    = ALL_ACHIEVEMENTS.length;
