@@ -157,6 +157,8 @@ export default function SettingsPage() {
         'lexivo_unit_done_days', 'lexivo_review_log', 'lexivo_srs_last_review',
         'lexivo_freezes', 'lexivo_last_freeze_week', 'lexivo_streak_bonus_date',
         'lexivo_hard_words', 'lexivo_flash_xp_units', 'lexivo_quiz_xp_units',
+        'lexivo_sync_stat_ts', 'lexivo_sync_settings_ts', 'lexivo_sync_lists_ts',
+        'lexivo_achievements', 'lexivo_achievement_dates',
       ];
       progressKeys.forEach(k => localStorage.removeItem(k));
       const toRemove: string[] = [];
@@ -170,6 +172,7 @@ export default function SettingsPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const dels = await Promise.all([
+          supabase.from('user_data').delete().eq('id', user.id),
           supabase.from('srs_words').delete().eq('user_id', user.id),
           supabase.from('learned_words').delete().eq('user_id', user.id),
           supabase.from('starred_words').delete().eq('user_id', user.id),
@@ -179,7 +182,6 @@ export default function SettingsPage() {
         ]);
         const failed = dels.filter(r => r.error).map(r => r.error!.message);
         if (failed.length > 0) throw new Error(`Supabase delete failed: ${failed.join('; ')}`);
-        await supabase.from('profiles').update({ reset_at: new Date().toISOString() }).eq('id', user.id);
       }
       await new Promise(r => setTimeout(r, 200));
       window.location.replace('/');
