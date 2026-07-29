@@ -10,6 +10,7 @@ import {
   getProfilePicUrl, saveProfilePicUrl, removeProfilePicUrl, displayXP,
 } from '@/lib/storage';
 import { getLevelInfo, ALL_ACHIEVEMENTS } from '@/lib/gamification';
+import { pushSettings } from '@/lib/sync';
 import type { UserSettings } from '@/lib/types';
 import { useRef } from 'react';
 import XpModal from '@/components/XpModal';
@@ -126,6 +127,7 @@ export default function ProfilePage() {
           .getPublicUrl(`${user.id}/avatar.jpg`);
         const url = `${publicUrl}?t=${Date.now()}`;
         saveProfilePicUrl(url);
+        pushSettings();
         await supabase.from('profiles').upsert({ id: user.id, avatar_url: url });
         setProfilePic(url);
       } else {

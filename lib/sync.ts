@@ -209,6 +209,10 @@ export async function pullAll(): Promise<void> {
       if (row.avatar_url) saveProfilePicUrl(row.avatar_url as string);
       lsSet(S.settingsTs, cloudSettingsTs);
     }
+    // Apply avatar_url even when settings timestamp didn't win (pic upload is independent)
+    if (row.avatar_url && !getProfilePicUrl()) {
+      saveProfilePicUrl(row.avatar_url as string);
+    }
 
     // ── Lists (union-merge) ──────────────────────────────────────────────────
 
