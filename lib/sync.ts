@@ -1,6 +1,6 @@
 import { supabase } from './supabase';
 import type { UserSettings, LearnedWord, SRSWord, UnitProgress } from './types';
-import { getSettings, saveSettings, getLearnedWords, saveLearnedWord, getSRSWords, localDateStr } from './storage';
+import { getSettings, saveSettings, getLearnedWords, saveLearnedWord, getSRSWords, localDateStr, getProfilePicUrl, saveProfilePicUrl } from './storage';
 import type { HardWordEntry } from './storage';
 
 const S = {
@@ -86,6 +86,8 @@ export async function pushSettings(): Promise<void> {
       reduce_motion:       s.reduceMotion,
       show_on_leaderboard: s.showOnLeaderboard,
       user_name:           s.name,
+      language_level:      s.languageLevel,
+      avatar_url:          getProfilePicUrl() || null,
       settings_updated_at: ts,
     });
     lsSet(S.settingsTs, ts);
@@ -111,6 +113,7 @@ export async function pushLists(): Promise<void> {
       unit_progress:    getAllUnitProgress(),
       review_log:       lsJSON<Record<string, number[]>>('lexivo_review_log', {}),
       imported_words:   lsJSON<unknown[]>('lexivo_imported_words', []),
+      achievements:     Object.entries(lsJSON<Record<string, string>>('lexivo_achievement_dates', {})).map(([id, date]) => ({ id, date })),
       lists_updated_at: ts,
     });
     lsSet(S.listsTs, ts);
@@ -176,8 +179,10 @@ export async function pullAll(): Promise<void> {
         ...(row.reduce_motion != null    && { reduceMotion: row.reduce_motion }),
         ...(row.show_on_leaderboard != null && { showOnLeaderboard: row.show_on_leaderboard }),
         ...(row.user_name != null        && { name: row.user_name }),
+        ...(row.language_level != null   && { languageLevel: row.language_level as UserSettings['languageLevel'] }),
       };
       saveSettings(merged);
+      if (row.avatar_url) saveProfilePicUrl(row.avatar_url as string);
       lsSet(S.settingsTs, cloudSettingsTs);
     }
 
@@ -294,6 +299,25 @@ export async function pullAll(): Promise<void> {
         if (merged.length > localIntervals.length) { local[wordKey] = merged; changed = true; }
       }
       if (changed) lsSet('lexivo_review_log', JSON.stringify(local));
+    }
+
+    // achievements: union by id, write to both lexivo_achievements and lexivo_achievement_dates
+    if (Array.isArray(row.achievements) && row.achievements.length > 0) {
+      const dates = lsJSON<Record<string, string>>('lexivo_achievement_dates', {});
+      const unlocked = lsJSON<string[]>('lexivo_achievements', []);
+      const unlockedSet = new Set(unlocked);
+      let changed = false;
+      for (const ach of row.achievements as { id: string; date: string }[]) {
+        if (!dates[ach.id]) {
+          dates[ach.id] = ach.date;
+          if (!unlockedSet.has(ach.id)) { unlocked.push(ach.id); unlockedSet.add(ach.id); }
+          changed = true;
+        }
+      }
+      if (changed) {
+        lsSet('lexivo_achievement_dates', JSON.stringify(dates));
+        lsSet('lexivo_achievements', JSON.stringify(unlocked));
+      }
     }
 
     // imported_words
