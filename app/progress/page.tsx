@@ -9,7 +9,7 @@ import {
   getTodayXP, getTodayLearnedCount, getDueWords, getStarredWords, getHardWords,
   getStudyHistory, getStudyDays, getReviewDays, getWordGoalDays,
   getSettings, getXPHistory, localDateStr, getReviewLog, getGraduatedCount, displayXP,
-  getUnitProgress,
+  getUnitProgress, getSRSLockedDays,
 } from '@/lib/storage';
 import type { XpEntry } from '@/lib/storage';
 import { useAppStore } from '@/lib/store';
@@ -46,6 +46,7 @@ function ProgressPage() {
   const [studyDays, setStudyDays] = useState<string[]>([]);
   const [reviewDays, setReviewDays] = useState<string[]>([]);
   const [wordGoalDays, setWordGoalDays] = useState<string[]>([]);
+  const [srsLockedDays, setSrsLockedDays] = useState<string[]>([]);
   const [dailyGoal, setDailyGoal] = useState(10);
   const [xpHistory, setXpHistory] = useState<XpEntry[]>([]);
   const [tab, setTab] = useState<'overview' | 'srs' | 'achievements' | 'calendar'>(tabParam ?? 'overview');
@@ -82,6 +83,7 @@ function ProgressPage() {
       setStudyDays(getStudyDays());
       setReviewDays(getReviewDays());
       setWordGoalDays(getWordGoalDays());
+      setSrsLockedDays(getSRSLockedDays());
       setDailyGoal(getSettings().dailyGoal);
       setXpHistory(getXPHistory());
     };
@@ -266,7 +268,7 @@ function ProgressPage() {
           <div className="animate-fade-in">
             <StudyCalendar
               history={studyHistory} streak={streak} totalDays={totalDays} studyDays={studyDays}
-              reviewDays={reviewDays} wordGoalDays={wordGoalDays}
+              reviewDays={reviewDays} wordGoalDays={wordGoalDays} srsLockedDays={srsLockedDays}
               dailyGoal={dailyGoal} dueCount={dueCount} todayWordsCount={todayCount}
             />
           </div>
@@ -567,8 +569,8 @@ const TASK_COLORS = {
   words:  { bg: '#059669', shadow: '#064e3b' },
 } as const;
 
-function MiniCalendar({ title, color, days, year, month }: {
-  title: string; color: string; days: string[]; year: number; month: number;
+function MiniCalendar({ title, color, days, year, month, lockedDays }: {
+  title: string; color: string; days: string[]; year: number; month: number; lockedDays?: string[];
 }) {
   const cells = buildMonthGrid(year, month);
   const todayStr = localDateStr(new Date());
@@ -581,7 +583,10 @@ function MiniCalendar({ title, color, days, year, month }: {
           <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: color, boxShadow: `0 0 5px ${color}` }} />
           <span className="text-xs font-bold truncate" style={{ color: 'var(--text)' }}>{title}</span>
         </div>
-        <span className="text-[10px] font-bold ml-1 shrink-0" style={{ color }}>{monthCount}</span>
+        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full shrink-0"
+          style={{ background: color, color: '#fff' }}>
+          {monthCount} {monthCount === 1 ? 'day' : 'days'}
+        </span>
       </div>
       <div className="grid grid-cols-7 gap-1">
         {['M','T','W','T','F','S','S'].map((d, i) => (
@@ -590,20 +595,24 @@ function MiniCalendar({ title, color, days, year, month }: {
         {cells.map((day, i) => {
           if (!day) return <div key={i} className="aspect-square" />;
           const dateStr = `${year}-${mm}-${String(day).padStart(2, '0')}`;
-          const done = days.includes(dateStr);
-          const isToday = dateStr === todayStr;
+          const done    = days.includes(dateStr);
+          const locked  = !done && !!lockedDays?.includes(dateStr);
+          const isToday  = dateStr === todayStr;
           const isFuture = dateStr > todayStr;
           return (
             <div key={i} className="aspect-square rounded-full flex items-center justify-center"
               style={{
-                background: done ? color : 'var(--border)',
-                outline: isToday ? `2.5px solid ${color}` : 'none',
+                background: done ? color : locked ? '#52525266' : 'var(--border)',
+                outline: isToday ? `3px solid ${color}` : 'none',
                 outlineOffset: '2px',
                 opacity: isFuture ? 0.2 : 1,
-                boxShadow: done ? `0 0 6px ${color}80` : 'none',
+                boxShadow: done ? `0 0 6px ${color}80` : isToday ? `0 0 8px ${color}50` : 'none',
               }}
             >
-              <span className="text-xs font-bold leading-none" style={{ color: done ? '#fff' : 'var(--text-muted)' }}>{day}</span>
+              {locked
+                ? <span style={{ fontSize: 7, lineHeight: 1 }}>🔒</span>
+                : <span className="text-xs font-bold leading-none" style={{ color: done ? '#fff' : 'var(--text-muted)' }}>{day}</span>
+              }
             </div>
           );
         })}
@@ -613,7 +622,7 @@ function MiniCalendar({ title, color, days, year, month }: {
 }
 
 function StudyCalendar({
-  history, streak, studyDays, reviewDays, wordGoalDays, dailyGoal, dueCount, todayWordsCount,
+  history, streak, studyDays, reviewDays, wordGoalDays, srsLockedDays, dailyGoal, dueCount, todayWordsCount,
 }: {
   history: Record<string, number>;
   streak: number;
@@ -621,6 +630,7 @@ function StudyCalendar({
   studyDays: string[];
   reviewDays: string[];
   wordGoalDays: string[];
+  srsLockedDays: string[];
   dailyGoal: number;
   dueCount: number;
   todayWordsCount: number;
@@ -736,9 +746,10 @@ function StudyCalendar({
               const isToday = dateStr === todayStr;
               const isFuture = dateStr > todayStr;
               const isSelected = selectedDay === dateStr;
-              const review = reviewDays.includes(dateStr);
-              const words  = wordGoalDays.includes(dateStr);
-              const anyDone = review || words;
+              const review   = reviewDays.includes(dateStr);
+              const words    = wordGoalDays.includes(dateStr);
+              const srsLocked = !review && srsLockedDays.includes(dateStr);
+              const anyDone  = review || words || srsLocked;
 
               return (
                 <button
@@ -753,8 +764,17 @@ function StudyCalendar({
                     transform: isSelected ? 'scale(1.12)' : 'scale(1)',
                   }}
                 >
-                  {review && <div className="absolute bottom-0 left-0 right-0" style={{ height: '50%', background: TASK_COLORS.review.bg }} />}
-                  {words  && <div className="absolute top-0 left-0 right-0" style={{ height: '50%', background: TASK_COLORS.words.bg }} />}
+                  {/* Bottom half: SRS review (indigo) or locked (gray) */}
+                  {review    && <div className="absolute bottom-0 left-0 right-0" style={{ height: '50%', background: TASK_COLORS.review.bg }} />}
+                  {srsLocked && <div className="absolute bottom-0 left-0 right-0 flex items-end justify-center pb-0.5" style={{ height: '50%', background: '#52525280' }}>
+                    <span style={{ fontSize: 7, lineHeight: 1 }}>🔒</span>
+                  </div>}
+                  {/* Top half: words goal (green) */}
+                  {words && <div className="absolute top-0 left-0 right-0" style={{ height: '50%', background: TASK_COLORS.words.bg }} />}
+                  {/* Separator line when both halves have content */}
+                  {(review || srsLocked) && words && (
+                    <div className="absolute inset-x-0 z-10" style={{ top: '50%', height: 1, background: 'rgba(0,0,0,0.3)', transform: 'translateY(-0.5px)' }} />
+                  )}
                   <span className="relative z-10 text-xs font-bold leading-none"
                     style={{ color: anyDone ? '#fff' : isToday ? 'var(--text)' : 'var(--text-muted)' }}>
                     {day}
@@ -868,7 +888,7 @@ function StudyCalendar({
 
               {/* Two mini-calendars */}
               <div className="grid grid-cols-2 gap-3">
-                <MiniCalendar title="SRS"                    color={TASK_COLORS.review.bg} days={reviewDays}   year={viewYear} month={viewMonth} />
+                <MiniCalendar title="SRS"                    color={TASK_COLORS.review.bg} days={reviewDays}   year={viewYear} month={viewMonth} lockedDays={srsLockedDays} />
                 <MiniCalendar title={`Words (${dailyGoal})`} color={TASK_COLORS.words.bg}  days={wordGoalDays} year={viewYear} month={viewMonth} />
               </div>
             </div>

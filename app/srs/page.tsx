@@ -6,6 +6,7 @@ import { speak, speakText } from '@/lib/speech';
 import {
   getDueWords, markIntervalDone, addXP, displayXP, recordStudySession, recordReviewDay,
   unlockAchievement, getSRSWords, getLearnedWords, removeSRSWord, getReviewLog,
+  recordSRSLockedDay,
 } from '@/lib/storage';
 import { pushLists, pushStats } from '@/lib/sync';
 import { stageColor } from '@/lib/srs';
@@ -71,7 +72,10 @@ export default function SRSReviewPage() {
     } catch {}
     // Fresh session — natural order by default
     setQueue([...allDue]);
-    if (allDue.length === 0) setDone(true);
+    if (allDue.length === 0) {
+      recordSRSLockedDay();
+      setDone(true);
+    }
     queueBuiltRef.current = true;
   }, []);
 

@@ -53,6 +53,7 @@ const KEYS = {
   achievementDates:  'lexivo_achievement_dates',
   flashcardXpUnits:  'lexivo_flash_xp_units',
   quizXpUnits:       'lexivo_quiz_xp_units',
+  srsLockedDays:     'lexivo_srs_locked_days',
 };
 
 function get<T>(key: string, fallback: T): T {
@@ -611,6 +612,14 @@ export function recordWordGoalDay() {
   checkAndUpdateStreak();
 }
 
+
+export function getSRSLockedDays(): string[] { return get<string[]>(KEYS.srsLockedDays, []); }
+export function saveSRSLockedDays(days: string[]) { set(KEYS.srsLockedDays, days); }
+export function recordSRSLockedDay() {
+  const today = localDateStr();
+  const days = getSRSLockedDays();
+  if (!days.includes(today)) { days.push(today); set(KEYS.srsLockedDays, days); }
+}
 
 export function getDayTasks(dateStr: string): { unit: boolean; review: boolean; words: boolean } {
   return {
