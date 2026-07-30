@@ -533,6 +533,21 @@ function XpHistorySection({ entries }: { entries: XpEntry[] }) {
 
 const MONTH_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
+function calcCurrentStreak(days: string[]): number {
+  if (!days.length) return 0;
+  const sorted = [...days].sort().reverse();
+  const today = localDateStr(new Date());
+  const yesterday = localDateStr(new Date(Date.now() - 86400000));
+  if (sorted[0] !== today && sorted[0] !== yesterday) return 0;
+  let count = 0;
+  let expected = new Date(sorted[0] === today ? Date.now() : Date.now() - 86400000);
+  for (const d of sorted) {
+    if (d === localDateStr(expected)) { count++; expected = new Date(expected.getTime() - 86400000); }
+    else break;
+  }
+  return count;
+}
+
 function calcLongestStreak(days: string[]): number {
   const sorted = [...days].sort();
   let longest = 0, current = 0, prev = '';
@@ -640,10 +655,17 @@ function StudyCalendar({
   const [viewYear, setViewYear] = useState(now.getFullYear());
   const [viewMonth, setViewMonth] = useState(now.getMonth());
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
+  const [showBreakdown, setShowBreakdown] = useState(false);
   const todayStr = localDateStr(now);
   const completeDays = reviewDays.filter(d => wordGoalDays.includes(d));
   const longestStreak = calcLongestStreak(completeDays);
   const activeDays = completeDays.length;
+
+  // Per-task stats
+  const wordsCurrent = calcCurrentStreak(wordGoalDays);
+  const wordsLongest = calcLongestStreak(wordGoalDays);
+  const srsCurrent   = calcCurrentStreak(reviewDays);
+  const srsLongest   = calcLongestStreak(reviewDays);
 
   const cells = buildMonthGrid(viewYear, viewMonth);
   const monthName = new Date(viewYear, viewMonth, 1).toLocaleString('default', { month: 'long', year: 'numeric' });
@@ -717,6 +739,44 @@ function StudyCalendar({
           <div className="text-2xl font-black text-white leading-tight">{activeDays}</div>
           <div className="text-[10px] text-white/70 font-semibold leading-tight">Full days</div>
         </div>
+      </div>
+
+      {/* Task breakdown — collapsed by default */}
+      <div>
+        <button
+          onClick={() => setShowBreakdown(b => !b)}
+          className="w-full flex items-center justify-center gap-1.5 py-1.5 text-[11px] font-semibold"
+          style={{ color: 'var(--text-muted)' }}
+        >
+          Task breakdown
+          <span style={{ fontSize: 9 }}>{showBreakdown ? '▴' : '▾'}</span>
+        </button>
+
+        {showBreakdown && (
+          <div className="space-y-2 mt-1">
+            {([
+              { label: 'Words', color: TASK_COLORS.words.bg, current: wordsCurrent, longest: wordsLongest, total: wordGoalDays.length },
+              { label: 'SRS',   color: TASK_COLORS.review.bg, current: srsCurrent,  longest: srsLongest,  total: reviewDays.length   },
+            ] as const).map(row => (
+              <div key={row.label} className="rounded-xl px-4 py-3 flex items-center gap-3"
+                style={{ background: 'var(--surface-2)', borderLeft: `3px solid ${row.color}` }}>
+                <span className="text-xs font-bold w-10 shrink-0" style={{ color: row.color }}>{row.label}</span>
+                <div className="flex gap-4 flex-1 justify-around">
+                  {([
+                    { val: row.current, label: 'Current' },
+                    { val: row.longest, label: 'Longest' },
+                    { val: row.total,   label: 'Days' },
+                  ] as const).map(stat => (
+                    <div key={stat.label} className="text-center">
+                      <div className="text-sm font-black" style={{ color: 'var(--text)' }}>{stat.val}</div>
+                      <div className="text-[9px] font-semibold" style={{ color: 'var(--text-muted)' }}>{stat.label}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Calendar card */}
