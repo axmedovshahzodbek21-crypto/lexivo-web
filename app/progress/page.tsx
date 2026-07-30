@@ -663,15 +663,15 @@ function StudyCalendar({
   const [viewMonth, setViewMonth] = useState(now.getMonth());
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [showBreakdown, setShowBreakdown] = useState(false);
-  const [infoModal, setInfoModal] = useState<{ title: string; body: string } | null>(null);
+  const [infoModal, setInfoModal] = useState<{ title: string; body: string; emoji: string; color: string } | null>(null);
 
   const INFO = {
-    review:   { title: 'SRS Review', body: 'Spaced Repetition System — words you\'ve learned come back for review at growing intervals. Complete all words due today to mark the review (blue) half of your day circle.' },
-    words:    { title: 'Daily Word Goal', body: 'Learn new words each day to hit your personal target. Set the number in Settings. Reach it to mark the words (green) half of your day circle.' },
-    streak:   { title: 'Current Streak', body: 'Days in a row where you completed BOTH SRS review and your word goal. Miss a day without a streak freeze and it resets to 0.' },
-    longest:  { title: 'Longest Streak', body: 'Your all-time personal best — the longest consecutive run of perfect days you\'ve ever achieved. It never resets.' },
-    fulldays: { title: 'Full Days', body: 'Total count of days where you completed both tasks. Every perfect day adds 1. This is your lifetime tally of fully productive days.' },
-    monthly:  { title: 'Monthly Summary', body: 'Words you learned and days you studied in each month. A day counts if you did at least one learning session that day.' },
+    review:   { title: 'SRS Review',       emoji: '🔁', color: TASK_COLORS.review.bg, body: 'Spaced Repetition System — words you\'ve learned come back for review at growing intervals. Complete all words due today to mark the blue half of your day circle.' },
+    words:    { title: 'Daily Word Goal',   emoji: '✏️', color: TASK_COLORS.words.bg,  body: 'Learn new words each day to hit your personal target. You set the number yourself in Settings. Reach it to mark the green half of your day circle.' },
+    streak:   { title: 'Current Streak',   emoji: '🔥', color: '#be123c',              body: 'Days in a row where you completed BOTH SRS review and your word goal. Miss a day without a streak freeze and it resets to 0.' },
+    longest:  { title: 'Longest Streak',   emoji: '⚡', color: '#0369a1',              body: 'Your all-time personal best — the longest consecutive run of perfect days you\'ve ever achieved. It never resets.' },
+    fulldays: { title: 'Full Days',         emoji: '🏆', color: '#b45309',              body: 'Total count of days where you completed both tasks. Every perfect day adds 1 — this is your lifetime tally of fully productive days.' },
+    monthly:  { title: 'Monthly Summary',  emoji: '📅', color: '#6d28d9',              body: 'Words you learned and days you studied each month. A day counts if you did at least one learning session.' },
   };
   function InfoBtn({ k, light }: { k: keyof typeof INFO; light?: boolean }) {
     return (
@@ -929,21 +929,33 @@ function StudyCalendar({
       </div> {/* end right column */}
 
       {/* Bottom sheet — outside grid */}
-      {/* Info modal */}
+      {/* Info bottom sheet */}
       {infoModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-6"
-          style={{ background: 'rgba(0,0,0,0.75)' }}
+        <div className="fixed inset-0 z-[60] flex items-end justify-center px-4 pb-4"
+          style={{ background: 'rgba(0,0,0,0.45)' }}
           onClick={() => setInfoModal(null)}>
-          <div className="rounded-2xl p-5 w-full max-w-xs"
-            style={{ background: 'var(--bg)', border: '1px solid var(--border)' }}
+          <div className="w-full max-w-sm rounded-2xl overflow-hidden"
+            style={{ background: 'var(--bg)', boxShadow: '0 -8px 40px rgba(0,0,0,0.6)' }}
             onClick={e => e.stopPropagation()}>
-            <p className="font-bold text-sm mb-2" style={{ color: 'var(--text)' }}>{infoModal.title}</p>
-            <p className="text-xs leading-relaxed" style={{ color: 'var(--text-muted)' }}>{infoModal.body}</p>
-            <button onClick={() => setInfoModal(null)}
-              className="mt-4 text-xs font-semibold px-4 py-2 rounded-xl w-full"
-              style={{ background: 'var(--surface-2)', color: 'var(--text-muted)' }}>
-              Got it
-            </button>
+            {/* Handle */}
+            <div className="flex justify-center pt-2.5 pb-1">
+              <div className="w-8 h-1 rounded-full" style={{ background: 'var(--border)' }} />
+            </div>
+            {/* Colored accent bar */}
+            <div className="mx-5 mt-2 mb-0 h-0.5 rounded-full" style={{ background: infoModal.color }} />
+            {/* Content */}
+            <div className="px-5 pt-3 pb-5">
+              <div className="flex items-center gap-2 mb-2">
+                <span style={{ fontSize: 18, lineHeight: 1 }}>{infoModal.emoji}</span>
+                <p className="font-bold text-sm" style={{ color: 'var(--text)' }}>{infoModal.title}</p>
+              </div>
+              <p className="text-xs leading-relaxed" style={{ color: 'var(--text-muted)' }}>{infoModal.body}</p>
+              <button onClick={() => setInfoModal(null)}
+                className="mt-4 w-full py-2.5 rounded-xl text-xs font-bold text-white"
+                style={{ background: infoModal.color }}>
+                Got it
+              </button>
+            </div>
           </div>
         </div>
       )}
