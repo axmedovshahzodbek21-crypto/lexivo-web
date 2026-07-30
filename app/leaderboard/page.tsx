@@ -85,9 +85,14 @@ export default function LeaderboardPage() {
     setSyncing(true);
     setSyncError('');
     try {
-      // Ensure local setting is true first so pushSettings doesn't overwrite it
       saveSettings({ ...getSettings(), showOnLeaderboard: true });
-      await Promise.all([pushStats(), pushSettings()]);
+      // Use user.id directly — avoids relying on getUid()/getSession() which can be stale
+      const { error: upsertErr } = await supabase.from('user_data').upsert({
+        id: user.id,
+        show_on_leaderboard: true,
+        settings_updated_at: new Date().toISOString(),
+      });
+      if (upsertErr) throw new Error(upsertErr.message);
       await load();
     } catch (err) {
       setSyncError(String(err));
