@@ -929,7 +929,11 @@ function StudyCalendar({
         </div>
 
         {/* Monthly breakdown */}
-        <MonthlyBreakdown history={history} onInfo={() => setInfoModal(INFO.monthly)} />
+        <MonthlyBreakdown history={history} onInfo={(e) => {
+          const r = e.currentTarget.getBoundingClientRect();
+          const above = r.bottom > window.innerHeight * 0.6;
+          setInfoModal({ ...INFO.monthly, x: r.left + r.width / 2, y: above ? r.top - 8 : r.bottom + 8, above });
+        }} />
 
       </div> {/* end right column */}
 
@@ -1039,7 +1043,7 @@ function StudyCalendar({
   );
 }
 
-function MonthlyBreakdown({ history, onInfo }: { history: Record<string, number>; onInfo?: () => void }) {
+function MonthlyBreakdown({ history, onInfo }: { history: Record<string, number>; onInfo?: (e: React.MouseEvent<HTMLButtonElement>) => void }) {
   const t = useTranslation();
   const months: { label: string; words: number; days: number }[] = [];
   const seen = new Set<string>();
