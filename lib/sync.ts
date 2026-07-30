@@ -63,10 +63,14 @@ export async function pushStats(): Promise<void> {
       streak_freezes:      lsJSON<number>('lexivo_freezes', 0),
       last_study_date:     lsGet('lexivo_last_study') || null,
       last_freeze_week:    lsGet('lexivo_last_freeze_week') || null,
-      today_xp:            todayXpDate === today ? lsJSON<number>('lexivo_today_xp', 0) : 0,
-      today_xp_date:       todayXpDate === today ? today : null,
-      daily_words_learned: todayCountDate === today ? lsJSON<number>('lexivo_today_count', 0) : 0,
-      daily_words_date:    todayCountDate === today ? today : null,
+      ...(todayXpDate === today ? {
+        today_xp:      lsJSON<number>('lexivo_today_xp', 0),
+        today_xp_date: today,
+      } : {}),
+      ...(todayCountDate === today ? {
+        daily_words_learned: lsJSON<number>('lexivo_today_count', 0),
+        daily_words_date:    today,
+      } : {}),
       stats_updated_at:    ts,
     });
     lsSet(S.statTs, ts);
