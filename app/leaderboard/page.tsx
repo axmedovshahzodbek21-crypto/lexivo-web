@@ -71,6 +71,14 @@ export default function LeaderboardPage() {
     } catch (e) {
       setSyncError(String(e));
     }
+    // Ensure authenticated users are visible — direct upsert bypasses getUid() race
+    if (user && getSettings().showOnLeaderboard !== false) {
+      await supabase.from('user_data').upsert({
+        id: user.id,
+        show_on_leaderboard: true,
+        settings_updated_at: new Date().toISOString(),
+      });
+    }
     const { data, error: err } = await supabase.rpc('get_leaderboard').limit(500);
     if (err) {
       setError('Could not load leaderboard. Please try again.');
@@ -101,6 +109,17 @@ export default function LeaderboardPage() {
   };
 
   useEffect(() => { load(); }, []);
+
+  // When auth resolves after initial load, push show_on_leaderboard if needed
+  useEffect(() => {
+    if (!user) return;
+    if (getSettings().showOnLeaderboard === false) return;
+    supabase.from('user_data').upsert({
+      id: user.id,
+      show_on_leaderboard: true,
+      settings_updated_at: new Date().toISOString(),
+    });
+  }, [user?.id]);
 
   const myIndex = user ? entries.findIndex(e => e.user_id === user.id) : -1;
   const [selected, setSelected] = useState<LeaderboardEntry | null>(null);

@@ -56,6 +56,7 @@ export async function pushStats(): Promise<void> {
     const today = localDateStr();
     const todayXpDate = lsGet('lexivo_today_xp_date');
     const todayCountDate = lsGet('lexivo_today_count_date');
+    const s = getSettings();
     await supabase.from('user_data').upsert({
       id: uid,
       total_xp:            lsJSON<number>('lexivo_xp', 0),
@@ -63,6 +64,7 @@ export async function pushStats(): Promise<void> {
       streak_freezes:      lsJSON<number>('lexivo_freezes', 0),
       last_study_date:     lsGet('lexivo_last_study') || null,
       last_freeze_week:    lsGet('lexivo_last_freeze_week') || null,
+      show_on_leaderboard: s.showOnLeaderboard ?? true,
       ...(todayXpDate === today ? {
         today_xp:      lsJSON<number>('lexivo_today_xp', 0),
         today_xp_date: today,
