@@ -257,11 +257,11 @@ export default function QuizPage() {
         const p = getUnitProgress(collectionName, qDayNumber);
         if (p.learnDone && p.flashcardDone && p.quizDone) fireConfetti();
       }
-      pushLists();
-      pushStats();
       recordQuizSession();
       const newAchievements = checkAchievements();
       newAchievements.forEach(pushAchievement);
+      pushLists();
+      pushStats();
 
 
       setDone(true);

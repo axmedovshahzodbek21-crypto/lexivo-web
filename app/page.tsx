@@ -7,6 +7,7 @@ import { useAppStore } from '@/lib/store';
 import { useShallow } from 'zustand/react/shallow';
 import { getWordOfDay } from '@/lib/data';
 import { getStreak, getXP, getTodayXP, getTodayLearnedCount, getDueWords, getLearnedWords, getSettings, isOnboarded, getFreezes, checkAndGrantWeeklyFreeze, getImportedWords, getLastStudyDate, localDateStr, displayXP } from '@/lib/storage';
+import { pullAll } from '@/lib/sync';
 import { getLevelInfo } from '@/lib/gamification';
 import { speak } from '@/lib/speech';
 import { getTheme, toggleTheme, type Theme } from '@/lib/theme';
@@ -161,6 +162,17 @@ export default function HomePage() {
     setHideLists(localStorage.getItem('home_hide_lists') === '1');
     setHideGrammar(localStorage.getItem('home_hide_grammar') === '1');
     setHideClasses(localStorage.getItem('home_hide_classes') === '1');
+
+    pullAll().then(() => {
+      setXp(getXP());
+      setStreak(getStreak());
+      setFreezes(getFreezes());
+      setTodayXp(getTodayXP());
+      setTodayCount(getTodayLearnedCount());
+      setDueCount(getDueWords().length);
+      setLearnedCount(getLearnedWords().length);
+      setSettings(getSettings());
+    });
   }, [router]);
 
   useEffect(() => {

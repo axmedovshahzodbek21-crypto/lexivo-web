@@ -158,14 +158,13 @@ export default function SRSReviewPage() {
     const { leveledUp, newLevel, newXp } = addXP(xpTotal, 'SRS Review');
     if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
     setSessionXP(xpTotal);
-    pushLists();
-    pushStats();
-
     unlockAchievement('srs_first', 50); // 5 XP
     recordStudySession();
     if (getDueWords().length === 0) recordReviewDay();
     const newAchievements = checkAchievements();
     newAchievements.forEach(pushAchievement);
+    pushLists();
+    pushStats();
   }, [queue, pushAchievement, setPendingLevelUp]);
 
   const grade = useCallback((g: 'knew' | 'notYet') => {
