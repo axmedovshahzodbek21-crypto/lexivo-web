@@ -641,8 +641,8 @@ function StudyCalendar({
   const [viewMonth, setViewMonth] = useState(now.getMonth());
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const todayStr = localDateStr(now);
-  const longestStreak = calcLongestStreak(studyDays);
   const completeDays = reviewDays.filter(d => wordGoalDays.includes(d));
+  const longestStreak = calcLongestStreak(completeDays);
   const activeDays = completeDays.length;
 
   const cells = buildMonthGrid(viewYear, viewMonth);
