@@ -57,24 +57,48 @@ export async function pushStats(): Promise<void> {
     const todayXpDate = lsGet('lexivo_today_xp_date');
     const todayCountDate = lsGet('lexivo_today_count_date');
     const s = getSettings();
-    await supabase.from('user_data').upsert({
-      id: uid,
-      total_xp:            lsJSON<number>('lexivo_xp', 0),
-      streak:              lsJSON<number>('lexivo_streak', 0),
-      streak_freezes:      lsJSON<number>('lexivo_freezes', 0),
-      last_study_date:     lsGet('lexivo_last_study') || null,
-      last_freeze_week:    lsGet('lexivo_last_freeze_week') || null,
-      show_on_leaderboard: s.showOnLeaderboard ?? true,
-      ...(todayXpDate === today ? {
-        today_xp:      lsJSON<number>('lexivo_today_xp', 0),
-        today_xp_date: today,
-      } : {}),
-      ...(todayCountDate === today ? {
-        daily_words_learned: lsJSON<number>('lexivo_today_count', 0),
-        daily_words_date:    today,
-      } : {}),
-      stats_updated_at:    ts,
-    });
+    const xp = lsJSON<number>('lexivo_xp', 0);
+    const streak = lsJSON<number>('lexivo_streak', 0);
+    const studyDays = lsJSON<string[]>('lexivo_study_days', []);
+    await Promise.all([
+      supabase.from('user_data').upsert({
+        id: uid,
+        total_xp:            xp,
+        streak:              streak,
+        streak_freezes:      lsJSON<number>('lexivo_freezes', 0),
+        last_study_date:     lsGet('lexivo_last_study') || null,
+        last_freeze_week:    lsGet('lexivo_last_freeze_week') || null,
+        show_on_leaderboard: s.showOnLeaderboard ?? true,
+        ...(todayXpDate === today ? {
+          today_xp:      lsJSON<number>('lexivo_today_xp', 0),
+          today_xp_date: today,
+        } : {}),
+        ...(todayCountDate === today ? {
+          daily_words_learned: lsJSON<number>('lexivo_today_count', 0),
+          daily_words_date:    today,
+        } : {}),
+        stats_updated_at:    ts,
+      }),
+      supabase.from('user_stats').upsert({
+        id:               uid,
+        xp:               xp,
+        streak:           streak,
+        freezes:          lsJSON<number>('lexivo_freezes', 0),
+        last_study_date:  lsGet('lexivo_last_study') || null,
+        last_freeze_week: lsGet('lexivo_last_freeze_week') || null,
+        total_days:       studyDays.length,
+        study_days:       studyDays,
+        ...(todayXpDate === today ? {
+          today_xp:      lsJSON<number>('lexivo_today_xp', 0),
+          today_xp_date: today,
+        } : {}),
+        ...(todayCountDate === today ? {
+          today_count:      lsJSON<number>('lexivo_today_count', 0),
+          today_count_date: today,
+        } : {}),
+        xp_updated_at:    ts,
+      }),
+    ]);
     lsSet(S.statTs, ts);
   } catch {}
 }
@@ -85,17 +109,27 @@ export async function pushSettings(): Promise<void> {
   try {
     const s = getSettings();
     const ts = new Date().toISOString();
-    await supabase.from('user_data').upsert({
-      id: uid,
-      daily_word_goal:     s.dailyGoal,
-      quiz_direction:      s.quizDirection,
-      reduce_motion:       s.reduceMotion,
-      show_on_leaderboard: s.showOnLeaderboard ?? true,
-      user_name:           s.name,
-      language_level:      s.languageLevel,
-      ...(getProfilePicUrl() ? { avatar_url: getProfilePicUrl() } : {}),
-      settings_updated_at: ts,
-    });
+    const showOnLeaderboard = s.showOnLeaderboard ?? true;
+    await Promise.all([
+      supabase.from('user_data').upsert({
+        id: uid,
+        daily_word_goal:     s.dailyGoal,
+        quiz_direction:      s.quizDirection,
+        reduce_motion:       s.reduceMotion,
+        show_on_leaderboard: showOnLeaderboard,
+        user_name:           s.name,
+        language_level:      s.languageLevel,
+        ...(getProfilePicUrl() ? { avatar_url: getProfilePicUrl() } : {}),
+        settings_updated_at: ts,
+      }),
+      supabase.from('profiles').upsert({
+        id:                  uid,
+        name:                s.name,
+        show_on_leaderboard: showOnLeaderboard,
+        language_level:      s.languageLevel,
+        ...(getProfilePicUrl() ? { avatar_url: getProfilePicUrl() } : {}),
+      }),
+    ]);
     lsSet(S.settingsTs, ts);
   } catch {}
 }
@@ -105,23 +139,40 @@ export async function pushLists(): Promise<void> {
   if (!uid) return;
   try {
     const ts = new Date().toISOString();
-    await supabase.from('user_data').upsert({
-      id: uid,
-      learned_words:    getLearnedWords(),
-      srs_words:        getSRSWords(),
-      starred_words:    lsJSON<string[]>('lexivo_starred', []),
-      hard_words:       lsJSON<HardWordEntry[]>('lexivo_hard_words', []),
-      study_days:       lsJSON<string[]>('lexivo_study_days', []),
-      review_days:      lsJSON<string[]>('lexivo_review_days', []),
-      word_goal_days:   lsJSON<string[]>('lexivo_word_goal_days', []),
-      unit_done_days:   lsJSON<string[]>('lexivo_unit_done_days', []),
-      xp_history:       lsJSON<unknown[]>('lexivo_xp_history', []),
-      unit_progress:    getAllUnitProgress(),
-      review_log:       lsJSON<Record<string, number[]>>('lexivo_review_log', {}),
-      imported_words:   lsJSON<unknown[]>('lexivo_imported_words', []),
-      achievements:     Object.entries(lsJSON<Record<string, string>>('lexivo_achievement_dates', {})).map(([id, date]) => ({ id, date })),
-      lists_updated_at: ts,
-    });
+    const learnedWords = getLearnedWords();
+    const promises = [
+      supabase.from('user_data').upsert({
+        id: uid,
+        learned_words:    learnedWords,
+        srs_words:        getSRSWords(),
+        starred_words:    lsJSON<string[]>('lexivo_starred', []),
+        hard_words:       lsJSON<HardWordEntry[]>('lexivo_hard_words', []),
+        study_days:       lsJSON<string[]>('lexivo_study_days', []),
+        review_days:      lsJSON<string[]>('lexivo_review_days', []),
+        word_goal_days:   lsJSON<string[]>('lexivo_word_goal_days', []),
+        unit_done_days:   lsJSON<string[]>('lexivo_unit_done_days', []),
+        xp_history:       lsJSON<unknown[]>('lexivo_xp_history', []),
+        unit_progress:    getAllUnitProgress(),
+        review_log:       lsJSON<Record<string, number[]>>('lexivo_review_log', {}),
+        imported_words:   lsJSON<unknown[]>('lexivo_imported_words', []),
+        achievements:     Object.entries(lsJSON<Record<string, string>>('lexivo_achievement_dates', {})).map(([id, date]) => ({ id, date })),
+        lists_updated_at: ts,
+      }),
+    ];
+    if (learnedWords.length > 0) {
+      promises.push(
+        supabase.from('learned_words').upsert(
+          learnedWords.map(w => ({
+            user_id:    uid,
+            word:       w.word,
+            collection: w.collectionName,
+            learned_at: w.learnedAt,
+          })),
+          { onConflict: 'user_id,word,collection', ignoreDuplicates: true }
+        )
+      );
+    }
+    await Promise.all(promises);
     lsSet(S.listsTs, ts);
   } catch {}
 }

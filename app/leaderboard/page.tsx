@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
-import { localDateStr, displayXP, getSettings, saveSettings, getLearnedWords, getSRSWords } from '@/lib/storage';
+import { localDateStr, displayXP, getSettings, saveSettings } from '@/lib/storage';
 import { pushStats, pushSettings } from '@/lib/sync';
 
 interface LeaderboardEntry {
@@ -83,40 +83,8 @@ export default function LeaderboardPage() {
   const manualSync = async () => {
     if (!user) return;
     setSyncing(true);
-    setSyncError('');
-    try {
-      const s = { ...getSettings(), showOnLeaderboard: true };
-      saveSettings(s);
-      const ts = new Date().toISOString();
-      const today = localDateStr();
-      // Full upsert — ensures row is created even if it never existed
-      const lsGet = (k: string) => (typeof window !== 'undefined' ? localStorage.getItem(k) ?? '' : '');
-      const lsNum = (k: string, d = 0) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } };
-      const { error: upsertErr } = await supabase.from('user_data').upsert({
-        id: user.id,
-        total_xp:            lsNum('lexivo_xp'),
-        streak:              lsNum('lexivo_streak'),
-        streak_freezes:      lsNum('lexivo_freezes'),
-        last_study_date:     lsGet('lexivo_last_study') || null,
-        daily_word_goal:     s.dailyGoal,
-        quiz_direction:      s.quizDirection,
-        reduce_motion:       s.reduceMotion,
-        show_on_leaderboard: true,
-        user_name:           s.name,
-        language_level:      s.languageLevel,
-        learned_words:       getLearnedWords(),
-        srs_words:           getSRSWords(),
-        study_days:          JSON.parse(lsGet('lexivo_study_days') || '[]'),
-        stats_updated_at:    ts,
-        settings_updated_at: ts,
-        ...(lsGet('lexivo_today_xp_date') === today ? { today_xp: lsNum('lexivo_today_xp'), today_xp_date: today } : {}),
-        ...(lsGet('lexivo_today_count_date') === today ? { daily_words_learned: lsNum('lexivo_today_count'), daily_words_date: today } : {}),
-      });
-      if (upsertErr) throw new Error(`Sync failed: ${upsertErr.message} (code: ${upsertErr.code})`);
-      await load();
-    } catch (err) {
-      setSyncError(String(err));
-    }
+    saveSettings({ ...getSettings(), showOnLeaderboard: true });
+    await load();
     setSyncing(false);
   };
 
