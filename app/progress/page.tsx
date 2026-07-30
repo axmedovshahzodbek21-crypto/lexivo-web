@@ -603,7 +603,7 @@ function MiniCalendar({ title, color, days, year, month, lockedDays }: {
           {monthCount} {monthCount === 1 ? 'day' : 'days'}
         </span>
       </div>
-      <div className="grid grid-cols-7 gap-1">
+      <div className="grid grid-cols-7 gap-y-1">
         {['M','T','W','T','F','S','S'].map((d, i) => (
           <div key={i} className="flex items-center justify-center text-[8px] font-bold pb-0.5" style={{ color: 'var(--text-muted)' }}>{d}</div>
         ))}
@@ -614,20 +614,27 @@ function MiniCalendar({ title, color, days, year, month, lockedDays }: {
           const locked  = !done && !!lockedDays?.includes(dateStr);
           const isToday  = dateStr === todayStr;
           const isFuture = dateStr > todayStr;
+          const hasCircle = done || locked || isToday;
           return (
-            <div key={i} className="aspect-square rounded-full flex items-center justify-center"
-              style={{
-                background: done ? color : locked ? '#52525266' : 'var(--border)',
-                outline: isToday ? `3px solid ${color}` : 'none',
-                outlineOffset: '2px',
-                opacity: isFuture ? 0.2 : 1,
-                boxShadow: done ? `0 0 6px ${color}80` : isToday ? `0 0 8px ${color}50` : 'none',
-              }}
+            <div key={i} className="aspect-square flex items-center justify-center"
+              style={{ opacity: isFuture ? 0.2 : 1 }}
             >
-              {locked
-                ? <span style={{ fontSize: 7, lineHeight: 1 }}>🔒</span>
-                : <span className="text-xs font-bold leading-none" style={{ color: done ? '#fff' : 'var(--text-muted)' }}>{day}</span>
-              }
+              <div className="flex items-center justify-center"
+                style={{
+                  width: hasCircle ? '72%' : 'auto',
+                  aspectRatio: hasCircle ? '1' : undefined,
+                  borderRadius: '50%',
+                  background: done ? color : locked ? '#52525244' : 'transparent',
+                  outline: isToday ? `2px solid ${color}` : 'none',
+                  outlineOffset: '2px',
+                  boxShadow: done ? `0 0 5px ${color}70` : isToday ? `0 0 5px ${color}40` : 'none',
+                }}
+              >
+                {locked
+                  ? <span style={{ fontSize: 7, lineHeight: 1 }}>🔒</span>
+                  : <span style={{ fontSize: 10, fontWeight: done || isToday ? 700 : 500, lineHeight: 1, color: done ? '#fff' : isToday ? color : 'var(--text-muted)' }}>{day}</span>
+                }
+              </div>
             </div>
           );
         })}
@@ -656,6 +663,25 @@ function StudyCalendar({
   const [viewMonth, setViewMonth] = useState(now.getMonth());
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [showBreakdown, setShowBreakdown] = useState(false);
+  const [infoModal, setInfoModal] = useState<{ title: string; body: string } | null>(null);
+
+  const INFO = {
+    review:   { title: 'SRS Review', body: 'Spaced Repetition System — words you\'ve learned come back for review at growing intervals. Complete all words due today to mark the review (blue) half of your day circle.' },
+    words:    { title: 'Daily Word Goal', body: 'Learn new words each day to hit your personal target. Set the number in Settings. Reach it to mark the words (green) half of your day circle.' },
+    streak:   { title: 'Current Streak', body: 'Days in a row where you completed BOTH SRS review and your word goal. Miss a day without a streak freeze and it resets to 0.' },
+    longest:  { title: 'Longest Streak', body: 'Your all-time personal best — the longest consecutive run of perfect days you\'ve ever achieved. It never resets.' },
+    fulldays: { title: 'Full Days', body: 'Total count of days where you completed both tasks. Every perfect day adds 1. This is your lifetime tally of fully productive days.' },
+    monthly:  { title: 'Monthly Summary', body: 'Words you learned and days you studied in each month. A day counts if you did at least one learning session that day.' },
+  };
+  function InfoBtn({ k, light }: { k: keyof typeof INFO; light?: boolean }) {
+    return (
+      <button
+        onClick={e => { e.stopPropagation(); setInfoModal(INFO[k]); }}
+        className="w-4 h-4 rounded-full flex items-center justify-center shrink-0"
+        style={{ background: light ? 'rgba(255,255,255,0.25)' : 'var(--border)', color: light ? '#fff' : 'var(--text-muted)', fontSize: 9, fontWeight: 700, lineHeight: 1 }}
+      >i</button>
+    );
+  }
   const todayStr = localDateStr(now);
   const completeDays = reviewDays.filter(d => wordGoalDays.includes(d));
   const longestStreak = calcLongestStreak(completeDays);
@@ -706,7 +732,10 @@ function StudyCalendar({
             <div className="rounded-2xl py-3 px-4 flex flex-col items-center gap-1.5 border"
               style={{ background: reviewToday ? TASK_COLORS.review.bg : 'var(--surface)', borderColor: reviewToday ? TASK_COLORS.review.bg : 'var(--border)' }}>
               <span style={{ fontSize: 22, color: reviewToday ? '#fff' : 'var(--text-muted)' }}>{reviewToday ? '✅' : '○'}</span>
-              <span className="text-xs font-bold" style={{ color: reviewToday ? '#fff' : 'var(--text-muted)' }}>Review</span>
+              <span className="flex items-center gap-1">
+                <span className="text-xs font-bold" style={{ color: reviewToday ? '#fff' : 'var(--text-muted)' }}>Review</span>
+                <InfoBtn k="review" light={reviewToday} />
+              </span>
               <span className="text-[9px] font-semibold" style={{ color: reviewToday ? 'rgba(255,255,255,0.7)' : 'var(--text-muted)' }}>
                 {reviewToday ? 'All done!' : dueCount > 0 ? `${dueCount} due` : 'Nothing due'}
               </span>
@@ -715,7 +744,10 @@ function StudyCalendar({
             <div className="rounded-2xl py-3 px-4 flex flex-col items-center gap-1.5 border"
               style={{ background: wordsToday ? TASK_COLORS.words.bg : 'var(--surface)', borderColor: wordsToday ? TASK_COLORS.words.bg : 'var(--border)' }}>
               <span style={{ fontSize: 22, color: wordsToday ? '#fff' : 'var(--text-muted)' }}>{wordsToday ? '✅' : '✏️'}</span>
-              <span className="text-xs font-bold" style={{ color: wordsToday ? '#fff' : 'var(--text-muted)' }}>Words</span>
+              <span className="flex items-center gap-1">
+                <span className="text-xs font-bold" style={{ color: wordsToday ? '#fff' : 'var(--text-muted)' }}>Words</span>
+                <InfoBtn k="words" light={wordsToday} />
+              </span>
               <span className="text-[9px] font-semibold" style={{ color: wordsToday ? 'rgba(255,255,255,0.7)' : 'var(--text-muted)' }}>{goalLabel}</span>
             </div>
           </div>
@@ -727,17 +759,26 @@ function StudyCalendar({
         <div className="rounded-2xl p-3 flex flex-col gap-1" style={{ background: '#be123c', boxShadow: '0 3px 0 #881337' }}>
           <span className="text-xl">🔥</span>
           <div className="text-2xl font-black text-white leading-tight">{streak}</div>
-          <div className="text-[10px] text-white/70 font-semibold leading-tight">{t.progress.currentStreak}</div>
+          <div className="flex items-center gap-1">
+            <div className="text-[10px] text-white/70 font-semibold leading-tight">{t.progress.currentStreak}</div>
+            <InfoBtn k="streak" light />
+          </div>
         </div>
         <div className="rounded-2xl p-3 flex flex-col gap-1" style={{ background: '#0369a1', boxShadow: '0 3px 0 #0c4a6e' }}>
           <span className="text-xl">⚡</span>
           <div className="text-2xl font-black text-white leading-tight">{longestStreak}</div>
-          <div className="text-[10px] text-white/70 font-semibold leading-tight">{t.progress.longestStreak}</div>
+          <div className="flex items-center gap-1">
+            <div className="text-[10px] text-white/70 font-semibold leading-tight">{t.progress.longestStreak}</div>
+            <InfoBtn k="longest" light />
+          </div>
         </div>
         <div className="rounded-2xl p-3 flex flex-col gap-1" style={{ background: '#b45309', boxShadow: '0 3px 0 #78350f' }}>
           <span className="text-xl">🏆</span>
           <div className="text-2xl font-black text-white leading-tight">{activeDays}</div>
-          <div className="text-[10px] text-white/70 font-semibold leading-tight">Full days</div>
+          <div className="flex items-center gap-1">
+            <div className="text-[10px] text-white/70 font-semibold leading-tight">Full days</div>
+            <InfoBtn k="fulldays" light />
+          </div>
         </div>
       </div>
 
@@ -883,15 +924,34 @@ function StudyCalendar({
         </div>
 
         {/* Monthly breakdown */}
-        <MonthlyBreakdown history={history} />
+        <MonthlyBreakdown history={history} onInfo={() => setInfoModal(INFO.monthly)} />
 
       </div> {/* end right column */}
 
       {/* Bottom sheet — outside grid */}
+      {/* Info modal */}
+      {infoModal && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-6"
+          style={{ background: 'rgba(0,0,0,0.75)' }}
+          onClick={() => setInfoModal(null)}>
+          <div className="rounded-2xl p-5 w-full max-w-xs"
+            style={{ background: 'var(--bg)', border: '1px solid var(--border)' }}
+            onClick={e => e.stopPropagation()}>
+            <p className="font-bold text-sm mb-2" style={{ color: 'var(--text)' }}>{infoModal.title}</p>
+            <p className="text-xs leading-relaxed" style={{ color: 'var(--text-muted)' }}>{infoModal.body}</p>
+            <button onClick={() => setInfoModal(null)}
+              className="mt-4 text-xs font-semibold px-4 py-2 rounded-xl w-full"
+              style={{ background: 'var(--surface-2)', color: 'var(--text-muted)' }}>
+              Got it
+            </button>
+          </div>
+        </div>
+      )}
+
       {selectedDay && sheetTasks && (
         <div className="fixed inset-0 z-50 flex items-end justify-center" style={{ background: 'rgba(0,0,0,0.8)' }}
           onClick={() => setSelectedDay(null)}>
-          <div className="w-full rounded-t-3xl max-h-[90vh] overflow-y-auto"
+          <div className="w-full max-w-lg rounded-t-3xl max-h-[90vh] overflow-y-auto"
             style={{ background: 'var(--bg)' }}
             onClick={e => e.stopPropagation()}>
             {/* Handle */}
@@ -959,7 +1019,7 @@ function StudyCalendar({
   );
 }
 
-function MonthlyBreakdown({ history }: { history: Record<string, number> }) {
+function MonthlyBreakdown({ history, onInfo }: { history: Record<string, number>; onInfo?: () => void }) {
   const t = useTranslation();
   const months: { label: string; words: number; days: number }[] = [];
   const seen = new Set<string>();
@@ -981,7 +1041,16 @@ function MonthlyBreakdown({ history }: { history: Record<string, number> }) {
 
   return (
     <div className="card">
-      <h3 className="font-semibold mb-3 text-sm">{t.progress.monthlySummary}</h3>
+      <div className="flex items-center gap-1.5 mb-3">
+        <h3 className="font-semibold text-sm">{t.progress.monthlySummary}</h3>
+        {onInfo && (
+          <button onClick={onInfo}
+            className="w-4 h-4 rounded-full flex items-center justify-center shrink-0"
+            style={{ background: 'var(--border)', color: 'var(--text-muted)', fontSize: 9, fontWeight: 700 }}>
+            i
+          </button>
+        )}
+      </div>
       <div className="space-y-3">
         {months.map(m => (
           <div key={m.label}>
