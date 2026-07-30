@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { localDateStr, displayXP } from '@/lib/storage';
+import { pushStats, pushSettings } from '@/lib/sync';
 
 interface LeaderboardEntry {
   user_id: string;
@@ -61,6 +62,7 @@ export default function LeaderboardPage() {
   const load = async () => {
     setLoading(true);
     setError('');
+    await Promise.all([pushStats(), pushSettings()]);
     const { data, error: err } = await supabase.rpc('get_leaderboard').limit(500);
     if (err) {
       setError('Could not load leaderboard. Please try again.');
