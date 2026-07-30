@@ -171,23 +171,24 @@ export async function pullAll(): Promise<void> {
     lsSet('lexivo_streak', JSON.stringify(Math.max(lsJSON<number>('lexivo_streak', 0), row.streak ?? 0)));
     lsSet('lexivo_freezes', JSON.stringify(Math.max(lsJSON<number>('lexivo_freezes', 0), row.streak_freezes ?? 0)));
 
+    // Daily accumulators: always take max regardless of which side has newer timestamp
+    const today = localDateStr();
+    if (row.today_xp_date === today) {
+      const localTodayXp = lsGet('lexivo_today_xp_date') === today ? lsJSON<number>('lexivo_today_xp', 0) : 0;
+      lsSet('lexivo_today_xp', JSON.stringify(Math.max(row.today_xp ?? 0, localTodayXp)));
+      lsSet('lexivo_today_xp_date', today);
+    }
+    if (row.daily_words_date === today) {
+      const localCount = lsGet('lexivo_today_count_date') === today ? lsJSON<number>('lexivo_today_count', 0) : 0;
+      lsSet('lexivo_today_count', JSON.stringify(Math.max(row.daily_words_learned ?? 0, localCount)));
+      lsSet('lexivo_today_count_date', today);
+    }
+
     if (cloudStatsNewer) {
-      const today = localDateStr();
       if (row.last_study_date && row.last_study_date >= (lsGet('lexivo_last_study') || '')) {
         lsSet('lexivo_last_study', row.last_study_date);
       }
       if (row.last_freeze_week) lsSet('lexivo_last_freeze_week', row.last_freeze_week);
-
-      if (row.today_xp_date === today) {
-        const localTodayXp = lsGet('lexivo_today_xp_date') === today ? lsJSON<number>('lexivo_today_xp', 0) : 0;
-        lsSet('lexivo_today_xp', JSON.stringify(Math.max(row.today_xp ?? 0, localTodayXp)));
-        lsSet('lexivo_today_xp_date', today);
-      }
-      if (row.daily_words_date === today) {
-        const localCount = lsGet('lexivo_today_count_date') === today ? lsJSON<number>('lexivo_today_count', 0) : 0;
-        lsSet('lexivo_today_count', JSON.stringify(Math.max(row.daily_words_learned ?? 0, localCount)));
-        lsSet('lexivo_today_count_date', today);
-      }
       lsSet(S.statTs, cloudStatsTs);
     }
 
