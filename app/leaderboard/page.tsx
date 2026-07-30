@@ -71,14 +71,6 @@ export default function LeaderboardPage() {
     } catch (e) {
       setSyncError(String(e));
     }
-    // Ensure authenticated users are visible — direct upsert bypasses getUid() race
-    if (user && getSettings().showOnLeaderboard !== false) {
-      await supabase.from('user_data').upsert({
-        id: user.id,
-        show_on_leaderboard: true,
-        settings_updated_at: new Date().toISOString(),
-      });
-    }
     const { data, error: err } = await supabase.rpc('get_leaderboard').limit(500);
     if (err) {
       setError('Could not load leaderboard. Please try again.');
@@ -94,11 +86,9 @@ export default function LeaderboardPage() {
     setSyncError('');
     try {
       saveSettings({ ...getSettings(), showOnLeaderboard: true });
-      // Use user.id directly — avoids relying on getUid()/getSession() which can be stale
       const { error: upsertErr } = await supabase.from('user_data').upsert({
         id: user.id,
         show_on_leaderboard: true,
-        settings_updated_at: new Date().toISOString(),
       });
       if (upsertErr) throw new Error(upsertErr.message);
       await load();
@@ -116,10 +106,10 @@ export default function LeaderboardPage() {
     if (!user) return;
     if (getSettings().showOnLeaderboard === false) return;
     (async () => {
+      // No settings_updated_at here — avoids triggering pullAll to overwrite local settings
       await supabase.from('user_data').upsert({
         id: user.id,
         show_on_leaderboard: true,
-        settings_updated_at: new Date().toISOString(),
       });
       // Re-fetch entries so the current user now appears
       const { data } = await supabase.rpc('get_leaderboard').limit(500);
