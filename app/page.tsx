@@ -31,12 +31,12 @@ export default function HomePage() {
     useShallow(s => ({ collections: s.collections, collectionsLoaded: s.collectionsLoaded }))
   );
   const [wod, setWod] = useState<WordItem | null>(null);
-  const [streak, setStreak] = useState(() => typeof window !== 'undefined' ? getStreak() : 0);
-  const [xp, setXp] = useState(() => typeof window !== 'undefined' ? getXP() : 0);
-  const [todayXp, setTodayXp] = useState(() => typeof window !== 'undefined' ? getTodayXP() : 0);
-  const [todayCount, setTodayCount] = useState(() => typeof window !== 'undefined' ? getTodayLearnedCount() : 0);
-  const [dueCount, setDueCount] = useState(() => typeof window !== 'undefined' ? getDueWords().length : 0);
-  const [learnedCount, setLearnedCount] = useState(() => typeof window !== 'undefined' ? getLearnedWords().length : 0);
+  const [streak, setStreak] = useState(0);
+  const [xp, setXp] = useState(0);
+  const [todayXp, setTodayXp] = useState(0);
+  const [todayCount, setTodayCount] = useState(0);
+  const [dueCount, setDueCount] = useState(0);
+  const [learnedCount, setLearnedCount] = useState(0);
   const [settings, setSettings] = useState<UserSettings>({ name: 'Learner', dailyGoal: 10, languageLevel: 'B1', defaultAccent: 'us', autoPlayOnReveal: true, sessionSize: 20, fontSize: 'normal', studyOrder: 'random', quizDirection: 'word-to-uz', reduceMotion: false, uiLanguage: 'en', showOnLeaderboard: true });
   const [freezes, setFreezes] = useState(0);
   const [streakRisk, setStreakRisk] = useState<'safe' | 'at-risk' | 'freeze-saves'>('safe');

@@ -212,19 +212,14 @@ export function getStudyHistory(): Record<string, number> {
 }
 
 export function getTodayLearnedCount(): number {
-  const date = localDateStr();
-  const storedDate = get<string>(KEYS.todayCountDate, '');
-  if (storedDate !== date) return 0;
-  return get<number>(KEYS.todayCount, 0);
+  const today = localDateStr();
+  return getLearnedWords().filter(
+    w => w.learnedAt && localDateStr(new Date(w.learnedAt)) === today
+  ).length;
 }
 
 export function incrementTodayCount() {
-  const date = localDateStr();
-  const storedDate = get<string>(KEYS.todayCountDate, '');
-  const count = storedDate === date ? get<number>(KEYS.todayCount, 0) : 0;
-  const newCount = count + 1;
-  set(KEYS.todayCount, newCount);
-  set(KEYS.todayCountDate, date);
+  const newCount = getTodayLearnedCount();
   if (newCount >= getSettings().dailyGoal) recordWordGoalDay();
 }
 
