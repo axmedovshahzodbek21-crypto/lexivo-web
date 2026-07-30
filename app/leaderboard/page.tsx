@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
-import { localDateStr, displayXP } from '@/lib/storage';
+import { localDateStr, displayXP, getSettings, saveSettings } from '@/lib/storage';
 import { pushStats, pushSettings } from '@/lib/sync';
 
 interface LeaderboardEntry {
@@ -85,15 +85,10 @@ export default function LeaderboardPage() {
     setSyncing(true);
     setSyncError('');
     try {
-      const { error: e } = await supabase.from('user_data').upsert({
-        id: user.id,
-        total_xp:            JSON.parse(localStorage.getItem('lexivo_xp') ?? '0'),
-        show_on_leaderboard: true,
-        user_name:           JSON.parse(localStorage.getItem('lexivo_settings') ?? '{}')?.name ?? 'Learner',
-        stats_updated_at:    new Date().toISOString(),
-      });
-      if (e) setSyncError(e.message);
-      else await load();
+      // Ensure local setting is true first so pushSettings doesn't overwrite it
+      saveSettings({ ...getSettings(), showOnLeaderboard: true });
+      await Promise.all([pushStats(), pushSettings()]);
+      await load();
     } catch (err) {
       setSyncError(String(err));
     }
