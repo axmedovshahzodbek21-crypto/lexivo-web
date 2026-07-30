@@ -88,7 +88,7 @@ export async function pushSettings(): Promise<void> {
       daily_word_goal:     s.dailyGoal,
       quiz_direction:      s.quizDirection,
       reduce_motion:       s.reduceMotion,
-      show_on_leaderboard: s.showOnLeaderboard,
+      show_on_leaderboard: s.showOnLeaderboard ?? true,
       user_name:           s.name,
       language_level:      s.languageLevel,
       ...(getProfilePicUrl() ? { avatar_url: getProfilePicUrl() } : {}),
