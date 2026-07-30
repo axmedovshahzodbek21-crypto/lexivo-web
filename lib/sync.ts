@@ -60,6 +60,8 @@ export async function pushStats(): Promise<void> {
     const xp = lsJSON<number>('lexivo_xp', 0);
     const streak = lsJSON<number>('lexivo_streak', 0);
     const studyDays = lsJSON<string[]>('lexivo_study_days', []);
+    const reviewDays = lsJSON<string[]>('lexivo_review_days', []);
+    const wordGoalDays = lsJSON<string[]>('lexivo_word_goal_days', []);
     await Promise.all([
       supabase.from('user_data').upsert({
         id: uid,
@@ -88,6 +90,8 @@ export async function pushStats(): Promise<void> {
         last_freeze_week: lsGet('lexivo_last_freeze_week') || null,
         total_days:       studyDays.length,
         study_days:       studyDays,
+        review_days:      reviewDays,
+        word_goal_days:   wordGoalDays,
         ...(todayXpDate === today ? {
           today_xp:      lsJSON<number>('lexivo_today_xp', 0),
           today_xp_date: today,
