@@ -663,7 +663,7 @@ function StudyCalendar({
   const [viewMonth, setViewMonth] = useState(now.getMonth());
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [showBreakdown, setShowBreakdown] = useState(false);
-  const [infoModal, setInfoModal] = useState<{ title: string; body: string; emoji: string; color: string } | null>(null);
+  const [infoModal, setInfoModal] = useState<{ title: string; body: string; emoji: string; color: string; x: number; y: number; above: boolean } | null>(null);
 
   const INFO = {
     review:   { title: 'SRS Review',       emoji: '🔁', color: TASK_COLORS.review.bg, body: 'Spaced Repetition System — words you\'ve learned come back for review at growing intervals. Complete all words due today to mark the blue half of your day circle.' },
@@ -676,7 +676,12 @@ function StudyCalendar({
   function InfoBtn({ k, light }: { k: keyof typeof INFO; light?: boolean }) {
     return (
       <button
-        onClick={e => { e.stopPropagation(); setInfoModal(INFO[k]); }}
+        onClick={e => {
+          e.stopPropagation();
+          const r = e.currentTarget.getBoundingClientRect();
+          const above = r.bottom > window.innerHeight * 0.6;
+          setInfoModal({ ...INFO[k], x: r.left + r.width / 2, y: above ? r.top - 8 : r.bottom + 8, above });
+        }}
         className="w-4 h-4 rounded-full flex items-center justify-center shrink-0"
         style={{ background: light ? 'rgba(255,255,255,0.25)' : 'var(--border)', color: light ? '#fff' : 'var(--text-muted)', fontSize: 9, fontWeight: 700, lineHeight: 1 }}
       >i</button>
@@ -929,35 +934,38 @@ function StudyCalendar({
       </div> {/* end right column */}
 
       {/* Bottom sheet — outside grid */}
-      {/* Info bottom sheet */}
+      {/* Info tooltip */}
       {infoModal && (
-        <div className="fixed inset-0 z-[60] flex items-end justify-center px-4 pb-4"
-          style={{ background: 'rgba(0,0,0,0.45)' }}
-          onClick={() => setInfoModal(null)}>
-          <div className="w-full max-w-sm rounded-2xl overflow-hidden"
-            style={{ background: 'var(--bg)', boxShadow: '0 -8px 40px rgba(0,0,0,0.6)' }}
-            onClick={e => e.stopPropagation()}>
-            {/* Handle */}
-            <div className="flex justify-center pt-2.5 pb-1">
-              <div className="w-8 h-1 rounded-full" style={{ background: 'var(--border)' }} />
-            </div>
-            {/* Colored accent bar */}
-            <div className="mx-5 mt-2 mb-0 h-0.5 rounded-full" style={{ background: infoModal.color }} />
-            {/* Content */}
-            <div className="px-5 pt-3 pb-5">
-              <div className="flex items-center gap-2 mb-2">
-                <span style={{ fontSize: 18, lineHeight: 1 }}>{infoModal.emoji}</span>
-                <p className="font-bold text-sm" style={{ color: 'var(--text)' }}>{infoModal.title}</p>
+        <>
+          <div className="fixed inset-0 z-[59]" onClick={() => setInfoModal(null)} />
+          <div className="fixed z-[60] w-52 rounded-xl overflow-hidden"
+            style={{
+              left: Math.min(Math.max(infoModal.x - 104, 8), (typeof window !== 'undefined' ? window.innerWidth : 800) - 216),
+              top: infoModal.above ? undefined : infoModal.y,
+              bottom: infoModal.above ? (typeof window !== 'undefined' ? window.innerHeight - infoModal.y : undefined) : undefined,
+              backdropFilter: 'blur(18px)',
+              WebkitBackdropFilter: 'blur(18px)',
+              background: 'rgba(18, 12, 38, 0.88)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="h-0.5" style={{ background: infoModal.color }} />
+            <div className="p-3">
+              <div className="flex items-center gap-1.5 mb-1.5">
+                <span style={{ fontSize: 13, lineHeight: 1 }}>{infoModal.emoji}</span>
+                <p className="font-bold text-[11px]" style={{ color: '#fff' }}>{infoModal.title}</p>
               </div>
-              <p className="text-xs leading-relaxed" style={{ color: 'var(--text-muted)' }}>{infoModal.body}</p>
+              <p className="text-[10px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)' }}>{infoModal.body}</p>
               <button onClick={() => setInfoModal(null)}
-                className="mt-4 w-full py-2.5 rounded-xl text-xs font-bold text-white"
+                className="mt-2.5 w-full py-1.5 rounded-lg text-[10px] font-bold text-white"
                 style={{ background: infoModal.color }}>
                 Got it
               </button>
             </div>
           </div>
-        </div>
+        </>
       )}
 
       {selectedDay && sheetTasks && (
