@@ -59,10 +59,18 @@ export default function LeaderboardPage() {
   const [error, setError] = useState('');
   const today = todayStr();
 
+  const [syncError, setSyncError] = useState('');
+  const [syncing, setSyncing] = useState(false);
+
   const load = async () => {
     setLoading(true);
     setError('');
-    await Promise.all([pushStats(), pushSettings()]);
+    setSyncError('');
+    try {
+      await Promise.all([pushStats(), pushSettings()]);
+    } catch (e) {
+      setSyncError(String(e));
+    }
     const { data, error: err } = await supabase.rpc('get_leaderboard').limit(500);
     if (err) {
       setError('Could not load leaderboard. Please try again.');
@@ -70,6 +78,26 @@ export default function LeaderboardPage() {
       setEntries((data as LeaderboardEntry[]) ?? []);
     }
     setLoading(false);
+  };
+
+  const manualSync = async () => {
+    if (!user) return;
+    setSyncing(true);
+    setSyncError('');
+    try {
+      const { error: e } = await supabase.from('user_data').upsert({
+        id: user.id,
+        total_xp:            JSON.parse(localStorage.getItem('lexivo_xp') ?? '0'),
+        show_on_leaderboard: true,
+        user_name:           JSON.parse(localStorage.getItem('lexivo_settings') ?? '{}')?.name ?? 'Learner',
+        stats_updated_at:    new Date().toISOString(),
+      });
+      if (e) setSyncError(e.message);
+      else await load();
+    } catch (err) {
+      setSyncError(String(err));
+    }
+    setSyncing(false);
   };
 
   useEffect(() => { load(); }, []);
@@ -363,9 +391,15 @@ export default function LeaderboardPage() {
 
             {/* Your rank if outside top list */}
             {user && myIndex === -1 && (
-              <div className="mt-4 rounded-2xl p-4 border border-dashed border-[var(--border)] text-center space-y-1">
+              <div className="mt-4 rounded-2xl p-4 border border-dashed border-[var(--border)] text-center space-y-2">
                 <p className="text-sm font-semibold text-[var(--text)]">You're not on the leaderboard yet</p>
-                <p className="text-xs text-[var(--text-muted)]">Earn XP by learning words to appear here</p>
+                <p className="text-xs text-[var(--text-muted)]">Your data may not be synced. Tap below to sync now.</p>
+                {syncError && <p className="text-xs text-red-400 break-all">Error: {syncError}</p>}
+                <button onClick={manualSync} disabled={syncing}
+                  className="mt-1 px-4 py-2 rounded-xl text-xs font-bold text-white disabled:opacity-50"
+                  style={{ background: 'var(--primary)' }}>
+                  {syncing ? 'Syncing…' : '⟳ Sync to leaderboard'}
+                </button>
               </div>
             )}
 
