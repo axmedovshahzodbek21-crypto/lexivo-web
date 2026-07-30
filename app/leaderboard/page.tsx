@@ -110,15 +110,21 @@ export default function LeaderboardPage() {
 
   useEffect(() => { load(); }, []);
 
-  // When auth resolves after initial load, push show_on_leaderboard if needed
+  // When auth resolves after the initial load(), upsert show_on_leaderboard
+  // then re-fetch so the user appears without a manual refresh
   useEffect(() => {
     if (!user) return;
     if (getSettings().showOnLeaderboard === false) return;
-    supabase.from('user_data').upsert({
-      id: user.id,
-      show_on_leaderboard: true,
-      settings_updated_at: new Date().toISOString(),
-    });
+    (async () => {
+      await supabase.from('user_data').upsert({
+        id: user.id,
+        show_on_leaderboard: true,
+        settings_updated_at: new Date().toISOString(),
+      });
+      // Re-fetch entries so the current user now appears
+      const { data } = await supabase.rpc('get_leaderboard').limit(500);
+      if (data) setEntries(data as LeaderboardEntry[]);
+    })();
   }, [user?.id]);
 
   const myIndex = user ? entries.findIndex(e => e.user_id === user.id) : -1;
