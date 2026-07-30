@@ -145,7 +145,7 @@ export async function pullAll(): Promise<void> {
       const toRemove: string[] = [];
       for (let i = 0; i < localStorage.length; i++) {
         const k = localStorage.key(i)!;
-        if (k.startsWith('lexivo_') && k !== 'lexivo_ui_lang' && k !== 'lexivo_last_reset_at') {
+        if (k.startsWith('lexivo_') && k !== 'lexivo_ui_lang' && k !== 'lexivo_last_reset_at' && k !== 'lexivo_onboarded') {
           toRemove.push(k);
         }
       }

@@ -6,8 +6,9 @@ import { useTranslation } from '@/lib/useTranslation';
 import { useAppStore } from '@/lib/store';
 import { useShallow } from 'zustand/react/shallow';
 import { getWordOfDay } from '@/lib/data';
-import { getStreak, getXP, getTodayXP, getTodayLearnedCount, getDueWords, getLearnedWords, getSettings, isOnboarded, getFreezes, checkAndGrantWeeklyFreeze, getImportedWords, getLastStudyDate, localDateStr, displayXP } from '@/lib/storage';
+import { getStreak, getXP, getTodayXP, getTodayLearnedCount, getDueWords, getLearnedWords, getSettings, isOnboarded, setOnboarded, getFreezes, checkAndGrantWeeklyFreeze, getImportedWords, getLastStudyDate, localDateStr, displayXP } from '@/lib/storage';
 import { pullAll } from '@/lib/sync';
+import { useAuth } from '@/lib/auth-context';
 import { getLevelInfo } from '@/lib/gamification';
 import { speak } from '@/lib/speech';
 import { getTheme, toggleTheme, type Theme } from '@/lib/theme';
@@ -25,6 +26,7 @@ const LEVELED_NAMES = new Set(['A1', 'A2', 'B1', 'Advanced']);
 
 export default function HomePage() {
   const router = useRouter();
+  const { user, loading: authLoading } = useAuth();
   const { collections, collectionsLoaded } = useAppStore(
     useShallow(s => ({ collections: s.collections, collectionsLoaded: s.collectionsLoaded }))
   );
@@ -81,7 +83,15 @@ export default function HomePage() {
   ]);
 
   useEffect(() => {
-    if (!isOnboarded()) { router.replace('/onboarding'); return; }
+    if (authLoading) return;
+    if (!isOnboarded()) {
+      if (user) {
+        setOnboarded(); // already has an account — skip onboarding on new device
+      } else {
+        router.replace('/onboarding');
+        return;
+      }
+    }
     checkAndGrantWeeklyFreeze();
     const currentStreak = getStreak();
     const currentFreezes = getFreezes();
@@ -173,7 +183,7 @@ export default function HomePage() {
       setLearnedCount(getLearnedWords().length);
       setSettings(getSettings());
     });
-  }, [router]);
+  }, [router, user, authLoading]);
 
   useEffect(() => {
     if (collectionsLoaded && collections.length > 0) {
