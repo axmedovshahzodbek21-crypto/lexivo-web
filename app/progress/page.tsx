@@ -107,7 +107,7 @@ function ProgressPage() {
 
   // Averages
   const wordsPerDay = totalDays > 0 ? (learnedCount / totalDays).toFixed(1) : '—';
-  const xpPerDay = totalDays > 0 ? Math.round(xp / totalDays) : '—';
+  const xpPerDay = totalDays > 0 ? displayXP(Math.round(xp / totalDays)) : '—';
 
   // Foundation meta
   const LEVEL_META = [
@@ -167,7 +167,7 @@ function ProgressPage() {
               <StatBlock icon="📅" label={t.progress.studyDays} value={`${totalDays} ${t.progress.days}`} bg="#4338ca" shadow="#312e81" />
               <StatBlock icon="📚" label={t.progress.wordsLearned} value={learnedCount} bg="#059669" shadow="#064e3b" />
               <StatBlock icon="🧠" label={t.progress.srsMastered} value={masteredCount} bg="#7c3aed" shadow="#4c1d95" />
-              <StatBlock icon="⚡" label={t.progress.todayXp} value={`+${todayXp}`} bg="#b45309" shadow="#78350f" />
+              <StatBlock icon="⚡" label={t.progress.todayXp} value={`+${displayXP(todayXp)}`} bg="#b45309" shadow="#78350f" />
               <StatBlock icon="🎯" label={t.progress.todayWords} value={todayCount} bg="#be185d" shadow="#831843" />
             </div>
 
