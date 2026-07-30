@@ -41,6 +41,7 @@ const KEYS = {
   xpHistory: 'lexivo_xp_history',
   xpUpdatedAt:       'lexivo_xp_updated_at',
   streakBonusDate:   'lexivo_streak_bonus_date',
+  lastCompleteDay:   'lexivo_last_complete_day',
   settingsUpdatedAt: 'lexivo_settings_updated_at',
   hardWords:         'lexivo_hard_words',
   flashTotalDays:    'lexivo_flash_total_days',
@@ -449,7 +450,22 @@ export function getGraduatedCount(): number {
 // ─── Streak ───────────────────────────────────────────────────────────────────
 
 export function getStreak(): number {
-  return get<number>(KEYS.streak, 0);
+  const stored = get<number>(KEYS.streak, 0);
+  if (stored <= 0) return 0;
+
+  // Validate: reset if no complete day (both tasks done) in the last 2 days
+  const today = localDateStr();
+  const yesterday = localDateStr(new Date(Date.now() - 86400000));
+  const twoDaysAgo = localDateStr(new Date(Date.now() - 86400000 * 2));
+  const reviewSet = new Set(getReviewDays());
+  const wordSet   = new Set(getWordGoalDays());
+  const isComplete = (d: string) => reviewSet.has(d) && wordSet.has(d);
+
+  if (isComplete(today) || isComplete(yesterday)) return stored;
+  if (isComplete(twoDaysAgo) && get<number>(KEYS.freezes, 0) > 0) return stored;
+
+  set(KEYS.streak, 0);
+  return 0;
 }
 
 // ─── Streak freeze ────────────────────────────────────────────────────────────
@@ -504,7 +520,6 @@ export function recordStudySession(): { freezeUsed: boolean } {
   const today = localDateStr();
   const last  = get<string>(KEYS.lastStudy, '');
 
-  // Always record today in the study days list (idempotent)
   const days = getStudyDays();
   if (!days.includes(today)) {
     days.push(today);
@@ -513,37 +528,47 @@ export function recordStudySession(): { freezeUsed: boolean } {
 
   if (last === today) return { freezeUsed: false };
 
-  checkAndGrantWeeklyFreeze();
+  set(KEYS.lastStudy, today);
+  set(KEYS.totalDays, get<number>(KEYS.totalDays, 0) + 1);
 
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  const yStr = localDateStr(yesterday);
+  return { freezeUsed: false };
+}
 
-  const twoDaysAgo = new Date();
-  twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
-  const tdStr = localDateStr(twoDaysAgo);
+// Called from recordReviewDay() and recordWordGoalDay() — only fires once per day
+// when BOTH tasks are complete (review done + word goal met).
+function checkAndUpdateStreak() {
+  const today = localDateStr();
+  if (get<string>(KEYS.lastCompleteDay, '') === today) return;
+
+  const reviewDaysArr = get<string[]>(KEYS.reviewDays, []);
+  const wordGoalDaysArr = get<string[]>(KEYS.wordGoalDays, []);
+  if (!reviewDaysArr.includes(today) || !wordGoalDaysArr.includes(today)) return;
+
+  set(KEYS.lastCompleteDay, today);
+
+  const yesterday = localDateStr(new Date(Date.now() - 86400000));
+  const twoDaysAgo = localDateStr(new Date(Date.now() - 86400000 * 2));
+  const reviewSet = new Set(reviewDaysArr);
+  const wordSet   = new Set(wordGoalDaysArr);
+  const isComplete = (d: string) => reviewSet.has(d) && wordSet.has(d);
 
   let streak = get<number>(KEYS.streak, 0);
-  let freezeUsed = false;
 
-  if (last === yStr) {
+  if (isComplete(yesterday)) {
     streak += 1;
-  } else if (last === tdStr && get<number>(KEYS.freezes, 0) > 0) {
-    // Auto-apply freeze — covers yesterday, today continues the streak
+  } else if (isComplete(twoDaysAgo) && get<number>(KEYS.freezes, 0) > 0) {
     set(KEYS.freezes, get<number>(KEYS.freezes, 0) - 1);
     streak += 1;
-    freezeUsed = true;
-  } else if (last === '') {
-    streak = 1;
   } else {
     streak = 1;
   }
 
   set(KEYS.streak, streak);
-  set(KEYS.lastStudy, today);
-  set(KEYS.totalDays, get<number>(KEYS.totalDays, 0) + 1);
 
-  // Award streak bonus once per day
+  // Grant weekly freeze now that streak is active
+  checkAndGrantWeeklyFreeze();
+
+  // Streak bonus XP
   const bonusDate = get<string>(KEYS.streakBonusDate, '');
   if (bonusDate !== today) {
     const bonus = streak >= 30 ? STREAK_BONUS_30 : streak >= 7 ? STREAK_BONUS_7 : 0;
@@ -552,8 +577,6 @@ export function recordStudySession(): { freezeUsed: boolean } {
       set(KEYS.streakBonusDate, today);
     }
   }
-
-  return { freezeUsed };
 }
 
 export function getTotalStudyDays(): number {
@@ -576,6 +599,7 @@ export function recordReviewDay() {
   const today = localDateStr();
   const days = getReviewDays();
   if (!days.includes(today)) { days.push(today); set(KEYS.reviewDays, days); }
+  checkAndUpdateStreak();
 }
 
 export function getWordGoalDays(): string[] { return get<string[]>(KEYS.wordGoalDays, []); }
@@ -584,6 +608,7 @@ export function recordWordGoalDay() {
   const today = localDateStr();
   const days = getWordGoalDays();
   if (!days.includes(today)) { days.push(today); set(KEYS.wordGoalDays, days); }
+  checkAndUpdateStreak();
 }
 
 
