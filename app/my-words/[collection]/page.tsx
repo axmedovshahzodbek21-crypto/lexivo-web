@@ -6,6 +6,16 @@ import { useTranslation } from '@/lib/useTranslation';
 import { deleteImportedFolder, getCollectionsByFolder } from '@/lib/storage';
 import type { ImportedCollection } from '@/lib/types';
 
+const COLORS = [
+  '#5B8AF0', '#FF6B6B', '#06D6A0', '#FFD166',
+  '#A78BFA', '#FF9F43', '#F72585', '#4ECDC4',
+  '#3D8BFF', '#FF5E57', '#00C9A7', '#FFC75F',
+];
+
+function cardColor(index: number) {
+  return COLORS[index % COLORS.length];
+}
+
 interface Props {
   params: Promise<{ collection: string }>;
 }
@@ -18,8 +28,7 @@ export default function FolderPage({ params }: Props) {
   const [collections, setCollections] = useState<ImportedCollection[]>([]);
 
   useEffect(() => {
-    const load = () => setCollections(getCollectionsByFolder(folder));
-    load();
+    setCollections(getCollectionsByFolder(folder));
   }, [folder]);
 
   function handleDeleteFolder() {
@@ -33,10 +42,7 @@ export default function FolderPage({ params }: Props) {
       <div className="flex items-center gap-3 p-4 border-b border-[var(--border)]">
         <button onClick={() => router.back()} className="btn-icon text-lg" aria-label="Go back">←</button>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <span className="text-xl">📁</span>
-            <h1 className="font-bold text-[var(--text)] truncate">{folder}</h1>
-          </div>
+          <h1 className="font-bold text-[var(--text)] truncate">{folder}</h1>
           <p className="text-xs text-[var(--text-muted)]">
             {collections.length} unit{collections.length !== 1 ? 's' : ''}
           </p>
@@ -53,7 +59,7 @@ export default function FolderPage({ params }: Props) {
         >🗑️</button>
       </div>
 
-      <div className="p-4 space-y-3">
+      <div className="p-4">
         {collections.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-4 py-16 text-center">
             <div className="text-6xl">📂</div>
@@ -66,22 +72,24 @@ export default function FolderPage({ params }: Props) {
             </Link>
           </div>
         ) : (
-          collections.map(col => (
-            <Link
-              key={col.name}
-              href={`/my-words/${encodeURIComponent(folder)}/${encodeURIComponent(col.name)}`}
-              className="card flex items-center gap-4 hover:border-[var(--primary)] transition-colors"
-            >
-              <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0" style={{ background: 'var(--primary-bg)' }}>
-                📖
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-bold text-[var(--text)] truncate">{col.name}</p>
-                <p className="text-xs text-[var(--text-muted)] mt-0.5">{t.myWords.wordCount(col.count)}</p>
-              </div>
-              <span className="text-[var(--text-muted)] text-lg">›</span>
-            </Link>
-          ))
+          <div className="grid grid-cols-3 gap-3">
+            {collections.map((col, i) => (
+              <Link
+                key={col.name}
+                href={`/my-words/${encodeURIComponent(folder)}/${encodeURIComponent(col.name)}`}
+                className="flex flex-col rounded-2xl p-3 min-h-[100px] justify-between active:scale-95 transition-transform"
+                style={{ background: cardColor(i) }}
+              >
+                <span className="text-2xl">📖</span>
+                <div>
+                  <p className="font-bold text-white text-sm leading-tight line-clamp-2">{col.name}</p>
+                  <p className="text-[11px] mt-0.5" style={{ color: 'rgba(255,255,255,0.75)' }}>
+                    {t.myWords.wordCount(col.count)}
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
         )}
       </div>
     </div>

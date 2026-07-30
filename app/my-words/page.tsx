@@ -6,6 +6,16 @@ import { useTranslation } from '@/lib/useTranslation';
 import { getImportedFolders, getImportedCollections } from '@/lib/storage';
 import type { ImportedFolder, ImportedCollection } from '@/lib/types';
 
+const COLORS = [
+  '#5B8AF0', '#FF6B6B', '#06D6A0', '#FFD166',
+  '#A78BFA', '#FF9F43', '#F72585', '#4ECDC4',
+  '#3D8BFF', '#FF5E57', '#00C9A7', '#FFC75F',
+];
+
+function cardColor(index: number) {
+  return COLORS[index % COLORS.length];
+}
+
 export default function MyWordsPage() {
   const router = useRouter();
   const t = useTranslation();
@@ -16,11 +26,8 @@ export default function MyWordsPage() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const load = () => {
-      setFolders(getImportedFolders());
-      setOrphaned(getImportedCollections());
-    };
-    load();
+    setFolders(getImportedFolders());
+    setOrphaned(getImportedCollections());
   }, []);
 
   useEffect(() => {
@@ -35,6 +42,8 @@ export default function MyWordsPage() {
     setCreating(false);
     router.push(`/my-words/${encodeURIComponent(name)}`);
   }
+
+  const isEmpty = folders.length === 0 && orphaned.length === 0;
 
   return (
     <div className="flex flex-col min-h-screen animate-fade-in pb-24">
@@ -66,8 +75,8 @@ export default function MyWordsPage() {
         </form>
       )}
 
-      <div className="p-4 space-y-3">
-        {folders.length === 0 && orphaned.length === 0 ? (
+      <div className="p-4">
+        {isEmpty ? (
           <div className="flex flex-col items-center justify-center gap-4 py-16 text-center">
             <div className="text-6xl">📁</div>
             <p className="text-[var(--text-muted)] text-sm">No folders yet. Create one to get started.</p>
@@ -79,44 +88,46 @@ export default function MyWordsPage() {
           </div>
         ) : (
           <>
-            {folders.map(folder => (
-              <Link
-                key={folder.name}
-                href={`/my-words/${encodeURIComponent(folder.name)}`}
-                className="card flex items-center gap-4 hover:border-[var(--primary)] transition-colors"
-              >
-                <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0" style={{ background: 'var(--primary-bg)' }}>
-                  📁
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-bold text-[var(--text)] truncate">{folder.name}</p>
-                  <p className="text-xs text-[var(--text-muted)] mt-0.5">
-                    {folder.collectionCount} collection{folder.collectionCount !== 1 ? 's' : ''} · {folder.wordCount} item{folder.wordCount !== 1 ? 's' : ''}
-                  </p>
-                </div>
-                <span className="text-[var(--text-muted)] text-lg">›</span>
-              </Link>
-            ))}
+            <div className="grid grid-cols-3 gap-3">
+              {folders.map((folder, i) => (
+                <Link
+                  key={folder.name}
+                  href={`/my-words/${encodeURIComponent(folder.name)}`}
+                  className="flex flex-col rounded-2xl p-3 min-h-[100px] justify-between active:scale-95 transition-transform"
+                  style={{ background: cardColor(i) }}
+                >
+                  <span className="text-2xl">📁</span>
+                  <div>
+                    <p className="font-bold text-white text-sm leading-tight line-clamp-2">{folder.name}</p>
+                    <p className="text-[11px] mt-0.5" style={{ color: 'rgba(255,255,255,0.75)' }}>
+                      {folder.wordCount} words
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
 
             {orphaned.length > 0 && (
-              <div className="space-y-2">
-                <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide px-1 pt-2">Unfiled collections</p>
-                {orphaned.map(col => (
-                  <Link
-                    key={col.name}
-                    href={`/import?collection=${encodeURIComponent(col.name)}`}
-                    className="card flex items-center gap-4 hover:border-[var(--primary)] transition-colors border-dashed"
-                  >
-                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0" style={{ background: 'var(--primary-bg)' }}>
-                      📖
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-bold text-[var(--text)] truncate">{col.name}</p>
-                      <p className="text-xs text-[var(--text-muted)] mt-0.5">{t.myWords.wordCount(col.count)} · no folder assigned</p>
-                    </div>
-                    <span className="text-[var(--text-muted)] text-lg">›</span>
-                  </Link>
-                ))}
+              <div className="mt-5">
+                <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide px-1 mb-3">Unfiled</p>
+                <div className="grid grid-cols-3 gap-3">
+                  {orphaned.map((col, i) => (
+                    <Link
+                      key={col.name}
+                      href={`/import?collection=${encodeURIComponent(col.name)}`}
+                      className="flex flex-col rounded-2xl p-3 min-h-[100px] justify-between active:scale-95 transition-transform"
+                      style={{ background: cardColor(folders.length + i) }}
+                    >
+                      <span className="text-2xl">📖</span>
+                      <div>
+                        <p className="font-bold text-white text-sm leading-tight line-clamp-2">{col.name}</p>
+                        <p className="text-[11px] mt-0.5" style={{ color: 'rgba(255,255,255,0.75)' }}>
+                          {col.count} words
+                        </p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
               </div>
             )}
           </>
