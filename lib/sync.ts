@@ -1,6 +1,6 @@
 import { supabase } from './supabase';
 import type { UserSettings, LearnedWord, SRSWord, UnitProgress } from './types';
-import { getSettings, saveSettings, getLearnedWords, saveLearnedWord, getSRSWords, localDateStr, getProfilePicUrl, saveProfilePicUrl } from './storage';
+import { getSettings, saveSettings, getLearnedWords, saveLearnedWord, getSRSWords, getImportedWords, localDateStr, getProfilePicUrl, saveProfilePicUrl } from './storage';
 import type { HardWordEntry } from './storage';
 
 const S = {
@@ -158,7 +158,7 @@ export async function pushLists(): Promise<void> {
         xp_history:       lsJSON<unknown[]>('lexivo_xp_history', []),
         unit_progress:    getAllUnitProgress(),
         review_log:       lsJSON<Record<string, number[]>>('lexivo_review_log', {}),
-        imported_words:   lsJSON<unknown[]>('lexivo_imported_words', []),
+        imported_words:   getImportedWords(),
         achievements:     Object.entries(lsJSON<Record<string, string>>('lexivo_achievement_dates', {})).map(([id, date]) => ({ id, date })),
         lists_updated_at: ts,
       }),
