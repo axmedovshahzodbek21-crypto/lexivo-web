@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/lib/useTranslation';
 import { getImportedFolders, getImportedCollections } from '@/lib/storage';
+import { pushLists } from '@/lib/sync';
 import type { ImportedFolder, ImportedCollection } from '@/lib/types';
 
 const COLORS = [
@@ -28,6 +29,7 @@ export default function MyWordsPage() {
   useEffect(() => {
     setFolders(getImportedFolders());
     setOrphaned(getImportedCollections());
+    pushLists();
   }, []);
 
   useEffect(() => {
