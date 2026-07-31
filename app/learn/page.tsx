@@ -158,8 +158,8 @@ function LearnInner() {
       const imported = myCollection ? getImportedWordsByCollection(myCollection, myFolder) : getImportedWords();
       const list: StudyWord[] = imported.map(w => ({
         word: w.word,
-        partOfSpeech: '',
-        pronunciation: '',
+        partOfSpeech: w.partOfSpeech ?? '',
+        pronunciation: w.pronunciation ?? '',
         translation: w.translation,
         definition: w.definition,
         definitionUz: w.definitionUz,

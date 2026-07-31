@@ -93,6 +93,8 @@ export interface CustomList {
 
 export interface ImportedWord {
   word: string;
+  partOfSpeech?: string;
+  pronunciation?: string;
   translation: string;
   definition: string;
   definitionUz?: string;

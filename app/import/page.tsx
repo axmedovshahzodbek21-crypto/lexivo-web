@@ -57,6 +57,8 @@ function buildPrompt1(wordLang: string, transLang: string): string {
 Format EXACTLY like this for every word. Use plain text only — no markdown, no bold, no asterisks, no extra formatting:
 
 word: enormous
+partOfSpeech: adjective
+pronunciation: /ɪˈnɔːrməs/
 translation: ulkan
 definition: extremely large in size or extent
 definitionUz: Ulkan — juda katta yoki keng hajmga ega bo'lgan narsa yoki hodisa.
@@ -84,6 +86,8 @@ function buildPrompt2(wordLang: string, transLang: string): string {
 Format EXACTLY like this for every word. Use plain text only — no markdown, no bold, no asterisks, no extra formatting:
 
 word: enormous
+partOfSpeech: adjective
+pronunciation: /ɪˈnɔːrməs/
 translation: ulkan
 definition: extremely large in size or extent
 definitionUz: Ulkan — juda katta yoki keng hajmga ega bo'lgan narsa yoki hodisa.
@@ -163,6 +167,8 @@ function parseOutput(text: string, langCode: string): ParseResult {
     }
     words.push({
       word: fields.word,
+      partOfSpeech: fields.partofspeech || undefined,
+      pronunciation: fields.pronunciation || undefined,
       translation: fields.translation,
       definition: fields.definition ?? '',
       definitionUz: fields.definitionuz || undefined,
