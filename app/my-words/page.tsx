@@ -99,8 +99,11 @@ export default function MyWordsPage() {
                 <Link
                   key={folder.name}
                   href={`/my-words/${encodeURIComponent(folder.name)}`}
-                  className="flex flex-col rounded-2xl p-3 min-h-[100px] justify-between active:scale-95 transition-transform"
-                  style={{ background: cardColor(i) }}
+                  className="flex flex-col rounded-2xl p-3 min-h-[100px] justify-between transition-all duration-200 hover:-translate-y-1 animate-heartbeat"
+                  style={{
+                    background: cardColor(i),
+                    boxShadow: '0 6px 0 rgba(0,0,0,0.25), 0 10px 24px rgba(0,0,0,0.2)',
+                  }}
                 >
                   <span className="text-2xl">📁</span>
                   <div>
@@ -121,8 +124,11 @@ export default function MyWordsPage() {
                     <Link
                       key={col.name}
                       href={`/import?collection=${encodeURIComponent(col.name)}`}
-                      className="flex flex-col rounded-2xl p-3 min-h-[100px] justify-between active:scale-95 transition-transform"
-                      style={{ background: cardColor(folders.length + i) }}
+                      className="flex flex-col rounded-2xl p-3 min-h-[100px] justify-between transition-all duration-200 hover:-translate-y-1 animate-heartbeat"
+                      style={{
+                        background: cardColor(folders.length + i),
+                        boxShadow: '0 6px 0 rgba(0,0,0,0.25), 0 10px 24px rgba(0,0,0,0.2)',
+                      }}
                     >
                       <span className="text-2xl">📖</span>
                       <div>
