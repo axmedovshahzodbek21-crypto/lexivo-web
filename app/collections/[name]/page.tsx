@@ -117,21 +117,24 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
           {collection.name}
         </h1>
         {collection.description && (
-          <p className="text-sm text-white/80 mb-4">{collection.description}</p>
+          <p
+            className="text-sm text-white mb-4"
+            style={{ textShadow: '0 1px 6px rgba(0,0,0,0.35)' }}
+          >{collection.description}</p>
         )}
 
         {/* Stat pills */}
         <div className="flex flex-wrap gap-2 mb-4">
           {[
-            { emoji: '📋', label: t.collections.unitsCount(units.length) },
-            { emoji: '📚', label: t.collections.wordsCount(totalWords) },
-            { emoji: '✅', label: t.collections.completed(completedUnits, units.length) },
-          ].map(({ emoji, label }) => (
+            t.collections.unitsCount(units.length),
+            t.collections.wordsCount(totalWords),
+            t.collections.completed(completedUnits, units.length),
+          ].map((label) => (
             <span
               key={label}
-              className="flex items-center gap-1 text-xs font-semibold text-white bg-white/20 rounded-full px-3 py-1 backdrop-blur-sm"
+              className="flex items-center gap-1 text-xs font-semibold bg-black/25 text-white rounded-full px-3 py-1"
             >
-              {emoji} {label}
+              {label}
             </span>
           ))}
         </div>
