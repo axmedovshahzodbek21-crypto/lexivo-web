@@ -27,6 +27,8 @@ export default function MyWordsPage() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    setFolders(getImportedFolders());
+    setOrphaned(getImportedCollections());
     pullAll().then(() => {
       setFolders(getImportedFolders());
       setOrphaned(getImportedCollections());
