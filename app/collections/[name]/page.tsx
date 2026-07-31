@@ -1,5 +1,4 @@
-﻿'use client';
-import { SectionLoader } from '@/components/Loader';
+'use client';
 import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -8,6 +7,25 @@ import { getUnitProgress, getLearnProgress, getHardWordCount, getFlashcardProgre
 import type { WordCollection, UnitProgress } from '@/lib/types';
 import { useTranslation } from '@/lib/useTranslation';
 import { supabase } from '@/lib/supabase';
+
+const COLLECTION_HERO: Record<string, { gradient: string; glow: string }> = {
+  '30 Days of Powerful Words': {
+    gradient: 'linear-gradient(135deg, #6c63ff 0%, #9b8fff 100%)',
+    glow: 'rgba(108,99,255,0.45)',
+  },
+  '24 Vocabulary Challenge': {
+    gradient: 'linear-gradient(135deg, #FF6584 0%, #ff9eb5 100%)',
+    glow: 'rgba(255,101,132,0.45)',
+  },
+  'Word Mastery': {
+    gradient: 'linear-gradient(135deg, #1a9a50 0%, #2ECC71 100%)',
+    glow: 'rgba(46,204,113,0.45)',
+  },
+};
+const DEFAULT_HERO = {
+  gradient: 'linear-gradient(135deg, #6c63ff 0%, #9b8fff 100%)',
+  glow: 'rgba(108,99,255,0.45)',
+};
 
 interface UnitRow {
   dayNumber: number;
@@ -28,8 +46,6 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
   const [cols, setCols] = useState(2);
 
   useEffect(() => {
-    // Use window.innerWidth (not element clientWidth) so Ctrl+zoom actually changes columns.
-    // Content is constrained by max-w-2xl so element width doesn't change with zoom.
     const MIN_CARD = 320;
     const GAP = 8;
     const calculate = () => {
@@ -76,43 +92,65 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
 
   const totalWords = collection.days.reduce((a, d) => a + d.words.length, 0);
   const completedUnits = units.filter(u => u.progress.learnDone && u.progress.flashcardDone && u.progress.quizDone).length;
+  const hero = COLLECTION_HERO[collectionName] ?? DEFAULT_HERO;
+  const progressPct = units.length > 0 ? (completedUnits / units.length) * 100 : 0;
 
   return (
     <div className="flex flex-col min-h-screen animate-fade-in">
-      {/* Header */}
-      <div className="p-4 border-b border-[var(--border)]">
+
+      {/* ── Hero banner ── */}
+      <div
+        className="relative px-5 pt-5 pb-8"
+        style={{ background: hero.gradient, boxShadow: `0 8px 32px ${hero.glow}` }}
+      >
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-2 text-sm text-[var(--text-muted)] mb-3 hover:text-[var(--text)] transition-colors"
+          className="flex items-center gap-1.5 text-sm text-white/80 mb-4 hover:text-white transition-colors"
         >
           {t.collections.back}
         </button>
-        <h1 className="text-xl font-bold text-[var(--text)]">{collection.name}</h1>
+
+        <h1
+          className="text-2xl font-black text-white leading-tight mb-1"
+          style={{ textShadow: '0 2px 8px rgba(0,0,0,0.3)' }}
+        >
+          {collection.name}
+        </h1>
         {collection.description && (
-          <p className="text-sm text-[var(--text-muted)] mt-1">{collection.description}</p>
+          <p className="text-sm text-white/80 mb-4">{collection.description}</p>
         )}
-        <div className="flex gap-3 mt-3 text-sm text-[var(--text-muted)]">
-          <span>{t.collections.unitsCount(units.length)}</span>
-          <span>{t.collections.wordsCount(totalWords)}</span>
-          <span>{t.collections.completed(completedUnits, units.length)}</span>
+
+        {/* Stat pills */}
+        <div className="flex flex-wrap gap-2 mb-4">
+          {[
+            { emoji: '📋', label: t.collections.unitsCount(units.length) },
+            { emoji: '📚', label: t.collections.wordsCount(totalWords) },
+            { emoji: '✅', label: t.collections.completed(completedUnits, units.length) },
+          ].map(({ emoji, label }) => (
+            <span
+              key={label}
+              className="flex items-center gap-1 text-xs font-semibold text-white bg-white/20 rounded-full px-3 py-1 backdrop-blur-sm"
+            >
+              {emoji} {label}
+            </span>
+          ))}
         </div>
 
-        {/* Overall progress bar */}
-        {units.length > 0 && (
-          <div className="mt-3">
-            <div className="progress-bar">
-              <div
-                className="progress-bar-fill"
-                style={{ width: `${(completedUnits / units.length) * 100}%` }}
-              />
-            </div>
-          </div>
+        {/* Progress bar */}
+        <div className="h-2 rounded-full bg-white/25 overflow-hidden">
+          <div
+            className="h-full rounded-full bg-white transition-all duration-700"
+            style={{ width: `${progressPct}%` }}
+          />
+        </div>
+        {progressPct > 0 && (
+          <p className="text-xs text-white/70 mt-1 text-right">{Math.round(progressPct)}% complete</p>
         )}
       </div>
 
-      {/* Units list — columns driven by window.innerWidth so Ctrl+zoom adjusts density */}
+      {/* ── Units grid ── */}
       <div
-        className="flex-1 p-3 grid gap-2"
+        className="flex-1 p-3 grid gap-3"
         style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
       >
         {units.map((unit) => (
@@ -120,6 +158,7 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
             key={unit.dayNumber}
             unit={unit}
             collectionName={collectionName}
+            heroGradient={hero.gradient}
           />
         ))}
       </div>
@@ -127,7 +166,11 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
   );
 }
 
-function UnitCard({ unit, collectionName }: { unit: UnitRow; collectionName: string }) {
+function UnitCard({
+  unit, collectionName, heroGradient,
+}: {
+  unit: UnitRow; collectionName: string; heroGradient: string;
+}) {
   const t = useTranslation();
   const { learnDone, flashcardDone, quizDone } = unit.progress;
   const stagesComplete = [learnDone, flashcardDone, quizDone].filter(Boolean).length;
@@ -137,7 +180,7 @@ function UnitCard({ unit, collectionName }: { unit: UnitRow; collectionName: str
   const [hardCount, setHardCount] = useState(0);
   const [flashcardProgress, setFlashcardProgress] = useState(0);
   const [showInfo, setShowInfo] = useState(false);
-  const [storyInfo, setStoryInfo] = useState(() =>
+  const [storyInfo] = useState(() =>
     getStoryUnlockInfo(collectionName, unit.dayNumber, unit.wordCount),
   );
   const [activeStory, setActiveStory] = useState<{ num: number; title: string; content: string } | null>(null);
@@ -161,11 +204,7 @@ function UnitCard({ unit, collectionName }: { unit: UnitRow; collectionName: str
       .eq('unit_number', unit.dayNumber)
       .eq('story_number', storyNumber)
       .maybeSingle();
-    setActiveStory({
-      num: storyNumber,
-      title: data?.title ?? '',
-      content: data?.content ?? '',
-    });
+    setActiveStory({ num: storyNumber, title: data?.title ?? '', content: data?.content ?? '' });
     setStoryLoading(false);
   };
 
@@ -177,112 +216,141 @@ function UnitCard({ unit, collectionName }: { unit: UnitRow; collectionName: str
   const resumeUrl = learnProgress && learnProgress > 0
     ? `/learn?collection=${enc}&day=${unit.dayNumber}&startIndex=${learnProgress}`
     : null;
-  const learnUrl = `/learn?collection=${enc}&day=${unit.dayNumber}`;
-  const flashUrl = `/flashcards?collection=${enc}&day=${unit.dayNumber}`;
-  const quizUrl  = `/quiz?collection=${enc}&day=${unit.dayNumber}`;
-  const matchUrl = `/matching?collection=${enc}&day=${unit.dayNumber}`;
+  const learnUrl  = `/learn?collection=${enc}&day=${unit.dayNumber}`;
+  const flashUrl  = `/flashcards?collection=${enc}&day=${unit.dayNumber}`;
+  const quizUrl   = `/quiz?collection=${enc}&day=${unit.dayNumber}`;
+  const matchUrl  = `/matching?collection=${enc}&day=${unit.dayNumber}`;
 
   return (
-    <div className={`card transition-all ${isComplete ? 'border-[var(--success)] bg-green-50' : ''}`}>
-      {/* Unit header */}
-      <div className="mb-2">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold text-[var(--text-muted)]">{t.collections.unit(unit.dayNumber)}</span>
+    <div
+      className="rounded-2xl overflow-hidden flex flex-col"
+      style={{
+        background: 'var(--surface)',
+        border: isComplete ? '1.5px solid #22c55e' : '1.5px solid var(--border)',
+        boxShadow: isComplete
+          ? '0 0 0 3px rgba(34,197,94,0.1), 0 4px 16px rgba(0,0,0,0.08)'
+          : '0 4px 16px rgba(0,0,0,0.08)',
+      }}
+    >
+      {/* Colored top accent strip */}
+      <div className="h-1.5" style={{ background: isComplete ? '#22c55e' : heroGradient }} />
+
+      <div className="p-4 flex flex-col gap-3 flex-1">
+
+        {/* Unit header */}
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap mb-1">
+              <span
+                className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full text-white"
+                style={{ background: isComplete ? '#22c55e' : 'var(--primary)' }}
+              >
+                Unit {unit.dayNumber}
+              </span>
+              <span className="text-[10px] text-[var(--text-muted)]">{unit.wordCount} words</span>
+              {isComplete && <span className="text-[10px] font-bold text-green-500">✓ Done</span>}
+              {storyInfo.anyUnlocked && (
+                <span className="text-[10px] font-bold text-amber-500">📚 {storyInfo.unlockedCount}</span>
+              )}
+            </div>
+            <h3 className="font-bold text-[var(--text)] text-sm leading-tight truncate">{unit.topic}</h3>
+          </div>
           <button
             onClick={() => setShowInfo(true)}
-            className="text-sm leading-none opacity-60 hover:opacity-100 transition-opacity"
+            className="text-sm opacity-40 hover:opacity-80 transition-opacity shrink-0 mt-0.5"
             aria-label={t.collections.howMarking}
           >🕯️</button>
         </div>
-        <h3 className="font-semibold text-sm text-[var(--text)] truncate mt-0.5">{unit.topic}</h3>
-        <div className="flex items-center justify-between mt-1">
-          <div className="flex gap-1">
-            <StageIcon done={learnDone} icon="📖" label="Learn" />
-            <StageIcon done={flashcardDone} icon="🃏" label="Cards" />
-            <StageIcon done={quizDone} icon="❓" label="Quiz" />
-          </div>
-          <div className="flex items-center gap-1">
-            {isComplete && <span className="text-xs text-[var(--success)] font-semibold">✓</span>}
-            {storyInfo.anyUnlocked && (
-              <span className="text-xs font-bold text-amber-500">📚{storyInfo.unlockedCount}</span>
-            )}
-          </div>
+
+        {/* Progress bar */}
+        <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
+          <div
+            className="h-full rounded-full transition-all duration-500"
+            style={{
+              width: `${(stagesComplete / 3) * 100}%`,
+              background: isComplete ? '#22c55e' : heroGradient,
+            }}
+          />
         </div>
-      </div>
 
-      {/* Mini progress bar */}
-      <div className="progress-bar mb-2" style={{ height: 3 }}>
-        <div className="progress-bar-fill" style={{ width: `${(stagesComplete / 3) * 100}%`, height: 4 }} />
-      </div>
-
-      {/* Resume learn banner */}
-      {!learnDone && resumeUrl && (
-        <div className="flex items-center justify-between gap-2 mb-2 px-3 py-2 rounded-xl bg-[var(--primary-bg)] border border-[var(--primary)] border-opacity-30">
-          <span className="text-xs text-[var(--primary)]">{t.collections.savedAtWord((learnProgress ?? 0) + 1)}</span>
-          <div className="flex gap-2">
-            <Link href={resumeUrl} className="text-xs font-semibold text-[var(--primary)] hover:underline">{t.collections.continueBtn}</Link>
-            <span className="text-[var(--text-muted)]">·</span>
-            <Link href={learnUrl} className="text-xs text-[var(--text-muted)] hover:underline">{t.collections.restart}</Link>
+        {/* Resume banners */}
+        {!learnDone && resumeUrl && (
+          <div className="flex items-center justify-between gap-2 px-3 py-2 rounded-xl bg-[var(--primary-bg)] border border-[var(--primary)] border-opacity-30">
+            <span className="text-xs text-[var(--primary)]">{t.collections.savedAtWord((learnProgress ?? 0) + 1)}</span>
+            <div className="flex gap-2">
+              <Link href={resumeUrl} className="text-xs font-semibold text-[var(--primary)] hover:underline">{t.collections.continueBtn}</Link>
+              <span className="text-[var(--text-muted)]">·</span>
+              <Link href={learnUrl} className="text-xs text-[var(--text-muted)] hover:underline">{t.collections.restart}</Link>
+            </div>
           </div>
-        </div>
-      )}
-
-      {/* Resume flashcard banner */}
-      {!flashcardDone && flashcardProgress > 0 && (
-        <div className="flex items-center justify-between gap-2 mb-2 px-3 py-2 rounded-xl bg-purple-50 border border-purple-200">
-          <span className="text-xs text-purple-600">{t.collections.cardsRemaining(flashcardProgress)}</span>
-          <div className="flex gap-2">
-            <Link href={flashUrl} className="text-xs font-semibold text-purple-600 hover:underline">{t.collections.continueBtn}</Link>
-            <span className="text-[var(--text-muted)]">·</span>
-            <Link href={`${flashUrl}&fresh=true`} className="text-xs text-[var(--text-muted)] hover:underline">{t.collections.restart}</Link>
+        )}
+        {!flashcardDone && flashcardProgress > 0 && (
+          <div
+            className="flex items-center justify-between gap-2 px-3 py-2 rounded-xl"
+            style={{ background: 'rgba(234,88,12,0.08)', border: '1px solid rgba(234,88,12,0.25)' }}
+          >
+            <span className="text-xs font-medium" style={{ color: '#ea580c' }}>{t.collections.cardsRemaining(flashcardProgress)}</span>
+            <div className="flex gap-2">
+              <Link href={flashUrl} className="text-xs font-semibold hover:underline" style={{ color: '#ea580c' }}>{t.collections.continueBtn}</Link>
+              <span className="text-[var(--text-muted)]">·</span>
+              <Link href={`${flashUrl}&fresh=true`} className="text-xs text-[var(--text-muted)] hover:underline">{t.collections.restart}</Link>
+            </div>
           </div>
+        )}
+
+        {/* Mode buttons */}
+        <div className="grid grid-cols-3 gap-2">
+          <ModeButton href={learnUrl} icon="📖" label="Learn" done={learnDone} color="#4f46e5" />
+          <ModeButton
+            href={flashUrl}
+            icon="🃏"
+            label={hardCount > 0 ? `Cards (${hardCount})` : 'Cards'}
+            done={flashcardDone}
+            color="#ea580c"
+            locked={!learnDone}
+            lockReason={t.collections.completeLearnFirst}
+          />
+          <ModeButton
+            href={quizUrl}
+            icon="❓"
+            label="Quiz"
+            done={quizDone}
+            color="#d97706"
+            locked={!learnDone}
+            lockReason={t.collections.completeLearnFirst}
+            softLocked={learnDone && !flashcardDone}
+            softLockReason={t.collections.hardWordsRemain}
+          />
         </div>
-      )}
 
-      {/* Learning path */}
-      <div className="grid grid-cols-3 gap-2 mb-2">
-        <ModeButton href={learnUrl} icon="📖" label="Learn" done={learnDone} color="var(--primary)" />
-        <ModeButton
-          href={flashUrl} icon="🃏" label={hardCount > 0 ? `Cards (${hardCount})` : 'Cards'} done={flashcardDone} color="#FF6B35"
-          locked={!learnDone} lockReason={t.collections.completeLearnFirst}
-        />
-        <ModeButton
-          href={quizUrl} icon="❓" label="Quiz" done={quizDone} color="var(--warning)"
-          locked={!learnDone} lockReason={t.collections.completeLearnFirst}
-          softLocked={learnDone && !flashcardDone}
-          softLockReason={t.collections.hardWordsRemain}
-        />
-      </div>
+        {/* Match — full width */}
+        <ModeButton href={matchUrl} icon="🎯" label="Match" done={false} color="#db2777" wide />
 
-      {/* Extra activities */}
-      <div className="grid grid-cols-1 gap-2">
-        <ModeButton href={matchUrl} icon="🎯" label="Match" done={false} color="#EC4899" />
-      </div>
-
-      {/* Stories section */}
-      {storyInfo.anyUnlocked && (
-        <div className="mt-3 pt-3 border-t border-[var(--border)]">
-          <p className="text-xs font-bold text-[var(--text)] mb-2">📚 Stories</p>
-          <div className="flex flex-col gap-1.5">
-            {storyFlags.map((unlocked, i) => (
-              <button
-                key={i}
-                disabled={!unlocked}
-                onClick={() => unlocked && openStory(i + 1)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-xl text-left transition-all text-xs font-semibold ${
-                  unlocked
-                    ? 'bg-amber-50 border border-amber-200 text-amber-700 hover:bg-amber-100'
-                    : 'bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text-muted)] opacity-50 cursor-not-allowed'
-                }`}
-              >
-                <span>{storyEmojis[i]}</span>
-                <span className="flex-1">{storyLabels[i]}</span>
-                <span>{unlocked ? '→' : '🔒'}</span>
-              </button>
-            ))}
+        {/* Stories */}
+        {storyInfo.anyUnlocked && (
+          <div className="pt-2 border-t border-[var(--border)]">
+            <p className="text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)] mb-2">📚 Stories</p>
+            <div className="flex flex-col gap-1.5">
+              {storyFlags.map((unlocked, i) => (
+                <button
+                  key={i}
+                  disabled={!unlocked}
+                  onClick={() => unlocked && openStory(i + 1)}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-xl text-left transition-all text-xs font-semibold ${
+                    unlocked
+                      ? 'bg-amber-50 border border-amber-200 text-amber-700 hover:bg-amber-100'
+                      : 'bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text-muted)] opacity-40 cursor-not-allowed'
+                  }`}
+                >
+                  <span>{storyEmojis[i]}</span>
+                  <span className="flex-1">{storyLabels[i]}</span>
+                  <span>{unlocked ? '→' : '🔒'}</span>
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Story reader modal */}
       {activeStory && (
@@ -325,14 +393,21 @@ function UnitCard({ unit, collectionName }: { unit: UnitRow; collectionName: str
                   )}
                 </p>
                 {tappedWord && (
-                  <div className="shrink-0 rounded-xl p-3 flex items-center gap-3" style={{ background: 'var(--primary-bg)', border: '1px solid color-mix(in srgb, var(--primary) 25%, transparent)' }}>
+                  <div
+                    className="shrink-0 rounded-xl p-3 flex items-center gap-3"
+                    style={{ background: 'var(--primary-bg)', border: '1px solid color-mix(in srgb, var(--primary) 25%, transparent)' }}
+                  >
                     <span className="text-base font-bold flex-1" style={{ color: 'var(--primary)' }}>📖 {tappedWord}</span>
                     <button
                       onClick={() => { setTappedWord(null); setActiveStory(null); }}
                       className="text-xs font-bold px-3 py-1.5 rounded-lg text-white shrink-0"
                       style={{ background: 'var(--primary)' }}
                     >Go to unit</button>
-                    <button onClick={() => setTappedWord(null)} className="text-lg leading-none shrink-0" style={{ color: 'var(--text-muted)' }}>×</button>
+                    <button
+                      onClick={() => setTappedWord(null)}
+                      className="text-lg leading-none shrink-0"
+                      style={{ color: 'var(--text-muted)' }}
+                    >×</button>
                   </div>
                 )}
               </div>
@@ -376,10 +451,9 @@ function UnitCard({ unit, collectionName }: { unit: UnitRow; collectionName: str
                 </div>
               ))}
             </div>
-            <button
-              onClick={() => setShowInfo(false)}
-              className="btn-primary w-full mt-4"
-            >{t.common.gotIt}</button>
+            <button onClick={() => setShowInfo(false)} className="btn-primary w-full mt-4">
+              {t.common.gotIt}
+            </button>
           </div>
         </div>
       )}
@@ -387,36 +461,25 @@ function UnitCard({ unit, collectionName }: { unit: UnitRow; collectionName: str
   );
 }
 
-function StageIcon({ done, icon, label }: { done: boolean; icon: string; label: string }) {
-  return (
-    <div
-      title={label}
-      className={`w-6 h-6 rounded-full flex items-center justify-center text-xs transition-all ${
-        done
-          ? 'bg-[var(--success)] text-white'
-          : 'bg-[var(--surface-2)] text-[var(--text-muted)]'
-      }`}
-    >
-      {done ? '✓' : icon}
-    </div>
-  );
-}
-
 function ModeButton({
-  href, icon, label, done, color, locked, lockReason, softLocked, softLockReason,
+  href, icon, label, done, color, locked, lockReason, softLocked, softLockReason, wide,
 }: {
   href: string; icon: string; label: string; done: boolean; color: string;
   locked?: boolean; lockReason?: string;
   softLocked?: boolean; softLockReason?: string;
+  wide?: boolean;
 }) {
+  const base = `flex items-center justify-center ${wide ? 'flex-row gap-2 py-2.5 px-4' : 'flex-col gap-1.5 py-3'} rounded-xl text-xs font-bold transition-all`;
+
   if (locked) {
     return (
       <div
         title={lockReason}
-        className="flex flex-col items-center gap-1 py-2 rounded-xl text-xs font-medium border-2 border-dashed border-[var(--border)] text-[var(--text-muted)] opacity-50 cursor-not-allowed select-none"
+        className={`${base} cursor-not-allowed select-none`}
+        style={{ background: 'var(--surface-2)', border: '1.5px dashed var(--border)', opacity: 0.4 }}
       >
-        <span className="text-base">🔒</span>
-        <span>{label}</span>
+        <span className={wide ? 'text-base' : 'text-xl'}>🔒</span>
+        <span className="text-[var(--text-muted)]">{label}</span>
       </div>
     );
   }
@@ -425,24 +488,33 @@ function ModeButton({
       <Link
         href={href}
         title={softLockReason}
-        className="flex flex-col items-center gap-1 py-2 rounded-xl text-xs font-medium border-2 border-orange-300 text-orange-500 hover:bg-orange-50 transition-all hover:scale-105"
+        className={`${base} active:scale-95`}
+        style={{ background: 'rgba(234,179,8,0.1)', border: '1.5px solid rgba(234,179,8,0.45)', color: '#ca8a04' }}
       >
-        <span className="text-base">⚠️</span>
-        <span className="text-center leading-tight">{label}</span>
+        <span className={wide ? 'text-base' : 'text-xl'}>⚠️</span>
+        <span>{label}</span>
+      </Link>
+    );
+  }
+  if (done) {
+    return (
+      <Link
+        href={href}
+        className={`${base} active:scale-95`}
+        style={{ background: 'rgba(34,197,94,0.12)', border: '1.5px solid rgba(34,197,94,0.35)', color: '#16a34a' }}
+      >
+        <span className={wide ? 'text-base' : 'text-xl'}>✓</span>
+        <span>{label}</span>
       </Link>
     );
   }
   return (
     <Link
       href={href}
-      className={`flex flex-col items-center gap-1 py-2 rounded-xl text-xs font-medium transition-all hover:scale-105 ${
-        done
-          ? 'bg-green-100 text-[var(--success)] border border-[var(--success)]'
-          : 'border-2 border-[var(--border)] text-[var(--text-muted)] hover:border-current'
-      }`}
-      style={done ? {} : { '--hover-color': color } as React.CSSProperties}
+      className={`${base} text-white active:scale-95 hover:opacity-90`}
+      style={{ background: color, boxShadow: `0 3px 12px ${color}66` }}
     >
-      <span className="text-base">{done ? '✓' : icon}</span>
+      <span className={wide ? 'text-base' : 'text-xl'}>{icon}</span>
       <span>{label}</span>
     </Link>
   );
