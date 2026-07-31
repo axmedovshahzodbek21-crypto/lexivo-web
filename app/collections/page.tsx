@@ -41,7 +41,7 @@ function CollectionCard({
   return (
     <Link href={href} className="block group h-full">
       <div
-        className="h-full rounded-3xl p-5 flex flex-col items-center justify-center text-center gap-3 transition-all duration-200 group-hover:-translate-y-2"
+        className="h-full rounded-3xl p-5 flex flex-col items-center justify-center text-center gap-3 transition-all duration-200 group-hover:-translate-y-2 animate-heartbeat"
         style={{
           background: meta.gradient,
           boxShadow: `0 10px 0 ${meta.edge}, 0 16px 40px ${meta.glow}`,
