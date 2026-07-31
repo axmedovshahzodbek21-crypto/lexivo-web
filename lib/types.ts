@@ -95,6 +95,7 @@ export interface ImportedWord {
   word: string;
   translation: string;
   definition: string;
+  definitionUz?: string;
   example1: string;
   example1Translation?: string;
   example2: string;

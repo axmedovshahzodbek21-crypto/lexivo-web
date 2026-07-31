@@ -162,6 +162,7 @@ function LearnInner() {
         pronunciation: '',
         translation: w.translation,
         definition: w.definition,
+        definitionUz: w.definitionUz,
         example1: w.example1,
         example1Situation: '',
         example1Translation: w.example1Translation ?? '',

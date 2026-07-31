@@ -59,6 +59,7 @@ Format EXACTLY like this for every word. Use plain text only — no markdown, no
 word: enormous
 translation: ulkan
 definition: extremely large in size or extent
+definitionUz: Ulkan — juda katta yoki keng hajmga ega bo'lgan narsa yoki hodisa.
 example1: The enormous building towered above the city.
 example1Translation: Ulkan bino shahar ustida baland turardi.
 example2: She faced an enormous challenge at work.
@@ -71,20 +72,21 @@ example5: The discovery had an enormous impact on modern science.
 example5Translation: Bu kashfiyot zamonaviy fanga ulkan ta'sir ko'rsatdi.
 ---
 
-Important: the example above uses English/Uzbek only to show the format. In your actual response, write the definition and examples in ${wordLang}, and the translations in ${transLang}.
+Important: the example above uses English/Uzbek only to show the format. In your actual response, write the definition and examples in ${wordLang}, the translations and definitionUz in ${transLang}.
 
 Here are my words:
 [PASTE YOUR WORDS HERE, one per line]`;
 }
 
 function buildPrompt2(wordLang: string, transLang: string): string {
-  return `I have ${wordLang}-${transLang} word pairs. For each pair, keep my translation exactly as written. Add a short definition in ${wordLang} and 5 example sentences in ${wordLang} with their ${transLang} translations.
+  return `I have ${wordLang}-${transLang} word pairs. For each pair, keep my translation exactly as written. Add a short definition in ${wordLang}, a short explanation in ${transLang} (definitionUz), and 5 example sentences in ${wordLang} with their ${transLang} translations.
 
 Format EXACTLY like this for every word. Use plain text only — no markdown, no bold, no asterisks, no extra formatting:
 
 word: enormous
 translation: ulkan
 definition: extremely large in size or extent
+definitionUz: Ulkan — juda katta yoki keng hajmga ega bo'lgan narsa yoki hodisa.
 example1: The enormous building towered above the city.
 example1Translation: Ulkan bino shahar ustida baland turardi.
 example2: She faced an enormous challenge at work.
@@ -97,7 +99,7 @@ example5: The discovery had an enormous impact on modern science.
 example5Translation: Bu kashfiyot zamonaviy fanga ulkan ta'sir ko'rsatdi.
 ---
 
-Important: the example above uses English/Uzbek only to show the format. In your actual response, write the definition and examples in ${wordLang}, and the translations in ${transLang}.
+Important: the example above uses English/Uzbek only to show the format. In your actual response, write the definition and examples in ${wordLang}, the translations and definitionUz in ${transLang}.
 
 Here are my pairs (word - translation):
 [PASTE YOUR PAIRS HERE, one per line]`;
@@ -163,6 +165,7 @@ function parseOutput(text: string, langCode: string): ParseResult {
       word: fields.word,
       translation: fields.translation,
       definition: fields.definition ?? '',
+      definitionUz: fields.definitionuz || undefined,
       example1: fields.example1 ?? '',
       example1Translation: fields.example1translation ?? '',
       example2: fields.example2 ?? '',
