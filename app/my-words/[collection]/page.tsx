@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/lib/useTranslation';
 import { deleteImportedFolder, getCollectionsByFolder } from '@/lib/storage';
+import { pushLists } from '@/lib/sync';
 import type { ImportedCollection } from '@/lib/types';
 
 const COLORS = [
@@ -34,6 +35,7 @@ export default function FolderPage({ params }: Props) {
   function handleDeleteFolder() {
     if (!confirm(`Delete the entire "${folder}" folder and all its words?`)) return;
     deleteImportedFolder(folder);
+    pushLists();
     router.push('/my-words');
   }
 

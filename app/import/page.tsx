@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslation } from '@/lib/useTranslation';
 import { addImportedWords } from '@/lib/storage';
+import { pushLists } from '@/lib/sync';
 import type { ImportedWord } from '@/lib/types';
 
 const TUTORIAL = {
@@ -227,6 +228,7 @@ function ImportPageInner() {
       return;
     }
     addImportedWords(parsed, name, folder);
+    pushLists();
     setAdded(true);
     setTimeout(() => router.push(`/my-words/${encodeURIComponent(folder)}/${encodeURIComponent(name)}`), 1200);
   }

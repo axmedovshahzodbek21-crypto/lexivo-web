@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/lib/useTranslation';
 import { getImportedWordsByCollection, deleteImportedWord, deleteImportedCollection } from '@/lib/storage';
+import { pushLists } from '@/lib/sync';
 import { speakText } from '@/lib/speech';
 import type { ImportedWord } from '@/lib/types';
 
@@ -28,12 +29,14 @@ export default function FolderCollectionPage({ params }: Props) {
   function handleDelete(word: string) {
     if (!confirm(t.myWords.deleteConfirm)) return;
     deleteImportedWord(word, collectionName, folder);
+    pushLists();
     setWords(getImportedWordsByCollection(collectionName, folder));
   }
 
   function handleDeleteCollection() {
     if (!confirm(`Delete the "${collectionName}" collection and all its words?`)) return;
     deleteImportedCollection(collectionName, folder);
+    pushLists();
     router.push(`/my-words/${encodeURIComponent(folder)}`);
   }
 
