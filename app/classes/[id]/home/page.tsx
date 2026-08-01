@@ -87,19 +87,19 @@ export default function ClassHomePage() {
       setAnnouncements(anns ?? []);
       setWordCount(words?.length ?? 0);
 
-      if (teacher) {
-        const { data: members } = await supabase
-          .from('class_members').select('student_id').eq('class_id', id);
-        const count = members?.length ?? 0;
-        setMemberCount(count);
-        if (count > 0) {
-          const today = new Date().toISOString().slice(0, 10);
-          const ids = members!.map(m => m.student_id);
-          const { data: profiles } = await supabase
-            .from('profiles').select('last_study_date').in('id', ids);
-          setActiveToday(profiles?.filter(p => p.last_study_date === today).length ?? 0);
-        }
-      } else {
+      const { data: members } = await supabase
+        .from('class_members').select('student_id').eq('class_id', id);
+      const count = members?.length ?? 0;
+      setMemberCount(count);
+      if (count > 0) {
+        const today = new Date().toISOString().slice(0, 10);
+        const ids = (members ?? []).map((m: { student_id: string }) => m.student_id);
+        const { data: profiles } = await supabase
+          .from('profiles').select('last_study_date').in('id', ids);
+        setActiveToday(profiles?.filter(p => p.last_study_date === today).length ?? 0);
+      }
+
+      if (!teacher) {
         const [{ data: tgts }, { data: profile }] = await Promise.all([
           supabase.from('class_targets').select('id, title, due_date, completed_at, created_at')
             .eq('class_id', id).eq('student_id', user.id).order('created_at', { ascending: false }),
@@ -141,17 +141,33 @@ export default function ClassHomePage() {
             </p>
           </div>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 mb-3">
           {[
             `📖 ${wordCount} words`,
-            isTeacher ? `✅ ${activeToday} active today` : `📋 ${pending.length} pending`,
-            '🔥 Streak — Phase 2',
+            `✅ ${activeToday}/${memberCount} active`,
+            ...(!isTeacher ? [`📋 ${pending.length} pending`] : []),
           ].map(label => (
             <span key={label} className="text-xs font-semibold bg-black/20 text-white rounded-full px-3 py-1">
               {label}
             </span>
           ))}
         </div>
+        {memberCount > 0 && (
+          <div>
+            <div className="flex justify-between text-xs text-white/80 mb-1.5">
+              <span className="font-semibold">
+                {activeToday >= memberCount ? '🔥 Everyone\'s active today!' : '🔥 Class Activity'}
+              </span>
+              <span>{activeToday} of {memberCount}</span>
+            </div>
+            <div className="h-1.5 bg-white/25 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-white rounded-full transition-all duration-700"
+                style={{ width: `${memberCount > 0 ? (activeToday / memberCount) * 100 : 0}%` }}
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="flex-1 p-4 space-y-5">
