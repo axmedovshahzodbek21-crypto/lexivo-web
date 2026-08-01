@@ -408,6 +408,12 @@ export default function ClassesPage() {
                           </div>
                           <div className="flex items-center gap-2 shrink-0">
                             <button
+                              onClick={() => router.push(`/classes/${cls.id}/home`)}
+                              className="btn-primary text-xs px-3 py-1.5"
+                            >
+                              Enter →
+                            </button>
+                            <button
                               onClick={() => toggleLeaderboard(cls.id)}
                               className={`text-xs px-2.5 py-1.5 rounded-xl font-medium transition-colors ${expandedLeaderboard === cls.id ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--primary)]'}`}
                               aria-label="Toggle leaderboard"
@@ -693,7 +699,7 @@ export default function ClassesPage() {
                           <p className="text-xs text-[var(--text-muted)] mt-1">👥 {cls.member_count} student{cls.member_count !== 1 ? 's' : ''}</p>
                         </div>
                         <div className="flex flex-col gap-2 shrink-0">
-                          <button onClick={() => router.push(`/classes/${cls.id}`)} className="btn-primary text-xs px-3 py-1.5">Dashboard →</button>
+                          <button onClick={() => router.push(`/classes/${cls.id}/home`)} className="btn-primary text-xs px-3 py-1.5">Enter Class →</button>
                           <button onClick={() => deleteClass(cls.id)} className="btn-danger-ghost">Delete</button>
                         </div>
                       </div>
