@@ -19,7 +19,16 @@ const ACTIVITY_LABEL: Record<string, string> = { learn: 'Learn', flashcard: 'Fla
 
 type SortKey = 'lastActive' | 'xp' | 'progress' | 'name';
 type FilterKey = 'all' | 'active' | 'inactive';
-type Tab = 'students' | 'activity';
+type Tab = 'students' | 'activity' | 'radar';
+
+interface HardWord {
+  word_id: string;
+  word: string;
+  translation: string;
+  attempts: number;
+  correct_count: number;
+  accuracy_pct: number;
+}
 
 interface Announcement {
   id: string;
@@ -192,6 +201,9 @@ export default function ClassDashboardPage() {
   const [settingTarget, setSettingTarget] = useState(false);
   const [studentTargets, setStudentTargets] = useState<Record<string, Target[]>>({});
 
+  // Hard Word Radar
+  const [hardWords, setHardWords] = useState<HardWord[]>([]);
+
   // Activity feed
   const [activityFeed, setActivityFeed] = useState<ActivityRow[]>([]);
   const [activityLoading, setActivityLoading] = useState(false);
@@ -338,6 +350,8 @@ export default function ClassDashboardPage() {
     ]);
     setStudents((data as StudentRow[]) ?? []);
     setCollections((colData as CollectionMeta[]) ?? []);
+    const { data: hwData } = await supabase.rpc('get_hard_words', { p_class_id: id });
+    setHardWords((hwData as HardWord[]) ?? []);
     await Promise.all([loadNotes(), loadTargets(), loadAnnouncements()]);
     setLoading(false);
   };
@@ -503,7 +517,7 @@ export default function ClassDashboardPage() {
       {/* Tab switcher */}
       {!loading && (
         <div className="flex border-b border-[var(--border)]">
-          {(['students', 'activity'] as Tab[]).map(t => (
+          {(['students', 'activity', 'radar'] as Tab[]).map(t => (
             <button
               key={t}
               onClick={() => setTab(t)}
@@ -513,7 +527,7 @@ export default function ClassDashboardPage() {
                   : 'text-[var(--text-muted)] hover:text-[var(--text)]'
               }`}
             >
-              {t === 'students' ? '👥 Students' : '📡 Activity'}
+              {t === 'students' ? '👥 Students' : t === 'activity' ? '📡 Activity' : '🎯 Radar'}
             </button>
           ))}
         </div>
@@ -603,6 +617,45 @@ export default function ClassDashboardPage() {
                   </div>
                 </div>
               ))}
+            </div>
+          )
+
+        ) : tab === 'radar' ? (
+          /* ── Hard Word Radar tab ── */
+          hardWords.length === 0 ? (
+            <div className="card text-center py-16 space-y-3">
+              <div className="text-5xl">📡</div>
+              <p className="font-bold text-[var(--text)]">No data yet</p>
+              <p className="text-sm text-[var(--text-muted)]">Words appear here once students have studied them at least 3 times.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 p-3 rounded-xl bg-[var(--primary-bg)] border border-[var(--primary)]/20">
+                <span className="text-lg shrink-0">📡</span>
+                <p className="text-xs text-[var(--text)]">Words ranked by how often students struggle — lowest accuracy first.</p>
+              </div>
+              {hardWords.map((w, i) => {
+                const pct = w.accuracy_pct;
+                const barColor = pct < 30 ? 'var(--danger)' : pct < 60 ? '#f97316' : 'var(--success)';
+                return (
+                  <div key={w.word_id} className="card flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg shrink-0 flex items-center justify-center text-xs font-black" style={{ background: `color-mix(in srgb, ${barColor} 15%, transparent)`, color: barColor }}>
+                      #{i + 1}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-sm text-[var(--text)]">{w.word}</span>
+                        <span className="text-[var(--text-muted)] text-sm">·</span>
+                        <span className="text-[var(--primary)] text-sm">{w.translation}</span>
+                      </div>
+                      <div className="mt-1.5 h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
+                        <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: barColor }} />
+                      </div>
+                      <p className="text-[10px] text-[var(--text-muted)] mt-1">{w.correct_count}/{w.attempts} correct · {pct}% accuracy</p>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )
 
