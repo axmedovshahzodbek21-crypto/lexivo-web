@@ -19,7 +19,37 @@ const ACTIVITY_LABEL: Record<string, string> = { learn: 'Learn', flashcard: 'Fla
 
 type SortKey = 'lastActive' | 'xp' | 'progress' | 'name';
 type FilterKey = 'all' | 'active' | 'inactive';
-type Tab = 'students' | 'activity' | 'radar';
+type Tab = 'students' | 'activity' | 'radar' | 'analytics';
+
+interface AnalyticsRow {
+  student_id: string;
+  total_sessions: number;
+  avg_session_seconds: number;
+  total_words_learned: number;
+  total_gate_attempts: number;
+  total_gate_correct_first: number;
+  genuine_mastery_pct: number | null;
+  speed_flag_sessions: number;
+  last_session_at: string | null;
+  per_word_data_all: { word: string; outcome: string; seconds_to_mark: number; gate_attempts: number; gate_correct_first: boolean }[][] | null;
+}
+
+interface ActiveStudent {
+  student_id: string;
+  student_name: string;
+  avatar_url: string | null;
+  activity: string;
+  collection_name: string | null;
+  day_number: number | null;
+  started_at: string;
+}
+
+interface ProgressPoint {
+  study_date: string;
+  words_learned: number;
+  sessions_count: number;
+  active_students: number;
+}
 
 interface HardWord {
   word_id: string;
@@ -137,6 +167,336 @@ function dayLabel(iso: string): string {
   return new Date(date).toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' });
 }
 
+// ── Analytics helpers ──────────────────────────────────────────────────────
+
+function MiniPie({ learned, skipped, hard, size = 48 }: { learned: number; skipped: number; hard: number; size?: number }) {
+  const total = learned + skipped + hard;
+  if (total === 0) return <div style={{ width: size, height: size, borderRadius: '50%', background: 'var(--border)' }} />;
+  const toAngle = (n: number) => (n / total) * 360;
+  const learnedAngle = toAngle(learned);
+  const skippedAngle = toAngle(skipped);
+  const hardAngle = toAngle(hard);
+  return (
+    <div style={{
+      width: size,
+      height: size,
+      borderRadius: '50%',
+      background: `conic-gradient(#22c55e 0deg ${learnedAngle}deg, #f97316 ${learnedAngle}deg ${learnedAngle + skippedAngle}deg, #ef4444 ${learnedAngle + skippedAngle}deg ${learnedAngle + skippedAngle + hardAngle}deg)`,
+      flexShrink: 0,
+    }} />
+  );
+}
+
+function LineChart({ points, width = 300, height = 80 }: { points: { x: number; y: number }[]; width?: number; height?: number }) {
+  if (points.length < 2) return <div style={{ width, height, background: 'var(--surface-2)', borderRadius: 8 }} />;
+  const maxY = Math.max(...points.map(p => p.y), 1);
+  const pad = 4;
+  const w = width - pad * 2;
+  const h = height - pad * 2;
+  const sx = (i: number) => pad + (i / (points.length - 1)) * w;
+  const sy = (y: number) => pad + h - (y / maxY) * h;
+  const pathD = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${sx(i).toFixed(1)},${sy(p.y).toFixed(1)}`).join(' ');
+  const fillD = `${pathD} L${sx(points.length - 1).toFixed(1)},${(pad + h).toFixed(1)} L${pad},${(pad + h).toFixed(1)} Z`;
+  return (
+    <svg width={width} height={height} style={{ overflow: 'visible' }}>
+      <defs>
+        <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="var(--primary)" stopOpacity="0.3" />
+          <stop offset="100%" stopColor="var(--primary)" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <path d={fillD} fill="url(#chartGrad)" />
+      <path d={pathD} fill="none" stroke="var(--primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      {points.map((p, i) => (
+        <circle key={i} cx={sx(i)} cy={sy(p.y)} r="3" fill="var(--primary)" />
+      ))}
+    </svg>
+  );
+}
+
+function classMasteryColor(pct: number): string {
+  if (pct === 0) return 'var(--border)';
+  if (pct < 25) return '#ef4444';
+  if (pct < 50) return '#f97316';
+  if (pct < 75) return '#eab308';
+  if (pct < 90) return '#84cc16';
+  return '#22c55e';
+}
+
+function AnalyticsTab({
+  analyticsData, activeStudents, progressPoints, loading, students, collections, digestText, digestLoading, onDigest,
+}: {
+  analyticsData: AnalyticsRow[];
+  activeStudents: ActiveStudent[];
+  progressPoints: ProgressPoint[];
+  loading: boolean;
+  students: StudentRow[];
+  collections: CollectionMeta[];
+  classId: string;
+  digestText: string;
+  digestLoading: boolean;
+  onDigest: () => void;
+}) {
+  const studentName = (id: string) => students.find(s => s.student_id === id)?.name ?? 'Unknown';
+
+  if (loading) return <div className="flex justify-center py-12"><div className="text-4xl animate-bounce">📊</div></div>;
+
+  if (analyticsData.length === 0 && activeStudents.length === 0) {
+    return (
+      <div className="card text-center py-16 space-y-3">
+        <div className="text-5xl">📊</div>
+        <p className="font-bold text-[var(--text)]">No session data yet</p>
+        <p className="text-sm text-[var(--text-muted)]">Data appears here once students complete learn sessions with Phase 4 active.</p>
+      </div>
+    );
+  }
+
+  // Flatten per-word data from all students
+  const allWords: { word: string; seconds: number }[] = [];
+  for (const row of analyticsData) {
+    for (const session of row.per_word_data_all ?? []) {
+      for (const w of session ?? []) {
+        if (w.outcome === 'learned') allWords.push({ word: w.word, seconds: w.seconds_to_mark });
+      }
+    }
+  }
+  const wordMap: Record<string, number[]> = {};
+  for (const { word, seconds } of allWords) {
+    if (!wordMap[word]) wordMap[word] = [];
+    wordMap[word].push(seconds);
+  }
+  const wordStats = Object.entries(wordMap)
+    .map(([word, times]) => ({ word, avg: times.reduce((s, v) => s + v, 0) / times.length }))
+    .sort((a, b) => b.avg - a.avg)
+    .slice(0, 10);
+  const maxAvg = wordStats[0]?.avg ?? 1;
+
+  // Speed-flagged students
+  const speedFlagged = analyticsData.filter(r => r.speed_flag_sessions > 0);
+
+  // Progress chart data
+  const chartPoints = progressPoints.map((p, i) => ({ x: i, y: p.words_learned }));
+
+  const ACTIVITY_ICON: Record<string, string> = { learn: '📖', flashcard: '🃏', quiz: '🧠' };
+
+  return (
+    <div className="space-y-5">
+      {/* Live studying now */}
+      <div>
+        <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide mb-2">
+          🟢 Studying now ({activeStudents.length})
+        </p>
+        {activeStudents.length === 0 ? (
+          <p className="text-sm text-[var(--text-muted)] px-1">No one studying right now</p>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            {activeStudents.map(s => (
+              <div key={s.student_id} className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: 'var(--surface-2)' }}>
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500" />
+                </span>
+                <span className="text-sm font-semibold text-[var(--text)]">{s.student_name}</span>
+                <span className="text-xs text-[var(--text-muted)]">{ACTIVITY_ICON[s.activity] ?? '📖'}</span>
+                {s.collection_name && <span className="text-[10px] text-[var(--text-muted)]">{s.collection_name} {s.day_number ? `U${s.day_number}` : ''}</span>}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Speed flag warnings */}
+      {speedFlagged.length > 0 && (
+        <div>
+          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide mb-2">⚡ Speed flags (&gt;10 words/min)</p>
+          <div className="space-y-2">
+            {speedFlagged.map(r => (
+              <div key={r.student_id} className="flex items-center gap-3 px-3 py-2.5 rounded-xl" style={{ background: 'color-mix(in srgb, var(--danger) 8%, var(--surface-2))' }}>
+                <span className="text-lg">⚠️</span>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-[var(--text)]">{studentName(r.student_id)}</p>
+                  <p className="text-[10px] text-[var(--text-muted)]">{r.speed_flag_sessions} flagged session{r.speed_flag_sessions > 1 ? 's' : ''} · possible rushing</p>
+                </div>
+                {r.genuine_mastery_pct != null && (
+                  <div className="text-right">
+                    <p className="text-sm font-bold" style={{ color: r.genuine_mastery_pct < 60 ? 'var(--danger)' : 'var(--success)' }}>{r.genuine_mastery_pct}%</p>
+                    <p className="text-[9px] text-[var(--text-muted)]">gate accuracy</p>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Progress over time */}
+      {progressPoints.length > 1 && (
+        <div>
+          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide mb-2">📈 Words learned (last 30 days)</p>
+          <div className="card p-3 overflow-hidden">
+            <div className="w-full overflow-x-auto">
+              <LineChart points={chartPoints} width={Math.max(300, chartPoints.length * 28)} height={88} />
+            </div>
+            <div className="flex justify-between mt-1">
+              <span className="text-[9px] text-[var(--text-muted)]">{progressPoints[0]?.study_date?.slice(5)}</span>
+              <span className="text-[9px] text-[var(--text-muted)] font-semibold">
+                Total: {progressPoints.reduce((s, p) => s + p.words_learned, 0)} words
+              </span>
+              <span className="text-[9px] text-[var(--text-muted)]">{progressPoints[progressPoints.length - 1]?.study_date?.slice(5)}</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Per-word time bar chart */}
+      {wordStats.length > 0 && (
+        <div>
+          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide mb-2">⏱ Slowest words (avg seconds to mark)</p>
+          <div className="card p-3 space-y-2">
+            {wordStats.map(({ word, avg }) => {
+              const pct = (avg / maxAvg) * 100;
+              const color = avg > 30 ? 'var(--danger)' : avg > 15 ? '#f97316' : 'var(--success)';
+              return (
+                <div key={word} className="flex items-center gap-2">
+                  <span className="text-xs text-[var(--text)] w-24 truncate shrink-0">{word}</span>
+                  <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
+                    <div className="h-full rounded-full" style={{ width: `${pct}%`, background: color }} />
+                  </div>
+                  <span className="text-[10px] text-[var(--text-muted)] w-8 text-right shrink-0">{avg.toFixed(0)}s</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Per-student summary with pie charts */}
+      {analyticsData.length > 0 && (
+        <div>
+          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide mb-2">👤 Per-student overview</p>
+          <div className="space-y-2">
+            {analyticsData.map(r => {
+              const wordData = (r.per_word_data_all ?? []).flat();
+              const learned = wordData.filter(w => w.outcome === 'learned').length;
+              const skipped = wordData.filter(w => w.outcome === 'skipped').length;
+              const hard = wordData.filter(w => w.outcome === 'too-hard').length;
+              return (
+                <div key={r.student_id} className="card flex items-center gap-3 p-3">
+                  <MiniPie learned={learned} skipped={skipped} hard={hard} size={44} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-bold text-[var(--text)] truncate">{studentName(r.student_id)}</p>
+                    <p className="text-[10px] text-[var(--text-muted)] mt-0.5">
+                      <span className="text-green-500 font-semibold">{learned}✓</span>
+                      {' · '}
+                      <span className="text-orange-500">{skipped}⏭</span>
+                      {' · '}
+                      <span className="text-red-500">{hard}😤</span>
+                      {' · '}{r.total_sessions} session{r.total_sessions !== 1 ? 's' : ''}
+                    </p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    {r.genuine_mastery_pct != null ? (
+                      <>
+                        <p className="text-sm font-black" style={{ color: r.genuine_mastery_pct >= 80 ? 'var(--success)' : r.genuine_mastery_pct >= 60 ? '#f97316' : 'var(--danger)' }}>
+                          {r.genuine_mastery_pct}%
+                        </p>
+                        <p className="text-[9px] text-[var(--text-muted)]">mastery</p>
+                      </>
+                    ) : (
+                      <p className="text-[10px] text-[var(--text-muted)]">no gate data</p>
+                    )}
+                    {r.speed_flag_sessions > 0 && <p className="text-[9px] text-[var(--danger)] font-semibold mt-0.5">⚡ {r.speed_flag_sessions} flags</p>}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Class Mastery Heatmap */}
+      {students.length > 0 && collections.length > 0 && (
+        <div>
+          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide mb-2">🗺 Class Mastery Heatmap</p>
+          <div className="card p-3 space-y-3">
+            <p className="text-[10px] text-[var(--text-muted)]">% of class that has completed each unit · tap for details</p>
+            {collections.map(col => {
+              const completionPcts = Array.from({ length: col.total_units }, (_, i) => {
+                const unit = i + 1;
+                const done = students.filter(s => (s.collection_progress[col.collection_name] ?? 0) >= unit).length;
+                return students.length > 0 ? Math.round((done / students.length) * 100) : 0;
+              });
+              const avgPct = completionPcts.length > 0
+                ? Math.round(completionPcts.reduce((s, v) => s + v, 0) / completionPcts.length)
+                : 0;
+              return (
+                <div key={col.collection_name}>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-[10px] font-bold text-[var(--text)]">{col.label}</span>
+                    <span className="text-[9px] font-semibold" style={{ color: classMasteryColor(avgPct) }}>{avgPct}% avg</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1">
+                    {completionPcts.map((pct, i) => (
+                      <div
+                        key={i}
+                        className="flex items-center justify-center rounded text-[8px] font-black text-white"
+                        style={{
+                          width: 28, height: 28,
+                          background: classMasteryColor(pct),
+                          opacity: pct === 0 ? 0.35 : 1,
+                          fontSize: 8,
+                        }}
+                        title={`Unit ${i + 1}: ${pct}% of class completed`}
+                      >
+                        {i + 1}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+            {/* Legend */}
+            <div className="flex items-center gap-3 flex-wrap pt-1 border-t border-[var(--border)]">
+              {[
+                { color: 'var(--border)', label: '0%' },
+                { color: '#ef4444', label: '<25%' },
+                { color: '#eab308', label: '50%' },
+                { color: '#84cc16', label: '75%' },
+                { color: '#22c55e', label: '90%+' },
+              ].map(({ color, label }) => (
+                <div key={label} className="flex items-center gap-1">
+                  <div className="w-2.5 h-2.5 rounded" style={{ background: color }} />
+                  <span className="text-[9px] text-[var(--text-muted)]">{label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* AI Weekly Digest */}
+      <div>
+        <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide mb-2">🤖 AI Weekly Digest</p>
+        <div className="card space-y-3">
+          <p className="text-xs text-[var(--text-muted)]">Generate a personalised coaching summary based on this week&apos;s data.</p>
+          <button
+            onClick={onDigest}
+            disabled={digestLoading || analyticsData.length === 0}
+            className="w-full btn-primary py-3 disabled:opacity-50"
+          >
+            {digestLoading ? '✨ Generating…' : '✨ Generate digest'}
+          </button>
+          {digestText && (
+            <div className="text-sm text-[var(--text)] leading-relaxed whitespace-pre-wrap bg-[var(--surface-2)] rounded-xl p-3 animate-fade-in">
+              {digestText}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ProgressBar({ done, total, color }: { done: number; total: number; color: string }) {
   const pct = total === 0 ? 0 : Math.min(100, (done / total) * 100);
   return (
@@ -219,6 +579,14 @@ export default function ClassDashboardPage() {
   const [unitRows, setUnitRows] = useState<UnitRow[]>([]);
   const [unitTopics, setUnitTopics] = useState<Record<number, string>>({});
   const [unitLoading, setUnitLoading] = useState(false);
+
+  // Analytics tab
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsRow[]>([]);
+  const [activeStudents, setActiveStudents] = useState<ActiveStudent[]>([]);
+  const [progressPoints, setProgressPoints] = useState<ProgressPoint[]>([]);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
+  const [digestText, setDigestText] = useState('');
+  const [digestLoading, setDigestLoading] = useState(false);
 
   // Streak calendar
   const [streakModal, setStreakModal] = useState<StudentRow | null>(null);
@@ -338,6 +706,24 @@ export default function ClassDashboardPage() {
     setActivityLoading(false);
   };
 
+  const loadAnalytics = async () => {
+    if (!id) return;
+    setAnalyticsLoading(true);
+    const [{ data: ad }, { data: pd }] = await Promise.all([
+      supabase.rpc('get_class_analytics', { p_class_id: id }),
+      supabase.rpc('get_class_progress_over_time', { p_class_id: id, p_days: 30 }),
+    ]);
+    setAnalyticsData((ad as AnalyticsRow[]) ?? []);
+    setProgressPoints((pd as ProgressPoint[]) ?? []);
+    setAnalyticsLoading(false);
+  };
+
+  const loadActiveStudents = async () => {
+    if (!id) return;
+    const { data } = await supabase.rpc('get_active_students', { p_class_id: id });
+    setActiveStudents((data as ActiveStudent[]) ?? []);
+  };
+
   const load = async () => {
     if (!user || !id) return;
     setLoading(true);
@@ -358,6 +744,13 @@ export default function ClassDashboardPage() {
 
   useEffect(() => { if (user) load(); else setLoading(false); }, [user, id]);
   useEffect(() => { if (tab === 'activity' && activityFeed.length === 0) loadActivity(); }, [tab]);
+  useEffect(() => {
+    if (tab !== 'analytics') return;
+    if (analyticsData.length === 0) loadAnalytics();
+    loadActiveStudents();
+    const id30s = setInterval(loadActiveStudents, 30_000);
+    return () => clearInterval(id30s);
+  }, [tab]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!streakModal || !id) return;
     setStreakLoading(true);
@@ -517,17 +910,18 @@ export default function ClassDashboardPage() {
       {/* Tab switcher */}
       {!loading && (
         <div className="flex border-b border-[var(--border)]">
-          {(['students', 'activity', 'radar'] as Tab[]).map(t => (
+          {(['students', 'activity', 'radar', 'analytics'] as Tab[]).map(t => (
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${
+              className={`flex-1 py-2.5 text-xs font-semibold transition-colors ${
                 tab === t
                   ? 'border-b-2 border-[var(--primary)] text-[var(--primary)]'
                   : 'text-[var(--text-muted)] hover:text-[var(--text)]'
               }`}
             >
-              {t === 'students' ? '👥 Students' : t === 'activity' ? '📡 Activity' : '🎯 Radar'}
+              {t === 'students' ? '👥' : t === 'activity' ? '📡' : t === 'radar' ? '🎯' : '📊'}
+              {' '}{t === 'students' ? 'Students' : t === 'activity' ? 'Activity' : t === 'radar' ? 'Radar' : 'Analytics'}
             </button>
           ))}
         </div>
@@ -619,6 +1013,44 @@ export default function ClassDashboardPage() {
               ))}
             </div>
           )
+
+        ) : tab === 'analytics' ? (
+          /* ── Analytics tab ── */
+          <AnalyticsTab
+            analyticsData={analyticsData}
+            activeStudents={activeStudents}
+            progressPoints={progressPoints}
+            loading={analyticsLoading}
+            students={students}
+            collections={collections}
+            classId={id ?? ''}
+            digestText={digestText}
+            digestLoading={digestLoading}
+            onDigest={async () => {
+              setDigestLoading(true);
+              try {
+                const payload = analyticsData.map(r => {
+                  const s = students.find(st => st.student_id === r.student_id);
+                  return {
+                    studentName: s?.name ?? 'Unknown',
+                    totalSessions: r.total_sessions,
+                    totalWordsLearned: r.total_words_learned,
+                    avgSessionSeconds: r.avg_session_seconds,
+                    genuineMasteryPct: r.genuine_mastery_pct,
+                    speedFlagSessions: r.speed_flag_sessions,
+                  };
+                });
+                const res = await fetch('/api/digest', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ classId: id, analytics: payload }),
+                });
+                const json = await res.json();
+                setDigestText(json.digest ?? json.error ?? 'Error generating digest');
+              } catch { setDigestText('Error connecting to AI service'); }
+              setDigestLoading(false);
+            }}
+          />
 
         ) : tab === 'radar' ? (
           /* ── Hard Word Radar tab ── */

@@ -13,6 +13,7 @@ import {
   saveLearnMarks, getLearnMarks, getStarredWords, getLearnXPAmount, displayXP,
 } from '@/lib/storage';
 import { pushLists, pushStats } from '@/lib/sync';
+import { supabase } from '@/lib/supabase';
 import { createSRSWord } from '@/lib/srs';
 import { addSRSWord as storeSRSWord } from '@/lib/storage';
 import type { Accent } from '@/lib/speech';
@@ -130,6 +131,21 @@ function LearnInner() {
   const currentIndexRef = useRef(index);
   useEffect(() => { currentIndexRef.current = index; }, [index]);
 
+  // ── Phase 5: analytics tracking refs (no re-renders) ──────────────────────
+  // Reset when words array is first populated (fires once per session load)
+  const sessionStartRef = useRef<number>(Date.now());
+  const wordStartRef = useRef<number>(Date.now());
+  type WordOutcome = { word: string; outcome: string; seconds_to_mark: number; gate_attempts: number; gate_correct_first: boolean };
+  const perWordDataRef = useRef<WordOutcome[]>([]);
+  const wordGateAttemptsRef = useRef(0);
+  const wordGateCorrectFirstRef = useRef(true);
+
+  useEffect(() => {
+    if (words.length === 0) return;
+    perWordDataRef.current = [];
+    sessionStartRef.current = Date.now();
+  }, [words]);
+
   const t = useTranslation();
 
   useEffect(() => {
@@ -245,6 +261,9 @@ function LearnInner() {
       setGateSelected(null);
       setInSpotCheck(false);
       setSpotCheckSelected(null);
+      wordStartRef.current = Date.now();
+      wordGateAttemptsRef.current = 0;
+      wordGateCorrectFirstRef.current = true;
     }
   }, [current]);
 
@@ -266,6 +285,58 @@ function LearnInner() {
     }, 1000);
     return () => clearInterval(id);
   }, [revealed]); // restart countdown whenever a new reveal happens
+
+  // ── Heartbeat: upsert student_presence every 30s while session is active ──
+  useEffect(() => {
+    if (done || words.length === 0) return;
+    const upsert = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      await supabase.from('student_presence').upsert({
+        student_id: user.id,
+        activity: 'learn',
+        collection_name: collectionName ?? null,
+        day_number: dayNumber ?? null,
+        started_at: new Date(sessionStartRef.current).toISOString(),
+        last_heartbeat: new Date().toISOString(),
+      }, { onConflict: 'student_id' });
+    };
+    upsert();
+    const id = setInterval(upsert, 30_000);
+    return () => clearInterval(id);
+  }, [done, words.length, collectionName, dayNumber]);
+
+  // ── Emit session analytics when done ──────────────────────────────────────
+  useEffect(() => {
+    if (!done || words.length === 0) return;
+    const emit = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const wordsLearned = marks.filter(m => m === 'learned').length;
+      const wordsSkipped = marks.filter(m => m === 'skipped').length;
+      const wordsHard = marks.filter(m => m === 'too-hard').length;
+      const sessionSeconds = Math.round((Date.now() - sessionStartRef.current) / 1000);
+      const gateAttempts = perWordDataRef.current.reduce((s, w) => s + w.gate_attempts, 0);
+      const gateCorrectFirst = perWordDataRef.current.filter(w => w.outcome === 'learned' && w.gate_correct_first).length;
+      await supabase.from('learn_session_analytics').insert({
+        student_id: user.id,
+        collection_name: collectionName ?? 'all',
+        day_number: dayNumber ?? 0,
+        started_at: new Date(sessionStartRef.current).toISOString(),
+        completed_at: new Date().toISOString(),
+        total_words: words.length,
+        words_learned: wordsLearned,
+        words_skipped: wordsSkipped,
+        words_hard: wordsHard,
+        session_seconds: sessionSeconds,
+        gate_attempts: gateAttempts,
+        gate_correct_first_try: gateCorrectFirst,
+        per_word_data: perWordDataRef.current,
+      });
+      await supabase.from('student_presence').delete().eq('student_id', user.id);
+    };
+    emit();
+  }, [done, marks, words, collectionName, dayNumber]);
 
   const advanceCard = useCallback(async () => {
     if (!current) return;
@@ -289,6 +360,13 @@ function LearnInner() {
     }
     recordStudySession();
     setSessionCount(c => c + 1);
+    perWordDataRef.current.push({
+      word: current.word,
+      outcome: 'learned',
+      seconds_to_mark: Math.round((Date.now() - wordStartRef.current) / 1000),
+      gate_attempts: wordGateAttemptsRef.current,
+      gate_correct_first: wordGateCorrectFirstRef.current,
+    });
     setMarks(m => { const n = [...m]; n[index] = 'learned'; return n; });
     const newAch = checkAchievements();
     newAch.forEach(pushAchievement);
@@ -317,6 +395,7 @@ function LearnInner() {
     setGateCorrectIndex(opts.indexOf(correct));
     setGateSelected(null);
     setInQuizGate(true);
+    wordGateAttemptsRef.current += 1;
   }, [current, revealed, revealCountdown, inQuizGate, inSpotCheck, marks, index, words, advanceCard]);
 
   const selectGateAnswer = useCallback((idx: number) => {
@@ -349,6 +428,7 @@ function LearnInner() {
         advanceCard();
       }, 700);
     } else {
+      wordGateCorrectFirstRef.current = false;
       setTimeout(() => {
         if (currentIndexRef.current !== capturedIndex) return;
         setInQuizGate(false);
@@ -372,6 +452,13 @@ function LearnInner() {
     if (!current) return;
     addHardWord(current.word);
     setSkipped(s => [...s, current]);
+    perWordDataRef.current.push({
+      word: current.word,
+      outcome: 'too-hard',
+      seconds_to_mark: Math.round((Date.now() - wordStartRef.current) / 1000),
+      gate_attempts: 0,
+      gate_correct_first: true,
+    });
     setMarks(m => { const n = [...m]; n[index] = 'too-hard'; return n; });
     if (index + 1 >= words.length) setDone(true);
     else { setIndex(i => i + 1); setMaxReached(m => Math.max(m, index + 1)); }
@@ -386,6 +473,13 @@ function LearnInner() {
     if (!current) return;
     dismissSkipTip();
     setPureSkipped(s => [...s, current]);
+    perWordDataRef.current.push({
+      word: current.word,
+      outcome: 'skipped',
+      seconds_to_mark: Math.round((Date.now() - wordStartRef.current) / 1000),
+      gate_attempts: 0,
+      gate_correct_first: true,
+    });
     setMarks(m => { const n = [...m]; n[index] = 'skipped'; return n; });
     if (index + 1 >= words.length) setDone(true);
     else { setIndex(i => i + 1); setMaxReached(m => Math.max(m, index + 1)); }

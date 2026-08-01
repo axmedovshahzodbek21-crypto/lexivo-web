@@ -3,7 +3,7 @@ import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
-import { getUnitProgress, getLearnProgress, getHardWordCount, getFlashcardProgress, getStoryUnlockInfo } from '@/lib/storage';
+import { getUnitProgress, getLearnProgress, getHardWordCount, getFlashcardProgress, getStoryUnlockInfo, getSRSWords, getReviewLog, getLearnedWords } from '@/lib/storage';
 import type { WordCollection, UnitProgress } from '@/lib/types';
 import { useTranslation } from '@/lib/useTranslation';
 import { supabase } from '@/lib/supabase';
@@ -45,6 +45,13 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
   const [units, setUnits] = useState<UnitRow[]>([]);
   const [cols, setCols] = useState(2);
 
+  // Heatmap
+  type WordMastery = { word: string; srsScore: number; gateScore: number | null; combined: number };
+  type UnitMastery = { dayNumber: number; topic: string; words: WordMastery[]; avgScore: number };
+  const [unitMastery, setUnitMastery] = useState<UnitMastery[]>([]);
+  const [heatmapLoaded, setHeatmapLoaded] = useState(false);
+  const [heatmapUnit, setHeatmapUnit] = useState<number | null>(null);
+
   useEffect(() => {
     const MIN_CARD = 320;
     const GAP = 8;
@@ -72,6 +79,59 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
     }));
     setUnits(rows);
   }, [collectionsLoaded, collections, collectionName]);
+
+  useEffect(() => {
+    if (!collection) return;
+    const reviewLog = getReviewLog();
+    const srsWords = getSRSWords();
+    const learnedWords = getLearnedWords();
+    const srsSet = new Set(srsWords.filter(w => w.collectionName === collectionName).map(w => w.id));
+    const learnedSet = new Set(learnedWords.filter(w => w.collectionName === collectionName).map(w => `${collectionName}::${w.word}`));
+
+    const build = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      const gateMap: Record<string, { attempts: number; correct: number }> = {};
+      if (user) {
+        const { data } = await supabase
+          .from('learn_session_analytics')
+          .select('per_word_data')
+          .eq('student_id', user.id)
+          .eq('collection_name', collectionName);
+        for (const row of data ?? []) {
+          for (const w of (row.per_word_data ?? []) as { word: string; gate_attempts: number; gate_correct_first: boolean }[]) {
+            if (!gateMap[w.word]) gateMap[w.word] = { attempts: 0, correct: 0 };
+            gateMap[w.word].attempts += 1; // count sessions, not gate openings within a session
+            if (w.gate_correct_first) gateMap[w.word].correct += 1;
+          }
+        }
+      }
+
+      const result: UnitMastery[] = collection.days.map(day => {
+        const words: WordMastery[] = day.words.map(w => {
+          const id = `${collectionName}::${w.word}`;
+          // Use 6 as the denominator (learn session = stage 0, then 5 review intervals).
+          // Newly learned words with 0 reviews score 1/6 ≈ 0.17 (red) instead of 0 (grey).
+          const intervals = reviewLog[id] ?? [];
+          const srsScore = !learnedSet.has(id)
+            ? 0.0
+            : (1 + Math.min(intervals.length, 5)) / 6;
+          const gate = gateMap[w.word];
+          const gateScore = gate && gate.attempts > 0 ? gate.correct / gate.attempts : null;
+          const combined = srsScore === 0 && gateScore === null
+            ? 0
+            : srsScore * 0.6 + (gateScore ?? 0) * 0.4;
+          return { word: w.word, srsScore, gateScore, combined };
+        });
+        const avgScore = words.length > 0 ? words.reduce((s, w) => s + w.combined, 0) / words.length : 0;
+        return { dayNumber: day.dayNumber, topic: day.topic ?? `Unit ${day.dayNumber}`, words, avgScore };
+      });
+
+      setUnitMastery(result);
+      setHeatmapLoaded(true);
+    };
+
+    build();
+  }, [collection, collectionName]);
 
   if (!collectionsLoaded) {
     return (
@@ -165,6 +225,161 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
           />
         ))}
       </div>
+
+      {/* ── Word Mastery Heatmap ── */}
+      {heatmapLoaded && (
+        <div className="px-3 pb-6">
+          <MasteryHeatmap
+            unitMastery={unitMastery}
+            collection={collection}
+            selectedUnit={heatmapUnit}
+            onSelectUnit={setHeatmapUnit}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Heatmap helpers ───────────────────────────────────────────────────────
+
+function masteryColor(score: number): string {
+  if (score === 0) return 'var(--border)';
+  if (score < 0.2) return '#ef4444';
+  if (score < 0.4) return '#f97316';
+  if (score < 0.6) return '#eab308';
+  if (score < 0.8) return '#84cc16';
+  return '#22c55e';
+}
+
+function masteryLabel(score: number): string {
+  if (score === 0) return 'Not studied';
+  if (score < 0.2) return 'Needs work';
+  if (score < 0.4) return 'Struggling';
+  if (score < 0.6) return 'Learning';
+  if (score < 0.8) return 'Good';
+  return 'Mastered';
+}
+
+type WordMastery = { word: string; srsScore: number; gateScore: number | null; combined: number };
+type UnitMastery = { dayNumber: number; topic: string; words: WordMastery[]; avgScore: number };
+
+function MasteryHeatmap({
+  unitMastery, collection, selectedUnit, onSelectUnit,
+}: {
+  unitMastery: UnitMastery[];
+  collection: WordCollection;
+  selectedUnit: number | null;
+  onSelectUnit: (u: number | null) => void;
+}) {
+  const drillUnit = selectedUnit !== null ? unitMastery.find(u => u.dayNumber === selectedUnit) : null;
+  const collectionDay = drillUnit
+    ? collection.days.find(d => d.dayNumber === drillUnit.dayNumber)
+    : null;
+
+  const totalStudied = unitMastery.flatMap(u => u.words).filter(w => w.combined > 0).length;
+  const totalWords = unitMastery.flatMap(u => u.words).length;
+  const avgMastery = totalWords > 0
+    ? unitMastery.flatMap(u => u.words).reduce((s, w) => s + w.combined, 0) / totalWords
+    : 0;
+
+  return (
+    <div className="space-y-3">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="font-bold text-sm text-[var(--text)]">🗺 Word Mastery Heatmap</h3>
+          <p className="text-[10px] text-[var(--text-muted)] mt-0.5">
+            {totalStudied}/{totalWords} words studied · avg {Math.round(avgMastery * 100)}% mastery
+          </p>
+        </div>
+        {drillUnit && (
+          <button
+            onClick={() => onSelectUnit(null)}
+            className="text-xs font-semibold text-[var(--primary)] hover:opacity-70 transition-opacity"
+          >
+            ← All units
+          </button>
+        )}
+      </div>
+
+      {drillUnit ? (
+        /* ── Per-word drill-down ── */
+        <div className="space-y-2">
+          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">
+            Unit {drillUnit.dayNumber} · {drillUnit.topic}
+          </p>
+          <div className="grid grid-cols-2 gap-2">
+            {drillUnit.words.map((w, i) => {
+              const col = collectionDay?.words[i];
+              return (
+                <div
+                  key={w.word}
+                  className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl"
+                  style={{ background: 'var(--surface-2)', borderLeft: `3px solid ${masteryColor(w.combined)}` }}
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-bold text-[var(--text)] truncate">{w.word}</p>
+                    <p className="text-[10px] text-[var(--text-muted)] truncate">{col?.translation ?? ''}</p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="text-xs font-black" style={{ color: masteryColor(w.combined) }}>
+                      {Math.round(w.combined * 100)}%
+                    </p>
+                    <p className="text-[9px] text-[var(--text-muted)]">{masteryLabel(w.combined)}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          {/* SRS + gate breakdown legend */}
+          <div className="flex gap-4 px-1 pt-1">
+            <p className="text-[9px] text-[var(--text-muted)]">⬜ SRS 60% + 🎯 Gate 40%</p>
+          </div>
+        </div>
+      ) : (
+        /* ── Per-unit overview grid ── */
+        <div className="space-y-2">
+          <div className="grid grid-cols-5 gap-1.5">
+            {unitMastery.map(u => (
+              <button
+                key={u.dayNumber}
+                onClick={() => onSelectUnit(u.dayNumber)}
+                className="flex flex-col items-center gap-1 py-2.5 px-1 rounded-xl transition-transform active:scale-95 hover:opacity-80"
+                style={{ background: masteryColor(u.avgScore) + '22', border: `2px solid ${masteryColor(u.avgScore)}` }}
+                title={`Unit ${u.dayNumber}: ${masteryLabel(u.avgScore)} (${Math.round(u.avgScore * 100)}%)`}
+              >
+                <div
+                  className="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-black text-white"
+                  style={{ background: masteryColor(u.avgScore) }}
+                >
+                  {u.dayNumber}
+                </div>
+                <p className="text-[8px] font-bold" style={{ color: masteryColor(u.avgScore) }}>
+                  {Math.round(u.avgScore * 100)}%
+                </p>
+              </button>
+            ))}
+          </div>
+
+          {/* Legend */}
+          <div className="flex items-center gap-3 flex-wrap px-1 pt-1">
+            {[
+              { color: 'var(--border)', label: 'Not studied' },
+              { color: '#ef4444', label: 'Needs work' },
+              { color: '#eab308', label: 'Learning' },
+              { color: '#84cc16', label: 'Good' },
+              { color: '#22c55e', label: 'Mastered' },
+            ].map(({ color, label }) => (
+              <div key={label} className="flex items-center gap-1">
+                <div className="w-2.5 h-2.5 rounded-full" style={{ background: color }} />
+                <span className="text-[9px] text-[var(--text-muted)]">{label}</span>
+              </div>
+            ))}
+          </div>
+          <p className="text-[9px] text-[var(--text-muted)] px-1">Tap a unit to see word-by-word breakdown</p>
+        </div>
+      )}
     </div>
   );
 }
