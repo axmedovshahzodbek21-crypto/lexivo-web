@@ -114,6 +114,20 @@ function LearnInner() {
   const [sessionSize, setSessionSize] = useState(20);
   const [studyOrder, setStudyOrder] = useState<'random' | 'in-order'>('random');
   const [showSkipTip, setShowSkipTip] = useState(false);
+
+  // Anti-cheat state
+  const [revealCountdown, setRevealCountdown] = useState(0);
+  const [inQuizGate, setInQuizGate] = useState(false);
+  const [gateOptions, setGateOptions] = useState<string[]>([]);
+  const [gateCorrectIndex, setGateCorrectIndex] = useState(-1);
+  const [gateSelected, setGateSelected] = useState<number | null>(null);
+  const [inSpotCheck, setInSpotCheck] = useState(false);
+  const [spotCheckWord, setSpotCheckWord] = useState<StudyWord | null>(null);
+  const [spotCheckOptions, setSpotCheckOptions] = useState<string[]>([]);
+  const [spotCheckCorrectIndex, setSpotCheckCorrectIndex] = useState(-1);
+  const [spotCheckSelected, setSpotCheckSelected] = useState<number | null>(null);
+  const [learnedSinceLastCheck, setLearnedSinceLastCheck] = useState(0);
+
   const t = useTranslation();
 
   useEffect(() => {
@@ -224,6 +238,11 @@ function LearnInner() {
       setShowEx3Translation(false);
       setShowUzDefinition(false);
       setShowMoreExamples(false);
+      setRevealCountdown(0);
+      setInQuizGate(false);
+      setGateSelected(null);
+      setInSpotCheck(false);
+      setSpotCheckSelected(null);
     }
   }, [current]);
 
@@ -233,6 +252,18 @@ function LearnInner() {
       else speakAccent(current.word, defaultAccent);
     }
   }, [revealed]); // intentionally only on revealed change
+
+  useEffect(() => {
+    if (!revealed) return;
+    setRevealCountdown(3);
+    const id = setInterval(() => {
+      setRevealCountdown(c => {
+        if (c <= 1) { clearInterval(id); return 0; }
+        return c - 1;
+      });
+    }, 1000);
+    return () => clearInterval(id);
+  }, [revealed]); // restart countdown whenever a new reveal happens
 
   const advanceCard = useCallback(async () => {
     if (!current) return;
@@ -272,6 +303,57 @@ function LearnInner() {
       setMaxReached(m => Math.max(m, index + 1));
     }
   }, [current, index, words, collectionName, pushAchievement, setPendingLevelUp, hardOnly]);
+
+  const tryAdvanceCard = useCallback(() => {
+    if (!current || !revealed || revealCountdown > 0 || inQuizGate || inSpotCheck) return;
+    if (marks[index] === 'learned') { advanceCard(); return; } // already marked — bypass gate
+    if (words.length < 2) { advanceCard(); return; }
+    const correct = current.translation;
+    const pool = [...words.filter(w => w.word !== current.word)].sort(() => Math.random() - 0.5);
+    const opts = [correct, ...pool.slice(0, 3).map(w => w.translation)].sort(() => Math.random() - 0.5);
+    setGateOptions(opts);
+    setGateCorrectIndex(opts.indexOf(correct));
+    setGateSelected(null);
+    setInQuizGate(true);
+  }, [current, revealed, revealCountdown, inQuizGate, inSpotCheck, marks, index, words, advanceCard]);
+
+  const selectGateAnswer = useCallback((idx: number) => {
+    if (gateSelected !== null) return;
+    setGateSelected(idx);
+    if (idx === gateCorrectIndex) {
+      setTimeout(() => {
+        const next = learnedSinceLastCheck + 1;
+        if (next >= 3) {
+          const learnedWords = words.filter((_, i) => marks[i] === 'learned');
+          if (learnedWords.length > 0) {
+            const checkWord = learnedWords[Math.floor(Math.random() * learnedWords.length)];
+            const correct = checkWord.translation;
+            const pool = [...words.filter(w => w.word !== checkWord.word)].sort(() => Math.random() - 0.5);
+            const opts = [correct, ...pool.slice(0, 3).map(w => w.translation)].sort(() => Math.random() - 0.5);
+            setLearnedSinceLastCheck(0);
+            setSpotCheckWord(checkWord);
+            setSpotCheckOptions(opts);
+            setSpotCheckCorrectIndex(opts.indexOf(correct));
+            setSpotCheckSelected(null);
+            setInQuizGate(false);
+            setInSpotCheck(true);
+            return;
+          }
+        }
+        setLearnedSinceLastCheck(next >= 3 ? 0 : next);
+        setInQuizGate(false);
+        advanceCard();
+      }, 700);
+    } else {
+      setTimeout(() => { setInQuizGate(false); setGateSelected(null); }, 1200);
+    }
+  }, [gateSelected, gateCorrectIndex, learnedSinceLastCheck, words, marks, advanceCard]);
+
+  const selectSpotCheckAnswer = useCallback((idx: number) => {
+    if (spotCheckSelected !== null) return;
+    setSpotCheckSelected(idx);
+    setTimeout(() => { setInSpotCheck(false); advanceCard(); }, 700);
+  }, [spotCheckSelected, advanceCard]);
 
   const markTooHard = useCallback(() => {
     if (!current) return;
@@ -316,14 +398,14 @@ function LearnInner() {
           e.preventDefault();
           if (!done) {
             if (!revealed) { setRevealed(true); dismissSkipTip(); }
-            else advanceCard();
+            else if (!inQuizGate && !inSpotCheck) tryAdvanceCard();
           }
           break;
       }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [current, done, focusMode, revealed, marks, index, advanceCard, markTooHard, skipWord, dismissSkipTip]);
+  }, [current, done, focusMode, revealed, marks, index, tryAdvanceCard, markTooHard, skipWord, dismissSkipTip, inQuizGate, inSpotCheck]);
 
   // No unit selected → show picker
   if (!collectionName && !hardOnly && !sourceMyWords && !sourceStarred) return <UnitPicker mode="learn" />;
@@ -646,40 +728,91 @@ function LearnInner() {
           </div>
         )}
 
-        {/* Action buttons — after reveal or on unvisited card before reveal */}
+        {/* Action buttons — anti-cheat state machine */}
         {!isMarked && (
           <div className="no-focus space-y-2">
-            {showBack && (
-              <div className="flex gap-3 animate-fade-in">
-                <button
-                  onClick={markTooHard}
-                  className="flex-1 py-3.5 rounded-xl border-2 border-[var(--danger)] text-[var(--danger)] font-semibold text-sm hover:bg-red-50 transition-colors press-3d"
-                >
-                  {t.learn.tooHard} <kbd className="ml-1 opacity-60 text-xs">H</kbd>
-                </button>
-                <button
-                  onClick={advanceCard}
-                  className="flex-[2] btn-primary py-3.5 text-center press-3d"
-                >
-                  {t.learn.gotIt} <kbd className="ml-1 opacity-60 text-xs">Space</kbd>
-                </button>
-              </div>
-            )}
-            <button
-              onClick={skipWord}
-              className="w-full py-3 rounded-xl border-2 border-[var(--border)] text-[var(--text-muted)] font-semibold text-sm hover:border-orange-300 hover:text-orange-500 transition-colors press-3d"
-            >
-              {t.common.skip} <kbd className="ml-1 opacity-60 text-xs">K</kbd>
-            </button>
-            {showSkipTip && (
-              <div className="flex items-start gap-2 bg-orange-50 border border-orange-200 rounded-xl px-3 py-2.5 animate-fade-in">
-                <span className="text-base shrink-0 mt-0.5">⏭️</span>
-                <div className="flex-1">
-                  <p className="text-xs font-semibold text-orange-700">{t.learn.skipTipTitle}</p>
-                  <p className="text-xs text-orange-600 mt-0.5">{t.learn.skipTipBody}</p>
+            {inSpotCheck && spotCheckWord ? (
+              /* ── Spot-check panel ── */
+              <div className="animate-fade-in space-y-2">
+                <p className="text-xs font-bold text-[var(--primary)] text-center uppercase tracking-wide">🔍 Spot check!</p>
+                <p className="text-sm font-semibold text-[var(--text)] text-center">
+                  What is the translation of <span className="text-[var(--primary)]">{spotCheckWord.word}</span>?
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  {spotCheckOptions.map((opt, i) => {
+                    const isSelected = spotCheckSelected === i;
+                    const isCorrect = i === spotCheckCorrectIndex;
+                    const showResult = spotCheckSelected !== null;
+                    let cls = 'py-3 px-3 rounded-xl text-sm font-semibold border-2 transition-colors text-left press-3d ';
+                    if (showResult && isCorrect) cls += 'bg-green-500 border-green-500 text-white';
+                    else if (showResult && isSelected) cls += 'bg-red-500 border-red-500 text-white';
+                    else cls += 'border-[var(--border)] text-[var(--text)] hover:border-[var(--primary)]';
+                    return (
+                      <button key={i} onClick={() => selectSpotCheckAnswer(i)} disabled={spotCheckSelected !== null} className={cls}>
+                        {opt}
+                      </button>
+                    );
+                  })}
                 </div>
-                <button onClick={dismissSkipTip} className="text-orange-400 hover:text-orange-600 text-sm font-bold shrink-0 mt-0.5" aria-label="Dismiss tip">✕</button>
               </div>
+            ) : inQuizGate ? (
+              /* ── Quiz gate panel ── */
+              <div className="animate-fade-in space-y-2">
+                <p className="text-xs font-bold text-[var(--text-muted)] text-center">Quick check — what is the translation?</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {gateOptions.map((opt, i) => {
+                    const isSelected = gateSelected === i;
+                    const isCorrect = i === gateCorrectIndex;
+                    const showResult = gateSelected !== null;
+                    let cls = 'py-3 px-3 rounded-xl text-sm font-semibold border-2 transition-colors text-left press-3d ';
+                    if (showResult && isCorrect) cls += 'bg-green-500 border-green-500 text-white';
+                    else if (showResult && isSelected) cls += 'bg-red-500 border-red-500 text-white';
+                    else cls += 'border-[var(--border)] text-[var(--text)] hover:border-[var(--primary)]';
+                    return (
+                      <button key={i} onClick={() => selectGateAnswer(i)} disabled={gateSelected !== null} className={cls}>
+                        {opt}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              /* ── Normal action buttons ── */
+              <>
+                {showBack && (
+                  <div className="flex gap-3 animate-fade-in">
+                    <button
+                      onClick={markTooHard}
+                      className="flex-1 py-3.5 rounded-xl border-2 border-[var(--danger)] text-[var(--danger)] font-semibold text-sm hover:bg-red-50 transition-colors press-3d"
+                    >
+                      {t.learn.tooHard} <kbd className="ml-1 opacity-60 text-xs">H</kbd>
+                    </button>
+                    <button
+                      onClick={tryAdvanceCard}
+                      disabled={revealCountdown > 0}
+                      className="flex-[2] btn-primary py-3.5 text-center press-3d disabled:opacity-60"
+                    >
+                      {revealCountdown > 0 ? `⏳ ${revealCountdown}s` : <>{t.learn.gotIt} <kbd className="ml-1 opacity-60 text-xs">Space</kbd></>}
+                    </button>
+                  </div>
+                )}
+                <button
+                  onClick={skipWord}
+                  className="w-full py-3 rounded-xl border-2 border-[var(--border)] text-[var(--text-muted)] font-semibold text-sm hover:border-orange-300 hover:text-orange-500 transition-colors press-3d"
+                >
+                  {t.common.skip} <kbd className="ml-1 opacity-60 text-xs">K</kbd>
+                </button>
+                {showSkipTip && (
+                  <div className="flex items-start gap-2 bg-orange-50 border border-orange-200 rounded-xl px-3 py-2.5 animate-fade-in">
+                    <span className="text-base shrink-0 mt-0.5">⏭️</span>
+                    <div className="flex-1">
+                      <p className="text-xs font-semibold text-orange-700">{t.learn.skipTipTitle}</p>
+                      <p className="text-xs text-orange-600 mt-0.5">{t.learn.skipTipBody}</p>
+                    </div>
+                    <button onClick={dismissSkipTip} className="text-orange-400 hover:text-orange-600 text-sm font-bold shrink-0 mt-0.5" aria-label="Dismiss tip">✕</button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         )}
