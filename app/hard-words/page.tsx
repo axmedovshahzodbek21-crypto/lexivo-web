@@ -54,6 +54,7 @@ export default function HardWordsPage() {
   useEffect(() => { reload(); }, [reload]);
 
   const handleRemove = (word: string) => {
+    if (!confirm(`Remove "${word}" from hard words?`)) return;
     removeHardWord(word);
     pushLists();
     reload();

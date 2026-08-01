@@ -66,6 +66,7 @@ export default function Navigation() {
   const levelColor = LEVEL_COLORS[levelInfo.level] ?? LEVEL_COLORS_FALLBACK;
 
   const handleSignOut = async () => {
+    if (!confirm('Sign out of your account?')) return;
     await signOut();
     router.replace('/login');
   };

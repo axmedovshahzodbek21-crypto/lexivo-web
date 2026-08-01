@@ -221,6 +221,7 @@ export default function SettingsPage() {
   };
 
   const handleSignOut = async () => {
+    if (!confirm('Sign out of your account?')) return;
     clearUserData();
     await supabase.auth.signOut();
     window.location.replace('/login');

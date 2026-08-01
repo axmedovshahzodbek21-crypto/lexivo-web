@@ -87,6 +87,7 @@ export default function ListDetailPage({ params }: { params: Promise<{ id: strin
   };
 
   const handleRemove = (word: string) => {
+    if (!confirm(`Remove "${word}" from this list?`)) return;
     removeWordFromList(id, word);
     reload();
   };

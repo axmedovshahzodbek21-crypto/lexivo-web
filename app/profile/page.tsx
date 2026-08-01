@@ -140,6 +140,7 @@ export default function ProfilePage() {
   }
 
   async function handleRemovePhoto() {
+    if (!confirm('Remove your profile photo? This cannot be undone.')) return;
     removeProfilePic();
     removeProfilePicUrl();
     if (user) {
@@ -150,6 +151,7 @@ export default function ProfilePage() {
   }
 
   async function handleSignOut() {
+    if (!confirm('Sign out of your account?')) return;
     await signOut();
     router.replace('/login');
   }

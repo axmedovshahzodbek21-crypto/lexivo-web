@@ -302,6 +302,7 @@ export default function ClassesPage() {
 
   const leaveClass = async (classId: string) => {
     if (!user) return;
+    if (!confirm('Leave this class? You will need the class code to rejoin.')) return;
     await supabase.from('class_members').delete().eq('class_id', classId).eq('student_id', user.id);
     load();
   };
