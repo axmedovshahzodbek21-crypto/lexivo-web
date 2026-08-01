@@ -303,7 +303,13 @@ function LearnInner() {
     };
     upsert();
     const id = setInterval(upsert, 30_000);
-    return () => clearInterval(id);
+    return () => {
+      clearInterval(id);
+      // Delete presence row when navigating away mid-session (not just on done)
+      supabase.auth.getUser().then(({ data: { user } }) => {
+        if (user) supabase.from('student_presence').delete().eq('student_id', user.id).then(() => {});
+      });
+    };
   }, [done, words.length, collectionName, dayNumber]);
 
   // ── Emit session analytics when done ──────────────────────────────────────
