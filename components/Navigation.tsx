@@ -70,8 +70,8 @@ export default function Navigation() {
     router.replace('/login');
   };
 
-  // Hide when inside a class room (e.g. /classes/abc123/home)
-  if (/^\/classes\/[^/]+\/.+/.test(pathname)) return null;
+  // Hide when inside a class room (/classes/[id] or /classes/[id]/*)
+  if (/^\/classes\/[^/]+(\/|$)/.test(pathname)) return null;
 
   return (
     <>
