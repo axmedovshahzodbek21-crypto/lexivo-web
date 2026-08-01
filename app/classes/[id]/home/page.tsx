@@ -62,6 +62,8 @@ export default function ClassHomePage() {
   const [wordCount, setWordCount] = useState(0);
   const [memberCount, setMemberCount] = useState(0);
   const [activeToday, setActiveToday] = useState(0);
+  const [needsAttention, setNeedsAttention] = useState(0);
+  const [readCounts, setReadCounts] = useState<Record<string, number>>({});
 
   useEffect(() => {
     if (!user) return;
@@ -87,6 +89,29 @@ export default function ClassHomePage() {
       setAnnouncements(anns ?? []);
       setWordCount(words?.length ?? 0);
 
+      // Read receipts: student marks read, teacher fetches counts
+      if (!teacher && anns && anns.length > 0) {
+        void (async () => {
+          try {
+            await supabase.from('class_announcement_reads')
+              .upsert(anns.map(a => ({ announcement_id: a.id, student_id: user.id })), { onConflict: 'announcement_id,student_id' });
+          } catch (_) {}
+        })();
+      }
+      if (teacher && anns && anns.length > 0) {
+        void (async () => {
+          try {
+            const annIds = (anns as Announcement[]).map(a => a.id);
+            const { data: reads } = await supabase.from('class_announcement_reads').select('announcement_id').in('announcement_id', annIds);
+            const counts: Record<string, number> = {};
+            for (const r of reads ?? []) {
+              counts[r.announcement_id] = (counts[r.announcement_id] ?? 0) + 1;
+            }
+            setReadCounts(counts);
+          } catch (_) {}
+        })();
+      }
+
       const { data: members } = await supabase
         .from('class_members').select('student_id').eq('class_id', id);
       const count = members?.length ?? 0;
@@ -97,6 +122,8 @@ export default function ClassHomePage() {
         const { data: profiles } = await supabase
           .from('profiles').select('last_study_date').in('id', ids);
         setActiveToday(profiles?.filter(p => p.last_study_date === today).length ?? 0);
+        const threeDaysAgo = new Date(Date.now() - 3 * 86400000).toISOString().slice(0, 10);
+        setNeedsAttention(profiles?.filter(p => !p.last_study_date || p.last_study_date < threeDaysAgo).length ?? 0);
       }
 
       if (!teacher) {
@@ -172,6 +199,20 @@ export default function ClassHomePage() {
 
       <div className="flex-1 p-4 space-y-5">
 
+        {/* Spotlight banner (teacher only) */}
+        {isTeacher && needsAttention > 0 && (
+          <div className="p-4 rounded-2xl border border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-950/30 flex items-center gap-3">
+            <span className="text-xl">⚠️</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-black text-red-600 dark:text-red-400">
+                {needsAttention} student{needsAttention > 1 ? 's' : ''} need attention
+              </p>
+              <p className="text-xs text-[var(--text-muted)]">Haven't studied in 3+ days · Check Dashboard</p>
+            </div>
+            <span className="text-red-500 text-sm shrink-0">→</span>
+          </div>
+        )}
+
         {/* Homework (student) */}
         {!isTeacher && targets.length > 0 && (
           <section>
@@ -230,7 +271,10 @@ export default function ClassHomePage() {
                       <p className="text-sm text-[var(--text)]">{a.message}</p>
                       <p className="text-xs text-[var(--text-muted)] mt-0.5">{timeAgo(a.created_at)}</p>
                     </div>
-                    {isNew && <span className="text-[10px] font-bold text-[var(--primary)] self-start pt-0.5">NEW</span>}
+                    {isTeacher
+                      ? <span className="text-[9px] font-bold text-[var(--text-muted)] self-start pt-0.5 bg-[var(--surface-2)] px-1.5 py-0.5 rounded-md shrink-0">{readCounts[a.id] ?? 0}/{memberCount}</span>
+                      : isNew && <span className="text-[10px] font-bold text-[var(--primary)] self-start pt-0.5">NEW</span>
+                    }
                   </div>
                 );
               })}

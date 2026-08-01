@@ -1,11 +1,24 @@
 'use client';
-import { SectionLoader } from '@/components/Loader';
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 
-type InputTab = 'manual' | 'ai';
+type InputTab = 'manual' | 'ai' | 'collection';
+
+type CollectionDay = {
+  dayNumber: number;
+  topic: string;
+  words: Array<{ word: string; translation: string; definition?: string; example1?: string; example1_translation?: string; example2?: string; example2_translation?: string }>;
+};
+type CollectionData = { days: CollectionDay[] };
+
+const BUILT_IN_COLLECTIONS = [
+  { name: 'A1 Starter',       emoji: '🌱', file: '/data/a1_collection.json' },
+  { name: 'A2 Elementary',    emoji: '📗', file: '/data/a2_collection.json' },
+  { name: 'B1 Intermediate',  emoji: '📘', file: '/data/b1_collection.json' },
+  { name: 'B2+ Advanced',     emoji: '📕', file: '/data/advanced_collection.json' },
+];
 
 interface ClassWord {
   id: string;
@@ -220,6 +233,13 @@ export default function ClassWordsPage() {
   const [copied2, setCopied2] = useState(false);
   const [importing, setImporting] = useState(false);
 
+  // Collection import tab
+  const [selectedCollection, setSelectedCollection] = useState<string | null>(null);
+  const [collectionData, setCollectionData] = useState<CollectionData | null>(null);
+  const [selectedDayIdx, setSelectedDayIdx] = useState<number | null>(null);
+  const [loadingCollection, setLoadingCollection] = useState(false);
+  const [importingCollection, setImportingCollection] = useState(false);
+
   const parseResult = useMemo(() => parseOutput(pasted, wordLangCode), [pasted, wordLangCode]);
   const parsed = parseResult.words;
 
@@ -293,6 +313,42 @@ export default function ClassWordsPage() {
   const deleteWord = async (wordId: string) => {
     await supabase.from('class_words').delete().eq('id', wordId);
     setWords(prev => prev.filter(w => w.id !== wordId));
+  };
+
+  const pickCollection = async (file: string) => {
+    if (selectedCollection === file) {
+      setSelectedCollection(null); setCollectionData(null); setSelectedDayIdx(null); return;
+    }
+    setLoadingCollection(true); setSelectedCollection(file); setSelectedDayIdx(null);
+    try {
+      const res = await fetch(file);
+      setCollectionData(await res.json() as CollectionData);
+    } catch (_) { setCollectionData(null); }
+    setLoadingCollection(false);
+  };
+
+  const importCollectionDay = async () => {
+    if (!user || !collectionData || selectedDayIdx === null) return;
+    setImportingCollection(true);
+    try {
+      const day = collectionData.days[selectedDayIdx];
+      const colName = BUILT_IN_COLLECTIONS.find(c => c.file === selectedCollection)?.name ?? '';
+      const rows = day.words.map(w => ({
+        class_id: id, teacher_id: user.id,
+        word: w.word, translation: w.translation,
+        definition: w.definition || null,
+        example1: w.example1 || null,
+        example1_translation: w.example1_translation || null,
+        example2: w.example2 || null,
+        example2_translation: w.example2_translation || null,
+        folder_name: colName,
+        collection_name: `Day ${day.dayNumber}: ${day.topic}`,
+      }));
+      await supabase.from('class_words').insert(rows);
+      setSelectedDayIdx(null);
+      await loadWords();
+    } catch (_) {}
+    setImportingCollection(false);
   };
 
   const copyPrompt = (text: string, which: 1 | 2) => {
@@ -389,13 +445,13 @@ export default function ClassWordsPage() {
         <div className="p-4 space-y-4">
           {/* Tab switcher */}
           <div className="flex rounded-2xl overflow-hidden border border-[var(--border)]">
-            {(['manual', 'ai'] as InputTab[]).map(t => (
+            {(['manual', 'ai', 'collection'] as InputTab[]).map(t => (
               <button
                 key={t}
                 onClick={() => setTab(t)}
-                className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${tab === t ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface-2)] text-[var(--text-muted)]'}`}
+                className={`flex-1 py-2.5 text-xs font-semibold transition-colors ${tab === t ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface-2)] text-[var(--text-muted)]'}`}
               >
-                {t === 'manual' ? '✏️ Manual' : '🤖 AI Import'}
+                {t === 'manual' ? '✏️ Manual' : t === 'ai' ? '🤖 AI' : '📚 Collection'}
               </button>
             ))}
           </div>
@@ -610,6 +666,65 @@ export default function ClassWordsPage() {
                     </button>
                   )}
                 </div>
+              )}
+            </div>
+          )}
+
+          {/* Collection Import tab */}
+          {tab === 'collection' && (
+            <div className="space-y-3">
+              <div className="card space-y-3">
+                <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">Pick a Collection</p>
+                <div className="space-y-2">
+                  {BUILT_IN_COLLECTIONS.map(col => {
+                    const isSelected = selectedCollection === col.file;
+                    return (
+                      <button key={col.file} onClick={() => pickCollection(col.file)}
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-colors text-left ${isSelected ? 'bg-[var(--primary-bg)] border-[var(--primary)]/50' : 'bg-[var(--surface-2)] border-[var(--border)] hover:border-[var(--primary)]/30'}`}
+                      >
+                        <span className="text-xl">{col.emoji}</span>
+                        <p className={`flex-1 text-sm font-bold ${isSelected ? 'text-[var(--primary)]' : 'text-[var(--text)]'}`}>{col.name}</p>
+                        {isSelected && <span className="text-[var(--primary)] text-sm">✓</span>}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {loadingCollection && (
+                <div className="flex justify-center py-6">
+                  <div className="w-6 h-6 border-2 border-[var(--primary)] border-t-transparent rounded-full animate-spin" />
+                </div>
+              )}
+
+              {!loadingCollection && collectionData && (
+                <div className="card space-y-2">
+                  <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">Pick a Unit</p>
+                  <div className="space-y-1.5 max-h-72 overflow-y-auto">
+                    {collectionData.days.map((day, i) => {
+                      const isSelected = selectedDayIdx === i;
+                      return (
+                        <button key={i} onClick={() => setSelectedDayIdx(isSelected ? null : i)}
+                          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border transition-colors text-left ${isSelected ? 'bg-[var(--primary-bg)] border-[var(--primary)]/50' : 'bg-[var(--surface-2)] border-[var(--border)] hover:border-[var(--primary)]/30'}`}
+                        >
+                          <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 text-xs font-black ${isSelected ? 'bg-[var(--primary)] text-white' : 'bg-[var(--primary-bg)] text-[var(--primary)]'}`}>
+                            {day.dayNumber}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className={`text-sm font-semibold truncate ${isSelected ? 'text-[var(--primary)]' : 'text-[var(--text)]'}`}>{day.topic}</p>
+                            <p className="text-xs text-[var(--text-muted)]">{day.words.length} words</p>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {collectionData && selectedDayIdx !== null && (
+                <button onClick={importCollectionDay} disabled={importingCollection} className="w-full btn-primary py-3 disabled:opacity-50">
+                  {importingCollection ? 'Importing…' : `Import ${collectionData.days[selectedDayIdx].words.length} words to class`}
+                </button>
               )}
             </div>
           )}
