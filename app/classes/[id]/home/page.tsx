@@ -201,16 +201,19 @@ export default function ClassHomePage() {
 
         {/* Spotlight banner (teacher only) */}
         {isTeacher && needsAttention > 0 && (
-          <div className="p-4 rounded-2xl border border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-950/30 flex items-center gap-3">
+          <button
+            onClick={() => router.push(`/classes/${id}`)}
+            className="w-full text-left p-4 rounded-2xl border border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-950/30 flex items-center gap-3 hover:opacity-80 transition-opacity"
+          >
             <span className="text-xl">⚠️</span>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-black text-red-600 dark:text-red-400">
                 {needsAttention} student{needsAttention > 1 ? 's' : ''} need attention
               </p>
-              <p className="text-xs text-[var(--text-muted)]">Haven't studied in 3+ days · Check Dashboard</p>
+              <p className="text-xs text-[var(--text-muted)]">Haven't studied in 3+ days · Tap to open Dashboard</p>
             </div>
             <span className="text-red-500 text-sm shrink-0">→</span>
-          </div>
+          </button>
         )}
 
         {/* Homework (student) */}

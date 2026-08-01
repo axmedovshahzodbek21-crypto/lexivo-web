@@ -113,8 +113,8 @@ export default function ClassHomeworkPage() {
 
   const deleteHomework = async (hwItem: Homework) => {
     if (!confirm(`Delete "${hwItem.title}"?`)) return;
-    await supabase.from('class_homework').delete().eq('id', hwItem.id);
-    setHw(prev => prev.filter(h => h.id !== hwItem.id));
+    const { error } = await supabase.from('class_homework').delete().eq('id', hwItem.id);
+    if (!error) setHw(prev => prev.filter(h => h.id !== hwItem.id));
   };
 
   if (loading) {
