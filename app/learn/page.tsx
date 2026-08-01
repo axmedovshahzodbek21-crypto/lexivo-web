@@ -1,6 +1,6 @@
 ﻿'use client';
 import { PageLoader, SectionLoader } from '@/components/Loader';
-import { useEffect, useState, useCallback, useMemo, Suspense } from 'react';
+import { useEffect, useRef, useState, useCallback, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { useShallow } from 'zustand/react/shallow';
@@ -127,6 +127,8 @@ function LearnInner() {
   const [spotCheckCorrectIndex, setSpotCheckCorrectIndex] = useState(-1);
   const [spotCheckSelected, setSpotCheckSelected] = useState<number | null>(null);
   const [learnedSinceLastCheck, setLearnedSinceLastCheck] = useState(0);
+  const currentIndexRef = useRef(index);
+  useEffect(() => { currentIndexRef.current = index; }, [index]);
 
   const t = useTranslation();
 
@@ -319,9 +321,11 @@ function LearnInner() {
 
   const selectGateAnswer = useCallback((idx: number) => {
     if (gateSelected !== null) return;
+    const capturedIndex = index;
     setGateSelected(idx);
     if (idx === gateCorrectIndex) {
       setTimeout(() => {
+        if (currentIndexRef.current !== capturedIndex) return;
         const next = learnedSinceLastCheck + 1;
         if (next >= 3) {
           const learnedWords = words.filter((_, i) => marks[i] === 'learned');
@@ -345,15 +349,24 @@ function LearnInner() {
         advanceCard();
       }, 700);
     } else {
-      setTimeout(() => { setInQuizGate(false); setGateSelected(null); }, 1200);
+      setTimeout(() => {
+        if (currentIndexRef.current !== capturedIndex) return;
+        setInQuizGate(false);
+        setGateSelected(null);
+      }, 1200);
     }
-  }, [gateSelected, gateCorrectIndex, learnedSinceLastCheck, words, marks, advanceCard]);
+  }, [gateSelected, gateCorrectIndex, index, learnedSinceLastCheck, words, marks, advanceCard]);
 
   const selectSpotCheckAnswer = useCallback((idx: number) => {
     if (spotCheckSelected !== null) return;
+    const capturedIndex = index;
     setSpotCheckSelected(idx);
-    setTimeout(() => { setInSpotCheck(false); advanceCard(); }, 700);
-  }, [spotCheckSelected, advanceCard]);
+    setTimeout(() => {
+      if (currentIndexRef.current !== capturedIndex) return;
+      setInSpotCheck(false);
+      advanceCard();
+    }, 700);
+  }, [spotCheckSelected, index, advanceCard]);
 
   const markTooHard = useCallback(() => {
     if (!current) return;
