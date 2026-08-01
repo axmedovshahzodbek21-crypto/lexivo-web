@@ -511,6 +511,9 @@ function ProgressBar({ done, total, color }: { done: number; total: number; colo
 
 const _topicsCache: Record<string, Record<number, string>> = {};
 
+type CachedClass = { classInfo: ClassInfo; students: StudentRow[]; collections: CollectionMeta[]; hardWords: HardWord[] };
+const _classCache = new Map<string, CachedClass>();
+
 async function fetchTopics(collectionName: string): Promise<Record<number, string>> {
   if (_topicsCache[collectionName]) return _topicsCache[collectionName];
   try {
@@ -726,7 +729,16 @@ export default function ClassDashboardPage() {
 
   const load = async () => {
     if (!user || !id) return;
-    setLoading(true);
+    const cached = _classCache.get(id);
+    if (cached) {
+      setClassInfo(cached.classInfo);
+      setStudents(cached.students);
+      setCollections(cached.collections);
+      setHardWords(cached.hardWords);
+      setLoading(false); // show stale data immediately, refresh silently below
+    } else {
+      setLoading(true);
+    }
     const { data: cls } = await supabase.from('classes').select('*').eq('id', id).single();
     if (!cls || cls.teacher_id !== user.id) { setNotTeacher(true); setLoading(false); return; }
     setClassInfo(cls);
@@ -738,6 +750,12 @@ export default function ClassDashboardPage() {
     setCollections((colData as CollectionMeta[]) ?? []);
     const { data: hwData } = await supabase.rpc('get_hard_words', { p_class_id: id });
     setHardWords((hwData as HardWord[]) ?? []);
+    _classCache.set(id, {
+      classInfo: cls as ClassInfo,
+      students: (data as StudentRow[]) ?? [],
+      collections: (colData as CollectionMeta[]) ?? [],
+      hardWords: (hwData as HardWord[]) ?? [],
+    });
     await Promise.all([loadNotes(), loadTargets(), loadAnnouncements()]);
     setLoading(false);
   };
