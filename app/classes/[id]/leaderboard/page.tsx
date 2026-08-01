@@ -105,7 +105,8 @@ export default function ClassLeaderboardPage() {
               const isMe = row.student_id === user?.id;
               const targetH = PODIUM_HEIGHTS[rankIdx];
               const barColor = isMe ? 'var(--primary)' : PODIUM_COLORS[rankIdx];
-              const glowColor = isMe ? 'var(--primary)' : PODIUM_COLORS[rankIdx];
+              // CSS variables can't be used in hex-opacity shorthand — use fixed hex for glow
+              const glowColor = isMe ? '#6c63ff' : PODIUM_COLORS[rankIdx];
               const medal = MEDALS[rankIdx];
 
               return (
