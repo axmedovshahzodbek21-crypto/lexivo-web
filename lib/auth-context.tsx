@@ -37,6 +37,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
+      if (event === 'SIGNED_OUT') {
+        // Covers automatic sign-out (token expiry) — manual sign-out calls
+        // clearUserData() directly before reaching here, so calling twice is safe.
+        clearUserData();
+      }
       if (event === 'PASSWORD_RECOVERY' && typeof window !== 'undefined' && !window.location.pathname.includes('update-password')) {
         window.location.replace('/update-password');
       }
