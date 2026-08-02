@@ -23,6 +23,12 @@ function dueLabel(due: string | null): { text: string; overdue: boolean } | null
   return { text: `Due ${due}`, overdue: false };
 }
 
+type HwCache = {
+  isTeacher: boolean; hw: Homework[];
+  completedIds: string[]; completionCounts: Record<string, number>; memberCount: number;
+};
+const _hwCache = new Map<string, HwCache>();
+
 export default function ClassHomeworkPage() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
@@ -41,43 +47,56 @@ export default function ClassHomeworkPage() {
 
   useEffect(() => {
     if (!user) return;
-    (async () => {
+    const cacheKey = `${user.id}:${id}`;
+    const cached = _hwCache.get(cacheKey);
+    if (cached) {
+      setIsTeacher(cached.isTeacher);
+      setHw(cached.hw);
+      setCompletedIds(new Set(cached.completedIds));
+      setCompletionCounts(cached.completionCounts);
+      setMemberCount(cached.memberCount);
+      setLoading(false);
+    } else {
       setLoading(true);
+    }
 
-      const { data: cls } = await supabase.from('classes').select('teacher_id').eq('id', id).maybeSingle();
+    (async () => {
+      const [{ data: cls }, { data: hwData }] = await Promise.all([
+        supabase.from('classes').select('teacher_id').eq('id', id).maybeSingle(),
+        supabase.from('class_homework')
+          .select('id, class_id, teacher_id, title, due_date, created_at')
+          .eq('class_id', id).order('created_at', { ascending: false }),
+      ]);
       const teacher = cls?.teacher_id === user.id;
-      setIsTeacher(teacher);
-
-      const { data: hwData } = await supabase
-        .from('class_homework')
-        .select('id, class_id, teacher_id, title, due_date, created_at')
-        .eq('class_id', id)
-        .order('created_at', { ascending: false });
       const homeworks = (hwData ?? []) as Homework[];
-      setHw(homeworks);
+      const hwIds = homeworks.map(h => h.id);
 
+      const [{ data: members }, { data: comps }] = await Promise.all([
+        teacher
+          ? supabase.from('class_members').select('student_id').eq('class_id', id)
+          : Promise.resolve({ data: [] as { student_id: string }[] }),
+        hwIds.length > 0
+          ? (teacher
+              ? supabase.from('class_homework_completions').select('homework_id').in('homework_id', hwIds)
+              : supabase.from('class_homework_completions').select('homework_id').eq('student_id', user.id).in('homework_id', hwIds))
+          : Promise.resolve({ data: [] as { homework_id: string }[] }),
+      ]);
+
+      const memberCount = (members ?? []).length;
+      let newCompletedIds: string[] = [];
+      let newCounts: Record<string, number> = {};
       if (teacher) {
-        const { data: members } = await supabase.from('class_members').select('student_id').eq('class_id', id);
-        setMemberCount(members?.length ?? 0);
-
-        if (homeworks.length > 0) {
-          const hwIds = homeworks.map(h => h.id);
-          const { data: comps } = await supabase
-            .from('class_homework_completions').select('homework_id').in('homework_id', hwIds);
-          const counts: Record<string, number> = {};
-          for (const comp of comps ?? []) {
-            counts[comp.homework_id] = (counts[comp.homework_id] ?? 0) + 1;
-          }
-          setCompletionCounts(counts);
-        }
-      } else if (homeworks.length > 0) {
-        const hwIds = homeworks.map(h => h.id);
-        const { data: comps } = await supabase
-          .from('class_homework_completions').select('homework_id')
-          .eq('student_id', user.id).in('homework_id', hwIds);
-        setCompletedIds(new Set((comps ?? []).map(c => c.homework_id)));
+        for (const c of comps ?? []) newCounts[c.homework_id] = (newCounts[c.homework_id] ?? 0) + 1;
+      } else {
+        newCompletedIds = (comps ?? []).map((c: { homework_id: string }) => c.homework_id);
       }
 
+      _hwCache.set(cacheKey, { isTeacher: teacher, hw: homeworks, completedIds: newCompletedIds, completionCounts: newCounts, memberCount });
+      setIsTeacher(teacher);
+      setHw(homeworks);
+      setCompletedIds(new Set(newCompletedIds));
+      setCompletionCounts(newCounts);
+      setMemberCount(memberCount);
       setLoading(false);
     })();
   }, [id, user]);
@@ -90,7 +109,10 @@ export default function ClassHomeworkPage() {
         class_id: id, teacher_id: user.id, title: title.trim(),
         ...(dueDate ? { due_date: dueDate } : {}),
       }).select().maybeSingle();
-      if (newHw) setHw(prev => [newHw as Homework, ...prev]);
+      if (newHw) {
+        setHw(prev => [newHw as Homework, ...prev]);
+        _hwCache.delete(`${user.id}:${id}`);
+      }
       setTitle(''); setDueDate(''); setShowForm(false);
     } catch (_) {}
     setAdding(false);
@@ -112,9 +134,9 @@ export default function ClassHomeworkPage() {
   };
 
   const deleteHomework = async (hwItem: Homework) => {
-    if (!confirm(`Delete "${hwItem.title}"?`)) return;
+    if (!user || !confirm(`Delete "${hwItem.title}"?`)) return;
     const { error } = await supabase.from('class_homework').delete().eq('id', hwItem.id);
-    if (!error) setHw(prev => prev.filter(h => h.id !== hwItem.id));
+    if (!error) { setHw(prev => prev.filter(h => h.id !== hwItem.id)); _hwCache.delete(`${user.id}:${id}`); }
   };
 
   if (loading) {

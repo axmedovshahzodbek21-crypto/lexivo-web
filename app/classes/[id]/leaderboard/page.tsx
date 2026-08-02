@@ -33,6 +33,8 @@ function Avatar({ row }: { row: LeaderboardRow }) {
   );
 }
 
+const _classLbCache = new Map<string, LeaderboardRow[]>();
+
 const MEDALS = ['🥇', '🥈', '🥉'];
 const PODIUM_HEIGHTS = [170, 120, 90]; // 1st, 2nd, 3rd in px
 const PODIUM_COLORS = ['#f59e0b', '#94a3b8', '#cd7f32']; // gold, silver, bronze
@@ -47,16 +49,23 @@ export default function ClassLeaderboardPage() {
 
   useEffect(() => {
     if (!user) return;
-    (async () => {
+    const cached = _classLbCache.get(id);
+    if (cached) {
+      setRows(cached);
+      setLoading(false);
+      setTimeout(() => setAnimated(true), 60);
+    } else {
       setLoading(true);
       setAnimated(false);
-      const { data } = await supabase
-        .rpc('get_class_leaderboard', { p_class_id: id })
-        .limit(200);
-      setRows((data as LeaderboardRow[]) ?? []);
+    }
+
+    (async () => {
+      const { data } = await supabase.rpc('get_class_leaderboard', { p_class_id: id }).limit(200);
+      const rows = (data as LeaderboardRow[]) ?? [];
+      _classLbCache.set(id, rows);
+      setRows(rows);
       setLoading(false);
-      // small delay so the DOM paints height:0 before transitioning
-      setTimeout(() => setAnimated(true), 60);
+      if (!cached) setTimeout(() => setAnimated(true), 60);
     })();
   }, [id, user]);
 

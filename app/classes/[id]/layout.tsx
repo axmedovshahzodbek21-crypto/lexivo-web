@@ -1,19 +1,20 @@
 import type { ReactNode } from 'react';
 import ClassShellNav from '@/components/ClassShellNav';
 
-export default function ClassLayout({
+export default async function ClassLayout({
   children,
   params,
 }: {
   children: ReactNode;
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = await params;
   return (
     <div className="flex flex-col min-h-screen">
       <div className="flex-1 pb-16 sm:pb-0 sm:pl-16">
         {children}
       </div>
-      <ClassShellNav classId={params.id} />
+      <ClassShellNav classId={id} />
     </div>
   );
 }
