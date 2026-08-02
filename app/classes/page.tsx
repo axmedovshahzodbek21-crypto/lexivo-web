@@ -89,6 +89,18 @@ function dueDateLabel(due: string | null): { text: string; overdue: boolean } | 
   return { text: `Due ${new Date(due + 'T00:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`, overdue: false };
 }
 
+const CLASS_COLORS = [
+  'from-indigo-500 to-purple-500', 'from-pink-500 to-rose-400',
+  'from-emerald-500 to-teal-400', 'from-blue-500 to-cyan-400',
+  'from-amber-500 to-orange-400', 'from-violet-500 to-purple-400',
+  'from-red-500 to-pink-400', 'from-cyan-500 to-blue-400',
+];
+const GLOW_COLORS = ['#818cf8','#ec4899','#22c55e','#3b82f6','#f59e0b','#8b5cf6','#ef4444','#06b6d4'];
+function classGradient(id: string) {
+  const n = id.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % CLASS_COLORS.length;
+  return { gradient: CLASS_COLORS[n], glow: GLOW_COLORS[n] };
+}
+
 type ClassesCache = {
   myClasses: ClassRow[];
   joinedClasses: ClassRow[];
@@ -424,41 +436,34 @@ export default function ClassesPage() {
                     const doneTargets = targets.filter(t => t.completed_at);
                     const hw = classWords[cls.id] ?? [];
 
+                    const { gradient, glow } = classGradient(cls.id);
                     return (
-                      <div key={cls.id} className="card space-y-3">
-                        {/* Class header */}
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <p className="font-semibold text-[var(--text)]">{cls.name}</p>
-                              {unreadNotes > 0 && (
-                                <span className="bg-[var(--primary)] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full shrink-0">{unreadNotes} new</span>
-                              )}
-                              {activeTargets.length > 0 && (
-                                <span className="bg-amber-500/20 text-amber-600 dark:text-amber-400 text-[9px] font-bold px-1.5 py-0.5 rounded-full shrink-0">{activeTargets.length} target{activeTargets.length !== 1 ? 's' : ''}</span>
-                              )}
+                      <div key={cls.id} className="rounded-2xl overflow-hidden border border-[var(--border)]" style={{ boxShadow: `0 4px 24px ${glow}22` }}>
+                        {/* Gradient header */}
+                        <div className={`bg-gradient-to-br ${gradient} px-4 pt-4 pb-5`}>
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <p className="font-black text-white text-lg leading-tight">{cls.name}</p>
+                                {unreadNotes > 0 && <span className="bg-white/25 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">{unreadNotes} new</span>}
+                              </div>
+                              <p className="text-sm text-white/70 mt-0.5">👩‍🏫 {teacherProfiles[cls.teacher_id]?.name ?? 'Teacher'} · {cls.join_code}</p>
+                              <div className="flex gap-2 mt-2.5 flex-wrap">
+                                {hw.length > 0 && <span className="text-xs bg-black/20 text-white font-semibold px-2.5 py-1 rounded-full">📖 {hw.length} words</span>}
+                                {activeTargets.length > 0 && <span className="text-xs bg-black/20 text-white font-semibold px-2.5 py-1 rounded-full">🎯 {activeTargets.length} target{activeTargets.length !== 1 ? 's' : ''}</span>}
+                              </div>
                             </div>
-                            <p className="text-xs text-[var(--text-muted)] mt-0.5">
-                            👩‍🏫 {teacherProfiles[cls.teacher_id]?.name ?? 'Teacher'} · {cls.join_code}
-                          </p>
-                          </div>
-                          <div className="flex items-center gap-2 shrink-0">
-                            <button
-                              onClick={() => router.push(`/classes/${cls.id}/home`)}
-                              className="btn-primary text-xs px-3 py-1.5"
-                            >
-                              Enter →
-                            </button>
-                            <button
-                              onClick={() => toggleLeaderboard(cls.id)}
-                              className={`text-xs px-2.5 py-1.5 rounded-xl font-medium transition-colors ${expandedLeaderboard === cls.id ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--primary)]'}`}
-                              aria-label="Toggle leaderboard"
-                            >
-                              🏆
-                            </button>
-                            <button onClick={() => leaveClass(cls.id)} className="btn-danger-ghost">Leave</button>
+                            <div className="flex flex-col gap-1.5 shrink-0 items-end">
+                              <button onClick={() => router.push(`/classes/${cls.id}/home`)} className="bg-white text-gray-900 font-black text-xs px-3.5 py-1.5 rounded-xl hover:opacity-90 transition-opacity">Enter →</button>
+                              <div className="flex gap-1">
+                                <button onClick={() => toggleLeaderboard(cls.id)} className={`text-xs px-2 py-1 rounded-lg font-medium transition-all ${expandedLeaderboard === cls.id ? 'bg-white/30 text-white' : 'bg-black/20 text-white/80 hover:bg-black/30'}`}>🏆</button>
+                                <button onClick={() => leaveClass(cls.id)} className="text-xs px-2 py-1 rounded-lg bg-black/20 text-white/80 hover:bg-red-500/40 transition-colors font-medium">Leave</button>
+                              </div>
+                            </div>
                           </div>
                         </div>
+                        {/* Content sections */}
+                        <div className="bg-[var(--surface)] space-y-0 divide-y divide-[var(--border)]">
 
                         {/* Announcements from teacher */}
                         {(classAnnouncements[cls.id] ?? []).length > 0 && (
@@ -656,6 +661,7 @@ export default function ClassesPage() {
                             </div>
                           );
                         })()}
+                        </div>
                       </div>
                     );
                   })}
