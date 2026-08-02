@@ -64,6 +64,9 @@ function LearnInner() {
   const sp = useSearchParams();
   const sourceMyWords = sp.get('source') === 'my-words';
   const sourceStarred = sp.get('source') === 'starred';
+  const sourceClass = sp.get('source') === 'class';
+  const classIdParam = sp.get('classId') ?? '';
+  const classNameParam = sp.get('className') ?? 'Class';
   const starredUnitIndex = parseInt(sp.get('unit') ?? '1') - 1; // 0-based
   const myCollection = sp.get('myCollection') ?? undefined;
   const myFolder     = sp.get('myFolder') ?? undefined;
@@ -115,6 +118,7 @@ function LearnInner() {
   const [sessionSize, setSessionSize] = useState(20);
   const [studyOrder, setStudyOrder] = useState<'random' | 'in-order'>('random');
   const [showSkipTip, setShowSkipTip] = useState(false);
+  const [classWordsLoaded, setClassWordsLoaded] = useState(false);
 
   // Anti-cheat state
   const [revealCountdown, setRevealCountdown] = useState(0);
@@ -244,6 +248,50 @@ function LearnInner() {
     }
   }, [collectionsLoaded, collections, collectionName, dayNumber, hardOnly, sourceMyWords, sourceStarred, starredUnitIndex, myCollection, myFolder]);
 
+  useEffect(() => {
+    if (!sourceClass || !classIdParam) return;
+    (async () => {
+      const { data } = await supabase
+        .from('class_words')
+        .select('word, translation, definition, example1, example1_translation, example2, example2_translation, examples')
+        .eq('class_id', classIdParam)
+        .order('created_at', { ascending: true });
+      const rows = (data as any[]) ?? [];
+      const list: StudyWord[] = rows.map(row => {
+        const exs: { sentence: string; translation: string }[] = row.examples ?? [];
+        return {
+          word: row.word,
+          partOfSpeech: '',
+          pronunciation: '',
+          translation: row.translation,
+          definition: row.definition ?? '',
+          definitionUz: '',
+          example1: exs[0]?.sentence ?? row.example1 ?? '',
+          example1Situation: '',
+          example1Translation: exs[0]?.translation ?? row.example1_translation ?? '',
+          example2: exs[1]?.sentence ?? row.example2 ?? '',
+          example2Situation: '',
+          example2Translation: exs[1]?.translation ?? row.example2_translation ?? '',
+          example3: exs[2]?.sentence ?? '',
+          example3Situation: '',
+          example3Translation: exs[2]?.translation ?? '',
+          extraExamples: exs.slice(3).map(e => e.sentence).filter(Boolean),
+          extraExampleTranslations: exs.slice(3).map(e => e.translation),
+          language: undefined,
+          collectionName: classNameParam,
+          topic: classNameParam,
+          dayNumber: 0,
+        };
+      });
+      const ordered = studyOrder === 'random'
+        ? [...list].sort(() => Math.random() - 0.5)
+        : list;
+      setWords(ordered);
+      setMarks(new Array(ordered.length).fill(null));
+      setClassWordsLoaded(true);
+    })();
+  }, [sourceClass, classIdParam]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const current = words[index];
 
   useEffect(() => {
@@ -295,8 +343,8 @@ function LearnInner() {
       await supabase.from('student_presence').upsert({
         student_id: user.id,
         activity: 'learn',
-        collection_name: collectionName ?? null,
-        day_number: dayNumber ?? null,
+        collection_name: sourceClass ? classNameParam : (collectionName ?? null),
+        day_number: sourceClass ? null : (dayNumber ?? null),
         started_at: new Date(sessionStartRef.current).toISOString(),
         last_heartbeat: new Date().toISOString(),
       }, { onConflict: 'student_id' });
@@ -326,8 +374,8 @@ function LearnInner() {
       const gateCorrectFirst = perWordDataRef.current.filter(w => w.outcome === 'learned' && w.gate_correct_first).length;
       await supabase.from('learn_session_analytics').insert({
         student_id: user.id,
-        collection_name: collectionName ?? 'all',
-        day_number: dayNumber ?? 0,
+        collection_name: sourceClass ? classNameParam : (collectionName ?? 'all'),
+        day_number: sourceClass ? 0 : (dayNumber ?? 0),
         started_at: new Date(sessionStartRef.current).toISOString(),
         completed_at: new Date().toISOString(),
         total_words: words.length,
@@ -521,9 +569,10 @@ function LearnInner() {
   }, [current, done, focusMode, revealed, marks, index, tryAdvanceCard, markTooHard, skipWord, dismissSkipTip, inQuizGate, inSpotCheck]);
 
   // No unit selected → show picker
-  if (!collectionName && !hardOnly && !sourceMyWords && !sourceStarred) return <UnitPicker mode="learn" />;
+  if (!collectionName && !hardOnly && !sourceMyWords && !sourceStarred && !sourceClass) return <UnitPicker mode="learn" />;
 
-  if (!collectionsLoaded) return <LoadingState />;
+  if (!collectionsLoaded && !sourceClass) return <LoadingState />;
+  if (sourceClass && !classWordsLoaded && words.length === 0) return <LoadingState />;
 
   if (words.length === 0) {
     return (
@@ -536,15 +585,20 @@ function LearnInner() {
   }
 
   if (done) {
-    const backUrl = hardOnly ? '/hard-words' : sourceMyWords ? (myCollection ? (myFolder ? `/my-words/${encodeURIComponent(myFolder)}/${encodeURIComponent(myCollection)}` : `/my-words/${encodeURIComponent(myCollection)}`) : '/my-words') : collectionName ? `/collections/${encodeURIComponent(collectionName)}` : '/';
+    const backUrl = sourceClass
+      ? `/classes/${classIdParam}/words`
+      : hardOnly ? '/hard-words'
+      : sourceMyWords ? (myCollection ? (myFolder ? `/my-words/${encodeURIComponent(myFolder)}/${encodeURIComponent(myCollection)}` : `/my-words/${encodeURIComponent(myCollection)}`) : '/my-words')
+      : collectionName ? `/collections/${encodeURIComponent(collectionName)}`
+      : '/';
     return (
       <SessionDone
         sessionCount={sessionCount}
         skipped={skipped}
         pureSkipped={pureSkipped}
         backUrl={backUrl}
-        collectionName={collectionName}
-        dayNumber={dayNumber}
+        collectionName={sourceClass ? classNameParam : collectionName}
+        dayNumber={sourceClass ? undefined : dayNumber}
         xpEarned={sessionXP}
         streak={getStreak()}
         todayCount={getTodayLearnedCount()}
@@ -627,7 +681,7 @@ function LearnInner() {
         <div className="flex-1 mx-3">
           <div className="flex items-center justify-between mb-1.5">
             <span className="text-xs font-medium text-[var(--text-muted)] truncate">
-              {collectionName ? collectionName.split(' ').slice(0, 2).join(' ') : 'All Collections'}
+              {sourceClass ? classNameParam : (collectionName ? collectionName.split(' ').slice(0, 2).join(' ') : 'All Collections')}
             </span>
             <div className="flex items-center shrink-0 ml-2">
               <button

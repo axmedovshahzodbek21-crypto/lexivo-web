@@ -464,19 +464,9 @@ export default function ClassesPage() {
                         <button onClick={e => { e.stopPropagation(); copyLink(cls.join_code, cls.id); }} className="text-base transition-transform hover:scale-110">{copiedLinkId === cls.id ? '✅' : '🔗'}</button>
                       </div>
                     </div>
-                    <div className="bg-black/20 flex items-center justify-between px-4 py-2.5 min-h-[40px]">
-                      {deleteConfirmId === cls.id ? (
-                        <div className="flex items-center gap-2 w-full">
-                          <span className="text-xs text-white/80 font-semibold">Delete class?</span>
-                          <button onClick={e => { e.stopPropagation(); deleteClass(cls.id); }} className="text-xs font-black text-white bg-red-500/70 hover:bg-red-500 px-2.5 py-1 rounded-lg transition-colors">Yes, delete</button>
-                          <button onClick={e => { e.stopPropagation(); setDeleteConfirmId(null); }} className="text-xs text-white/60 hover:text-white px-2 py-1 rounded-lg transition-colors">Cancel</button>
-                        </div>
-                      ) : (
-                        <>
-                          <button onClick={e => { e.stopPropagation(); setDeleteConfirmId(cls.id); }} className="text-xs text-white/40 hover:text-red-300 transition-colors font-medium">Delete</button>
-                          <button onClick={() => router.push(`/classes/${cls.id}/home`)} className="text-xs font-black text-white bg-white/20 hover:bg-white/30 px-3.5 py-1.5 rounded-xl transition-colors">Enter →</button>
-                        </>
-                      )}
+                    <div className="bg-black/20 flex items-center justify-between px-4 py-2.5">
+                      <button onClick={e => { e.stopPropagation(); setDeleteConfirmId(cls.id); }} className="text-xs text-white/40 hover:text-red-300 transition-colors font-medium">Delete</button>
+                      <button onClick={() => router.push(`/classes/${cls.id}/home`)} className="text-xs font-black text-white bg-white/20 hover:bg-white/30 px-3.5 py-1.5 rounded-xl transition-colors">Enter →</button>
                     </div>
                   </div>
                 );
@@ -813,6 +803,30 @@ export default function ClassesPage() {
       )}
 
       {/* Create Class Modal */}
+      {deleteConfirmId && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setDeleteConfirmId(null)}>
+          <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-5 space-y-4" onClick={e => e.stopPropagation()}>
+            <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto" />
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-red-500/15 flex items-center justify-center text-xl shrink-0">🗑️</div>
+              <div>
+                <h2 className="font-bold text-lg text-[var(--text)]">Delete Class?</h2>
+                <p className="text-xs text-[var(--text-muted)]">This will remove all members and data.</p>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <button onClick={() => setDeleteConfirmId(null)} className="flex-1 btn-ghost py-3 text-sm">Cancel</button>
+              <button
+                onClick={() => deleteClass(deleteConfirmId)}
+                className="flex-1 py-3 rounded-2xl font-bold text-sm text-white bg-red-500 hover:bg-red-600 active:scale-95 transition-all"
+              >
+                Yes, Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showCreate && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setShowCreate(false)}>
           <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-5 space-y-4" onClick={e => e.stopPropagation()}>

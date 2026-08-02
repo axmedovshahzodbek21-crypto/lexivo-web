@@ -239,7 +239,8 @@ export default function ClassWordsPage() {
   const router = useRouter();
   const { user } = useAuth();
   const [className, setClassName] = useState('');
-  const [notTeacher, setNotTeacher] = useState(false);
+  const [isTeacher, setIsTeacher] = useState(false);
+  const [notMember, setNotMember] = useState(false);
   const [loading, setLoading] = useState(true);
   const [words, setWords] = useState<ClassWord[]>([]);
   const [tab, setTab] = useState<InputTab>('manual');
@@ -322,7 +323,13 @@ export default function ClassWordsPage() {
 
     (async () => {
       const { data: cls } = await supabase.from('classes').select('name, teacher_id').eq('id', id).single();
-      if (!cls || cls.teacher_id !== user.id) { setNotTeacher(true); setLoading(false); return; }
+      if (!cls) { setNotMember(true); setLoading(false); return; }
+      const isT = cls.teacher_id === user.id;
+      if (!isT) {
+        const { data: membership } = await supabase.from('class_members').select('id').eq('class_id', id).eq('student_id', user.id).maybeSingle();
+        if (!membership) { setNotMember(true); setLoading(false); return; }
+      }
+      setIsTeacher(isT);
       setClassName(cls.name);
       await loadWords(cls.name);
       setLoading(false);
@@ -441,10 +448,10 @@ export default function ClassWordsPage() {
     </div>
   );
 
-  if (notTeacher) return (
+  if (notMember) return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8">
       <div className="text-5xl">⛔</div>
-      <p className="font-bold text-[var(--text)]">Not your class</p>
+      <p className="font-bold text-[var(--text)]">You're not in this class</p>
       <button onClick={() => router.back()} className="btn-primary">Go back</button>
     </div>
   );
@@ -507,34 +514,42 @@ export default function ClassWordsPage() {
       <div className="flex items-center gap-3 p-4 border-b border-[var(--border)]">
         <button onClick={() => router.back()} className="btn-icon text-lg" aria-label="Go back">←</button>
         <div className="flex-1 min-w-0">
-          <h1 className="font-bold text-[var(--text)]">📝 Homework Words</h1>
+          <h1 className="font-bold text-[var(--text)]">📝 Class Words</h1>
           <p className="text-xs text-[var(--text-muted)] truncate">{className}</p>
         </div>
-        <div className="shrink-0 text-right">
-          <p className="text-xl font-black text-[var(--primary)]">{words.length}</p>
-          <p className="text-[10px] text-[var(--text-muted)]">items</p>
-        </div>
+        {words.length > 0 && (
+          <button
+            onClick={() => router.push(`/learn?source=class&classId=${id}&className=${encodeURIComponent(className)}`)}
+            className="shrink-0 px-4 py-2 rounded-2xl text-sm font-bold text-white"
+            style={{ background: 'linear-gradient(135deg, var(--primary), #9333ea)', boxShadow: '0 4px 12px rgba(109,60,255,0.35)' }}
+          >
+            Study →
+          </button>
+        )}
       </div>
 
       {loading ? (
         <div className="flex justify-center py-12"><div className="text-4xl animate-bounce">📝</div></div>
       ) : (
         <div className="p-4 space-y-4">
-          {/* Tab switcher */}
-          <div className="flex rounded-2xl overflow-hidden border border-[var(--border)]">
-            {(['manual', 'ai', 'collection'] as InputTab[]).map(t => (
-              <button
-                key={t}
-                onClick={() => setTab(t)}
-                className={`flex-1 py-2.5 text-xs font-semibold transition-colors ${tab === t ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface-2)] text-[var(--text-muted)]'}`}
-              >
-                {t === 'manual' ? '✏️ Manual' : t === 'ai' ? '🤖 AI' : '📚 Collection'}
-              </button>
-            ))}
-          </div>
+          {/* Tab switcher — teacher only */}
+          {isTeacher && (
+            <div className="flex rounded-2xl overflow-hidden border border-[var(--border)]">
+              {(['manual', 'ai', 'collection'] as InputTab[]).map(t => (
+                <button
+                  key={t}
+                  onClick={() => setTab(t)}
+                  className={`flex-1 py-2.5 text-xs font-semibold transition-colors ${tab === t ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface-2)] text-[var(--text-muted)]'}`}
+                >
+                  {t === 'manual' ? '✏️ Manual' : t === 'ai' ? '🤖 AI' : '📚 Collection'}
+                </button>
+              ))}
+            </div>
+          )}
 
+          {/* Add-word tabs — teacher only */}
           {/* Manual tab */}
-          {tab === 'manual' && (
+          {isTeacher && tab === 'manual' && (
             <div className="space-y-3">
               {FolderCollectionCard}
               <div className="card space-y-3">
@@ -589,7 +604,7 @@ export default function ClassWordsPage() {
           )}
 
           {/* AI Import tab */}
-          {tab === 'ai' && (
+          {isTeacher && tab === 'ai' && (
             <div className="space-y-3">
               {FolderCollectionCard}
 
@@ -756,7 +771,7 @@ export default function ClassWordsPage() {
           )}
 
           {/* Collection Import tab */}
-          {tab === 'collection' && (
+          {isTeacher && tab === 'collection' && (
             <div className="space-y-3">
               <div className="card space-y-3">
                 <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">Pick a Collection</p>
