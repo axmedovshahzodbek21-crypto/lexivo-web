@@ -89,6 +89,18 @@ function dueDateLabel(due: string | null): { text: string; overdue: boolean } | 
   return { text: `Due ${new Date(due + 'T00:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`, overdue: false };
 }
 
+type ClassesCache = {
+  myClasses: ClassRow[];
+  joinedClasses: ClassRow[];
+  teacherProfiles: Record<string, { name: string; avatar_url: string | null }>;
+  classNotes: Record<string, Note[]>;
+  classTargets: Record<string, Target[]>;
+  classAnnouncements: Record<string, Announcement[]>;
+  classWords: Record<string, ClassWord[]>;
+  learnedWordIds: string[];
+};
+const _classesCache = new Map<string, ClassesCache>();
+
 export default function ClassesPage() {
   const router = useRouter();
   const { user } = useAuth();
@@ -113,77 +125,70 @@ export default function ClassesPage() {
   const [learnedWordIds, setLearnedWordIds] = useState<Set<string>>(new Set<string>());
   const [flashcard, setFlashcard] = useState<{ words: ClassWord[]; label: string; index: number; flipped: boolean } | null>(null);
 
-  const loadAnnouncements = async (classIds: string[]) => {
+  const fetchAnnouncements = async (classIds: string[]): Promise<Record<string, Announcement[]>> => {
     const { data } = await supabase
       .from('class_announcements')
       .select('id, class_id, message, created_at')
       .in('class_id', classIds)
       .order('created_at', { ascending: false });
-    if (!data) return;
     const map: Record<string, Announcement[]> = {};
-    for (const a of data) {
+    for (const a of data ?? []) {
       if (!map[a.class_id]) map[a.class_id] = [];
       map[a.class_id].push(a);
     }
-    setClassAnnouncements(map);
+    return map;
   };
 
-  const loadNotes = async (userId: string) => {
+  const fetchNotes = async (userId: string): Promise<Record<string, Note[]>> => {
     const { data } = await supabase
       .from('class_notes')
       .select('id, class_id, message, created_at, read_at')
       .eq('student_id', userId)
       .order('created_at', { ascending: false });
-    if (!data || data.length === 0) return;
+    if (!data || data.length === 0) return {};
     const map: Record<string, Note[]> = {};
     for (const n of data) {
       if (!map[n.class_id]) map[n.class_id] = [];
       map[n.class_id].push(n);
     }
-    setClassNotes(map);
     const unreadIds = data.filter((n: Note) => !n.read_at).map((n: Note) => n.id);
     if (unreadIds.length > 0) {
-      await supabase.from('class_notes').update({ read_at: new Date().toISOString() }).in('id', unreadIds);
+      supabase.from('class_notes').update({ read_at: new Date().toISOString() }).in('id', unreadIds).then(() => {});
     }
+    return map;
   };
 
-  const loadTargets = async (userId: string) => {
+  const fetchTargets = async (userId: string): Promise<Record<string, Target[]>> => {
     const { data } = await supabase
       .from('class_targets')
       .select('id, class_id, title, due_date, completed_at, created_at')
       .eq('student_id', userId)
       .order('created_at', { ascending: false });
-    if (!data || data.length === 0) return;
+    if (!data || data.length === 0) return {};
     const map: Record<string, Target[]> = {};
     for (const t of data) {
       if (!map[t.class_id]) map[t.class_id] = [];
       map[t.class_id].push(t);
     }
-    setClassTargets(map);
+    return map;
   };
 
-  const loadHomework = async (classIds: string[], userId: string) => {
-    if (classIds.length === 0) return;
-    const { data: wordData } = await supabase
-      .from('class_words')
-      .select('id, class_id, word, translation, definition, example1, example1_translation, example2, example2_translation, folder_name, collection_name')
-      .in('class_id', classIds)
-      .order('created_at', { ascending: true });
-    if (wordData) {
-      const map: Record<string, ClassWord[]> = {};
-      for (const w of wordData) {
-        if (!map[w.class_id]) map[w.class_id] = [];
-        map[w.class_id].push(w as ClassWord);
-      }
-      setClassWords(map);
+  const fetchHomework = async (classIds: string[], userId: string): Promise<{ words: Record<string, ClassWord[]>; learnedIds: string[] }> => {
+    if (classIds.length === 0) return { words: {}, learnedIds: [] };
+    const [{ data: wordData }, { data: progress }] = await Promise.all([
+      supabase
+        .from('class_words')
+        .select('id, class_id, word, translation, definition, example1, example1_translation, example2, example2_translation, folder_name, collection_name')
+        .in('class_id', classIds)
+        .order('created_at', { ascending: true }),
+      supabase.from('class_word_progress').select('word_id').eq('student_id', userId),
+    ]);
+    const words: Record<string, ClassWord[]> = {};
+    for (const w of wordData ?? []) {
+      if (!words[w.class_id]) words[w.class_id] = [];
+      words[w.class_id].push(w as ClassWord);
     }
-    const { data: progress } = await supabase
-      .from('class_word_progress')
-      .select('word_id')
-      .eq('student_id', userId);
-    if (progress) {
-      setLearnedWordIds(new Set<string>((progress as Array<{ word_id: string }>).map(p => p.word_id)));
-    }
+    return { words, learnedIds: (progress ?? []).map((p: { word_id: string }) => p.word_id) };
   };
 
   const markLearned = async (wordId: string) => {
@@ -198,52 +203,81 @@ export default function ClassesPage() {
     setLearnedWordIds(prev => { const s = new Set<string>(prev); s.delete(wordId); return s; });
   };
 
+  const applyCache = (c: ClassesCache) => {
+    setMyClasses(c.myClasses);
+    setJoinedClasses(c.joinedClasses);
+    setTeacherProfiles(c.teacherProfiles);
+    setClassNotes(c.classNotes);
+    setClassTargets(c.classTargets);
+    setClassAnnouncements(c.classAnnouncements);
+    setClassWords(c.classWords);
+    setLearnedWordIds(new Set<string>(c.learnedWordIds));
+  };
+
   const load = async () => {
     if (!user) return;
-    setLoading(true);
 
-    const { data: taught } = await supabase
-      .from('classes')
-      .select('*')
-      .eq('teacher_id', user.id)
-      .order('created_at', { ascending: false });
+    // Serve stale data instantly, then refresh silently in background
+    const cached = _classesCache.get(user.id);
+    if (cached) { applyCache(cached); setLoading(false); }
+    else setLoading(true);
 
-    const taughtWithCounts: ClassRow[] = [];
-    for (const cls of taught ?? []) {
-      const { count } = await supabase
-        .from('class_members')
-        .select('*', { count: 'exact', head: true })
-        .eq('class_id', cls.id);
-      taughtWithCounts.push({ ...cls, member_count: count ?? 0 });
+    // Fetch taught classes and student memberships in parallel
+    const [{ data: taught }, { data: memberships }] = await Promise.all([
+      supabase.from('classes').select('*').eq('teacher_id', user.id).order('created_at', { ascending: false }),
+      supabase.from('class_members').select('class_id').eq('student_id', user.id),
+    ]);
+
+    // One batch query for member counts instead of N individual queries
+    const taughtIds = (taught ?? []).map((c: ClassRow) => c.id);
+    let newMyClasses: ClassRow[] = [];
+    if (taughtIds.length > 0) {
+      const { data: memberRows } = await supabase.from('class_members').select('class_id').in('class_id', taughtIds);
+      const countMap: Record<string, number> = {};
+      for (const m of memberRows ?? []) countMap[m.class_id] = (countMap[m.class_id] ?? 0) + 1;
+      newMyClasses = (taught ?? []).map((c: ClassRow) => ({ ...c, member_count: countMap[c.id] ?? 0 }));
     }
-    setMyClasses(taughtWithCounts);
 
-    const { data: memberships } = await supabase
-      .from('class_members')
-      .select('class_id')
-      .eq('student_id', user.id);
-
-    let joined: ClassRow[] = [];
+    let newJoined: ClassRow[] = [];
     if (memberships && memberships.length > 0) {
       const classIds = memberships.map((m: { class_id: string }) => m.class_id);
       const { data } = await supabase.from('classes').select('*').in('id', classIds);
-      joined = (data ?? []).filter((c: ClassRow) => c.teacher_id !== user.id);
-    }
-    setJoinedClasses(joined);
-
-    if (joined.length > 0) {
-      const teacherIds = [...new Set(joined.map((c: ClassRow) => c.teacher_id))];
-      const { data: teachers } = await supabase
-        .from('profiles')
-        .select('id, name, avatar_url')
-        .in('id', teacherIds);
-      const tMap: Record<string, { name: string; avatar_url: string | null }> = {};
-      for (const t of teachers ?? []) tMap[t.id] = { name: t.name, avatar_url: t.avatar_url };
-      setTeacherProfiles(tMap);
-      const joinedIds = joined.map((c: ClassRow) => c.id);
-      await Promise.all([loadNotes(user.id), loadTargets(user.id), loadAnnouncements(joinedIds), loadHomework(joinedIds, user.id)]);
+      newJoined = (data ?? []).filter((c: ClassRow) => c.teacher_id !== user.id);
     }
 
+    let newTeacherProfiles: Record<string, { name: string; avatar_url: string | null }> = {};
+    let newNotes: Record<string, Note[]> = {};
+    let newTargets: Record<string, Target[]> = {};
+    let newAnnouncements: Record<string, Announcement[]> = {};
+    let newWords: Record<string, ClassWord[]> = {};
+    let newLearnedIds: string[] = [];
+
+    if (newJoined.length > 0) {
+      const teacherIds = [...new Set(newJoined.map((c: ClassRow) => c.teacher_id))];
+      const joinedIds = newJoined.map((c: ClassRow) => c.id);
+      const [{ data: teachers }, notes, targets, announcements, homework] = await Promise.all([
+        supabase.from('profiles').select('id, name, avatar_url').in('id', teacherIds),
+        fetchNotes(user.id),
+        fetchTargets(user.id),
+        fetchAnnouncements(joinedIds),
+        fetchHomework(joinedIds, user.id),
+      ]);
+      for (const t of teachers ?? []) newTeacherProfiles[t.id] = { name: t.name, avatar_url: t.avatar_url };
+      newNotes = notes;
+      newTargets = targets;
+      newAnnouncements = announcements;
+      newWords = homework.words;
+      newLearnedIds = homework.learnedIds;
+    }
+
+    const fresh: ClassesCache = {
+      myClasses: newMyClasses, joinedClasses: newJoined,
+      teacherProfiles: newTeacherProfiles, classNotes: newNotes,
+      classTargets: newTargets, classAnnouncements: newAnnouncements,
+      classWords: newWords, learnedWordIds: newLearnedIds,
+    };
+    _classesCache.set(user.id, fresh);
+    applyCache(fresh);
     setLoading(false);
   };
 
@@ -272,7 +306,7 @@ export default function ClassesPage() {
       teacher_id: user.id,
     });
     if (err) setError('Failed to create class. Please try again.');
-    else { setClassName(''); setShowCreate(false); load(); }
+    else { setClassName(''); setShowCreate(false); _classesCache.delete(user.id); load(); }
     setCreating(false);
   };
 
@@ -287,7 +321,7 @@ export default function ClassesPage() {
     if (err) {
       if (err.code === '23505') setJoinError('You are already in this class.');
       else setJoinError('Failed to join. Please try again.');
-    } else { setJoinCode(''); load(); }
+    } else { setJoinCode(''); _classesCache.delete(user.id); load(); }
   };
 
   const toggleLeaderboard = async (classId: string) => {
@@ -304,13 +338,14 @@ export default function ClassesPage() {
     if (!user) return;
     if (!confirm('Leave this class? You will need the class code to rejoin.')) return;
     await supabase.from('class_members').delete().eq('class_id', classId).eq('student_id', user.id);
-    load();
+    _classesCache.delete(user.id); load();
   };
 
   const deleteClass = async (classId: string) => {
+    if (!user) return;
     if (!confirm('Delete this class? All students will be removed.')) return;
     await supabase.from('classes').delete().eq('id', classId);
-    load();
+    _classesCache.delete(user.id); load();
   };
 
   const [copiedLinkId, setCopiedLinkId] = useState<string | null>(null);
