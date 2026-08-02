@@ -180,6 +180,9 @@ function groupWords(words: ClassWord[]) {
   return map;
 }
 
+type WordsCache = { className: string; words: ClassWord[] };
+const _wordsCache = new Map<string, WordsCache>();
+
 export default function ClassWordsPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
@@ -243,25 +246,36 @@ export default function ClassWordsPage() {
   const parseResult = useMemo(() => parseOutput(pasted, wordLangCode), [pasted, wordLangCode]);
   const parsed = parseResult.words;
 
-  const loadWords = async () => {
+  const loadWords = async (clsName?: string) => {
     const { data } = await supabase
       .from('class_words')
       .select('id, word, translation, definition, example1, example1_translation, example2, example2_translation, folder_name, collection_name, created_at')
       .eq('class_id', id)
       .order('created_at', { ascending: true });
-    setWords((data as ClassWord[]) ?? []);
+    const fetched = (data as ClassWord[]) ?? [];
+    setWords(fetched);
+    if (clsName !== undefined) _wordsCache.set(id, { className: clsName, words: fetched });
+    else { const c = _wordsCache.get(id); if (c) _wordsCache.set(id, { ...c, words: fetched }); }
   };
 
   useEffect(() => {
     if (!user || !id) return;
-    const init = async () => {
+    const cached = _wordsCache.get(id);
+    if (cached) {
+      setClassName(cached.className);
+      setWords(cached.words);
+      setLoading(false);
+    } else {
+      setLoading(true);
+    }
+
+    (async () => {
       const { data: cls } = await supabase.from('classes').select('name, teacher_id').eq('id', id).single();
       if (!cls || cls.teacher_id !== user.id) { setNotTeacher(true); setLoading(false); return; }
       setClassName(cls.name);
-      await loadWords();
+      await loadWords(cls.name);
       setLoading(false);
-    };
-    init();
+    })();
   }, [user, id]);
 
   const addManual = async () => {
@@ -312,7 +326,11 @@ export default function ClassWordsPage() {
 
   const deleteWord = async (wordId: string) => {
     await supabase.from('class_words').delete().eq('id', wordId);
-    setWords(prev => prev.filter(w => w.id !== wordId));
+    setWords(prev => {
+      const next = prev.filter(w => w.id !== wordId);
+      const c = _wordsCache.get(id); if (c) _wordsCache.set(id, { ...c, words: next });
+      return next;
+    });
   };
 
   const pickCollection = async (file: string) => {
