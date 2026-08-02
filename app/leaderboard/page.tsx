@@ -51,6 +51,8 @@ function Avatar({ name, url, size = 40 }: { name: string; url: string | null; si
   );
 }
 
+let _leaderboardCache: LeaderboardEntry[] | null = null;
+
 export default function LeaderboardPage() {
   const router = useRouter();
   const { user } = useAuth();
@@ -63,9 +65,14 @@ export default function LeaderboardPage() {
   const [syncing, setSyncing] = useState(false);
 
   const load = async () => {
-    setLoading(true);
-    setError('');
-    setSyncError('');
+    if (_leaderboardCache) {
+      setEntries(_leaderboardCache);
+      setLoading(false);
+    } else {
+      setLoading(true);
+      setError('');
+      setSyncError('');
+    }
     try {
       await Promise.all([pushStats(), pushSettings()]);
     } catch (e) {
@@ -73,9 +80,10 @@ export default function LeaderboardPage() {
     }
     const { data, error: err } = await supabase.rpc('get_leaderboard').limit(500);
     if (err) {
-      setError('Could not load leaderboard. Please try again.');
+      if (!_leaderboardCache) setError('Could not load leaderboard. Please try again.');
     } else {
-      setEntries((data as LeaderboardEntry[]) ?? []);
+      _leaderboardCache = (data as LeaderboardEntry[]) ?? [];
+      setEntries(_leaderboardCache);
     }
     setLoading(false);
   };
