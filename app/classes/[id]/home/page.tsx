@@ -7,6 +7,14 @@ import { useAuth } from '@/lib/auth-context';
 interface Announcement { id: string; message: string; created_at: string; }
 interface Target { id: string; title: string; due_date: string | null; completed_at: string | null; }
 
+type HomeCache = {
+  className: string; isTeacher: boolean; teacherName: string;
+  announcements: Announcement[]; targets: Target[];
+  wordCount: number; memberCount: number; activeToday: number;
+  needsAttention: number; readCounts: Record<string, number>;
+};
+const _homeCache = new Map<string, HomeCache>();
+
 function timeAgo(iso: string) {
   const m = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
   if (m < 1) return 'just now';
@@ -67,75 +75,94 @@ export default function ClassHomePage() {
 
   useEffect(() => {
     if (!user) return;
-    (async () => {
+    const cacheKey = `${user.id}:${id}`;
+    const cached = _homeCache.get(cacheKey);
+    if (cached) {
+      setClassName(cached.className);
+      setIsTeacher(cached.isTeacher);
+      setTeacherName(cached.teacherName);
+      setAnnouncements(cached.announcements);
+      setTargets(cached.targets);
+      setWordCount(cached.wordCount);
+      setMemberCount(cached.memberCount);
+      setActiveToday(cached.activeToday);
+      setNeedsAttention(cached.needsAttention);
+      setReadCounts(cached.readCounts);
+      setLoading(false);
+    } else {
       setLoading(true);
+    }
 
+    (async () => {
       const { data: cls } = await supabase
-        .from('classes')
-        .select('name, teacher_id')
-        .eq('id', id)
-        .maybeSingle();
+        .from('classes').select('name, teacher_id').eq('id', id).maybeSingle();
       if (!cls) { router.replace('/classes'); return; }
 
       const teacher = cls.teacher_id === user.id;
-      setClassName(cls.name);
-      setIsTeacher(teacher);
 
-      const [{ data: anns }, { data: words }] = await Promise.all([
+      const [{ data: anns }, { data: words }, { data: members }] = await Promise.all([
         supabase.from('class_announcements').select('id, message, created_at')
           .eq('class_id', id).order('created_at', { ascending: false }).limit(5),
         supabase.from('class_words').select('id').eq('class_id', id),
+        supabase.from('class_members').select('student_id').eq('class_id', id),
       ]);
-      setAnnouncements(anns ?? []);
-      setWordCount(words?.length ?? 0);
 
-      // Read receipts: student marks read, teacher fetches counts
-      if (!teacher && anns && anns.length > 0) {
-        void (async () => {
-          try {
-            await supabase.from('class_announcement_reads')
-              .upsert(anns.map(a => ({ announcement_id: a.id, student_id: user.id })), { onConflict: 'announcement_id,student_id' });
-          } catch (_) {}
-        })();
-      }
-      if (teacher && anns && anns.length > 0) {
-        void (async () => {
-          try {
-            const annIds = (anns as Announcement[]).map(a => a.id);
-            const { data: reads } = await supabase.from('class_announcement_reads').select('announcement_id').in('announcement_id', annIds);
-            const counts: Record<string, number> = {};
-            for (const r of reads ?? []) {
-              counts[r.announcement_id] = (counts[r.announcement_id] ?? 0) + 1;
-            }
-            setReadCounts(counts);
-          } catch (_) {}
-        })();
-      }
+      const memberCount = members?.length ?? 0;
+      const memberIds = (members ?? []).map((m: { student_id: string }) => m.student_id);
+      const annIds = ((anns ?? []) as Announcement[]).map(a => a.id);
 
-      const { data: members } = await supabase
-        .from('class_members').select('student_id').eq('class_id', id);
-      const count = members?.length ?? 0;
-      setMemberCount(count);
-      if (count > 0) {
-        const today = new Date().toISOString().slice(0, 10);
-        const ids = (members ?? []).map((m: { student_id: string }) => m.student_id);
-        const { data: profiles } = await supabase
-          .from('profiles').select('last_study_date').in('id', ids);
-        setActiveToday(profiles?.filter(p => p.last_study_date === today).length ?? 0);
-        const threeDaysAgo = new Date(Date.now() - 3 * 86400000).toISOString().slice(0, 10);
-        setNeedsAttention(profiles?.filter(p => !p.last_study_date || p.last_study_date < threeDaysAgo).length ?? 0);
+      const [{ data: profiles }, { data: reads }, { data: tgts }, { data: tProfile }] = await Promise.all([
+        memberCount > 0
+          ? supabase.from('profiles').select('last_study_date').in('id', memberIds)
+          : Promise.resolve({ data: [] as { last_study_date: string | null }[] }),
+        teacher && annIds.length > 0
+          ? supabase.from('class_announcement_reads').select('announcement_id').in('announcement_id', annIds)
+          : Promise.resolve({ data: [] as { announcement_id: string }[] }),
+        !teacher
+          ? supabase.from('class_targets').select('id, title, due_date, completed_at, created_at')
+              .eq('class_id', id).eq('student_id', user.id).order('created_at', { ascending: false })
+          : Promise.resolve({ data: [] as Target[] }),
+        !teacher
+          ? supabase.from('profiles').select('name').eq('id', cls.teacher_id).maybeSingle()
+          : Promise.resolve({ data: null as { name?: string } | null }),
+      ]);
+
+      const today = new Date().toISOString().slice(0, 10);
+      const threeDaysAgo = new Date(Date.now() - 3 * 86400000).toISOString().slice(0, 10);
+      const activeToday = (profiles ?? []).filter(p => p.last_study_date === today).length;
+      const needsAttention = (profiles ?? []).filter(p => !p.last_study_date || p.last_study_date < threeDaysAgo).length;
+
+      const counts: Record<string, number> = {};
+      for (const r of reads ?? []) {
+        counts[r.announcement_id] = (counts[r.announcement_id] ?? 0) + 1;
       }
 
-      if (!teacher) {
-        const [{ data: tgts }, { data: profile }] = await Promise.all([
-          supabase.from('class_targets').select('id, title, due_date, completed_at, created_at')
-            .eq('class_id', id).eq('student_id', user.id).order('created_at', { ascending: false }),
-          supabase.from('profiles').select('name').eq('id', cls.teacher_id).maybeSingle(),
-        ]);
-        setTargets(tgts ?? []);
-        setTeacherName((profile as { name?: string } | null)?.name ?? 'Teacher');
+      // Mark announcements read (student side effect — fire and forget)
+      if (!teacher && annIds.length > 0) {
+        void supabase.from('class_announcement_reads')
+          .upsert(annIds.map(aid => ({ announcement_id: aid, student_id: user.id })), { onConflict: 'announcement_id,student_id' });
       }
 
+      const snapshot: HomeCache = {
+        className: cls.name, isTeacher: teacher,
+        teacherName: (tProfile as { name?: string } | null)?.name ?? 'Teacher',
+        announcements: (anns ?? []) as Announcement[],
+        targets: (tgts ?? []) as Target[],
+        wordCount: words?.length ?? 0, memberCount, activeToday, needsAttention,
+        readCounts: counts,
+      };
+      _homeCache.set(cacheKey, snapshot);
+
+      setClassName(snapshot.className);
+      setIsTeacher(snapshot.isTeacher);
+      setTeacherName(snapshot.teacherName);
+      setAnnouncements(snapshot.announcements);
+      setTargets(snapshot.targets);
+      setWordCount(snapshot.wordCount);
+      setMemberCount(snapshot.memberCount);
+      setActiveToday(snapshot.activeToday);
+      setNeedsAttention(snapshot.needsAttention);
+      setReadCounts(snapshot.readCounts);
       setLoading(false);
     })();
   }, [id, user, router]);
