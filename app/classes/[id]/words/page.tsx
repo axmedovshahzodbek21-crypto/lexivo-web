@@ -20,6 +20,8 @@ const BUILT_IN_COLLECTIONS = [
   { name: 'B2+ Advanced',     emoji: '📕', file: '/data/advanced_collection.json' },
 ];
 
+type WordExample = { sentence: string; translation: string };
+
 interface ClassWord {
   id: string;
   word: string;
@@ -29,6 +31,7 @@ interface ClassWord {
   example1_translation: string | null;
   example2: string | null;
   example2_translation: string | null;
+  examples: WordExample[] | null;
   folder_name: string | null;
   collection_name: string | null;
   created_at: string;
@@ -38,10 +41,7 @@ interface ParsedWord {
   word: string;
   translation: string;
   definition: string;
-  example1: string;
-  example1Translation: string;
-  example2: string;
-  example2Translation: string;
+  examples: WordExample[];
   language: string;
 }
 
@@ -64,18 +64,36 @@ const LANGUAGES = [
   { label: 'Chinese', code: 'zh-CN' },
 ];
 
+const EXAMPLE_FORMAT = `example1: The enormous building towered above the city.
+example1Translation: Ulkan bino shahar ustida baland turardi.
+example2: She faced an enormous challenge at work.
+example2Translation: U ishda ulkan muammoga duch keldi.
+example3: The enormous whale surfaced near the boat.
+example3Translation: Ulkan kit qayiq yonida suvdan chiqdi.
+example4: They needed an enormous amount of funding.
+example4Translation: Ularga juda katta miqdorda mablag' kerak edi.
+example5: His enormous appetite surprised everyone at the table.
+example5Translation: Uning ulkan ishtahasi dasturxon atrofidagilarni hayratga soldi.
+example6: The storm caused enormous damage to the coast.
+example6Translation: Bo'ron qirg'oqda ulkan zarar keltirdi.
+example7: She had an enormous influence on her students.
+example7Translation: U o'z o'quvchilariga ulkan ta'sir ko'rsatdi.
+example8: The project required enormous effort from the whole team.
+example8Translation: Loyiha butun jamoadan ulkan kuch talab qildi.
+example9: An enormous crowd gathered in the central square.
+example9Translation: Markaziy maydonga ulkan olomon to'plandi.
+example10: The enormous pressure made it hard to focus.
+example10Translation: Ulkan bosim diqqatni jamlashni qiyinlashtirdi.`;
+
 function buildPrompt1(wordLang: string, transLang: string): string {
-  return `I have a list of ${wordLang} words I want to learn. For each word, provide the translation in ${transLang}, a short definition in ${wordLang}, and 2 example sentences in ${wordLang} with their ${transLang} translations.
+  return `I have a list of ${wordLang} words I want to learn. For each word, provide the translation in ${transLang}, a short definition in ${wordLang}, and 10 example sentences in ${wordLang} with their ${transLang} translations.
 
 Format EXACTLY like this for every word. Use plain text only — no markdown, no bold, no asterisks, no extra formatting:
 
 word: enormous
 translation: ulkan
 definition: extremely large in size or extent
-example1: The enormous building towered above the city.
-example1Translation: Ulkan bino shahar ustida baland turardi.
-example2: She faced an enormous challenge at work.
-example2Translation: U ishda ulkan muammoga duch keldi.
+${EXAMPLE_FORMAT}
 ---
 
 Important: the example above uses English/Uzbek only to show the format. In your actual response, write the definition and examples in ${wordLang}, and the translations in ${transLang}.
@@ -85,17 +103,14 @@ Here are my words:
 }
 
 function buildPrompt2(wordLang: string, transLang: string): string {
-  return `I have ${wordLang}-${transLang} word pairs. For each pair, keep my translation exactly as written. Add a short definition in ${wordLang} and 2 example sentences in ${wordLang} with their ${transLang} translations.
+  return `I have ${wordLang}-${transLang} word pairs. For each pair, keep my translation exactly as written. Add a short definition in ${wordLang} and 10 example sentences in ${wordLang} with their ${transLang} translations.
 
 Format EXACTLY like this for every word. Use plain text only — no markdown, no bold, no asterisks, no extra formatting:
 
 word: enormous
 translation: ulkan
 definition: extremely large in size or extent
-example1: The enormous building towered above the city.
-example1Translation: Ulkan bino shahar ustida baland turardi.
-example2: She faced an enormous challenge at work.
-example2Translation: U ishda ulkan muammoga duch keldi.
+${EXAMPLE_FORMAT}
 ---
 
 Important: the example above uses English/Uzbek only to show the format. In your actual response, write the definition and examples in ${wordLang}, and the translations in ${transLang}.
@@ -151,16 +166,13 @@ function parseOutput(text: string, langCode: string): ParseResult {
       errors.push({ index: i + 1, preview, reason: 'Missing "translation:" field' });
       continue;
     }
-    words.push({
-      word: fields.word,
-      translation: fields.translation,
-      definition: fields.definition ?? '',
-      example1: fields.example1 ?? '',
-      example1Translation: fields.example1translation ?? '',
-      example2: fields.example2 ?? '',
-      example2Translation: fields.example2translation ?? '',
-      language: langCode,
-    });
+    const examples: WordExample[] = [];
+    for (let n = 1; n <= 10; n++) {
+      const s = fields[`example${n}`];
+      const t = fields[`example${n}translation`];
+      if (s) examples.push({ sentence: s, translation: t ?? '' });
+    }
+    words.push({ word: fields.word, translation: fields.translation, definition: fields.definition ?? '', examples, language: langCode });
   }
   return { words, errors };
 }
@@ -182,6 +194,45 @@ function groupWords(words: ClassWord[]) {
 
 type WordsCache = { className: string; words: ClassWord[] };
 const _wordsCache = new Map<string, WordsCache>();
+
+function WordCard({ w }: { w: ClassWord }) {
+  const [expanded, setExpanded] = useState(false);
+  const allExamples: WordExample[] = w.examples && w.examples.length > 0
+    ? w.examples
+    : [
+        ...(w.example1 ? [{ sentence: w.example1, translation: w.example1_translation ?? '' }] : []),
+        ...(w.example2 ? [{ sentence: w.example2, translation: w.example2_translation ?? '' }] : []),
+      ];
+  const visible = expanded ? allExamples : allExamples.slice(0, 3);
+  const hidden = allExamples.length - 3;
+
+  return (
+    <div className="flex-1 min-w-0">
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="font-bold text-sm text-[var(--text)]">{w.word}</span>
+        <span className="text-[var(--text-muted)] text-sm">·</span>
+        <span className="text-[var(--primary)] text-sm font-medium">{w.translation}</span>
+      </div>
+      {w.definition && <p className="text-xs text-[var(--text-muted)] mt-0.5">{w.definition}</p>}
+      <div className="mt-1 space-y-1">
+        {visible.map((ex, i) => (
+          <div key={i}>
+            <p className="text-xs italic text-[var(--text-muted)]">&ldquo;{ex.sentence}&rdquo;</p>
+            {ex.translation && <p className="text-[10px] text-[var(--text-muted)] pl-2">↳ {ex.translation}</p>}
+          </div>
+        ))}
+      </div>
+      {allExamples.length > 3 && (
+        <button
+          onClick={() => setExpanded(p => !p)}
+          className="text-[10px] font-semibold text-[var(--primary)] mt-1"
+        >
+          {expanded ? '▲ Show less' : `▼ +${hidden} more examples`}
+        </button>
+      )}
+    </div>
+  );
+}
 
 export default function ClassWordsPage() {
   const { id } = useParams<{ id: string }>();
@@ -249,7 +300,7 @@ export default function ClassWordsPage() {
   const loadWords = async (clsName?: string) => {
     const { data } = await supabase
       .from('class_words')
-      .select('id, word, translation, definition, example1, example1_translation, example2, example2_translation, folder_name, collection_name, created_at')
+      .select('id, word, translation, definition, example1, example1_translation, example2, example2_translation, examples, folder_name, collection_name, created_at')
       .eq('class_id', id)
       .order('created_at', { ascending: true });
     const fetched = (data as ClassWord[]) ?? [];
@@ -310,10 +361,11 @@ export default function ClassWordsPage() {
       word: w.word,
       translation: w.translation,
       definition: w.definition || null,
-      example1: w.example1 || null,
-      example1_translation: w.example1Translation || null,
-      example2: w.example2 || null,
-      example2_translation: w.example2Translation || null,
+      example1: w.examples[0]?.sentence || null,
+      example1_translation: w.examples[0]?.translation || null,
+      example2: w.examples[1]?.sentence || null,
+      example2_translation: w.examples[1]?.translation || null,
+      examples: w.examples.length > 0 ? w.examples : null,
       language: w.language,
       folder_name: folderInput.trim() || null,
       collection_name: collectionInput.trim() || null,
@@ -351,17 +403,24 @@ export default function ClassWordsPage() {
     try {
       const day = collectionData.days[selectedDayIdx];
       const colName = BUILT_IN_COLLECTIONS.find(c => c.file === selectedCollection)?.name ?? '';
-      const rows = day.words.map(w => ({
-        class_id: id, teacher_id: user.id,
-        word: w.word, translation: w.translation,
-        definition: w.definition || null,
-        example1: w.example1 || null,
-        example1_translation: w.example1_translation || null,
-        example2: w.example2 || null,
-        example2_translation: w.example2_translation || null,
-        folder_name: colName,
-        collection_name: `Day ${day.dayNumber}: ${day.topic}`,
-      }));
+      const rows = day.words.map(w => {
+        const examples: WordExample[] = [
+          ...(w.example1 ? [{ sentence: w.example1, translation: w.example1_translation ?? '' }] : []),
+          ...(w.example2 ? [{ sentence: w.example2, translation: w.example2_translation ?? '' }] : []),
+        ];
+        return {
+          class_id: id, teacher_id: user.id,
+          word: w.word, translation: w.translation,
+          definition: w.definition || null,
+          example1: w.example1 || null,
+          example1_translation: w.example1_translation || null,
+          example2: w.example2 || null,
+          example2_translation: w.example2_translation || null,
+          examples: examples.length > 0 ? examples : null,
+          folder_name: colName,
+          collection_name: `Day ${day.dayNumber}: ${day.topic}`,
+        };
+      });
       await supabase.from('class_words').insert(rows);
       setSelectedDayIdx(null);
       await loadWords();
@@ -606,10 +665,13 @@ export default function ClassWordsPage() {
                       <div><span className="text-[var(--primary)] font-bold">word:</span><span className="text-[var(--text)]"> enormous</span><span className="ml-2 text-green-500 font-sans font-semibold text-[10px]">required</span></div>
                       <div><span className="text-[var(--primary)] font-bold">translation:</span><span className="text-[var(--text)]"> ulkan</span><span className="ml-2 text-green-500 font-sans font-semibold text-[10px]">required</span></div>
                       <div><span className="text-[var(--text-muted)]">definition:</span><span className="text-[var(--text)]"> extremely large in size</span><span className="ml-2 text-[var(--text-muted)] font-sans text-[10px]">optional</span></div>
-                      <div><span className="text-[var(--text-muted)]">example1:</span><span className="text-[var(--text)]"> The enormous building towered above the city.</span><span className="ml-2 text-[var(--text-muted)] font-sans text-[10px]">optional</span></div>
-                      <div><span className="text-[var(--text-muted)]">example1Translation:</span><span className="text-[var(--text)]"> Ulkan bino shahar ustida baland turardi.</span><span className="ml-2 text-[var(--text-muted)] font-sans text-[10px]">optional</span></div>
-                      <div><span className="text-[var(--text-muted)]">example2:</span><span className="text-[var(--text)]"> She faced an enormous challenge at work.</span><span className="ml-2 text-[var(--text-muted)] font-sans text-[10px]">optional</span></div>
-                      <div><span className="text-[var(--text-muted)]">example2Translation:</span><span className="text-[var(--text)]"> U ishda ulkan muammoga duch keldi.</span><span className="ml-2 text-[var(--text-muted)] font-sans text-[10px]">optional</span></div>
+                      {Array.from({length: 10}, (_, i) => i + 1).map(n => (
+                        <div key={n}>
+                          <span className="text-[var(--text-muted)]">example{n}:</span><span className="text-[var(--text)]"> sentence #{n}</span>
+                          <br />
+                          <span className="text-[var(--text-muted)]">example{n}Translation:</span><span className="text-[var(--text)]"> translation #{n}</span>
+                        </div>
+                      ))}
                       <div className="pt-1 text-[var(--text-muted)]">---</div>
                       <div className="pt-1 text-[var(--text-muted)] italic">next word block goes here...</div>
                     </div>
@@ -669,10 +731,15 @@ export default function ClassWordsPage() {
                             <span className="text-[var(--primary)] font-medium">{w.translation}</span>
                           </div>
                           {w.definition && <p className="text-xs text-[var(--text-muted)]">{w.definition}</p>}
-                          {w.example1 && <p className="text-xs italic text-[var(--text)]">&quot;{w.example1}&quot;</p>}
-                          {w.example1Translation && <p className="text-xs text-[var(--text-muted)] pl-2">↳ {w.example1Translation}</p>}
-                          {w.example2 && <p className="text-xs italic text-[var(--text)]">&quot;{w.example2}&quot;</p>}
-                          {w.example2Translation && <p className="text-xs text-[var(--text-muted)] pl-2">↳ {w.example2Translation}</p>}
+                          {w.examples.slice(0, 3).map((ex, ei) => (
+                            <div key={ei}>
+                              <p className="text-xs italic text-[var(--text)]">&quot;{ex.sentence}&quot;</p>
+                              {ex.translation && <p className="text-xs text-[var(--text-muted)] pl-2">↳ {ex.translation}</p>}
+                            </div>
+                          ))}
+                          {w.examples.length > 3 && (
+                            <p className="text-[10px] text-[var(--text-muted)] font-medium">+{w.examples.length - 3} more examples hidden</p>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -781,15 +848,7 @@ export default function ClassWordsPage() {
                       )}
                       {!collapsed && colWords.map(w => (
                         <div key={w.id} className={`card flex items-start gap-3 ${folder ? 'border-l-2 border-[var(--primary)] border-opacity-30' : ''}`}>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <span className="font-bold text-sm text-[var(--text)]">{w.word}</span>
-                              <span className="text-[var(--text-muted)] text-sm">·</span>
-                              <span className="text-[var(--primary)] text-sm font-medium">{w.translation}</span>
-                            </div>
-                            {w.definition && <p className="text-xs text-[var(--text-muted)] mt-0.5">{w.definition}</p>}
-                            {w.example1 && <p className="text-xs italic text-[var(--text-muted)] mt-0.5">&ldquo;{w.example1}&rdquo;</p>}
-                          </div>
+                          <WordCard w={w} />
                           <button onClick={() => deleteWord(w.id)} className="text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors text-sm shrink-0" aria-label="Delete word">✕</button>
                         </div>
                       ))}
