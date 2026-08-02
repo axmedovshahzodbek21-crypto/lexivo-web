@@ -353,10 +353,12 @@ export default function ClassesPage() {
     _classesCache.delete(user.id); load();
   };
 
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+
   const deleteClass = async (classId: string) => {
     if (!user) return;
-    if (!confirm('Delete this class? All students will be removed.')) return;
     await supabase.from('classes').delete().eq('id', classId);
+    setDeleteConfirmId(null);
     _classesCache.delete(user.id); load();
   };
 
@@ -462,9 +464,19 @@ export default function ClassesPage() {
                         <button onClick={e => { e.stopPropagation(); copyLink(cls.join_code, cls.id); }} className="text-base transition-transform hover:scale-110">{copiedLinkId === cls.id ? '✅' : '🔗'}</button>
                       </div>
                     </div>
-                    <div className="bg-black/20 flex items-center justify-between px-4 py-2.5">
-                      <button onClick={e => { e.stopPropagation(); deleteClass(cls.id); }} className="text-xs text-white/40 hover:text-red-300 transition-colors font-medium">Delete</button>
-                      <button onClick={() => router.push(`/classes/${cls.id}/home`)} className="text-xs font-black text-white bg-white/20 hover:bg-white/30 px-3.5 py-1.5 rounded-xl transition-colors">Enter →</button>
+                    <div className="bg-black/20 flex items-center justify-between px-4 py-2.5 min-h-[40px]">
+                      {deleteConfirmId === cls.id ? (
+                        <div className="flex items-center gap-2 w-full">
+                          <span className="text-xs text-white/80 font-semibold">Delete class?</span>
+                          <button onClick={e => { e.stopPropagation(); deleteClass(cls.id); }} className="text-xs font-black text-white bg-red-500/70 hover:bg-red-500 px-2.5 py-1 rounded-lg transition-colors">Yes, delete</button>
+                          <button onClick={e => { e.stopPropagation(); setDeleteConfirmId(null); }} className="text-xs text-white/60 hover:text-white px-2 py-1 rounded-lg transition-colors">Cancel</button>
+                        </div>
+                      ) : (
+                        <>
+                          <button onClick={e => { e.stopPropagation(); setDeleteConfirmId(cls.id); }} className="text-xs text-white/40 hover:text-red-300 transition-colors font-medium">Delete</button>
+                          <button onClick={() => router.push(`/classes/${cls.id}/home`)} className="text-xs font-black text-white bg-white/20 hover:bg-white/30 px-3.5 py-1.5 rounded-xl transition-colors">Enter →</button>
+                        </>
+                      )}
                     </div>
                   </div>
                 );
