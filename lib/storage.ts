@@ -971,7 +971,7 @@ export function getImportedWordsByCollection(collectionName: string, folderName?
 
 // ─── Class Homework Temp ──────────────────────────────────────────────────────
 const CLASS_HW_TEMP_KEY = 'lexivo_class_hw_temp';
-export interface ClassHWWord { word: string; translation: string; definition: string; example1: string; example1Translation: string; example2: string; example2Translation: string; className: string; }
+export interface ClassHWWord { word: string; translation: string; definition: string; example1: string; example1Translation: string; example2: string; example2Translation: string; example3: string; example3Translation: string; extraExamples: string[]; extraExampleTranslations: string[]; className: string; }
 export function saveClassHWTemp(words: ClassHWWord[]): void { if (typeof window !== 'undefined') localStorage.setItem(CLASS_HW_TEMP_KEY, JSON.stringify(words)); }
 export function getClassHWTemp(): ClassHWWord[] { try { return JSON.parse(typeof window !== 'undefined' ? (localStorage.getItem(CLASS_HW_TEMP_KEY) ?? '[]') : '[]'); } catch { return []; } }
 

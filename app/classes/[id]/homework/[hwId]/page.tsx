@@ -118,6 +118,10 @@ export default function UnitStudyHubPage() {
       example1Translation: w.examples[0]?.translation ?? '',
       example2: w.examples[1]?.sentence ?? '',
       example2Translation: w.examples[1]?.translation ?? '',
+      example3: w.examples[2]?.sentence ?? '',
+      example3Translation: w.examples[2]?.translation ?? '',
+      extraExamples: w.examples.slice(3).map(e => e.sentence),
+      extraExampleTranslations: w.examples.slice(3).map(e => e.translation),
       className: unitName,
     }));
     saveClassHWTemp(hwWords);

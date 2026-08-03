@@ -192,7 +192,8 @@ export default function QuizPage() {
         translation: w.translation, definition: w.definition,
         example1: w.example1, example1Situation: '', example1Translation: w.example1Translation,
         example2: w.example2, example2Situation: '', example2Translation: w.example2Translation,
-        example3: '', example3Translation: '', example3Situation: '',
+        example3: w.example3 ?? '', example3Translation: w.example3Translation ?? '', example3Situation: '',
+        extraExamples: w.extraExamples ?? [], extraExampleTranslations: w.extraExampleTranslations ?? [],
         collectionName: 'class-hw', topic: w.className, dayNumber: 0,
       }));
       const words = shuffle(allWords);
