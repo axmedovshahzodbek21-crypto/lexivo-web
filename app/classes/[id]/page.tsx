@@ -121,7 +121,8 @@ interface HardWordRaw { user_id: string; word: string; }
 
 interface CurrFolder { id: string; assignmentId: string; name: string; units: CurrUnit[]; }
 interface CurrUnit { id: string; name: string; wordCount: number; }
-interface CurrHW { id: string; unitId: string; unitName: string; modes: string[]; dueDate: string | null; studentIds: string[] | null; progressByMode: Record<string, number>; }
+interface CurrWordUnit { id: string; name: string; wordCount: number; }
+interface CurrHW { id: string; unitId: string | null; classUnitId: string | null; source: 'library' | 'class'; unitName: string; modes: string[]; dueDate: string | null; studentIds: string[] | null; progressByMode: Record<string, number>; }
 
 function Avatar({ name, url, size = 38 }: { name: string; url: string | null; size?: number }) {
   if (url) return <img src={url} alt={name} style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />;
@@ -694,16 +695,28 @@ function CurriculumTab({
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [folders, setFolders] = useState<CurrFolder[]>([]);
+  const [cwUnits, setCwUnits] = useState<CurrWordUnit[]>([]);
   const [homework, setHomework] = useState<CurrHW[]>([]);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const [expandedCW, setExpandedCW] = useState<Set<string>>(new Set());
 
   // Folder picker modal
   const [showFolderPicker, setShowFolderPicker] = useState(false);
   const [availFolders, setAvailFolders] = useState<{ id: string; name: string; unitCount: number }[]>([]);
   const [folderPickerLoading, setFolderPickerLoading] = useState(false);
 
-  // Assign homework modal
-  const [hwUnit, setHwUnit] = useState<{ id: string; name: string } | null>(null);
+  // Class word unit modals
+  const [cwUnitCreating, setCwUnitCreating] = useState(false);
+  const [cwUnitNewName, setCwUnitNewName] = useState('');
+  const [cwUnitRenaming, setCwUnitRenaming] = useState<CurrWordUnit | null>(null);
+  const [cwUnitRenameName, setCwUnitRenameName] = useState('');
+  const [cwWordsMgr, setCwWordsMgr] = useState<CurrWordUnit | null>(null);
+  const [cwWordsAll, setCwWordsAll] = useState<{ id: string; word: string; translation: string; unitId: string | null }[]>([]);
+  const [cwWordsPending, setCwWordsPending] = useState<Record<string, boolean>>({});
+  const [cwWordsSaving, setCwWordsSaving] = useState(false);
+
+  // Assign homework modal — now supports both library units and class word units
+  const [hwUnit, setHwUnit] = useState<{ id: string; name: string; isClassWords?: boolean } | null>(null);
   const [hwModes, setHwModes] = useState<Set<string>>(new Set(['learn', 'flashcard', 'quiz']));
   const [hwDueDate, setHwDueDate] = useState('');
   const [hwWho, setHwWho] = useState<'class' | 'specific'>('class');
@@ -718,57 +731,62 @@ function CurriculumTab({
 
   const loadCurriculum = async () => {
     setLoading(true);
-    // 1. Assignments → folder IDs
-    const { data: assigns } = await supabase
-      .from('class_library_assignments')
-      .select('id, folder_id, teacher_folders(id, name)')
-      .eq('class_id', classId);
+    const [assignsRes, cwUnitRes] = await Promise.all([
+      supabase.from('class_library_assignments').select('id, folder_id, teacher_folders(id, name)').eq('class_id', classId),
+      supabase.from('class_word_units').select('id, name, class_words(count)').eq('class_id', classId).order('created_at'),
+    ]);
 
-    if (!assigns || assigns.length === 0) { setFolders([]); setHomework([]); setLoading(false); return; }
+    const assigns = (assignsRes.data ?? []) as any[];
+    const cwUnitRows = (cwUnitRes.data ?? []) as any[];
 
-    const folderIds = assigns.map((a: any) => a.teacher_folders.id);
+    // Library folders
+    let parsedFolders: CurrFolder[] = [];
+    if (assigns.length > 0) {
+      const folderIds = assigns.map((a: any) => a.teacher_folders.id);
+      const { data: unitData } = await supabase
+        .from('teacher_units').select('id, folder_id, name, teacher_unit_words(count)')
+        .in('folder_id', folderIds).order('position').order('created_at');
+      parsedFolders = assigns.map((a: any) => ({
+        id: a.teacher_folders.id, assignmentId: a.id, name: a.teacher_folders.name,
+        units: (unitData ?? [])
+          .filter((u: any) => u.folder_id === a.teacher_folders.id)
+          .map((u: any) => ({ id: u.id, name: u.name, wordCount: u.teacher_unit_words?.[0]?.count ?? 0 })),
+      }));
+    }
 
-    // 2. Units for those folders
-    const { data: unitData } = await supabase
-      .from('teacher_units')
-      .select('id, folder_id, name, teacher_unit_words(count)')
-      .in('folder_id', folderIds)
-      .order('position').order('created_at');
-
-    const parsedFolders: CurrFolder[] = assigns.map((a: any) => ({
-      id: a.teacher_folders.id,
-      assignmentId: a.id,
-      name: a.teacher_folders.name,
-      units: (unitData ?? [])
-        .filter((u: any) => u.folder_id === a.teacher_folders.id)
-        .map((u: any) => ({ id: u.id, name: u.name, wordCount: u.teacher_unit_words?.[0]?.count ?? 0 })),
+    const parsedCW: CurrWordUnit[] = cwUnitRows.map((u: any) => ({
+      id: u.id, name: u.name, wordCount: u.class_words?.[0]?.count ?? 0,
     }));
 
-    // 3. Homework for class
+    // Homework
     const { data: hwData } = await supabase
       .from('class_homework')
-      .select('id, unit_id, modes, due_date, student_ids, teacher_units(name)')
-      .eq('class_id', classId)
-      .order('created_at', { ascending: false });
+      .select('id, unit_id, class_unit_id, modes, due_date, student_ids, teacher_units(name), class_word_units(name)')
+      .eq('class_id', classId).order('created_at', { ascending: false });
 
     let parsedHw: CurrHW[] = [];
     if (hwData && hwData.length > 0) {
       const hwIds = (hwData as any[]).map(h => h.id);
       const { data: progData } = await supabase
-        .from('class_homework_progress')
-        .select('homework_id, student_id, mode')
-        .in('homework_id', hwIds);
+        .from('class_homework_progress').select('homework_id, student_id, mode').in('homework_id', hwIds);
       parsedHw = (hwData as any[]).map(h => {
         const rows = (progData ?? []).filter((p: any) => p.homework_id === h.id);
         const progressByMode: Record<string, number> = {};
         for (const mode of (h.modes ?? [])) {
           progressByMode[mode] = new Set(rows.filter((p: any) => p.mode === mode).map((p: any) => p.student_id)).size;
         }
-        return { id: h.id, unitId: h.unit_id, unitName: h.teacher_units?.name ?? 'Unknown unit', modes: h.modes ?? [], dueDate: h.due_date, studentIds: h.student_ids, progressByMode };
+        const isClass = h.class_unit_id != null;
+        const unitName = isClass ? (h.class_word_units?.name ?? 'Unit') : (h.teacher_units?.name ?? 'Unit');
+        return {
+          id: h.id, unitId: h.unit_id ?? null, classUnitId: h.class_unit_id ?? null,
+          source: isClass ? 'class' : 'library', unitName,
+          modes: h.modes ?? [], dueDate: h.due_date, studentIds: h.student_ids, progressByMode,
+        };
       });
     }
 
     setFolders(parsedFolders);
+    setCwUnits(parsedCW);
     setHomework(parsedHw);
     setLoading(false);
   };
@@ -801,7 +819,7 @@ function CurriculumTab({
     await loadCurriculum();
   };
 
-  const openHwModal = (unit: { id: string; name: string }) => {
+  const openHwModal = (unit: { id: string; name: string; isClassWords?: boolean }) => {
     setHwUnit(unit);
     setHwModes(new Set(['learn', 'flashcard', 'quiz']));
     setHwDueDate('');
@@ -814,7 +832,7 @@ function CurriculumTab({
     setHwSaving(true);
     await supabase.from('class_homework').insert({
       class_id: classId,
-      unit_id: hwUnit.id,
+      ...(hwUnit.isClassWords ? { class_unit_id: hwUnit.id } : { unit_id: hwUnit.id }),
       modes: [...hwModes],
       due_date: hwDueDate || null,
       student_ids: hwWho === 'class' ? null : [...hwStudentIds],
@@ -822,6 +840,51 @@ function CurriculumTab({
     });
     setHwUnit(null);
     setHwSaving(false);
+    await loadCurriculum();
+  };
+
+  const createCWUnit = async () => {
+    if (!user || !cwUnitNewName.trim()) return;
+    await supabase.from('class_word_units').insert({ class_id: classId, teacher_id: user.id, name: cwUnitNewName.trim() });
+    setCwUnitCreating(false);
+    setCwUnitNewName('');
+    await loadCurriculum();
+  };
+
+  const renameCWUnit = async () => {
+    if (!cwUnitRenaming || !cwUnitRenameName.trim()) return;
+    await supabase.from('class_word_units').update({ name: cwUnitRenameName.trim() }).eq('id', cwUnitRenaming.id);
+    setCwUnitRenaming(null);
+    await loadCurriculum();
+  };
+
+  const deleteCWUnit = async (unit: CurrWordUnit) => {
+    if (!confirm(`Delete unit "${unit.name}"? Words will remain but lose their unit assignment.`)) return;
+    await supabase.from('class_word_units').delete().eq('id', unit.id);
+    await loadCurriculum();
+  };
+
+  const openManageWords = async (unit: CurrWordUnit) => {
+    const { data } = await supabase.from('class_words').select('id, word, translation, unit_id').eq('class_id', classId).order('created_at');
+    const words = (data ?? []) as any[];
+    const pending: Record<string, boolean> = {};
+    for (const w of words) pending[w.id] = w.unit_id === unit.id;
+    setCwWordsAll(words);
+    setCwWordsPending(pending);
+    setCwWordsMgr(unit);
+  };
+
+  const saveManageWords = async () => {
+    if (!cwWordsMgr) return;
+    setCwWordsSaving(true);
+    for (const w of cwWordsAll) {
+      const shouldBe = cwWordsPending[w.id] ?? false;
+      const isMember = w.unitId === cwWordsMgr.id;
+      if (shouldBe && !isMember) await supabase.from('class_words').update({ unit_id: cwWordsMgr.id }).eq('id', w.id);
+      else if (!shouldBe && isMember) await supabase.from('class_words').update({ unit_id: null }).eq('id', w.id);
+    }
+    setCwWordsSaving(false);
+    setCwWordsMgr(null);
     await loadCurriculum();
   };
 
@@ -896,7 +959,7 @@ function CurriculumTab({
                       {folder.units.length === 0 ? (
                         <p className="text-xs text-[var(--text-muted)] text-center py-3">No units in this folder</p>
                       ) : folder.units.map(unit => {
-                        const hw = homework.find(h => h.unitId === unit.id);
+                        const hw = homework.find(h => h.source === 'library' && h.unitId === unit.id);
                         return (
                           <div key={unit.id} className="flex items-center gap-3 px-2 py-2 rounded-xl" style={{ background: 'var(--surface-2)' }}>
                             <div className="flex-1 min-w-0">
@@ -924,6 +987,65 @@ function CurriculumTab({
         )}
       </div>
 
+      {/* ── Class Words ── */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">📝 Class Words</p>
+          <button onClick={() => { setCwUnitNewName(''); setCwUnitCreating(true); }} className="text-xs font-semibold text-amber-500 hover:opacity-70 transition-opacity">+ New Unit</button>
+        </div>
+
+        {cwUnits.length === 0 ? (
+          <div className="card text-center py-10 space-y-2">
+            <div className="text-4xl">📝</div>
+            <p className="font-bold text-[var(--text)]">No units yet</p>
+            <p className="text-sm text-[var(--text-muted)]">Create a unit to organise class words into homework groups.</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {cwUnits.map(unit => {
+              const isOpen = expandedCW.has(unit.id);
+              const hw = homework.find(h => h.source === 'class' && h.classUnitId === unit.id);
+              return (
+                <div key={unit.id} className="card overflow-hidden">
+                  <button
+                    className="w-full flex items-center gap-3 text-left"
+                    onClick={() => setExpandedCW(prev => { const next = new Set(prev); if (isOpen) { next.delete(unit.id); } else { next.add(unit.id); } return next; })}
+                  >
+                    <span className="text-xl">📝</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-sm text-[var(--text)] truncate">{unit.name}</p>
+                      <p className="text-xs text-[var(--text-muted)]">{unit.wordCount} word{unit.wordCount !== 1 ? 's' : ''}</p>
+                    </div>
+                    <div className="flex items-center gap-3 shrink-0">
+                      <button onClick={e => { e.stopPropagation(); setCwUnitRenameName(unit.name); setCwUnitRenaming(unit); }} className="text-[10px] text-[var(--text-muted)] hover:text-[var(--primary)] transition-colors">Rename</button>
+                      <button onClick={e => { e.stopPropagation(); deleteCWUnit(unit); }} className="text-[10px] text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors">Delete</button>
+                      <span className="text-xs text-[var(--text-muted)]">{isOpen ? '▲' : '▼'}</span>
+                    </div>
+                  </button>
+
+                  {isOpen && (
+                    <div className="mt-3 border-t border-[var(--border)] pt-3 flex gap-2">
+                      <button onClick={() => openManageWords(unit)} className="flex-1 text-xs font-semibold px-3 py-2 rounded-xl border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--primary)] hover:border-[var(--primary)] transition-colors">
+                        ✏️ Manage Words
+                      </button>
+                      {hw ? (
+                        <button onClick={() => openHwDetail(hw)} className="flex-1 text-xs font-bold px-3 py-2 rounded-xl" style={{ background: 'color-mix(in srgb, #F59E0B 15%, transparent)', color: '#F59E0B' }}>
+                          📋 View Progress
+                        </button>
+                      ) : (
+                        <button onClick={() => openHwModal({ ...unit, isClassWords: true })} className="flex-1 text-xs font-semibold px-3 py-2 rounded-xl border border-[var(--border)] text-[var(--text-muted)] hover:text-amber-500 hover:border-amber-400 transition-colors">
+                          + Assign HW
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
       {/* ── Homework ── */}
       <div>
         <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide mb-3">📋 Homework</p>
@@ -941,7 +1063,10 @@ function CurriculumTab({
                 <button key={hw.id} onClick={() => openHwDetail(hw)} className="card w-full text-left space-y-3 hover:opacity-90 transition-opacity">
                   <div className="flex items-start gap-3">
                     <div className="flex-1 min-w-0">
-                      <p className="font-bold text-sm text-[var(--text)] truncate">{hw.unitName}</p>
+                      <div className="flex items-center gap-1.5">
+                        <p className="font-bold text-sm text-[var(--text)] truncate">{hw.unitName}</p>
+                        {hw.source === 'class' && <span className="shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded" style={{ background: 'color-mix(in srgb, #F59E0B 15%, transparent)', color: '#F59E0B' }}>Class</span>}
+                      </div>
                       <div className="flex items-center gap-1.5 mt-0.5">
                         {hw.modes.map(m => <span key={m} className="text-xs">{HW_MODE_ICON[m] ?? m}</span>)}
                         {hw.studentIds && <span className="text-[10px] text-[var(--text-muted)]">· {hw.studentIds.length} student{hw.studentIds.length !== 1 ? 's' : ''}</span>}
@@ -974,6 +1099,79 @@ function CurriculumTab({
           </div>
         )}
       </div>
+
+      {/* ── Create class word unit modal ── */}
+      {cwUnitCreating && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setCwUnitCreating(false)}>
+          <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-5 space-y-4" onClick={e => e.stopPropagation()}>
+            <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto" />
+            <p className="font-bold text-[var(--text)]">New Unit</p>
+            <input
+              autoFocus value={cwUnitNewName} onChange={e => setCwUnitNewName(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && createCWUnit()}
+              placeholder="Unit name" className="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]"
+            />
+            <div className="flex gap-3">
+              <button onClick={() => setCwUnitCreating(false)} className="flex-1 btn-ghost py-3 text-sm">Cancel</button>
+              <button onClick={createCWUnit} disabled={!cwUnitNewName.trim()} className="flex-1 btn-primary py-3 disabled:opacity-50">Create</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Rename class word unit modal ── */}
+      {cwUnitRenaming && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setCwUnitRenaming(null)}>
+          <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-5 space-y-4" onClick={e => e.stopPropagation()}>
+            <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto" />
+            <p className="font-bold text-[var(--text)]">Rename Unit</p>
+            <input
+              autoFocus value={cwUnitRenameName} onChange={e => setCwUnitRenameName(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && renameCWUnit()}
+              className="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]"
+            />
+            <div className="flex gap-3">
+              <button onClick={() => setCwUnitRenaming(null)} className="flex-1 btn-ghost py-3 text-sm">Cancel</button>
+              <button onClick={renameCWUnit} disabled={!cwUnitRenameName.trim()} className="flex-1 btn-primary py-3 disabled:opacity-50">Save</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Manage words modal ── */}
+      {cwWordsMgr && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setCwWordsMgr(null)}>
+          <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-5 space-y-4 max-h-[75vh] flex flex-col" onClick={e => e.stopPropagation()}>
+            <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto shrink-0" />
+            <p className="font-bold text-[var(--text)] shrink-0">Words in &ldquo;{cwWordsMgr.name}&rdquo;</p>
+            {cwWordsAll.length === 0 ? (
+              <p className="text-sm text-center text-[var(--text-muted)] py-6">No words in this class yet.</p>
+            ) : (
+              <div className="flex-1 overflow-y-auto min-h-0 space-y-1">
+                {cwWordsAll.map(w => (
+                  <label key={w.id} className="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer hover:bg-[var(--surface-2)] transition-colors">
+                    <input
+                      type="checkbox" checked={cwWordsPending[w.id] ?? false}
+                      onChange={e => setCwWordsPending(prev => ({ ...prev, [w.id]: e.target.checked }))}
+                      className="w-4 h-4 rounded accent-[var(--primary)]"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-[var(--text)] truncate">{w.word}</p>
+                      <p className="text-xs text-[var(--primary)] truncate">{w.translation}</p>
+                    </div>
+                  </label>
+                ))}
+              </div>
+            )}
+            <div className="flex gap-3 shrink-0">
+              <button onClick={() => setCwWordsMgr(null)} className="flex-1 btn-ghost py-3 text-sm">Cancel</button>
+              <button onClick={saveManageWords} disabled={cwWordsSaving} className="flex-1 btn-primary py-3 disabled:opacity-50">
+                {cwWordsSaving ? 'Saving…' : 'Save'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Folder picker modal ── */}
       {showFolderPicker && (

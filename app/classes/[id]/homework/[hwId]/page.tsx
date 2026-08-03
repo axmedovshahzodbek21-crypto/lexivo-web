@@ -33,7 +33,7 @@ function dueLabel(due: string | null): { text: string; overdue: boolean } | null
 }
 
 export default function UnitStudyHubPage() {
-  const { id: classId, hwId } = useParams<{ id: string; hwId: string }>();
+  const { hwId } = useParams<{ id: string; hwId: string }>();
   const { user } = useAuth();
   const router = useRouter();
 
@@ -55,7 +55,7 @@ export default function UnitStudyHubPage() {
     const [hwRes, progRes] = await Promise.all([
       supabase
         .from('class_homework')
-        .select('unit_id, modes, due_date, student_ids, teacher_units(name)')
+        .select('unit_id, class_unit_id, modes, due_date, student_ids, teacher_units(name), class_word_units(name)')
         .eq('id', hwId)
         .single(),
       supabase
@@ -68,16 +68,26 @@ export default function UnitStudyHubPage() {
     const hw = hwRes.data;
     if (!hw) { setLoading(false); return; }
 
-    const unitId = hw.unit_id as string;
-    const name = (hw.teacher_units as any)?.name ?? '';
+    const unitId = hw.unit_id as string | null;
+    const classUnitId = hw.class_unit_id as string | null;
+    const isClassWords = classUnitId != null;
+    const name = isClassWords
+      ? ((hw.class_word_units as any)?.name ?? '')
+      : ((hw.teacher_units as any)?.name ?? '');
     const hwModes = (hw.modes as string[]) ?? [];
     const due = hw.due_date as string | null;
 
-    const wordsRes = await supabase
-      .from('teacher_unit_words')
-      .select('word, translation, definition, examples')
-      .eq('unit_id', unitId)
-      .order('created_at');
+    const wordsRes = isClassWords
+      ? await supabase
+          .from('class_words')
+          .select('word, translation, definition, examples')
+          .eq('unit_id', classUnitId!)
+          .order('created_at')
+      : await supabase
+          .from('teacher_unit_words')
+          .select('word, translation, definition, examples')
+          .eq('unit_id', unitId!)
+          .order('created_at');
 
     const unitWords: UnitWord[] = ((wordsRes.data as any[]) ?? []).map(w => ({
       word: w.word,

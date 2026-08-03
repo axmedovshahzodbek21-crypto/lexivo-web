@@ -20,6 +20,15 @@ interface AssignedFolder {
   showAll: boolean;
 }
 
+interface CWUnit {
+  id: string;
+  name: string;
+  wordCount: number;
+  homeworkId: string | null;
+  hwModes: string[] | null;
+  hwDue: string | null;
+}
+
 function dueLabel(due: string | null): { text: string; overdue: boolean } | null {
   if (!due) return null;
   const today = new Date().toISOString().slice(0, 10);
@@ -40,6 +49,7 @@ export default function ClassHomeworkPage() {
   const [loading, setLoading] = useState(true);
   const [isTeacher, setIsTeacher] = useState(false);
   const [folders, setFolders] = useState<AssignedFolder[]>([]);
+  const [cwUnits, setCwUnits] = useState<CWUnit[]>([]);
   const [completedModes, setCompletedModes] = useState<Record<string, Set<string>>>({});
   const [totalAssigned, setTotalAssigned] = useState(0);
   const [totalDone, setTotalDone] = useState(0);
@@ -58,66 +68,61 @@ export default function ClassHomeworkPage() {
 
     if (teacher) { setLoading(false); return; }
 
-    const { data: assigns } = await supabase
-      .from('class_library_assignments')
-      .select('id, folder_id, teacher_folders(id, name)')
-      .eq('class_id', id);
+    const userId = user!.id;
 
-    if (!assigns?.length) { setFolders([]); setLoading(false); return; }
-
-    const folderIds = assigns.map((a: any) => a.teacher_folders.id as string);
-
-    const [unitsRes, hwRes] = await Promise.all([
-      supabase
-        .from('teacher_units')
-        .select('id, folder_id, name, teacher_unit_words(count)')
-        .in('folder_id', folderIds)
-        .order('created_at'),
-      supabase
-        .from('class_homework')
-        .select('id, unit_id, modes, due_date, student_ids')
-        .eq('class_id', id),
+    const [assignsRes, cwUnitRes, hwRes] = await Promise.all([
+      supabase.from('class_library_assignments').select('id, folder_id, teacher_folders(id, name)').eq('class_id', id),
+      supabase.from('class_word_units').select('id, name, class_words(count)').eq('class_id', id).order('created_at'),
+      supabase.from('class_homework').select('id, unit_id, class_unit_id, modes, due_date, student_ids').eq('class_id', id),
     ]);
 
-    const allUnits = (unitsRes.data ?? []) as any[];
+    const assigns = (assignsRes.data ?? []) as any[];
+    const cwUnitRows = (cwUnitRes.data ?? []) as any[];
     const allHw = (hwRes.data ?? []) as any[];
 
-    // Filter homework applicable to this student
-    const userId = user!.id;
     const applicableHw = allHw.filter(h => {
       const sids = h.student_ids as string[] | null;
       return sids === null || sids.includes(userId);
     });
 
-    const hwByUnit: Record<string, any> = {};
-    for (const h of applicableHw) hwByUnit[h.unit_id] = h;
+    const hwByLibUnit: Record<string, any> = {};
+    const hwByCWUnit: Record<string, any> = {};
+    for (const h of applicableHw) {
+      if (h.unit_id) hwByLibUnit[h.unit_id] = h;
+      if (h.class_unit_id) hwByCWUnit[h.class_unit_id] = h;
+    }
 
-    // Load completed modes for this student
     const hwIds = applicableHw.map(h => h.id);
-    let modeMap: Record<string, Set<string>> = {};
+    const modeMap: Record<string, Set<string>> = {};
     if (hwIds.length > 0) {
       const { data: prog } = await supabase
-        .from('class_homework_progress')
-        .select('homework_id, mode')
-        .eq('student_id', userId)
-        .in('homework_id', hwIds);
+        .from('class_homework_progress').select('homework_id, mode')
+        .eq('student_id', userId).in('homework_id', hwIds);
       for (const p of (prog ?? [])) {
         if (!modeMap[p.homework_id]) modeMap[p.homework_id] = new Set();
         modeMap[p.homework_id].add(p.mode);
       }
     }
 
-    // Build folder list
+    // Library folders
+    let folderUnitsData: any[] = [];
+    if (assigns.length > 0) {
+      const folderIds = assigns.map((a: any) => a.teacher_folders.id as string);
+      const { data: unitsData } = await supabase
+        .from('teacher_units').select('id, folder_id, name, teacher_unit_words(count)')
+        .in('folder_id', folderIds).order('created_at');
+      folderUnitsData = (unitsData ?? []) as any[];
+    }
+
     const built: AssignedFolder[] = assigns.map((a: any) => {
       const folder = a.teacher_folders;
-      const units: FolderUnit[] = allUnits
+      const units: FolderUnit[] = folderUnitsData
         .filter(u => u.folder_id === folder.id)
         .map(u => {
-          const hw = hwByUnit[u.id] ?? null;
+          const hw = hwByLibUnit[u.id] ?? null;
           const countList = u.teacher_unit_words as any[];
           return {
-            id: u.id as string,
-            name: u.name as string,
+            id: u.id as string, name: u.name as string,
             wordCount: countList?.[0]?.count ?? 0,
             homeworkId: hw?.id ?? null,
             hwModes: hw ? (hw.modes as string[]) : null,
@@ -127,20 +132,36 @@ export default function ClassHomeworkPage() {
       return { id: folder.id, name: folder.name, units, showAll: false };
     });
 
+    // Class word units (assigned homework only shown)
+    const builtCW: CWUnit[] = cwUnitRows.map((u: any) => {
+      const hw = hwByCWUnit[u.id] ?? null;
+      const countList = u.class_words as any[];
+      return {
+        id: u.id as string, name: u.name as string,
+        wordCount: countList?.[0]?.count ?? 0,
+        homeworkId: hw?.id ?? null,
+        hwModes: hw ? (hw.modes as string[]) : null,
+        hwDue: hw?.due_date ?? null,
+      };
+    }).filter((u: CWUnit) => u.homeworkId !== null);
+
     // Totals
     let assigned = 0, done = 0;
     for (const f of built) {
       for (const u of f.units) {
         if (u.homeworkId) {
           assigned++;
-          const modes = u.hwModes ?? [];
-          const completed = modeMap[u.homeworkId] ?? new Set();
-          if (modes.length > 0 && modes.every(m => completed.has(m))) done++;
+          if ((u.hwModes ?? []).every(m => (modeMap[u.homeworkId!] ?? new Set()).has(m))) done++;
         }
       }
     }
+    for (const u of builtCW) {
+      assigned++;
+      if ((u.hwModes ?? []).every(m => (modeMap[u.homeworkId!] ?? new Set()).has(m))) done++;
+    }
 
     setFolders(built);
+    setCwUnits(builtCW);
     setCompletedModes(modeMap);
     setTotalAssigned(assigned);
     setTotalDone(done);
@@ -204,7 +225,7 @@ export default function ClassHomeworkPage() {
           </div>
         )}
 
-        {/* Folder sections */}
+        {/* Library folders */}
         {folders.map(folder => {
           const hiddenCount = folder.units.filter(u => !u.homeworkId).length;
           const visible = folder.showAll
@@ -309,6 +330,72 @@ export default function ClassHomeworkPage() {
             </div>
           );
         })}
+
+        {/* Class word units section */}
+        {cwUnits.length > 0 && (
+          <div className="mt-2">
+            <div className="flex items-center gap-2 mb-2 px-1">
+              <span className="text-xs">📝</span>
+              <p className="flex-1 text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">Class Words</p>
+            </div>
+            <div className="space-y-2">
+              {cwUnits.map(unit => {
+                const modes = unit.hwModes ?? [];
+                const completed = completedModes[unit.homeworkId!] ?? new Set();
+                const allDone = modes.length > 0 && modes.every(m => completed.has(m));
+                const due = dueLabel(unit.hwDue);
+                return (
+                  <button
+                    key={unit.id}
+                    onClick={() => router.push(`/classes/${id}/homework/${unit.homeworkId}`)}
+                    className={`w-full flex items-center gap-3 p-4 rounded-2xl border text-left transition-all active:scale-[0.98] ${
+                      allDone
+                        ? 'bg-green-50 border-green-200 dark:bg-green-950/30 dark:border-green-800'
+                        : 'bg-[var(--surface)] border-[var(--border)] shadow-sm'
+                    }`}
+                  >
+                    <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${
+                      allDone ? 'bg-green-100 dark:bg-green-900/50' : 'bg-amber-50 dark:bg-amber-950/30'
+                    }`}>
+                      {allDone ? (
+                        <svg className="w-6 h-6 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                      ) : (
+                        <span className="text-sm font-black text-amber-500">
+                          {completed.size}/{modes.length}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-sm font-bold truncate ${allDone ? 'text-green-700 dark:text-green-400' : 'text-[var(--text)]'}`}>
+                        {unit.name}
+                      </p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <div className="flex gap-1">
+                          {modes.map(m => (
+                            <span key={m} className="text-sm" style={{ opacity: completed.has(m) ? 1 : 0.3 }} title={m}>
+                              {MODE_ICON[m] ?? m}
+                            </span>
+                          ))}
+                        </div>
+                        {due && (
+                          <span className={`text-[10px] font-semibold ${due.overdue ? 'text-red-500' : 'text-[var(--text-muted)]'}`}>
+                            {due.text}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <svg className="w-4 h-4 text-[var(--text-muted)] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   );
