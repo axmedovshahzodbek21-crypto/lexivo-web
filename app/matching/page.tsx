@@ -5,7 +5,7 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
-import { getHardWords, getStarredWords, getCustomListWords, getImportedWords, getImportedWordsByCollection } from '@/lib/storage';
+import { getHardWords, getStarredWords, getCustomListWords, getImportedWords, getImportedWordsByCollection, getClassHWTemp } from '@/lib/storage';
 import { getClassWordsFull, addClassHardWord } from '@/lib/class-srs';
 import { supabase } from '@/lib/supabase';
 import { checkAchievements } from '@/lib/gamification';
@@ -76,6 +76,7 @@ function MatchingInner() {
   const listId           = searchParams.get('list') ?? undefined;
   const sourceMyWords    = searchParams.get('source') === 'my-words';
   const sourceClass      = searchParams.get('source') === 'class';
+  const sourceClassHW    = searchParams.get('source') === 'class-hw';
   const classId          = searchParams.get('classId') ?? undefined;
   const classNameParam   = searchParams.get('className') ?? 'Class';
   const myCollection     = searchParams.get('myCollection') ?? undefined;
@@ -110,6 +111,19 @@ function MatchingInner() {
   const timerInterval = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
+    if (sourceClassHW) {
+      const hw = getClassHWTemp();
+      const list: MatchWord[] = hw.map(w => ({
+        word: w.word, partOfSpeech: '', pronunciation: '',
+        translation: w.translation, definition: w.definition,
+        example1: w.example1, example1Situation: '', example1Translation: w.example1Translation,
+        example2: w.example2, example2Situation: '', example2Translation: w.example2Translation,
+        example3: '', example3Translation: '', example3Situation: '',
+        collectionName: w.className, topic: w.className, dayNumber: 0,
+      }));
+      setWords(shuffle(list));
+      return;
+    }
     if (sourceClass && classId) {
       (async () => {
         const raw = await getClassWordsFull(classId);
@@ -159,7 +173,7 @@ function MatchingInner() {
     }
     if (!collectionsLoaded) return;
     setWords(buildList(collections, collectionParam, dayParam, starredParam, hardParam, listId));
-  }, [collectionsLoaded, collections, collectionParam, dayParam, starredParam, hardParam, listId, sourceMyWords, sourceClass, classId, classNameParam, myCollection, myFolder]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [collectionsLoaded, collections, collectionParam, dayParam, starredParam, hardParam, listId, sourceMyWords, sourceClassHW, sourceClass, classId, classNameParam, myCollection, myFolder]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const initRound = useCallback((idx: number, wordList: MatchWord[]) => {
     const batch = wordList.slice(idx * BATCH_SIZE, (idx + 1) * BATCH_SIZE);

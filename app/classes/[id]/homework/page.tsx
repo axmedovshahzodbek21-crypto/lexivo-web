@@ -1,16 +1,23 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 
-interface Homework {
+interface FolderUnit {
   id: string;
-  class_id: string;
-  teacher_id: string;
-  title: string;
-  due_date: string | null;
-  created_at: string;
+  name: string;
+  wordCount: number;
+  homeworkId: string | null;
+  hwModes: string[] | null;
+  hwDue: string | null;
+}
+
+interface AssignedFolder {
+  id: string;
+  name: string;
+  units: FolderUnit[];
+  showAll: boolean;
 }
 
 function dueLabel(due: string | null): { text: string; overdue: boolean } | null {
@@ -23,121 +30,126 @@ function dueLabel(due: string | null): { text: string; overdue: boolean } | null
   return { text: `Due ${due}`, overdue: false };
 }
 
-type HwCache = {
-  isTeacher: boolean; hw: Homework[];
-  completedIds: string[]; completionCounts: Record<string, number>; memberCount: number;
-};
-const _hwCache = new Map<string, HwCache>();
+const MODE_ICON: Record<string, string> = { learn: '📖', flashcard: '🃏', quiz: '🧠', match: '🎯' };
 
 export default function ClassHomeworkPage() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
+  const router = useRouter();
 
   const [loading, setLoading] = useState(true);
   const [isTeacher, setIsTeacher] = useState(false);
-  const [hw, setHw] = useState<Homework[]>([]);
-  const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
-  const [completionCounts, setCompletionCounts] = useState<Record<string, number>>({});
-  const [memberCount, setMemberCount] = useState(0);
-
-  const [showForm, setShowForm] = useState(false);
-  const [title, setTitle] = useState('');
-  const [dueDate, setDueDate] = useState('');
-  const [adding, setAdding] = useState(false);
+  const [folders, setFolders] = useState<AssignedFolder[]>([]);
+  const [completedModes, setCompletedModes] = useState<Record<string, Set<string>>>({});
+  const [totalAssigned, setTotalAssigned] = useState(0);
+  const [totalDone, setTotalDone] = useState(0);
 
   useEffect(() => {
     if (!user) return;
-    const cacheKey = `${user.id}:${id}`;
-    const cached = _hwCache.get(cacheKey);
-    if (cached) {
-      setIsTeacher(cached.isTeacher);
-      setHw(cached.hw);
-      setCompletedIds(new Set(cached.completedIds));
-      setCompletionCounts(cached.completionCounts);
-      setMemberCount(cached.memberCount);
-      setLoading(false);
-    } else {
-      setLoading(true);
+    load();
+  }, [user, id]);
+
+  async function load() {
+    setLoading(true);
+
+    const { data: cls } = await supabase.from('classes').select('teacher_id').eq('id', id).maybeSingle();
+    const teacher = cls?.teacher_id === user!.id;
+    setIsTeacher(teacher);
+
+    if (teacher) { setLoading(false); return; }
+
+    const { data: assigns } = await supabase
+      .from('class_library_assignments')
+      .select('id, folder_id, teacher_folders(id, name)')
+      .eq('class_id', id);
+
+    if (!assigns?.length) { setFolders([]); setLoading(false); return; }
+
+    const folderIds = assigns.map((a: any) => a.teacher_folders.id as string);
+
+    const [unitsRes, hwRes] = await Promise.all([
+      supabase
+        .from('teacher_units')
+        .select('id, folder_id, name, teacher_unit_words(count)')
+        .in('folder_id', folderIds)
+        .order('created_at'),
+      supabase
+        .from('class_homework')
+        .select('id, unit_id, modes, due_date, student_ids')
+        .eq('class_id', id),
+    ]);
+
+    const allUnits = (unitsRes.data ?? []) as any[];
+    const allHw = (hwRes.data ?? []) as any[];
+
+    // Filter homework applicable to this student
+    const userId = user!.id;
+    const applicableHw = allHw.filter(h => {
+      const sids = h.student_ids as string[] | null;
+      return sids === null || sids.includes(userId);
+    });
+
+    const hwByUnit: Record<string, any> = {};
+    for (const h of applicableHw) hwByUnit[h.unit_id] = h;
+
+    // Load completed modes for this student
+    const hwIds = applicableHw.map(h => h.id);
+    let modeMap: Record<string, Set<string>> = {};
+    if (hwIds.length > 0) {
+      const { data: prog } = await supabase
+        .from('class_homework_progress')
+        .select('homework_id, mode')
+        .eq('student_id', userId)
+        .in('homework_id', hwIds);
+      for (const p of (prog ?? [])) {
+        if (!modeMap[p.homework_id]) modeMap[p.homework_id] = new Set();
+        modeMap[p.homework_id].add(p.mode);
+      }
     }
 
-    (async () => {
-      const [{ data: cls }, { data: hwData }] = await Promise.all([
-        supabase.from('classes').select('teacher_id').eq('id', id).maybeSingle(),
-        supabase.from('class_homework')
-          .select('id, class_id, teacher_id, title, due_date, created_at')
-          .eq('class_id', id).order('created_at', { ascending: false }),
-      ]);
-      const teacher = cls?.teacher_id === user.id;
-      const homeworks = (hwData ?? []) as Homework[];
-      const hwIds = homeworks.map(h => h.id);
+    // Build folder list
+    const built: AssignedFolder[] = assigns.map((a: any) => {
+      const folder = a.teacher_folders;
+      const units: FolderUnit[] = allUnits
+        .filter(u => u.folder_id === folder.id)
+        .map(u => {
+          const hw = hwByUnit[u.id] ?? null;
+          const countList = u.teacher_unit_words as any[];
+          return {
+            id: u.id as string,
+            name: u.name as string,
+            wordCount: countList?.[0]?.count ?? 0,
+            homeworkId: hw?.id ?? null,
+            hwModes: hw ? (hw.modes as string[]) : null,
+            hwDue: hw?.due_date ?? null,
+          };
+        });
+      return { id: folder.id, name: folder.name, units, showAll: false };
+    });
 
-      const [{ data: members }, { data: comps }] = await Promise.all([
-        teacher
-          ? supabase.from('class_members').select('student_id').eq('class_id', id)
-          : Promise.resolve({ data: [] as { student_id: string }[] }),
-        hwIds.length > 0
-          ? (teacher
-              ? supabase.from('class_homework_completions').select('homework_id').in('homework_id', hwIds)
-              : supabase.from('class_homework_completions').select('homework_id').eq('student_id', user.id).in('homework_id', hwIds))
-          : Promise.resolve({ data: [] as { homework_id: string }[] }),
-      ]);
-
-      const memberCount = (members ?? []).length;
-      let newCompletedIds: string[] = [];
-      let newCounts: Record<string, number> = {};
-      if (teacher) {
-        for (const c of comps ?? []) newCounts[c.homework_id] = (newCounts[c.homework_id] ?? 0) + 1;
-      } else {
-        newCompletedIds = (comps ?? []).map((c: { homework_id: string }) => c.homework_id);
+    // Totals
+    let assigned = 0, done = 0;
+    for (const f of built) {
+      for (const u of f.units) {
+        if (u.homeworkId) {
+          assigned++;
+          const modes = u.hwModes ?? [];
+          const completed = modeMap[u.homeworkId] ?? new Set();
+          if (modes.length > 0 && modes.every(m => completed.has(m))) done++;
+        }
       }
-
-      _hwCache.set(cacheKey, { isTeacher: teacher, hw: homeworks, completedIds: newCompletedIds, completionCounts: newCounts, memberCount });
-      setIsTeacher(teacher);
-      setHw(homeworks);
-      setCompletedIds(new Set(newCompletedIds));
-      setCompletionCounts(newCounts);
-      setMemberCount(memberCount);
-      setLoading(false);
-    })();
-  }, [id, user]);
-
-  const addHomework = async () => {
-    if (!title.trim() || !user) return;
-    setAdding(true);
-    try {
-      const { data: newHw } = await supabase.from('class_homework').insert({
-        class_id: id, teacher_id: user.id, title: title.trim(),
-        ...(dueDate ? { due_date: dueDate } : {}),
-      }).select().maybeSingle();
-      if (newHw) {
-        setHw(prev => [newHw as Homework, ...prev]);
-        _hwCache.delete(`${user.id}:${id}`);
-      }
-      setTitle(''); setDueDate(''); setShowForm(false);
-    } catch (_) {}
-    setAdding(false);
-  };
-
-  const toggleComplete = async (hwItem: Homework) => {
-    if (!user) return;
-    const isDone = completedIds.has(hwItem.id);
-    setCompletedIds(prev => { const n = new Set(prev); isDone ? n.delete(hwItem.id) : n.add(hwItem.id); return n; });
-    try {
-      if (isDone) {
-        await supabase.from('class_homework_completions').delete().eq('homework_id', hwItem.id).eq('student_id', user.id);
-      } else {
-        await supabase.from('class_homework_completions').upsert({ homework_id: hwItem.id, student_id: user.id }, { onConflict: 'homework_id,student_id' });
-      }
-    } catch (_) {
-      setCompletedIds(prev => { const n = new Set(prev); isDone ? n.add(hwItem.id) : n.delete(hwItem.id); return n; });
     }
-  };
 
-  const deleteHomework = async (hwItem: Homework) => {
-    if (!user || !confirm(`Delete "${hwItem.title}"?`)) return;
-    const { error } = await supabase.from('class_homework').delete().eq('id', hwItem.id);
-    if (!error) { setHw(prev => prev.filter(h => h.id !== hwItem.id)); _hwCache.delete(`${user.id}:${id}`); }
-  };
+    setFolders(built);
+    setCompletedModes(modeMap);
+    setTotalAssigned(assigned);
+    setTotalDone(done);
+    setLoading(false);
+  }
+
+  function toggleShowAll(folderId: string) {
+    setFolders(prev => prev.map(f => f.id === folderId ? { ...f, showAll: !f.showAll } : f));
+  }
 
   if (loading) {
     return (
@@ -147,154 +159,156 @@ export default function ClassHomeworkPage() {
     );
   }
 
-  const doneCount = hw.filter(h => completedIds.has(h.id)).length;
+  // Teacher redirect
+  if (isTeacher) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] p-8 text-center">
+        <span className="text-5xl mb-4">📋</span>
+        <p className="text-base font-bold text-[var(--text)] mb-2">Manage Homework from the Dashboard</p>
+        <p className="text-sm text-[var(--text-muted)]">
+          Go to the class Dashboard → Curriculum tab to assign library units as homework and track per-student progress.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen animate-fade-in pb-24">
-      <div className="p-4 space-y-4">
+      <div className="p-4 space-y-1">
 
-        {/* Teacher: add form */}
-        {isTeacher && (
-          !showForm ? (
-            <button
-              onClick={() => setShowForm(true)}
-              className="w-full py-3 rounded-2xl border-2 border-dashed border-[var(--primary)]/40 text-sm font-bold text-[var(--primary)] hover:bg-[var(--primary-bg)] transition-colors"
-            >
-              + New Assignment
-            </button>
-          ) : (
-            <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-4 space-y-3">
-              <p className="text-sm font-bold text-[var(--text)]">New Assignment</p>
-              <input
-                value={title}
-                onChange={e => setTitle(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && addHomework()}
-                placeholder="e.g. Study Unit 5 vocabulary"
-                autoFocus
-                className="w-full px-3 py-2.5 text-sm rounded-xl bg-[var(--surface-2)] text-[var(--text)] border-none outline-none placeholder:text-[var(--text-muted)]"
-              />
-              <div className="flex items-center gap-2">
-                <label className="text-xs text-[var(--text-muted)] shrink-0">Due date (optional)</label>
-                <input
-                  type="date"
-                  value={dueDate}
-                  onChange={e => setDueDate(e.target.value)}
-                  min={new Date().toISOString().slice(0, 10)}
-                  className="flex-1 px-3 py-1.5 text-sm rounded-xl bg-[var(--surface-2)] text-[var(--text)] border-none outline-none"
-                />
-              </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => { setShowForm(false); setTitle(''); setDueDate(''); }}
-                  className="flex-1 py-2 text-sm font-medium text-[var(--text-muted)] hover:bg-[var(--surface-2)] rounded-xl transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={addHomework}
-                  disabled={adding || !title.trim()}
-                  className="flex-1 py-2 text-sm font-bold text-white bg-[var(--primary)] rounded-xl disabled:opacity-50 transition-opacity"
-                >
-                  {adding ? '…' : 'Add'}
-                </button>
-              </div>
-            </div>
-          )
-        )}
-
-        {/* Student: progress bar */}
-        {!isTeacher && hw.length > 0 && (
-          <div className="bg-[var(--primary-bg)] border border-[var(--primary)]/30 rounded-2xl p-4">
+        {/* Progress bar */}
+        {totalAssigned > 0 && (
+          <div className="bg-[var(--primary-bg)] border border-[var(--primary)]/30 rounded-2xl p-4 mb-4">
             <div className="flex items-center justify-between mb-2">
               <p className="text-sm font-black text-[var(--text)]">My Progress</p>
-              <p className="text-sm font-bold text-[var(--primary)]">{doneCount} / {hw.length} done</p>
+              <p className="text-sm font-bold text-[var(--primary)]">{totalDone} / {totalAssigned} done</p>
             </div>
             <div className="h-1.5 bg-[var(--primary)]/15 rounded-full overflow-hidden">
               <div
                 className="h-full bg-[var(--primary)] rounded-full transition-all duration-500"
-                style={{ width: `${hw.length > 0 ? (doneCount / hw.length) * 100 : 0}%` }}
+                style={{ width: `${totalAssigned > 0 ? (totalDone / totalAssigned) * 100 : 0}%` }}
               />
             </div>
-            {doneCount === hw.length && hw.length > 0 && (
+            {totalDone === totalAssigned && totalAssigned > 0 && (
               <p className="text-xs font-bold text-[var(--primary)] mt-2">🎉 All done! Great work!</p>
             )}
           </div>
         )}
 
-        {/* Empty state */}
-        {hw.length === 0 ? (
+        {/* Empty */}
+        {folders.length === 0 && (
           <div className="flex flex-col items-center justify-center py-20 gap-3 text-center">
-            <span className="text-5xl">📋</span>
-            <p className="text-base font-bold text-[var(--text)]">
-              {isTeacher ? 'No assignments yet' : 'No homework yet'}
-            </p>
-            <p className="text-sm text-[var(--text-muted)]">
-              {isTeacher ? 'Create an assignment above' : "Your teacher hasn't assigned anything yet"}
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {hw.map(hwItem => {
-              const isDone = completedIds.has(hwItem.id);
-              const due = dueLabel(hwItem.due_date);
-              const count = completionCounts[hwItem.id] ?? 0;
-              return (
-                <div
-                  key={hwItem.id}
-                  className={`flex items-start gap-3 p-4 rounded-2xl border transition-colors ${
-                    isDone && !isTeacher
-                      ? 'bg-green-50 border-green-200 dark:bg-green-950/30 dark:border-green-800'
-                      : 'bg-[var(--surface)] border-[var(--border)]'
-                  }`}
-                >
-                  {!isTeacher ? (
-                    <button
-                      onClick={() => toggleComplete(hwItem)}
-                      className={`w-6 h-6 mt-0.5 rounded-md border-2 flex items-center justify-center shrink-0 transition-colors text-xs font-bold ${
-                        isDone ? 'bg-green-500 border-green-500 text-white' : 'border-[var(--border)] hover:border-[var(--primary)]'
-                      }`}
-                    >
-                      {isDone && '✓'}
-                    </button>
-                  ) : (
-                    <div className="w-10 h-10 shrink-0 rounded-xl bg-[var(--primary-bg)] flex items-center justify-center">
-                      <span className="text-base font-black text-[var(--primary)]">{count}</span>
-                    </div>
-                  )}
-
-                  <div className="flex-1 min-w-0">
-                    <p className={`text-sm font-bold ${
-                      isDone && !isTeacher
-                        ? 'line-through text-green-600 dark:text-green-400'
-                        : 'text-[var(--text)]'
-                    }`}>
-                      {hwItem.title}
-                    </p>
-                    {due && (
-                      <p className={`text-xs mt-0.5 ${due.overdue ? 'text-red-500 font-bold' : 'text-[var(--text-muted)]'}`}>
-                        {due.text}
-                      </p>
-                    )}
-                    {isTeacher && (
-                      <p className="text-xs text-[var(--text-muted)] mt-0.5">
-                        {memberCount > 0 ? `${count} / ${memberCount} completed` : `${count} completed`}
-                      </p>
-                    )}
-                  </div>
-
-                  {isTeacher && (
-                    <button
-                      onClick={() => deleteHomework(hwItem)}
-                      className="text-[var(--text-muted)] hover:text-red-500 transition-colors shrink-0 mt-0.5 text-sm"
-                    >
-                      ✕
-                    </button>
-                  )}
-                </div>
-              );
-            })}
+            <span className="text-5xl">📚</span>
+            <p className="text-base font-bold text-[var(--text)]">No homework yet</p>
+            <p className="text-sm text-[var(--text-muted)]">Your teacher hasn&apos;t assigned any units yet</p>
           </div>
         )}
+
+        {/* Folder sections */}
+        {folders.map(folder => {
+          const hiddenCount = folder.units.filter(u => !u.homeworkId).length;
+          const visible = folder.showAll
+            ? folder.units
+            : folder.units.filter(u => u.homeworkId !== null);
+
+          return (
+            <div key={folder.id} className="mb-4">
+              {/* Folder header */}
+              <div className="flex items-center gap-2 mb-2 px-1">
+                <span className="text-xs">📁</span>
+                <p className="flex-1 text-xs font-bold text-[var(--text-muted)] truncate uppercase tracking-wide">{folder.name}</p>
+                {hiddenCount > 0 && (
+                  <button
+                    onClick={() => toggleShowAll(folder.id)}
+                    className="text-[10px] font-semibold text-[var(--primary)] shrink-0"
+                  >
+                    {folder.showAll ? 'Show less' : `${hiddenCount} hidden — Show all`}
+                  </button>
+                )}
+              </div>
+
+              {/* Units */}
+              {visible.length === 0 && (
+                <p className="text-xs text-[var(--text-muted)] px-1 pb-2">No units assigned yet</p>
+              )}
+              <div className="space-y-2">
+                {visible.map(unit => {
+                  if (!unit.homeworkId) {
+                    // Unassigned unit
+                    return (
+                      <div key={unit.id} className="flex items-center gap-3 p-4 rounded-2xl border border-[var(--border)]/50 bg-[var(--surface)]/60">
+                        <div className="w-10 h-10 rounded-xl bg-[var(--surface-2)] flex items-center justify-center shrink-0 text-lg">🔒</div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-[var(--text-muted)] truncate">{unit.name}</p>
+                          <p className="text-xs text-[var(--text-muted)]">{unit.wordCount} words · Not yet assigned</p>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  // Assigned unit with homework
+                  const modes = unit.hwModes ?? [];
+                  const completed = completedModes[unit.homeworkId] ?? new Set();
+                  const allDone = modes.length > 0 && modes.every(m => completed.has(m));
+                  const due = dueLabel(unit.hwDue);
+
+                  return (
+                    <button
+                      key={unit.id}
+                      onClick={() => router.push(`/classes/${id}/homework/${unit.homeworkId}`)}
+                      className={`w-full flex items-center gap-3 p-4 rounded-2xl border text-left transition-all active:scale-[0.98] ${
+                        allDone
+                          ? 'bg-green-50 border-green-200 dark:bg-green-950/30 dark:border-green-800'
+                          : 'bg-[var(--surface)] border-[var(--border)] shadow-sm'
+                      }`}
+                    >
+                      <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${
+                        allDone ? 'bg-green-100 dark:bg-green-900/50' : 'bg-[var(--primary-bg)]'
+                      }`}>
+                        {allDone ? (
+                          <svg className="w-6 h-6 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                        ) : (
+                          <span className="text-sm font-black text-[var(--primary)]">
+                            {completed.size}/{modes.length}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-sm font-bold truncate ${allDone ? 'text-green-700 dark:text-green-400' : 'text-[var(--text)]'}`}>
+                          {unit.name}
+                        </p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <div className="flex gap-1">
+                            {modes.map(m => (
+                              <span
+                                key={m}
+                                className="text-sm"
+                                style={{ opacity: completed.has(m) ? 1 : 0.3 }}
+                                title={m}
+                              >
+                                {MODE_ICON[m] ?? m}
+                              </span>
+                            ))}
+                          </div>
+                          {due && (
+                            <span className={`text-[10px] font-semibold ${due.overdue ? 'text-red-500' : 'text-[var(--text-muted)]'}`}>
+                              {due.text}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <svg className="w-4 h-4 text-[var(--text-muted)] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

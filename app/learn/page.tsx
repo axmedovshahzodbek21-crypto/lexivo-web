@@ -11,6 +11,7 @@ import {
   getHardWords, removeHardWord, getSettings, getStreak, getTodayLearnedCount,
   saveLearnProgress, clearLearnProgress, getLearnProgress,
   saveLearnMarks, getLearnMarks, getStarredWords, getLearnXPAmount, displayXP,
+  getClassHWTemp,
 } from '@/lib/storage';
 import { pushLists, pushStats } from '@/lib/sync';
 import { supabase } from '@/lib/supabase';
@@ -66,6 +67,7 @@ function LearnInner() {
   const sourceMyWords = sp.get('source') === 'my-words';
   const sourceStarred = sp.get('source') === 'starred';
   const sourceClass = sp.get('source') === 'class';
+  const sourceClassHW = sp.get('source') === 'class-hw';
   const classIdParam = sp.get('classId') ?? '';
   const classNameParam = sp.get('className') ?? 'Class';
   const starredUnitIndex = parseInt(sp.get('unit') ?? '1') - 1; // 0-based
@@ -292,6 +294,23 @@ function LearnInner() {
       setClassWordsLoaded(true);
     })();
   }, [sourceClass, classIdParam]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (!sourceClassHW) return;
+    const hw = getClassHWTemp();
+    const list: StudyWord[] = hw.map(w => ({
+      word: w.word, partOfSpeech: '', pronunciation: '',
+      translation: w.translation, definition: w.definition, definitionUz: '',
+      example1: w.example1, example1Situation: '', example1Translation: w.example1Translation,
+      example2: w.example2, example2Situation: '', example2Translation: w.example2Translation,
+      example3: '', example3Situation: '', example3Translation: '',
+      extraExamples: [], extraExampleTranslations: [],
+      collectionName: w.className, topic: w.className, dayNumber: 0,
+    }));
+    setWords(list.sort(() => Math.random() - 0.5));
+    setMarks(new Array(list.length).fill(null));
+    setClassWordsLoaded(true);
+  }, [sourceClassHW]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const current = words[index];
 
@@ -583,10 +602,10 @@ function LearnInner() {
   }, [current, done, focusMode, revealed, marks, index, tryAdvanceCard, markTooHard, skipWord, dismissSkipTip, inQuizGate, inSpotCheck]);
 
   // No unit selected → show picker
-  if (!collectionName && !hardOnly && !sourceMyWords && !sourceStarred && !sourceClass) return <UnitPicker mode="learn" />;
+  if (!collectionName && !hardOnly && !sourceMyWords && !sourceStarred && !sourceClass && !sourceClassHW) return <UnitPicker mode="learn" />;
 
-  if (!collectionsLoaded && !sourceClass) return <LoadingState />;
-  if (sourceClass && !classWordsLoaded && words.length === 0) return <LoadingState />;
+  if (!collectionsLoaded && !sourceClass && !sourceClassHW) return <LoadingState />;
+  if ((sourceClass || sourceClassHW) && !classWordsLoaded && words.length === 0) return <LoadingState />;
 
   if (words.length === 0) {
     return (
@@ -601,6 +620,7 @@ function LearnInner() {
   if (done) {
     const backUrl = sourceClass
       ? `/classes/${classIdParam}/words`
+      : sourceClassHW ? '/classes'
       : hardOnly ? '/hard-words'
       : sourceMyWords ? (myCollection ? (myFolder ? `/my-words/${encodeURIComponent(myFolder)}/${encodeURIComponent(myCollection)}` : `/my-words/${encodeURIComponent(myCollection)}`) : '/my-words')
       : collectionName ? `/collections/${encodeURIComponent(collectionName)}`
