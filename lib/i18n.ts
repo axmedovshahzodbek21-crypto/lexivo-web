@@ -10,6 +10,7 @@ const en = {
     matching: 'Matching',
     leaderboard: 'Leaderboard',
     classes: 'Classes',
+    library: 'Library',
   },
   sidebar: {
     tagline: 'Vocabulary Learning',
@@ -445,6 +446,7 @@ const uz: typeof en = {
     matching: 'Moslashtirish',
     leaderboard: 'Reyting',
     classes: 'Sinflar',
+    library: 'Kutubxona',
   },
   sidebar: {
     tagline: "Lug'at o'rganish",
