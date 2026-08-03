@@ -3,6 +3,7 @@ import { useEffect, useRef, useState, useMemo } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
+import { getClassDueWords, getClassSRSAll } from '@/lib/class-srs';
 
 type InputTab = 'manual' | 'ai' | 'collection';
 
@@ -243,6 +244,10 @@ export default function ClassWordsPage() {
   const [notMember, setNotMember] = useState(false);
   const [loading, setLoading] = useState(true);
   const [words, setWords] = useState<ClassWord[]>([]);
+  const [dueCount, setDueCount] = useState(0);
+  const [learnedCount, setLearnedCount] = useState(0);
+  const [hardCount, setHardCount] = useState(0);
+  const [starredCount, setStarredCount] = useState(0);
   const [tab, setTab] = useState<InputTab>('manual');
   const [collapsedCols, setCollapsedCols] = useState<Set<string>>(new Set());
   const toggleCol = (key: string) => setCollapsedCols(prev => { const s = new Set(prev); s.has(key) ? s.delete(key) : s.add(key); return s; });
@@ -297,6 +302,22 @@ export default function ClassWordsPage() {
 
   const parseResult = useMemo(() => parseOutput(pasted, wordLangCode), [pasted, wordLangCode]);
   const parsed = parseResult.words;
+
+  useEffect(() => {
+    if (!user || !id) return;
+    (async () => {
+      const [due, all, { count: hard }, { count: starred }] = await Promise.all([
+        getClassDueWords(user.id, id),
+        getClassSRSAll(user.id, id),
+        supabase.from('class_hard_words').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('class_id', id),
+        supabase.from('class_starred_words').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('class_id', id),
+      ]);
+      setDueCount(due.length);
+      setLearnedCount(all.length);
+      setHardCount(hard ?? 0);
+      setStarredCount(starred ?? 0);
+    })();
+  }, [user, id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadWords = async (clsName?: string) => {
     const { data } = await supabase
@@ -517,15 +538,6 @@ export default function ClassWordsPage() {
           <h1 className="font-bold text-[var(--text)]">📝 Class Words</h1>
           <p className="text-xs text-[var(--text-muted)] truncate">{className}</p>
         </div>
-        {words.length > 0 && (
-          <button
-            onClick={() => router.push(`/learn?source=class&classId=${id}&className=${encodeURIComponent(className)}`)}
-            className="shrink-0 px-4 py-2 rounded-2xl text-sm font-bold text-white"
-            style={{ background: 'linear-gradient(135deg, var(--primary), #9333ea)', boxShadow: '0 4px 12px rgba(109,60,255,0.35)' }}
-          >
-            Study →
-          </button>
-        )}
       </div>
 
       {loading ? (
@@ -825,6 +837,70 @@ export default function ClassWordsPage() {
                 <button onClick={importCollectionDay} disabled={importingCollection} className="w-full btn-primary py-3 disabled:opacity-50">
                   {importingCollection ? 'Importing…' : `Import ${collectionData.days[selectedDayIdx].words.length} words to class`}
                 </button>
+              )}
+            </div>
+          )}
+
+          {/* ── Study Hub ─────────────────────────────────── */}
+          {words.length > 0 && (
+            <div className="space-y-3 pt-1">
+              {/* Practice */}
+              <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">── Practice</p>
+              <div className="grid grid-cols-2 gap-2">
+                {([
+                  { label: '📖 Study',      href: `/learn?source=class&classId=${id}&className=${encodeURIComponent(className)}`,      primary: true  },
+                  { label: '🃏 Flashcards', href: `/flashcards?source=class&classId=${id}&className=${encodeURIComponent(className)}`, primary: false },
+                  { label: '❓ Quiz',       href: `/quiz?source=class&classId=${id}&className=${encodeURIComponent(className)}`,       primary: false },
+                  { label: '🔗 Match',      href: `/matching?source=class&classId=${id}&className=${encodeURIComponent(className)}`,   primary: false },
+                ] as { label: string; href: string; primary: boolean }[]).map(({ label, href, primary }) => (
+                  <button
+                    key={label}
+                    onClick={() => router.push(href)}
+                    className={`flex items-center justify-between px-4 py-3.5 rounded-2xl text-sm font-bold transition-all active:scale-95 ${primary ? 'text-white' : 'bg-[var(--surface-2)] text-[var(--text)]'}`}
+                    style={primary ? { background: 'linear-gradient(135deg, var(--primary), #9333ea)', boxShadow: '0 4px 12px rgba(109,60,255,0.3)' } : {}}
+                  >
+                    <span>{label}</span><span className="opacity-50 text-xs">→</span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Review */}
+              <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">── Review</p>
+              <div className="card flex items-center justify-between gap-3">
+                <div>
+                  <p className="font-bold text-sm text-[var(--text)]">SRS Review</p>
+                  <p className="text-xs text-[var(--text-muted)]">
+                    {dueCount > 0 ? `${dueCount} word${dueCount !== 1 ? 's' : ''} due today` : 'All caught up ✓'}
+                  </p>
+                </div>
+                {dueCount > 0 ? (
+                  <button
+                    onClick={() => router.push(`/classes/${id}/review`)}
+                    className="shrink-0 px-4 py-2 rounded-2xl text-sm font-bold text-white"
+                    style={{ background: 'linear-gradient(135deg, #f59e0b, #ef4444)', boxShadow: '0 4px 10px rgba(239,68,68,0.3)' }}
+                  >Review →</button>
+                ) : (
+                  <span className="text-2xl">✅</span>
+                )}
+              </div>
+
+              {/* My Stats — students only */}
+              {!isTeacher && (
+                <>
+                  <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">── My Stats</p>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { value: `${learnedCount}/${words.length}`, label: 'Learned', color: 'var(--primary)' },
+                      { value: hardCount,    label: 'Hard',    color: '#ef4444' },
+                      { value: starredCount, label: 'Starred', color: '#f59e0b' },
+                    ].map(({ value, label, color }) => (
+                      <div key={label} className="card text-center py-3 space-y-0.5">
+                        <p className="text-lg font-black" style={{ color }}>{value}</p>
+                        <p className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-wide">{label}</p>
+                      </div>
+                    ))}
+                  </div>
+                </>
               )}
             </div>
           )}
