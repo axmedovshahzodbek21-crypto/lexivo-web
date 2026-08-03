@@ -16,6 +16,7 @@ import { pushLists, pushStats } from '@/lib/sync';
 import { supabase } from '@/lib/supabase';
 import { createSRSWord } from '@/lib/srs';
 import { addSRSWord as storeSRSWord } from '@/lib/storage';
+import { initClassSRSWord } from '@/lib/class-srs';
 import type { Accent } from '@/lib/speech';
 import { checkAchievements } from '@/lib/gamification';
 import type { WordItem, WordCollection } from '@/lib/types';
@@ -395,17 +396,30 @@ function LearnInner() {
   const advanceCard = useCallback(async () => {
     if (!current) return;
     if (hardOnly) removeHardWord(current.word);
-    const isNew = saveLearnedWord({
-      word: current.word,
-      translation: current.translation,
-      collectionName: current.collectionName,
-      topic: current.topic,
-      dayNumber: current.dayNumber,
-      learnedAt: new Date().toISOString(),
-    });
-    const srsWord = createSRSWord(current, current.collectionName, current.dayNumber, current.topic);
-    storeSRSWord(srsWord);
-    if (isNew) incrementTodayCount();
+
+    let isNew: boolean;
+    if (sourceClass) {
+      // Class mode: SRS lives in Supabase, not personal localStorage
+      isNew = true; // always count toward daily goal (XP is unified)
+      incrementTodayCount();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await initClassSRSWord(user.id, classIdParam, current.word, current.translation);
+      }
+    } else {
+      isNew = saveLearnedWord({
+        word: current.word,
+        translation: current.translation,
+        collectionName: current.collectionName,
+        topic: current.topic,
+        dayNumber: current.dayNumber,
+        learnedAt: new Date().toISOString(),
+      });
+      const srsWord = createSRSWord(current, current.collectionName, current.dayNumber, current.topic);
+      storeSRSWord(srsWord);
+      if (isNew) incrementTodayCount();
+    }
+
     if (isNew) {
       const learnXP = getLearnXPAmount();
       const { leveledUp, newLevel, newXp } = addXP(learnXP, 'Learn', `Unit ${current.dayNumber} · ${current.collectionName}`);
