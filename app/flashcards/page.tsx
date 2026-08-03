@@ -6,6 +6,8 @@ import { useAppStore } from '@/lib/store';
 import { useShallow } from 'zustand/react/shallow';
 import { speak, speakText } from '@/lib/speech';
 import { recordStudySession, markFlashcardComplete, getStarredWords, getHardWords, getCustomListWords, getUnitProgress, saveFlashcardProgress, getFlashcardProgress, clearFlashcardProgress, getImportedWords, getImportedWordsByCollection, getClassHWTemp, recordFlashcardSession, addXP, hasFlashcardXPAwarded, markFlashcardXPAwarded } from '@/lib/storage';
+import { supabase } from '@/lib/supabase';
+import { getClassWordsFull } from '@/lib/class-srs';
 import { pushLists, pushStats } from '@/lib/sync';
 import { checkAchievements } from '@/lib/gamification';
 import type { WordItem, WordCollection } from '@/lib/types';
@@ -76,6 +78,9 @@ export default function FlashcardsPage() {
   const fresh       = sp.get('fresh') === 'true';
   const sourceMyWords = sp.get('source') === 'my-words';
   const sourceClassHW = sp.get('source') === 'class-hw';
+  const sourceClass   = sp.get('source') === 'class';
+  const classId       = sp.get('classId') ?? undefined;
+  const classNameParam = sp.get('className') ?? 'Class';
   const myCollection = sp.get('myCollection') ?? undefined;
   const myFolder     = sp.get('myFolder') ?? undefined;
   const { collections, collectionsLoaded, pushAchievement, setPendingLevelUp, focusMode, setFocusMode } = useAppStore(
@@ -103,14 +108,39 @@ export default function FlashcardsPage() {
   // Gate: must complete Learn before Flashcards (for unit sessions)
   const [gateUrl, setGateUrl] = useState<string | null>(null);
   useEffect(() => {
+    if (sourceClass) return; // class sessions have no gate
     if (collectionName && dayNumber !== undefined) {
       if (!getUnitProgress(collectionName, dayNumber).learnDone) {
         setGateUrl(`/learn?collection=${encodeURIComponent(collectionName)}&day=${dayNumber}`);
       }
     }
-  }, [collectionName, dayNumber]);
+  }, [collectionName, dayNumber, sourceClass]);
+
+  // Class flashcards: fetch words from Supabase
+  useEffect(() => {
+    if (!sourceClass || !classId) return;
+    (async () => {
+      const raw = await getClassWordsFull(classId);
+      const list: StudyWord[] = raw.map(w => {
+        const exs = w.examples ?? [];
+        return {
+          word: w.word, partOfSpeech: '', pronunciation: '',
+          translation: w.translation, definition: w.definition ?? '',
+          example1: exs[0]?.sentence ?? w.example1 ?? '',
+          example1Situation: '', example1Translation: exs[0]?.translation ?? w.example1_translation ?? '',
+          example2: exs[1]?.sentence ?? w.example2 ?? '',
+          example2Situation: '', example2Translation: exs[1]?.translation ?? w.example2_translation ?? '',
+          example3: exs[2]?.sentence ?? '', example3Translation: exs[2]?.translation ?? '', example3Situation: '',
+          collectionName: classId, topic: classNameParam, dayNumber: 0,
+        };
+      });
+      originalWordCount.current = list.length;
+      setDeck(list.sort(() => Math.random() - 0.5));
+    })();
+  }, [sourceClass, classId, classNameParam]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
+    if (sourceClass) return; // handled by separate class useEffect
     if (sourceClassHW) {
       const hw = getClassHWTemp();
       const list: StudyWord[] = hw.map(w => ({
@@ -235,7 +265,7 @@ export default function FlashcardsPage() {
   const markKnown = () => advance(true);
   const markUnknown = () => advance(false);
 
-  if (!collectionName && !starredOnly && !hardOnly && !listId && !sourceMyWords && !sourceClassHW) return <UnitPicker mode="flashcards" />;
+  if (!collectionName && !starredOnly && !hardOnly && !listId && !sourceMyWords && !sourceClassHW && !sourceClass) return <UnitPicker mode="flashcards" />;
 
   if (gateUrl) {
     return (
@@ -300,7 +330,7 @@ export default function FlashcardsPage() {
           )}
           <div className="flex gap-3">
             <button onClick={() => { setIndex(0); setSide('front'); setKnown(0); setUnknown(0); setUnknownWords([]); setDone(false); }} className="btn-secondary flex-1">{t.common.again}</button>
-            <Link href={starredOnly ? '/starred' : hardOnly ? '/hard-words' : sourceClassHW ? '/classes' : sourceMyWords ? (myCollection ? (myFolder ? `/my-words/${encodeURIComponent(myFolder)}/${encodeURIComponent(myCollection)}` : `/my-words/${encodeURIComponent(myCollection)}`) : '/my-words') : collectionName ? `/collections/${encodeURIComponent(collectionName)}` : '/'} className="btn-primary flex-1 text-center">{t.common.back}</Link>
+            <Link href={starredOnly ? '/starred' : hardOnly ? '/hard-words' : sourceClass ? `/classes/${classId}/words` : sourceClassHW ? '/classes' : sourceMyWords ? (myCollection ? (myFolder ? `/my-words/${encodeURIComponent(myFolder)}/${encodeURIComponent(myCollection)}` : `/my-words/${encodeURIComponent(myCollection)}`) : '/my-words') : collectionName ? `/collections/${encodeURIComponent(collectionName)}` : '/'} className="btn-primary flex-1 text-center">{t.common.back}</Link>
           </div>
         </div>
       </div>

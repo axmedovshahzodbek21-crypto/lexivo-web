@@ -9,6 +9,7 @@ import { pushLists, pushStats } from '@/lib/sync';
 import { fireConfetti } from '@/lib/confetti';
 import { checkAchievements } from '@/lib/gamification';
 import { supabase } from '@/lib/supabase';
+import { getClassWordsFull } from '@/lib/class-srs';
 import type { WordItem, WordCollection, QuizType } from '@/lib/types';
 import Link from 'next/link';
 import UnitPicker from '@/components/UnitPicker';
@@ -107,8 +108,11 @@ export default function QuizPage() {
   const dayNumber = dayParam ? parseInt(dayParam) : undefined;
   const starredOnly = sp.get('starred') === 'true';
   const listId      = sp.get('list') ?? undefined;
-  const sourceMyWords = sp.get('source') === 'my-words';
-  const sourceClassHW = sp.get('source') === 'class-hw';
+  const sourceMyWords  = sp.get('source') === 'my-words';
+  const sourceClassHW  = sp.get('source') === 'class-hw';
+  const sourceClass    = sp.get('source') === 'class';
+  const classId        = sp.get('classId') ?? undefined;
+  const classNameParam = sp.get('className') ?? 'Class';
   const myCollection = sp.get('myCollection') ?? undefined;
   const myFolder     = sp.get('myFolder') ?? undefined;
   const { collections, collectionsLoaded, pushAchievement, setPendingLevelUp } = useAppStore();
@@ -131,6 +135,7 @@ export default function QuizPage() {
   // Gate: must complete Learn → Cards before Quiz (for unit sessions)
   const [gateInfo, setGateInfo] = useState<{ url: string; missing: string } | null>(null);
   useEffect(() => {
+    if (sourceClass) return; // class sessions have no gate
     if (collectionName && dayNumber !== undefined) {
       const p = getUnitProgress(collectionName, dayNumber);
       if (!p.learnDone) {
@@ -139,9 +144,41 @@ export default function QuizPage() {
         setGateInfo({ url: `/flashcards?collection=${encodeURIComponent(collectionName)}&day=${dayNumber}`, missing: 'Flashcards' });
       }
     }
-  }, [collectionName, dayNumber]);
+  }, [collectionName, dayNumber, sourceClass]);
+
+  // Class quiz: fetch words from Supabase and build questions
+  useEffect(() => {
+    if (!sourceClass || !classId) return;
+    (async () => {
+      const raw = await getClassWordsFull(classId);
+      const allWords: QuizWord[] = raw.map(w => ({
+        word: w.word, partOfSpeech: '', pronunciation: '',
+        translation: w.translation, definition: w.definition ?? '',
+        example1: w.example1 ?? '', example1Situation: '', example1Translation: w.example1_translation ?? '',
+        example2: w.example2 ?? '', example2Situation: '', example2Translation: w.example2_translation ?? '',
+        example3: '', example3Translation: '', example3Situation: '',
+        collectionName: classId, topic: classNameParam, dayNumber: 0,
+      }));
+      const words = shuffle(allWords);
+      const types: ['word_to_translation', 'translation_to_word', 'definition_to_word'] =
+        ['word_to_translation', 'translation_to_word', 'definition_to_word'];
+      const qs: QuizQuestion[] = words.map((word, i): QuizQuestion => {
+        const type = types[i % 3];
+        let prompt = '';
+        let correct = '';
+        if (type === 'word_to_translation') { prompt = word.word; correct = word.translation; }
+        else if (type === 'translation_to_word') { prompt = word.translation; correct = word.word; }
+        else { prompt = word.definition || word.word; correct = word.word; }
+        const pool = allWords.filter(w => w.word !== word.word).map(w => type === 'word_to_translation' ? w.translation : w.word);
+        const wrongs = shuffle([...new Set(pool)].filter(w => w !== correct)).slice(0, 3);
+        return { word, type, prompt, correct, options: shuffle([correct, ...wrongs]) };
+      });
+      setQuestions(qs);
+    })();
+  }, [sourceClass, classId, classNameParam]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
+    if (sourceClass) return; // handled by separate class useEffect
     if (sourceClassHW) {
       const hw = getClassHWTemp();
       const allWords: QuizWord[] = hw.map(w => ({
@@ -272,7 +309,7 @@ export default function QuizPage() {
     }
   }, [index, questions, correct, selected, current, collectionName, sourceClassHW, pushAchievement, setPendingLevelUp]);
 
-  if (!collectionName && !starredOnly && !listId && !sourceMyWords && !sourceClassHW) return <UnitPicker mode="quiz" />;
+  if (!collectionName && !starredOnly && !listId && !sourceMyWords && !sourceClassHW && !sourceClass) return <UnitPicker mode="quiz" />;
 
   if (gateInfo) {
     return (
@@ -303,7 +340,7 @@ export default function QuizPage() {
 
   if (done) {
     const score = Math.round((correct / questions.length) * 100);
-    const backUrl = starredOnly ? '/starred' : sourceClassHW ? '/classes' : sourceMyWords ? (myCollection ? (myFolder ? `/my-words/${encodeURIComponent(myFolder)}/${encodeURIComponent(myCollection)}` : `/my-words/${encodeURIComponent(myCollection)}`) : '/my-words') : collectionName ? `/collections/${encodeURIComponent(collectionName)}` : '/';
+    const backUrl = starredOnly ? '/starred' : sourceClass ? `/classes/${classId}/words` : sourceClassHW ? '/classes' : sourceMyWords ? (myCollection ? (myFolder ? `/my-words/${encodeURIComponent(myFolder)}/${encodeURIComponent(myCollection)}` : `/my-words/${encodeURIComponent(myCollection)}`) : '/my-words') : collectionName ? `/collections/${encodeURIComponent(collectionName)}` : '/';
     return (
       <div className="p-6 text-center flex flex-col items-center justify-center min-h-screen animate-fade-in">
         <div className="text-6xl mb-4">{score === 100 ? '🏆' : score >= 80 ? '🎉' : score >= 50 ? '👍' : '💪'}</div>

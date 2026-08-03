@@ -6,6 +6,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
 import { getHardWords, getStarredWords, getCustomListWords, getImportedWords, getImportedWordsByCollection } from '@/lib/storage';
+import { getClassWordsFull } from '@/lib/class-srs';
 import { checkAchievements } from '@/lib/gamification';
 import type { WordItem, WordCollection } from '@/lib/types';
 
@@ -73,6 +74,9 @@ function MatchingInner() {
   const hardParam        = searchParams.get('hard') === 'true';
   const listId           = searchParams.get('list') ?? undefined;
   const sourceMyWords    = searchParams.get('source') === 'my-words';
+  const sourceClass      = searchParams.get('source') === 'class';
+  const classId          = searchParams.get('classId') ?? undefined;
+  const classNameParam   = searchParams.get('className') ?? 'Class';
   const myCollection     = searchParams.get('myCollection') ?? undefined;
   const myFolder         = searchParams.get('myFolder') ?? undefined;
 
@@ -99,6 +103,26 @@ function MatchingInner() {
   const timerInterval = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
+    if (sourceClass && classId) {
+      (async () => {
+        const raw = await getClassWordsFull(classId);
+        const list: MatchWord[] = raw.map(w => {
+          const exs = w.examples ?? [];
+          return {
+            word: w.word, partOfSpeech: '', pronunciation: '',
+            translation: w.translation, definition: w.definition ?? '',
+            example1: exs[0]?.sentence ?? w.example1 ?? '', example1Situation: '',
+            example1Translation: exs[0]?.translation ?? w.example1_translation ?? '',
+            example2: exs[1]?.sentence ?? w.example2 ?? '', example2Situation: '',
+            example2Translation: exs[1]?.translation ?? w.example2_translation ?? '',
+            example3: '', example3Translation: '', example3Situation: '',
+            collectionName: classId, topic: classNameParam, dayNumber: 0,
+          };
+        });
+        setWords(shuffle(list));
+      })();
+      return;
+    }
     if (sourceMyWords) {
       const imported = myCollection
         ? getImportedWordsByCollection(myCollection, myFolder)
@@ -128,7 +152,7 @@ function MatchingInner() {
     }
     if (!collectionsLoaded) return;
     setWords(buildList(collections, collectionParam, dayParam, starredParam, hardParam, listId));
-  }, [collectionsLoaded, collections, collectionParam, dayParam, starredParam, hardParam, listId, sourceMyWords, myCollection, myFolder]);
+  }, [collectionsLoaded, collections, collectionParam, dayParam, starredParam, hardParam, listId, sourceMyWords, sourceClass, classId, classNameParam, myCollection, myFolder]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const initRound = useCallback((idx: number, wordList: MatchWord[]) => {
     const batch = wordList.slice(idx * BATCH_SIZE, (idx + 1) * BATCH_SIZE);
@@ -210,7 +234,7 @@ function MatchingInner() {
   }, [matched, wrongPair, selected, timerActive, roundWords, mistakes, elapsed, roundIndex, words.length]);
 
   // ── Not supported / loading ──
-  if (!collectionsLoaded && !sourceMyWords) {
+  if (!collectionsLoaded && !sourceMyWords && !sourceClass) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <SectionLoader />

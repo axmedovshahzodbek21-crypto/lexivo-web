@@ -118,6 +118,28 @@ export async function getClassSRSForTeacher(
   return (data ?? []) as ClassSRSEntry[];
 }
 
+// Raw class word shape returned from Supabase (used by study-mode pages)
+export interface ClassWordRaw {
+  id: string;
+  word: string;
+  translation: string;
+  definition: string | null;
+  example1: string | null;
+  example1_translation: string | null;
+  example2: string | null;
+  example2_translation: string | null;
+  examples: Array<{ sentence: string; translation: string }> | null;
+}
+
+export async function getClassWordsFull(classId: string): Promise<ClassWordRaw[]> {
+  const { data } = await supabase
+    .from('class_words')
+    .select('id, word, translation, definition, example1, example1_translation, example2, example2_translation, examples')
+    .eq('class_id', classId)
+    .order('created_at', { ascending: true });
+  return (data ?? []) as ClassWordRaw[];
+}
+
 export function stageLabel(stage: number): string {
   return ['New', '+1 done', '+3 done', '+7 done', '+14 done', 'Graduated'][Math.min(stage, 5)];
 }
