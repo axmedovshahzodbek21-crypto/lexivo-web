@@ -5,6 +5,16 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { saveClassHWTemp } from '@/lib/storage';
 import type { ClassHWWord } from '@/lib/storage';
+import { loadCollections, loadCEFRCollection } from '@/lib/data';
+import type { WordCollection } from '@/lib/types';
+
+async function fetchCollectionByName(name: string): Promise<WordCollection | null> {
+  if (name === '30 Days of Powerful Words') { const c = await loadCollections(); return c[0] ?? null; }
+  if (name === '24 Vocabulary Challenge')   { const c = await loadCollections(); return c[1] ?? null; }
+  if (name === 'Word Mastery')              { const c = await loadCollections(); return c[2] ?? null; }
+  const lvl = ({ A1: 'a1', A2: 'a2', B1: 'b1' } as Record<string, 'a1'|'a2'|'b1'>)[name];
+  return lvl ? loadCEFRCollection(lvl) : null;
+}
 
 interface UnitWord {
   word: string;
@@ -58,7 +68,7 @@ export default function UnitStudyHubPage() {
     const [hwRes, progRes] = await Promise.all([
       supabase
         .from('class_homework')
-        .select('unit_id, class_unit_id, modes, due_date, student_ids, teacher_units(name), class_word_units(name)')
+        .select('unit_id, class_unit_id, collection_name, day_number, modes, due_date, student_ids, teacher_units(name), class_word_units(name)')
         .eq('id', hwId)
         .single(),
       supabase
@@ -73,34 +83,59 @@ export default function UnitStudyHubPage() {
 
     const unitId = hw.unit_id as string | null;
     const classUnitId = hw.class_unit_id as string | null;
+    const collectionName = hw.collection_name as string | null;
+    const dayNumber = hw.day_number as number | null;
     const isClassWords = classUnitId != null;
-    const name = isClassWords
-      ? ((hw.class_word_units as any)?.name ?? '')
-      : ((hw.teacher_units as any)?.name ?? '');
+    const isCollection = collectionName != null;
     const hwModes = (hw.modes as string[]) ?? [];
     const due = hw.due_date as string | null;
 
-    const wordsRes = isClassWords
-      ? await supabase
-          .from('class_words')
-          .select('word, translation, definition, examples')
-          .eq('unit_id', classUnitId!)
-          .order('created_at')
-      : await supabase
-          .from('teacher_unit_words')
-          .select('word, translation, definition, part_of_speech, pronunciation, definition_uz, examples')
-          .eq('unit_id', unitId!)
-          .order('created_at');
+    let name = '';
+    let unitWords: UnitWord[] = [];
 
-    const unitWords: UnitWord[] = ((wordsRes.data as any[]) ?? []).map(w => ({
-      word: w.word,
-      translation: w.translation,
-      definition: w.definition ?? null,
-      partOfSpeech: w.part_of_speech ?? null,
-      pronunciation: w.pronunciation ?? null,
-      definitionUz: w.definition_uz ?? null,
-      examples: (w.examples ?? []) as { sentence: string; translation: string }[],
-    }));
+    if (isCollection) {
+      name = `${collectionName} · Day ${dayNumber}`;
+      const col = await fetchCollectionByName(collectionName!);
+      const day = col?.days.find(d => d.dayNumber === dayNumber);
+      unitWords = (day?.words ?? []).map(w => ({
+        word: w.word,
+        translation: w.translation,
+        definition: w.definition ?? null,
+        partOfSpeech: w.partOfSpeech ?? null,
+        pronunciation: w.pronunciation ?? null,
+        definitionUz: w.definitionUz ?? null,
+        examples: [
+          { sentence: w.example1, translation: w.example1Translation ?? '' },
+          { sentence: w.example2, translation: w.example2Translation ?? '' },
+          ...(w.example3 ? [{ sentence: w.example3, translation: w.example3Translation ?? '' }] : []),
+          ...(w.extraExamples ?? []).map((ex: string, i: number) => ({ sentence: ex, translation: (w.extraExampleTranslations ?? [])[i] ?? '' })),
+        ].filter(e => e.sentence) as { sentence: string; translation: string }[],
+      }));
+    } else {
+      name = isClassWords
+        ? ((hw.class_word_units as any)?.name ?? '')
+        : ((hw.teacher_units as any)?.name ?? '');
+      const wordsRes = isClassWords
+        ? await supabase
+            .from('class_words')
+            .select('word, translation, definition, examples')
+            .eq('unit_id', classUnitId!)
+            .order('created_at')
+        : await supabase
+            .from('teacher_unit_words')
+            .select('word, translation, definition, part_of_speech, pronunciation, definition_uz, examples')
+            .eq('unit_id', unitId!)
+            .order('created_at');
+      unitWords = ((wordsRes.data as any[]) ?? []).map(w => ({
+        word: w.word,
+        translation: w.translation,
+        definition: w.definition ?? null,
+        partOfSpeech: w.part_of_speech ?? null,
+        pronunciation: w.pronunciation ?? null,
+        definitionUz: w.definition_uz ?? null,
+        examples: (w.examples ?? []) as { sentence: string; translation: string }[],
+      }));
+    }
 
     const done = new Set((progRes.data ?? []).map((p: any) => p.mode as string));
 

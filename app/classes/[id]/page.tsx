@@ -4,6 +4,8 @@ import { useEffect, useState, useMemo } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
+import { loadCollections, loadCEFRCollection } from '@/lib/data';
+import type { WordCollection } from '@/lib/types';
 
 interface CollectionMeta {
   collection_name: string;
@@ -122,7 +124,7 @@ interface HardWordRaw { user_id: string; word: string; }
 interface CurrFolder { id: string; assignmentId: string; name: string; units: CurrUnit[]; }
 interface CurrUnit { id: string; name: string; wordCount: number; }
 interface CurrWordUnit { id: string; name: string; wordCount: number; }
-interface CurrHW { id: string; unitId: string | null; classUnitId: string | null; source: 'library' | 'class'; unitName: string; modes: string[]; dueDate: string | null; studentIds: string[] | null; progressByMode: Record<string, number>; }
+interface CurrHW { id: string; unitId: string | null; classUnitId: string | null; collectionName: string | null; dayNumber: number | null; source: 'library' | 'class' | 'collection'; unitName: string; modes: string[]; dueDate: string | null; studentIds: string[] | null; progressByMode: Record<string, number>; }
 
 function Avatar({ name, url, size = 38 }: { name: string; url: string | null; size?: number }) {
   if (url) return <img src={url} alt={name} style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />;
@@ -685,6 +687,23 @@ const HW_MODE_COLOR: Record<string, string> = { learn: '#3B82F6', flashcard: '#8
 const REQUIRED_MODES = ['learn', 'flashcard', 'quiz'];
 const OPTIONAL_MODES = ['match'];
 
+const COLLECTION_META = [
+  { name: '30 Days of Powerful Words', emoji: '🔥', totalDays: 30 },
+  { name: '24 Vocabulary Challenge',   emoji: '⚡', totalDays: 24 },
+  { name: 'Word Mastery',              emoji: '🏆', totalDays: 32 },
+  { name: 'A1',                        emoji: '🟢', totalDays: 23 },
+  { name: 'A2',                        emoji: '🔵', totalDays: 30 },
+  { name: 'B1',                        emoji: '🟡', totalDays: 26 },
+];
+
+async function fetchCollectionByName(name: string): Promise<WordCollection | null> {
+  if (name === '30 Days of Powerful Words') { const c = await loadCollections(); return c[0] ?? null; }
+  if (name === '24 Vocabulary Challenge')   { const c = await loadCollections(); return c[1] ?? null; }
+  if (name === 'Word Mastery')              { const c = await loadCollections(); return c[2] ?? null; }
+  const lvl = ({ A1: 'a1', A2: 'a2', B1: 'b1' } as Record<string, 'a1'|'a2'|'b1'>)[name];
+  return lvl ? loadCEFRCollection(lvl) : null;
+}
+
 function CurriculumTab({
   classId,
   students,
@@ -715,13 +734,22 @@ function CurriculumTab({
   const [cwWordsPending, setCwWordsPending] = useState<Record<string, boolean>>({});
   const [cwWordsSaving, setCwWordsSaving] = useState(false);
 
-  // Assign homework modal — now supports both library units and class word units
+  // Assign homework modal — supports library units, class word units, and collections
   const [hwUnit, setHwUnit] = useState<{ id: string; name: string; isClassWords?: boolean } | null>(null);
   const [hwModes, setHwModes] = useState<Set<string>>(new Set(['learn', 'flashcard', 'quiz']));
   const [hwDueDate, setHwDueDate] = useState('');
   const [hwWho, setHwWho] = useState<'class' | 'specific'>('class');
   const [hwStudentIds, setHwStudentIds] = useState<Set<string>>(new Set());
   const [hwSaving, setHwSaving] = useState(false);
+  const [hwCollectionName, setHwCollectionName] = useState<string | null>(null);
+  const [hwDayNumber, setHwDayNumber] = useState<number | null>(null);
+
+  // Collection picker
+  const [collPickerOpen, setCollPickerOpen] = useState(false);
+  const [collPickerStep, setCollPickerStep] = useState<1 | 2>(1);
+  const [collPickerCollName, setCollPickerCollName] = useState('');
+  const [collPickerDays, setCollPickerDays] = useState<{ dayNumber: number; topic: string; wordCount: number }[]>([]);
+  const [collPickerLoading, setCollPickerLoading] = useState(false);
 
   // Homework detail modal
   const [hwDetail, setHwDetail] = useState<CurrHW | null>(null);
@@ -761,7 +789,7 @@ function CurriculumTab({
     // Homework
     const { data: hwData } = await supabase
       .from('class_homework')
-      .select('id, unit_id, class_unit_id, modes, due_date, student_ids, teacher_units(name), class_word_units(name)')
+      .select('id, unit_id, class_unit_id, collection_name, day_number, modes, due_date, student_ids, teacher_units(name), class_word_units(name)')
       .eq('class_id', classId).order('created_at', { ascending: false });
 
     let parsedHw: CurrHW[] = [];
@@ -775,11 +803,18 @@ function CurriculumTab({
         for (const mode of (h.modes ?? [])) {
           progressByMode[mode] = new Set(rows.filter((p: any) => p.mode === mode).map((p: any) => p.student_id)).size;
         }
+        const collName = h.collection_name as string | null;
+        const dayNum = h.day_number as number | null;
+        const isCollection = collName != null;
         const isClass = h.class_unit_id != null;
-        const unitName = isClass ? (h.class_word_units?.name ?? 'Unit') : (h.teacher_units?.name ?? 'Unit');
+        const source: CurrHW['source'] = isCollection ? 'collection' : isClass ? 'class' : 'library';
+        const unitName = isCollection
+          ? `${collName} · Day ${dayNum}`
+          : isClass ? (h.class_word_units?.name ?? 'Unit') : (h.teacher_units?.name ?? 'Unit');
         return {
           id: h.id, unitId: h.unit_id ?? null, classUnitId: h.class_unit_id ?? null,
-          source: isClass ? 'class' : 'library', unitName,
+          collectionName: collName, dayNumber: dayNum,
+          source, unitName,
           modes: h.modes ?? [], dueDate: h.due_date, studentIds: h.student_ids, progressByMode,
         };
       });
@@ -827,20 +862,45 @@ function CurriculumTab({
     setHwStudentIds(new Set());
   };
 
+  const closeHwModal = () => {
+    setHwUnit(null);
+    setHwCollectionName(null);
+    setHwDayNumber(null);
+  };
+
   const saveHomework = async () => {
-    if (!user || !hwUnit) return;
+    if (!user || (!hwUnit && !hwCollectionName)) return;
     setHwSaving(true);
     await supabase.from('class_homework').insert({
       class_id: classId,
-      ...(hwUnit.isClassWords ? { class_unit_id: hwUnit.id } : { unit_id: hwUnit.id }),
+      ...(hwCollectionName
+        ? { collection_name: hwCollectionName, day_number: hwDayNumber }
+        : hwUnit!.isClassWords ? { class_unit_id: hwUnit!.id } : { unit_id: hwUnit!.id }),
       modes: [...hwModes],
       due_date: hwDueDate || null,
       student_ids: hwWho === 'class' ? null : [...hwStudentIds],
       assigned_by: user.id,
     });
-    setHwUnit(null);
+    closeHwModal();
     setHwSaving(false);
     await loadCurriculum();
+  };
+
+  const pickCollection = async (name: string) => {
+    setCollPickerCollName(name);
+    setCollPickerStep(2);
+    setCollPickerLoading(true);
+    const col = await fetchCollectionByName(name);
+    setCollPickerDays((col?.days ?? []).map(d => ({ dayNumber: d.dayNumber, topic: d.topic, wordCount: d.words.length })));
+    setCollPickerLoading(false);
+  };
+
+  const pickCollectionDay = (dayNumber: number, topic: string) => {
+    setCollPickerOpen(false);
+    setCollPickerStep(1);
+    setHwCollectionName(collPickerCollName);
+    setHwDayNumber(dayNumber);
+    openHwModal({ id: 'collection', name: `${collPickerCollName} · Day ${dayNumber}: ${topic}` });
   };
 
   const createCWUnit = async () => {
@@ -1046,6 +1106,20 @@ function CurriculumTab({
         )}
       </div>
 
+      {/* ── Collections ── */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">📗 Collections</p>
+          <button onClick={() => { setCollPickerOpen(true); setCollPickerStep(1); }} className="text-xs font-semibold text-green-600 dark:text-green-400 hover:opacity-70 transition-opacity">+ Assign Day</button>
+        </div>
+        <div className="card text-center py-8 space-y-2">
+          <div className="text-3xl">📗</div>
+          <p className="text-sm font-bold text-[var(--text)]">Pre-built Collection Days</p>
+          <p className="text-xs text-[var(--text-muted)]">Assign a day from 30 Days, A1, A2, B1, and more directly as homework.</p>
+          <button onClick={() => { setCollPickerOpen(true); setCollPickerStep(1); }} className="btn-primary text-xs px-4 py-2 !mt-3">+ Assign a Day</button>
+        </div>
+      </div>
+
       {/* ── Homework ── */}
       <div>
         <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide mb-3">📋 Homework</p>
@@ -1066,6 +1140,7 @@ function CurriculumTab({
                       <div className="flex items-center gap-1.5">
                         <p className="font-bold text-sm text-[var(--text)] truncate">{hw.unitName}</p>
                         {hw.source === 'class' && <span className="shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded" style={{ background: 'color-mix(in srgb, #F59E0B 15%, transparent)', color: '#F59E0B' }}>Class</span>}
+                        {hw.source === 'collection' && <span className="shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded" style={{ background: 'rgba(34,197,94,0.15)', color: '#16a34a' }}>📗</span>}
                       </div>
                       <div className="flex items-center gap-1.5 mt-0.5">
                         {hw.modes.map(m => <span key={m} className="text-xs">{HW_MODE_ICON[m] ?? m}</span>)}
@@ -1204,9 +1279,68 @@ function CurriculumTab({
         </div>
       )}
 
+      {/* ── Collection picker — step 1 (pick collection) ── */}
+      {collPickerOpen && collPickerStep === 1 && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setCollPickerOpen(false)}>
+          <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-5 space-y-4 max-h-[75vh] flex flex-col" onClick={e => e.stopPropagation()}>
+            <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto shrink-0" />
+            <p className="font-bold text-[var(--text)] shrink-0">Pick a Collection</p>
+            <div className="flex-1 overflow-y-auto space-y-2 min-h-0">
+              {COLLECTION_META.map(c => (
+                <button key={c.name} onClick={() => pickCollection(c.name)} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-[var(--primary-bg)] transition-colors" style={{ background: 'var(--surface-2)' }}>
+                  <span className="text-2xl">{c.emoji}</span>
+                  <div>
+                    <p className="font-semibold text-sm text-[var(--text)]">{c.name}</p>
+                    <p className="text-[10px] text-[var(--text-muted)]">{c.totalDays} days</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+            <button onClick={() => setCollPickerOpen(false)} className="w-full btn-ghost py-3 shrink-0">Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Collection picker — step 2 (pick day) ── */}
+      {collPickerOpen && collPickerStep === 2 && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => { setCollPickerOpen(false); setCollPickerStep(1); }}>
+          <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-5 space-y-4 max-h-[80vh] flex flex-col" onClick={e => e.stopPropagation()}>
+            <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto shrink-0" />
+            <div className="flex items-center gap-2 shrink-0">
+              <button onClick={() => setCollPickerStep(1)} className="text-xs text-[var(--text-muted)] hover:text-[var(--text)]">← Back</button>
+              <p className="font-bold text-[var(--text)] flex-1 truncate">{collPickerCollName}</p>
+            </div>
+            {collPickerLoading ? (
+              <div className="flex justify-center py-8"><div className="text-3xl animate-bounce">📗</div></div>
+            ) : (
+              <div className="flex-1 overflow-y-auto space-y-2 min-h-0">
+                {collPickerDays.map(d => {
+                  const alreadyAssigned = homework.some(h => h.collectionName === collPickerCollName && h.dayNumber === d.dayNumber);
+                  return (
+                    <button key={d.dayNumber} onClick={() => !alreadyAssigned && pickCollectionDay(d.dayNumber, d.topic)}
+                      disabled={alreadyAssigned}
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-colors ${alreadyAssigned ? 'opacity-50 cursor-default' : 'hover:bg-[var(--primary-bg)]'}`}
+                      style={{ background: 'var(--surface-2)' }}>
+                      <div className="shrink-0 w-8 text-center">
+                        <p className="text-xs font-black text-[var(--primary)]">{d.dayNumber}</p>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-sm text-[var(--text)] truncate">{d.topic}</p>
+                        <p className="text-[10px] text-[var(--text-muted)]">{d.wordCount} words{alreadyAssigned ? ' · Assigned ✓' : ''}</p>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+            <button onClick={() => { setCollPickerOpen(false); setCollPickerStep(1); }} className="w-full btn-ghost py-3 shrink-0">Cancel</button>
+          </div>
+        </div>
+      )}
+
       {/* ── Assign homework modal ── */}
       {hwUnit && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setHwUnit(null)}>
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={closeHwModal}>
           <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-5 space-y-4 max-h-[85vh] flex flex-col" onClick={e => e.stopPropagation()}>
             <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto shrink-0" />
             <p className="font-bold text-[var(--text)] shrink-0">Assign: {hwUnit.name}</p>
@@ -1265,7 +1399,7 @@ function CurriculumTab({
             )}
 
             <div className="flex gap-3 shrink-0">
-              <button onClick={() => setHwUnit(null)} className="flex-1 btn-ghost py-3 text-sm">Cancel</button>
+              <button onClick={closeHwModal} className="flex-1 btn-ghost py-3 text-sm">Cancel</button>
               <button onClick={saveHomework} disabled={hwSaving || (hwWho === 'specific' && hwStudentIds.size === 0)} className="flex-1 btn-primary py-3 disabled:opacity-50">
                 {hwSaving ? 'Saving…' : 'Assign 📋'}
               </button>

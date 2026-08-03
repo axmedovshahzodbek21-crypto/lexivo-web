@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
+import { loadCollections, loadCEFRCollection } from '@/lib/data';
+import type { WordCollection } from '@/lib/types';
 
 interface FolderUnit {
   id: string;
@@ -29,6 +31,24 @@ interface CWUnit {
   hwDue: string | null;
 }
 
+interface CollHW {
+  id: string;
+  collectionName: string;
+  dayNumber: number;
+  topic: string;
+  wordCount: number;
+  hwModes: string[];
+  hwDue: string | null;
+}
+
+async function fetchCollectionByName(name: string): Promise<WordCollection | null> {
+  if (name === '30 Days of Powerful Words') { const c = await loadCollections(); return c[0] ?? null; }
+  if (name === '24 Vocabulary Challenge')   { const c = await loadCollections(); return c[1] ?? null; }
+  if (name === 'Word Mastery')              { const c = await loadCollections(); return c[2] ?? null; }
+  const lvl = ({ A1: 'a1', A2: 'a2', B1: 'b1' } as Record<string, 'a1'|'a2'|'b1'>)[name];
+  return lvl ? loadCEFRCollection(lvl) : null;
+}
+
 function dueLabel(due: string | null): { text: string; overdue: boolean } | null {
   if (!due) return null;
   const today = new Date().toISOString().slice(0, 10);
@@ -50,6 +70,7 @@ export default function ClassHomeworkPage() {
   const [isTeacher, setIsTeacher] = useState(false);
   const [folders, setFolders] = useState<AssignedFolder[]>([]);
   const [cwUnits, setCwUnits] = useState<CWUnit[]>([]);
+  const [collHwItems, setCollHwItems] = useState<CollHW[]>([]);
   const [completedModes, setCompletedModes] = useState<Record<string, Set<string>>>({});
   const [totalAssigned, setTotalAssigned] = useState(0);
   const [totalDone, setTotalDone] = useState(0);
@@ -73,7 +94,7 @@ export default function ClassHomeworkPage() {
     const [assignsRes, cwUnitRes, hwRes] = await Promise.all([
       supabase.from('class_library_assignments').select('id, folder_id, teacher_folders(id, name)').eq('class_id', id),
       supabase.from('class_word_units').select('id, name, class_words(count)').eq('class_id', id).order('created_at'),
-      supabase.from('class_homework').select('id, unit_id, class_unit_id, modes, due_date, student_ids').eq('class_id', id),
+      supabase.from('class_homework').select('id, unit_id, class_unit_id, collection_name, day_number, modes, due_date, student_ids').eq('class_id', id),
     ]);
 
     const assigns = (assignsRes.data ?? []) as any[];
@@ -87,9 +108,11 @@ export default function ClassHomeworkPage() {
 
     const hwByLibUnit: Record<string, any> = {};
     const hwByCWUnit: Record<string, any> = {};
+    const collHwRows: any[] = [];
     for (const h of applicableHw) {
       if (h.unit_id) hwByLibUnit[h.unit_id] = h;
-      if (h.class_unit_id) hwByCWUnit[h.class_unit_id] = h;
+      else if (h.class_unit_id) hwByCWUnit[h.class_unit_id] = h;
+      else if (h.collection_name) collHwRows.push(h);
     }
 
     const hwIds = applicableHw.map(h => h.id);
@@ -145,6 +168,28 @@ export default function ClassHomeworkPage() {
       };
     }).filter((u: CWUnit) => u.homeworkId !== null);
 
+    // Collection HW — look up topic + wordCount from local JSON
+    const collItems: CollHW[] = [];
+    if (collHwRows.length > 0) {
+      const colCache: Record<string, WordCollection | null> = {};
+      for (const h of collHwRows) {
+        const name = h.collection_name as string;
+        const day = h.day_number as number;
+        if (!(name in colCache)) colCache[name] = await fetchCollectionByName(name);
+        const col = colCache[name];
+        const dayData = col?.days.find((d: any) => d.dayNumber === day);
+        collItems.push({
+          id: h.id,
+          collectionName: name,
+          dayNumber: day,
+          topic: dayData?.topic ?? `Day ${day}`,
+          wordCount: dayData?.words.length ?? 0,
+          hwModes: (h.modes as string[]) ?? [],
+          hwDue: (h.due_date as string | null) ?? null,
+        });
+      }
+    }
+
     // Totals
     let assigned = 0, done = 0;
     for (const f of built) {
@@ -159,9 +204,14 @@ export default function ClassHomeworkPage() {
       assigned++;
       if ((u.hwModes ?? []).every(m => (modeMap[u.homeworkId!] ?? new Set()).has(m))) done++;
     }
+    for (const h of collItems) {
+      assigned++;
+      if (h.hwModes.every(m => (modeMap[h.id] ?? new Set()).has(m))) done++;
+    }
 
     setFolders(built);
     setCwUnits(builtCW);
+    setCollHwItems(collItems);
     setCompletedModes(modeMap);
     setTotalAssigned(assigned);
     setTotalDone(done);
@@ -383,6 +433,64 @@ export default function ClassHomeworkPage() {
                           <span className={`text-[10px] font-semibold ${due.overdue ? 'text-red-500' : 'text-[var(--text-muted)]'}`}>
                             {due.text}
                           </span>
+                        )}
+                      </div>
+                    </div>
+                    <svg className="w-4 h-4 text-[var(--text-muted)] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Collections section */}
+        {collHwItems.length > 0 && (
+          <div className="mt-2">
+            <div className="flex items-center gap-2 mb-2 px-1">
+              <span className="text-xs">📗</span>
+              <p className="flex-1 text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">Collections</p>
+            </div>
+            <div className="space-y-2">
+              {collHwItems.map(item => {
+                const modes = item.hwModes;
+                const completed = completedModes[item.id] ?? new Set();
+                const allDone = modes.length > 0 && modes.every(m => completed.has(m));
+                const due = dueLabel(item.hwDue);
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => router.push(`/classes/${id}/homework/${item.id}`)}
+                    className={`w-full flex items-center gap-3 p-4 rounded-2xl border text-left transition-all active:scale-[0.98] ${
+                      allDone
+                        ? 'bg-green-50 border-green-200 dark:bg-green-950/30 dark:border-green-800'
+                        : 'bg-[var(--surface)] border-[var(--border)] shadow-sm'
+                    }`}
+                  >
+                    <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 text-lg ${
+                      allDone ? 'bg-green-100 dark:bg-green-900/50' : 'bg-green-50 dark:bg-green-950/30'
+                    }`}>
+                      {allDone ? (
+                        <svg className="w-6 h-6 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                      ) : <span>📗</span>}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-sm font-bold truncate ${allDone ? 'text-green-700 dark:text-green-400' : 'text-[var(--text)]'}`}>
+                        {item.collectionName} · Day {item.dayNumber}
+                      </p>
+                      <p className="text-xs text-[var(--text-muted)] truncate">{item.topic} · {item.wordCount} words</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <div className="flex gap-1">
+                          {modes.map(m => (
+                            <span key={m} className="text-sm" style={{ opacity: completed.has(m) ? 1 : 0.3 }}>{MODE_ICON[m] ?? m}</span>
+                          ))}
+                        </div>
+                        {due && (
+                          <span className={`text-[10px] font-semibold ${due.overdue ? 'text-red-500' : 'text-[var(--text-muted)]'}`}>{due.text}</span>
                         )}
                       </div>
                     </div>
