@@ -19,7 +19,7 @@ const ACTIVITY_LABEL: Record<string, string> = { learn: 'Learn', flashcard: 'Fla
 
 type SortKey = 'lastActive' | 'xp' | 'progress' | 'name';
 type FilterKey = 'all' | 'active' | 'inactive';
-type Tab = 'students' | 'activity' | 'radar' | 'analytics' | 'srs';
+type Tab = 'students' | 'activity' | 'radar' | 'analytics' | 'srs' | 'curriculum';
 
 interface AnalyticsRow {
   student_id: string;
@@ -118,6 +118,10 @@ interface SRSRow {
 }
 interface WordForGrid { word: string; translation: string; }
 interface HardWordRaw { user_id: string; word: string; }
+
+interface CurrFolder { id: string; assignmentId: string; name: string; units: CurrUnit[]; }
+interface CurrUnit { id: string; name: string; wordCount: number; }
+interface CurrHW { id: string; unitId: string; unitName: string; modes: string[]; dueDate: string | null; studentIds: string[] | null; progressByMode: Record<string, number>; }
 
 function Avatar({ name, url, size = 38 }: { name: string; url: string | null; size?: number }) {
   if (url) return <img src={url} alt={name} style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />;
@@ -675,6 +679,454 @@ function SRSTab({
   );
 }
 
+const HW_MODE_ICON: Record<string, string> = { learn: '📖', flashcard: '🃏', quiz: '🧠', match: '🎯' };
+const HW_MODE_COLOR: Record<string, string> = { learn: '#3B82F6', flashcard: '#8B5CF6', quiz: '#EC4899', match: '#10B981' };
+const REQUIRED_MODES = ['learn', 'flashcard', 'quiz'];
+const OPTIONAL_MODES = ['match'];
+
+function CurriculumTab({
+  classId,
+  students,
+}: {
+  classId: string;
+  students: { studentId: string; name: string }[];
+}) {
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [folders, setFolders] = useState<CurrFolder[]>([]);
+  const [homework, setHomework] = useState<CurrHW[]>([]);
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
+
+  // Folder picker modal
+  const [showFolderPicker, setShowFolderPicker] = useState(false);
+  const [availFolders, setAvailFolders] = useState<{ id: string; name: string; unitCount: number }[]>([]);
+  const [folderPickerLoading, setFolderPickerLoading] = useState(false);
+
+  // Assign homework modal
+  const [hwUnit, setHwUnit] = useState<{ id: string; name: string } | null>(null);
+  const [hwModes, setHwModes] = useState<Set<string>>(new Set(['learn', 'flashcard', 'quiz']));
+  const [hwDueDate, setHwDueDate] = useState('');
+  const [hwWho, setHwWho] = useState<'class' | 'specific'>('class');
+  const [hwStudentIds, setHwStudentIds] = useState<Set<string>>(new Set());
+  const [hwSaving, setHwSaving] = useState(false);
+
+  // Homework detail modal
+  const [hwDetail, setHwDetail] = useState<CurrHW | null>(null);
+  const [detailProgress, setDetailProgress] = useState<{ studentId: string; name: string; modes: Set<string> }[]>([]);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [hwDeleting, setHwDeleting] = useState(false);
+
+  const loadCurriculum = async () => {
+    setLoading(true);
+    // 1. Assignments → folder IDs
+    const { data: assigns } = await supabase
+      .from('class_library_assignments')
+      .select('id, folder_id, teacher_folders(id, name)')
+      .eq('class_id', classId);
+
+    if (!assigns || assigns.length === 0) { setFolders([]); setHomework([]); setLoading(false); return; }
+
+    const folderIds = assigns.map((a: any) => a.teacher_folders.id);
+
+    // 2. Units for those folders
+    const { data: unitData } = await supabase
+      .from('teacher_units')
+      .select('id, folder_id, name, teacher_unit_words(count)')
+      .in('folder_id', folderIds)
+      .order('position').order('created_at');
+
+    const parsedFolders: CurrFolder[] = assigns.map((a: any) => ({
+      id: a.teacher_folders.id,
+      assignmentId: a.id,
+      name: a.teacher_folders.name,
+      units: (unitData ?? [])
+        .filter((u: any) => u.folder_id === a.teacher_folders.id)
+        .map((u: any) => ({ id: u.id, name: u.name, wordCount: u.teacher_unit_words?.[0]?.count ?? 0 })),
+    }));
+
+    // 3. Homework for class
+    const { data: hwData } = await supabase
+      .from('class_homework')
+      .select('id, unit_id, modes, due_date, student_ids, teacher_units(name)')
+      .eq('class_id', classId)
+      .order('created_at', { ascending: false });
+
+    let parsedHw: CurrHW[] = [];
+    if (hwData && hwData.length > 0) {
+      const hwIds = (hwData as any[]).map(h => h.id);
+      const { data: progData } = await supabase
+        .from('class_homework_progress')
+        .select('homework_id, student_id, mode')
+        .in('homework_id', hwIds);
+      parsedHw = (hwData as any[]).map(h => {
+        const rows = (progData ?? []).filter((p: any) => p.homework_id === h.id);
+        const progressByMode: Record<string, number> = {};
+        for (const mode of (h.modes ?? [])) {
+          progressByMode[mode] = new Set(rows.filter((p: any) => p.mode === mode).map((p: any) => p.student_id)).size;
+        }
+        return { id: h.id, unitId: h.unit_id, unitName: h.teacher_units?.name ?? 'Unknown unit', modes: h.modes ?? [], dueDate: h.due_date, studentIds: h.student_ids, progressByMode };
+      });
+    }
+
+    setFolders(parsedFolders);
+    setHomework(parsedHw);
+    setLoading(false);
+  };
+
+  useEffect(() => { loadCurriculum(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const openFolderPicker = async () => {
+    if (!user) return;
+    setShowFolderPicker(true);
+    setFolderPickerLoading(true);
+    const assignedIds = new Set(folders.map(f => f.id));
+    const { data } = await supabase.from('teacher_folders').select('id, name, teacher_units(count)').eq('teacher_id', user.id).order('position');
+    setAvailFolders(
+      ((data ?? []) as any[])
+        .filter(f => !assignedIds.has(f.id))
+        .map(f => ({ id: f.id, name: f.name, unitCount: f.teacher_units?.[0]?.count ?? 0 }))
+    );
+    setFolderPickerLoading(false);
+  };
+
+  const assignFolder = async (folderId: string) => {
+    await supabase.from('class_library_assignments').insert({ class_id: classId, folder_id: folderId });
+    setShowFolderPicker(false);
+    await loadCurriculum();
+  };
+
+  const unassignFolder = async (assignmentId: string) => {
+    if (!confirm('Remove this folder from the class? Students will lose access to its units.')) return;
+    await supabase.from('class_library_assignments').delete().eq('id', assignmentId);
+    await loadCurriculum();
+  };
+
+  const openHwModal = (unit: { id: string; name: string }) => {
+    setHwUnit(unit);
+    setHwModes(new Set(['learn', 'flashcard', 'quiz']));
+    setHwDueDate('');
+    setHwWho('class');
+    setHwStudentIds(new Set());
+  };
+
+  const saveHomework = async () => {
+    if (!user || !hwUnit) return;
+    setHwSaving(true);
+    await supabase.from('class_homework').insert({
+      class_id: classId,
+      unit_id: hwUnit.id,
+      modes: [...hwModes],
+      due_date: hwDueDate || null,
+      student_ids: hwWho === 'class' ? null : [...hwStudentIds],
+      assigned_by: user.id,
+    });
+    setHwUnit(null);
+    setHwSaving(false);
+    await loadCurriculum();
+  };
+
+  const openHwDetail = async (hw: CurrHW) => {
+    setHwDetail(hw);
+    setDetailLoading(true);
+    const { data } = await supabase.from('class_homework_progress').select('student_id, mode').eq('homework_id', hw.id);
+    const byStudent: Record<string, Set<string>> = {};
+    for (const p of (data ?? []) as any[]) {
+      if (!byStudent[p.student_id]) byStudent[p.student_id] = new Set();
+      byStudent[p.student_id].add(p.mode);
+    }
+    const targetStudents = hw.studentIds ? students.filter(s => hw.studentIds!.includes(s.studentId)) : students;
+    setDetailProgress(targetStudents.map(s => ({ studentId: s.studentId, name: s.name, modes: byStudent[s.studentId] ?? new Set() })));
+    setDetailLoading(false);
+  };
+
+  const deleteHomework = async () => {
+    if (!hwDetail || !confirm('Delete this homework assignment?')) return;
+    setHwDeleting(true);
+    await supabase.from('class_homework').delete().eq('id', hwDetail.id);
+    setHwDetail(null);
+    setHwDeleting(false);
+    await loadCurriculum();
+  };
+
+  const totalStudentsForHw = (hw: CurrHW) => hw.studentIds ? hw.studentIds.length : students.length;
+
+  if (loading) return <div className="flex justify-center py-12"><div className="text-4xl animate-bounce">📋</div></div>;
+
+  return (
+    <div className="space-y-6">
+      {/* ── Library ── */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">📚 Library</p>
+          <button onClick={openFolderPicker} className="text-xs font-semibold text-[var(--primary)] hover:opacity-70 transition-opacity">+ Assign Folder</button>
+        </div>
+
+        {folders.length === 0 ? (
+          <div className="card text-center py-12 space-y-3">
+            <div className="text-4xl">📚</div>
+            <p className="font-bold text-[var(--text)]">No folders assigned</p>
+            <p className="text-sm text-[var(--text-muted)]">Assign a folder from your library to give students access to its units.</p>
+            <button onClick={openFolderPicker} className="btn-primary">+ Assign Folder</button>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {folders.map(folder => {
+              const isOpen = expanded.has(folder.id);
+              return (
+                <div key={folder.id} className="card overflow-hidden">
+                  <button
+                    className="w-full flex items-center gap-3 text-left"
+                    onClick={() => setExpanded(prev => { const next = new Set(prev); if (isOpen) { next.delete(folder.id); } else { next.add(folder.id); } return next; })}
+                  >
+                    <span className="text-xl">📁</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-sm text-[var(--text)] truncate">{folder.name}</p>
+                      <p className="text-xs text-[var(--text-muted)]">{folder.units.length} unit{folder.units.length !== 1 ? 's' : ''}</p>
+                    </div>
+                    <div className="flex items-center gap-3 shrink-0">
+                      <button onClick={e => { e.stopPropagation(); unassignFolder(folder.assignmentId); }} className="text-[10px] text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors">
+                        Remove
+                      </button>
+                      <span className="text-xs text-[var(--text-muted)]">{isOpen ? '▲' : '▼'}</span>
+                    </div>
+                  </button>
+
+                  {isOpen && (
+                    <div className="mt-3 border-t border-[var(--border)] pt-3 space-y-2">
+                      {folder.units.length === 0 ? (
+                        <p className="text-xs text-[var(--text-muted)] text-center py-3">No units in this folder</p>
+                      ) : folder.units.map(unit => {
+                        const hw = homework.find(h => h.unitId === unit.id);
+                        return (
+                          <div key={unit.id} className="flex items-center gap-3 px-2 py-2 rounded-xl" style={{ background: 'var(--surface-2)' }}>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold text-[var(--text)] truncate">{unit.name}</p>
+                              <p className="text-[10px] text-[var(--text-muted)]">{unit.wordCount} words</p>
+                            </div>
+                            {hw ? (
+                              <button onClick={() => openHwDetail(hw)} className="shrink-0 text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: 'color-mix(in srgb, var(--primary) 15%, transparent)', color: 'var(--primary)' }}>
+                                📋 Assigned
+                              </button>
+                            ) : (
+                              <button onClick={() => openHwModal(unit)} className="shrink-0 text-[10px] font-semibold px-2.5 py-1 rounded-full border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--primary)] hover:border-[var(--primary)] transition-colors">
+                                + Homework
+                              </button>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* ── Homework ── */}
+      <div>
+        <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide mb-3">📋 Homework</p>
+        {homework.length === 0 ? (
+          <div className="card text-center py-10 space-y-2">
+            <div className="text-4xl">📋</div>
+            <p className="text-sm text-[var(--text-muted)]">No homework assigned yet — expand a folder and tap + Homework on a unit.</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {homework.map(hw => {
+              const total = totalStudentsForHw(hw);
+              const due = dueDateLabel(hw.dueDate);
+              return (
+                <button key={hw.id} onClick={() => openHwDetail(hw)} className="card w-full text-left space-y-3 hover:opacity-90 transition-opacity">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-sm text-[var(--text)] truncate">{hw.unitName}</p>
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        {hw.modes.map(m => <span key={m} className="text-xs">{HW_MODE_ICON[m] ?? m}</span>)}
+                        {hw.studentIds && <span className="text-[10px] text-[var(--text-muted)]">· {hw.studentIds.length} student{hw.studentIds.length !== 1 ? 's' : ''}</span>}
+                      </div>
+                    </div>
+                    {due && (
+                      <span className={`shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full ${due.overdue ? 'text-[var(--danger)]' : 'text-[var(--text-muted)]'}`} style={{ background: due.overdue ? 'color-mix(in srgb, var(--danger) 10%, transparent)' : 'var(--surface-2)' }}>
+                        {due.text}
+                      </span>
+                    )}
+                  </div>
+                  <div className="space-y-1.5">
+                    {hw.modes.map(mode => {
+                      const done = hw.progressByMode[mode] ?? 0;
+                      const pct = total === 0 ? 0 : (done / total) * 100;
+                      return (
+                        <div key={mode} className="flex items-center gap-2">
+                          <span className="text-xs w-4 shrink-0">{HW_MODE_ICON[mode] ?? mode}</span>
+                          <div className="flex-1 h-1.5 rounded-full" style={{ background: 'var(--border)' }}>
+                            <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: HW_MODE_COLOR[mode] ?? 'var(--primary)' }} />
+                          </div>
+                          <span className="text-[10px] text-[var(--text-muted)] w-10 text-right font-medium shrink-0">{done}/{total}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* ── Folder picker modal ── */}
+      {showFolderPicker && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setShowFolderPicker(false)}>
+          <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-5 space-y-4 max-h-[70vh] flex flex-col" onClick={e => e.stopPropagation()}>
+            <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto shrink-0" />
+            <p className="font-bold text-[var(--text)] shrink-0">Assign a Folder</p>
+            {folderPickerLoading ? (
+              <div className="flex justify-center py-8"><div className="text-3xl animate-bounce">📁</div></div>
+            ) : availFolders.length === 0 ? (
+              <div className="text-center py-8 space-y-2">
+                <p className="text-4xl">📁</p>
+                <p className="text-sm text-[var(--text-muted)]">All your library folders are already assigned, or you haven&apos;t created any yet.</p>
+              </div>
+            ) : (
+              <div className="flex-1 overflow-y-auto space-y-2 min-h-0">
+                {availFolders.map(f => (
+                  <button key={f.id} onClick={() => assignFolder(f.id)} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-colors hover:bg-[var(--primary-bg)]" style={{ background: 'var(--surface-2)' }}>
+                    <span className="text-xl">📁</span>
+                    <div>
+                      <p className="font-semibold text-sm text-[var(--text)]">{f.name}</p>
+                      <p className="text-[10px] text-[var(--text-muted)]">{f.unitCount} unit{f.unitCount !== 1 ? 's' : ''}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+            <button onClick={() => setShowFolderPicker(false)} className="w-full btn-ghost py-3 shrink-0">Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Assign homework modal ── */}
+      {hwUnit && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setHwUnit(null)}>
+          <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-5 space-y-4 max-h-[85vh] flex flex-col" onClick={e => e.stopPropagation()}>
+            <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto shrink-0" />
+            <p className="font-bold text-[var(--text)] shrink-0">Assign: {hwUnit.name}</p>
+
+            <div className="shrink-0">
+              <p className="text-xs font-semibold text-[var(--text-muted)] mb-2">Modes</p>
+              <div className="flex flex-wrap gap-2">
+                {[...REQUIRED_MODES, ...OPTIONAL_MODES].map(mode => {
+                  const required = REQUIRED_MODES.includes(mode);
+                  const active = hwModes.has(mode);
+                  return (
+                    <button
+                      key={mode}
+                      disabled={required}
+                      onClick={() => setHwModes(prev => { const next = new Set(prev); if (next.has(mode)) { next.delete(mode); } else { next.add(mode); } return next; })}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all"
+                      style={{ background: active ? 'var(--primary)' : 'var(--surface-2)', color: active ? 'white' : 'var(--text-muted)', borderColor: active ? 'var(--primary)' : 'var(--border)', opacity: required ? 0.75 : 1 }}
+                    >
+                      {HW_MODE_ICON[mode]} {mode.charAt(0).toUpperCase() + mode.slice(1)}{required ? ' *' : ''}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-[10px] text-[var(--text-muted)] mt-1">* Required</p>
+            </div>
+
+            <div className="shrink-0">
+              <label className="text-xs font-semibold text-[var(--text-muted)] mb-1.5 block">Due Date (optional)</label>
+              <input type="date" value={hwDueDate} onChange={e => setHwDueDate(e.target.value)} min={new Date().toISOString().slice(0, 10)} className="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]" />
+            </div>
+
+            <div className="shrink-0">
+              <p className="text-xs font-semibold text-[var(--text-muted)] mb-2">Assign to</p>
+              <div className="flex gap-2">
+                {(['class', 'specific'] as const).map(who => (
+                  <button key={who} onClick={() => setHwWho(who)} className="flex-1 py-2 rounded-xl text-sm font-semibold border transition-all"
+                    style={{ background: hwWho === who ? 'var(--primary)' : 'var(--surface-2)', color: hwWho === who ? 'white' : 'var(--text-muted)', borderColor: hwWho === who ? 'var(--primary)' : 'var(--border)' }}>
+                    {who === 'class' ? '👥 Whole Class' : '👤 Specific Students'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {hwWho === 'specific' && (
+              <div className="flex-1 overflow-y-auto min-h-0 space-y-1">
+                {students.map(s => {
+                  const checked = hwStudentIds.has(s.studentId);
+                  return (
+                    <label key={s.studentId} className="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer hover:bg-[var(--surface-2)] transition-colors">
+                      <input type="checkbox" checked={checked} onChange={() => setHwStudentIds(prev => { const next = new Set(prev); if (next.has(s.studentId)) { next.delete(s.studentId); } else { next.add(s.studentId); } return next; })} className="w-4 h-4 rounded accent-[var(--primary)]" />
+                      <span className="text-sm font-medium text-[var(--text)]">{s.name}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            )}
+
+            <div className="flex gap-3 shrink-0">
+              <button onClick={() => setHwUnit(null)} className="flex-1 btn-ghost py-3 text-sm">Cancel</button>
+              <button onClick={saveHomework} disabled={hwSaving || (hwWho === 'specific' && hwStudentIds.size === 0)} className="flex-1 btn-primary py-3 disabled:opacity-50">
+                {hwSaving ? 'Saving…' : 'Assign 📋'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Homework detail modal ── */}
+      {hwDetail && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setHwDetail(null)}>
+          <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-5 space-y-4 max-h-[80vh] flex flex-col" onClick={e => e.stopPropagation()}>
+            <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto shrink-0" />
+            <div className="flex items-start justify-between shrink-0">
+              <div>
+                <p className="font-bold text-[var(--text)]">{hwDetail.unitName}</p>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  {hwDetail.modes.map(m => <span key={m} className="text-sm">{HW_MODE_ICON[m] ?? m}</span>)}
+                  {(() => { const d = dueDateLabel(hwDetail.dueDate); return d ? <span className={`text-[10px] font-medium ${d.overdue ? 'text-[var(--danger)]' : 'text-[var(--text-muted)]'}`}>· {d.text}</span> : null; })()}
+                </div>
+              </div>
+              <button onClick={deleteHomework} disabled={hwDeleting} className="text-xs text-[var(--danger)] hover:opacity-70 transition-opacity disabled:opacity-50">
+                {hwDeleting ? 'Deleting…' : '🗑 Delete'}
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto min-h-0 space-y-2">
+              {detailLoading ? (
+                <div className="flex justify-center py-8"><div className="text-3xl animate-bounce">📋</div></div>
+              ) : detailProgress.length === 0 ? (
+                <p className="text-sm text-center text-[var(--text-muted)] py-6">No students assigned</p>
+              ) : detailProgress.map(sp => {
+                const doneModes = hwDetail.modes.filter(m => sp.modes.has(m));
+                const allDone = doneModes.length === hwDetail.modes.length;
+                return (
+                  <div key={sp.studentId} className="flex items-center gap-3 px-3 py-2.5 rounded-xl" style={{ background: 'var(--surface-2)' }}>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-[var(--text)]">{sp.name}</p>
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        {hwDetail.modes.map(m => <span key={m} className="text-sm" style={{ opacity: sp.modes.has(m) ? 1 : 0.2 }}>{HW_MODE_ICON[m] ?? m}</span>)}
+                      </div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="text-sm font-bold" style={{ color: allDone ? 'var(--success, #22c55e)' : 'var(--text-muted)' }}>{doneModes.length}/{hwDetail.modes.length}</p>
+                      <p className="text-[9px] text-[var(--text-muted)]">{allDone ? 'done ✓' : 'in progress'}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <button onClick={() => setHwDetail(null)} className="w-full btn-ghost py-3 shrink-0">Close</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ProgressBar({ done, total, color }: { done: number; total: number; color: string }) {
   const pct = total === 0 ? 0 : Math.min(100, (done / total) * 100);
   return (
@@ -1137,7 +1589,7 @@ export default function ClassDashboardPage() {
       {/* Tab switcher */}
       {!loading && (
         <div className="flex overflow-x-auto border-b border-[var(--border)]">
-          {(['students', 'activity', 'radar', 'analytics', 'srs'] as Tab[]).map(t => (
+          {(['students', 'activity', 'radar', 'analytics', 'srs', 'curriculum'] as Tab[]).map(t => (
             <button
               key={t}
               onClick={() => setTab(t)}
@@ -1147,8 +1599,8 @@ export default function ClassDashboardPage() {
                   : 'text-[var(--text-muted)] hover:text-[var(--text)]'
               }`}
             >
-              {t === 'students' ? '👥' : t === 'activity' ? '📡' : t === 'radar' ? '🎯' : t === 'analytics' ? '📊' : '📚'}
-              {' '}{t === 'students' ? 'Students' : t === 'activity' ? 'Activity' : t === 'radar' ? 'Radar' : t === 'analytics' ? 'Analytics' : 'SRS'}
+              {t === 'students' ? '👥' : t === 'activity' ? '📡' : t === 'radar' ? '🎯' : t === 'analytics' ? '📊' : t === 'srs' ? '📚' : '📋'}
+              {' '}{t === 'students' ? 'Students' : t === 'activity' ? 'Activity' : t === 'radar' ? 'Radar' : t === 'analytics' ? 'Analytics' : t === 'srs' ? 'SRS' : 'Curriculum'}
             </button>
           ))}
         </div>
@@ -1326,6 +1778,13 @@ export default function ClassDashboardPage() {
             hardWordsRaw={hardWordsRaw}
             srsNames={srsNames}
             loading={srsLoading}
+          />
+
+        ) : tab === 'curriculum' ? (
+          /* ── Curriculum tab ── */
+          <CurriculumTab
+            classId={id ?? ''}
+            students={students.map(s => ({ studentId: s.student_id, name: s.name }))}
           />
 
         ) : (
