@@ -10,6 +10,9 @@ interface UnitWord {
   word: string;
   translation: string;
   definition: string | null;
+  partOfSpeech: string | null;
+  pronunciation: string | null;
+  definitionUz: string | null;
   examples: { sentence: string; translation: string }[];
 }
 
@@ -85,7 +88,7 @@ export default function UnitStudyHubPage() {
           .order('created_at')
       : await supabase
           .from('teacher_unit_words')
-          .select('word, translation, definition, examples')
+          .select('word, translation, definition, part_of_speech, pronunciation, definition_uz, examples')
           .eq('unit_id', unitId!)
           .order('created_at');
 
@@ -93,6 +96,9 @@ export default function UnitStudyHubPage() {
       word: w.word,
       translation: w.translation,
       definition: w.definition ?? null,
+      partOfSpeech: w.part_of_speech ?? null,
+      pronunciation: w.pronunciation ?? null,
+      definitionUz: w.definition_uz ?? null,
       examples: (w.examples ?? []) as { sentence: string; translation: string }[],
     }));
 
@@ -114,6 +120,9 @@ export default function UnitStudyHubPage() {
       word: w.word,
       translation: w.translation,
       definition: w.definition ?? '',
+      partOfSpeech: w.partOfSpeech ?? '',
+      pronunciation: w.pronunciation ?? '',
+      definitionUz: w.definitionUz ?? '',
       example1: w.examples[0]?.sentence ?? '',
       example1Translation: w.examples[0]?.translation ?? '',
       example2: w.examples[1]?.sentence ?? '',

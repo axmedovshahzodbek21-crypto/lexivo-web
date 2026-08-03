@@ -10,12 +10,18 @@ interface UnitWord {
   word: string;
   translation: string;
   definition: string | null;
+  partOfSpeech: string | null;
+  pronunciation: string | null;
+  definitionUz: string | null;
   examples: WordExample[];
 }
 interface ParsedWord {
   word: string;
   translation: string;
   definition: string;
+  partOfSpeech: string;
+  pronunciation: string;
+  definitionUz: string;
   examples: WordExample[];
 }
 
@@ -25,7 +31,7 @@ function parseOutput(text: string): ParsedWord[] {
   const results: ParsedWord[] = [];
   const blocks = text.split(/\n---\n|\n---$|^---\n/m).map(b => b.trim()).filter(Boolean);
   for (const block of blocks) {
-    const w: ParsedWord = { word: '', translation: '', definition: '', examples: [] };
+    const w: ParsedWord = { word: '', translation: '', definition: '', partOfSpeech: '', pronunciation: '', definitionUz: '', examples: [] };
     const sentences: Record<number, string> = {};
     const translations: Record<number, string> = {};
     for (const line of block.split('\n')) {
@@ -36,6 +42,9 @@ function parseOutput(text: string): ParsedWord[] {
       if (key === 'word') w.word = val;
       else if (key === 'translation') w.translation = val;
       else if (key === 'definition') w.definition = val;
+      else if (key === 'part of speech') w.partOfSpeech = val;
+      else if (key === 'pronunciation') w.pronunciation = val;
+      else if (key === 'uzbek definition') w.definitionUz = val;
       else {
         const sm = key.match(/^example (\d+)$/);
         const tm = key.match(/^example (\d+) translation$/);
@@ -59,8 +68,11 @@ ${words}
 For each word output exactly this format, separated by ---:
 
 Word: [the ${wordLang.toLowerCase()} word]
+Part of speech: [noun / verb / adjective / adverb / phrase / etc.]
+Pronunciation: [IPA pronunciation, e.g. /wɜːrd/]
 Translation: [${transLang.toLowerCase()} translation]
 Definition: [short definition in ${wordLang.toLowerCase()}, max 20 words]
+Uzbek definition: [short definition in Uzbek, max 20 words]
 Example 1: [natural sentence using the word in ${wordLang.toLowerCase()}]
 Example 1 Translation: [${transLang.toLowerCase()} translation of example 1]
 Example 2: [another natural sentence in ${wordLang.toLowerCase()}]
@@ -124,7 +136,7 @@ export default function UnitPage() {
     const [unitRes, folderRes, wordsRes] = await Promise.all([
       supabase.from('teacher_units').select('name').eq('id', unitId).single(),
       supabase.from('teacher_folders').select('name').eq('id', folderId).single(),
-      supabase.from('teacher_unit_words').select('id, word, translation, definition, examples').eq('unit_id', unitId).order('position').order('created_at'),
+      supabase.from('teacher_unit_words').select('id, word, translation, definition, part_of_speech, pronunciation, definition_uz, examples').eq('unit_id', unitId).order('position').order('created_at'),
     ]);
     setUnitName(unitRes.data?.name ?? '');
     setFolderName(folderRes.data?.name ?? '');
@@ -133,6 +145,9 @@ export default function UnitPage() {
       word: w.word,
       translation: w.translation,
       definition: w.definition ?? null,
+      partOfSpeech: w.part_of_speech ?? null,
+      pronunciation: w.pronunciation ?? null,
+      definitionUz: w.definition_uz ?? null,
       examples: (w.examples ?? []) as WordExample[],
     })));
     setLoading(false);
@@ -147,6 +162,9 @@ export default function UnitPage() {
       word: w.word,
       translation: w.translation,
       ...(w.definition ? { definition: w.definition } : {}),
+      ...(w.partOfSpeech ? { part_of_speech: w.partOfSpeech } : {}),
+      ...(w.pronunciation ? { pronunciation: w.pronunciation } : {}),
+      ...(w.definitionUz ? { definition_uz: w.definitionUz } : {}),
       examples: w.examples,
     }));
     await supabase.from('teacher_unit_words').insert(rows);

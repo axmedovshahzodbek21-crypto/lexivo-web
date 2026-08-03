@@ -188,8 +188,8 @@ export default function QuizPage() {
     if (sourceClassHW) {
       const hw = getClassHWTemp();
       const allWords: QuizWord[] = hw.map(w => ({
-        word: w.word, partOfSpeech: '', pronunciation: '',
-        translation: w.translation, definition: w.definition,
+        word: w.word, partOfSpeech: w.partOfSpeech ?? '', pronunciation: w.pronunciation ?? '',
+        translation: w.translation, definition: w.definition, definitionUz: w.definitionUz ?? '',
         example1: w.example1, example1Situation: '', example1Translation: w.example1Translation,
         example2: w.example2, example2Situation: '', example2Translation: w.example2Translation,
         example3: w.example3 ?? '', example3Translation: w.example3Translation ?? '', example3Situation: '',

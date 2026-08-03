@@ -299,8 +299,8 @@ function LearnInner() {
     if (!sourceClassHW) return;
     const hw = getClassHWTemp();
     const list: StudyWord[] = hw.map(w => ({
-      word: w.word, partOfSpeech: '', pronunciation: '',
-      translation: w.translation, definition: w.definition, definitionUz: '',
+      word: w.word, partOfSpeech: w.partOfSpeech ?? '', pronunciation: w.pronunciation ?? '',
+      translation: w.translation, definition: w.definition, definitionUz: w.definitionUz ?? '',
       example1: w.example1, example1Situation: '', example1Translation: w.example1Translation,
       example2: w.example2, example2Situation: '', example2Translation: w.example2Translation,
       example3: w.example3 ?? '', example3Situation: '', example3Translation: w.example3Translation ?? '',
