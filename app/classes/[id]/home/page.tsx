@@ -194,6 +194,14 @@ export default function ClassHomePage() {
               {isTeacher ? `${memberCount} students` : `👩‍🏫 ${teacherName}`}
             </p>
           </div>
+          {isTeacher && (
+            <button
+              onClick={() => router.push(`/classes/${id}`)}
+              className="shrink-0 bg-white/20 hover:bg-white/30 transition-colors rounded-xl px-3 py-1.5 text-xs font-bold text-white"
+            >
+              Dashboard →
+            </button>
+          )}
         </div>
         <div className="flex flex-wrap gap-2 mb-3">
           {[
