@@ -19,7 +19,7 @@ const ACTIVITY_LABEL: Record<string, string> = { learn: 'Learn', flashcard: 'Fla
 
 type SortKey = 'lastActive' | 'xp' | 'progress' | 'name';
 type FilterKey = 'all' | 'active' | 'inactive';
-type Tab = 'students' | 'activity' | 'radar' | 'analytics';
+type Tab = 'students' | 'activity' | 'radar' | 'analytics' | 'srs';
 
 interface AnalyticsRow {
   student_id: string;
@@ -108,6 +108,16 @@ interface ActivityRow {
   day_number: number;
   completed_at: string;
 }
+
+interface SRSRow {
+  user_id: string;
+  word: string;
+  translation: string;
+  stage: number;
+  next_due: string;
+}
+interface WordForGrid { word: string; translation: string; }
+interface HardWordRaw { user_id: string; word: string; }
 
 function Avatar({ name, url, size = 38 }: { name: string; url: string | null; size?: number }) {
   if (url) return <img src={url} alt={name} style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />;
@@ -497,6 +507,174 @@ function AnalyticsTab({
   );
 }
 
+const SRS_COLORS = ['#9CA3AF', '#F59E0B', '#3B82F6', '#8B5CF6', '#EC4899', '#10B981'];
+const SRS_LABELS = ['New', '+1d', '+3d', '+7d', '+14d', '✓'];
+
+function SRSTab({
+  srsRows, gridWords, hardWordsRaw, srsNames, loading,
+}: {
+  srsRows: SRSRow[];
+  gridWords: WordForGrid[];
+  hardWordsRaw: HardWordRaw[];
+  srsNames: Record<string, string>;
+  loading: boolean;
+}) {
+  if (loading) return <div className="flex justify-center py-12"><div className="text-4xl animate-bounce">📚</div></div>;
+
+  const today = new Date().toISOString().slice(0, 10);
+  const studentIds = [...new Set(srsRows.map(r => r.user_id))];
+
+  const wordStageMap = new Map<string, Map<string, number>>();
+  for (const r of srsRows) {
+    if (!wordStageMap.has(r.word)) wordStageMap.set(r.word, new Map());
+    wordStageMap.get(r.word)!.set(r.user_id, r.stage);
+  }
+
+  const hardCounts = new Map<string, number>();
+  for (const h of hardWordsRaw) hardCounts.set(h.word, (hardCounts.get(h.word) ?? 0) + 1);
+  const hardSorted = [...hardCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
+
+  return (
+    <div className="space-y-5">
+      {/* Per-student overview */}
+      <section>
+        <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-widest mb-3">Student SRS Overview</p>
+        {studentIds.length === 0 ? (
+          <div className="card text-center py-10 space-y-2">
+            <p className="text-4xl">📚</p>
+            <p className="text-sm text-[var(--text-muted)]">No SRS data yet — students need to study class words first.</p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {studentIds.map(uid => {
+              const entries = srsRows.filter(r => r.user_id === uid);
+              const dueToday = entries.filter(r => r.next_due <= today && r.stage < 5).length;
+              const overdue = entries.filter(r => r.next_due < today && r.stage < 5).length;
+              const stageCounts = Array.from({ length: 6 }, (_, s) => entries.filter(r => r.stage === s).length);
+              const total = entries.length;
+              return (
+                <div key={uid} className="card space-y-2">
+                  <div className="flex items-center justify-between">
+                    <p className="font-semibold text-sm text-[var(--text)]">{srsNames[uid] ?? uid.slice(0, 8)}</p>
+                    <div className="flex items-center gap-3 text-xs">
+                      {dueToday > 0 && <span style={{ color: '#F59E0B' }} className="font-bold">{dueToday} due</span>}
+                      {overdue > 0 && <span className="text-[var(--danger)] font-bold">{overdue} overdue</span>}
+                      <span className="text-[var(--text-muted)]">{total} words</span>
+                    </div>
+                  </div>
+                  <div className="flex h-3 rounded-full overflow-hidden">
+                    {stageCounts.map((count, s) =>
+                      count > 0 ? (
+                        <div key={s} title={`Stage ${s}: ${count}`} style={{ flex: count, background: SRS_COLORS[s] }} />
+                      ) : null
+                    )}
+                    {total === 0 && <div className="flex-1 rounded-full" style={{ background: 'var(--surface-2)' }} />}
+                  </div>
+                  <div className="flex gap-3 flex-wrap">
+                    {stageCounts.map((count, s) => count > 0 ? (
+                      <span key={s} className="text-[10px]" style={{ color: SRS_COLORS[s] }}>{SRS_LABELS[s]}: {count}</span>
+                    ) : null)}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </section>
+
+      {/* Word Mastery Grid */}
+      {gridWords.length > 0 && studentIds.length > 0 && (
+        <section>
+          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-widest mb-3">Word Mastery Grid</p>
+          <div className="card p-0 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs border-collapse">
+                <thead>
+                  <tr>
+                    <th className="sticky left-0 z-10 text-left px-3 py-2 font-semibold border-b border-r text-[var(--text-muted)]" style={{ background: 'var(--surface)', borderColor: 'var(--border)', minWidth: 130 }}>Word</th>
+                    {studentIds.map(uid => (
+                      <th key={uid} className="px-2 py-2 text-center font-medium text-[var(--text-muted)] border-b" style={{ borderColor: 'var(--border)', minWidth: 64 }}>
+                        <span className="block truncate max-w-[72px]">{srsNames[uid] ?? uid.slice(0, 6)}</span>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {gridWords.map((w, i) => {
+                    const byUser = wordStageMap.get(w.word) ?? new Map<string, number>();
+                    const rowBg = i % 2 === 0 ? 'var(--surface)' : 'var(--surface-2)';
+                    return (
+                      <tr key={w.word}>
+                        <td className="sticky left-0 z-10 px-3 py-1.5 border-r font-medium text-[var(--text)]" style={{ background: rowBg, borderColor: 'var(--border)' }}>
+                          <span className="block">{w.word}</span>
+                          <span className="text-[10px] text-[var(--text-muted)]">{w.translation}</span>
+                        </td>
+                        {studentIds.map(uid => {
+                          const stage = byUser.get(uid);
+                          return (
+                            <td key={uid} className="px-1 py-1 text-center" style={{ background: rowBg }}>
+                              <div
+                                className="mx-auto w-8 h-7 rounded-md flex items-center justify-center text-[9px] font-bold"
+                                title={stage !== undefined ? SRS_LABELS[stage] : 'Not studied'}
+                                style={stage !== undefined
+                                  ? { background: SRS_COLORS[stage], color: 'white' }
+                                  : { border: '1px solid var(--border)', color: 'var(--text-muted)' }}
+                              >
+                                {stage !== undefined ? SRS_LABELS[stage] : '–'}
+                              </div>
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            <div className="px-3 py-2 border-t flex flex-wrap gap-3" style={{ borderColor: 'var(--border)' }}>
+              {SRS_COLORS.map((c, s) => (
+                <span key={s} className="flex items-center gap-1 text-[10px] text-[var(--text-muted)]">
+                  <span className="w-3 h-3 rounded-sm inline-block" style={{ background: c }} />{SRS_LABELS[s]}
+                </span>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Class Hard Words */}
+      {hardSorted.length > 0 && (
+        <section>
+          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-widest mb-3">Class Hard Words</p>
+          <div className="space-y-2">
+            {hardSorted.map(([word, count], i) => {
+              const info = gridWords.find(w => w.word === word);
+              const maxCount = hardSorted[0][1];
+              return (
+                <div key={word} className="card flex items-center gap-3">
+                  <div className="w-7 h-7 rounded-lg shrink-0 flex items-center justify-center text-xs font-black" style={{ background: 'color-mix(in srgb, var(--danger) 15%, transparent)', color: 'var(--danger)' }}>
+                    #{i + 1}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <span className="font-bold text-sm text-[var(--text)]">{word}</span>
+                      {info && <span className="text-xs text-[var(--primary)]">{info.translation}</span>}
+                    </div>
+                    <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
+                      <div className="h-full rounded-full" style={{ width: `${(count / maxCount) * 100}%`, background: 'var(--danger)' }} />
+                    </div>
+                    <p className="text-[10px] text-[var(--text-muted)] mt-0.5">{count} student{count !== 1 ? 's' : ''} got this wrong</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+    </div>
+  );
+}
+
 function ProgressBar({ done, total, color }: { done: number; total: number; color: string }) {
   const pct = total === 0 ? 0 : Math.min(100, (done / total) * 100);
   return (
@@ -590,6 +768,14 @@ export default function ClassDashboardPage() {
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
   const [digestText, setDigestText] = useState('');
   const [digestLoading, setDigestLoading] = useState(false);
+
+  // SRS tab
+  const [srsRows, setSrsRows] = useState<SRSRow[]>([]);
+  const [gridWords, setGridWords] = useState<WordForGrid[]>([]);
+  const [hardWordsRaw, setHardWordsRaw] = useState<HardWordRaw[]>([]);
+  const [srsNames, setSrsNames] = useState<Record<string, string>>({});
+  const [srsLoading, setSrsLoading] = useState(false);
+  const [srsLoaded, setSrsLoaded] = useState(false);
 
   // Streak calendar
   const [streakModal, setStreakModal] = useState<StudentRow | null>(null);
@@ -727,6 +913,28 @@ export default function ClassDashboardPage() {
     setActiveStudents((data as ActiveStudent[]) ?? []);
   };
 
+  const loadSRS = async () => {
+    if (!id) return;
+    setSrsLoading(true);
+    const [{ data: srs }, { data: words }, { data: hard }] = await Promise.all([
+      supabase.from('class_srs_states').select('user_id, word, translation, stage, next_due').eq('class_id', id),
+      supabase.from('class_words').select('word, translation').eq('class_id', id).order('word'),
+      supabase.from('class_hard_words').select('user_id, word').eq('class_id', id),
+    ]);
+    setSrsRows((srs as SRSRow[]) ?? []);
+    setGridWords((words as WordForGrid[]) ?? []);
+    setHardWordsRaw((hard as HardWordRaw[]) ?? []);
+    const uids = [...new Set(((srs as SRSRow[]) ?? []).map(r => r.user_id))];
+    if (uids.length > 0) {
+      const { data: profiles } = await supabase.from('profiles').select('id, name').in('id', uids);
+      const map: Record<string, string> = {};
+      for (const p of (profiles as { id: string; name: string }[]) ?? []) map[p.id] = p.name;
+      setSrsNames(map);
+    }
+    setSrsLoading(false);
+    setSrsLoaded(true);
+  };
+
   const load = async () => {
     if (!user || !id) return;
     const cached = _classCache.get(id);
@@ -769,6 +977,7 @@ export default function ClassDashboardPage() {
     const id30s = setInterval(loadActiveStudents, 30_000);
     return () => clearInterval(id30s);
   }, [tab]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (tab === 'srs' && !srsLoaded) loadSRS(); }, [tab]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!streakModal || !id) return;
     setStreakLoading(true);
@@ -927,19 +1136,19 @@ export default function ClassDashboardPage() {
 
       {/* Tab switcher */}
       {!loading && (
-        <div className="flex border-b border-[var(--border)]">
-          {(['students', 'activity', 'radar', 'analytics'] as Tab[]).map(t => (
+        <div className="flex overflow-x-auto border-b border-[var(--border)]">
+          {(['students', 'activity', 'radar', 'analytics', 'srs'] as Tab[]).map(t => (
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`flex-1 py-2.5 text-xs font-semibold transition-colors ${
+              className={`flex-1 shrink-0 py-2.5 text-xs font-semibold transition-colors ${
                 tab === t
                   ? 'border-b-2 border-[var(--primary)] text-[var(--primary)]'
                   : 'text-[var(--text-muted)] hover:text-[var(--text)]'
               }`}
             >
-              {t === 'students' ? '👥' : t === 'activity' ? '📡' : t === 'radar' ? '🎯' : '📊'}
-              {' '}{t === 'students' ? 'Students' : t === 'activity' ? 'Activity' : t === 'radar' ? 'Radar' : 'Analytics'}
+              {t === 'students' ? '👥' : t === 'activity' ? '📡' : t === 'radar' ? '🎯' : t === 'analytics' ? '📊' : '📚'}
+              {' '}{t === 'students' ? 'Students' : t === 'activity' ? 'Activity' : t === 'radar' ? 'Radar' : t === 'analytics' ? 'Analytics' : 'SRS'}
             </button>
           ))}
         </div>
@@ -1108,6 +1317,16 @@ export default function ClassDashboardPage() {
               })}
             </div>
           )
+
+        ) : tab === 'srs' ? (
+          /* ── SRS tab ── */
+          <SRSTab
+            srsRows={srsRows}
+            gridWords={gridWords}
+            hardWordsRaw={hardWordsRaw}
+            srsNames={srsNames}
+            loading={srsLoading}
+          />
 
         ) : (
           /* ── Students tab ── */
