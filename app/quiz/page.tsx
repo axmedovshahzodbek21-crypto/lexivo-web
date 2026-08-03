@@ -9,7 +9,7 @@ import { pushLists, pushStats } from '@/lib/sync';
 import { fireConfetti } from '@/lib/confetti';
 import { checkAchievements } from '@/lib/gamification';
 import { supabase } from '@/lib/supabase';
-import { getClassWordsFull } from '@/lib/class-srs';
+import { getClassWordsFull, addClassHardWord } from '@/lib/class-srs';
 import type { WordItem, WordCollection, QuizType } from '@/lib/types';
 import Link from 'next/link';
 import UnitPicker from '@/components/UnitPicker';
@@ -124,6 +124,7 @@ export default function QuizPage() {
   const [correct, setCorrect] = useState(0);
   const [done, setDone] = useState(false);
   const [wrongQuestions, setWrongQuestions] = useState<QuizQuestion[]>([]);
+  const [userId, setUserId] = useState<string | null>(null);
   const selecting = useRef(false);
   const t = useTranslation();
   const [quizDirection, setQuizDirection] = useState<'word-to-uz' | 'uz-to-word'>('word-to-uz');
@@ -131,6 +132,11 @@ export default function QuizPage() {
   useEffect(() => {
     setQuizDirection(getSettings().quizDirection);
   }, []);
+
+  useEffect(() => {
+    if (!sourceClass) return;
+    supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
+  }, [sourceClass]);
 
   // Gate: must complete Learn → Cards before Quiz (for unit sessions)
   const [gateInfo, setGateInfo] = useState<{ url: string; missing: string } | null>(null);
@@ -270,10 +276,15 @@ export default function QuizPage() {
     if (option === current?.correct) {
       setCorrect(c => c + 1);
     } else {
-      if (current) setWrongQuestions(prev => [...prev, current]);
+      if (current) {
+        setWrongQuestions(prev => [...prev, current]);
+        if (sourceClass && classId && userId) {
+          addClassHardWord(userId, classId, current.word.word);
+        }
+      }
     }
     recordStudySession();
-  }, [state, current]);
+  }, [state, current, sourceClass, classId, userId]);
 
   const next = useCallback(() => {
     if (index + 1 >= questions.length) {

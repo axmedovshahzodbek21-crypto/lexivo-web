@@ -118,7 +118,48 @@ export async function getClassSRSForTeacher(
   return (data ?? []) as ClassSRSEntry[];
 }
 
-// Raw class word shape returned from Supabase (used by study-mode pages)
+// ── Starred words ─────────────────────────────────────────────────────────────
+
+export async function getClassStarredWordIds(userId: string, classId: string): Promise<Set<string>> {
+  const { data } = await supabase
+    .from('class_starred_words')
+    .select('word')
+    .eq('user_id', userId)
+    .eq('class_id', classId);
+  return new Set((data ?? []).map((r: { word: string }) => r.word));
+}
+
+export async function addClassStarredWord(userId: string, classId: string, word: string): Promise<void> {
+  await supabase.from('class_starred_words').upsert(
+    { user_id: userId, class_id: classId, word },
+    { onConflict: 'user_id,class_id,word', ignoreDuplicates: true },
+  );
+}
+
+export async function removeClassStarredWord(userId: string, classId: string, word: string): Promise<void> {
+  await supabase.from('class_starred_words').delete()
+    .eq('user_id', userId).eq('class_id', classId).eq('word', word);
+}
+
+// ── Hard words ────────────────────────────────────────────────────────────────
+
+export async function getClassHardWordIds(userId: string, classId: string): Promise<Set<string>> {
+  const { data } = await supabase
+    .from('class_hard_words')
+    .select('word')
+    .eq('user_id', userId)
+    .eq('class_id', classId);
+  return new Set((data ?? []).map((r: { word: string }) => r.word));
+}
+
+export async function addClassHardWord(userId: string, classId: string, word: string): Promise<void> {
+  await supabase.from('class_hard_words').upsert(
+    { user_id: userId, class_id: classId, word },
+    { onConflict: 'user_id,class_id,word', ignoreDuplicates: true },
+  );
+}
+
+// ── Raw class word shape returned from Supabase (used by study-mode pages) ───
 export interface ClassWordRaw {
   id: string;
   word: string;

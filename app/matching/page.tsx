@@ -6,7 +6,8 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
 import { getHardWords, getStarredWords, getCustomListWords, getImportedWords, getImportedWordsByCollection } from '@/lib/storage';
-import { getClassWordsFull } from '@/lib/class-srs';
+import { getClassWordsFull, addClassHardWord } from '@/lib/class-srs';
+import { supabase } from '@/lib/supabase';
 import { checkAchievements } from '@/lib/gamification';
 import type { WordItem, WordCollection } from '@/lib/types';
 
@@ -82,6 +83,12 @@ function MatchingInner() {
 
   const [words,       setWords]       = useState<MatchWord[]>([]);
   const [roundIndex,  setRoundIndex]  = useState(0);
+  const [userId,      setUserId]      = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!sourceClass) return;
+    supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
+  }, [sourceClass]);
 
   // Round state
   const [roundWords,  setRoundWords]  = useState<MatchWord[]>([]);
@@ -230,8 +237,11 @@ function MatchingInner() {
       setSelected(null);
       setWrongPair({ left: leftId, right: rightId });
       wrongTimeout.current = setTimeout(() => setWrongPair(null), 650);
+      if (sourceClass && classId && userId) {
+        addClassHardWord(userId, classId, leftId);
+      }
     }
-  }, [matched, wrongPair, selected, timerActive, roundWords, mistakes, elapsed, roundIndex, words.length]);
+  }, [matched, wrongPair, selected, timerActive, roundWords, mistakes, elapsed, roundIndex, words.length, sourceClass, classId, userId]);
 
   // ── Not supported / loading ──
   if (!collectionsLoaded && !sourceMyWords && !sourceClass) {

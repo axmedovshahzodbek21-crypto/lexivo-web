@@ -3,7 +3,7 @@ import { useEffect, useRef, useState, useMemo } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
-import { getClassDueWords, getClassSRSAll } from '@/lib/class-srs';
+import { getClassDueWords, getClassSRSAll, getClassStarredWordIds, addClassStarredWord, removeClassStarredWord } from '@/lib/class-srs';
 
 type InputTab = 'manual' | 'ai' | 'collection';
 
@@ -248,6 +248,7 @@ export default function ClassWordsPage() {
   const [learnedCount, setLearnedCount] = useState(0);
   const [hardCount, setHardCount] = useState(0);
   const [starredCount, setStarredCount] = useState(0);
+  const [starredIds, setStarredIds] = useState<Set<string>>(new Set());
   const [tab, setTab] = useState<InputTab>('manual');
   const [collapsedCols, setCollapsedCols] = useState<Set<string>>(new Set());
   const toggleCol = (key: string) => setCollapsedCols(prev => { const s = new Set(prev); s.has(key) ? s.delete(key) : s.add(key); return s; });
@@ -306,18 +307,36 @@ export default function ClassWordsPage() {
   useEffect(() => {
     if (!user || !id) return;
     (async () => {
-      const [due, all, { count: hard }, { count: starred }] = await Promise.all([
+      const [due, all, { count: hard }, starIds] = await Promise.all([
         getClassDueWords(user.id, id),
         getClassSRSAll(user.id, id),
         supabase.from('class_hard_words').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('class_id', id),
-        supabase.from('class_starred_words').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('class_id', id),
+        getClassStarredWordIds(user.id, id),
       ]);
       setDueCount(due.length);
       setLearnedCount(all.length);
       setHardCount(hard ?? 0);
-      setStarredCount(starred ?? 0);
+      setStarredIds(starIds);
+      setStarredCount(starIds.size);
     })();
   }, [user, id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const toggleStar = async (word: string) => {
+    if (!user) return;
+    const isStarred = starredIds.has(word);
+    // Optimistic update
+    setStarredIds(prev => {
+      const next = new Set(prev);
+      isStarred ? next.delete(word) : next.add(word);
+      return next;
+    });
+    setStarredCount(c => isStarred ? c - 1 : c + 1);
+    if (isStarred) {
+      await removeClassStarredWord(user.id, id, word);
+    } else {
+      await addClassStarredWord(user.id, id, word);
+    }
+  };
 
   const loadWords = async (clsName?: string) => {
     const { data } = await supabase
@@ -900,6 +919,12 @@ export default function ClassWordsPage() {
                       </div>
                     ))}
                   </div>
+                  <button
+                    onClick={() => router.push(`/classes/${id}/progress`)}
+                    className="w-full flex items-center justify-between px-4 py-3 rounded-2xl bg-[var(--surface-2)] text-sm font-semibold text-[var(--text)] active:scale-95 transition-transform"
+                  >
+                    <span>📊 My Progress</span><span className="text-[var(--text-muted)] text-xs">→</span>
+                  </button>
                 </>
               )}
             </div>
@@ -940,7 +965,15 @@ export default function ClassWordsPage() {
                       {!collapsed && colWords.map(w => (
                         <div key={w.id} className={`card flex items-start gap-3 ${folder ? 'border-l-2 border-[var(--primary)] border-opacity-30' : ''}`}>
                           <WordCard w={w} />
-                          <button onClick={() => deleteWord(w.id)} className="text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors text-sm shrink-0" aria-label="Delete word">✕</button>
+                          {isTeacher ? (
+                            <button onClick={() => deleteWord(w.id)} className="text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors text-sm shrink-0 mt-0.5" aria-label="Delete word">✕</button>
+                          ) : (
+                            <button
+                              onClick={() => toggleStar(w.word)}
+                              className={`text-lg shrink-0 mt-0.5 transition-transform active:scale-75 ${starredIds.has(w.word) ? 'opacity-100' : 'opacity-25 hover:opacity-60'}`}
+                              aria-label={starredIds.has(w.word) ? 'Unstar word' : 'Star word'}
+                            >{starredIds.has(w.word) ? '⭐' : '☆'}</button>
+                          )}
                         </div>
                       ))}
                     </div>
