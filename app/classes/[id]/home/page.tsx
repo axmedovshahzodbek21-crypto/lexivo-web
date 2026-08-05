@@ -82,7 +82,6 @@ export default function ClassHomePage() {
   const [showStudents, setShowStudents] = useState(false);
   const [students, setStudents] = useState<StudentProfile[]>([]);
   const [studentsLoading, setStudentsLoading] = useState(false);
-  const [studentsLoaded, setStudentsLoaded] = useState(false);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [targets, setTargets] = useState<Target[]>([]);
   const [wordCount, setWordCount] = useState(0);
@@ -194,11 +193,10 @@ export default function ClassHomePage() {
 
   const openStudentsSheet = async () => {
     setShowStudents(true);
-    if (studentsLoaded) return;
     setStudentsLoading(true);
     const { data: mems } = await supabase.from('class_members').select('student_id').eq('class_id', id);
     const ids = (mems ?? []).map((m: { student_id: string }) => m.student_id);
-    if (!ids.length) { setStudentsLoading(false); setStudentsLoaded(true); return; }
+    if (!ids.length) { setStudentsLoading(false); return; }
     const [{ data: profs }, { data: uData }] = await Promise.all([
       supabase.from('profiles').select('id, name, avatar_url, last_study_date').in('id', ids),
       supabase.from('user_data').select('id, xp, streak, total_learned').in('id', ids),
@@ -210,7 +208,6 @@ export default function ClassHomePage() {
     });
     list.sort((a, b) => b.xp - a.xp);
     setStudents(list);
-    setStudentsLoaded(true);
     setStudentsLoading(false);
   };
 
