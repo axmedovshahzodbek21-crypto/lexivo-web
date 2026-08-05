@@ -15,6 +15,28 @@ import { getTheme, toggleTheme, type Theme } from '@/lib/theme';
 import type { WordItem, UserSettings } from '@/lib/types';
 import XpModal from '@/components/XpModal';
 import TiltCard from '@/components/TiltCard';
+import { supabase } from '@/lib/supabase';
+
+type HomeClassSummary = {
+  classId: string; className: string; isTeacher: boolean;
+  studentCount: number; activeToday: number;
+  classXP: number; classStreak: number; pendingHomework: number;
+};
+
+function computeClassStreak(datesDesc: string[]): number {
+  if (!datesDesc.length) return 0;
+  const set = new Set(datesDesc);
+  const today = new Date().toISOString().slice(0, 10);
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  if (!set.has(today) && !set.has(yesterday)) return 0;
+  let streak = 0;
+  let cur = set.has(today) ? Date.now() : Date.now() - 86400000;
+  while (true) {
+    const key = new Date(cur).toISOString().slice(0, 10);
+    if (set.has(key)) { streak++; cur -= 86400000; } else break;
+  }
+  return streak;
+}
 
 const COLLECTION_META: Record<string, { icon: string; color: string; desc: string }> = {
   '30 Days of Powerful Words': { icon: '🏆', color: 'var(--primary)', desc: 'Essential IELTS vocabulary by topic' },
@@ -74,6 +96,7 @@ export default function HomePage() {
   const [workingOrder, setWorkingOrder] = useState<string[]>([]);
   const [switchFirst, setSwitchFirst] = useState<string | null>(null);
   const [showCustomize, setShowCustomize] = useState(false);
+  const [homeClasses, setHomeClasses] = useState<HomeClassSummary[]>([]);
   const [sectionOrder, setSectionOrder] = useState([
     'collections', 'reading', 'day_streak', 'total_xp', 'words',
     'daily_goal', 'level', 'wod',
@@ -192,6 +215,65 @@ export default function HomePage() {
     }
   }, [collectionsLoaded, collections]);
 
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const [{ data: taught }, { data: memberships }] = await Promise.all([
+        supabase.from('classes').select('id, name').eq('teacher_id', user.id),
+        supabase.from('class_members').select('class_id, class_xp').eq('student_id', user.id),
+      ]);
+      const taughtIds = new Set((taught ?? []).map((c: { id: string }) => c.id));
+      const cards: HomeClassSummary[] = [];
+
+      if (taught && taught.length > 0) {
+        const taughtList = taught.map((c: { id: string }) => c.id);
+        const today = new Date().toISOString().slice(0, 10);
+        const [{ data: memberRows }, { data: activeTodayRows }] = await Promise.all([
+          supabase.from('class_members').select('class_id').in('class_id', taughtList),
+          supabase.from('class_study_days').select('class_id').in('class_id', taughtList).eq('study_date', today),
+        ]);
+        const memberCount: Record<string, number> = {};
+        for (const r of memberRows ?? []) memberCount[r.class_id] = (memberCount[r.class_id] ?? 0) + 1;
+        const activeCount: Record<string, number> = {};
+        for (const r of activeTodayRows ?? []) activeCount[r.class_id] = (activeCount[r.class_id] ?? 0) + 1;
+        for (const c of taught) {
+          cards.push({ classId: c.id, className: c.name, isTeacher: true,
+            studentCount: memberCount[c.id] ?? 0, activeToday: activeCount[c.id] ?? 0,
+            classXP: 0, classStreak: 0, pendingHomework: 0 });
+        }
+      }
+
+      const studentMemberships = (memberships ?? []).filter((m: { class_id: string }) => !taughtIds.has(m.class_id));
+      if (studentMemberships.length > 0) {
+        const studentClassIds = studentMemberships.map((m: { class_id: string }) => m.class_id);
+        const xpMap: Record<string, number> = {};
+        for (const m of studentMemberships) xpMap[m.class_id] = m.class_xp ?? 0;
+        const [{ data: classNames }, { data: studyDays }, { data: pendingHw }] = await Promise.all([
+          supabase.from('classes').select('id, name').in('id', studentClassIds),
+          supabase.from('class_study_days').select('class_id, study_date')
+            .eq('student_id', user.id).in('class_id', studentClassIds)
+            .order('study_date', { ascending: false }).limit(60),
+          supabase.from('class_targets').select('class_id')
+            .eq('student_id', user.id).in('class_id', studentClassIds).is('completed_at', null),
+        ]);
+        const daysByClass: Record<string, string[]> = {};
+        for (const r of studyDays ?? []) {
+          if (!daysByClass[r.class_id]) daysByClass[r.class_id] = [];
+          daysByClass[r.class_id].push(r.study_date);
+        }
+        const pendingByClass: Record<string, number> = {};
+        for (const r of pendingHw ?? []) pendingByClass[r.class_id] = (pendingByClass[r.class_id] ?? 0) + 1;
+        for (const c of classNames ?? []) {
+          cards.push({ classId: c.id, className: c.name, isTeacher: false,
+            studentCount: 0, activeToday: 0,
+            classXP: xpMap[c.id] ?? 0,
+            classStreak: computeClassStreak(daysByClass[c.id] ?? []),
+            pendingHomework: pendingByClass[c.id] ?? 0 });
+        }
+      }
+      setHomeClasses(cards);
+    })();
+  }, [user]);
 
   const t = useTranslation();
   const levelInfo = getLevelInfo(xp);
@@ -701,6 +783,51 @@ export default function HomePage() {
           </>
         );
       })()}
+
+      {/* My Classes */}
+      {homeClasses.length > 0 && !hideClasses && (
+        <div className="space-y-3">
+          <h2 className="text-base font-bold text-[var(--text)]">My Classes</h2>
+          {homeClasses.map(card => (
+            <Link key={card.classId} href={`/classes/${card.classId}/home`} className="block">
+              <div
+                className="rounded-2xl px-4 py-3.5 flex items-center gap-3 hover:-translate-y-0.5 transition-transform"
+                style={{
+                  background: card.isTeacher
+                    ? 'linear-gradient(135deg, #0e7490, #22d3ee)'
+                    : 'linear-gradient(135deg, #5b21b6, #8b5cf6)',
+                  boxShadow: card.isTeacher
+                    ? '0 6px 0 #164e63, 0 10px 24px rgba(14,116,144,0.35)'
+                    : '0 6px 0 #3b0764, 0 10px 24px rgba(91,33,182,0.35)',
+                }}
+              >
+                <div className="flex-1 min-w-0">
+                  <p className="font-black text-white text-[15px] leading-tight truncate">
+                    {card.isTeacher ? '🏫' : '🎓'} {card.className}
+                  </p>
+                  {card.isTeacher ? (
+                    <>
+                      <span className="inline-block mt-1.5 text-[10px] font-bold bg-white/20 text-white rounded-full px-2 py-0.5">Teacher</span>
+                      <p className="text-xs text-white/70 mt-1.5">
+                        👨‍🎓 {card.studentCount} students &nbsp;·&nbsp; 🟢 {card.activeToday} active today
+                      </p>
+                    </>
+                  ) : (
+                    <div className="flex flex-wrap gap-1.5 mt-2">
+                      <span className="text-xs font-semibold bg-white/20 text-white rounded-full px-2.5 py-0.5">⚡ {card.classXP} XP</span>
+                      <span className="text-xs font-semibold bg-white/20 text-white rounded-full px-2.5 py-0.5">🔥 {card.classStreak} day streak</span>
+                      {card.pendingHomework > 0 && (
+                        <span className="text-xs font-semibold text-amber-300 bg-amber-500/25 rounded-full px-2.5 py-0.5">📋 {card.pendingHomework} pending</span>
+                      )}
+                    </div>
+                  )}
+                </div>
+                <span className="text-white/50 text-sm shrink-0">→</span>
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
 
       {/* Customize home modal */}
       {showCustomize && (
