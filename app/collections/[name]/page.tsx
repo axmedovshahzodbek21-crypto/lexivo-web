@@ -1,6 +1,6 @@
 'use client';
 import { use, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
 import { getUnitProgress, getLearnProgress, getHardWordCount, getFlashcardProgress, getStoryUnlockInfo, getSRSWords, getReviewLog, getLearnedWords } from '@/lib/storage';
@@ -38,6 +38,8 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
   const { name: encodedName } = use(params);
   const collectionName = decodeURIComponent(encodedName);
   const router = useRouter();
+  const sp = useSearchParams();
+  const doneOnly = sp.get('doneOnly') === 'true';
   const t = useTranslation();
   const { collections, collectionsLoaded } = useAppStore();
 
@@ -71,12 +73,15 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
     const found = collections.find(c => c.name === collectionName);
     if (!found) return;
     setCollection(found);
-    const rows: UnitRow[] = found.days.map(day => ({
+    const allRows: UnitRow[] = found.days.map(day => ({
       dayNumber: day.dayNumber,
       topic: day.topic || `Unit ${day.dayNumber}`,
       wordCount: day.words.length,
       progress: getUnitProgress(collectionName, day.dayNumber),
     }));
+    const rows = doneOnly
+      ? allRows.filter(r => r.progress.learnDone && r.progress.flashcardDone && r.progress.quizDone)
+      : allRows;
     setUnits(rows);
   }, [collectionsLoaded, collections, collectionName]);
 
@@ -212,19 +217,31 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
       </div>
 
       {/* ── Units grid ── */}
-      <div
-        className="flex-1 p-3 grid gap-3"
-        style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
-      >
-        {units.map((unit) => (
-          <UnitCard
-            key={unit.dayNumber}
-            unit={unit}
-            collectionName={collectionName}
-            heroGradient={hero.gradient}
-          />
-        ))}
-      </div>
+      {doneOnly && units.length === 0 ? (
+        <div className="flex-1 flex items-center justify-center p-8 text-center">
+          <div>
+            <div className="text-5xl mb-4">🎯</div>
+            <p className="font-bold text-[var(--text)] mb-1">No completed units yet</p>
+            <p className="text-sm text-[var(--text-muted)] leading-relaxed max-w-xs">
+              Complete Learn → Flashcards → Quiz for a unit to unlock it here.
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div
+          className="flex-1 p-3 grid gap-3"
+          style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
+        >
+          {units.map((unit) => (
+            <UnitCard
+              key={unit.dayNumber}
+              unit={unit}
+              collectionName={collectionName}
+              heroGradient={hero.gradient}
+            />
+          ))}
+        </div>
+      )}
 
       {/* ── Word Mastery Heatmap ── */}
       {heatmapLoaded && (

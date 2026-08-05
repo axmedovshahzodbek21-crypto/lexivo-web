@@ -106,7 +106,7 @@ export default function FreeTimePage() {
             {MAIN_COLLECTIONS.map(col => (
               <Link
                 key={col.slug}
-                href={`/collections/${encodeURIComponent(col.slug)}`}
+                href={`/collections/${encodeURIComponent(col.slug)}?doneOnly=true`}
                 className="flex items-center gap-3 p-4 rounded-2xl border transition-opacity hover:opacity-90"
                 style={{ background: 'var(--surface)', borderColor: `${col.color}30` }}
               >
