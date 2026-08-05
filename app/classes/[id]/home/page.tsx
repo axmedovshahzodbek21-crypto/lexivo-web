@@ -194,7 +194,7 @@ export default function ClassHomePage() {
               {isTeacher ? '👩‍🏫 Teacher' : '🎓 Student'}
             </span>
             <p className="text-sm text-white/75">
-              {isTeacher ? `${memberCount} students` : `👩‍🏫 ${teacherName}`}
+              {isTeacher ? `${memberCount} students` : `Taught by ${teacherName}`}
             </p>
           </div>
           {isTeacher && (
