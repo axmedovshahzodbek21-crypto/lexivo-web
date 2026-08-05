@@ -126,7 +126,7 @@ export default function CreatedClassesPage() {
         </button>
       </div>
 
-      <div className="p-4 space-y-3 max-w-2xl mx-auto w-full">
+      <div className="p-4 max-w-5xl mx-auto w-full">
         {loading ? (
           <SectionLoader />
         ) : myClasses.length === 0 ? (
@@ -135,42 +135,46 @@ export default function CreatedClassesPage() {
             <p className="text-base font-bold text-[var(--text)]">No classes yet</p>
             <p className="text-sm text-[var(--text-muted)]">Tap + Create to make your first class</p>
           </div>
-        ) : myClasses.map(cls => {
-          const { gradient, glow } = classGradient(cls.id);
-          return (
-            <div key={cls.id} className={`rounded-2xl overflow-hidden bg-gradient-to-br ${gradient} transition-transform hover:-translate-y-0.5`}
-              style={{ boxShadow: `0 6px 0 ${glow}88, 0 14px 32px ${glow}44` }}>
-              <div className="p-4 cursor-pointer" onClick={() => router.push(`/classes/${cls.id}/home`)}>
-                {renamingId === cls.id ? (
-                  <div className="flex items-center gap-2 mb-2">
-                    <input autoFocus value={renameText}
-                      onChange={e => setRenameText(e.target.value)}
-                      onKeyDown={e => { if (e.key === 'Enter') saveRename(cls.id); if (e.key === 'Escape') setRenamingId(null); }}
-                      onClick={e => e.stopPropagation()}
-                      className="flex-1 px-2 py-1 rounded-lg bg-black/20 text-white text-sm font-bold focus:outline-none" />
-                    <button onClick={e => { e.stopPropagation(); saveRename(cls.id); }} disabled={renaming} className="text-white/80 font-bold text-xs">✓</button>
-                    <button onClick={e => { e.stopPropagation(); setRenamingId(null); }} className="text-white/60 text-xs">✕</button>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {myClasses.map(cls => {
+              const { gradient, glow } = classGradient(cls.id);
+              return (
+                <div key={cls.id} className={`rounded-2xl overflow-hidden bg-gradient-to-br ${gradient} flex flex-col transition-all hover:-translate-y-1 duration-200`}
+                  style={{ boxShadow: `0 6px 0 ${glow}88, 0 14px 32px ${glow}44` }}>
+                  <div className="p-4 flex-1 cursor-pointer" onClick={() => router.push(`/classes/${cls.id}/home`)}>
+                    {renamingId === cls.id ? (
+                      <div className="flex items-center gap-2 mb-3">
+                        <input autoFocus value={renameText}
+                          onChange={e => setRenameText(e.target.value)}
+                          onKeyDown={e => { if (e.key === 'Enter') saveRename(cls.id); if (e.key === 'Escape') setRenamingId(null); }}
+                          onClick={e => e.stopPropagation()}
+                          className="flex-1 px-2 py-1 rounded-lg bg-black/20 text-white text-sm font-bold focus:outline-none" />
+                        <button onClick={e => { e.stopPropagation(); saveRename(cls.id); }} disabled={renaming} className="text-white/80 font-bold text-xs">✓</button>
+                        <button onClick={e => { e.stopPropagation(); setRenamingId(null); }} className="text-white/60 text-xs">✕</button>
+                      </div>
+                    ) : (
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <p className="text-lg font-black text-white leading-snug">{cls.name}</p>
+                        <button onClick={e => { e.stopPropagation(); setRenamingId(cls.id); setRenameText(cls.name); }} className="text-white/40 hover:text-white/80 text-sm transition-colors shrink-0 mt-0.5">✏️</button>
+                      </div>
+                    )}
+                    <p className="text-sm text-white/60 mb-4">👥 {cls.member_count ?? 0} student{(cls.member_count ?? 0) !== 1 ? 's' : ''}</p>
+                    <div className="flex items-center gap-2">
+                      <code className="text-xs font-black text-white bg-black/25 px-2.5 py-1 rounded-xl tracking-wider flex-1 text-center">{cls.join_code}</code>
+                      <button onClick={e => { e.stopPropagation(); copyCode(cls.join_code, cls.id); }} className="text-base transition-transform hover:scale-110 shrink-0">{copiedId === cls.id ? '✅' : '📋'}</button>
+                      <button onClick={e => { e.stopPropagation(); copyLink(cls.join_code, cls.id); }} className="text-base transition-transform hover:scale-110 shrink-0">{copiedLinkId === cls.id ? '✅' : '🔗'}</button>
+                    </div>
                   </div>
-                ) : (
-                  <div className="flex items-center gap-2 mb-1">
-                    <p className="text-xl font-black text-white leading-tight">{cls.name}</p>
-                    <button onClick={e => { e.stopPropagation(); setRenamingId(cls.id); setRenameText(cls.name); }} className="text-white/40 hover:text-white/80 text-sm transition-colors">✏️</button>
+                  <div className="bg-black/20 flex items-center justify-between px-4 py-2.5">
+                    <button onClick={e => { e.stopPropagation(); setDeleteConfirmId(cls.id); }} className="text-xs text-white/40 hover:text-red-300 transition-colors font-medium">Delete</button>
+                    <button onClick={() => router.push(`/classes/${cls.id}/home`)} className="text-xs font-black text-white bg-white/20 hover:bg-white/30 px-3.5 py-1.5 rounded-xl transition-colors">Enter →</button>
                   </div>
-                )}
-                <p className="text-sm text-white/60">👥 {cls.member_count ?? 0} student{(cls.member_count ?? 0) !== 1 ? 's' : ''}</p>
-                <div className="flex items-center gap-2 mt-3">
-                  <code className="text-xs font-black text-white bg-black/25 px-2.5 py-1 rounded-xl tracking-wider">{cls.join_code}</code>
-                  <button onClick={e => { e.stopPropagation(); copyCode(cls.join_code, cls.id); }} className="text-base transition-transform hover:scale-110">{copiedId === cls.id ? '✅' : '📋'}</button>
-                  <button onClick={e => { e.stopPropagation(); copyLink(cls.join_code, cls.id); }} className="text-base transition-transform hover:scale-110">{copiedLinkId === cls.id ? '✅' : '🔗'}</button>
                 </div>
-              </div>
-              <div className="bg-black/20 flex items-center justify-between px-4 py-2.5">
-                <button onClick={e => { e.stopPropagation(); setDeleteConfirmId(cls.id); }} className="text-xs text-white/40 hover:text-red-300 transition-colors font-medium">Delete</button>
-                <button onClick={() => router.push(`/classes/${cls.id}/home`)} className="text-xs font-black text-white bg-white/20 hover:bg-white/30 px-3.5 py-1.5 rounded-xl transition-colors">Enter →</button>
-              </div>
-            </div>
-          );
-        })}
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Delete Confirm */}
