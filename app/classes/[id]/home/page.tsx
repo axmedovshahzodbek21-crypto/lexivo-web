@@ -198,20 +198,10 @@ export default function ClassHomePage() {
     setShowStudents(true);
     setStudentsLoading(true);
     setStudentsError('');
-    const ids = memberIdsRef.current;
-    if (!ids.length) { setStudentsLoading(false); setStudentsError(`no member ids (ref empty)`); return; }
-    const [{ data: profs, error: profsErr }, { data: uData, error: uDataErr }] = await Promise.all([
-      supabase.from('profiles').select('id, name, avatar_url').in('id', ids),
-      supabase.from('user_data').select('id, total_xp, streak, last_study_date').in('id', ids),
-    ]);
-    if (profsErr) { setStudentsError(`profiles err: ${profsErr.message}`); setStudentsLoading(false); return; }
-    if (uDataErr) { setStudentsError(`user_data err: ${uDataErr.message}`); setStudentsLoading(false); return; }
-    if (!profs?.length) { setStudentsError(`ids=${ids.length} profs=0 udata=${uData?.length ?? 0}`); setStudentsLoading(false); return; }
-    const udMap = new Map((uData ?? []).map((u: { id: string; total_xp: number; streak: number; last_study_date: string | null }) => [u.id, u]));
-    const list: StudentProfile[] = (profs ?? []).map((p: { id: string; name: string; avatar_url: string | null }) => {
-      const u = udMap.get(p.id);
-      return { id: p.id, name: p.name ?? 'Student', avatar_url: p.avatar_url ?? null, xp: u?.total_xp ?? 0, streak: u?.streak ?? 0, last_study_date: u?.last_study_date ?? null, total_learned: 0 };
-    });
+    const { data, error } = await supabase.rpc('get_class_dashboard', { p_class_id: id });
+    if (error) { setStudentsError(error.message); setStudentsLoading(false); return; }
+    const list: StudentProfile[] = ((data ?? []) as { student_id: string; name: string; avatar_url: string | null; xp: number; streak: number; last_study_date: string | null; total_words: number }[])
+      .map(r => ({ id: r.student_id, name: r.name, avatar_url: r.avatar_url, xp: r.xp ?? 0, streak: r.streak ?? 0, last_study_date: r.last_study_date, total_learned: r.total_words ?? 0 }));
     list.sort((a, b) => b.xp - a.xp);
     setStudents(list);
     setStudentsLoading(false);
