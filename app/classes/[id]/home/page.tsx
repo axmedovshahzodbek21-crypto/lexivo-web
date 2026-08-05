@@ -135,7 +135,7 @@ export default function ClassHomePage() {
 
       const [{ data: profiles }, { data: reads }, { data: tgts }, { data: tProfile }] = await Promise.all([
         memberCount > 0
-          ? supabase.from('user_data').select('last_study_date').in('id', memberIds)
+          ? supabase.from('user_data').select('id, last_study_date').in('id', memberIds)
           : Promise.resolve({ data: [] as { last_study_date: string | null }[] }),
         teacher && annIds.length > 0
           ? supabase.from('class_announcement_reads').select('announcement_id').in('announcement_id', annIds)
@@ -202,14 +202,14 @@ export default function ClassHomePage() {
     if (!ids.length) { setStudentsLoading(false); setStudentsError(`no member ids (ref empty)`); return; }
     const [{ data: profs, error: profsErr }, { data: uData, error: uDataErr }] = await Promise.all([
       supabase.from('profiles').select('id, name, avatar_url').in('id', ids),
-      supabase.from('user_data').select('id, xp, streak, total_learned, last_study_date').in('id', ids),
+      supabase.from('user_data').select('id, total_xp, streak, last_study_date').in('id', ids),
     ]);
     if (profsErr) { setStudentsError(`profiles: ${profsErr.message}`); setStudentsLoading(false); return; }
     if (uDataErr) { setStudentsError(`user_data: ${uDataErr.message}`); setStudentsLoading(false); return; }
-    const udMap = new Map((uData ?? []).map((u: { id: string; xp: number; streak: number; total_learned: number; last_study_date: string | null }) => [u.id, u]));
+    const udMap = new Map((uData ?? []).map((u: { id: string; total_xp: number; streak: number; last_study_date: string | null }) => [u.id, u]));
     const list: StudentProfile[] = (profs ?? []).map((p: { id: string; name: string; avatar_url: string | null }) => {
       const u = udMap.get(p.id);
-      return { id: p.id, name: p.name ?? 'Student', avatar_url: p.avatar_url ?? null, xp: u?.xp ?? 0, streak: u?.streak ?? 0, last_study_date: u?.last_study_date ?? null, total_learned: u?.total_learned ?? 0 };
+      return { id: p.id, name: p.name ?? 'Student', avatar_url: p.avatar_url ?? null, xp: u?.total_xp ?? 0, streak: u?.streak ?? 0, last_study_date: u?.last_study_date ?? null, total_learned: 0 };
     });
     list.sort((a, b) => b.xp - a.xp);
     setStudents(list);
