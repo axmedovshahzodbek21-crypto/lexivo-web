@@ -389,6 +389,7 @@ function migrateReviewLogToPerWord() {
 export function checkAndUnlearn(today: string = localDateStr()): void {
   const srsWords = getSRSWords();
   const log = getReviewLog();
+  const lastReview = getSRSLastReview();
 
   const datesToUnlearn = new Set<string>();
 
@@ -397,7 +398,8 @@ export function checkAndUnlearn(today: string = localDateStr()): void {
     const nextInterval = SRS_INTERVALS.find(i => !completed.includes(i));
     if (nextInterval === undefined) continue; // graduated
 
-    const dueDate = addDaysToDateStr(w.learnedAt, nextInterval);
+    const baseDate = lastReview[w.id] ?? w.learnedAt;
+    const dueDate = addDaysToDateStr(baseDate, nextInterval);
     if (daysBetweenDateStrs(dueDate, today) >= 3) {
       datesToUnlearn.add(w.learnedAt);
     }
@@ -415,6 +417,7 @@ export function getDueWords(): DueSRSWord[] {
   checkAndUnlearn(today);
   const srsWords = getSRSWords();
   const log = getReviewLog();
+  const lastReview = getSRSLastReview();
 
   const result: DueSRSWord[] = [];
 
@@ -423,7 +426,8 @@ export function getDueWords(): DueSRSWord[] {
     const nextInterval = SRS_INTERVALS.find(i => !completed.includes(i));
     if (nextInterval === undefined) continue; // graduated
 
-    const dueDate = addDaysToDateStr(w.learnedAt, nextInterval);
+    const baseDate = lastReview[w.id] ?? w.learnedAt;
+    const dueDate = addDaysToDateStr(baseDate, nextInterval);
     if (dueDate > today) continue; // not yet due
 
     result.push({ ...w, dueInterval: nextInterval });
