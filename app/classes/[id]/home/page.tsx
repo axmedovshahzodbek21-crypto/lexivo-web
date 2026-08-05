@@ -6,6 +6,10 @@ import { useAuth } from '@/lib/auth-context';
 
 interface Announcement { id: string; message: string; created_at: string; }
 interface Target { id: string; title: string; due_date: string | null; completed_at: string | null; }
+interface StudentProfile {
+  id: string; name: string; avatar_url: string | null;
+  xp: number; streak: number; last_study_date: string | null; total_learned: number;
+}
 
 type HomeCache = {
   className: string; isTeacher: boolean; teacherName: string; teacherId: string; teacherBio: string;
@@ -75,6 +79,10 @@ export default function ClassHomePage() {
   const [teacherBio, setTeacherBio] = useState('');
   const [showTeacherBio, setShowTeacherBio] = useState(false);
   const [showHW, setShowHW] = useState(false);
+  const [showStudents, setShowStudents] = useState(false);
+  const [students, setStudents] = useState<StudentProfile[]>([]);
+  const [studentsLoading, setStudentsLoading] = useState(false);
+  const [studentsLoaded, setStudentsLoaded] = useState(false);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [targets, setTargets] = useState<Target[]>([]);
   const [wordCount, setWordCount] = useState(0);
@@ -184,6 +192,28 @@ export default function ClassHomePage() {
     })();
   }, [id, user, router]);
 
+  const openStudentsSheet = async () => {
+    setShowStudents(true);
+    if (studentsLoaded) return;
+    setStudentsLoading(true);
+    const { data: mems } = await supabase.from('class_members').select('student_id').eq('class_id', id);
+    const ids = (mems ?? []).map((m: { student_id: string }) => m.student_id);
+    if (!ids.length) { setStudentsLoading(false); setStudentsLoaded(true); return; }
+    const [{ data: profs }, { data: uData }] = await Promise.all([
+      supabase.from('profiles').select('id, name, avatar_url, last_study_date').in('id', ids),
+      supabase.from('user_data').select('id, xp, streak, total_learned').in('id', ids),
+    ]);
+    const pm = new Map((profs ?? []).map((p: { id: string; name: string; avatar_url: string | null; last_study_date: string | null }) => [p.id, p]));
+    const list: StudentProfile[] = (uData ?? []).map((u: { id: string; xp: number; streak: number; total_learned: number }) => {
+      const p = pm.get(u.id);
+      return { id: u.id, name: p?.name ?? 'Student', avatar_url: p?.avatar_url ?? null, xp: u.xp ?? 0, streak: u.streak ?? 0, last_study_date: p?.last_study_date ?? null, total_learned: u.total_learned ?? 0 };
+    });
+    list.sort((a, b) => b.xp - a.xp);
+    setStudents(list);
+    setStudentsLoaded(true);
+    setStudentsLoading(false);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -272,6 +302,61 @@ export default function ClassHomePage() {
           </div>
         </div>
       )}
+      {/* Students sheet (teacher only) */}
+      {showStudents && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setShowStudents(false)}>
+          <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl flex flex-col max-h-[90dvh]" onClick={e => e.stopPropagation()}>
+            <div className="pt-4 px-5 pb-3 shrink-0 border-b border-[var(--border)]">
+              <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto mb-3" />
+              <div className="flex items-center justify-between">
+                <h2 className="font-bold text-[var(--text)]">👥 Students</h2>
+                <span className="text-xs font-semibold text-[var(--text-muted)] bg-[var(--surface-2)] px-2.5 py-1 rounded-full">{memberCount}</span>
+              </div>
+            </div>
+            <div className="overflow-y-auto flex-1 px-5 py-3 space-y-2">
+              {studentsLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="w-7 h-7 border-2 border-[var(--primary)] border-t-transparent rounded-full animate-spin" />
+                </div>
+              ) : students.length === 0 ? (
+                <p className="text-center text-sm text-[var(--text-muted)] py-10">No students yet</p>
+              ) : students.map((s, i) => {
+                const today = new Date().toISOString().slice(0, 10);
+                const isActive = s.last_study_date === today;
+                return (
+                  <div key={s.id} className="flex items-center gap-3 p-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)]">
+                    <div className="w-7 h-7 rounded-xl flex items-center justify-center text-xs font-black shrink-0 bg-[var(--surface)] text-[var(--text-muted)]">{i + 1}</div>
+                    {s.avatar_url ? (
+                      <img src={s.avatar_url} alt={s.name} className="w-9 h-9 rounded-full object-cover shrink-0" />
+                    ) : (
+                      <div className="w-9 h-9 rounded-full flex items-center justify-center text-white font-black text-sm shrink-0"
+                        style={{ background: avatarColor(s.id) }}>
+                        {(s.name[0] || '?').toUpperCase()}
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <p className="font-bold text-sm truncate text-[var(--text)]">{s.name}</p>
+                        {isActive && (
+                          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full shrink-0" style={{ background: 'rgba(16,185,129,0.15)', color: 'var(--success)' }}>TODAY</span>
+                        )}
+                      </div>
+                      {s.streak > 0 && <p className="text-xs text-[var(--text-muted)]">🔥 {s.streak} day streak</p>}
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="text-sm font-black" style={{ color: 'var(--primary)' }}>{s.xp.toFixed(1)} XP</p>
+                      {s.total_learned > 0 && <p className="text-[10px] text-[var(--text-muted)]">{s.total_learned} words</p>}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="px-5 pb-5 pt-3 shrink-0">
+              <button onClick={() => setShowStudents(false)} className="w-full btn-ghost py-3 text-sm">Close</button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Hero */}
       <div
         className={`bg-gradient-to-br ${gradient} px-5 pt-6 pb-8 relative`}
@@ -294,7 +379,11 @@ export default function ClassHomePage() {
               {isTeacher ? 'Teacher' : '🎓 Student'}
             </span>
             <p className="text-sm text-white/75">
-              {isTeacher ? `${memberCount} students` : `Taught by ${teacherName}`}
+              {isTeacher ? (
+                <button onClick={openStudentsSheet} className="underline underline-offset-2 hover:opacity-80 transition-opacity active:scale-95">
+                  {memberCount} students
+                </button>
+              ) : `Taught by ${teacherName}`}
             </p>
           </div>
           {isTeacher && (
@@ -384,11 +473,12 @@ export default function ClassHomePage() {
             <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--text-muted)] mb-3">📊 Quick Stats</h2>
             <div className="grid grid-cols-3 gap-3">
               {[
-                { icon: '👥', value: memberCount, label: 'Students' },
-                { icon: '✅', value: activeToday, label: 'Active today' },
-                { icon: '📖', value: wordCount, label: 'Words' },
-              ].map(({ icon, value, label }) => (
-                <div key={label} className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-3 flex flex-col items-center gap-1">
+                { icon: '👥', value: memberCount, label: 'Students', onClick: openStudentsSheet },
+                { icon: '✅', value: activeToday, label: 'Active today', onClick: undefined },
+                { icon: '📖', value: wordCount, label: 'Words', onClick: undefined },
+              ].map(({ icon, value, label, onClick }) => (
+                <div key={label} onClick={onClick}
+                  className={`bg-[var(--surface)] border border-[var(--border)] rounded-xl p-3 flex flex-col items-center gap-1 ${onClick ? 'cursor-pointer hover:bg-[var(--surface-2)] active:scale-95 transition-all' : ''}`}>
                   <span className="text-xl">{icon}</span>
                   <span className="text-xl font-black text-[var(--text)]">{value}</span>
                   <span className="text-[10px] text-[var(--text-muted)] font-medium">{label}</span>
