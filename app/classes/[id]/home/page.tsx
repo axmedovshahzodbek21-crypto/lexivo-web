@@ -74,6 +74,7 @@ export default function ClassHomePage() {
   const [teacherId, setTeacherId] = useState('');
   const [teacherBio, setTeacherBio] = useState('');
   const [showTeacherBio, setShowTeacherBio] = useState(false);
+  const [showHW, setShowHW] = useState(false);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [targets, setTargets] = useState<Target[]>([]);
   const [wordCount, setWordCount] = useState(0);
@@ -194,6 +195,12 @@ export default function ClassHomePage() {
   const gradient = classGradient(id);
   const glow = GLOW[gradient] ?? '#6366f1';
   const pending = targets.filter(t => !t.completed_at);
+  const sortedPending = [...pending].sort((a, b) => {
+    if (!a.due_date && !b.due_date) return 0;
+    if (!a.due_date) return 1;
+    if (!b.due_date) return -1;
+    return a.due_date.localeCompare(b.due_date);
+  });
 
   return (
     <div className="flex flex-col min-h-screen animate-fade-in pb-6">
@@ -219,6 +226,49 @@ export default function ClassHomePage() {
               className="w-full py-3 rounded-xl text-sm font-medium text-[var(--text-muted)] hover:bg-[var(--surface-2)] transition-colors">
               Close
             </button>
+          </div>
+        </div>
+      )}
+      {/* Homework sheet */}
+      {showHW && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setShowHW(false)}>
+          <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl flex flex-col max-h-[85dvh]" onClick={e => e.stopPropagation()}>
+            <div className="pt-4 px-5 pb-3 shrink-0 border-b border-[var(--border)]">
+              <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto mb-3" />
+              <div className="flex items-center justify-between">
+                <h2 className="font-bold text-[var(--text)]">📋 Pending Homework</h2>
+                <span className="text-xs font-semibold text-[var(--text-muted)] bg-[var(--surface-2)] px-2.5 py-1 rounded-full">
+                  {sortedPending.length} task{sortedPending.length !== 1 ? 's' : ''}
+                </span>
+              </div>
+            </div>
+            <div className="overflow-y-auto flex-1 px-5 py-3 space-y-2">
+              {sortedPending.length === 0 ? (
+                <div className="text-center py-10 space-y-2">
+                  <p className="text-4xl">🎉</p>
+                  <p className="text-sm font-bold text-[var(--text)]">All caught up!</p>
+                  <p className="text-xs text-[var(--text-muted)]">No pending homework</p>
+                </div>
+              ) : sortedPending.map(t => {
+                const due = dueLabel(t.due_date);
+                return (
+                  <div key={t.id} className="flex items-start gap-3 p-3.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)]">
+                    <span className="text-lg mt-0.5 shrink-0">{due?.overdue ? '🔴' : '📌'}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-[var(--text)] leading-snug">{t.title}</p>
+                      {due ? (
+                        <p className={`text-xs mt-0.5 font-medium ${due.overdue ? 'text-red-500' : 'text-[var(--text-muted)]'}`}>{due.text}</p>
+                      ) : (
+                        <p className="text-xs mt-0.5 text-[var(--text-muted)]">No deadline</p>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="px-5 pb-5 pt-3 shrink-0">
+              <button onClick={() => setShowHW(false)} className="w-full btn-ghost py-3 text-sm">Close</button>
+            </div>
           </div>
         </div>
       )}
@@ -257,15 +307,17 @@ export default function ClassHomePage() {
           )}
         </div>
         <div className="flex flex-wrap gap-2 mb-3">
-          {[
-            `📖 ${wordCount} words`,
-            `✅ ${activeToday}/${memberCount} active`,
-            ...(!isTeacher ? [`📋 ${pending.length} pending`] : []),
-          ].map(label => (
-            <span key={label} className="text-xs font-semibold bg-black/20 text-white rounded-full px-3 py-1">
-              {label}
-            </span>
+          {[`📖 ${wordCount} words`, `✅ ${activeToday}/${memberCount} active`].map(label => (
+            <span key={label} className="text-xs font-semibold bg-black/20 text-white rounded-full px-3 py-1">{label}</span>
           ))}
+          {!isTeacher && (
+            <button
+              onClick={() => setShowHW(true)}
+              className="text-xs font-semibold bg-black/20 text-white rounded-full px-3 py-1 hover:bg-black/35 transition-colors active:scale-95"
+            >
+              📋 {pending.length} pending
+            </button>
+          )}
         </div>
         {memberCount > 0 && (
           <div>
