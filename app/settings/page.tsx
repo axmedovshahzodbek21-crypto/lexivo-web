@@ -45,13 +45,20 @@ export default function SettingsPage() {
   const [importMsg, setImportMsg] = useState('');
   const [pendingImport, setPendingImport] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [bio, setBio] = useState('');
 
   useEffect(() => {
     setThemeState(getTheme());
     setNotif(getNotifSettings());
     setPermission(getNotifPermission());
     setNotifSupported(isNotifSupported());
-    supabase.auth.getUser().then(({ data: { user } }) => setUserEmail(user?.email ?? null));
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUserEmail(user?.email ?? null);
+      if (user) {
+        supabase.from('profiles').select('bio').eq('id', user.id).maybeSingle()
+          .then(({ data }) => { if (data?.bio) setBio(data.bio); });
+      }
+    });
   }, []);
 
   const handleThemeSelect = (t: Theme) => {
@@ -235,8 +242,12 @@ export default function SettingsPage() {
     saveSettingsUpdatedAt(now);
     pushSettings();
     supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user && settings.name.trim()) {
-        supabase.from('profiles').upsert({ id: user.id, name: settings.name.trim() }, { onConflict: 'id' });
+      if (user) {
+        supabase.from('profiles').upsert({
+          id: user.id,
+          ...(settings.name.trim() && { name: settings.name.trim() }),
+          bio,
+        }, { onConflict: 'id' });
       }
     });
     setSaved(true);
@@ -290,6 +301,19 @@ export default function SettingsPage() {
             className="w-full px-4 py-3 rounded-xl bg-[var(--surface-2)] border-2 border-transparent focus:border-[var(--primary)] outline-none transition-colors"
             placeholder={t.settings.namePlaceholder}
           />
+        </div>
+
+        <div>
+          <label className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide block mb-1.5">Bio</label>
+          <textarea
+            value={bio}
+            onChange={e => setBio(e.target.value)}
+            rows={3}
+            maxLength={200}
+            className="w-full px-4 py-3 rounded-xl bg-[var(--surface-2)] border-2 border-transparent focus:border-[var(--primary)] outline-none transition-colors resize-none text-sm text-[var(--text)]"
+            placeholder="Tell others about yourself…"
+          />
+          <p className="text-[10px] text-[var(--text-muted)] mt-1">{bio.length}/200 · Shared on leaderboard and in classes</p>
         </div>
 
         <div>

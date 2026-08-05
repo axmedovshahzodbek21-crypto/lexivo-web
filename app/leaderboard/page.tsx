@@ -26,8 +26,15 @@ function todayStr() {
   return localDateStr();
 }
 
-function Avatar({ name, url, size = 40 }: { name: string; url: string | null; size?: number }) {
+const AVATAR_PALETTE = ['#6366f1','#8b5cf6','#06b6d4','#10b981','#f59e0b','#ef4444','#ec4899','#3b82f6'];
+function avatarColor(userId: string): string {
+  const hash = userId.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+  return AVATAR_PALETTE[hash % AVATAR_PALETTE.length];
+}
+
+function Avatar({ name, url, size = 40, userId }: { name: string; url: string | null; size?: number; userId: string }) {
   const initial = (name || '?').charAt(0).toUpperCase();
+  const bg = avatarColor(userId);
   if (url) {
     return (
       <img
@@ -41,7 +48,7 @@ function Avatar({ name, url, size = 40 }: { name: string; url: string | null; si
     <div
       style={{
         width: size, height: size, borderRadius: '50%', flexShrink: 0,
-        background: 'var(--primary)', color: 'white',
+        background: bg, color: 'white',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         fontWeight: 800, fontSize: size * 0.4,
       }}
@@ -117,6 +124,7 @@ export default function LeaderboardPage() {
 
   const myIndex = user ? entries.findIndex(e => e.user_id === user.id) : -1;
   const [selected, setSelected] = useState<LeaderboardEntry | null>(null);
+  const [selectedBio, setSelectedBio] = useState<string | null | undefined>(undefined);
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
   const [filter, setFilter] = useState<'all' | 'starred'>('all');
   const [calMonth, setCalMonth] = useState<{ year: number; month: number }>(() => {
@@ -131,6 +139,10 @@ export default function LeaderboardPage() {
 
   useEffect(() => {
     const n = new Date(); setCalMonth({ year: n.getFullYear(), month: n.getMonth() });
+    if (!selected) { setSelectedBio(undefined); return; }
+    setSelectedBio(undefined);
+    supabase.from('profiles').select('bio').eq('id', selected.user_id).maybeSingle()
+      .then(({ data }) => setSelectedBio(data?.bio ?? null));
   }, [selected?.user_id]);
 
   const toggleSave = async (targetId: string) => {
@@ -171,7 +183,7 @@ export default function LeaderboardPage() {
             <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-5 flex flex-col gap-4" onClick={e => e.stopPropagation()}>
               <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto" />
               <div className="flex flex-col items-center gap-2">
-                <Avatar name={selected.name} url={selected.avatar_url} size={56} />
+                <Avatar name={selected.name} url={selected.avatar_url} size={56} userId={selected.user_id} />
                 <div className="flex items-center gap-2">
                   <p className="text-lg font-bold text-[var(--text)]">{selected.name}</p>
                   {user && selected.user_id !== user.id && (
@@ -180,6 +192,13 @@ export default function LeaderboardPage() {
                     </button>
                   )}
                 </div>
+                {selectedBio !== undefined && (
+                  <div className="w-full bg-[var(--surface-2)] rounded-xl px-4 py-3">
+                    <p className="text-sm text-[var(--text-muted)] italic leading-relaxed text-center">
+                      {selectedBio || 'No bio yet'}
+                    </p>
+                  </div>
+                )}
               </div>
               {/* Stats grid */}
               <div className="grid grid-cols-2 gap-2">
@@ -348,7 +367,7 @@ export default function LeaderboardPage() {
                       className={`flex-1 flex flex-col items-center rounded-2xl pb-4 px-2 border-2 cursor-pointer transition-all hover:opacity-90 active:scale-95 ${pt}`}
                       style={{ background: bg, borderColor: isMe ? 'var(--primary)' : borderColor, boxShadow: isMe ? '0 0 0 2px var(--primary)' : undefined }}>
                       <div className={`text-${rank === 1 ? '3xl' : '2xl'} mb-2`}>{medal}</div>
-                      <Avatar name={e.name} url={e.avatar_url} size={avatarSize} />
+                      <Avatar name={e.name} url={e.avatar_url} size={avatarSize} userId={e.user_id} />
                       <p className="text-xs font-bold mt-2 text-center truncate w-full px-1" style={{ color: 'var(--text)' }}>
                         {savedIds.has(e.user_id) ? '⭐ ' : ''}{e.name}
                       </p>
@@ -382,7 +401,7 @@ export default function LeaderboardPage() {
                       style={rankChipStyle(rank, isMe)}>
                       {rank}
                     </div>
-                    <Avatar name={e.name} url={e.avatar_url} size={38} />
+                    <Avatar name={e.name} url={e.avatar_url} size={38} userId={e.user_id} />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
                         {savedIds.has(e.user_id) && <span className="text-sm leading-none">⭐</span>}

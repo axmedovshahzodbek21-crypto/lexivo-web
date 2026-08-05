@@ -73,6 +73,7 @@ export default function ProfilePage() {
   const [dueCount, setDueCount]       = useState(0);
   const [unlockedIds, setUnlockedIds] = useState<string[]>([]);
   const [profilePic, setProfilePic]   = useState<string | null>(null);
+  const [bio, setBio]                 = useState<string | null>(null);
   const [showXpModal, setShowXpModal] = useState(false);
   const [passwordSent, setPasswordSent] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -80,6 +81,12 @@ export default function ProfilePage() {
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase.from('profiles').select('bio').eq('id', user.id).maybeSingle()
+      .then(({ data }) => setBio(data?.bio ?? null));
+  }, [user?.id]);
 
   useEffect(() => {
     const load = () => {
@@ -277,6 +284,9 @@ export default function ProfilePage() {
               {settings.languageLevel} · {CEFR_LABELS[settings.languageLevel] ?? ''}
             </span>
           </div>
+          {bio && (
+            <p className="text-sm text-[var(--text-muted)] mt-2 max-w-xs leading-relaxed italic text-center">"{bio}"</p>
+          )}
           {/* Today's quick stats */}
           <div className="flex items-center gap-4 mt-4 text-sm">
             <div className="text-center">

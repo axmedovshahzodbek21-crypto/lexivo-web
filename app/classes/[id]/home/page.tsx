@@ -8,11 +8,17 @@ interface Announcement { id: string; message: string; created_at: string; }
 interface Target { id: string; title: string; due_date: string | null; completed_at: string | null; }
 
 type HomeCache = {
-  className: string; isTeacher: boolean; teacherName: string;
+  className: string; isTeacher: boolean; teacherName: string; teacherId: string; teacherBio: string;
   announcements: Announcement[]; targets: Target[];
   wordCount: number; memberCount: number; activeToday: number;
   needsAttention: number; readCounts: Record<string, number>;
 };
+
+const AVATAR_PALETTE = ['#6366f1','#8b5cf6','#06b6d4','#10b981','#f59e0b','#ef4444','#ec4899','#3b82f6'];
+function avatarColor(userId: string): string {
+  const hash = userId.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+  return AVATAR_PALETTE[hash % AVATAR_PALETTE.length];
+}
 const _homeCache = new Map<string, HomeCache>();
 
 function timeAgo(iso: string) {
@@ -65,6 +71,9 @@ export default function ClassHomePage() {
   const [className, setClassName] = useState('');
   const [isTeacher, setIsTeacher] = useState(false);
   const [teacherName, setTeacherName] = useState('');
+  const [teacherId, setTeacherId] = useState('');
+  const [teacherBio, setTeacherBio] = useState('');
+  const [showTeacherBio, setShowTeacherBio] = useState(false);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [targets, setTargets] = useState<Target[]>([]);
   const [wordCount, setWordCount] = useState(0);
@@ -81,6 +90,8 @@ export default function ClassHomePage() {
       setClassName(cached.className);
       setIsTeacher(cached.isTeacher);
       setTeacherName(cached.teacherName);
+      setTeacherId(cached.teacherId);
+      setTeacherBio(cached.teacherBio);
       setAnnouncements(cached.announcements);
       setTargets(cached.targets);
       setWordCount(cached.wordCount);
@@ -123,8 +134,8 @@ export default function ClassHomePage() {
               .eq('class_id', id).eq('student_id', user.id).order('created_at', { ascending: false })
           : Promise.resolve({ data: [] as Target[] }),
         !teacher
-          ? supabase.from('profiles').select('name').eq('id', cls.teacher_id).maybeSingle()
-          : Promise.resolve({ data: null as { name?: string } | null }),
+          ? supabase.from('profiles').select('name, bio').eq('id', cls.teacher_id).maybeSingle()
+          : Promise.resolve({ data: null as { name?: string; bio?: string } | null }),
       ]);
 
       const today = new Date().toISOString().slice(0, 10);
@@ -143,9 +154,12 @@ export default function ClassHomePage() {
           .upsert(annIds.map(aid => ({ announcement_id: aid, student_id: user.id })), { onConflict: 'announcement_id,student_id' });
       }
 
+      const tProfileData = tProfile as { name?: string; bio?: string } | null;
       const snapshot: HomeCache = {
         className: cls.name, isTeacher: teacher,
-        teacherName: (tProfile as { name?: string } | null)?.name ?? 'Teacher',
+        teacherName: tProfileData?.name ?? 'Teacher',
+        teacherId: cls.teacher_id,
+        teacherBio: tProfileData?.bio ?? '',
         announcements: (anns ?? []) as Announcement[],
         targets: (tgts ?? []) as Target[],
         wordCount: words?.length ?? 0, memberCount, activeToday, needsAttention,
@@ -156,6 +170,8 @@ export default function ClassHomePage() {
       setClassName(snapshot.className);
       setIsTeacher(snapshot.isTeacher);
       setTeacherName(snapshot.teacherName);
+      setTeacherId(snapshot.teacherId);
+      setTeacherBio(snapshot.teacherBio);
       setAnnouncements(snapshot.announcements);
       setTargets(snapshot.targets);
       setWordCount(snapshot.wordCount);
@@ -181,17 +197,51 @@ export default function ClassHomePage() {
 
   return (
     <div className="flex flex-col min-h-screen animate-fade-in pb-6">
+      {/* Teacher bio sheet */}
+      {showTeacherBio && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setShowTeacherBio(false)}>
+          <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-5 flex flex-col gap-4" onClick={e => e.stopPropagation()}>
+            <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto" />
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-16 h-16 rounded-full flex items-center justify-center text-white font-black text-2xl shadow-lg"
+                style={{ background: avatarColor(teacherId) }}>
+                {(teacherName[0] || 'T').toUpperCase()}
+              </div>
+              <p className="text-lg font-bold text-[var(--text)]">{teacherName}</p>
+              <span className="text-[10px] font-bold bg-[var(--primary-bg)] text-[var(--primary)] rounded-full px-2.5 py-0.5">Teacher</span>
+            </div>
+            <div className="bg-[var(--surface-2)] rounded-xl px-4 py-3">
+              <p className="text-sm leading-relaxed text-center" style={{ color: teacherBio ? 'var(--text)' : 'var(--text-muted)', fontStyle: teacherBio ? 'normal' : 'italic' }}>
+                {teacherBio || 'No bio yet'}
+              </p>
+            </div>
+            <button onClick={() => setShowTeacherBio(false)}
+              className="w-full py-3 rounded-xl text-sm font-medium text-[var(--text-muted)] hover:bg-[var(--surface-2)] transition-colors">
+              Close
+            </button>
+          </div>
+        </div>
+      )}
       {/* Hero */}
       <div
         className={`bg-gradient-to-br ${gradient} px-5 pt-6 pb-8 relative`}
         style={{ boxShadow: `0 8px 32px ${glow}55` }}
       >
         <div className="flex items-start gap-3 mb-4">
-          <span className="text-3xl">🏫</span>
+          {isTeacher ? (
+            <span className="text-3xl">🏫</span>
+          ) : (
+            <button onClick={() => setShowTeacherBio(true)} className="shrink-0 focus:outline-none active:scale-95 transition-transform" aria-label="View teacher profile">
+              <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-black text-xl border-2 border-white/30 shadow-md"
+                style={{ background: avatarColor(teacherId || id) }}>
+                {(teacherName[0] || 'T').toUpperCase()}
+              </div>
+            </button>
+          )}
           <div className="flex-1 min-w-0">
             <h1 className="text-xl font-black text-white leading-tight truncate">{className}</h1>
             <span className="inline-block text-[10px] font-bold bg-white/25 text-white rounded-full px-2.5 py-0.5 mt-0.5 mb-1">
-              {isTeacher ? '👩‍🏫 Teacher' : '🎓 Student'}
+              {isTeacher ? 'Teacher' : '🎓 Student'}
             </span>
             <p className="text-sm text-white/75">
               {isTeacher ? `${memberCount} students` : `Taught by ${teacherName}`}
