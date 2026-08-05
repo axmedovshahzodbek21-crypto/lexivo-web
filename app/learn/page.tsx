@@ -929,91 +929,41 @@ function LearnInner() {
           </div>
         )}
 
-        {/* Action buttons — anti-cheat state machine */}
-        {!isMarked && (
+        {/* Action buttons — normal state only; quiz states handled by full-screen overlay */}
+        {!isMarked && !inSpotCheck && !inQuizGate && (
           <div className="no-focus space-y-2">
-            {inSpotCheck && spotCheckWord ? (
-              /* ── Spot-check panel ── */
-              <div className="animate-fade-in space-y-2">
-                <p className="text-xs font-bold text-[var(--primary)] text-center uppercase tracking-wide">🔍 Spot check!</p>
-                <p className="text-sm font-semibold text-[var(--text)] text-center">
-                  What is the translation of <span className="text-[var(--primary)]">{spotCheckWord.word}</span>?
-                </p>
-                <div className="grid grid-cols-2 gap-2">
-                  {spotCheckOptions.map((opt, i) => {
-                    const isSelected = spotCheckSelected === i;
-                    const isCorrect = i === spotCheckCorrectIndex;
-                    const showResult = spotCheckSelected !== null;
-                    let cls = 'py-3 px-3 rounded-xl text-sm font-semibold border-2 transition-colors text-left press-3d ';
-                    if (showResult && isCorrect) cls += 'bg-green-500 border-green-500 text-white';
-                    else if (showResult && isSelected) cls += 'bg-red-500 border-red-500 text-white';
-                    else cls += 'border-[var(--border)] text-[var(--text)] hover:border-[var(--primary)]';
-                    return (
-                      <button key={i} onClick={() => selectSpotCheckAnswer(i)} disabled={spotCheckSelected !== null} className={cls}>
-                        {opt}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            ) : inQuizGate ? (
-              /* ── Quiz gate panel ── */
-              <div className="animate-fade-in space-y-2">
-                <p className="text-xs font-bold text-[var(--text-muted)] text-center">Quick check — what is the translation?</p>
-                <div className="grid grid-cols-2 gap-2">
-                  {gateOptions.map((opt, i) => {
-                    const isSelected = gateSelected === i;
-                    const isCorrect = i === gateCorrectIndex;
-                    const showResult = gateSelected !== null;
-                    let cls = 'py-3 px-3 rounded-xl text-sm font-semibold border-2 transition-colors text-left press-3d ';
-                    if (showResult && isCorrect) cls += 'bg-green-500 border-green-500 text-white';
-                    else if (showResult && isSelected) cls += 'bg-red-500 border-red-500 text-white';
-                    else cls += 'border-[var(--border)] text-[var(--text)] hover:border-[var(--primary)]';
-                    return (
-                      <button key={i} onClick={() => selectGateAnswer(i)} disabled={gateSelected !== null} className={cls}>
-                        {opt}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            ) : (
-              /* ── Normal action buttons ── */
-              <>
-                {showBack && (
-                  <div className="flex gap-3 animate-fade-in">
-                    <button
-                      onClick={markTooHard}
-                      className="flex-1 py-3.5 rounded-xl border-2 border-[var(--danger)] text-[var(--danger)] font-semibold text-sm hover:bg-red-50 transition-colors press-3d"
-                    >
-                      {t.learn.tooHard} <kbd className="ml-1 opacity-60 text-xs">H</kbd>
-                    </button>
-                    <button
-                      onClick={tryAdvanceCard}
-                      disabled={revealCountdown > 0}
-                      className="flex-[2] btn-primary py-3.5 text-center press-3d disabled:opacity-60"
-                    >
-                      {revealCountdown > 0 ? `⏳ ${revealCountdown}s` : <>{t.learn.gotIt} <kbd className="ml-1 opacity-60 text-xs">Space</kbd></>}
-                    </button>
-                  </div>
-                )}
+            {showBack && (
+              <div className="flex gap-3 animate-fade-in">
                 <button
-                  onClick={skipWord}
-                  className="w-full py-3 rounded-xl border-2 border-[var(--border)] text-[var(--text-muted)] font-semibold text-sm hover:border-orange-300 hover:text-orange-500 transition-colors press-3d"
+                  onClick={markTooHard}
+                  className="flex-1 py-3.5 rounded-xl border-2 border-[var(--danger)] text-[var(--danger)] font-semibold text-sm hover:bg-red-50 transition-colors press-3d"
                 >
-                  {t.common.skip} <kbd className="ml-1 opacity-60 text-xs">K</kbd>
+                  {t.learn.tooHard} <kbd className="ml-1 opacity-60 text-xs">H</kbd>
                 </button>
-                {showSkipTip && (
-                  <div className="flex items-start gap-2 bg-orange-50 border border-orange-200 rounded-xl px-3 py-2.5 animate-fade-in">
-                    <span className="text-base shrink-0 mt-0.5">⏭️</span>
-                    <div className="flex-1">
-                      <p className="text-xs font-semibold text-orange-700">{t.learn.skipTipTitle}</p>
-                      <p className="text-xs text-orange-600 mt-0.5">{t.learn.skipTipBody}</p>
-                    </div>
-                    <button onClick={dismissSkipTip} className="text-orange-400 hover:text-orange-600 text-sm font-bold shrink-0 mt-0.5" aria-label="Dismiss tip">✕</button>
-                  </div>
-                )}
-              </>
+                <button
+                  onClick={tryAdvanceCard}
+                  disabled={revealCountdown > 0}
+                  className="flex-[2] btn-primary py-3.5 text-center press-3d disabled:opacity-60"
+                >
+                  {revealCountdown > 0 ? `⏳ ${revealCountdown}s` : <>{t.learn.gotIt} <kbd className="ml-1 opacity-60 text-xs">Space</kbd></>}
+                </button>
+              </div>
+            )}
+            <button
+              onClick={skipWord}
+              className="w-full py-3 rounded-xl border-2 border-[var(--border)] text-[var(--text-muted)] font-semibold text-sm hover:border-orange-300 hover:text-orange-500 transition-colors press-3d"
+            >
+              {t.common.skip} <kbd className="ml-1 opacity-60 text-xs">K</kbd>
+            </button>
+            {showSkipTip && (
+              <div className="flex items-start gap-2 bg-orange-50 border border-orange-200 rounded-xl px-3 py-2.5 animate-fade-in">
+                <span className="text-base shrink-0 mt-0.5">⏭️</span>
+                <div className="flex-1">
+                  <p className="text-xs font-semibold text-orange-700">{t.learn.skipTipTitle}</p>
+                  <p className="text-xs text-orange-600 mt-0.5">{t.learn.skipTipBody}</p>
+                </div>
+                <button onClick={dismissSkipTip} className="text-orange-400 hover:text-orange-600 text-sm font-bold shrink-0 mt-0.5" aria-label="Dismiss tip">✕</button>
+              </div>
             )}
           </div>
         )}
@@ -1022,6 +972,52 @@ function LearnInner() {
           {t.learn.remaining(words.length - index - 1)} · <kbd>S</kbd> {t.learn.listenShort} · <kbd>H</kbd> {revealed ? t.learn.tooHardShort : t.learn.hintShort}{!revealed ? <> · <kbd>K</kbd> {t.learn.skipShort}</> : null}
         </div>
       </div>
+
+      {/* Full-screen quiz overlay */}
+      {(inSpotCheck || inQuizGate) && (() => {
+        const isSpot = inSpotCheck;
+        const word = isSpot ? (spotCheckWord?.word ?? '') : current.word;
+        const options = isSpot ? spotCheckOptions : gateOptions;
+        const correctIndex = isSpot ? spotCheckCorrectIndex : gateCorrectIndex;
+        const selected = isSpot ? spotCheckSelected : gateSelected;
+        return (
+          <div className="fixed inset-0 z-50 flex flex-col animate-fade-in" style={{ background: 'var(--bg)' }}>
+            <div className="flex flex-col flex-1 px-6 pt-10 pb-8 max-w-lg mx-auto w-full">
+              <p className="text-sm font-extrabold tracking-wide" style={{ color: 'var(--primary)' }}>
+                {isSpot ? '🔍  Spot Check' : '🎯  Quick Check'}
+              </p>
+              <div className="mt-7">
+                <p className="text-3xl font-black text-[var(--text)]">{word}</p>
+                <p className="text-sm text-[var(--text-muted)] mt-2">
+                  {isSpot ? 'What does this word mean?' : 'What is the translation?'}
+                </p>
+              </div>
+              <div className="flex-1" />
+              <div className="space-y-3">
+                {options.map((opt, i) => {
+                  const isSelected = selected === i;
+                  const isCorrect = i === correctIndex;
+                  const showResult = selected !== null;
+                  let cls = 'w-full py-4 px-5 rounded-2xl text-base font-bold border-2 text-left transition-colors press-3d ';
+                  if (showResult && isCorrect) cls += 'bg-green-500 border-green-500 text-white';
+                  else if (showResult && isSelected) cls += 'bg-red-500 border-red-500 text-white';
+                  else cls += 'border-[var(--border)] text-[var(--text)] hover:border-[var(--primary)]';
+                  return (
+                    <button
+                      key={i}
+                      onClick={() => isSpot ? selectSpotCheckAnswer(i) : selectGateAnswer(i)}
+                      disabled={selected !== null}
+                      className={cls}
+                    >
+                      {opt}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }
