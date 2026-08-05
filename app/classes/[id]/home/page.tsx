@@ -204,8 +204,9 @@ export default function ClassHomePage() {
       supabase.from('profiles').select('id, name, avatar_url').in('id', ids),
       supabase.from('user_data').select('id, total_xp, streak, last_study_date').in('id', ids),
     ]);
-    if (profsErr) { setStudentsError(`profiles: ${profsErr.message}`); setStudentsLoading(false); return; }
-    if (uDataErr) { setStudentsError(`user_data: ${uDataErr.message}`); setStudentsLoading(false); return; }
+    if (profsErr) { setStudentsError(`profiles err: ${profsErr.message}`); setStudentsLoading(false); return; }
+    if (uDataErr) { setStudentsError(`user_data err: ${uDataErr.message}`); setStudentsLoading(false); return; }
+    if (!profs?.length) { setStudentsError(`ids=${ids.length} profs=0 udata=${uData?.length ?? 0}`); setStudentsLoading(false); return; }
     const udMap = new Map((uData ?? []).map((u: { id: string; total_xp: number; streak: number; last_study_date: string | null }) => [u.id, u]));
     const list: StudentProfile[] = (profs ?? []).map((p: { id: string; name: string; avatar_url: string | null }) => {
       const u = udMap.get(p.id);
