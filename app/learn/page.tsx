@@ -620,7 +620,7 @@ function LearnInner() {
   if (done) {
     const backUrl = sourceClass
       ? `/classes/${classIdParam}/words`
-      : sourceClassHW ? '/classes'
+      : sourceClassHW ? (sp.get('hwId') ? `/classes/${sp.get('classId')}/homework/${sp.get('hwId')}` : '/classes')
       : hardOnly ? '/hard-words'
       : sourceMyWords ? (myCollection ? (myFolder ? `/my-words/${encodeURIComponent(myFolder)}/${encodeURIComponent(myCollection)}` : `/my-words/${encodeURIComponent(myCollection)}`) : '/my-words')
       : collectionName ? `/collections/${encodeURIComponent(collectionName)}`

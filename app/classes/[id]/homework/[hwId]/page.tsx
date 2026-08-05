@@ -49,7 +49,7 @@ type HWMeta = { unitName: string; modes: string[]; dueDate: string | null; words
 const _hwCache = new Map<string, HWMeta>();
 
 export default function UnitStudyHubPage() {
-  const { hwId } = useParams<{ id: string; hwId: string }>();
+  const { id: classId, hwId } = useParams<{ id: string; hwId: string }>();
   const { user } = useAuth();
   const router = useRouter();
 
@@ -189,24 +189,27 @@ export default function UnitStudyHubPage() {
     }));
     saveClassHWTemp(hwWords);
 
-    // Record progress optimistically
-    try {
-      await supabase.from('class_homework_progress').upsert({
-        homework_id: hwId,
-        student_id: user!.id,
-        mode,
-      }, { onConflict: 'homework_id,student_id,mode', ignoreDuplicates: true });
-      setCompletedModes(prev => new Set([...prev, mode]));
-    } catch (_) {}
+    // Record progress
+    const { error: progErr } = await supabase.from('class_homework_progress').upsert({
+      homework_id: hwId,
+      student_id: user!.id,
+      mode,
+    }, { onConflict: 'homework_id,student_id,mode', ignoreDuplicates: true });
+    if (!progErr) setCompletedModes(prev => new Set([...prev, mode]));
 
     const encodedName = encodeURIComponent(unitName);
+    const hwBack = `/classes/${classId}/homework/${hwId}`;
     const paths: Record<string, string> = {
-      learn: `/learn?source=class-hw&className=${encodedName}`,
-      flashcard: `/flashcards?source=class-hw&className=${encodedName}`,
-      quiz: `/quiz?source=class-hw&className=${encodedName}`,
-      match: `/matching?source=class-hw&className=${encodedName}`,
+      learn: `/learn?source=class-hw&className=${encodedName}&classId=${classId}&hwId=${hwId}`,
+      flashcard: `/flashcards?source=class-hw&className=${encodedName}&classId=${classId}&hwId=${hwId}`,
+      quiz: `/quiz?source=class-hw&className=${encodedName}&classId=${classId}&hwId=${hwId}`,
+      match: `/matching?source=class-hw&className=${encodedName}&classId=${classId}&hwId=${hwId}`,
     };
-    router.push(paths[mode] ?? '/');
+    if (progErr) {
+      // If progress save failed, still navigate but warn
+      console.error('Progress save failed:', progErr.message);
+    }
+    router.push(paths[mode] ?? hwBack);
   }
 
   if (loading) {
