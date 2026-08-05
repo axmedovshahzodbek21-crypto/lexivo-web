@@ -190,6 +190,9 @@ export default function ClassHomePage() {
           <span className="text-3xl">🏫</span>
           <div className="flex-1 min-w-0">
             <h1 className="text-xl font-black text-white leading-tight truncate">{className}</h1>
+            <span className="inline-block text-[10px] font-bold bg-white/25 text-white rounded-full px-2.5 py-0.5 mt-0.5 mb-1">
+              {isTeacher ? '👩‍🏫 Teacher' : '🎓 Student'}
+            </span>
             <p className="text-sm text-white/75">
               {isTeacher ? `${memberCount} students` : `👩‍🏫 ${teacherName}`}
             </p>
