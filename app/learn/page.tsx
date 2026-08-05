@@ -981,33 +981,37 @@ function LearnInner() {
         const correctIndex = isSpot ? spotCheckCorrectIndex : gateCorrectIndex;
         const selected = isSpot ? spotCheckSelected : gateSelected;
         return (
-          <div className="fixed inset-0 z-50 flex flex-col animate-fade-in" style={{ background: 'var(--bg)' }}>
-            <div className="flex flex-col flex-1 px-6 pt-10 pb-8 max-w-lg mx-auto w-full">
-              <p className="text-sm font-extrabold tracking-wide" style={{ color: 'var(--primary)' }}>
+          <div className="fixed inset-0 z-50 flex flex-col animate-fade-in" style={{ backgroundColor: 'var(--surface)' }}>
+            <div className="flex flex-col flex-1 px-5 pt-12 pb-8 max-w-lg mx-auto w-full">
+              <p className="text-xs font-extrabold tracking-widest uppercase mb-6" style={{ color: 'var(--primary)' }}>
                 {isSpot ? '🔍  Spot Check' : '🎯  Quick Check'}
               </p>
-              <div className="mt-7">
-                <p className="text-3xl font-black text-[var(--text)]">{word}</p>
-                <p className="text-sm text-[var(--text-muted)] mt-2">
+
+              {/* Question box */}
+              <div className="w-full rounded-2xl p-5 mb-6" style={{ background: 'var(--surface-2)', border: '2px solid var(--border)' }}>
+                <p className="text-2xl font-black" style={{ color: 'var(--text)' }}>{word}</p>
+                <p className="text-sm mt-1.5" style={{ color: 'var(--text-muted)' }}>
                   {isSpot ? 'What does this word mean?' : 'What is the translation?'}
                 </p>
               </div>
-              <div className="flex-1" />
-              <div className="space-y-3">
+
+              {/* 2×2 answer grid */}
+              <div className="grid grid-cols-2 gap-3">
                 {options.map((opt, i) => {
-                  const isSelected = selected === i;
                   const isCorrect = i === correctIndex;
                   const showResult = selected !== null;
-                  let cls = 'w-full py-4 px-5 rounded-2xl text-base font-bold border-2 text-left transition-colors press-3d ';
-                  if (showResult && isCorrect) cls += 'bg-green-500 border-green-500 text-white';
-                  else if (showResult && isSelected) cls += 'bg-red-500 border-red-500 text-white';
-                  else cls += 'border-[var(--border)] text-[var(--text)] hover:border-[var(--primary)]';
+                  let bg = 'var(--surface-2)';
+                  let border = 'var(--border)';
+                  let color = 'var(--text)';
+                  if (showResult && isCorrect) { bg = '#22c55e'; border = '#22c55e'; color = '#fff'; }
+                  else if (showResult && selected === i) { bg = '#ef4444'; border = '#ef4444'; color = '#fff'; }
                   return (
                     <button
                       key={i}
                       onClick={() => isSpot ? selectSpotCheckAnswer(i) : selectGateAnswer(i)}
                       disabled={selected !== null}
-                      className={cls}
+                      className="py-5 px-4 rounded-2xl text-sm font-semibold text-left transition-colors press-3d"
+                      style={{ background: bg, border: `2px solid ${border}`, color }}
                     >
                       {opt}
                     </button>
