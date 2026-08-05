@@ -17,11 +17,15 @@ const CARD_COLORS = [
   '#3D8BFF','#FF5E57','#00C9A7','#FFC75F',
 ];
 
+// Module-level cache — survives navigation within the same tab session
+const _cache: Record<string, Folder[]> = {};
+
 export default function LibraryPage() {
   const { user } = useAuth();
   const router = useRouter();
-  const [folders, setFolders] = useState<Folder[]>([]);
-  const [loading, setLoading] = useState(true);
+  const cached = user ? (_cache[user.id] ?? null) : null;
+  const [folders, setFolders] = useState<Folder[]>(cached ?? []);
+  const [loading, setLoading] = useState(cached === null);
   const [creating, setCreating] = useState(false);
   const [newName, setNewName] = useState('');
   const [showCreate, setShowCreate] = useState(false);
@@ -35,18 +39,19 @@ export default function LibraryPage() {
 
   async function load() {
     if (!user) return;
-    setLoading(true);
     const { data } = await supabase
       .from('teacher_folders')
       .select('id, name, teacher_units(count)')
       .eq('teacher_id', user.id)
       .order('position')
       .order('created_at');
-    setFolders((data ?? []).map((f: any) => ({
+    const result = (data ?? []).map((f: any) => ({
       id: f.id,
       name: f.name,
       unit_count: f.teacher_units?.[0]?.count ?? 0,
-    })));
+    }));
+    _cache[user.id] = result;
+    setFolders(result);
     setLoading(false);
   }
 

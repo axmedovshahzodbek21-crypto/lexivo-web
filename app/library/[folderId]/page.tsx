@@ -17,15 +17,19 @@ const CARD_COLORS = [
   '#3D8BFF','#FF5E57','#00C9A7','#FFC75F',
 ];
 
+// Module-level cache keyed by folderId
+const _cache: Record<string, { name: string; units: Unit[] }> = {};
+
 export default function FolderPage() {
   const { user } = useAuth();
   const router = useRouter();
   const params = useParams();
   const folderId = params.folderId as string;
 
-  const [folderName, setFolderName] = useState('');
-  const [units, setUnits] = useState<Unit[]>([]);
-  const [loading, setLoading] = useState(true);
+  const cached = _cache[folderId] ?? null;
+  const [folderName, setFolderName] = useState(cached?.name ?? '');
+  const [units, setUnits] = useState<Unit[]>(cached?.units ?? []);
+  const [loading, setLoading] = useState(cached === null);
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState('');
   const [creating, setCreating] = useState(false);
@@ -39,17 +43,19 @@ export default function FolderPage() {
 
   async function load() {
     if (!user) return;
-    setLoading(true);
     const [folderRes, unitsRes] = await Promise.all([
       supabase.from('teacher_folders').select('name').eq('id', folderId).single(),
       supabase.from('teacher_units').select('id, name, teacher_unit_words(count)').eq('folder_id', folderId).order('position').order('created_at'),
     ]);
-    setFolderName(folderRes.data?.name ?? '');
-    setUnits((unitsRes.data ?? []).map((u: any) => ({
+    const name = folderRes.data?.name ?? '';
+    const result = (unitsRes.data ?? []).map((u: any) => ({
       id: u.id,
       name: u.name,
       word_count: u.teacher_unit_words?.[0]?.count ?? 0,
-    })));
+    }));
+    _cache[folderId] = { name, units: result };
+    setFolderName(name);
+    setUnits(result);
     setLoading(false);
   }
 
