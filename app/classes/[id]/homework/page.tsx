@@ -61,19 +61,35 @@ function dueLabel(due: string | null): { text: string; overdue: boolean } | null
 
 const MODE_ICON: Record<string, string> = { learn: '📖', flashcard: '🃏', quiz: '🧠', match: '🎯' };
 
+type CachedHW = {
+  isTeacher: boolean;
+  folders: AssignedFolder[];
+  cwUnits: CWUnit[];
+  collHwItems: CollHW[];
+  completedModes: Record<string, string[]>;
+  totalAssigned: number;
+  totalDone: number;
+};
+const _cache: Record<string, CachedHW> = {};
+
 export default function ClassHomeworkPage() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const router = useRouter();
 
-  const [loading, setLoading] = useState(true);
-  const [isTeacher, setIsTeacher] = useState(false);
-  const [folders, setFolders] = useState<AssignedFolder[]>([]);
-  const [cwUnits, setCwUnits] = useState<CWUnit[]>([]);
-  const [collHwItems, setCollHwItems] = useState<CollHW[]>([]);
-  const [completedModes, setCompletedModes] = useState<Record<string, Set<string>>>({});
-  const [totalAssigned, setTotalAssigned] = useState(0);
-  const [totalDone, setTotalDone] = useState(0);
+  const cacheKey = user ? `${user.id}:${id}` : null;
+  const cached = cacheKey ? (_cache[cacheKey] ?? null) : null;
+
+  const [loading, setLoading] = useState(cached === null);
+  const [isTeacher, setIsTeacher] = useState(cached?.isTeacher ?? false);
+  const [folders, setFolders] = useState<AssignedFolder[]>(cached?.folders ?? []);
+  const [cwUnits, setCwUnits] = useState<CWUnit[]>(cached?.cwUnits ?? []);
+  const [collHwItems, setCollHwItems] = useState<CollHW[]>(cached?.collHwItems ?? []);
+  const [completedModes, setCompletedModes] = useState<Record<string, Set<string>>>(
+    cached ? Object.fromEntries(Object.entries(cached.completedModes).map(([k, v]) => [k, new Set(v)])) : {}
+  );
+  const [totalAssigned, setTotalAssigned] = useState(cached?.totalAssigned ?? 0);
+  const [totalDone, setTotalDone] = useState(cached?.totalDone ?? 0);
 
   useEffect(() => {
     if (!user) return;
@@ -81,13 +97,15 @@ export default function ClassHomeworkPage() {
   }, [user, id]);
 
   async function load() {
-    setLoading(true);
-
     const { data: cls } = await supabase.from('classes').select('teacher_id').eq('id', id).maybeSingle();
     const teacher = cls?.teacher_id === user!.id;
     setIsTeacher(teacher);
 
-    if (teacher) { setLoading(false); return; }
+    if (teacher) {
+      if (cacheKey) _cache[cacheKey] = { isTeacher: true, folders: [], cwUnits: [], collHwItems: [], completedModes: {}, totalAssigned: 0, totalDone: 0 };
+      setLoading(false);
+      return;
+    }
 
     const userId = user!.id;
 
@@ -208,6 +226,16 @@ export default function ClassHomeworkPage() {
       assigned++;
       if (h.hwModes.every(m => (modeMap[h.id] ?? new Set()).has(m))) done++;
     }
+
+    if (cacheKey) _cache[cacheKey] = {
+      isTeacher: false,
+      folders: built,
+      cwUnits: builtCW,
+      collHwItems: collItems,
+      completedModes: Object.fromEntries(Object.entries(modeMap).map(([k, v]) => [k, [...v]])),
+      totalAssigned: assigned,
+      totalDone: done,
+    };
 
     setFolders(built);
     setCwUnits(builtCW);
