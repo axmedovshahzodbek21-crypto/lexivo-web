@@ -234,6 +234,11 @@ export default function SettingsPage() {
     saveLevelUpdatedAt(now);
     saveSettingsUpdatedAt(now);
     pushSettings();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user && settings.name.trim()) {
+        supabase.from('profiles').upsert({ id: user.id, name: settings.name.trim() }, { onConflict: 'id' });
+      }
+    });
     setSaved(true);
     setTimeout(() => { setSaved(false); router.back(); }, 1000);
   };
