@@ -45,6 +45,9 @@ function dueLabel(due: string | null): { text: string; overdue: boolean } | null
   return { text: `Due ${due}`, overdue: false };
 }
 
+type HWMeta = { unitName: string; modes: string[]; dueDate: string | null; words: UnitWord[] };
+const _hwCache = new Map<string, HWMeta>();
+
 export default function UnitStudyHubPage() {
   const { hwId } = useParams<{ id: string; hwId: string }>();
   const { user } = useAuth();
@@ -64,19 +67,37 @@ export default function UnitStudyHubPage() {
   }, [user, hwId]);
 
   async function load() {
-    setLoading(true);
+    const cached = _hwCache.get(hwId);
+    if (cached) {
+      setUnitName(cached.unitName);
+      setModes(cached.modes);
+      setDueDate(cached.dueDate);
+      setWords(cached.words);
+      setLoading(false);
+    } else {
+      setLoading(true);
+    }
+
+    // Always fetch progress fresh; fetch metadata only if not cached
     const [hwRes, progRes] = await Promise.all([
-      supabase
-        .from('class_homework')
-        .select('unit_id, class_unit_id, collection_name, day_number, modes, due_date, student_ids, teacher_units(name), class_word_units(name)')
-        .eq('id', hwId)
-        .single(),
+      cached
+        ? Promise.resolve({ data: null })
+        : supabase
+            .from('class_homework')
+            .select('unit_id, class_unit_id, collection_name, day_number, modes, due_date, student_ids, teacher_units(name), class_word_units(name)')
+            .eq('id', hwId)
+            .single(),
       supabase
         .from('class_homework_progress')
         .select('mode')
         .eq('homework_id', hwId)
         .eq('student_id', user!.id),
     ]);
+
+    const done = new Set((progRes.data ?? []).map((p: any) => p.mode as string));
+    setCompletedModes(done);
+
+    if (cached) { setLoading(false); return; }
 
     const hw = hwRes.data;
     if (!hw) { setLoading(false); return; }
@@ -137,13 +158,11 @@ export default function UnitStudyHubPage() {
       }));
     }
 
-    const done = new Set((progRes.data ?? []).map((p: any) => p.mode as string));
-
+    _hwCache.set(hwId, { unitName: name, modes: hwModes, dueDate: due, words: unitWords });
     setUnitName(name);
     setModes(hwModes);
     setDueDate(due);
     setWords(unitWords);
-    setCompletedModes(done);
     setLoading(false);
   }
 
