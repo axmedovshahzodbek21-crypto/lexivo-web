@@ -180,8 +180,11 @@ export default function LeaderboardPage() {
         }).filter(Boolean).length;
         return (
           <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setSelected(null)}>
-            <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-5 flex flex-col gap-4" onClick={e => e.stopPropagation()}>
-              <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto" />
+            <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl flex flex-col max-h-[90dvh]" onClick={e => e.stopPropagation()}>
+              <div className="pt-4 px-5 pb-1 shrink-0">
+                <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto" />
+              </div>
+              <div className="overflow-y-auto flex-1 px-5 pb-2 flex flex-col gap-4">
               <div className="flex flex-col items-center gap-2">
                 <Avatar name={selected.name} url={selected.avatar_url} size={56} userId={selected.user_id} />
                 <div className="flex items-center gap-2">
@@ -287,7 +290,10 @@ export default function LeaderboardPage() {
                   <div className="flex items-center gap-1"><div className="w-2.5 h-2.5 rounded-full" style={{ background: '#059669' }} /><span className="text-[10px] text-[var(--text-muted)]">Daily goal</span></div>
                 </div>
               </div>
-              <button onClick={() => setSelected(null)} className="w-full btn-ghost py-3 text-sm">Close</button>
+              </div>
+              <div className="px-5 pb-5 pt-2 shrink-0">
+                <button onClick={() => setSelected(null)} className="w-full btn-ghost py-3 text-sm">Close</button>
+              </div>
             </div>
           </div>
         );
