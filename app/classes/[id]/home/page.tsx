@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
@@ -82,6 +82,8 @@ export default function ClassHomePage() {
   const [showStudents, setShowStudents] = useState(false);
   const [students, setStudents] = useState<StudentProfile[]>([]);
   const [studentsLoading, setStudentsLoading] = useState(false);
+  const [studentsError, setStudentsError] = useState('');
+  const memberIdsRef = useRef<string[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [targets, setTargets] = useState<Target[]>([]);
   const [wordCount, setWordCount] = useState(0);
@@ -128,6 +130,7 @@ export default function ClassHomePage() {
 
       const memberCount = members?.length ?? 0;
       const memberIds = (members ?? []).map((m: { student_id: string }) => m.student_id);
+      memberIdsRef.current = memberIds;
       const annIds = ((anns ?? []) as Announcement[]).map(a => a.id);
 
       const [{ data: profiles }, { data: reads }, { data: tgts }, { data: tProfile }] = await Promise.all([
@@ -194,13 +197,15 @@ export default function ClassHomePage() {
   const openStudentsSheet = async () => {
     setShowStudents(true);
     setStudentsLoading(true);
-    const { data: mems } = await supabase.from('class_members').select('student_id').eq('class_id', id);
-    const ids = (mems ?? []).map((m: { student_id: string }) => m.student_id);
-    if (!ids.length) { setStudentsLoading(false); return; }
-    const [{ data: profs }, { data: uData }] = await Promise.all([
+    setStudentsError('');
+    const ids = memberIdsRef.current;
+    if (!ids.length) { setStudentsLoading(false); setStudentsError(`no member ids (ref empty)`); return; }
+    const [{ data: profs, error: profsErr }, { data: uData, error: uDataErr }] = await Promise.all([
       supabase.from('profiles').select('id, name, avatar_url, last_study_date').in('id', ids),
       supabase.from('user_data').select('id, xp, streak, total_learned').in('id', ids),
     ]);
+    if (profsErr) { setStudentsError(`profiles: ${profsErr.message}`); setStudentsLoading(false); return; }
+    if (uDataErr) console.warn('user_data error:', uDataErr.message);
     const udMap = new Map((uData ?? []).map((u: { id: string; xp: number; streak: number; total_learned: number }) => [u.id, u]));
     const list: StudentProfile[] = (profs ?? []).map((p: { id: string; name: string; avatar_url: string | null; last_study_date: string | null }) => {
       const u = udMap.get(p.id);
@@ -315,6 +320,8 @@ export default function ClassHomePage() {
                 <div className="flex items-center justify-center py-12">
                   <div className="w-7 h-7 border-2 border-[var(--primary)] border-t-transparent rounded-full animate-spin" />
                 </div>
+              ) : studentsError ? (
+                <p className="text-center text-xs text-red-400 py-10 break-all px-2">{studentsError}</p>
               ) : students.length === 0 ? (
                 <p className="text-center text-sm text-[var(--text-muted)] py-10">No students yet</p>
               ) : students.map((s, i) => {
