@@ -203,10 +203,10 @@ export default function ClassHomePage() {
       supabase.from('profiles').select('id, name, avatar_url, last_study_date').in('id', ids),
       supabase.from('user_data').select('id, xp, streak, total_learned').in('id', ids),
     ]);
-    const pm = new Map((profs ?? []).map((p: { id: string; name: string; avatar_url: string | null; last_study_date: string | null }) => [p.id, p]));
-    const list: StudentProfile[] = (uData ?? []).map((u: { id: string; xp: number; streak: number; total_learned: number }) => {
-      const p = pm.get(u.id);
-      return { id: u.id, name: p?.name ?? 'Student', avatar_url: p?.avatar_url ?? null, xp: u.xp ?? 0, streak: u.streak ?? 0, last_study_date: p?.last_study_date ?? null, total_learned: u.total_learned ?? 0 };
+    const udMap = new Map((uData ?? []).map((u: { id: string; xp: number; streak: number; total_learned: number }) => [u.id, u]));
+    const list: StudentProfile[] = (profs ?? []).map((p: { id: string; name: string; avatar_url: string | null; last_study_date: string | null }) => {
+      const u = udMap.get(p.id);
+      return { id: p.id, name: p.name ?? 'Student', avatar_url: p.avatar_url ?? null, xp: u?.xp ?? 0, streak: u?.streak ?? 0, last_study_date: p.last_study_date ?? null, total_learned: u?.total_learned ?? 0 };
     });
     list.sort((a, b) => b.xp - a.xp);
     setStudents(list);
