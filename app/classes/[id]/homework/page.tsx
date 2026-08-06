@@ -250,6 +250,17 @@ export default function ClassHomeworkPage() {
     setFolders(prev => prev.map(f => f.id === folderId ? { ...f, showAll: !f.showAll } : f));
   }
 
+  const collFolders: { name: string; items: CollHW[] }[] = [];
+  for (const item of collHwItems) {
+    let folder = collFolders.find(f => f.name === item.collectionName);
+    if (!folder) {
+      folder = { name: item.collectionName, items: [] };
+      collFolders.push(folder);
+    }
+    folder.items.push(item);
+  }
+  for (const folder of collFolders) folder.items.sort((a, b) => a.dayNumber - b.dayNumber);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -474,23 +485,23 @@ export default function ClassHomeworkPage() {
           </div>
         )}
 
-        {/* Collections section */}
-        {collHwItems.length > 0 && (
+        {/* Collections section — grouped into folders, one per collection */}
+        {collFolders.length > 0 && (
           <div className="mt-2">
             <div className="flex items-center gap-2 mb-2 px-1">
               <span className="text-xs">📗</span>
               <p className="flex-1 text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">Collections</p>
             </div>
             <div className="space-y-2">
-              {collHwItems.map(item => {
-                const modes = item.hwModes;
-                const completed = completedModes[item.id] ?? new Set();
-                const allDone = modes.length > 0 && modes.every(m => completed.has(m));
-                const due = dueLabel(item.hwDue);
+              {collFolders.map(folder => {
+                const doneCount = folder.items.filter(item =>
+                  item.hwModes.length > 0 && item.hwModes.every(m => (completedModes[item.id] ?? new Set()).has(m))
+                ).length;
+                const allDone = doneCount === folder.items.length;
                 return (
                   <button
-                    key={item.id}
-                    onClick={() => router.push(`/classes/${id}/homework/${item.id}`)}
+                    key={folder.name}
+                    onClick={() => router.push(`/classes/${id}/homework/collection/${encodeURIComponent(folder.name)}`)}
                     className={`w-full flex items-center gap-3 p-4 rounded-2xl border text-left transition-all active:scale-[0.98] ${
                       allDone
                         ? 'bg-green-50 border-green-200 dark:bg-green-950/30 dark:border-green-800'
@@ -508,19 +519,11 @@ export default function ClassHomeworkPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className={`text-sm font-bold truncate ${allDone ? 'text-green-700 dark:text-green-400' : 'text-[var(--text)]'}`}>
-                        {item.collectionName} · Day {item.dayNumber}
+                        {folder.name}
                       </p>
-                      <p className="text-xs text-[var(--text-muted)] truncate">{item.topic} · {item.wordCount} words</p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <div className="flex gap-1">
-                          {modes.map(m => (
-                            <span key={m} className="text-sm" style={{ opacity: completed.has(m) ? 1 : 0.3 }}>{MODE_ICON[m] ?? m}</span>
-                          ))}
-                        </div>
-                        {due && (
-                          <span className={`text-[10px] font-semibold ${due.overdue ? 'text-red-500' : 'text-[var(--text-muted)]'}`}>{due.text}</span>
-                        )}
-                      </div>
+                      <p className="text-xs text-[var(--text-muted)] truncate">
+                        {folder.items.length} unit{folder.items.length !== 1 ? 's' : ''} assigned · {doneCount}/{folder.items.length} done
+                      </p>
                     </div>
                     <svg className="w-4 h-4 text-[var(--text-muted)] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

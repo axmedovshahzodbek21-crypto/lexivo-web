@@ -1,6 +1,6 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { saveClassHWTemp } from '@/lib/storage';
@@ -47,6 +47,7 @@ export default function UnitStudyHubPage() {
   const { id: classId, hwId } = useParams<{ id: string; hwId: string }>();
   const { user } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [loading, setLoading] = useState(true);
   const [unitName, setUnitName] = useState('');
@@ -56,11 +57,25 @@ export default function UnitStudyHubPage() {
   const [completedModes, setCompletedModes] = useState<Set<string>>(new Set());
   const [navigating, setNavigating] = useState<string | null>(null);
   const [progressError, setProgressError] = useState<string | null>(null);
+  const autoStartedRef = useRef(false);
 
   useEffect(() => {
     if (!user) return;
     load();
   }, [user, hwId]);
+
+  // Support ?mode=learn deep-links (e.g. from the collection unit grid) that
+  // jump straight into a mode instead of landing on this page first.
+  useEffect(() => {
+    if (loading || autoStartedRef.current || words.length === 0) return;
+    const autoMode = searchParams.get('mode');
+    if (autoMode && modes.includes(autoMode)) {
+      autoStartedRef.current = true;
+      router.replace(`/classes/${classId}/homework/${hwId}`);
+      startMode(autoMode);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, words, modes]);
 
   async function load() {
     const cached = _hwCache.get(hwId);
@@ -243,56 +258,56 @@ export default function UnitStudyHubPage() {
 
   return (
     <div className="flex flex-col min-h-screen animate-fade-in pb-24">
-      <div className="p-4 space-y-4">
+      <div className="p-3 space-y-3">
 
         {progressError && (
-          <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-2xl p-4 flex items-start gap-3">
-            <span className="text-xl shrink-0">⚠️</span>
+          <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-xl p-3 flex items-start gap-2.5">
+            <span className="text-lg shrink-0">⚠️</span>
             <div>
-              <p className="font-bold text-red-700 dark:text-red-400 text-sm">Couldn&apos;t save progress</p>
-              <p className="text-red-600 dark:text-red-500 text-xs mt-0.5 break-all">{progressError}</p>
+              <p className="font-bold text-red-700 dark:text-red-400 text-xs">Couldn&apos;t save progress</p>
+              <p className="text-red-600 dark:text-red-500 text-[11px] mt-0.5 break-all">{progressError}</p>
             </div>
           </div>
         )}
 
         {/* Unit card */}
         <div
-          className="rounded-2xl overflow-hidden flex flex-col"
+          className="rounded-xl overflow-hidden flex flex-col"
           style={{
             background: 'var(--surface)',
             border: allDone ? '1.5px solid #22c55e' : '1.5px solid var(--border)',
             boxShadow: allDone
-              ? '0 0 0 3px rgba(34,197,94,0.1), 0 4px 16px rgba(0,0,0,0.08)'
-              : '0 4px 16px rgba(0,0,0,0.08)',
+              ? '0 0 0 2px rgba(34,197,94,0.1), 0 2px 10px rgba(0,0,0,0.06)'
+              : '0 2px 10px rgba(0,0,0,0.06)',
           }}
         >
           <div
-            className="h-1.5"
+            className="h-1"
             style={{ background: allDone ? '#22c55e' : 'linear-gradient(135deg, var(--primary) 0%, color-mix(in srgb, var(--primary) 75%, transparent) 100%)' }}
           />
 
-          <div className="p-4 flex flex-col gap-3">
+          <div className="p-3 flex flex-col gap-2">
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap mb-1">
+              <div className="flex items-center gap-1.5 flex-wrap mb-0.5">
                 <span
-                  className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full text-white"
+                  className="text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full text-white"
                   style={{ background: allDone ? '#22c55e' : 'var(--primary)' }}
                 >
                   Unit Homework
                 </span>
-                <span className="text-[10px] text-[var(--text-muted)]">{words.length} word{words.length !== 1 ? 's' : ''}</span>
-                {allDone && <span className="text-[10px] font-bold text-green-500">✓ Done</span>}
+                <span className="text-[9px] text-[var(--text-muted)]">{words.length} word{words.length !== 1 ? 's' : ''}</span>
+                {allDone && <span className="text-[9px] font-bold text-green-500">✓ Done</span>}
+                {due && (
+                  <span className={`text-[9px] font-semibold ${due.overdue ? 'text-red-500' : 'text-[var(--text-muted)]'}`}>
+                    {due.overdue ? '⚠️ ' : '📅 '}{due.text}
+                  </span>
+                )}
               </div>
-              <h1 className="font-bold text-[var(--text)] text-base leading-tight">{unitName}</h1>
-              {due && (
-                <p className={`text-xs font-semibold mt-1 ${due.overdue ? 'text-red-500' : 'text-[var(--text-muted)]'}`}>
-                  {due.overdue ? '⚠️ ' : '📅 '}{due.text}
-                </p>
-              )}
+              <h1 className="font-bold text-[var(--text)] text-sm leading-tight">{unitName}</h1>
             </div>
 
             {/* Progress bar */}
-            <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
+            <div className="h-1 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
               <div
                 className="h-full rounded-full transition-all duration-500"
                 style={{
@@ -301,11 +316,11 @@ export default function UnitStudyHubPage() {
                 }}
               />
             </div>
-            <p className="text-[10px] text-[var(--text-muted)] -mt-2">{completedModes.size}/{modes.length} modes done</p>
+            <p className="text-[9px] text-[var(--text-muted)] -mt-1.5">{completedModes.size}/{modes.length} modes done</p>
 
             {/* Mode buttons */}
             {nonMatchModes.length > 0 && (
-              <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${nonMatchModes.length}, minmax(0, 1fr))` }}>
+              <div className="grid gap-1.5" style={{ gridTemplateColumns: `repeat(${nonMatchModes.length}, minmax(0, 1fr))` }}>
                 {nonMatchModes.map(mode => (
                   <HWModeButton
                     key={mode}
@@ -335,11 +350,11 @@ export default function UnitStudyHubPage() {
 
         {/* All done banner */}
         {allDone && (
-          <div className="bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-2xl p-4 flex items-center gap-3">
-            <span className="text-2xl">🎉</span>
+          <div className="bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-xl p-2.5 flex items-center gap-2">
+            <span className="text-lg">🎉</span>
             <div>
-              <p className="font-bold text-green-700 dark:text-green-400 text-sm">All modes complete!</p>
-              <p className="text-green-600 dark:text-green-500 text-xs mt-0.5">Great work on this unit.</p>
+              <p className="font-bold text-green-700 dark:text-green-400 text-xs">All modes complete!</p>
+              <p className="text-green-600 dark:text-green-500 text-[10px] mt-0.5">Great work on this unit.</p>
             </div>
           </div>
         )}
@@ -347,16 +362,16 @@ export default function UnitStudyHubPage() {
         {/* Word list preview */}
         {words.length > 0 && (
           <div>
-            <p className="text-xs font-bold text-[var(--text-muted)] tracking-widest uppercase mb-3">Words in this unit</p>
-            <div className="space-y-2">
+            <p className="text-[10px] font-bold text-[var(--text-muted)] tracking-widest uppercase mb-2">Words in this unit</p>
+            <div className="space-y-1.5">
               {words.map((w, i) => (
-                <div key={i} className="flex items-center gap-3 p-3 bg-[var(--surface)] rounded-xl">
+                <div key={i} className="flex items-center gap-2.5 p-2.5 bg-[var(--surface)] rounded-lg">
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-sm text-[var(--text)]">{w.word}</p>
-                    <p className="text-xs text-[var(--primary)] font-semibold mt-0.5">{w.translation}</p>
+                    <p className="font-bold text-xs text-[var(--text)]">{w.word}</p>
+                    <p className="text-[11px] text-[var(--primary)] font-semibold mt-0.5">{w.translation}</p>
                   </div>
                   {w.examples.length > 0 && (
-                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-lg bg-[var(--primary-bg)] text-[var(--primary)] shrink-0">
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-[var(--primary-bg)] text-[var(--primary)] shrink-0">
                       {w.examples.length}ex
                     </span>
                   )}
@@ -378,7 +393,7 @@ function HWModeButton({
   const color = MODE_COLOR[mode] ?? 'var(--primary)';
   const icon = MODE_ICON[mode] ?? '📖';
   const label = MODE_LABEL[mode] ?? mode;
-  const base = `flex items-center justify-center ${wide ? 'flex-row gap-2 py-2.5 px-4' : 'flex-col gap-1.5 py-3'} rounded-xl text-xs font-bold transition-all disabled:opacity-60`;
+  const base = `flex items-center justify-center ${wide ? 'flex-row gap-1.5 py-2 px-3' : 'flex-col gap-1 py-2'} rounded-lg text-[11px] font-bold transition-all disabled:opacity-60`;
 
   if (locked) {
     return (
@@ -387,7 +402,7 @@ function HWModeButton({
         className={`${base} cursor-not-allowed select-none`}
         style={{ background: 'var(--surface-2)', border: '1.5px dashed var(--border)', opacity: 0.4 }}
       >
-        <span className={wide ? 'text-base' : 'text-xl'}>🔒</span>
+        <span className={wide ? 'text-sm' : 'text-base'}>🔒</span>
         <span className="text-[var(--text-muted)]">{label}</span>
       </div>
     );
@@ -401,9 +416,9 @@ function HWModeButton({
         style={{ background: 'rgba(34,197,94,0.12)', border: '1.5px solid rgba(34,197,94,0.35)', color: '#16a34a' }}
       >
         {busy ? (
-          <div className="w-4 h-4 border-2 border-green-500 border-t-transparent rounded-full animate-spin" />
+          <div className="w-3.5 h-3.5 border-2 border-green-500 border-t-transparent rounded-full animate-spin" />
         ) : (
-          <span className={wide ? 'text-base' : 'text-xl'}>✓</span>
+          <span className={wide ? 'text-sm' : 'text-base'}>✓</span>
         )}
         <span>{label}</span>
       </button>
@@ -417,9 +432,9 @@ function HWModeButton({
       style={{ background: color, boxShadow: `0 3px 12px ${color}66` }}
     >
       {busy ? (
-        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+        <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
       ) : (
-        <span className={wide ? 'text-base' : 'text-xl'}>{icon}</span>
+        <span className={wide ? 'text-sm' : 'text-base'}>{icon}</span>
       )}
       <span>{label}</span>
     </button>
