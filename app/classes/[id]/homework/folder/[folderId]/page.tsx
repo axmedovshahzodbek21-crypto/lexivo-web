@@ -3,27 +3,14 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
+import { AssignedUnitCard, UnassignedUnitCard, type AssignedUnit } from '../../_shared';
 
-interface FolderUnit {
+interface UnassignedUnit {
   id: string;
-  name: string;
+  badge: string;
+  title: string;
   wordCount: number;
-  homeworkId: string | null;
-  hwModes: string[] | null;
-  hwDue: string | null;
 }
-
-function dueLabel(due: string | null): { text: string; overdue: boolean } | null {
-  if (!due) return null;
-  const today = new Date().toISOString().slice(0, 10);
-  const tomorrow = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
-  if (due < today) return { text: `Overdue · ${due}`, overdue: true };
-  if (due === today) return { text: 'Due today', overdue: false };
-  if (due === tomorrow) return { text: 'Due tomorrow', overdue: false };
-  return { text: `Due ${due}`, overdue: false };
-}
-
-const MODE_ICON: Record<string, string> = { learn: '📖', flashcard: '🃏', quiz: '🧠', match: '🎯' };
 
 export default function ClassFolderHomeworkPage() {
   const { id: classId, folderId } = useParams<{ id: string; folderId: string }>();
@@ -32,7 +19,8 @@ export default function ClassFolderHomeworkPage() {
 
   const [loading, setLoading] = useState(true);
   const [folderName, setFolderName] = useState('');
-  const [units, setUnits] = useState<FolderUnit[]>([]);
+  const [assigned, setAssigned] = useState<AssignedUnit[]>([]);
+  const [unassigned, setUnassigned] = useState<UnassignedUnit[]>([]);
   const [completedModes, setCompletedModes] = useState<Record<string, Set<string>>>({});
   const [showAll, setShowAll] = useState(false);
 
@@ -77,21 +65,30 @@ export default function ClassFolderHomeworkPage() {
       }
     }
 
-    const built: FolderUnit[] = unitRows.map(u => {
+    const builtAssigned: AssignedUnit[] = [];
+    const builtUnassigned: UnassignedUnit[] = [];
+    unitRows.forEach((u, i) => {
       const hw = hwByUnit[u.id] ?? null;
       const countList = u.teacher_unit_words as any[];
-      return {
-        id: u.id as string,
-        name: u.name as string,
-        wordCount: countList?.[0]?.count ?? 0,
-        homeworkId: hw?.id ?? null,
-        hwModes: hw ? (hw.modes as string[]) : null,
-        hwDue: hw?.due_date ?? null,
-      };
+      const wordCount = countList?.[0]?.count ?? 0;
+      const badge = `Unit ${i + 1}`;
+      if (hw) {
+        builtAssigned.push({
+          hwId: hw.id as string,
+          badge,
+          title: u.name as string,
+          wordCount,
+          modes: (hw.modes as string[]) ?? [],
+          dueDate: (hw.due_date as string | null) ?? null,
+        });
+      } else {
+        builtUnassigned.push({ id: u.id as string, badge, title: u.name as string, wordCount });
+      }
     });
 
     setFolderName((folderRes.data as any)?.name ?? 'Folder');
-    setUnits(built);
+    setAssigned(builtAssigned);
+    setUnassigned(builtUnassigned);
     setCompletedModes(modeMap);
     setLoading(false);
   }
@@ -104,118 +101,79 @@ export default function ClassFolderHomeworkPage() {
     );
   }
 
-  const assignedUnits = units.filter(u => u.homeworkId !== null);
-  const doneCount = assignedUnits.filter(u => {
-    const modes = u.hwModes ?? [];
-    const completed = completedModes[u.homeworkId!] ?? new Set();
-    return modes.length > 0 && modes.every(m => completed.has(m));
-  }).length;
-  const hiddenCount = units.length - assignedUnits.length;
-  const visible = showAll ? units : assignedUnits;
+  const doneCount = assigned.filter(u =>
+    u.modes.length > 0 && u.modes.every(m => (completedModes[u.hwId] ?? new Set()).has(m))
+  ).length;
+  const progressPct = assigned.length > 0 ? (doneCount / assigned.length) * 100 : 0;
 
   return (
     <div className="flex flex-col min-h-screen animate-fade-in pb-24">
-      <div className="p-4 space-y-4">
-
+      <div
+        className="relative px-5 pt-5 pb-8"
+        style={{
+          background: 'linear-gradient(135deg, var(--primary) 0%, color-mix(in srgb, var(--primary) 75%, transparent) 100%)',
+          boxShadow: '0 8px 32px rgba(79,70,229,0.35)',
+        }}
+      >
         <button
           onClick={() => router.push(`/classes/${classId}/homework`)}
-          className="flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors"
+          className="flex items-center gap-1.5 text-sm text-white/80 mb-4 hover:text-white transition-colors"
         >
           ← Back
         </button>
 
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-lg">📁</span>
-            <h1 className="text-lg font-black text-[var(--text)]">{folderName}</h1>
-          </div>
-          {assignedUnits.length > 0 && (
-            <p className="text-xs text-[var(--text-muted)]">{doneCount}/{assignedUnits.length} units done</p>
-          )}
+        <h1
+          className="text-2xl font-black text-white leading-tight mb-1"
+          style={{ textShadow: '0 2px 8px rgba(0,0,0,0.3)' }}
+        >
+          📁 {folderName}
+        </h1>
+
+        <div className="flex flex-wrap gap-2 mb-4">
+          <span className="flex items-center gap-1 text-xs font-semibold bg-black/25 text-white rounded-full px-3 py-1">
+            {assigned.length} unit{assigned.length !== 1 ? 's' : ''} assigned
+          </span>
+          <span className="flex items-center gap-1 text-xs font-semibold bg-black/25 text-white rounded-full px-3 py-1">
+            {doneCount}/{assigned.length} done
+          </span>
         </div>
 
-        {visible.length === 0 && (
-          <p className="text-sm text-[var(--text-muted)] px-1 py-8 text-center">No units assigned yet</p>
-        )}
-
-        <div className="space-y-2">
-          {visible.map(unit => {
-            if (!unit.homeworkId) {
-              return (
-                <div key={unit.id} className="flex items-center gap-3 p-4 rounded-2xl border border-[var(--border)]/50 bg-[var(--surface)]/60">
-                  <div className="w-10 h-10 rounded-xl bg-[var(--surface-2)] flex items-center justify-center shrink-0 text-lg">🔒</div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-[var(--text-muted)] truncate">{unit.name}</p>
-                    <p className="text-xs text-[var(--text-muted)]">{unit.wordCount} words · Not yet assigned</p>
-                  </div>
-                </div>
-              );
-            }
-
-            const modes = unit.hwModes ?? [];
-            const completed = completedModes[unit.homeworkId] ?? new Set();
-            const allDone = modes.length > 0 && modes.every(m => completed.has(m));
-            const due = dueLabel(unit.hwDue);
-
-            return (
-              <button
-                key={unit.id}
-                onClick={() => router.push(`/classes/${classId}/homework/${unit.homeworkId}`)}
-                className={`w-full flex items-center gap-3 p-4 rounded-2xl border text-left transition-all active:scale-[0.98] ${
-                  allDone
-                    ? 'bg-green-50 border-green-200 dark:bg-green-950/30 dark:border-green-800'
-                    : 'bg-[var(--surface)] border-[var(--border)] shadow-sm'
-                }`}
-              >
-                <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${
-                  allDone ? 'bg-green-100 dark:bg-green-900/50' : 'bg-[var(--primary-bg)]'
-                }`}>
-                  {allDone ? (
-                    <svg className="w-6 h-6 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                  ) : (
-                    <span className="text-sm font-black text-[var(--primary)]">
-                      {completed.size}/{modes.length}
-                    </span>
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className={`text-sm font-bold truncate ${allDone ? 'text-green-700 dark:text-green-400' : 'text-[var(--text)]'}`}>
-                    {unit.name}
-                  </p>
-                  <div className="flex items-center gap-2 mt-1">
-                    <div className="flex gap-1">
-                      {modes.map(m => (
-                        <span key={m} className="text-sm" style={{ opacity: completed.has(m) ? 1 : 0.3 }} title={m}>
-                          {MODE_ICON[m] ?? m}
-                        </span>
-                      ))}
-                    </div>
-                    {due && (
-                      <span className={`text-[10px] font-semibold ${due.overdue ? 'text-red-500' : 'text-[var(--text-muted)]'}`}>
-                        {due.text}
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <svg className="w-4 h-4 text-[var(--text-muted)] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            );
-          })}
+        <div className="h-2 rounded-full bg-white/25 overflow-hidden">
+          <div
+            className="h-full rounded-full bg-white transition-all duration-700"
+            style={{ width: `${progressPct}%` }}
+          />
         </div>
-
-        {hiddenCount > 0 && (
-          <button
-            onClick={() => setShowAll(s => !s)}
-            className="w-full text-center text-xs font-semibold text-[var(--primary)] py-2"
-          >
-            {showAll ? 'Show less' : `${hiddenCount} more unit${hiddenCount !== 1 ? 's' : ''} in this folder — Show all`}
-          </button>
-        )}
       </div>
+
+      {assigned.length === 0 && unassigned.length === 0 ? (
+        <div className="flex-1 flex items-center justify-center p-8 text-center">
+          <div>
+            <div className="text-5xl mb-4">📁</div>
+            <p className="font-bold text-[var(--text)] mb-1">No units in this folder yet</p>
+          </div>
+        </div>
+      ) : (
+        <>
+          <div className="flex-1 p-3 grid gap-3" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))' }}>
+            {assigned.map(unit => (
+              <AssignedUnitCard key={unit.hwId} classId={classId} unit={unit} completed={completedModes[unit.hwId] ?? new Set()} />
+            ))}
+            {showAll && unassigned.map(unit => (
+              <UnassignedUnitCard key={unit.id} badge={unit.badge} title={unit.title} wordCount={unit.wordCount} />
+            ))}
+          </div>
+
+          {unassigned.length > 0 && (
+            <button
+              onClick={() => setShowAll(s => !s)}
+              className="text-center text-xs font-semibold text-[var(--primary)] py-2"
+            >
+              {showAll ? 'Show less' : `${unassigned.length} more unit${unassigned.length !== 1 ? 's' : ''} in this folder — Show all`}
+            </button>
+          )}
+        </>
+      )}
     </div>
   );
 }
