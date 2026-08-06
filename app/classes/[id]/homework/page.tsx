@@ -267,18 +267,32 @@ export default function ClassHomeworkPage() {
   // Teacher redirect
   if (isTeacher) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] p-8 text-center">
-        <span className="text-5xl mb-4">📋</span>
-        <p className="text-base font-bold text-[var(--text)] mb-2">Manage Homework from the Dashboard</p>
-        <p className="text-sm text-[var(--text-muted)]">
-          Go to the class Dashboard → Curriculum tab to assign library units as homework and track per-student progress.
-        </p>
+      <div className="flex flex-col min-h-screen">
+        <button
+          onClick={() => router.push(`/classes/${id}/home`)}
+          className="flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors p-4"
+        >
+          ← Back
+        </button>
+        <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
+          <span className="text-5xl mb-4">📋</span>
+          <p className="text-base font-bold text-[var(--text)] mb-2">Manage Homework from the Dashboard</p>
+          <p className="text-sm text-[var(--text-muted)]">
+            Go to the class Dashboard → Curriculum tab to assign library units as homework and track per-student progress.
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="flex flex-col min-h-screen animate-fade-in pb-24">
+      <button
+        onClick={() => router.push(`/classes/${id}/home`)}
+        className="flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors px-4 pt-4"
+      >
+        ← Back
+      </button>
       <div className="p-4 space-y-1">
 
         {/* Progress bar */}

@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 
@@ -42,6 +42,7 @@ const PODIUM_ORDER = [1, 0, 2]; // display order: 2nd, 1st, 3rd
 
 export default function ClassLeaderboardPage() {
   const { id } = useParams<{ id: string }>();
+  const router = useRouter();
   const { user } = useAuth();
   const [rows, setRows] = useState<LeaderboardRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -79,10 +80,18 @@ export default function ClassLeaderboardPage() {
 
   if (rows.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen gap-3 text-center p-8">
-        <span className="text-5xl">🏆</span>
-        <h1 className="text-lg font-bold text-[var(--text)]">No rankings yet</h1>
-        <p className="text-sm text-[var(--text-muted)]">Students need to earn XP to appear here</p>
+      <div className="flex flex-col min-h-screen">
+        <button
+          onClick={() => router.push(`/classes/${id}/home`)}
+          className="flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors p-4"
+        >
+          ← Back
+        </button>
+        <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center p-8">
+          <span className="text-5xl">🏆</span>
+          <h1 className="text-lg font-bold text-[var(--text)]">No rankings yet</h1>
+          <p className="text-sm text-[var(--text-muted)]">Students need to earn XP to appear here</p>
+        </div>
       </div>
     );
   }
@@ -92,6 +101,12 @@ export default function ClassLeaderboardPage() {
 
   return (
     <div className="flex flex-col min-h-screen animate-fade-in pb-24">
+      <button
+        onClick={() => router.push(`/classes/${id}/home`)}
+        className="flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors p-4 pb-0"
+      >
+        ← Back
+      </button>
       {/* My position banner (if outside top 3) */}
       {myRank > 3 && (
         <div className="mx-4 mt-4 p-3 rounded-2xl bg-[var(--primary-bg)] border border-[var(--primary)]/30 flex items-center gap-3">
