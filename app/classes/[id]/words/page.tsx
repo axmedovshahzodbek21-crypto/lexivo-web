@@ -492,7 +492,7 @@ export default function ClassWordsPage() {
     <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8">
       <div className="text-5xl">⛔</div>
       <p className="font-bold text-[var(--text)]">You're not in this class</p>
-      <button onClick={() => router.back()} className="btn-primary">Go back</button>
+      <button onClick={() => router.push(`/classes/${id}/home`)} className="btn-primary">Go back</button>
     </div>
   );
 
@@ -552,7 +552,7 @@ export default function ClassWordsPage() {
     <div className="flex flex-col min-h-screen pb-24 animate-fade-in">
       {/* Header */}
       <div className="flex items-center gap-3 p-4 border-b border-[var(--border)]">
-        <button onClick={() => router.back()} className="btn-icon text-lg" aria-label="Go back">←</button>
+        <button onClick={() => router.push(`/classes/${id}/home`)} className="btn-icon text-lg" aria-label="Go back">←</button>
         <div className="flex-1 min-w-0">
           <h1 className="font-bold text-[var(--text)]">📝 Class Words</h1>
           <p className="text-xs text-[var(--text-muted)] truncate">{className}</p>
