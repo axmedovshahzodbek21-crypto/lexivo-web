@@ -19,7 +19,6 @@ interface AssignedFolder {
   id: string;
   name: string;
   units: FolderUnit[];
-  showAll: boolean;
 }
 
 interface CWUnit {
@@ -170,7 +169,7 @@ export default function ClassHomeworkPage() {
             hwDue: hw?.due_date ?? null,
           };
         });
-      return { id: folder.id, name: folder.name, units, showAll: false };
+      return { id: folder.id, name: folder.name, units };
     });
 
     // Class word units (assigned homework only shown)
@@ -246,10 +245,6 @@ export default function ClassHomeworkPage() {
     setLoading(false);
   }
 
-  function toggleShowAll(folderId: string) {
-    setFolders(prev => prev.map(f => f.id === folderId ? { ...f, showAll: !f.showAll } : f));
-  }
-
   const collFolders: { name: string; items: CollHW[] }[] = [];
   for (const item of collHwItems) {
     let folder = collFolders.find(f => f.name === item.collectionName);
@@ -314,111 +309,53 @@ export default function ClassHomeworkPage() {
           </div>
         )}
 
-        {/* Library folders */}
-        {folders.map(folder => {
-          const hiddenCount = folder.units.filter(u => !u.homeworkId).length;
-          const visible = folder.showAll
-            ? folder.units
-            : folder.units.filter(u => u.homeworkId !== null);
+        {/* Library folders — shown as folder tiles only; units live on their own page */}
+        {folders.length > 0 && (
+          <div className="mb-4 space-y-2">
+            {folders.map(folder => {
+              const assignedUnits = folder.units.filter(u => u.homeworkId !== null);
+              const doneCount = assignedUnits.filter(u => {
+                const modes = u.hwModes ?? [];
+                const completed = completedModes[u.homeworkId!] ?? new Set();
+                return modes.length > 0 && modes.every(m => completed.has(m));
+              }).length;
+              const allDone = assignedUnits.length > 0 && doneCount === assignedUnits.length;
 
-          return (
-            <div key={folder.id} className="mb-4">
-              {/* Folder header */}
-              <div className="flex items-center gap-2 mb-2 px-1">
-                <span className="text-xs">📁</span>
-                <p className="flex-1 text-xs font-bold text-[var(--text-muted)] truncate uppercase tracking-wide">{folder.name}</p>
-                {hiddenCount > 0 && (
-                  <button
-                    onClick={() => toggleShowAll(folder.id)}
-                    className="text-[10px] font-semibold text-[var(--primary)] shrink-0"
-                  >
-                    {folder.showAll ? 'Show less' : `${hiddenCount} hidden — Show all`}
-                  </button>
-                )}
-              </div>
-
-              {/* Units */}
-              {visible.length === 0 && (
-                <p className="text-xs text-[var(--text-muted)] px-1 pb-2">No units assigned yet</p>
-              )}
-              <div className="space-y-2">
-                {visible.map(unit => {
-                  if (!unit.homeworkId) {
-                    // Unassigned unit
-                    return (
-                      <div key={unit.id} className="flex items-center gap-3 p-4 rounded-2xl border border-[var(--border)]/50 bg-[var(--surface)]/60">
-                        <div className="w-10 h-10 rounded-xl bg-[var(--surface-2)] flex items-center justify-center shrink-0 text-lg">🔒</div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-[var(--text-muted)] truncate">{unit.name}</p>
-                          <p className="text-xs text-[var(--text-muted)]">{unit.wordCount} words · Not yet assigned</p>
-                        </div>
-                      </div>
-                    );
-                  }
-
-                  // Assigned unit with homework
-                  const modes = unit.hwModes ?? [];
-                  const completed = completedModes[unit.homeworkId] ?? new Set();
-                  const allDone = modes.length > 0 && modes.every(m => completed.has(m));
-                  const due = dueLabel(unit.hwDue);
-
-                  return (
-                    <button
-                      key={unit.id}
-                      onClick={() => router.push(`/classes/${id}/homework/${unit.homeworkId}`)}
-                      className={`w-full flex items-center gap-3 p-4 rounded-2xl border text-left transition-all active:scale-[0.98] ${
-                        allDone
-                          ? 'bg-green-50 border-green-200 dark:bg-green-950/30 dark:border-green-800'
-                          : 'bg-[var(--surface)] border-[var(--border)] shadow-sm'
-                      }`}
-                    >
-                      <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${
-                        allDone ? 'bg-green-100 dark:bg-green-900/50' : 'bg-[var(--primary-bg)]'
-                      }`}>
-                        {allDone ? (
-                          <svg className="w-6 h-6 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                          </svg>
-                        ) : (
-                          <span className="text-sm font-black text-[var(--primary)]">
-                            {completed.size}/{modes.length}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className={`text-sm font-bold truncate ${allDone ? 'text-green-700 dark:text-green-400' : 'text-[var(--text)]'}`}>
-                          {unit.name}
-                        </p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <div className="flex gap-1">
-                            {modes.map(m => (
-                              <span
-                                key={m}
-                                className="text-sm"
-                                style={{ opacity: completed.has(m) ? 1 : 0.3 }}
-                                title={m}
-                              >
-                                {MODE_ICON[m] ?? m}
-                              </span>
-                            ))}
-                          </div>
-                          {due && (
-                            <span className={`text-[10px] font-semibold ${due.overdue ? 'text-red-500' : 'text-[var(--text-muted)]'}`}>
-                              {due.text}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <svg className="w-4 h-4 text-[var(--text-muted)] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              return (
+                <button
+                  key={folder.id}
+                  onClick={() => router.push(`/classes/${id}/homework/folder/${folder.id}`)}
+                  className={`w-full flex items-center gap-3 p-4 rounded-2xl border text-left transition-all active:scale-[0.98] ${
+                    allDone
+                      ? 'bg-green-50 border-green-200 dark:bg-green-950/30 dark:border-green-800'
+                      : 'bg-[var(--surface)] border-[var(--border)] shadow-sm'
+                  }`}
+                >
+                  <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 text-lg ${
+                    allDone ? 'bg-green-100 dark:bg-green-900/50' : 'bg-[var(--primary-bg)]'
+                  }`}>
+                    {allDone ? (
+                      <svg className="w-6 h-6 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                       </svg>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          );
-        })}
+                    ) : <span>📁</span>}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm font-bold truncate ${allDone ? 'text-green-700 dark:text-green-400' : 'text-[var(--text)]'}`}>
+                      {folder.name}
+                    </p>
+                    <p className="text-xs text-[var(--text-muted)] truncate">
+                      {assignedUnits.length} unit{assignedUnits.length !== 1 ? 's' : ''} assigned · {doneCount}/{assignedUnits.length} done
+                    </p>
+                  </div>
+                  <svg className="w-4 h-4 text-[var(--text-muted)] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              );
+            })}
+          </div>
+        )}
 
         {/* Class word units section */}
         {cwUnits.length > 0 && (
