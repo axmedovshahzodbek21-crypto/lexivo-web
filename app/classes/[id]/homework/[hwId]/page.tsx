@@ -26,14 +26,9 @@ interface UnitWord {
   examples: { sentence: string; translation: string }[];
 }
 
-const MODE_ICON: Record<string, string> = { learn: '📖', flashcard: '🃏', quiz: '🧠', match: '🎯' };
-const MODE_LABEL: Record<string, string> = { learn: 'Learn', flashcard: 'Flashcard', quiz: 'Quiz', match: 'Match' };
-const MODE_DESC: Record<string, string> = {
-  learn: 'Study each word with examples',
-  flashcard: 'Flip through cards',
-  quiz: 'Test your knowledge',
-  match: 'Match words to translations',
-};
+const MODE_ICON: Record<string, string> = { learn: '📖', flashcard: '🃏', quiz: '❓', match: '🎯' };
+const MODE_LABEL: Record<string, string> = { learn: 'Learn', flashcard: 'Cards', quiz: 'Quiz', match: 'Match' };
+const MODE_COLOR: Record<string, string> = { learn: '#4f46e5', flashcard: '#ea580c', quiz: '#d97706', match: '#db2777' };
 
 function dueLabel(due: string | null): { text: string; overdue: boolean } | null {
   if (!due) return null;
@@ -60,6 +55,7 @@ export default function UnitStudyHubPage() {
   const [words, setWords] = useState<UnitWord[]>([]);
   const [completedModes, setCompletedModes] = useState<Set<string>>(new Set());
   const [navigating, setNavigating] = useState<string | null>(null);
+  const [progressError, setProgressError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -189,13 +185,33 @@ export default function UnitStudyHubPage() {
     }));
     saveClassHWTemp(hwWords);
 
-    // Record progress
-    const { error: progErr } = await supabase.from('class_homework_progress').upsert({
-      homework_id: hwId,
-      student_id: user!.id,
-      mode,
-    }, { onConflict: 'homework_id,student_id,mode', ignoreDuplicates: true });
-    if (!progErr) setCompletedModes(prev => new Set([...prev, mode]));
+    // Record progress. Avoid upsert(onConflict) since there's no confirmed unique
+    // constraint on (homework_id, student_id, mode) — do a manual check-then-insert instead.
+    setProgressError(null);
+    const { data: existing, error: checkErr } = await supabase
+      .from('class_homework_progress')
+      .select('mode')
+      .eq('homework_id', hwId)
+      .eq('student_id', user!.id)
+      .eq('mode', mode)
+      .maybeSingle();
+
+    let progErr = checkErr;
+    if (!checkErr && !existing) {
+      const { error: insertErr } = await supabase.from('class_homework_progress').insert({
+        homework_id: hwId,
+        student_id: user!.id,
+        mode,
+      });
+      progErr = insertErr;
+    }
+
+    if (!progErr) {
+      setCompletedModes(prev => new Set([...prev, mode]));
+    } else {
+      console.error('Progress save failed:', progErr.message);
+      setProgressError(progErr.message);
+    }
 
     const encodedName = encodeURIComponent(unitName);
     const hwBack = `/classes/${classId}/homework/${hwId}`;
@@ -205,10 +221,6 @@ export default function UnitStudyHubPage() {
       quiz: `/quiz?source=class-hw&className=${encodedName}&classId=${classId}&hwId=${hwId}`,
       match: `/matching?source=class-hw&className=${encodedName}&classId=${classId}&hwId=${hwId}`,
     };
-    if (progErr) {
-      // If progress save failed, still navigate but warn
-      console.error('Progress save failed:', progErr.message);
-    }
     router.push(paths[mode] ?? hwBack);
   }
 
@@ -222,35 +234,98 @@ export default function UnitStudyHubPage() {
 
   const allDone = modes.length > 0 && modes.every(m => completedModes.has(m));
   const due = dueLabel(dueDate);
+  const nonMatchModes = modes.filter(m => m !== 'match');
+  const hasMatch = modes.includes('match');
+  const progressPct = modes.length > 0 ? (completedModes.size / modes.length) * 100 : 0;
 
   return (
     <div className="flex flex-col min-h-screen animate-fade-in pb-24">
       <div className="p-4 space-y-4">
 
-        {/* Header */}
-        <div
-          className="rounded-2xl p-5 text-white"
-          style={{ background: 'linear-gradient(135deg, var(--primary) 0%, color-mix(in srgb, var(--primary) 75%, transparent) 100%)' }}
-        >
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex-1 min-w-0">
-              <p className="text-white/70 text-xs font-semibold mb-1 uppercase tracking-wider">Unit Homework</p>
-              <h1 className="text-xl font-black leading-tight">{unitName}</h1>
-              <p className="text-white/80 text-sm mt-1">
-                {words.length} word{words.length !== 1 ? 's' : ''} · {completedModes.size}/{modes.length} modes done
-              </p>
+        {progressError && (
+          <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-2xl p-4 flex items-start gap-3">
+            <span className="text-xl shrink-0">⚠️</span>
+            <div>
+              <p className="font-bold text-red-700 dark:text-red-400 text-sm">Couldn&apos;t save progress</p>
+              <p className="text-red-600 dark:text-red-500 text-xs mt-0.5 break-all">{progressError}</p>
             </div>
-            {allDone && (
-              <div className="shrink-0 bg-white/20 rounded-xl px-3 py-1.5 text-sm font-black">
-                ✓ Done
+          </div>
+        )}
+
+        {/* Unit card */}
+        <div
+          className="rounded-2xl overflow-hidden flex flex-col"
+          style={{
+            background: 'var(--surface)',
+            border: allDone ? '1.5px solid #22c55e' : '1.5px solid var(--border)',
+            boxShadow: allDone
+              ? '0 0 0 3px rgba(34,197,94,0.1), 0 4px 16px rgba(0,0,0,0.08)'
+              : '0 4px 16px rgba(0,0,0,0.08)',
+          }}
+        >
+          <div
+            className="h-1.5"
+            style={{ background: allDone ? '#22c55e' : 'linear-gradient(135deg, var(--primary) 0%, color-mix(in srgb, var(--primary) 75%, transparent) 100%)' }}
+          />
+
+          <div className="p-4 flex flex-col gap-3">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap mb-1">
+                <span
+                  className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full text-white"
+                  style={{ background: allDone ? '#22c55e' : 'var(--primary)' }}
+                >
+                  Unit Homework
+                </span>
+                <span className="text-[10px] text-[var(--text-muted)]">{words.length} word{words.length !== 1 ? 's' : ''}</span>
+                {allDone && <span className="text-[10px] font-bold text-green-500">✓ Done</span>}
+              </div>
+              <h1 className="font-bold text-[var(--text)] text-base leading-tight">{unitName}</h1>
+              {due && (
+                <p className={`text-xs font-semibold mt-1 ${due.overdue ? 'text-red-500' : 'text-[var(--text-muted)]'}`}>
+                  {due.overdue ? '⚠️ ' : '📅 '}{due.text}
+                </p>
+              )}
+            </div>
+
+            {/* Progress bar */}
+            <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
+              <div
+                className="h-full rounded-full transition-all duration-500"
+                style={{
+                  width: `${progressPct}%`,
+                  background: allDone ? '#22c55e' : 'linear-gradient(135deg, var(--primary) 0%, color-mix(in srgb, var(--primary) 75%, transparent) 100%)',
+                }}
+              />
+            </div>
+            <p className="text-[10px] text-[var(--text-muted)] -mt-2">{completedModes.size}/{modes.length} modes done</p>
+
+            {/* Mode buttons */}
+            {nonMatchModes.length > 0 && (
+              <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${nonMatchModes.length}, minmax(0, 1fr))` }}>
+                {nonMatchModes.map(mode => (
+                  <HWModeButton
+                    key={mode}
+                    mode={mode}
+                    done={completedModes.has(mode)}
+                    busy={navigating === mode}
+                    disabled={!!navigating}
+                    onClick={() => startMode(mode)}
+                  />
+                ))}
               </div>
             )}
+            {hasMatch && (
+              <HWModeButton
+                mode="match"
+                done={completedModes.has('match')}
+                busy={navigating === 'match'}
+                disabled={!!navigating}
+                onClick={() => startMode('match')}
+                wide
+              />
+            )}
           </div>
-          {due && (
-            <p className={`text-xs font-semibold mt-3 ${due.overdue ? 'text-red-200' : 'text-white/70'}`}>
-              {due.overdue ? '⚠️ ' : '📅 '}{due.text}
-            </p>
-          )}
         </div>
 
         {/* All done banner */}
@@ -263,50 +338,6 @@ export default function UnitStudyHubPage() {
             </div>
           </div>
         )}
-
-        {/* Mode cards */}
-        <div>
-          <p className="text-xs font-bold text-[var(--text-muted)] tracking-widest uppercase mb-3">Study Modes</p>
-          <div className="space-y-3">
-            {modes.map(mode => {
-              const done = completedModes.has(mode);
-              const busy = navigating === mode;
-              return (
-                <button
-                  key={mode}
-                  onClick={() => startMode(mode)}
-                  disabled={!!navigating}
-                  className={`w-full flex items-center gap-4 p-4 rounded-2xl border text-left transition-all disabled:opacity-60 ${
-                    done
-                      ? 'bg-green-50 border-green-200 dark:bg-green-950/30 dark:border-green-800'
-                      : 'bg-[var(--surface)] border-[var(--border)] hover:border-[var(--primary)]/50 active:scale-[0.98]'
-                  }`}
-                >
-                  <span className="text-3xl">{MODE_ICON[mode] ?? '📖'}</span>
-                  <div className="flex-1 min-w-0">
-                    <p className={`font-bold text-sm ${done ? 'text-green-700 dark:text-green-400' : 'text-[var(--text)]'}`}>
-                      {MODE_LABEL[mode] ?? mode}
-                    </p>
-                    <p className={`text-xs mt-0.5 ${done ? 'text-green-600 dark:text-green-500' : 'text-[var(--text-muted)]'}`}>
-                      {done ? 'Completed ✓' : MODE_DESC[mode]}
-                    </p>
-                  </div>
-                  {busy ? (
-                    <div className="w-5 h-5 border-2 border-[var(--primary)] border-t-transparent rounded-full animate-spin shrink-0" />
-                  ) : done ? (
-                    <svg className="w-5 h-5 text-green-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                  ) : (
-                    <svg className="w-5 h-5 text-[var(--primary)] shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-                    </svg>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </div>
 
         {/* Word list preview */}
         {words.length > 0 && (
@@ -331,5 +362,49 @@ export default function UnitStudyHubPage() {
         )}
       </div>
     </div>
+  );
+}
+
+function HWModeButton({
+  mode, done, busy, disabled, onClick, wide,
+}: {
+  mode: string; done: boolean; busy: boolean; disabled: boolean; onClick: () => void; wide?: boolean;
+}) {
+  const color = MODE_COLOR[mode] ?? 'var(--primary)';
+  const icon = MODE_ICON[mode] ?? '📖';
+  const label = MODE_LABEL[mode] ?? mode;
+  const base = `flex items-center justify-center ${wide ? 'flex-row gap-2 py-2.5 px-4' : 'flex-col gap-1.5 py-3'} rounded-xl text-xs font-bold transition-all disabled:opacity-60`;
+
+  if (done) {
+    return (
+      <button
+        onClick={onClick}
+        disabled={disabled}
+        className={`${base} active:scale-95`}
+        style={{ background: 'rgba(34,197,94,0.12)', border: '1.5px solid rgba(34,197,94,0.35)', color: '#16a34a' }}
+      >
+        {busy ? (
+          <div className="w-4 h-4 border-2 border-green-500 border-t-transparent rounded-full animate-spin" />
+        ) : (
+          <span className={wide ? 'text-base' : 'text-xl'}>✓</span>
+        )}
+        <span>{label}</span>
+      </button>
+    );
+  }
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={`${base} text-white active:scale-95 hover:opacity-90`}
+      style={{ background: color, boxShadow: `0 3px 12px ${color}66` }}
+    >
+      {busy ? (
+        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+      ) : (
+        <span className={wide ? 'text-base' : 'text-xl'}>{icon}</span>
+      )}
+      <span>{label}</span>
+    </button>
   );
 }
