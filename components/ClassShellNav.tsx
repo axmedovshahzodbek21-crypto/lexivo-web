@@ -19,6 +19,7 @@ export default function ClassShellNav({ classId }: { classId: string }) {
   const router = useRouter();
   const { user } = useAuth();
   const [isTeacher, setIsTeacher] = useState(false);
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -49,7 +50,7 @@ export default function ClassShellNav({ classId }: { classId: string }) {
 
   const handleBackClick = () => {
     if (atClassTop) {
-      if (confirm('Leave this class and return to your classes list?')) router.push('/classes');
+      setShowLeaveConfirm(true);
     } else {
       router.push(classHomeHref);
     }
@@ -107,6 +108,46 @@ export default function ClassShellNav({ classId }: { classId: string }) {
           );
         })}
       </nav>
+
+      {/* Leave-class confirm modal */}
+      {showLeaveConfirm && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50"
+          onClick={() => setShowLeaveConfirm(false)}
+        >
+          <div
+            className="w-full max-w-sm rounded-2xl p-5 space-y-4"
+            style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex items-start gap-3">
+              <span className="text-2xl shrink-0">🚪</span>
+              <div>
+                <p className="font-bold text-[var(--text)]">Leave this class?</p>
+                <p className="text-sm text-[var(--text-muted)] mt-1">
+                  You&apos;ll return to your classes list.
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowLeaveConfirm(false)}
+                className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-[var(--text)]"
+                style={{ background: 'var(--surface-2)' }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => { setShowLeaveConfirm(false); router.push('/classes'); }}
+                className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white"
+                style={{ background: 'var(--primary)' }}
+              >
+                Leave
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
