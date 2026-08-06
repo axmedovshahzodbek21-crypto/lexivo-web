@@ -38,6 +38,16 @@ export default function ClassShellNav({ classId }: { classId: string }) {
     return seg === '' ? pathname === full : pathname.startsWith(full);
   };
 
+  // The top arrow is a two-step back: from any class subpage it first drops
+  // you at this class's home, and only from there does it leave the class
+  // entirely (back to /classes). Prevents an accidental single click from
+  // kicking you out of the class you're working in.
+  const classHomeHref = `/classes/${classId}/home`;
+  const classRootHref = `/classes/${classId}`;
+  const atClassTop = pathname === classHomeHref || pathname === classRootHref;
+  const backHref = atClassTop ? '/classes' : classHomeHref;
+  const backTitle = atClassTop ? 'Back to classes' : 'Back to class home';
+
   return (
     <>
       {/* Mobile bottom bar */}
@@ -64,7 +74,7 @@ export default function ClassShellNav({ classId }: { classId: string }) {
 
       {/* Desktop sidebar */}
       <nav className="hidden sm:flex fixed left-0 top-0 bottom-0 w-16 z-50 flex-col items-center py-4 gap-1 bg-[var(--surface)] border-r border-[var(--border)]">
-        <Link href="/classes" className="flex items-center justify-center w-10 h-10 rounded-xl text-[var(--text-muted)] hover:bg-[var(--surface-2)] mb-3 text-lg" title="Back to classes">
+        <Link href={backHref} className="flex items-center justify-center w-10 h-10 rounded-xl text-[var(--text-muted)] hover:bg-[var(--surface-2)] mb-3 text-lg" title={backTitle}>
           ←
         </Link>
         {items.map(({ seg, icon, label }) => {
