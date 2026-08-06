@@ -151,7 +151,7 @@ export default function JoinedClassesPage() {
   return (
     <div className="flex flex-col min-h-screen pb-24 animate-fade-in">
       <div className="flex items-center gap-3 p-4 border-b border-[var(--border)]">
-        <button onClick={() => router.back()} className="btn-icon text-lg" aria-label="Go back">←</button>
+        <button onClick={() => router.push('/classes')} className="btn-icon text-lg" aria-label="Go back">←</button>
         <div className="flex-1">
           <h1 className="font-bold text-[var(--text)]">🎓 Joined Classes</h1>
           <p className="text-xs text-[var(--text-muted)]">Classes you are enrolled in</p>
