@@ -123,9 +123,11 @@ export default function ClassShellNav({ classId }: { classId: string }) {
             <div className="flex items-start gap-3">
               <span className="text-2xl shrink-0">🚪</span>
               <div>
-                <p className="font-bold text-[var(--text)]">Leave this class?</p>
+                <p className="font-bold text-[var(--text)]">Exit this class?</p>
                 <p className="text-sm text-[var(--text-muted)] mt-1">
-                  You&apos;ll return to your classes list.
+                  {isTeacher
+                    ? "You'll return to your classes list."
+                    : "You'll return to your joined classes list — you'll stay enrolled in this class."}
                 </p>
               </div>
             </div>
@@ -142,7 +144,7 @@ export default function ClassShellNav({ classId }: { classId: string }) {
                 className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white"
                 style={{ background: 'var(--primary)' }}
               >
-                Leave
+                Exit
               </button>
             </div>
           </div>
