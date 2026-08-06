@@ -559,7 +559,16 @@ function UnitCard({
         </div>
 
         {/* Match — full width */}
-        <ModeButton href={matchUrl} icon="🎯" label="Match" done={false} color="#db2777" wide />
+        <ModeButton
+          href={matchUrl}
+          icon="🎯"
+          label="Match"
+          done={false}
+          color="#db2777"
+          wide
+          locked={!learnDone}
+          lockReason={t.collections.completeLearnFirst}
+        />
 
         {/* Stories */}
         {storyInfo.anyUnlocked && (

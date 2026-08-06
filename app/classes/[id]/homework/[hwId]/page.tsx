@@ -237,6 +237,9 @@ export default function UnitStudyHubPage() {
   const nonMatchModes = modes.filter(m => m !== 'match');
   const hasMatch = modes.includes('match');
   const progressPct = modes.length > 0 ? (completedModes.size / modes.length) * 100 : 0;
+  const learnAssigned = modes.includes('learn');
+  const learnDone = completedModes.has('learn');
+  const gatedByLearn = (mode: string) => mode !== 'learn' && learnAssigned && !learnDone;
 
   return (
     <div className="flex flex-col min-h-screen animate-fade-in pb-24">
@@ -310,6 +313,7 @@ export default function UnitStudyHubPage() {
                     done={completedModes.has(mode)}
                     busy={navigating === mode}
                     disabled={!!navigating}
+                    locked={gatedByLearn(mode)}
                     onClick={() => startMode(mode)}
                   />
                 ))}
@@ -321,6 +325,7 @@ export default function UnitStudyHubPage() {
                 done={completedModes.has('match')}
                 busy={navigating === 'match'}
                 disabled={!!navigating}
+                locked={gatedByLearn('match')}
                 onClick={() => startMode('match')}
                 wide
               />
@@ -366,15 +371,27 @@ export default function UnitStudyHubPage() {
 }
 
 function HWModeButton({
-  mode, done, busy, disabled, onClick, wide,
+  mode, done, busy, disabled, onClick, wide, locked,
 }: {
-  mode: string; done: boolean; busy: boolean; disabled: boolean; onClick: () => void; wide?: boolean;
+  mode: string; done: boolean; busy: boolean; disabled: boolean; onClick: () => void; wide?: boolean; locked?: boolean;
 }) {
   const color = MODE_COLOR[mode] ?? 'var(--primary)';
   const icon = MODE_ICON[mode] ?? '📖';
   const label = MODE_LABEL[mode] ?? mode;
   const base = `flex items-center justify-center ${wide ? 'flex-row gap-2 py-2.5 px-4' : 'flex-col gap-1.5 py-3'} rounded-xl text-xs font-bold transition-all disabled:opacity-60`;
 
+  if (locked) {
+    return (
+      <div
+        title="Complete Learn first"
+        className={`${base} cursor-not-allowed select-none`}
+        style={{ background: 'var(--surface-2)', border: '1.5px dashed var(--border)', opacity: 0.4 }}
+      >
+        <span className={wide ? 'text-base' : 'text-xl'}>🔒</span>
+        <span className="text-[var(--text-muted)]">{label}</span>
+      </div>
+    );
+  }
   if (done) {
     return (
       <button
