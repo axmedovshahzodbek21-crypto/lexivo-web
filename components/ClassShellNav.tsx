@@ -138,7 +138,7 @@ export default function ClassShellNav({ classId }: { classId: string }) {
                 Cancel
               </button>
               <button
-                onClick={() => { setShowLeaveConfirm(false); router.push('/classes'); }}
+                onClick={() => { setShowLeaveConfirm(false); router.push(isTeacher ? '/classes/created' : '/classes/joined'); }}
                 className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white"
                 style={{ background: 'var(--primary)' }}
               >
