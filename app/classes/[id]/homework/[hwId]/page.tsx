@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { saveClassHWTemp } from '@/lib/storage';
 import type { ClassHWWord } from '@/lib/storage';
+import { recordClassXP } from '@/lib/class-xp';
 import { loadCollections, loadCEFRCollection } from '@/lib/data';
 import type { WordCollection } from '@/lib/types';
 
@@ -212,6 +213,7 @@ export default function UnitStudyHubPage() {
       .maybeSingle();
 
     let progErr = checkErr;
+    let firstCompletion = false;
     if (!checkErr && !existing) {
       const { error: insertErr } = await supabase.from('class_homework_progress').insert({
         homework_id: hwId,
@@ -219,10 +221,12 @@ export default function UnitStudyHubPage() {
         mode,
       });
       progErr = insertErr;
+      firstCompletion = !insertErr;
     }
 
     if (!progErr) {
       setCompletedModes(prev => new Set([...prev, mode]));
+      if (firstCompletion) void recordClassXP(user!.id, classId, 5);
     } else {
       console.error('Progress save failed:', progErr.message);
       setProgressError(progErr.message);

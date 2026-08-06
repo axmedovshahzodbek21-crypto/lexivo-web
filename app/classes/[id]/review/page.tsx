@@ -2,8 +2,8 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { addXP, displayXP, recordStudySession } from '@/lib/storage';
-import { useAppStore } from '@/lib/store';
+import { displayXP, recordStudySession } from '@/lib/storage';
+import { recordClassXP } from '@/lib/class-xp';
 import { speak } from '@/lib/speech';
 import {
   getClassDueWords, getClassSRSAll, advanceClassSRSWord,
@@ -20,8 +20,6 @@ const TILE_COLORS = [
 export default function ClassReviewPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const { setPendingLevelUp } = useAppStore();
-
   const [queue,      setQueue]      = useState<ClassSRSEntry[]>([]);
   const [allPool,    setAllPool]    = useState<ClassSRSEntry[]>([]); // for choice generation
   const [index,      setIndex]      = useState(0);
@@ -107,11 +105,10 @@ export default function ClassReviewPage() {
     await Promise.all(finalResults.map(r => advanceClassSRSWord(userId, id, r.word, r.knew)));
     const knewCount = finalResults.filter(r => r.knew).length;
     const xp = knewCount * 2; // 2 XP per correct review (matches personal SRS rate)
-    const { leveledUp, newLevel, newXp } = addXP(xp, 'Class SRS Review');
-    if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
+    await recordClassXP(userId, id, xp); // class XP is isolated from the app-wide pool — no level-up here
     setSessionXP(xp);
     recordStudySession();
-  }, [userId, id, setPendingLevelUp]);
+  }, [userId, id]);
 
   const grade = useCallback((knew: boolean) => {
     if (!current || grading.current) return;
