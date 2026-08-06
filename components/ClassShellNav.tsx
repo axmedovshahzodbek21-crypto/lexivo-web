@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
@@ -16,6 +16,7 @@ const TEACHER_ITEM = { seg: '', icon: '📊', label: 'Dashboard' };
 
 export default function ClassShellNav({ classId }: { classId: string }) {
   const pathname = usePathname();
+  const router = useRouter();
   const { user } = useAuth();
   const [isTeacher, setIsTeacher] = useState(false);
 
@@ -45,8 +46,14 @@ export default function ClassShellNav({ classId }: { classId: string }) {
   const classHomeHref = `/classes/${classId}/home`;
   const classRootHref = `/classes/${classId}`;
   const atClassTop = pathname === classHomeHref || pathname === classRootHref;
-  const backHref = atClassTop ? '/classes' : classHomeHref;
-  const backTitle = atClassTop ? 'Back to classes' : 'Back to class home';
+
+  const handleBackClick = () => {
+    if (atClassTop) {
+      if (confirm('Leave this class and return to your classes list?')) router.push('/classes');
+    } else {
+      router.push(classHomeHref);
+    }
+  };
 
   return (
     <>
@@ -74,9 +81,13 @@ export default function ClassShellNav({ classId }: { classId: string }) {
 
       {/* Desktop sidebar */}
       <nav className="hidden sm:flex fixed left-0 top-0 bottom-0 w-16 z-50 flex-col items-center py-4 gap-1 bg-[var(--surface)] border-r border-[var(--border)]">
-        <Link href={backHref} className="flex items-center justify-center w-10 h-10 rounded-xl text-[var(--text-muted)] hover:bg-[var(--surface-2)] mb-3 text-lg" title={backTitle}>
+        <button
+          onClick={handleBackClick}
+          className="flex items-center justify-center w-10 h-10 rounded-xl text-[var(--text-muted)] hover:bg-[var(--surface-2)] mb-3 text-lg"
+          title={atClassTop ? 'Back to classes' : 'Back to class home'}
+        >
           ←
-        </Link>
+        </button>
         {items.map(({ seg, icon, label }) => {
           const active = isActive(seg);
           const href = `/classes/${classId}${seg ? `/${seg}` : ''}`;
