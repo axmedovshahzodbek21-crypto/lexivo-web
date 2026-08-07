@@ -56,6 +56,7 @@ export interface UnitProgress {
   learnDone: boolean;
   flashcardDone: boolean;
   quizDone: boolean;
+  matchDone?: boolean;
   completedAt?: string;
 }
 

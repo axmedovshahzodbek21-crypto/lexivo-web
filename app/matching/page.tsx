@@ -5,7 +5,7 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
-import { getHardWords, getStarredWords, getCustomListWords, getImportedWords, getImportedWordsByCollection, getClassHWTemp, addXP, hasMatchXPAwarded, markMatchXPAwarded } from '@/lib/storage';
+import { getHardWords, getStarredWords, getCustomListWords, getImportedWords, getImportedWordsByCollection, getClassHWTemp, addXP, hasMatchXPAwarded, markMatchXPAwarded, markMatchComplete } from '@/lib/storage';
 import { getClassWordsFull, addClassHardWord } from '@/lib/class-srs';
 import { supabase } from '@/lib/supabase';
 import { checkAchievements } from '@/lib/gamification';
@@ -244,6 +244,7 @@ function MatchingInner() {
         setTotalTime(prev => prev + elapsed);
         const isLast = roundIndex + 1 >= Math.ceil(words.length / BATCH_SIZE);
         if (isLast && collectionParam && dayParam !== undefined) {
+          markMatchComplete(collectionParam, dayParam);
           if (!hasMatchXPAwarded(collectionParam, dayParam)) {
             const result = addXP(words.length * 4, 'Match', `Unit ${dayParam} · ${collectionParam}`);
             markMatchXPAwarded(collectionParam, dayParam);

@@ -774,6 +774,12 @@ export function markQuizComplete(collectionName: string, dayNumber: number) {
   set(key, updated);
 }
 
+export function markMatchComplete(collectionName: string, dayNumber: number) {
+  const key = `${KEYS.unitProgress}_${collectionName}_${dayNumber}`;
+  const p = getUnitProgress(collectionName, dayNumber);
+  set(key, { ...p, matchDone: true });
+}
+
 // ─── Starred words ───────────────────────────────────────────────────────────
 
 export function getStarredWords(): string[] {

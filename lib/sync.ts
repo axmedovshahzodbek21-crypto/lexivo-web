@@ -383,6 +383,7 @@ export async function pullAll(): Promise<void> {
             learnDone:     lp.learnDone     || cp.learnDone,
             flashcardDone: lp.flashcardDone || cp.flashcardDone,
             quizDone:      lp.quizDone      || cp.quizDone,
+            matchDone:     (lp.matchDone    || cp.matchDone) ?? false,
             completedAt:   lp.completedAt   ?? cp.completedAt,
           };
           lsSet(lsKey, JSON.stringify(merged));

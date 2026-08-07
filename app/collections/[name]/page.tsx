@@ -407,7 +407,7 @@ function UnitCard({
   unit: UnitRow; collectionName: string; heroGradient: string;
 }) {
   const t = useTranslation();
-  const { learnDone, flashcardDone, quizDone } = unit.progress;
+  const { learnDone, flashcardDone, quizDone, matchDone } = unit.progress;
   const stagesComplete = [learnDone, flashcardDone, quizDone].filter(Boolean).length;
   const isComplete = stagesComplete === 3;
 
@@ -563,7 +563,7 @@ function UnitCard({
           href={matchUrl}
           icon="🎯"
           label="Match"
-          done={false}
+          done={!!matchDone}
           color="#db2777"
           wide
           locked={!learnDone}
