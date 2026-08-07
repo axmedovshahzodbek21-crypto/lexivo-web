@@ -1478,37 +1478,80 @@ function CurriculumTab({
 
       {/* ── Homework detail modal ── */}
       {hwDetail && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setHwDetail(null)}>
-          <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-5 space-y-4 max-h-[80vh] flex flex-col" onClick={e => e.stopPropagation()}>
-            <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto shrink-0" />
-            <div className="flex items-start justify-between shrink-0">
-              <div>
-                <p className="font-bold text-[var(--text)]">{hwDetail.unitName}</p>
-                <div className="flex items-center gap-1.5 mt-0.5">
-                  {hwDetail.modes.map(m => <span key={m} className="text-sm">{HW_MODE_ICON[m] ?? m}</span>)}
-                  {(() => { const d = dueDateLabel(hwDetail.dueDate); return d ? <span className={`text-[10px] font-medium ${d.overdue ? 'text-[var(--danger)]' : 'text-[var(--text-muted)]'}`}>· {d.text}</span> : null; })()}
-                </div>
-              </div>
-              <button onClick={deleteHomework} disabled={hwDeleting} className="text-xs text-[var(--danger)] hover:opacity-70 transition-opacity disabled:opacity-50">
-                {hwDeleting ? 'Deleting…' : '🗑 Delete'}
-              </button>
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60" onClick={() => setHwDetail(null)}>
+          <div
+            className="w-full max-w-md flex flex-col max-h-[82vh]"
+            style={{
+              background: 'var(--surface)',
+              borderRadius: '24px 24px 0 0',
+              boxShadow: '0 -12px 40px rgba(0,0,0,0.6), 0 -2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08)',
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Handle */}
+            <div className="flex justify-center pt-3 shrink-0">
+              <div style={{ width: 36, height: 4, borderRadius: 2, background: 'var(--border)' }} />
             </div>
 
-            <div className="flex-1 overflow-y-auto min-h-0 space-y-2">
+            {/* Header */}
+            <div className="shrink-0 px-5 pt-3 pb-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1 min-w-0">
+                  <p style={{ fontWeight: 900, fontSize: 16, color: 'var(--text)' }} className="truncate">{hwDetail.unitName}</p>
+                  <div className="flex items-center gap-1.5 flex-wrap mt-2">
+                    {hwDetail.modes.map(m => {
+                      const color = HW_MODE_COLOR[m] ?? 'var(--primary)';
+                      return (
+                        <span key={m} style={{
+                          fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20,
+                          background: `color-mix(in srgb, ${color} 20%, transparent)`,
+                          color,
+                          border: `1px solid color-mix(in srgb, ${color} 35%, transparent)`,
+                        }}>{HW_MODE_ICON[m]} {HW_MODE_LABEL[m]}</span>
+                      );
+                    })}
+                    {(() => { const d = dueDateLabel(hwDetail.dueDate); return d ? <span style={{ fontSize: 10, color: d.overdue ? 'var(--danger)' : 'var(--text-muted)' }}>· {d.text}</span> : null; })()}
+                  </div>
+                </div>
+                <button
+                  onClick={deleteHomework}
+                  disabled={hwDeleting}
+                  className="shrink-0 active:scale-95 transition-transform disabled:opacity-50"
+                  style={{
+                    fontSize: 11, fontWeight: 700, padding: '6px 12px', borderRadius: 10,
+                    background: 'color-mix(in srgb, var(--danger) 12%, transparent)',
+                    color: 'var(--danger)',
+                    border: '1px solid color-mix(in srgb, var(--danger) 30%, transparent)',
+                  }}
+                >{hwDeleting ? 'Deleting…' : '🗑 Delete'}</button>
+              </div>
+            </div>
+
+            {/* Student list */}
+            <div className="flex-1 overflow-y-auto min-h-0 px-5 py-3 space-y-2">
               {detailLoading ? (
-                <div className="flex justify-center py-8"><div className="text-3xl animate-bounce">📋</div></div>
+                <div className="flex justify-center py-10"><div className="text-3xl animate-bounce">📋</div></div>
               ) : detailProgress.length === 0 ? (
-                <p className="text-sm text-center text-[var(--text-muted)] py-6">No students assigned</p>
+                <p className="text-sm text-center text-[var(--text-muted)] py-8">No students assigned</p>
               ) : detailProgress.map(sp => {
                 const doneModes = hwDetail.modes.filter(m => sp.modes.has(m));
                 const allDone = doneModes.length === hwDetail.modes.length;
                 return (
-                  <div key={sp.studentId} className="px-3 py-3 rounded-xl" style={{ background: 'var(--surface-2)' }}>
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="text-sm font-bold text-[var(--text)]">{sp.name}</p>
-                      <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{
-                        background: allDone ? 'color-mix(in srgb, #22c55e 15%, transparent)' : 'var(--border)',
-                        color: allDone ? '#22c55e' : 'var(--text-muted)',
+                  <div key={sp.studentId} style={{
+                    padding: '12px 14px',
+                    borderRadius: 14,
+                    background: 'var(--surface-2)',
+                    boxShadow: allDone
+                      ? 'inset 0 2px 5px rgba(0,0,0,0.2), 0 0 0 1px rgba(34,197,94,0.2)'
+                      : 'inset 0 2px 5px rgba(0,0,0,0.2)',
+                  }}>
+                    <div className="flex items-center justify-between mb-2.5">
+                      <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>{sp.name}</p>
+                      <span style={{
+                        fontSize: 11, fontWeight: 800, padding: '3px 10px', borderRadius: 20,
+                        background: allDone ? 'linear-gradient(135deg, #22c55e, #15803d)' : 'var(--border)',
+                        color: allDone ? 'white' : 'var(--text-muted)',
+                        boxShadow: allDone ? '0 2px 6px rgba(34,197,94,0.4), inset 0 1px 0 rgba(255,255,255,0.2)' : 'inset 0 1px 3px rgba(0,0,0,0.2)',
                       }}>
                         {allDone ? '✓ Done' : `${doneModes.length}/${hwDetail.modes.length}`}
                       </span>
@@ -1518,13 +1561,21 @@ function CurriculumTab({
                         const done = sp.modes.has(m);
                         const color = HW_MODE_COLOR[m] ?? 'var(--primary)';
                         return (
-                          <span key={m} className="text-[11px] font-semibold px-2.5 py-1 rounded-full flex items-center gap-1" style={{
-                            background: done ? `color-mix(in srgb, ${color} 18%, transparent)` : 'var(--border)',
-                            color: done ? color : 'var(--text-muted)',
+                          <span key={m} style={{
+                            fontSize: 11, fontWeight: 700, padding: '4px 11px', borderRadius: 20,
+                            display: 'flex', alignItems: 'center', gap: 4,
+                            ...(done ? {
+                              background: `linear-gradient(135deg, ${color}, color-mix(in srgb, ${color} 70%, #000))`,
+                              color: 'white',
+                              boxShadow: `0 2px 8px color-mix(in srgb, ${color} 45%, transparent), inset 0 1px 0 rgba(255,255,255,0.2)`,
+                            } : {
+                              background: 'var(--surface)',
+                              color: 'var(--text-muted)',
+                              boxShadow: 'inset 0 1px 4px rgba(0,0,0,0.25)',
+                            }),
                           }}>
-                            <span style={{ opacity: done ? 1 : 0.4 }}>{HW_MODE_ICON[m]}</span>
+                            <span style={{ opacity: done ? 1 : 0.35, fontSize: 12 }}>{HW_MODE_ICON[m]}</span>
                             {HW_MODE_LABEL[m] ?? m}
-                            {done && <span className="text-[9px] font-black">✓</span>}
                           </span>
                         );
                       })}
@@ -1534,7 +1585,20 @@ function CurriculumTab({
               })}
             </div>
 
-            <button onClick={() => setHwDetail(null)} className="w-full btn-ghost py-3 shrink-0">Close</button>
+            {/* Close */}
+            <div className="shrink-0 px-5 pb-6 pt-3" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+              <button
+                onClick={() => setHwDetail(null)}
+                className="w-full active:scale-[0.98] transition-transform"
+                style={{
+                  padding: '14px', borderRadius: 14, fontWeight: 700, fontSize: 14,
+                  background: 'var(--surface-2)',
+                  color: 'var(--text-muted)',
+                  boxShadow: 'inset 0 2px 5px rgba(0,0,0,0.2), 0 1px 0 rgba(255,255,255,0.04)',
+                  border: 'none',
+                }}
+              >Close</button>
+            </div>
           </div>
         </div>
       )}
