@@ -637,6 +637,7 @@ function LearnInner() {
         streak={getStreak()}
         todayCount={getTodayLearnedCount()}
         onRestart={() => { setIndex(0); setMaxReached(0); setDone(false); setSessionCount(0); setSkipped([]); setPureSkipped([]); setMarks(new Array(words.length).fill(null)); }}
+        classHWNextUrl={sourceClassHW && sp.get('hwId') ? `/flashcards?source=class-hw&className=${encodeURIComponent(classNameParam)}&classId=${classIdParam}&hwId=${sp.get('hwId')}` : undefined}
       />
     );
   }
@@ -1152,7 +1153,7 @@ function LoadingState() {
 }
 
 function SessionDone({
-  sessionCount, skipped, pureSkipped, backUrl, collectionName, dayNumber, xpEarned, streak, todayCount, onRestart,
+  sessionCount, skipped, pureSkipped, backUrl, collectionName, dayNumber, xpEarned, streak, todayCount, onRestart, classHWNextUrl,
 }: {
   sessionCount: number;
   skipped: StudyWord[];
@@ -1164,6 +1165,7 @@ function SessionDone({
   streak: number;
   todayCount: number;
   onRestart: () => void;
+  classHWNextUrl?: string;
 }) {
   const t = useTranslation();
   const hardStudyUrl = collectionName
@@ -1203,7 +1205,7 @@ function SessionDone({
         </div>
       </div>
 
-      {/* Next step: Flashcards */}
+      {/* Next step: Flashcards (regular) */}
       {collectionName && dayNumber !== undefined && (
         <Link
           href={`/flashcards?collection=${encodeURIComponent(collectionName)}&day=${dayNumber}`}
@@ -1213,6 +1215,21 @@ function SessionDone({
           <div>
             <div className="font-bold text-sm">{t.learn.practiceFlashcards}</div>
             <div className="text-xs opacity-80 mt-0.5">{t.learn.reinforceSub}</div>
+          </div>
+          <span className="text-lg">→</span>
+        </Link>
+      )}
+
+      {/* Next step: Cards (class homework) */}
+      {classHWNextUrl && (
+        <Link
+          href={classHWNextUrl}
+          className="w-full flex items-center justify-between px-5 py-4 rounded-2xl text-white mb-1"
+          style={{ background: 'linear-gradient(135deg, #ea580c, #f97316)' }}
+        >
+          <div>
+            <div className="font-bold text-sm">Next: Practice with Cards</div>
+            <div className="text-xs opacity-80 mt-0.5">Reinforce what you just learned</div>
           </div>
           <span className="text-lg">→</span>
         </Link>
