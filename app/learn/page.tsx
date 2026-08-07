@@ -425,6 +425,10 @@ function LearnInner() {
       if (user) {
         await initClassSRSWord(user.id, classIdParam, current.word, current.translation);
       }
+    } else if (sourceClassHW) {
+      // Class homework: teacher-assigned words, always award XP per word
+      isNew = true;
+      incrementTodayCount();
     } else {
       isNew = saveLearnedWord({
         word: current.word,
