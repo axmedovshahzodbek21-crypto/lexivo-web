@@ -240,8 +240,11 @@ function classMasteryColor(pct: number): string {
   return '#22c55e';
 }
 
+interface FolderHeatUnit { id: string; name: string; hasHw: boolean; pct: number; }
+interface FolderHeatFolder { id: string; name: string; units: FolderHeatUnit[]; }
+
 function AnalyticsTab({
-  analyticsData, activeStudents, progressPoints, loading, students, collections, digestText, digestLoading, onDigest,
+  analyticsData, activeStudents, progressPoints, loading, students, collections, classId, digestText, digestLoading, onDigest,
 }: {
   analyticsData: AnalyticsRow[];
   activeStudents: ActiveStudent[];
@@ -255,6 +258,50 @@ function AnalyticsTab({
   onDigest: () => void;
 }) {
   const studentName = (id: string) => students.find(s => s.student_id === id)?.name ?? 'Unknown';
+
+  const [folderHeatmap, setFolderHeatmap] = useState<FolderHeatFolder[]>([]);
+  useEffect(() => {
+    if (!classId || students.length === 0) return;
+    (async () => {
+      const { data: assigns } = await supabase
+        .from('class_library_assignments')
+        .select('id, teacher_folders(id, name)')
+        .eq('class_id', classId);
+      if (!assigns || assigns.length === 0) return;
+      const folderIds = (assigns as any[]).map((a: any) => a.teacher_folders.id);
+      const { data: unitData } = await supabase
+        .from('teacher_units').select('id, folder_id, name')
+        .in('folder_id', folderIds).order('position').order('created_at');
+      const unitIds = (unitData ?? []).map((u: any) => u.id);
+      const { data: hwData } = unitIds.length > 0
+        ? await supabase.from('class_homework').select('id, unit_id, modes, student_ids').eq('class_id', classId).in('unit_id', unitIds)
+        : { data: [] };
+      const hwIds = (hwData ?? []).map((h: any) => h.id);
+      const { data: progData } = hwIds.length > 0
+        ? await supabase.from('class_homework_progress').select('homework_id, student_id, mode').in('homework_id', hwIds)
+        : { data: [] };
+      const prog = (progData ?? []) as { homework_id: string; student_id: string; mode: string }[];
+      const hwMap = new Map<string, { id: string; modes: string[]; studentIds: string[] | null }>();
+      for (const h of (hwData ?? []) as any[]) hwMap.set(h.unit_id, { id: h.id, modes: h.modes, studentIds: h.student_ids });
+      setFolderHeatmap((assigns as any[]).map((a: any) => ({
+        id: a.teacher_folders.id,
+        name: a.teacher_folders.name,
+        units: ((unitData ?? []) as any[])
+          .filter((u: any) => u.folder_id === a.teacher_folders.id)
+          .map((u: any) => {
+            const hw = hwMap.get(u.id);
+            if (!hw) return { id: u.id, name: u.name, hasHw: false, pct: 0 };
+            const assigned = hw.studentIds ?? students.map(s => s.student_id);
+            const n = assigned.length;
+            if (n === 0) return { id: u.id, name: u.name, hasHw: true, pct: 0 };
+            const completed = assigned.filter(sid =>
+              hw.modes.every(mode => prog.some(p => p.homework_id === hw.id && p.student_id === sid && p.mode === mode))
+            ).length;
+            return { id: u.id, name: u.name, hasHw: true, pct: Math.round((completed / n) * 100) };
+          }),
+      })));
+    })();
+  }, [classId, students]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (loading) return <div className="flex justify-center py-12"><div className="text-4xl animate-bounce">📊</div></div>;
 
@@ -427,6 +474,59 @@ function AnalyticsTab({
                 </div>
               );
             })}
+          </div>
+        </div>
+      )}
+
+      {/* Library Folder Heatmap */}
+      {folderHeatmap.length > 0 && (
+        <div>
+          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide mb-2">📁 Library Homework Completion</p>
+          <div className="card p-3 space-y-3">
+            <p className="text-[10px] text-[var(--text-muted)]">% of assigned students who completed all modes · dashed = no homework assigned</p>
+            {folderHeatmap.map(folder => {
+              const hwUnits = folder.units.filter(u => u.hasHw);
+              const avgPct = hwUnits.length > 0
+                ? Math.round(hwUnits.reduce((s, u) => s + u.pct, 0) / hwUnits.length)
+                : null;
+              return (
+                <div key={folder.id}>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-[10px] font-bold text-[var(--text)]">📁 {folder.name}</span>
+                    {avgPct !== null
+                      ? <span className="text-[9px] font-semibold" style={{ color: classMasteryColor(avgPct) }}>{avgPct}% avg</span>
+                      : <span className="text-[9px] text-[var(--text-muted)]">no homework yet</span>}
+                  </div>
+                  <div className="flex flex-wrap gap-1">
+                    {folder.units.map((unit, i) => (
+                      <div
+                        key={unit.id}
+                        title={unit.hasHw ? `${unit.name}: ${unit.pct}% completed` : `${unit.name}: no homework assigned`}
+                        className="flex items-center justify-center text-[8px] font-black"
+                        style={{
+                          width: 28, height: 28, borderRadius: 5,
+                          ...(unit.hasHw
+                            ? { background: classMasteryColor(unit.pct), color: 'white', opacity: unit.pct === 0 ? 0.4 : 1 }
+                            : { background: 'transparent', color: 'var(--text-muted)', border: '1px dashed var(--border)', opacity: 0.5 }),
+                        }}
+                      >{i + 1}</div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+            <div className="flex items-center gap-3 flex-wrap pt-1 border-t border-[var(--border)]">
+              <div className="flex items-center gap-1">
+                <div className="w-2.5 h-2.5 rounded" style={{ border: '1px dashed var(--border)' }} />
+                <span className="text-[9px] text-[var(--text-muted)]">No HW</span>
+              </div>
+              {[{ color: 'var(--border)', label: '0%' }, { color: '#ef4444', label: '<25%' }, { color: '#eab308', label: '50%' }, { color: '#84cc16', label: '75%' }, { color: '#22c55e', label: '90%+' }].map(({ color, label }) => (
+                <div key={label} className="flex items-center gap-1">
+                  <div className="w-2.5 h-2.5 rounded" style={{ background: color }} />
+                  <span className="text-[9px] text-[var(--text-muted)]">{label}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}
