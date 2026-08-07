@@ -683,6 +683,7 @@ function SRSTab({
 }
 
 const HW_MODE_ICON: Record<string, string> = { learn: '📖', flashcard: '🃏', quiz: '🧠', match: '🎯' };
+const HW_MODE_LABEL: Record<string, string> = { learn: 'Learn', flashcard: 'Cards', quiz: 'Quiz', match: 'Match' };
 const HW_MODE_COLOR: Record<string, string> = { learn: '#3B82F6', flashcard: '#8B5CF6', quiz: '#EC4899', match: '#10B981' };
 const REQUIRED_MODES = ['learn', 'flashcard', 'quiz'];
 const OPTIONAL_MODES = ['match'];
@@ -1135,35 +1136,51 @@ function CurriculumTab({
               const due = dueDateLabel(hw.dueDate);
               return (
                 <button key={hw.id} onClick={() => openHwDetail(hw)} className="card w-full text-left space-y-3 hover:opacity-90 transition-opacity">
-                  <div className="flex items-start gap-3">
+                  {/* Header */}
+                  <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-1.5 flex-wrap">
                         <p className="font-bold text-sm text-[var(--text)] truncate">{hw.unitName}</p>
                         {hw.source === 'class' && <span className="shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded" style={{ background: 'color-mix(in srgb, #F59E0B 15%, transparent)', color: '#F59E0B' }}>Class</span>}
                         {hw.source === 'collection' && <span className="shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded" style={{ background: 'rgba(34,197,94,0.15)', color: '#16a34a' }}>📗</span>}
+                        {due && (
+                          <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${due.overdue ? 'text-[var(--danger)]' : 'text-[var(--text-muted)]'}`} style={{ background: due.overdue ? 'color-mix(in srgb, var(--danger) 10%, transparent)' : 'var(--surface-2)' }}>
+                            {due.text}
+                          </span>
+                        )}
                       </div>
-                      <div className="flex items-center gap-1.5 mt-0.5">
-                        {hw.modes.map(m => <span key={m} className="text-xs">{HW_MODE_ICON[m] ?? m}</span>)}
-                        {hw.studentIds && <span className="text-[10px] text-[var(--text-muted)]">· {hw.studentIds.length} student{hw.studentIds.length !== 1 ? 's' : ''}</span>}
-                      </div>
+                      <p className="text-[11px] text-[var(--text-muted)] mt-0.5">{total} student{total !== 1 ? 's' : ''}</p>
                     </div>
-                    {due && (
-                      <span className={`shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full ${due.overdue ? 'text-[var(--danger)]' : 'text-[var(--text-muted)]'}`} style={{ background: due.overdue ? 'color-mix(in srgb, var(--danger) 10%, transparent)' : 'var(--surface-2)' }}>
-                        {due.text}
-                      </span>
-                    )}
+                    {/* Overall completion pill */}
+                    {(() => {
+                      const allModeDone = total > 0 ? Math.floor(
+                        hw.modes.reduce((sum, m) => sum + (hw.progressByMode[m] ?? 0), 0) / hw.modes.length
+                      ) : 0;
+                      const allDone = hw.modes.every(m => (hw.progressByMode[m] ?? 0) >= total && total > 0);
+                      return (
+                        <div className="shrink-0 text-right">
+                          <p className="text-sm font-black" style={{ color: allDone ? '#22c55e' : 'var(--text)' }}>{allModeDone}/{total}</p>
+                          <p className="text-[9px] text-[var(--text-muted)]">{allDone ? 'all done ✓' : 'avg done'}</p>
+                        </div>
+                      );
+                    })()}
                   </div>
-                  <div className="space-y-1.5">
+                  {/* Per-mode rows */}
+                  <div className="space-y-2">
                     {hw.modes.map(mode => {
                       const done = hw.progressByMode[mode] ?? 0;
                       const pct = total === 0 ? 0 : (done / total) * 100;
+                      const color = HW_MODE_COLOR[mode] ?? 'var(--primary)';
                       return (
-                        <div key={mode} className="flex items-center gap-2">
-                          <span className="text-xs w-4 shrink-0">{HW_MODE_ICON[mode] ?? mode}</span>
-                          <div className="flex-1 h-1.5 rounded-full" style={{ background: 'var(--border)' }}>
-                            <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: HW_MODE_COLOR[mode] ?? 'var(--primary)' }} />
+                        <div key={mode} className="flex items-center gap-2.5">
+                          <div className="flex items-center gap-1.5 w-20 shrink-0">
+                            <span className="text-sm leading-none">{HW_MODE_ICON[mode]}</span>
+                            <span className="text-xs font-semibold" style={{ color }}>{HW_MODE_LABEL[mode] ?? mode}</span>
                           </div>
-                          <span className="text-[10px] text-[var(--text-muted)] w-10 text-right font-medium shrink-0">{done}/{total}</span>
+                          <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
+                            <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: color }} />
+                          </div>
+                          <span className="text-xs font-bold text-[var(--text)] w-10 text-right shrink-0">{done}/{total}</span>
                         </div>
                       );
                     })}
@@ -1435,16 +1452,31 @@ function CurriculumTab({
                 const doneModes = hwDetail.modes.filter(m => sp.modes.has(m));
                 const allDone = doneModes.length === hwDetail.modes.length;
                 return (
-                  <div key={sp.studentId} className="flex items-center gap-3 px-3 py-2.5 rounded-xl" style={{ background: 'var(--surface-2)' }}>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-[var(--text)]">{sp.name}</p>
-                      <div className="flex items-center gap-1.5 mt-0.5">
-                        {hwDetail.modes.map(m => <span key={m} className="text-sm" style={{ opacity: sp.modes.has(m) ? 1 : 0.2 }}>{HW_MODE_ICON[m] ?? m}</span>)}
-                      </div>
+                  <div key={sp.studentId} className="px-3 py-3 rounded-xl" style={{ background: 'var(--surface-2)' }}>
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-sm font-bold text-[var(--text)]">{sp.name}</p>
+                      <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{
+                        background: allDone ? 'color-mix(in srgb, #22c55e 15%, transparent)' : 'var(--border)',
+                        color: allDone ? '#22c55e' : 'var(--text-muted)',
+                      }}>
+                        {allDone ? '✓ Done' : `${doneModes.length}/${hwDetail.modes.length}`}
+                      </span>
                     </div>
-                    <div className="text-right shrink-0">
-                      <p className="text-sm font-bold" style={{ color: allDone ? 'var(--success, #22c55e)' : 'var(--text-muted)' }}>{doneModes.length}/{hwDetail.modes.length}</p>
-                      <p className="text-[9px] text-[var(--text-muted)]">{allDone ? 'done ✓' : 'in progress'}</p>
+                    <div className="flex gap-1.5 flex-wrap">
+                      {hwDetail.modes.map(m => {
+                        const done = sp.modes.has(m);
+                        const color = HW_MODE_COLOR[m] ?? 'var(--primary)';
+                        return (
+                          <span key={m} className="text-[11px] font-semibold px-2.5 py-1 rounded-full flex items-center gap-1" style={{
+                            background: done ? `color-mix(in srgb, ${color} 18%, transparent)` : 'var(--border)',
+                            color: done ? color : 'var(--text-muted)',
+                          }}>
+                            <span style={{ opacity: done ? 1 : 0.4 }}>{HW_MODE_ICON[m]}</span>
+                            {HW_MODE_LABEL[m] ?? m}
+                            {done && <span className="text-[9px] font-black">✓</span>}
+                          </span>
+                        );
+                      })}
                     </div>
                   </div>
                 );
