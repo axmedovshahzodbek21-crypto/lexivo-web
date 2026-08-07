@@ -25,6 +25,24 @@ function avatarColor(userId: string): string {
 }
 const _homeCache = new Map<string, HomeCache>();
 
+const XP_REASON_ICON: Record<string, string> = { Learn: '📖', Cards: '🃏', Quiz: '🧠', Match: '🎯', 'SRS Review': '🔄' };
+function XpHistoryRow({ entry }: { entry: { amount: number; reason: string; created_at: string } }) {
+  const icon = XP_REASON_ICON[entry.reason] ?? '⚡';
+  const diff = Date.now() - new Date(entry.created_at).getTime();
+  const m = Math.floor(diff / 60000);
+  const ago = m < 1 ? 'just now' : m < 60 ? `${m}m ago` : m < 1440 ? `${Math.floor(m / 60)}h ago` : m < 10080 ? `${Math.floor(m / 1440)}d ago` : new Date(entry.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  return (
+    <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-[var(--surface-2)]">
+      <span className="text-xl shrink-0">{icon}</span>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-semibold text-[var(--text)]">{entry.reason}</p>
+        <p className="text-[11px] text-[var(--text-muted)]">{ago}</p>
+      </div>
+      <p className="text-sm font-black shrink-0" style={{ color: 'var(--primary)' }}>+{entry.amount.toFixed(1)}</p>
+    </div>
+  );
+}
+
 function timeAgo(iso: string) {
   const m = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
   if (m < 1) return 'just now';
@@ -83,6 +101,12 @@ export default function ClassHomePage() {
   const [students, setStudents] = useState<StudentProfile[]>([]);
   const [studentsLoading, setStudentsLoading] = useState(false);
   const [studentsError, setStudentsError] = useState('');
+  const [xpHistoryStudent, setXpHistoryStudent] = useState<StudentProfile | null>(null);
+  const [teacherXpHistory, setTeacherXpHistory] = useState<{ id: string; amount: number; reason: string; created_at: string }[]>([]);
+  const [teacherXpHistoryLoading, setTeacherXpHistoryLoading] = useState(false);
+  const [myXpHistory, setMyXpHistory] = useState<{ id: string; amount: number; reason: string; created_at: string }[]>([]);
+  const [myXpHistoryLoading, setMyXpHistoryLoading] = useState(false);
+  const [myXpHistoryLoaded, setMyXpHistoryLoaded] = useState(false);
   const memberIdsRef = useRef<string[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [targets, setTargets] = useState<Target[]>([]);
@@ -193,6 +217,30 @@ export default function ClassHomePage() {
       setLoading(false);
     })();
   }, [id, user, router]);
+
+  const openXpHistory = async (s: StudentProfile) => {
+    setXpHistoryStudent(s);
+    setTeacherXpHistoryLoading(true);
+    setTeacherXpHistory([]);
+    const { data } = await supabase.rpc('get_student_xp_history', { p_class_id: id, p_student_id: s.id });
+    setTeacherXpHistory((data ?? []) as { id: string; amount: number; reason: string; created_at: string }[]);
+    setTeacherXpHistoryLoading(false);
+  };
+
+  const loadMyXpHistory = async () => {
+    if (myXpHistoryLoaded || !user) return;
+    setMyXpHistoryLoading(true);
+    const { data } = await supabase
+      .from('class_xp_history')
+      .select('id, amount, reason, created_at')
+      .eq('user_id', user.id)
+      .eq('class_id', id)
+      .order('created_at', { ascending: false })
+      .limit(30);
+    setMyXpHistory((data ?? []) as { id: string; amount: number; reason: string; created_at: string }[]);
+    setMyXpHistoryLoaded(true);
+    setMyXpHistoryLoading(false);
+  };
 
   const openStudentsSheet = async () => {
     setShowStudents(true);
@@ -338,16 +386,45 @@ export default function ClassHomePage() {
                       </div>
                       {s.streak > 0 && <p className="text-xs text-[var(--text-muted)]">🔥 {s.streak} day streak</p>}
                     </div>
-                    <div className="text-right shrink-0">
+                    <button onClick={() => openXpHistory(s)} className="text-right shrink-0 hover:opacity-70 transition-opacity active:scale-95">
                       <p className="text-sm font-black" style={{ color: 'var(--primary)' }}>{s.xp.toFixed(1)} XP</p>
-                      {s.total_learned > 0 && <p className="text-[10px] text-[var(--text-muted)]">{s.total_learned} words</p>}
-                    </div>
+                      <p className="text-[10px] text-[var(--text-muted)]">{s.total_learned > 0 ? `${s.total_learned} words` : 'tap for history'}</p>
+                    </button>
                   </div>
                 );
               })}
             </div>
             <div className="px-5 pb-5 pt-3 shrink-0">
               <button onClick={() => setShowStudents(false)} className="w-full btn-ghost py-3 text-sm">Close</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Teacher: student XP history sheet */}
+      {xpHistoryStudent && (
+        <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/50" onClick={() => setXpHistoryStudent(null)}>
+          <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl flex flex-col max-h-[80dvh]" onClick={e => e.stopPropagation()}>
+            <div className="pt-4 px-5 pb-3 shrink-0 border-b border-[var(--border)]">
+              <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto mb-3" />
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="font-bold text-[var(--text)]">⚡ XP History</h2>
+                  <p className="text-xs text-[var(--text-muted)]">{xpHistoryStudent.name} · {xpHistoryStudent.xp.toFixed(1)} XP total</p>
+                </div>
+                <button onClick={() => setXpHistoryStudent(null)} className="text-xs text-[var(--text-muted)] hover:text-[var(--text)]">✕</button>
+              </div>
+            </div>
+            <div className="overflow-y-auto flex-1 px-5 py-3 space-y-2">
+              {teacherXpHistoryLoading ? (
+                <div className="flex justify-center py-10"><div className="w-6 h-6 border-2 border-[var(--primary)] border-t-transparent rounded-full animate-spin" /></div>
+              ) : teacherXpHistory.length === 0 ? (
+                <p className="text-center text-sm text-[var(--text-muted)] py-10">No XP history yet</p>
+              ) : teacherXpHistory.map(h => (
+                <XpHistoryRow key={h.id} entry={h} />
+              ))}
+            </div>
+            <div className="px-5 pb-5 pt-3 shrink-0">
+              <button onClick={() => setXpHistoryStudent(null)} className="w-full btn-ghost py-3 text-sm">Close</button>
             </div>
           </div>
         </div>
@@ -480,6 +557,28 @@ export default function ClassHomePage() {
                 </div>
               ))}
             </div>
+          </section>
+        )}
+
+        {/* My XP History (student only) */}
+        {!isTeacher && (
+          <section>
+            <button
+              className="w-full flex items-center justify-between mb-3"
+              onClick={() => { if (!myXpHistoryLoaded) loadMyXpHistory(); }}
+            >
+              <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--text-muted)]">⚡ My XP History</h2>
+              {!myXpHistoryLoaded && <span className="text-xs text-[var(--primary)] font-semibold">Load</span>}
+            </button>
+            {myXpHistoryLoading ? (
+              <div className="flex justify-center py-6"><div className="w-6 h-6 border-2 border-[var(--primary)] border-t-transparent rounded-full animate-spin" /></div>
+            ) : myXpHistoryLoaded && myXpHistory.length === 0 ? (
+              <p className="text-sm text-center text-[var(--text-muted)] py-4">No XP earned in this class yet</p>
+            ) : myXpHistoryLoaded ? (
+              <div className="space-y-2">
+                {myXpHistory.map(h => <XpHistoryRow key={h.id} entry={h} />)}
+              </div>
+            ) : null}
           </section>
         )}
 

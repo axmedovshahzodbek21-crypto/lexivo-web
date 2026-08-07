@@ -105,7 +105,7 @@ export default function ClassReviewPage() {
     await Promise.all(finalResults.map(r => advanceClassSRSWord(userId, id, r.word, r.knew)));
     const knewCount = finalResults.filter(r => r.knew).length;
     const xp = knewCount * 2; // 2 XP per correct review (matches personal SRS rate)
-    await recordClassXP(userId, id, xp); // class XP is isolated from the app-wide pool — no level-up here
+    await recordClassXP(userId, id, xp, 'SRS Review'); // class XP is isolated from the app-wide pool — no level-up here
     setSessionXP(xp);
     recordStudySession();
   }, [userId, id]);
