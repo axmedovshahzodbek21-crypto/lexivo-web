@@ -993,48 +993,73 @@ function CurriculumTab({
             <button onClick={openFolderPicker} className="btn-primary">+ Assign Folder</button>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {folders.map(folder => {
               const isOpen = expanded.has(folder.id);
               return (
-                <div key={folder.id} className="card overflow-hidden">
+                <div key={folder.id} style={{
+                  borderRadius: 18,
+                  overflow: 'hidden',
+                  boxShadow: '0 10px 28px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.07)',
+                  border: '1px solid rgba(245,158,11,0.22)',
+                }}>
+                  {/* Folder header — amber 3D */}
                   <button
-                    className="w-full flex items-center gap-3 text-left"
+                    className="w-full flex items-center gap-3 text-left active:brightness-90 transition-all"
+                    style={{
+                      padding: '14px 16px',
+                      background: 'linear-gradient(160deg, #FBBF24 0%, #D97706 60%, #B45309 100%)',
+                      boxShadow: isOpen ? 'inset 0 -3px 8px rgba(0,0,0,0.2)' : undefined,
+                    }}
                     onClick={() => setExpanded(prev => { const next = new Set(prev); if (isOpen) { next.delete(folder.id); } else { next.add(folder.id); } return next; })}
                   >
-                    <span className="text-xl">📁</span>
+                    <span style={{ fontSize: 28, filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.35))' }}>📁</span>
                     <div className="flex-1 min-w-0">
-                      <p className="font-bold text-sm text-[var(--text)] truncate">{folder.name}</p>
-                      <p className="text-xs text-[var(--text-muted)]">{folder.units.length} unit{folder.units.length !== 1 ? 's' : ''}</p>
+                      <p style={{ fontWeight: 900, fontSize: 15, color: 'white', textShadow: '0 1px 3px rgba(0,0,0,0.4)' }} className="truncate">{folder.name}</p>
+                      <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.72)' }}>{folder.units.length} unit{folder.units.length !== 1 ? 's' : ''}</p>
                     </div>
                     <div className="flex items-center gap-3 shrink-0">
-                      <button onClick={e => { e.stopPropagation(); unassignFolder(folder.assignmentId); }} className="text-[10px] text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors">
-                        Remove
-                      </button>
-                      <span className="text-xs text-[var(--text-muted)]">{isOpen ? '▲' : '▼'}</span>
+                      <button
+                        onClick={e => { e.stopPropagation(); unassignFolder(folder.assignmentId); }}
+                        className="hover:bg-white/10 transition-colors"
+                        style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', padding: '3px 9px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.25)' }}
+                      >Remove</button>
+                      <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 11, fontWeight: 700 }}>{isOpen ? '▲' : '▼'}</span>
                     </div>
                   </button>
 
+                  {/* Units — inset tray */}
                   {isOpen && (
-                    <div className="mt-3 border-t border-[var(--border)] pt-3 space-y-2">
+                    <div className="space-y-2" style={{ background: 'var(--surface)', padding: '12px 12px 14px', boxShadow: 'inset 0 4px 12px rgba(0,0,0,0.28)' }}>
                       {folder.units.length === 0 ? (
-                        <p className="text-xs text-[var(--text-muted)] text-center py-3">No units in this folder</p>
+                        <p className="text-xs text-[var(--text-muted)] text-center py-4">No units in this folder</p>
                       ) : folder.units.map(unit => {
                         const hw = homework.find(h => h.source === 'library' && h.unitId === unit.id);
                         return (
-                          <div key={unit.id} className="flex items-center gap-3 px-2 py-2 rounded-xl" style={{ background: 'var(--surface-2)' }}>
+                          <div key={unit.id} className="flex items-center gap-3" style={{
+                            padding: '10px 14px',
+                            borderRadius: 12,
+                            background: 'var(--surface-2)',
+                            boxShadow: 'inset 0 2px 5px rgba(0,0,0,0.22), 0 1px 0 rgba(255,255,255,0.04)',
+                          }}>
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm font-semibold text-[var(--text)] truncate">{unit.name}</p>
-                              <p className="text-[10px] text-[var(--text-muted)]">{unit.wordCount} words</p>
+                              <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }} className="truncate">{unit.name}</p>
+                              <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>{unit.wordCount} words</p>
                             </div>
                             {hw ? (
-                              <button onClick={() => openHwDetail(hw)} className="shrink-0 text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: 'color-mix(in srgb, var(--primary) 15%, transparent)', color: 'var(--primary)' }}>
-                                📋 Assigned
-                              </button>
+                              <button onClick={() => openHwDetail(hw)} className="shrink-0 active:scale-95 transition-transform" style={{
+                                fontSize: 11, fontWeight: 800, padding: '5px 13px', borderRadius: 20,
+                                background: 'linear-gradient(135deg, #22c55e, #15803d)',
+                                color: 'white',
+                                boxShadow: '0 3px 8px rgba(34,197,94,0.4), inset 0 1px 0 rgba(255,255,255,0.2)',
+                              }}>✓ Assigned</button>
                             ) : (
-                              <button onClick={() => openHwModal(unit)} className="shrink-0 text-[10px] font-semibold px-2.5 py-1 rounded-full border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--primary)] hover:border-[var(--primary)] transition-colors">
-                                + Homework
-                              </button>
+                              <button onClick={() => openHwModal(unit)} className="shrink-0 active:scale-95 transition-transform" style={{
+                                fontSize: 11, fontWeight: 700, padding: '5px 13px', borderRadius: 20,
+                                background: 'linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 65%, #8b5cf6))',
+                                color: 'white',
+                                boxShadow: '0 3px 10px color-mix(in srgb, var(--primary) 45%, transparent), inset 0 1px 0 rgba(255,255,255,0.18)',
+                              }}>+ Homework</button>
                             )}
                           </div>
                         );
@@ -1067,36 +1092,58 @@ function CurriculumTab({
               const isOpen = expandedCW.has(unit.id);
               const hw = homework.find(h => h.source === 'class' && h.classUnitId === unit.id);
               return (
-                <div key={unit.id} className="card overflow-hidden">
+                <div key={unit.id} style={{
+                  borderRadius: 16,
+                  overflow: 'hidden',
+                  boxShadow: '0 8px 20px rgba(0,0,0,0.38), 0 2px 5px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.06)',
+                  border: '1px solid rgba(99,102,241,0.2)',
+                }}>
                   <button
-                    className="w-full flex items-center gap-3 text-left"
+                    className="w-full flex items-center gap-3 text-left active:brightness-90 transition-all"
+                    style={{
+                      padding: '13px 16px',
+                      background: 'linear-gradient(155deg, #6366F1 0%, #4F46E5 60%, #3730A3 100%)',
+                      boxShadow: isOpen ? 'inset 0 -3px 8px rgba(0,0,0,0.2)' : undefined,
+                    }}
                     onClick={() => setExpandedCW(prev => { const next = new Set(prev); if (isOpen) { next.delete(unit.id); } else { next.add(unit.id); } return next; })}
                   >
-                    <span className="text-xl">📝</span>
+                    <span style={{ fontSize: 26, filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.35))' }}>📝</span>
                     <div className="flex-1 min-w-0">
-                      <p className="font-bold text-sm text-[var(--text)] truncate">{unit.name}</p>
-                      <p className="text-xs text-[var(--text-muted)]">{unit.wordCount} word{unit.wordCount !== 1 ? 's' : ''}</p>
+                      <p style={{ fontWeight: 900, fontSize: 14, color: 'white', textShadow: '0 1px 3px rgba(0,0,0,0.4)' }} className="truncate">{unit.name}</p>
+                      <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)' }}>{unit.wordCount} word{unit.wordCount !== 1 ? 's' : ''}</p>
                     </div>
-                    <div className="flex items-center gap-3 shrink-0">
-                      <button onClick={e => { e.stopPropagation(); setCwUnitRenameName(unit.name); setCwUnitRenaming(unit); }} className="text-[10px] text-[var(--text-muted)] hover:text-[var(--primary)] transition-colors">Rename</button>
-                      <button onClick={e => { e.stopPropagation(); deleteCWUnit(unit); }} className="text-[10px] text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors">Delete</button>
-                      <span className="text-xs text-[var(--text-muted)]">{isOpen ? '▲' : '▼'}</span>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button onClick={e => { e.stopPropagation(); setCwUnitRenameName(unit.name); setCwUnitRenaming(unit); }} className="hover:bg-white/10 transition-colors" style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', padding: '2px 7px', borderRadius: 6, border: '1px solid rgba(255,255,255,0.2)' }}>Rename</button>
+                      <button onClick={e => { e.stopPropagation(); deleteCWUnit(unit); }} className="hover:bg-red-500/20 transition-colors" style={{ fontSize: 10, color: 'rgba(255,200,200,0.7)', padding: '2px 7px', borderRadius: 6, border: '1px solid rgba(255,100,100,0.2)' }}>Delete</button>
+                      <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 11, fontWeight: 700 }}>{isOpen ? '▲' : '▼'}</span>
                     </div>
                   </button>
 
                   {isOpen && (
-                    <div className="mt-3 border-t border-[var(--border)] pt-3 flex gap-2">
-                      <button onClick={() => openManageWords(unit)} className="flex-1 text-xs font-semibold px-3 py-2 rounded-xl border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--primary)] hover:border-[var(--primary)] transition-colors">
-                        ✏️ Manage Words
-                      </button>
+                    <div className="flex gap-2" style={{ background: 'var(--surface)', padding: '12px', boxShadow: 'inset 0 4px 12px rgba(0,0,0,0.25)' }}>
+                      <button onClick={() => openManageWords(unit)} className="flex-1 active:scale-95 transition-transform" style={{
+                        fontSize: 12, fontWeight: 600, padding: '9px', borderRadius: 12,
+                        background: 'var(--surface-2)',
+                        color: 'var(--text-muted)',
+                        boxShadow: 'inset 0 2px 5px rgba(0,0,0,0.2), 0 1px 0 rgba(255,255,255,0.04)',
+                        border: 'none',
+                      }}>✏️ Manage Words</button>
                       {hw ? (
-                        <button onClick={() => openHwDetail(hw)} className="flex-1 text-xs font-bold px-3 py-2 rounded-xl" style={{ background: 'color-mix(in srgb, #F59E0B 15%, transparent)', color: '#F59E0B' }}>
-                          📋 View Progress
-                        </button>
+                        <button onClick={() => openHwDetail(hw)} className="flex-1 active:scale-95 transition-transform" style={{
+                          fontSize: 12, fontWeight: 700, padding: '9px', borderRadius: 12,
+                          background: 'linear-gradient(135deg, #F59E0B, #D97706)',
+                          color: 'white',
+                          boxShadow: '0 3px 8px rgba(245,158,11,0.4), inset 0 1px 0 rgba(255,255,255,0.2)',
+                          border: 'none',
+                        }}>📋 View Progress</button>
                       ) : (
-                        <button onClick={() => openHwModal({ ...unit, isClassWords: true })} className="flex-1 text-xs font-semibold px-3 py-2 rounded-xl border border-[var(--border)] text-[var(--text-muted)] hover:text-amber-500 hover:border-amber-400 transition-colors">
-                          + Assign HW
-                        </button>
+                        <button onClick={() => openHwModal({ ...unit, isClassWords: true })} className="flex-1 active:scale-95 transition-transform" style={{
+                          fontSize: 12, fontWeight: 700, padding: '9px', borderRadius: 12,
+                          background: 'linear-gradient(135deg, #F59E0B, #D97706)',
+                          color: 'white',
+                          boxShadow: '0 3px 8px rgba(245,158,11,0.35), inset 0 1px 0 rgba(255,255,255,0.18)',
+                          border: 'none',
+                        }}>+ Assign HW</button>
                       )}
                     </div>
                   )}
@@ -1134,38 +1181,42 @@ function CurriculumTab({
             {homework.map(hw => {
               const total = totalStudentsForHw(hw);
               const due = dueDateLabel(hw.dueDate);
+              const allDone = hw.modes.every(m => (hw.progressByMode[m] ?? 0) >= total && total > 0);
+              const allModeDone = total > 0 ? Math.floor(hw.modes.reduce((sum, m) => sum + (hw.progressByMode[m] ?? 0), 0) / hw.modes.length) : 0;
               return (
-                <button key={hw.id} onClick={() => openHwDetail(hw)} className="card w-full text-left space-y-3 hover:opacity-90 transition-opacity">
+                <button key={hw.id} onClick={() => openHwDetail(hw)} className="w-full text-left active:scale-[0.985] transition-transform" style={{
+                  borderRadius: 16,
+                  padding: '14px 16px',
+                  background: 'var(--surface)',
+                  boxShadow: allDone
+                    ? '0 8px 20px rgba(34,197,94,0.18), 0 2px 5px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.07)'
+                    : '0 8px 20px rgba(0,0,0,0.38), 0 2px 5px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.07)',
+                  border: allDone ? '1px solid rgba(34,197,94,0.3)' : '1px solid rgba(255,255,255,0.06)',
+                  display: 'block',
+                }}>
                   {/* Header */}
-                  <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start justify-between gap-3 mb-3">
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5 flex-wrap">
+                      <div className="flex items-center gap-1.5 flex-wrap mb-0.5">
                         <p className="font-bold text-sm text-[var(--text)] truncate">{hw.unitName}</p>
-                        {hw.source === 'class' && <span className="shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded" style={{ background: 'color-mix(in srgb, #F59E0B 15%, transparent)', color: '#F59E0B' }}>Class</span>}
-                        {hw.source === 'collection' && <span className="shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded" style={{ background: 'rgba(34,197,94,0.15)', color: '#16a34a' }}>📗</span>}
+                        {hw.source === 'class' && <span style={{ fontSize: 9, fontWeight: 800, padding: '2px 6px', borderRadius: 6, background: 'rgba(245,158,11,0.18)', color: '#F59E0B' }}>Class</span>}
+                        {hw.source === 'collection' && <span style={{ fontSize: 9, fontWeight: 800, padding: '2px 6px', borderRadius: 6, background: 'rgba(34,197,94,0.15)', color: '#16a34a' }}>📗</span>}
                         {due && (
-                          <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${due.overdue ? 'text-[var(--danger)]' : 'text-[var(--text-muted)]'}`} style={{ background: due.overdue ? 'color-mix(in srgb, var(--danger) 10%, transparent)' : 'var(--surface-2)' }}>
-                            {due.text}
-                          </span>
+                          <span style={{
+                            fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 20,
+                            color: due.overdue ? 'var(--danger)' : 'var(--text-muted)',
+                            background: due.overdue ? 'color-mix(in srgb, var(--danger) 10%, transparent)' : 'var(--surface-2)',
+                          }}>{due.text}</span>
                         )}
                       </div>
-                      <p className="text-[11px] text-[var(--text-muted)] mt-0.5">{total} student{total !== 1 ? 's' : ''}</p>
+                      <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>{total} student{total !== 1 ? 's' : ''}</p>
                     </div>
-                    {/* Overall completion pill */}
-                    {(() => {
-                      const allModeDone = total > 0 ? Math.floor(
-                        hw.modes.reduce((sum, m) => sum + (hw.progressByMode[m] ?? 0), 0) / hw.modes.length
-                      ) : 0;
-                      const allDone = hw.modes.every(m => (hw.progressByMode[m] ?? 0) >= total && total > 0);
-                      return (
-                        <div className="shrink-0 text-right">
-                          <p className="text-sm font-black" style={{ color: allDone ? '#22c55e' : 'var(--text)' }}>{allModeDone}/{total}</p>
-                          <p className="text-[9px] text-[var(--text-muted)]">{allDone ? 'all done ✓' : 'avg done'}</p>
-                        </div>
-                      );
-                    })()}
+                    <div className="shrink-0 text-right">
+                      <p style={{ fontSize: 15, fontWeight: 900, color: allDone ? '#22c55e' : 'var(--text)' }}>{allModeDone}/{total}</p>
+                      <p style={{ fontSize: 9, color: 'var(--text-muted)' }}>{allDone ? 'all done ✓' : 'avg done'}</p>
+                    </div>
                   </div>
-                  {/* Per-mode rows */}
+                  {/* Per-mode bars */}
                   <div className="space-y-2">
                     {hw.modes.map(mode => {
                       const done = hw.progressByMode[mode] ?? 0;
@@ -1173,14 +1224,14 @@ function CurriculumTab({
                       const color = HW_MODE_COLOR[mode] ?? 'var(--primary)';
                       return (
                         <div key={mode} className="flex items-center gap-2.5">
-                          <div className="flex items-center gap-1.5 w-20 shrink-0">
-                            <span className="text-sm leading-none">{HW_MODE_ICON[mode]}</span>
-                            <span className="text-xs font-semibold" style={{ color }}>{HW_MODE_LABEL[mode] ?? mode}</span>
+                          <div className="flex items-center gap-1.5 shrink-0" style={{ width: 76 }}>
+                            <span style={{ fontSize: 13, lineHeight: 1 }}>{HW_MODE_ICON[mode]}</span>
+                            <span style={{ fontSize: 11, fontWeight: 700, color }}>{HW_MODE_LABEL[mode] ?? mode}</span>
                           </div>
-                          <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
-                            <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: color }} />
+                          <div className="flex-1 rounded-full overflow-hidden" style={{ height: 7, background: 'var(--surface-2)', boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.3)' }}>
+                            <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: `linear-gradient(90deg, ${color}, color-mix(in srgb, ${color} 70%, white))`, boxShadow: `0 0 6px ${color}80` }} />
                           </div>
-                          <span className="text-xs font-bold text-[var(--text)] w-10 text-right shrink-0">{done}/{total}</span>
+                          <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text)', width: 36, textAlign: 'right' }} className="shrink-0">{done}/{total}</span>
                         </div>
                       );
                     })}
