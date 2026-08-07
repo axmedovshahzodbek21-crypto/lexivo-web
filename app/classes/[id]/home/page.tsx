@@ -107,6 +107,7 @@ export default function ClassHomePage() {
   const [myXpHistory, setMyXpHistory] = useState<{ id: string; amount: number; reason: string; created_at: string }[]>([]);
   const [myXpHistoryLoading, setMyXpHistoryLoading] = useState(false);
   const [myXpHistoryLoaded, setMyXpHistoryLoaded] = useState(false);
+  const [pendingHwCount, setPendingHwCount] = useState(0);
   const memberIdsRef = useRef<string[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [targets, setTargets] = useState<Target[]>([]);
@@ -215,6 +216,30 @@ export default function ClassHomePage() {
       setNeedsAttention(snapshot.needsAttention);
       setReadCounts(snapshot.readCounts);
       setLoading(false);
+
+      // Student: async homework pending count (doesn't block main render)
+      if (!teacher) {
+        (async () => {
+          const { data: hwRows } = await supabase
+            .from('class_homework')
+            .select('id, modes, student_ids')
+            .eq('class_id', id);
+          const myHw = ((hwRows ?? []) as { id: string; modes: string[]; student_ids: string[] | null }[])
+            .filter(h => !h.student_ids || h.student_ids.includes(user.id));
+          if (myHw.length === 0) { setPendingHwCount(0); return; }
+          const { data: prog } = await supabase
+            .from('class_homework_progress')
+            .select('homework_id, mode')
+            .eq('student_id', user.id)
+            .in('homework_id', myHw.map(h => h.id));
+          const doneMap: Record<string, Set<string>> = {};
+          for (const p of (prog ?? []) as { homework_id: string; mode: string }[]) {
+            if (!doneMap[p.homework_id]) doneMap[p.homework_id] = new Set();
+            doneMap[p.homework_id].add(p.mode);
+          }
+          setPendingHwCount(myHw.filter(h => !h.modes.every((m: string) => doneMap[h.id]?.has(m))).length);
+        })();
+      }
     })();
   }, [id, user, router]);
 
@@ -514,6 +539,24 @@ export default function ClassHomePage() {
               <p className="text-xs text-[var(--text-muted)]">Haven't studied in 3+ days · Tap to open Dashboard</p>
             </div>
             <span className="text-red-500 text-sm shrink-0">→</span>
+          </button>
+        )}
+
+        {/* Pending homework banner (student) */}
+        {!isTeacher && pendingHwCount > 0 && (
+          <button
+            onClick={() => router.push(`/classes/${id}/homework`)}
+            className="w-full text-left p-4 rounded-2xl flex items-center gap-3 active:scale-[0.98] transition-transform"
+            style={{ background: 'linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 70%, #ec4899))' }}
+          >
+            <span className="text-2xl shrink-0">📋</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-black text-white">
+                {pendingHwCount === 1 ? 'You have new homework!' : `You have ${pendingHwCount} homework assignments`}
+              </p>
+              <p className="text-xs text-white/75">Tap to view and complete →</p>
+            </div>
+            <span className="text-white text-lg shrink-0">→</span>
           </button>
         )}
 
