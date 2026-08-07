@@ -429,6 +429,10 @@ function LearnInner() {
       // Class homework: teacher-assigned words, always award XP per word
       isNew = true;
       incrementTodayCount();
+      if (classIdParam) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) await initClassSRSWord(user.id, classIdParam, current.word, current.translation);
+      }
     } else {
       isNew = saveLearnedWord({
         word: current.word,

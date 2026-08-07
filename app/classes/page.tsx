@@ -9,12 +9,15 @@ function generateCode(): string {
   return 'LEXI-' + Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
 }
 
+interface ClassWord { word: string; translation: string; classId: string; className: string; }
+
 export default function ClassesPage() {
   const router = useRouter();
   const { user } = useAuth();
   const [createdCount, setCreatedCount] = useState<number | null>(null);
   const [joinedCount, setJoinedCount] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'overview' | 'words'>('overview');
 
   const [showCreate, setShowCreate] = useState(false);
   const [className, setClassName] = useState('');
@@ -25,10 +28,19 @@ export default function ClassesPage() {
   const [joinCode, setJoinCode] = useState('');
   const [joinError, setJoinError] = useState('');
 
+  const [myWords, setMyWords] = useState<ClassWord[]>([]);
+  const [wordsLoading, setWordsLoading] = useState(false);
+  const [wordsLoaded, setWordsLoaded] = useState(false);
+  const [wordSearch, setWordSearch] = useState('');
+
   useEffect(() => {
     if (!user) { setLoading(false); return; }
     loadCounts();
   }, [user?.id]);
+
+  useEffect(() => {
+    if (activeTab === 'words' && !wordsLoaded && user) loadWords();
+  }, [activeTab, user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadCounts = async () => {
     if (!user) return;
@@ -39,6 +51,28 @@ export default function ClassesPage() {
     setCreatedCount(c ?? 0);
     setJoinedCount(j ?? 0);
     setLoading(false);
+  };
+
+  const loadWords = async () => {
+    if (!user) return;
+    setWordsLoading(true);
+    const { data: srsRows } = await supabase
+      .from('class_srs_states')
+      .select('word, translation, class_id')
+      .eq('user_id', user.id)
+      .order('word');
+    if (!srsRows?.length) { setMyWords([]); setWordsLoading(false); setWordsLoaded(true); return; }
+    const classIds = [...new Set(srsRows.map(r => r.class_id as string))];
+    const { data: classRows } = await supabase.from('classes').select('id, name').in('id', classIds);
+    const nameMap = Object.fromEntries((classRows ?? []).map(c => [c.id, c.name as string]));
+    setMyWords(srsRows.map(r => ({
+      word: r.word as string,
+      translation: r.translation as string,
+      classId: r.class_id as string,
+      className: nameMap[r.class_id as string] ?? 'Unknown class',
+    })));
+    setWordsLoading(false);
+    setWordsLoaded(true);
   };
 
   const createClass = async () => {
@@ -86,12 +120,29 @@ export default function ClassesPage() {
         </div>
       </div>
 
+      {/* Tab bar */}
+      <div className="flex border-b border-[var(--border)] px-4">
+        {(['overview', 'words'] as const).map(tab => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className="py-3 px-4 text-sm font-semibold transition-colors relative"
+            style={{ color: activeTab === tab ? 'var(--primary)' : 'var(--text-muted)' }}
+          >
+            {tab === 'overview' ? 'Overview' : `My Words${myWords.length > 0 ? ` (${myWords.length})` : ''}`}
+            {activeTab === tab && (
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 rounded-full" style={{ background: 'var(--primary)' }} />
+            )}
+          </button>
+        ))}
+      </div>
+
       <div className="flex-1 flex flex-col gap-4 p-4 max-w-lg mx-auto w-full">
         {loading ? (
           <div className="flex-1 flex items-center justify-center">
             <div className="w-8 h-8 border-2 border-[var(--primary)] border-t-transparent rounded-full animate-spin" />
           </div>
-        ) : (
+        ) : activeTab === 'overview' ? (
           <>
             {/* My Classes card */}
             <button
@@ -145,6 +196,67 @@ export default function ClassesPage() {
                 Join a Class
               </button>
             </div>
+          </>
+        ) : (
+          /* ── My Words tab ── */
+          <>
+            {wordsLoading ? (
+              <div className="flex-1 flex items-center justify-center">
+                <div className="w-8 h-8 border-2 border-[var(--primary)] border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : myWords.length === 0 ? (
+              <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center py-16">
+                <span className="text-5xl">📚</span>
+                <p className="font-bold text-[var(--text)]">No words yet</p>
+                <p className="text-sm text-[var(--text-muted)]">Complete Learn mode in a class or homework to see your words here.</p>
+              </div>
+            ) : (
+              <>
+                {/* Search */}
+                <input
+                  type="text"
+                  placeholder="Search words…"
+                  value={wordSearch}
+                  onChange={e => setWordSearch(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]"
+                />
+
+                {/* Grouped by class */}
+                {(() => {
+                  const q = wordSearch.toLowerCase();
+                  const filtered = myWords.filter(w =>
+                    !q || w.word.toLowerCase().includes(q) || w.translation.toLowerCase().includes(q)
+                  );
+                  const grouped = filtered.reduce<Record<string, { name: string; words: ClassWord[] }>>((acc, w) => {
+                    if (!acc[w.classId]) acc[w.classId] = { name: w.className, words: [] };
+                    acc[w.classId].words.push(w);
+                    return acc;
+                  }, {});
+
+                  if (filtered.length === 0) return (
+                    <p className="text-center text-sm text-[var(--text-muted)] py-8">No matches for &ldquo;{wordSearch}&rdquo;</p>
+                  );
+
+                  return Object.entries(grouped).map(([classId, group]) => (
+                    <div key={classId}>
+                      <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest mb-2">
+                        {group.name} · {group.words.length} word{group.words.length !== 1 ? 's' : ''}
+                      </p>
+                      <div className="space-y-1.5">
+                        {group.words.map((w, i) => (
+                          <div key={i} className="flex items-center gap-3 p-2.5 bg-[var(--surface)] rounded-xl border border-[var(--border)]">
+                            <div className="flex-1 min-w-0">
+                              <p className="font-bold text-sm text-[var(--text)]">{w.word}</p>
+                              <p className="text-xs text-[var(--primary)] font-medium mt-0.5">{w.translation}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ));
+                })()}
+              </>
+            )}
           </>
         )}
       </div>
