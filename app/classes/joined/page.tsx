@@ -243,7 +243,7 @@ export default function JoinedClassesPage() {
                             : <div className="w-7 h-7 rounded-full shrink-0 flex items-center justify-center text-white text-xs font-black" style={{ background: 'var(--primary)' }}>{row.name.charAt(0).toUpperCase()}</div>}
                           <p className={`flex-1 text-sm truncate ${isMe ? 'font-bold text-[var(--primary)]' : 'text-[var(--text)]'}`}>{row.name}{isMe ? ' (you)' : ''}</p>
                           <div className="text-right shrink-0">
-                            <p className="text-xs font-bold text-[var(--primary)]">{row.xp} XP</p>
+                            <p className="text-xs font-bold text-[var(--primary)]">{(row.xp / 10).toFixed(1)} XP</p>
                             <p className="text-[10px] text-[var(--text-muted)]">🔥 {row.streak}</p>
                           </div>
                         </div>

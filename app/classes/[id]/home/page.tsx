@@ -38,7 +38,7 @@ function XpHistoryRow({ entry }: { entry: { amount: number; reason: string; crea
         <p className="text-sm font-semibold text-[var(--text)]">{entry.reason}</p>
         <p className="text-[11px] text-[var(--text-muted)]">{ago}</p>
       </div>
-      <p className="text-sm font-black shrink-0" style={{ color: 'var(--primary)' }}>+{entry.amount.toFixed(1)}</p>
+      <p className="text-sm font-black shrink-0" style={{ color: 'var(--primary)' }}>+{(entry.amount / 10).toFixed(1)}</p>
     </div>
   );
 }
@@ -387,7 +387,7 @@ export default function ClassHomePage() {
                       {s.streak > 0 && <p className="text-xs text-[var(--text-muted)]">🔥 {s.streak} day streak</p>}
                     </div>
                     <button onClick={() => openXpHistory(s)} className="text-right shrink-0 hover:opacity-70 transition-opacity active:scale-95">
-                      <p className="text-sm font-black" style={{ color: 'var(--primary)' }}>{s.xp.toFixed(1)} XP</p>
+                      <p className="text-sm font-black" style={{ color: 'var(--primary)' }}>{(s.xp / 10).toFixed(1)} XP</p>
                       <p className="text-[10px] text-[var(--text-muted)]">{s.total_learned > 0 ? `${s.total_learned} words` : 'tap for history'}</p>
                     </button>
                   </div>
@@ -409,7 +409,7 @@ export default function ClassHomePage() {
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="font-bold text-[var(--text)]">⚡ XP History</h2>
-                  <p className="text-xs text-[var(--text-muted)]">{xpHistoryStudent.name} · {xpHistoryStudent.xp.toFixed(1)} XP total</p>
+                  <p className="text-xs text-[var(--text-muted)]">{xpHistoryStudent.name} · {(xpHistoryStudent.xp / 10).toFixed(1)} XP total</p>
                 </div>
                 <button onClick={() => setXpHistoryStudent(null)} className="text-xs text-[var(--text-muted)] hover:text-[var(--text)]">✕</button>
               </div>

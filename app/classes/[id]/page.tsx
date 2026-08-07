@@ -2190,7 +2190,7 @@ export default function ClassDashboardPage() {
                         <p className="text-xs text-[var(--text-muted)]">Last active: {lastActiveLabel(s.last_study_date)}</p>
                       </div>
                       <div className="text-right shrink-0">
-                        <p className="text-sm font-black text-[var(--primary)]">{s.xp} XP</p>
+                        <p className="text-sm font-black text-[var(--primary)]">{(s.xp / 10).toFixed(1)} XP</p>
                         <p className="text-[10px] text-[var(--text-muted)]">
                           <button onClick={() => { const now = new Date(); setCalendarMonth({ year: now.getFullYear(), month: now.getMonth() }); setStreakModal(s); }} className="font-semibold hover:opacity-70 transition-opacity">🔥 {s.streak} ↗</button>
                           {' · 📚 '}{s.total_words}
