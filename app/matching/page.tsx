@@ -5,7 +5,7 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
-import { getHardWords, getStarredWords, getCustomListWords, getImportedWords, getImportedWordsByCollection, getClassHWTemp } from '@/lib/storage';
+import { getHardWords, getStarredWords, getCustomListWords, getImportedWords, getImportedWordsByCollection, getClassHWTemp, addXP, hasMatchXPAwarded, markMatchXPAwarded } from '@/lib/storage';
 import { getClassWordsFull, addClassHardWord } from '@/lib/class-srs';
 import { supabase } from '@/lib/supabase';
 import { checkAchievements } from '@/lib/gamification';
@@ -67,7 +67,7 @@ function formatTime(s: number) {
 function MatchingInner() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { collections, collectionsLoaded } = useAppStore();
+  const { collections, collectionsLoaded, setPendingLevelUp } = useAppStore();
 
   const collectionParam  = searchParams.get('collection') ?? undefined;
   const dayParam         = searchParams.get('day') ? parseInt(searchParams.get('day')!) : undefined;
@@ -243,6 +243,13 @@ function MatchingInner() {
         setTotalMistakes(prev => prev + mistakes);
         setTotalTime(prev => prev + elapsed);
         const isLast = roundIndex + 1 >= Math.ceil(words.length / BATCH_SIZE);
+        if (isLast && collectionParam && dayParam !== undefined) {
+          if (!hasMatchXPAwarded(collectionParam, dayParam)) {
+            const result = addXP(words.length * 4, 'Match', `Unit ${dayParam} · ${collectionParam}`);
+            markMatchXPAwarded(collectionParam, dayParam);
+            if (result.leveledUp) setPendingLevelUp({ level: result.newLevel, xp: result.newXp });
+          }
+        }
         setPhase(isLast ? 'done' : 'round_done');
       }
     } else {

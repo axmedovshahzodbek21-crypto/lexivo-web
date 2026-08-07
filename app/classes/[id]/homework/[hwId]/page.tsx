@@ -226,7 +226,11 @@ export default function UnitStudyHubPage() {
 
     if (!progErr) {
       setCompletedModes(prev => new Set([...prev, mode]));
-      if (firstCompletion) void recordClassXP(user!.id, classId, 5);
+      if (firstCompletion) {
+        const MODE_XP: Record<string, number> = { learn: 10, flashcard: 3, quiz: 5, match: 4 };
+        const xpPerWord = MODE_XP[mode] ?? 3;
+        void recordClassXP(user!.id, classId, words.length * xpPerWord);
+      }
     } else {
       console.error('Progress save failed:', progErr.message);
       setProgressError(progErr.message);

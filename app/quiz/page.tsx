@@ -296,9 +296,7 @@ export default function QuizPage() {
       if (collectionName) {
         const qDayNumber = dayNumber ?? questions[0]?.word.dayNumber ?? 1;
         if (!hasQuizXPAwarded(collectionName, qDayNumber)) {
-          const baseXp = Math.round(questions.length * 5); // 0.5 XP per word
-          const bonus  = isPerfect ? 30 : 0;               // +3.0 XP perfect bonus
-          const result = addXP(baseXp + bonus, 'Quiz', `Unit ${qDayNumber} · ${collectionName}`);
+          const result = addXP(questions.length * 5, 'Quiz', `Unit ${qDayNumber} · ${collectionName}`);
           markQuizXPAwarded(collectionName, qDayNumber);
           if (result.leveledUp) setPendingLevelUp({ level: result.newLevel, xp: result.newXp });
         }

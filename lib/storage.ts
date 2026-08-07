@@ -53,6 +53,7 @@ const KEYS = {
   achievementDates:  'lexivo_achievement_dates',
   flashcardXpUnits:  'lexivo_flash_xp_units',
   quizXpUnits:       'lexivo_quiz_xp_units',
+  matchXpUnits:      'lexivo_match_xp_units',
   srsLockedDays:     'lexivo_srs_locked_days',
 };
 
@@ -858,6 +859,15 @@ export function markQuizXPAwarded(collectionName: string, dayNumber: number): vo
   const list = get<string[]>(KEYS.quizXpUnits, []);
   const k = _unitKey(collectionName, dayNumber);
   if (!list.includes(k)) { list.push(k); set(KEYS.quizXpUnits, list); }
+}
+
+export function hasMatchXPAwarded(collectionName: string, dayNumber: number): boolean {
+  return get<string[]>(KEYS.matchXpUnits, []).includes(_unitKey(collectionName, dayNumber));
+}
+export function markMatchXPAwarded(collectionName: string, dayNumber: number): void {
+  const list = get<string[]>(KEYS.matchXpUnits, []);
+  const k = _unitKey(collectionName, dayNumber);
+  if (!list.includes(k)) { list.push(k); set(KEYS.matchXpUnits, list); }
 }
 
 // ─── Hard words (too hard) ───────────────────────────────────────────────────

@@ -2,6 +2,7 @@ import { supabase } from './supabase';
 import type { UserSettings, LearnedWord, SRSWord, UnitProgress } from './types';
 import { getSettings, saveSettings, getLearnedWords, saveLearnedWord, getSRSWords, getImportedWords, localDateStr, getProfilePicUrl, saveProfilePicUrl } from './storage';
 import type { HardWordEntry } from './storage';
+import { getNotifSettings, saveNotifSettings } from './notifications';
 
 const S = {
   statTs: 'lexivo_sync_stat_ts',
@@ -114,6 +115,7 @@ export async function pushSettings(): Promise<void> {
     const s = getSettings();
     const ts = new Date().toISOString();
     const showOnLeaderboard = s.showOnLeaderboard ?? true;
+    const notif = getNotifSettings();
     await Promise.all([
       supabase.from('user_data').upsert({
         id: uid,
@@ -123,6 +125,8 @@ export async function pushSettings(): Promise<void> {
         show_on_leaderboard: showOnLeaderboard,
         user_name:           s.name,
         language_level:      s.languageLevel,
+        notifications_enabled: notif.enabled,
+        notif_time:            notif.time,
         ...(getProfilePicUrl() ? { avatar_url: getProfilePicUrl() } : {}),
         settings_updated_at: ts,
       }),
@@ -269,6 +273,13 @@ export async function pullAll(): Promise<void> {
       };
       saveSettings(merged);
       if (row.avatar_url) saveProfilePicUrl(row.avatar_url as string);
+      if (row.notifications_enabled != null || row.notif_time != null) {
+        const currentNotif = getNotifSettings();
+        saveNotifSettings({
+          enabled: row.notifications_enabled ?? currentNotif.enabled,
+          time:    (row.notif_time as string) ?? currentNotif.time,
+        });
+      }
       lsSet(S.settingsTs, cloudSettingsTs);
     }
     // Apply avatar_url even when settings timestamp didn't win (pic upload is independent)

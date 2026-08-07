@@ -93,10 +93,12 @@ export default function SettingsPage() {
       setNotif(next);
       saveNotifSettings(next);
       scheduleOrShowNotification(next);
+      pushSettings();
     } else {
       const next = { ...notif, enabled: false };
       setNotif(next);
       saveNotifSettings(next);
+      pushSettings();
     }
   };
 
@@ -105,6 +107,7 @@ export default function SettingsPage() {
     setNotif(next);
     saveNotifSettings(next);
     if (next.enabled && permission === 'granted') scheduleOrShowNotification(next);
+    pushSettings();
   };
 
   const handleTest = async () => {
