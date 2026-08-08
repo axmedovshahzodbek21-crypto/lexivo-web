@@ -151,7 +151,7 @@ export default function ClassHomePage() {
 
       const teacher = cls.teacher_id === user.id;
 
-      const [{ data: anns }, { data: words }, { data: members }, { data: myMembership }] = await Promise.all([
+      const [{ data: anns }, { data: words }, { data: members }, { data: myMembership }, { data: libAssigns }] = await Promise.all([
         supabase.from('class_announcements').select('id, message, created_at')
           .eq('class_id', id).order('created_at', { ascending: false }).limit(5),
         supabase.from('class_words').select('id').eq('class_id', id),
@@ -159,6 +159,9 @@ export default function ClassHomePage() {
         !teacher
           ? supabase.from('class_members').select('class_xp').eq('class_id', id).eq('student_id', user.id).maybeSingle()
           : Promise.resolve({ data: null }),
+        supabase.from('class_library_assignments')
+          .select('teacher_folders(teacher_units(teacher_unit_words(id)))')
+          .eq('class_id', id),
       ]);
 
       if (!teacher) setMyClassXp((myMembership as { class_xp: number } | null)?.class_xp ?? 0);
@@ -208,7 +211,10 @@ export default function ClassHomePage() {
         teacherBio: tProfileData?.bio ?? '',
         announcements: (anns ?? []) as Announcement[],
         targets: (tgts ?? []) as Target[],
-        wordCount: words?.length ?? 0, memberCount, activeToday, needsAttention,
+        wordCount: (words?.length ?? 0) + ((libAssigns ?? []) as any[]).reduce((sum: number, a: any) =>
+          sum + ((a.teacher_folders?.teacher_units ?? []) as any[]).reduce((s: number, u: any) =>
+            s + (u.teacher_unit_words?.length ?? 0), 0), 0),
+        memberCount, activeToday, needsAttention,
         readCounts: counts,
       };
       _homeCache.set(cacheKey, snapshot);
