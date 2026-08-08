@@ -51,6 +51,7 @@ export default function UnitStudyHubPage() {
   const searchParams = useSearchParams();
 
   const [loading, setLoading] = useState(true);
+  const [className, setClassName] = useState('');
   const [unitName, setUnitName] = useState('');
   const [modes, setModes] = useState<string[]>([]);
   const [dueDate, setDueDate] = useState<string | null>(null);
@@ -118,7 +119,7 @@ export default function UnitStudyHubPage() {
     }
 
     // Always fetch progress fresh; fetch metadata only if not cached
-    const [hwRes, progRes] = await Promise.all([
+    const [hwRes, progRes, clsRes] = await Promise.all([
       cached
         ? Promise.resolve({ data: null })
         : supabase
@@ -131,7 +132,9 @@ export default function UnitStudyHubPage() {
         .select('mode')
         .eq('homework_id', hwId)
         .eq('student_id', user!.id),
+      supabase.from('classes').select('name').eq('id', classId).maybeSingle(),
     ]);
+    setClassName((clsRes.data as any)?.name ?? '');
 
     const done = new Set((progRes.data ?? []).map((p: any) => p.mode as string));
     setCompletedModes(done);
@@ -258,6 +261,13 @@ export default function UnitStudyHubPage() {
 
   return (
     <div className="flex flex-col min-h-screen animate-fade-in pb-24">
+      <div className="flex items-center gap-3 px-4 pt-4 pb-2">
+        <button onClick={() => router.push(`/classes/${classId}/homework`)} className="btn-icon">←</button>
+        <div className="min-w-0">
+          {className && <p className="text-xs text-[var(--text-muted)] font-medium truncate">{className}</p>}
+          <p className="font-bold text-[var(--text)] text-sm truncate">{unitName || 'Homework'}</p>
+        </div>
+      </div>
       <div className="p-3 space-y-3">
 
         {progressError && (

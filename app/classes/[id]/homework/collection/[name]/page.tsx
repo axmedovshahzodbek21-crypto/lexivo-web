@@ -22,6 +22,7 @@ export default function ClassCollectionHomeworkPage() {
   const router = useRouter();
 
   const [loading, setLoading] = useState(true);
+  const [className, setClassName] = useState('');
   const [units, setUnits] = useState<AssignedUnit[]>([]);
   const [completedModes, setCompletedModes] = useState<Record<string, Set<string>>>({});
 
@@ -31,11 +32,12 @@ export default function ClassCollectionHomeworkPage() {
   }, [user, classId, name]);
 
   async function load() {
-    const { data: hwRows } = await supabase
-      .from('class_homework')
-      .select('id, day_number, modes, due_date, student_ids')
-      .eq('class_id', classId)
-      .eq('collection_name', collectionName);
+    const [{ data: hwRows }, { data: cls }] = await Promise.all([
+      supabase.from('class_homework').select('id, day_number, modes, due_date, student_ids')
+        .eq('class_id', classId).eq('collection_name', collectionName),
+      supabase.from('classes').select('name').eq('id', classId).maybeSingle(),
+    ]);
+    setClassName((cls as any)?.name ?? '');
 
     const applicable = (hwRows ?? []).filter((h: any) => {
       const sids = h.student_ids as string[] | null;
@@ -101,6 +103,9 @@ export default function ClassCollectionHomeworkPage() {
           ← Back
         </button>
 
+        {className && (
+          <p className="text-xs font-semibold text-white/60 uppercase tracking-widest mb-1">{className}</p>
+        )}
         <h1
           className="text-2xl font-black text-white leading-tight mb-1"
           style={{ textShadow: '0 2px 8px rgba(0,0,0,0.3)' }}

@@ -47,6 +47,7 @@ export default function ClassLeaderboardPage() {
   const [rows, setRows] = useState<LeaderboardRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [animated, setAnimated] = useState(false);
+  const [className, setClassName] = useState('');
 
   useEffect(() => {
     if (!user) return;
@@ -61,10 +62,14 @@ export default function ClassLeaderboardPage() {
     }
 
     (async () => {
-      const { data } = await supabase.rpc('get_class_leaderboard', { p_class_id: id }).limit(200);
+      const [{ data }, { data: cls }] = await Promise.all([
+        supabase.rpc('get_class_leaderboard', { p_class_id: id }).limit(200),
+        supabase.from('classes').select('name').eq('id', id).maybeSingle(),
+      ]);
       const rows = (data as LeaderboardRow[]) ?? [];
       _classLbCache.set(id, rows);
       setRows(rows);
+      setClassName((cls as any)?.name ?? '');
       setLoading(false);
       if (!cached) setTimeout(() => setAnimated(true), 60);
     })();
@@ -81,12 +86,13 @@ export default function ClassLeaderboardPage() {
   if (rows.length === 0) {
     return (
       <div className="flex flex-col min-h-screen">
-        <button
-          onClick={() => router.push(`/classes/${id}/home`)}
-          className="flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors p-4"
-        >
-          ← Back
-        </button>
+        <div className="flex items-center gap-3 px-4 pt-4 pb-2">
+          <button onClick={() => router.push(`/classes/${id}/home`)} className="btn-icon">←</button>
+          <div className="min-w-0">
+            {className && <p className="text-xs text-[var(--text-muted)] font-medium truncate">{className}</p>}
+            <p className="font-bold text-[var(--text)] text-sm">Leaderboard</p>
+          </div>
+        </div>
         <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center p-8">
           <span className="text-5xl">🏆</span>
           <h1 className="text-lg font-bold text-[var(--text)]">No rankings yet</h1>
@@ -101,12 +107,13 @@ export default function ClassLeaderboardPage() {
 
   return (
     <div className="flex flex-col min-h-screen animate-fade-in pb-24">
-      <button
-        onClick={() => router.push(`/classes/${id}/home`)}
-        className="flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors p-4 pb-0"
-      >
-        ← Back
-      </button>
+      <div className="flex items-center gap-3 px-4 pt-4 pb-2">
+        <button onClick={() => router.push(`/classes/${id}/home`)} className="btn-icon">←</button>
+        <div className="min-w-0">
+          {className && <p className="text-xs text-[var(--text-muted)] font-medium truncate">{className}</p>}
+          <p className="font-bold text-[var(--text)] text-sm">Leaderboard</p>
+        </div>
+      </div>
       {/* My position banner (if outside top 3) */}
       {myRank > 3 && (
         <div className="mx-4 mt-4 p-3 rounded-2xl bg-[var(--primary-bg)] border border-[var(--primary)]/30 flex items-center gap-3">

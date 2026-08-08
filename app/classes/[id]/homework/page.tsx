@@ -80,6 +80,7 @@ export default function ClassHomeworkPage() {
   const cached = cacheKey ? (_cache[cacheKey] ?? null) : null;
 
   const [loading, setLoading] = useState(cached === null);
+  const [className, setClassName] = useState('');
   const [isTeacher, setIsTeacher] = useState(cached?.isTeacher ?? false);
   const [folders, setFolders] = useState<AssignedFolder[]>(cached?.folders ?? []);
   const [cwUnits, setCwUnits] = useState<CWUnit[]>(cached?.cwUnits ?? []);
@@ -96,9 +97,10 @@ export default function ClassHomeworkPage() {
   }, [user, id]);
 
   async function load() {
-    const { data: cls } = await supabase.from('classes').select('teacher_id').eq('id', id).maybeSingle();
-    const teacher = cls?.teacher_id === user!.id;
+    const { data: cls } = await supabase.from('classes').select('name, teacher_id').eq('id', id).maybeSingle();
+    const teacher = (cls as any)?.teacher_id === user!.id;
     setIsTeacher(teacher);
+    setClassName((cls as any)?.name ?? '');
 
     if (teacher) {
       if (cacheKey) _cache[cacheKey] = { isTeacher: true, folders: [], cwUnits: [], collHwItems: [], completedModes: {}, totalAssigned: 0, totalDone: 0 };
@@ -268,12 +270,13 @@ export default function ClassHomeworkPage() {
   if (isTeacher) {
     return (
       <div className="flex flex-col min-h-screen">
-        <button
-          onClick={() => router.push(`/classes/${id}/home`)}
-          className="flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors p-4"
-        >
-          ← Back
-        </button>
+        <div className="flex items-center gap-3 px-4 pt-4 pb-2">
+          <button onClick={() => router.push(`/classes/${id}/home`)} className="btn-icon">←</button>
+          <div className="min-w-0">
+            {className && <p className="text-xs text-[var(--text-muted)] font-medium truncate">{className}</p>}
+            <p className="font-bold text-[var(--text)] text-sm">Homework</p>
+          </div>
+        </div>
         <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
           <span className="text-5xl mb-4">📋</span>
           <p className="text-base font-bold text-[var(--text)] mb-2">Manage Homework from the Dashboard</p>
@@ -287,12 +290,13 @@ export default function ClassHomeworkPage() {
 
   return (
     <div className="flex flex-col min-h-screen animate-fade-in pb-24">
-      <button
-        onClick={() => router.push(`/classes/${id}/home`)}
-        className="flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors px-4 pt-4"
-      >
-        ← Back
-      </button>
+      <div className="flex items-center gap-3 px-4 pt-4 pb-2">
+        <button onClick={() => router.push(`/classes/${id}/home`)} className="btn-icon">←</button>
+        <div className="min-w-0">
+          {className && <p className="text-xs text-[var(--text-muted)] font-medium truncate">{className}</p>}
+          <p className="font-bold text-[var(--text)] text-sm">Homework</p>
+        </div>
+      </div>
       <div className="p-4 space-y-1">
 
         {/* Progress bar */}
