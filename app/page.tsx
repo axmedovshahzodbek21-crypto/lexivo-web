@@ -788,44 +788,42 @@ export default function HomePage() {
       {homeClasses.length > 0 && !hideClasses && (
         <div className="space-y-3">
           <h2 className="text-base font-bold text-[var(--text)]">My Classes</h2>
-          {homeClasses.map(card => (
-            <Link key={card.classId} href={`/classes/${card.classId}/home`} className="block">
-              <div
-                className="rounded-2xl px-4 py-3.5 flex items-center gap-3 hover:-translate-y-0.5 transition-transform"
-                style={{
-                  background: card.isTeacher
-                    ? 'linear-gradient(135deg, #0e7490, #22d3ee)'
-                    : 'linear-gradient(135deg, #5b21b6, #8b5cf6)',
-                  boxShadow: card.isTeacher
-                    ? '0 6px 0 #164e63, 0 10px 24px rgba(14,116,144,0.35)'
-                    : '0 6px 0 #3b0764, 0 10px 24px rgba(91,33,182,0.35)',
-                }}
-              >
-                <div className="flex-1 min-w-0">
-                  <p className="font-black text-white text-[15px] leading-tight truncate">
-                    {card.isTeacher ? '🏫' : '🎓'} {card.className}
-                  </p>
-                  {card.isTeacher ? (
-                    <>
-                      <span className="inline-block mt-1.5 text-[10px] font-bold bg-white/20 text-white rounded-full px-2 py-0.5">Teacher</span>
-                      <p className="text-xs text-white/70 mt-1.5">
-                        👨‍🎓 {card.studentCount} students &nbsp;·&nbsp; 🟢 {card.activeToday} active today
-                      </p>
-                    </>
-                  ) : (
-                    <div className="flex flex-wrap gap-1.5 mt-2">
-                      <span className="text-xs font-semibold bg-white/20 text-white rounded-full px-2.5 py-0.5">⚡ {card.classXP} XP</span>
-                      <span className="text-xs font-semibold bg-white/20 text-white rounded-full px-2.5 py-0.5">🔥 {card.classStreak} day streak</span>
-                      {card.pendingHomework > 0 && (
-                        <span className="text-xs font-semibold text-amber-300 bg-amber-500/25 rounded-full px-2.5 py-0.5">📋 {card.pendingHomework} pending</span>
-                      )}
+          <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(5, 1fr)', gridAutoRows: '130px' }}>
+            {homeClasses.map(card => {
+              const bg = card.isTeacher
+                ? 'linear-gradient(135deg, #0e7490, #22d3ee)'
+                : 'linear-gradient(135deg, #5b21b6, #8b5cf6)';
+              const edge = card.isTeacher ? '#164e63' : '#3b0764';
+              const glow = card.isTeacher ? 'rgba(14,116,144,0.4)' : 'rgba(91,33,182,0.4)';
+              return (
+                <div key={card.classId} className="relative">
+                  {card.pendingHomework > 0 && (
+                    <div className="absolute -top-1.5 -right-1.5 min-w-[22px] h-[22px] rounded-full bg-white text-[var(--danger)] text-[10px] flex items-center justify-center font-black z-10 shadow px-1">
+                      {card.pendingHomework}
                     </div>
                   )}
+                  <Link href={`/classes/${card.classId}/home`} className="block h-full">
+                    <div className="rounded-2xl h-full p-3 flex flex-col justify-between hover:-translate-y-1 transition-all duration-200 animate-heartbeat"
+                      style={{ background: bg, boxShadow: `0 7px 0 ${edge}, 0 10px 24px ${glow}`, textShadow: '0 1px 3px rgba(0,0,0,0.35)' }}>
+                      <div>
+                        <div className="text-2xl mb-1">{card.isTeacher ? '🏫' : '🎓'}</div>
+                        <div className="font-bold text-sm text-white leading-tight truncate">{card.className}</div>
+                        <div className="text-[10px] text-white/70 mt-0.5">
+                          {card.isTeacher ? `${card.studentCount} students` : `⚡ ${(card.classXP / 10).toFixed(1)} XP`}
+                        </div>
+                      </div>
+                      {!card.isTeacher && card.classStreak > 0 && (
+                        <div className="text-[10px] text-white/70">🔥 {card.classStreak} day streak</div>
+                      )}
+                      {card.isTeacher && (
+                        <div className="text-[10px] font-bold bg-white/20 text-white rounded-full px-2 py-0.5 self-start">Teacher</div>
+                      )}
+                    </div>
+                  </Link>
                 </div>
-                <span className="text-white/50 text-sm shrink-0">→</span>
-              </div>
-            </Link>
-          ))}
+              );
+            })}
+          </div>
         </div>
       )}
 
