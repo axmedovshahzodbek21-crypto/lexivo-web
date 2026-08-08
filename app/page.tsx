@@ -97,6 +97,7 @@ export default function HomePage() {
   const [switchFirst, setSwitchFirst] = useState<string | null>(null);
   const [showCustomize, setShowCustomize] = useState(false);
   const [homeClasses, setHomeClasses] = useState<HomeClassSummary[]>([]);
+  const [hiddenClassIds, setHiddenClassIds] = useState<Set<string>>(new Set());
   const [sectionOrder, setSectionOrder] = useState([
     'collections', 'reading', 'day_streak', 'total_xp', 'words',
     'daily_goal', 'level', 'wod',
@@ -184,7 +185,13 @@ export default function HomePage() {
     }
     order = order.filter(s => s !== 'shortcuts');
     const missing = DEFAULT_ORDER.filter(id => !order.includes(id));
-    setSectionOrder([...order.filter(id => ALL_IDS.has(id)), ...missing]);
+    setSectionOrder([...order.filter(id => ALL_IDS.has(id) || id.startsWith('class_')), ...missing]);
+    const hiddenCls = new Set(
+      Object.keys(localStorage)
+        .filter(k => k.startsWith('home_hide_class_') && localStorage.getItem(k) === '1')
+        .map(k => k.replace('home_hide_class_', ''))
+    );
+    setHiddenClassIds(hiddenCls);
     setHideFlashcards(localStorage.getItem('home_hide_flashcards') === '1');
     setHideQuiz(localStorage.getItem('home_hide_quiz') === '1');
     setHideMatch(localStorage.getItem('home_hide_match') === '1');
@@ -272,6 +279,13 @@ export default function HomePage() {
         }
       }
       setHomeClasses(cards);
+      setSectionOrder(prev => {
+        const newIds = cards.map(c => `class_${c.classId}`).filter(id => !prev.includes(id));
+        if (newIds.length === 0) return prev;
+        const updated = [...prev, ...newIds];
+        localStorage.setItem('home_section_order', updated.join(','));
+        return updated;
+      });
     })();
   }, [user]);
 
@@ -315,6 +329,11 @@ export default function HomePage() {
       else if (sId === 'lists')        setHideLists(true);
       else if (sId === 'grammar')      setHideGrammar(true);
       else if (sId === 'classes')      setHideClasses(true);
+      else if (sId.startsWith('class_')) {
+        const cId = sId.replace('class_', '');
+        localStorage.setItem(`home_hide_class_${cId}`, '1');
+        setHiddenClassIds(prev => new Set([...prev, cId]));
+      }
     });
     setHideMode(false);
     setHideSelection(new Set());
@@ -355,6 +374,11 @@ export default function HomePage() {
       else if (sId === 'lists')        setHideLists(false);
       else if (sId === 'grammar')      setHideGrammar(false);
       else if (sId === 'classes')      setHideClasses(false);
+      else if (sId.startsWith('class_')) {
+        const cId = sId.replace('class_', '');
+        localStorage.removeItem(`home_hide_class_${cId}`);
+        setHiddenClassIds(prev => { const n = new Set(prev); n.delete(cId); return n; });
+      }
     });
     setUnhideMode(false);
     setUnhideSelection(new Set());
@@ -467,6 +491,7 @@ export default function HomePage() {
           flashcards: hideFlashcards, quiz: hideQuiz, match: hideMatch,
           pomodoro: hidePomodoro, leaderboard: hideLeaderboard, starred: hideStarred,
           hard_words: hideHardWords, lists: hideLists, grammar: hideGrammar, classes: hideClasses,
+          ...Object.fromEntries(homeClasses.map(c => [`class_${c.classId}`, hiddenClassIds.has(c.classId)])),
         };
         const visible = sectionOrder.filter(sId => !HIDE_MAP[sId]);
         const displaySections = unhideMode
@@ -599,6 +624,41 @@ export default function HomePage() {
           ) : (
             <div className="rounded-2xl h-full animate-pulse" style={{ background: 'rgba(162,28,175,0.2)' }} />
           );
+          if (sId.startsWith('class_')) {
+            const classId = sId.replace('class_', '');
+            const card = homeClasses.find(c => c.classId === classId);
+            if (!card) return null;
+            const bg = card.isTeacher ? 'linear-gradient(135deg, #0e7490, #22d3ee)' : 'linear-gradient(135deg, #5b21b6, #8b5cf6)';
+            const edge = card.isTeacher ? '#164e63' : '#3b0764';
+            const glow = card.isTeacher ? 'rgba(14,116,144,0.4)' : 'rgba(91,33,182,0.4)';
+            return (
+              <div className="relative h-full">
+                {card.pendingHomework > 0 && (
+                  <div className="absolute -top-1.5 -right-1.5 min-w-[22px] h-[22px] rounded-full bg-white text-[var(--danger)] text-[10px] flex items-center justify-center font-black z-10 shadow px-1">
+                    {card.pendingHomework}
+                  </div>
+                )}
+                <Link href={`/classes/${card.classId}/home`} className="block h-full">
+                  <div className="rounded-2xl h-full p-3 flex flex-col justify-between hover:-translate-y-1 transition-all duration-200 animate-heartbeat"
+                    style={{ background: bg, boxShadow: `0 7px 0 ${edge}, 0 10px 24px ${glow}`, textShadow: '0 1px 3px rgba(0,0,0,0.35)' }}>
+                    <div>
+                      <div className="text-2xl mb-1">{card.isTeacher ? '🏫' : '🎓'}</div>
+                      <div className="font-bold text-sm text-white leading-tight truncate">{card.className}</div>
+                      <div className="text-[10px] text-white/70 mt-0.5">
+                        {card.isTeacher ? `${card.studentCount} students` : `⚡ ${(card.classXP / 10).toFixed(1)} XP`}
+                      </div>
+                    </div>
+                    {!card.isTeacher && card.classStreak > 0 && (
+                      <div className="text-[10px] text-white/70">🔥 {card.classStreak} day streak</div>
+                    )}
+                    {card.isTeacher && (
+                      <div className="text-[10px] font-bold bg-white/20 text-white rounded-full px-2 py-0.5 self-start">Teacher</div>
+                    )}
+                  </div>
+                </Link>
+              </div>
+            );
+          }
           if (sId in ACTION_MAP) {
             const a = ACTION_MAP[sId];
             return (
@@ -784,48 +844,6 @@ export default function HomePage() {
         );
       })()}
 
-      {/* My Classes */}
-      {homeClasses.length > 0 && !hideClasses && (
-        <div className="space-y-3">
-          <h2 className="text-base font-bold text-[var(--text)]">My Classes</h2>
-          <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(5, 1fr)', gridAutoRows: '130px' }}>
-            {homeClasses.map(card => {
-              const bg = card.isTeacher
-                ? 'linear-gradient(135deg, #0e7490, #22d3ee)'
-                : 'linear-gradient(135deg, #5b21b6, #8b5cf6)';
-              const edge = card.isTeacher ? '#164e63' : '#3b0764';
-              const glow = card.isTeacher ? 'rgba(14,116,144,0.4)' : 'rgba(91,33,182,0.4)';
-              return (
-                <div key={card.classId} className="relative">
-                  {card.pendingHomework > 0 && (
-                    <div className="absolute -top-1.5 -right-1.5 min-w-[22px] h-[22px] rounded-full bg-white text-[var(--danger)] text-[10px] flex items-center justify-center font-black z-10 shadow px-1">
-                      {card.pendingHomework}
-                    </div>
-                  )}
-                  <Link href={`/classes/${card.classId}/home`} className="block h-full">
-                    <div className="rounded-2xl h-full p-3 flex flex-col justify-between hover:-translate-y-1 transition-all duration-200 animate-heartbeat"
-                      style={{ background: bg, boxShadow: `0 7px 0 ${edge}, 0 10px 24px ${glow}`, textShadow: '0 1px 3px rgba(0,0,0,0.35)' }}>
-                      <div>
-                        <div className="text-2xl mb-1">{card.isTeacher ? '🏫' : '🎓'}</div>
-                        <div className="font-bold text-sm text-white leading-tight truncate">{card.className}</div>
-                        <div className="text-[10px] text-white/70 mt-0.5">
-                          {card.isTeacher ? `${card.studentCount} students` : `⚡ ${(card.classXP / 10).toFixed(1)} XP`}
-                        </div>
-                      </div>
-                      {!card.isTeacher && card.classStreak > 0 && (
-                        <div className="text-[10px] text-white/70">🔥 {card.classStreak} day streak</div>
-                      )}
-                      {card.isTeacher && (
-                        <div className="text-[10px] font-bold bg-white/20 text-white rounded-full px-2 py-0.5 self-start">Teacher</div>
-                      )}
-                    </div>
-                  </Link>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
 
       {/* Customize home modal */}
       {showCustomize && (
