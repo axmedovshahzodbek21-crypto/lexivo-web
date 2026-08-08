@@ -103,8 +103,7 @@ export default function ClassHomeworkPage() {
     setClassName((cls as any)?.name ?? '');
 
     if (teacher) {
-      if (cacheKey) _cache[cacheKey] = { isTeacher: true, folders: [], cwUnits: [], collHwItems: [], completedModes: {}, totalAssigned: 0, totalDone: 0 };
-      setLoading(false);
+      router.replace(`/classes/${id}?tab=curriculum`);
       return;
     }
 
@@ -262,28 +261,6 @@ export default function ClassHomeworkPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="w-8 h-8 border-2 border-[var(--primary)] border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  // Teacher redirect
-  if (isTeacher) {
-    return (
-      <div className="flex flex-col min-h-screen">
-        <div className="flex items-center gap-3 px-4 pt-4 pb-2">
-          <button onClick={() => router.push(`/classes/${id}/home`)} className="btn-icon">←</button>
-          <div className="min-w-0">
-            {className && <p className="text-xs text-[var(--text-muted)] font-medium truncate">{className}</p>}
-            <p className="font-bold text-[var(--text)] text-sm">Homework</p>
-          </div>
-        </div>
-        <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-          <span className="text-5xl mb-4">📋</span>
-          <p className="text-base font-bold text-[var(--text)] mb-2">Manage Homework from the Dashboard</p>
-          <p className="text-sm text-[var(--text-muted)]">
-            Go to the class Dashboard → Curriculum tab to assign library units as homework and track per-student progress.
-          </p>
-        </div>
       </div>
     );
   }
