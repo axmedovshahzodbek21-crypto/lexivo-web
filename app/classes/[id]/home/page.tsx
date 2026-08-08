@@ -668,9 +668,10 @@ export default function ClassHomePage() {
           )}
         </div>
         <div className="flex flex-wrap gap-2 mb-3">
-          {[`📖 ${wordCount} words`, `✅ ${activeToday}/${memberCount} active`].map(label => (
-            <span key={label} className="text-xs font-semibold bg-black/20 text-white rounded-full px-3 py-1">{label}</span>
-          ))}
+          <button onClick={() => router.push(`/classes/${id}/words`)} className="text-xs font-semibold bg-black/20 text-white rounded-full px-3 py-1 hover:bg-black/30 transition-colors">
+            📖 {wordCount} words
+          </button>
+          <span className="text-xs font-semibold bg-black/20 text-white rounded-full px-3 py-1">✅ {activeToday}/{memberCount} active</span>
           {!isTeacher && (
             <button
               onClick={() => setShowHW(true)}
