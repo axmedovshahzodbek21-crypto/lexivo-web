@@ -197,11 +197,8 @@ export default function SettingsPage() {
         });
         if (upsertErr) throw new Error(upsertErr.message);
         const dels = await Promise.all([
-          supabase.from('srs_words').delete().eq('user_id', user.id),
           supabase.from('learned_words').delete().eq('user_id', user.id),
-          supabase.from('starred_words').delete().eq('user_id', user.id),
           supabase.from('xp_history').delete().eq('user_id', user.id),
-          supabase.from('unit_progress').delete().eq('user_id', user.id),
         ]);
         const failed = dels.filter(r => r.error).map(r => r.error!.message);
         if (failed.length > 0) throw new Error(failed.join('; '));
