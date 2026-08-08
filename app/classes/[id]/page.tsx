@@ -2189,7 +2189,7 @@ export default function ClassDashboardPage() {
       {!loading && tab === 'students' && classStats && (
         <div className="grid grid-cols-4 divide-x divide-[var(--border)] border-b border-[var(--border)]">
           {[
-            { label: 'Total XP', value: classStats.totalXP.toLocaleString(), icon: '⚡' },
+            { label: 'Total XP', value: (classStats.totalXP / 10).toLocaleString(), icon: '⚡' },
             { label: 'Avg streak', value: `${classStats.avgStreak.toFixed(1)}d`, icon: '🔥' },
             { label: 'Avg items', value: Math.round(classStats.avgWords).toString(), icon: '📚' },
             { label: 'Active', value: `${classStats.activeCount}/${classStats.n}`, icon: '✅' },
