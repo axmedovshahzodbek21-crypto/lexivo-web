@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
@@ -12,11 +12,13 @@ const BASE_ITEMS = [
   { seg: 'homework',    icon: '📋', label: 'Homework' },
 ];
 
-const TEACHER_ITEM = { seg: '', icon: '📊', label: 'Dashboard' };
+const TEACHER_ITEM  = { seg: '', icon: '📊', label: 'Dashboard' };
+const CURRICULUM_ITEM = { seg: '__curriculum__', icon: '📋', label: 'Curriculum' };
 
 export default function ClassShellNav({ classId }: { classId: string }) {
   const pathname = usePathname();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user } = useAuth();
   const [isTeacher, setIsTeacher] = useState(false);
   const [className, setClassName] = useState('');
@@ -37,11 +39,19 @@ export default function ClassShellNav({ classId }: { classId: string }) {
       });
   }, [classId, user]);
 
-  const items = isTeacher ? [...BASE_ITEMS, TEACHER_ITEM] : BASE_ITEMS;
+  const items = isTeacher ? [...BASE_ITEMS, TEACHER_ITEM, CURRICULUM_ITEM] : BASE_ITEMS;
 
   const isActive = (seg: string) => {
+    if (seg === '__curriculum__') {
+      return pathname === `/classes/${classId}` && searchParams.get('tab') === 'curriculum';
+    }
     const full = `/classes/${classId}${seg ? `/${seg}` : ''}`;
-    return seg === '' ? pathname === full : pathname === full || pathname.startsWith(full + '/');
+    return seg === '' ? pathname === full && searchParams.get('tab') !== 'curriculum' : pathname === full || pathname.startsWith(full + '/');
+  };
+
+  const hrefFor = (seg: string) => {
+    if (seg === '__curriculum__') return `/classes/${classId}?tab=curriculum`;
+    return `/classes/${classId}${seg ? `/${seg}` : ''}`;
   };
 
   // Two-step back: subpage → class home → classes list
@@ -66,11 +76,10 @@ export default function ClassShellNav({ classId }: { classId: string }) {
       >
         {items.map(({ seg, icon, label }) => {
           const active = isActive(seg);
-          const href = `/classes/${classId}${seg ? `/${seg}` : ''}`;
           return (
             <Link
               key={seg || 'dashboard'}
-              href={href}
+              href={hrefFor(seg)}
               className={`flex flex-col items-center gap-0.5 px-3 py-1 min-w-[48px] ${active ? 'text-[var(--primary)]' : 'text-[var(--text-muted)]'}`}
             >
               <span className="text-xl leading-none">{icon}</span>
@@ -118,11 +127,10 @@ export default function ClassShellNav({ classId }: { classId: string }) {
           <nav className="flex-1 px-3 space-y-0.5">
             {items.map(({ seg, icon, label }) => {
               const active = isActive(seg);
-              const href = `/classes/${classId}${seg ? `/${seg}` : ''}`;
               return (
                 <Link
                   key={seg || 'dashboard'}
-                  href={href}
+                  href={hrefFor(seg)}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-semibold ${
                     active
                       ? 'text-white'

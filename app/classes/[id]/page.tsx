@@ -1,7 +1,7 @@
 ﻿'use client';
 import { PageLoader, SectionLoader } from '@/components/Loader';
 import { useEffect, useState, useMemo } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { loadCollections, loadCEFRCollection } from '@/lib/data';
@@ -1747,6 +1747,7 @@ type CollectionModal = { student: StudentRow; collectionName: string; label: str
 export default function ClassDashboardPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user } = useAuth();
   const [classInfo, setClassInfo] = useState<ClassInfo | null>(null);
   const [students, setStudents] = useState<StudentRow[]>([]);
@@ -1754,7 +1755,10 @@ export default function ClassDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const [notTeacher, setNotTeacher] = useState(false);
-  const [tab, setTab] = useState<Tab>('students');
+  const [tab, setTab] = useState<Tab>(() => {
+    const t = searchParams.get('tab') as Tab | null;
+    return t && ['students','activity','radar','analytics','srs','curriculum'].includes(t) ? t : 'students';
+  });
 
   // Sort & filter
   const [sortBy, setSortBy] = useState<SortKey>('lastActive');
