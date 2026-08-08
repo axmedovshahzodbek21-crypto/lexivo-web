@@ -182,7 +182,7 @@ export default function SettingsPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const ts = new Date().toISOString();
-        await supabase.from('user_data').upsert({
+        const { error: upsertErr } = await supabase.from('user_data').upsert({
           id: user.id,
           total_xp: 0, streak: 0, streak_freezes: 0,
           last_study_date: null, last_freeze_week: null,
@@ -194,23 +194,23 @@ export default function SettingsPage() {
           word_goal_days: [], unit_done_days: [], xp_history: [],
           unit_progress: {}, review_log: {}, imported_words: [],
           achievements: [], lists_updated_at: ts,
-          reset_at: ts,
         });
+        if (upsertErr) throw new Error(upsertErr.message);
         const dels = await Promise.all([
           supabase.from('srs_words').delete().eq('user_id', user.id),
           supabase.from('learned_words').delete().eq('user_id', user.id),
           supabase.from('starred_words').delete().eq('user_id', user.id),
           supabase.from('xp_history').delete().eq('user_id', user.id),
           supabase.from('unit_progress').delete().eq('user_id', user.id),
-          supabase.from('user_stats').delete().eq('id', user.id),
         ]);
         const failed = dels.filter(r => r.error).map(r => r.error!.message);
-        if (failed.length > 0) throw new Error(`Supabase delete failed: ${failed.join('; ')}`);
+        if (failed.length > 0) throw new Error(failed.join('; '));
       }
       await new Promise(r => setTimeout(r, 200));
       window.location.replace('/');
     } catch (e) {
-      setResetError('Something went wrong. Please try again.');
+      console.error('Reset error:', e);
+      setResetError(e instanceof Error ? e.message : 'Something went wrong. Please try again.');
       setResetLoading(false);
     }
   };
