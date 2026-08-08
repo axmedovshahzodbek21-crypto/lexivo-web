@@ -116,6 +116,7 @@ export default function ClassHomePage() {
   const [activeToday, setActiveToday] = useState(0);
   const [needsAttention, setNeedsAttention] = useState(0);
   const [readCounts, setReadCounts] = useState<Record<string, number>>({});
+  const [myClassXp, setMyClassXp] = useState(0);
 
   useEffect(() => {
     if (!user) return;
@@ -146,12 +147,17 @@ export default function ClassHomePage() {
 
       const teacher = cls.teacher_id === user.id;
 
-      const [{ data: anns }, { data: words }, { data: members }] = await Promise.all([
+      const [{ data: anns }, { data: words }, { data: members }, { data: myMembership }] = await Promise.all([
         supabase.from('class_announcements').select('id, message, created_at')
           .eq('class_id', id).order('created_at', { ascending: false }).limit(5),
         supabase.from('class_words').select('id').eq('class_id', id),
         supabase.from('class_members').select('student_id').eq('class_id', id),
+        !teacher
+          ? supabase.from('class_members').select('class_xp').eq('class_id', id).eq('student_id', user.id).maybeSingle()
+          : Promise.resolve({ data: null }),
       ]);
+
+      if (!teacher) setMyClassXp((myMembership as { class_xp: number } | null)?.class_xp ?? 0);
 
       const memberCount = members?.length ?? 0;
       const memberIds = (members ?? []).map((m: { student_id: string }) => m.student_id);
@@ -503,6 +509,11 @@ export default function ClassHomePage() {
             >
               📋 {pending.length} pending
             </button>
+          )}
+          {!isTeacher && (
+            <span className="text-xs font-semibold bg-black/20 text-white rounded-full px-3 py-1">
+              ⚡ {(myClassXp / 10).toFixed(1)} XP
+            </span>
           )}
         </div>
         {memberCount > 0 && (
