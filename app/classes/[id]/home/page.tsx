@@ -104,6 +104,8 @@ export default function ClassHomePage() {
   const [xpHistoryStudent, setXpHistoryStudent] = useState<StudentProfile | null>(null);
   const [teacherXpHistory, setTeacherXpHistory] = useState<{ id: string; amount: number; reason: string; created_at: string }[]>([]);
   const [teacherXpHistoryLoading, setTeacherXpHistoryLoading] = useState(false);
+  const [teacherXpCalMonth, setTeacherXpCalMonth] = useState(() => { const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), 1); });
+  const [teacherXpCalSelectedDay, setTeacherXpCalSelectedDay] = useState<string | null>(null);
   const [showXpCal, setShowXpCal] = useState(false);
   const [xpCalData, setXpCalData] = useState<{ id: string; amount: number; reason: string; created_at: string }[]>([]);
   const [xpCalLoading, setXpCalLoading] = useState(false);
@@ -277,6 +279,8 @@ const [memberCount, setMemberCount] = useState(0);
     setXpHistoryStudent(s);
     setTeacherXpHistoryLoading(true);
     setTeacherXpHistory([]);
+    setTeacherXpCalSelectedDay(null);
+    setTeacherXpCalMonth(new Date(new Date().getFullYear(), new Date().getMonth(), 1));
     const { data } = await supabase.rpc('get_student_xp_history', { p_class_id: id, p_student_id: s.id });
     setTeacherXpHistory((data ?? []) as { id: string; amount: number; reason: string; created_at: string }[]);
     setTeacherXpHistoryLoading(false);
@@ -340,6 +344,21 @@ const [memberCount, setMemberCount] = useState(0);
   const xpCalMonthLabel = ['January','February','March','April','May','June','July','August','September','October','November','December'][xpCalM];
   const xpCalTodayStr = new Date().toISOString().slice(0, 10);
   const selectedDayEntries = xpCalSelectedDay ? (xpByDate[xpCalSelectedDay] ?? []) : [];
+  // Teacher: student XP calendar helpers
+  const teacherXpByDate: Record<string, typeof teacherXpHistory> = {};
+  for (const e of teacherXpHistory) {
+    const day = e.created_at.slice(0, 10);
+    if (!teacherXpByDate[day]) teacherXpByDate[day] = [];
+    teacherXpByDate[day].push(e);
+  }
+  const tCalYear = teacherXpCalMonth.getFullYear();
+  const tCalM = teacherXpCalMonth.getMonth();
+  const tCalDaysInMonth = new Date(tCalYear, tCalM + 1, 0).getDate();
+  const tCalOffset = (new Date(tCalYear, tCalM, 1).getDay() + 6) % 7;
+  const tCalMM = String(tCalM + 1).padStart(2, '0');
+  const tCalCanNext = !(tCalYear === new Date().getFullYear() && tCalM === new Date().getMonth());
+  const tCalMonthLabel = ['January','February','March','April','May','June','July','August','September','October','November','December'][tCalM];
+  const tCalSelectedEntries = teacherXpCalSelectedDay ? (teacherXpByDate[teacherXpCalSelectedDay] ?? []) : [];
   const sortedPending = [...pending].sort((a, b) => {
     if (!a.due_date && !b.due_date) return 0;
     if (!a.due_date) return 1;
@@ -590,31 +609,96 @@ const [memberCount, setMemberCount] = useState(0);
           </div>
         </div>
       )}
-      {/* Teacher: student XP history sheet */}
+      {/* Teacher: student XP calendar sheet */}
       {xpHistoryStudent && (
-        <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/50" onClick={() => setXpHistoryStudent(null)}>
-          <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl flex flex-col max-h-[80dvh]" onClick={e => e.stopPropagation()}>
-            <div className="pt-4 px-5 pb-3 shrink-0 border-b border-[var(--border)]">
-              <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto mb-3" />
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="font-bold text-[var(--text)]">⚡ XP History</h2>
-                  <p className="text-xs text-[var(--text-muted)]">{xpHistoryStudent.name} · {(xpHistoryStudent.xp / 10).toFixed(1)} XP total</p>
-                </div>
-                <button onClick={() => setXpHistoryStudent(null)} className="text-xs text-[var(--text-muted)] hover:text-[var(--text)]">✕</button>
+        <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/50" onClick={() => { setXpHistoryStudent(null); setTeacherXpCalSelectedDay(null); }}>
+          <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl flex flex-col max-h-[90dvh]" onClick={e => e.stopPropagation()}>
+            <div className="pt-4 px-5 pb-3 shrink-0">
+              <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto mb-4" />
+              <div className="text-center mb-4">
+                <p className="text-4xl font-black" style={{ color: classAccent }}>⚡ {(xpHistoryStudent.xp / 10).toFixed(1)} XP</p>
+                <p className="text-sm font-bold text-[var(--text)] mt-1">{xpHistoryStudent.name}</p>
+                <p className="text-xs text-[var(--text-muted)]">Total class XP</p>
               </div>
             </div>
-            <div className="overflow-y-auto flex-1 px-5 py-3 space-y-2">
+            <div className="overflow-y-auto flex-1 px-5 pb-5 space-y-4">
               {teacherXpHistoryLoading ? (
                 <div className="flex justify-center py-10"><div className="w-6 h-6 border-2 border-[var(--primary)] border-t-transparent rounded-full animate-spin" /></div>
-              ) : teacherXpHistory.length === 0 ? (
-                <p className="text-center text-sm text-[var(--text-muted)] py-10">No XP history yet</p>
-              ) : teacherXpHistory.map(h => (
-                <XpHistoryRow key={h.id} entry={h} />
-              ))}
+              ) : (
+                <>
+                  <div className="card !p-4">
+                    <div className="flex items-center justify-between mb-4">
+                      <button onClick={() => { setTeacherXpCalMonth(new Date(tCalYear, tCalM - 1, 1)); setTeacherXpCalSelectedDay(null); }}
+                        className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-[var(--surface-2)] transition-colors text-[var(--text)] text-xl font-bold">‹</button>
+                      <span className="font-bold text-[var(--text)] text-sm">{tCalMonthLabel} {tCalYear}</span>
+                      <button onClick={() => { if (tCalCanNext) { setTeacherXpCalMonth(new Date(tCalYear, tCalM + 1, 1)); setTeacherXpCalSelectedDay(null); } }}
+                        disabled={!tCalCanNext}
+                        className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-[var(--surface-2)] transition-colors text-[var(--text)] text-xl font-bold disabled:opacity-30">›</button>
+                    </div>
+                    <div className="max-w-[308px] mx-auto">
+                      <div className="grid grid-cols-7 mb-1">
+                        {['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d => (
+                          <div key={d} className="w-10 h-7 flex items-center justify-center text-[10px] font-bold text-[var(--text-muted)]">{d}</div>
+                        ))}
+                      </div>
+                      <div className="grid grid-cols-7 gap-y-1.5">
+                        {Array.from({ length: tCalOffset }).map((_, i) => <div key={`e-${i}`} className="w-10 h-10" />)}
+                        {Array.from({ length: tCalDaysInMonth }, (_, i) => i + 1).map(day => {
+                          const dStr = `${tCalYear}-${tCalMM}-${String(day).padStart(2, '0')}`;
+                          const isToday = dStr === xpCalTodayStr;
+                          const isFuture = dStr > xpCalTodayStr;
+                          const isSelected = teacherXpCalSelectedDay === dStr;
+                          const entries = teacherXpByDate[dStr] ?? [];
+                          const hasXp = entries.length > 0;
+                          const dayXp = entries.reduce((s, e) => s + e.amount, 0);
+                          return (
+                            <button key={dStr} disabled={isFuture || !hasXp}
+                              onClick={() => hasXp && setTeacherXpCalSelectedDay(dStr)}
+                              className="w-10 h-10 rounded-full relative overflow-hidden flex flex-col items-center justify-center transition-all disabled:opacity-20"
+                              style={{
+                                background: hasXp ? classAccent : 'transparent',
+                                outline: isToday || isSelected ? '2.5px solid #6366f1' : 'none',
+                                outlineOffset: '2px',
+                                transform: isSelected ? 'scale(1.1)' : 'scale(1)',
+                              }}>
+                              <span className="text-xs font-bold leading-none" style={{ color: hasXp ? '#fff' : isToday ? 'var(--text)' : 'var(--text-muted)' }}>{day}</span>
+                              {hasXp && <span className="text-[7px] text-white/70 font-semibold leading-none">+{(dayXp / 10).toFixed(1)}</span>}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 mt-4 pt-3 border-t border-[var(--border)]">
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-3.5 h-3.5 rounded-full" style={{ background: classAccent }} />
+                        <span className="text-[10px] text-[var(--text-muted)]">XP earned</span>
+                      </div>
+                      <span className="text-[10px] text-[var(--text-muted)] ml-auto">Tap a day for details</span>
+                    </div>
+                  </div>
+                  {teacherXpCalSelectedDay && tCalSelectedEntries.length > 0 && (
+                    <div className="card space-y-2">
+                      <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-widest">{teacherXpCalSelectedDay}</p>
+                      <p className="font-black text-[var(--text)]">+{(tCalSelectedEntries.reduce((s, e) => s + e.amount, 0) / 10).toFixed(1)} XP</p>
+                      {tCalSelectedEntries.map(e => (
+                        <div key={e.id} className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg">{XP_REASON_ICON2[e.reason] ?? '⚡'}</span>
+                            <span className="text-sm text-[var(--text)]">{e.reason}</span>
+                          </div>
+                          <span className="text-sm font-bold" style={{ color: classAccent }}>+{(e.amount / 10).toFixed(1)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {!teacherXpHistoryLoading && Object.keys(teacherXpByDate).length === 0 && (
+                    <p className="text-sm text-center text-[var(--text-muted)] py-6">No XP earned in this class yet</p>
+                  )}
+                </>
+              )}
             </div>
             <div className="px-5 pb-5 pt-3 shrink-0">
-              <button onClick={() => setXpHistoryStudent(null)} className="w-full btn-ghost py-3 text-sm">Close</button>
+              <button onClick={() => { setXpHistoryStudent(null); setTeacherXpCalSelectedDay(null); }} className="w-full btn-ghost py-3 text-sm">Close</button>
             </div>
           </div>
         </div>
