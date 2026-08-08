@@ -599,8 +599,128 @@ export default function ClassWordsPage() {
         <div className="flex justify-center py-12"><div className="text-4xl animate-bounce">📝</div></div>
       ) : (
         <div className="p-4 space-y-4">
-          {/* Tab switcher — teacher only */}
+
+          {/* ── Word list — always first ── */}
+          {words.length > 0 && (
+            <div className="space-y-4 pt-2">
+              <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">
+                {words.length} word{words.length !== 1 ? 's' : ''} in this class
+              </p>
+              {Array.from(grouped.entries()).map(([folder, colMap]) => {
+                const folderCollapsed = folder ? collapsedFolders.has(folder) : false;
+                return (
+                <div key={folder} className="space-y-2">
+                  {folder && (
+                    <button onClick={() => toggleFolder(folder)} className="flex items-center gap-2 px-1 pt-1 w-full text-left">
+                      <span className="text-base">📁</span>
+                      <span className="font-bold text-sm text-[var(--text)]">{folder}</span>
+                      <span className="text-[10px] text-[var(--text-muted)] ml-auto">{folderCollapsed ? '▶' : '▼'}</span>
+                    </button>
+                  )}
+                  {!folderCollapsed && Array.from(colMap.entries()).map(([col, colWords]) => {
+                    const colKey = `${folder}::${col}`;
+                    const collapsed = collapsedCols.has(colKey);
+                    return (
+                    <div key={col} className={folder ? 'ml-4 space-y-1.5' : 'space-y-1.5'}>
+                      {col && (
+                        <button onClick={() => toggleCol(colKey)} className="flex items-center gap-2 px-1 w-full text-left">
+                          <span className="text-sm">📖</span>
+                          <span className="font-semibold text-xs text-[var(--text-muted)]">{col}</span>
+                          <span className="text-[10px] text-[var(--text-muted)]">· {colWords.length} word{colWords.length !== 1 ? 's' : ''}</span>
+                          <span className="text-[10px] text-[var(--text-muted)] ml-auto">{collapsed ? '▶' : '▼'}</span>
+                        </button>
+                      )}
+                      {!collapsed && colWords.map(w => (
+                        <div key={w.id} className={`card flex items-start gap-3 ${folder ? 'border-l-2 border-[var(--primary)] border-opacity-30' : ''}`}>
+                          <WordCard w={w} />
+                          {isTeacher && w.source !== 'library' ? (
+                            <button onClick={() => deleteWord(w.id)} className="text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors text-sm shrink-0 mt-0.5" aria-label="Delete word">✕</button>
+                          ) : !isTeacher ? (
+                            <button
+                              onClick={() => toggleStar(w.word)}
+                              className={`text-lg shrink-0 mt-0.5 transition-transform active:scale-75 ${starredIds.has(w.word) ? 'opacity-100' : 'opacity-25 hover:opacity-60'}`}
+                              aria-label={starredIds.has(w.word) ? 'Unstar word' : 'Star word'}
+                            >{starredIds.has(w.word) ? '⭐' : '☆'}</button>
+                          ) : null}
+                        </div>
+                      ))}
+                    </div>
+                    );
+                  })}
+                </div>
+                );
+              })}
+            </div>
+          )}
+
+          {words.length === 0 && !loading && (
+            <div className="card text-center py-10 space-y-2">
+              <div className="text-4xl">📝</div>
+              <p className="font-bold text-[var(--text)]">No words yet</p>
+              <p className="text-sm text-[var(--text-muted)]">{isTeacher ? 'Add words below' : 'Your teacher hasn\'t added any words yet'}</p>
+            </div>
+          )}
+
+          {/* ── Study Hub ── */}
+          {words.length > 0 && (
+            <div className="space-y-3 pt-1">
+              <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">── Practice</p>
+              <div className="grid grid-cols-2 gap-2">
+                {([
+                  { label: '📖 Study',      href: `/learn?source=class&classId=${id}&className=${encodeURIComponent(className)}`,      primary: true  },
+                  { label: '🃏 Flashcards', href: `/flashcards?source=class&classId=${id}&className=${encodeURIComponent(className)}`, primary: false },
+                  { label: '❓ Quiz',       href: `/quiz?source=class&classId=${id}&className=${encodeURIComponent(className)}`,       primary: false },
+                  { label: '🔗 Match',      href: `/matching?source=class&classId=${id}&className=${encodeURIComponent(className)}`,   primary: false },
+                ] as { label: string; href: string; primary: boolean }[]).map(({ label, href, primary }) => (
+                  <button
+                    key={label}
+                    onClick={() => router.push(href)}
+                    className={`flex items-center justify-between px-4 py-3.5 rounded-2xl text-sm font-bold transition-all active:scale-95 ${primary ? 'text-white' : 'bg-[var(--surface-2)] text-[var(--text)]'}`}
+                    style={primary ? { background: 'linear-gradient(135deg, var(--primary), #9333ea)', boxShadow: '0 4px 12px rgba(109,60,255,0.3)' } : {}}
+                  >
+                    <span>{label}</span><span className="opacity-50 text-xs">→</span>
+                  </button>
+                ))}
+              </div>
+              <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">── Review</p>
+              <div className="card flex items-center justify-between gap-3">
+                <div>
+                  <p className="font-bold text-sm text-[var(--text)]">SRS Review</p>
+                  <p className="text-xs text-[var(--text-muted)]">
+                    {dueCount > 0 ? `${dueCount} word${dueCount !== 1 ? 's' : ''} due today` : 'All caught up ✓'}
+                  </p>
+                </div>
+                {dueCount > 0 ? (
+                  <button onClick={() => router.push(`/classes/${id}/review`)} className="shrink-0 px-4 py-2 rounded-2xl text-sm font-bold text-white" style={{ background: 'linear-gradient(135deg, #f59e0b, #ef4444)', boxShadow: '0 4px 10px rgba(239,68,68,0.3)' }}>Review →</button>
+                ) : <span className="text-2xl">✅</span>}
+              </div>
+              {!isTeacher && (
+                <>
+                  <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">── My Stats</p>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { value: `${learnedCount}/${words.length}`, label: 'Learned', color: 'var(--primary)' },
+                      { value: hardCount,    label: 'Hard',    color: '#ef4444' },
+                      { value: starredCount, label: 'Starred', color: '#f59e0b' },
+                    ].map(({ value, label, color }) => (
+                      <div key={label} className="card text-center py-3 space-y-0.5">
+                        <p className="text-lg font-black" style={{ color }}>{value}</p>
+                        <p className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-wide">{label}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <button onClick={() => router.push(`/classes/${id}/progress`)} className="w-full flex items-center justify-between px-4 py-3 rounded-2xl bg-[var(--surface-2)] text-sm font-semibold text-[var(--text)] active:scale-95 transition-transform">
+                    <span>📊 My Progress</span><span className="text-[var(--text-muted)] text-xs">→</span>
+                  </button>
+                </>
+              )}
+            </div>
+          )}
+
+          {/* ── Add words (teacher only) — at the bottom ── */}
           {isTeacher && (
+          <div className="space-y-4 pt-2 border-t border-[var(--border)]">
+            <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">Add words</p>
             <div className="flex rounded-2xl overflow-hidden border border-[var(--border)]">
               {(['manual', 'ai', 'collection'] as InputTab[]).map(t => (
                 <button
@@ -612,7 +732,6 @@ export default function ClassWordsPage() {
                 </button>
               ))}
             </div>
-          )}
 
           {/* Add-word tabs — teacher only */}
           {/* Manual tab */}
@@ -896,138 +1015,9 @@ export default function ClassWordsPage() {
             </div>
           )}
 
-          {/* ── Study Hub ─────────────────────────────────── */}
-          {words.length > 0 && (
-            <div className="space-y-3 pt-1">
-              {/* Practice */}
-              <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">── Practice</p>
-              <div className="grid grid-cols-2 gap-2">
-                {([
-                  { label: '📖 Study',      href: `/learn?source=class&classId=${id}&className=${encodeURIComponent(className)}`,      primary: true  },
-                  { label: '🃏 Flashcards', href: `/flashcards?source=class&classId=${id}&className=${encodeURIComponent(className)}`, primary: false },
-                  { label: '❓ Quiz',       href: `/quiz?source=class&classId=${id}&className=${encodeURIComponent(className)}`,       primary: false },
-                  { label: '🔗 Match',      href: `/matching?source=class&classId=${id}&className=${encodeURIComponent(className)}`,   primary: false },
-                ] as { label: string; href: string; primary: boolean }[]).map(({ label, href, primary }) => (
-                  <button
-                    key={label}
-                    onClick={() => router.push(href)}
-                    className={`flex items-center justify-between px-4 py-3.5 rounded-2xl text-sm font-bold transition-all active:scale-95 ${primary ? 'text-white' : 'bg-[var(--surface-2)] text-[var(--text)]'}`}
-                    style={primary ? { background: 'linear-gradient(135deg, var(--primary), #9333ea)', boxShadow: '0 4px 12px rgba(109,60,255,0.3)' } : {}}
-                  >
-                    <span>{label}</span><span className="opacity-50 text-xs">→</span>
-                  </button>
-                ))}
-              </div>
-
-              {/* Review */}
-              <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">── Review</p>
-              <div className="card flex items-center justify-between gap-3">
-                <div>
-                  <p className="font-bold text-sm text-[var(--text)]">SRS Review</p>
-                  <p className="text-xs text-[var(--text-muted)]">
-                    {dueCount > 0 ? `${dueCount} word${dueCount !== 1 ? 's' : ''} due today` : 'All caught up ✓'}
-                  </p>
-                </div>
-                {dueCount > 0 ? (
-                  <button
-                    onClick={() => router.push(`/classes/${id}/review`)}
-                    className="shrink-0 px-4 py-2 rounded-2xl text-sm font-bold text-white"
-                    style={{ background: 'linear-gradient(135deg, #f59e0b, #ef4444)', boxShadow: '0 4px 10px rgba(239,68,68,0.3)' }}
-                  >Review →</button>
-                ) : (
-                  <span className="text-2xl">✅</span>
-                )}
-              </div>
-
-              {/* My Stats — students only */}
-              {!isTeacher && (
-                <>
-                  <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">── My Stats</p>
-                  <div className="grid grid-cols-3 gap-2">
-                    {[
-                      { value: `${learnedCount}/${words.length}`, label: 'Learned', color: 'var(--primary)' },
-                      { value: hardCount,    label: 'Hard',    color: '#ef4444' },
-                      { value: starredCount, label: 'Starred', color: '#f59e0b' },
-                    ].map(({ value, label, color }) => (
-                      <div key={label} className="card text-center py-3 space-y-0.5">
-                        <p className="text-lg font-black" style={{ color }}>{value}</p>
-                        <p className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-wide">{label}</p>
-                      </div>
-                    ))}
-                  </div>
-                  <button
-                    onClick={() => router.push(`/classes/${id}/progress`)}
-                    className="w-full flex items-center justify-between px-4 py-3 rounded-2xl bg-[var(--surface-2)] text-sm font-semibold text-[var(--text)] active:scale-95 transition-transform"
-                  >
-                    <span>📊 My Progress</span><span className="text-[var(--text-muted)] text-xs">→</span>
-                  </button>
-                </>
-              )}
-            </div>
+          </div>
           )}
 
-          {/* Word list — grouped by folder → collection */}
-          {words.length > 0 && (
-            <div className="space-y-4 pt-2">
-              <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">
-                {words.length} item{words.length !== 1 ? 's' : ''} assigned to this class
-              </p>
-              {Array.from(grouped.entries()).map(([folder, colMap]) => {
-                const folderCollapsed = folder ? collapsedFolders.has(folder) : false;
-                return (
-                <div key={folder} className="space-y-2">
-                  {/* Folder header */}
-                  {folder && (
-                    <button onClick={() => toggleFolder(folder)} className="flex items-center gap-2 px-1 pt-1 w-full text-left">
-                      <span className="text-base">📁</span>
-                      <span className="font-bold text-sm text-[var(--text)]">{folder}</span>
-                      <span className="text-[10px] text-[var(--text-muted)] ml-auto">{folderCollapsed ? '▶' : '▼'}</span>
-                    </button>
-                  )}
-                  {!folderCollapsed && Array.from(colMap.entries()).map(([col, colWords]) => {
-                    const colKey = `${folder}::${col}`;
-                    const collapsed = collapsedCols.has(colKey);
-                    return (
-                    <div key={col} className={folder ? 'ml-4 space-y-1.5' : 'space-y-1.5'}>
-                      {/* Collection header */}
-                      {col && (
-                        <button onClick={() => toggleCol(colKey)} className="flex items-center gap-2 px-1 w-full text-left">
-                          <span className="text-sm">📖</span>
-                          <span className="font-semibold text-xs text-[var(--text-muted)]">{col}</span>
-                          <span className="text-[10px] text-[var(--text-muted)]">· {colWords.length} item{colWords.length !== 1 ? 's' : ''}</span>
-                          <span className="text-[10px] text-[var(--text-muted)] ml-auto">{collapsed ? '▶' : '▼'}</span>
-                        </button>
-                      )}
-                      {!collapsed && colWords.map(w => (
-                        <div key={w.id} className={`card flex items-start gap-3 ${folder ? 'border-l-2 border-[var(--primary)] border-opacity-30' : ''}`}>
-                          <WordCard w={w} />
-                          {isTeacher && w.source !== 'library' ? (
-                            <button onClick={() => deleteWord(w.id)} className="text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors text-sm shrink-0 mt-0.5" aria-label="Delete word">✕</button>
-                          ) : !isTeacher ? (
-                            <button
-                              onClick={() => toggleStar(w.word)}
-                              className={`text-lg shrink-0 mt-0.5 transition-transform active:scale-75 ${starredIds.has(w.word) ? 'opacity-100' : 'opacity-25 hover:opacity-60'}`}
-                              aria-label={starredIds.has(w.word) ? 'Unstar word' : 'Star word'}
-                            >{starredIds.has(w.word) ? '⭐' : '☆'}</button>
-                          ) : null}
-                        </div>
-                      ))}
-                    </div>
-                    );
-                  })}
-                </div>
-                );
-              })}
-            </div>
-          )}
-
-          {words.length === 0 && !loading && (
-            <div className="card text-center py-10 space-y-2">
-              <div className="text-4xl">📝</div>
-              <p className="font-bold text-[var(--text)]">No items yet</p>
-              <p className="text-sm text-[var(--text-muted)]">Add items manually or use AI Import above</p>
-            </div>
-          )}
         </div>
       )}
     </div>

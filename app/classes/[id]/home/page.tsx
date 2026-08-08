@@ -14,7 +14,7 @@ interface StudentProfile {
 type HomeCache = {
   className: string; isTeacher: boolean; teacherName: string; teacherId: string; teacherBio: string;
   announcements: Announcement[]; targets: Target[];
-  wordCount: number; memberCount: number; activeToday: number;
+  memberCount: number; activeToday: number;
   needsAttention: number; readCounts: Record<string, number>;
 };
 
@@ -114,8 +114,7 @@ export default function ClassHomePage() {
   const memberIdsRef = useRef<string[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [targets, setTargets] = useState<Target[]>([]);
-  const [wordCount, setWordCount] = useState(0);
-  const [memberCount, setMemberCount] = useState(0);
+const [memberCount, setMemberCount] = useState(0);
   const [activeToday, setActiveToday] = useState(0);
   const [needsAttention, setNeedsAttention] = useState(0);
   const [readCounts, setReadCounts] = useState<Record<string, number>>({});
@@ -134,7 +133,6 @@ export default function ClassHomePage() {
       setTeacherBio(cached.teacherBio);
       setAnnouncements(cached.announcements);
       setTargets(cached.targets);
-      setWordCount(cached.wordCount);
       setMemberCount(cached.memberCount);
       setActiveToday(cached.activeToday);
       setNeedsAttention(cached.needsAttention);
@@ -151,17 +149,13 @@ export default function ClassHomePage() {
 
       const teacher = cls.teacher_id === user.id;
 
-      const [{ data: anns }, { data: words }, { data: members }, { data: myMembership }, { data: libAssigns }] = await Promise.all([
+      const [{ data: anns }, { data: members }, { data: myMembership }] = await Promise.all([
         supabase.from('class_announcements').select('id, message, created_at')
           .eq('class_id', id).order('created_at', { ascending: false }).limit(5),
-        supabase.from('class_words').select('id').eq('class_id', id),
         supabase.from('class_members').select('student_id').eq('class_id', id),
         !teacher
           ? supabase.from('class_members').select('class_xp').eq('class_id', id).eq('student_id', user.id).maybeSingle()
           : Promise.resolve({ data: null }),
-        supabase.from('class_library_assignments')
-          .select('teacher_folders(teacher_units(teacher_unit_words(id)))')
-          .eq('class_id', id),
       ]);
 
       if (!teacher) setMyClassXp((myMembership as { class_xp: number } | null)?.class_xp ?? 0);
@@ -211,9 +205,6 @@ export default function ClassHomePage() {
         teacherBio: tProfileData?.bio ?? '',
         announcements: (anns ?? []) as Announcement[],
         targets: (tgts ?? []) as Target[],
-        wordCount: (words?.length ?? 0) + ((libAssigns ?? []) as any[]).reduce((sum: number, a: any) =>
-          sum + ((a.teacher_folders?.teacher_units ?? []) as any[]).reduce((s: number, u: any) =>
-            s + (u.teacher_unit_words?.length ?? 0), 0), 0),
         memberCount, activeToday, needsAttention,
         readCounts: counts,
       };
@@ -226,7 +217,6 @@ export default function ClassHomePage() {
       setTeacherBio(snapshot.teacherBio);
       setAnnouncements(snapshot.announcements);
       setTargets(snapshot.targets);
-      setWordCount(snapshot.wordCount);
       setMemberCount(snapshot.memberCount);
       setActiveToday(snapshot.activeToday);
       setNeedsAttention(snapshot.needsAttention);
@@ -668,10 +658,7 @@ export default function ClassHomePage() {
           )}
         </div>
         <div className="flex flex-wrap gap-2 mb-3">
-          <button onClick={() => router.push(`/classes/${id}/words`)} className="text-xs font-semibold bg-black/20 text-white rounded-full px-3 py-1 hover:bg-black/30 transition-colors">
-            📖 {wordCount} words
-          </button>
-          <span className="text-xs font-semibold bg-black/20 text-white rounded-full px-3 py-1">✅ {activeToday}/{memberCount} active</span>
+<span className="text-xs font-semibold bg-black/20 text-white rounded-full px-3 py-1">✅ {activeToday}/{memberCount} active</span>
           {!isTeacher && (
             <button
               onClick={() => setShowHW(true)}
@@ -782,7 +769,6 @@ export default function ClassHomePage() {
               {[
                 { icon: '👥', value: memberCount, label: 'Students', onClick: openStudentsSheet },
                 { icon: '✅', value: activeToday, label: 'Active today', onClick: undefined },
-                { icon: '📖', value: wordCount, label: 'Words', onClick: undefined },
               ].map(({ icon, value, label, onClick }) => (
                 <div key={label} onClick={onClick}
                   className={`bg-[var(--surface)] border border-[var(--border)] rounded-xl p-3 flex flex-col items-center gap-1 ${onClick ? 'cursor-pointer hover:bg-[var(--surface-2)] active:scale-95 transition-all' : ''}`}>
