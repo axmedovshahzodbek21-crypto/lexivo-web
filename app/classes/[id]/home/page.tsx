@@ -399,7 +399,7 @@ export default function ClassHomePage() {
                           const dayXp = entries.reduce((s, e) => s + e.amount, 0);
                           return (
                             <button key={dStr} disabled={isFuture || !hasXp}
-                              onClick={() => setXpCalSelectedDay(isSelected ? null : dStr)}
+                              onClick={() => hasXp && setXpCalSelectedDay(dStr)}
                               className="w-10 h-10 rounded-full relative overflow-hidden flex flex-col items-center justify-center transition-all disabled:opacity-20"
                               style={{
                                 background: hasXp ? classAccent : 'transparent',
@@ -423,28 +423,47 @@ export default function ClassHomePage() {
                     </div>
                   </div>
 
-                  {/* Selected day breakdown */}
-                  {xpCalSelectedDay && selectedDayEntries.length > 0 && (
-                    <div className="space-y-2">
-                      <p className="text-[11px] font-bold uppercase tracking-widest text-[var(--text-muted)]">{xpCalSelectedDay}</p>
-                      {selectedDayEntries.map(e => (
-                        <div key={e.id} className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-[var(--surface-2)]">
-                          <span className="text-xl shrink-0">{XP_REASON_ICON2[e.reason] ?? '⚡'}</span>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-[var(--text)]">{e.reason}</p>
-                            <p className="text-[11px] text-[var(--text-muted)]">{timeAgo(e.created_at)}</p>
-                          </div>
-                          <p className="text-sm font-black shrink-0" style={{ color: classAccent }}>+{(e.amount / 10).toFixed(1)}</p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
                   {xpCalLoaded && Object.keys(xpByDate).length === 0 && (
                     <p className="text-sm text-center text-[var(--text-muted)] py-6">No XP earned in this class yet</p>
                   )}
                 </>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* XP day detail popup */}
+      {xpCalSelectedDay && selectedDayEntries.length > 0 && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 px-4" onClick={() => setXpCalSelectedDay(null)}>
+          <div className="w-full max-w-sm bg-[var(--surface)] rounded-2xl overflow-hidden shadow-2xl" onClick={e => e.stopPropagation()}>
+            <div className="px-5 pt-5 pb-3 border-b border-[var(--border)] flex items-center justify-between">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-[var(--text-muted)]">{xpCalSelectedDay}</p>
+                <p className="text-lg font-black text-[var(--text)]">
+                  +{(selectedDayEntries.reduce((s, e) => s + e.amount, 0) / 10).toFixed(1)} XP earned
+                </p>
+              </div>
+              <button onClick={() => setXpCalSelectedDay(null)}
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-[var(--surface-2)] text-[var(--text-muted)] hover:bg-[var(--border)] transition-colors text-sm">✕</button>
+            </div>
+            <div className="px-5 py-3 space-y-2 max-h-72 overflow-y-auto">
+              {selectedDayEntries.map(e => (
+                <div key={e.id} className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-[var(--surface-2)]">
+                  <span className="text-xl shrink-0">{XP_REASON_ICON2[e.reason] ?? '⚡'}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-[var(--text)]">{e.reason}</p>
+                    <p className="text-[11px] text-[var(--text-muted)]">{timeAgo(e.created_at)}</p>
+                  </div>
+                  <p className="text-sm font-black shrink-0" style={{ color: classAccent }}>+{(e.amount / 10).toFixed(1)}</p>
+                </div>
+              ))}
+            </div>
+            <div className="px-5 pb-4 pt-2">
+              <button onClick={() => setXpCalSelectedDay(null)}
+                className="w-full py-2.5 rounded-xl text-sm font-semibold text-[var(--text-muted)] bg-[var(--surface-2)] hover:bg-[var(--border)] transition-colors">
+                Close
+              </button>
             </div>
           </div>
         </div>
