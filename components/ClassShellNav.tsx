@@ -5,15 +5,20 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 
-const BASE_ITEMS = [
+const STUDENT_ITEMS = [
   { seg: 'home',        icon: '🏠', label: 'Home'     },
   { seg: 'words',       icon: '📖', label: 'Words'    },
   { seg: 'leaderboard', icon: '🏆', label: 'Ranks'    },
   { seg: 'homework',    icon: '📋', label: 'Homework' },
 ];
 
-const TEACHER_ITEM  = { seg: '', icon: '📊', label: 'Dashboard' };
-const CURRICULUM_ITEM = { seg: '__curriculum__', icon: '📋', label: 'Curriculum' };
+const TEACHER_ITEMS = [
+  { seg: 'home',        icon: '🏠', label: 'Home'        },
+  { seg: 'words',       icon: '📖', label: 'Words'       },
+  { seg: 'leaderboard', icon: '🏆', label: 'Ranks'       },
+  { seg: '',            icon: '📊', label: 'Dashboard'   },
+  { seg: '__curriculum__', icon: '📋', label: 'Curriculum' },
+];
 
 export default function ClassShellNav({ classId }: { classId: string }) {
   const pathname = usePathname();
@@ -39,7 +44,7 @@ export default function ClassShellNav({ classId }: { classId: string }) {
       });
   }, [classId, user]);
 
-  const items = isTeacher ? [...BASE_ITEMS, TEACHER_ITEM, CURRICULUM_ITEM] : BASE_ITEMS;
+  const items = isTeacher ? TEACHER_ITEMS : STUDENT_ITEMS;
 
   const isActive = (seg: string) => {
     if (seg === '__curriculum__') {
