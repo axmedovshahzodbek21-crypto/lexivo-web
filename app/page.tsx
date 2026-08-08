@@ -23,6 +23,21 @@ type HomeClassSummary = {
   classXP: number; classStreak: number; pendingHomework: number;
 };
 
+const CLASS_GRADIENTS = [
+  { bg: 'linear-gradient(135deg, #7c3aed, #a78bfa)', edge: '#4c1d95', glow: 'rgba(124,58,237,0.4)' },
+  { bg: 'linear-gradient(135deg, #0e7490, #22d3ee)', edge: '#164e63', glow: 'rgba(14,116,144,0.4)' },
+  { bg: 'linear-gradient(135deg, #b45309, #fbbf24)', edge: '#78350f', glow: 'rgba(180,83,9,0.4)'  },
+  { bg: 'linear-gradient(135deg, #be123c, #fb7185)', edge: '#881337', glow: 'rgba(190,18,60,0.4)'  },
+  { bg: 'linear-gradient(135deg, #1a9a50, #2ECC71)', edge: '#0f6634', glow: 'rgba(46,204,113,0.4)' },
+  { bg: 'linear-gradient(135deg, #ec4899, #f472b6)', edge: '#9d174d', glow: 'rgba(236,72,153,0.4)' },
+  { bg: 'linear-gradient(135deg, #d97706, #fcd34d)', edge: '#92400e', glow: 'rgba(217,119,6,0.4)'  },
+  { bg: 'linear-gradient(135deg, #0284c7, #38bdf8)', edge: '#0369a1', glow: 'rgba(2,132,199,0.4)'  },
+];
+function classGradient(classId: string) {
+  const hash = classId.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+  return CLASS_GRADIENTS[hash % CLASS_GRADIENTS.length];
+}
+
 function computeClassStreak(datesDesc: string[]): number {
   if (!datesDesc.length) return 0;
   const set = new Set(datesDesc);
@@ -628,9 +643,7 @@ export default function HomePage() {
             const classId = sId.replace('class_', '');
             const card = homeClasses.find(c => c.classId === classId);
             if (!card) return null;
-            const bg = card.isTeacher ? 'linear-gradient(135deg, #0e7490, #22d3ee)' : 'linear-gradient(135deg, #5b21b6, #8b5cf6)';
-            const edge = card.isTeacher ? '#164e63' : '#3b0764';
-            const glow = card.isTeacher ? 'rgba(14,116,144,0.4)' : 'rgba(91,33,182,0.4)';
+            const { bg, edge, glow } = classGradient(card.classId);
             return (
               <div className="relative h-full">
                 {card.pendingHomework > 0 && (
@@ -641,19 +654,23 @@ export default function HomePage() {
                 <Link href={`/classes/${card.classId}/home`} className="block h-full">
                   <div className="rounded-2xl h-full p-3 flex flex-col justify-between hover:-translate-y-1 transition-all duration-200 animate-heartbeat"
                     style={{ background: bg, boxShadow: `0 7px 0 ${edge}, 0 10px 24px ${glow}`, textShadow: '0 1px 3px rgba(0,0,0,0.35)' }}>
-                    <div>
-                      <div className="text-2xl mb-1">{card.isTeacher ? '🏫' : '🎓'}</div>
-                      <div className="font-bold text-sm text-white leading-tight truncate">{card.className}</div>
-                      <div className="text-[10px] text-white/70 mt-0.5">
-                        {card.isTeacher ? `${card.studentCount} students` : `⚡ ${(card.classXP / 10).toFixed(1)} XP`}
+                    <div className="flex items-start justify-between gap-1">
+                      <div className="flex-1 min-w-0">
+                        <div className="text-base font-black text-white leading-tight truncate">{card.className}</div>
+                        <div className="text-[10px] text-white/70 mt-1">
+                          {card.isTeacher ? `👨‍🎓 ${card.studentCount} students` : `⚡ ${(card.classXP / 10).toFixed(1)} XP`}
+                        </div>
                       </div>
+                      <span className="text-lg opacity-80 shrink-0">{card.isTeacher ? '🏫' : '🎓'}</span>
                     </div>
-                    {!card.isTeacher && card.classStreak > 0 && (
-                      <div className="text-[10px] text-white/70">🔥 {card.classStreak} day streak</div>
-                    )}
-                    {card.isTeacher && (
-                      <div className="text-[10px] font-bold bg-white/20 text-white rounded-full px-2 py-0.5 self-start">Teacher</div>
-                    )}
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold bg-white/20 text-white rounded-full px-2 py-0.5">
+                        {card.isTeacher ? 'Teacher' : 'Student'}
+                      </span>
+                      {!card.isTeacher && card.classStreak > 0 && (
+                        <span className="text-[10px] text-white/70">🔥 {card.classStreak}d</span>
+                      )}
+                    </div>
                   </div>
                 </Link>
               </div>
