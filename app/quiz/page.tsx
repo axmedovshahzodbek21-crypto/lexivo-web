@@ -401,7 +401,11 @@ export default function QuizPage() {
     <div className="flex flex-col min-h-screen">
       {/* Header */}
       <div className="flex items-center justify-between p-4">
-        <button onClick={() => router.back()} className="btn-icon" aria-label="Go back">←</button>
+        <button onClick={() => {
+          if (sourceClassHW && sp.get('hwId')) router.push(`/classes/${sp.get('classId')}/homework/${sp.get('hwId')}`);
+          else if (sourceClass && classId) router.push(`/classes/${classId}/words`);
+          else router.back();
+        }} className="btn-icon" aria-label="Go back">←</button>
         <div className="text-center">
           <div className="font-semibold text-sm">{t.quiz.title}</div>
           <div className="text-xs text-[var(--text-muted)]">{index + 1} / {questions.length}</div>

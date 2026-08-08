@@ -724,7 +724,13 @@ function LearnInner() {
               saveLearnProgress(collectionName, dayNumber, index);
               saveLearnMarks(collectionName, dayNumber, skipped.map(w => w.word), pureSkipped.map(w => w.word));
             }
-            router.back();
+            if (sourceClassHW && sp.get('hwId')) {
+              router.push(`/classes/${sp.get('classId')}/homework/${sp.get('hwId')}`);
+            } else if (sourceClass && classIdParam) {
+              router.push(`/classes/${classIdParam}/words`);
+            } else {
+              router.back();
+            }
           }}
           className="btn-icon text-lg"
           aria-label="Go back"
