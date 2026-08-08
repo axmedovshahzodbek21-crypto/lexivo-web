@@ -36,6 +36,7 @@ interface ClassWord {
   folder_name: string | null;
   collection_name: string | null;
   created_at: string;
+  source?: 'class' | 'library';
 }
 
 interface ParsedWord {
@@ -339,12 +340,47 @@ export default function ClassWordsPage() {
   };
 
   const loadWords = async (clsName?: string) => {
-    const { data } = await supabase
-      .from('class_words')
-      .select('id, word, translation, definition, example1, example1_translation, example2, example2_translation, examples, folder_name, collection_name, created_at')
-      .eq('class_id', id)
-      .order('created_at', { ascending: true });
-    const fetched = (data as ClassWord[]) ?? [];
+    const [{ data: cwData }, { data: libData }] = await Promise.all([
+      supabase
+        .from('class_words')
+        .select('id, word, translation, definition, example1, example1_translation, example2, example2_translation, examples, folder_name, collection_name, created_at')
+        .eq('class_id', id)
+        .order('created_at', { ascending: true }),
+      supabase
+        .from('class_library_assignments')
+        .select('teacher_folders(name, teacher_units(name, teacher_unit_words(id, word, translation, definition, examples, created_at)))')
+        .eq('class_id', id),
+    ]);
+
+    const classWords: ClassWord[] = ((cwData ?? []) as ClassWord[]).map(w => ({ ...w, source: 'class' as const }));
+
+    const libWords: ClassWord[] = [];
+    for (const assign of (libData ?? []) as any[]) {
+      const folder = assign.teacher_folders;
+      if (!folder) continue;
+      for (const unit of (folder.teacher_units ?? []) as any[]) {
+        for (const w of (unit.teacher_unit_words ?? []) as any[]) {
+          const exs: WordExample[] = (w.examples as any[] | null)?.map((e: any) => ({
+            sentence: e.sentence ?? '', translation: e.translation ?? '',
+          })) ?? [];
+          libWords.push({
+            id: w.id, word: w.word, translation: w.translation,
+            definition: w.definition ?? null,
+            example1: exs[0]?.sentence ?? null,
+            example1_translation: exs[0]?.translation ?? null,
+            example2: exs[1]?.sentence ?? null,
+            example2_translation: exs[1]?.translation ?? null,
+            examples: exs.length > 0 ? exs : null,
+            folder_name: folder.name,
+            collection_name: unit.name,
+            created_at: w.created_at ?? '',
+            source: 'library',
+          });
+        }
+      }
+    }
+
+    const fetched = [...classWords, ...libWords];
     setWords(fetched);
     if (clsName !== undefined) _wordsCache.set(id, { className: clsName, words: fetched });
     else { const c = _wordsCache.get(id); if (c) _wordsCache.set(id, { ...c, words: fetched }); }
@@ -965,15 +1001,15 @@ export default function ClassWordsPage() {
                       {!collapsed && colWords.map(w => (
                         <div key={w.id} className={`card flex items-start gap-3 ${folder ? 'border-l-2 border-[var(--primary)] border-opacity-30' : ''}`}>
                           <WordCard w={w} />
-                          {isTeacher ? (
+                          {isTeacher && w.source !== 'library' ? (
                             <button onClick={() => deleteWord(w.id)} className="text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors text-sm shrink-0 mt-0.5" aria-label="Delete word">✕</button>
-                          ) : (
+                          ) : !isTeacher ? (
                             <button
                               onClick={() => toggleStar(w.word)}
                               className={`text-lg shrink-0 mt-0.5 transition-transform active:scale-75 ${starredIds.has(w.word) ? 'opacity-100' : 'opacity-25 hover:opacity-60'}`}
                               aria-label={starredIds.has(w.word) ? 'Unstar word' : 'Star word'}
                             >{starredIds.has(w.word) ? '⭐' : '☆'}</button>
-                          )}
+                          ) : null}
                         </div>
                       ))}
                     </div>
