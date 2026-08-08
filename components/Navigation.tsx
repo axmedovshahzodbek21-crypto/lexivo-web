@@ -1,10 +1,9 @@
-﻿'use client';
+'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { getSettings, getStreak, getXP, getProfilePic, getProfilePicUrl, displayXP } from '@/lib/storage';
+import { usePathname } from 'next/navigation';
+import { getSettings, getXP, getProfilePic, getProfilePicUrl } from '@/lib/storage';
 import { getLevelInfo } from '@/lib/gamification';
-import { useAuth } from '@/lib/auth-context';
 import { useTranslation } from '@/lib/useTranslation';
 import { LEVEL_COLORS, LEVEL_COLORS_FALLBACK } from '@/lib/colors';
 
@@ -21,56 +20,27 @@ const NAV_HREFS = [
   { href: '/library',      icon: '📚', key: 'library'     },
 ] as const;
 
-// Mobile bottom bar: 5 core items only — Matching & Leaderboard are on the home page
 const MOBILE_NAV_HREFS = NAV_HREFS.slice(0, 5);
-
 
 export default function Navigation() {
   const pathname  = usePathname();
-  const router    = useRouter();
-  const { user, signOut } = useAuth();
   const t = useTranslation();
   const isActive  = (href: string) => href === '/' ? pathname === '/' : pathname.startsWith(href);
 
-  const [name, setName]           = useState('Learner');
-  const [langLevel, setLangLevel] = useState('B1');
-  const [streak, setStreak]       = useState(0);
-  const [xp, setXp]               = useState(0);
+  const [name, setName]         = useState('Learner');
+  const [xp, setXp]             = useState(0);
   const [profilePic, setProfilePic] = useState<string | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   useEffect(() => {
-    const stored = localStorage.getItem('lexivo_sidebar_open');
-    if (stored === 'false') setSidebarOpen(false);
-  }, []);
-
-  const toggleSidebar = () => {
-    const next = !sidebarOpen;
-    setSidebarOpen(next);
-    localStorage.setItem('lexivo_sidebar_open', String(next));
-  };
-
-  useEffect(() => {
-    const refresh = () => {
-      const s = getSettings();
-      setName(s.name);
-      setLangLevel(s.languageLevel);
-      setStreak(getStreak());
-      setXp(getXP());
-      setProfilePic(getProfilePicUrl() ?? getProfilePic());
-    };
-    refresh();
+    const s = getSettings();
+    setName(s.name);
+    setXp(getXP());
+    setProfilePic(getProfilePicUrl() ?? getProfilePic());
   }, [pathname]);
 
   const levelInfo  = getLevelInfo(xp);
   const initial    = name.charAt(0).toUpperCase();
   const levelColor = LEVEL_COLORS[levelInfo.level] ?? LEVEL_COLORS_FALLBACK;
-
-  const handleSignOut = async () => {
-    if (!confirm('Sign out of your account?')) return;
-    await signOut();
-    router.replace('/login');
-  };
 
   // Hide when inside a class room (/classes/[id] or /classes/[id]/*)
   if (/^\/classes\/[^/]+(\/|$)/.test(pathname)) return null;
@@ -99,165 +69,53 @@ export default function Navigation() {
         })}
       </nav>
 
-      {/* ── Desktop: floating expand button (visible only when sidebar is hidden) ── */}
-      <button
-        onClick={toggleSidebar}
-        aria-label="Show sidebar"
-        tabIndex={sidebarOpen ? -1 : 0}
-        className={`hidden sm:flex fixed top-4 left-2 z-50 w-7 h-7 items-center justify-center rounded-full bg-[var(--surface)] border border-[var(--border)] shadow-sm text-[var(--text-muted)] hover:text-white hover:bg-[var(--primary)] hover:border-[var(--primary)] transition-all duration-200 ${sidebarOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
-      >
-        ›
-      </button>
+      {/* ── Desktop: compact icon sidebar ── */}
+      <aside className="hidden sm:flex shrink-0 sticky top-0 h-screen w-16 z-30 flex-col items-center py-4 gap-1 bg-[var(--surface)] border-r border-[var(--border)]">
+        {/* Brand mark */}
+        <Link
+          href="/"
+          title="Lexivo"
+          className="flex items-center justify-center w-10 h-10 rounded-xl mb-3 text-base font-black text-white shrink-0"
+          style={{ background: 'linear-gradient(135deg, var(--primary), var(--primary-light))' }}
+        >
+          L
+        </Link>
 
-      {/* ── Desktop: persistent left sidebar ── */}
-      <aside className={`hidden sm:flex shrink-0 sticky top-0 h-screen z-30 transition-[width,padding] duration-300 ${sidebarOpen ? 'w-[224px] p-3' : 'w-0 overflow-hidden'}`}>
-        <div className={`sidebar-glass flex flex-col w-full h-full rounded-2xl overflow-y-auto ${sidebarOpen ? '' : 'hidden'}`}>
-        {/* Brand + collapse button */}
-        <div className="px-5 pt-6 pb-4 flex items-start justify-between gap-2">
-          <div className="min-w-0">
-            <span
-              className="text-2xl font-black tracking-tight"
-              style={{
-                background: 'linear-gradient(135deg, var(--primary), var(--primary-light))',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}
-            >Lexivo</span>
-            <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{t.sidebar.tagline}</div>
-          </div>
-          <button
-            onClick={toggleSidebar}
-            aria-label="Hide sidebar"
-            className="mt-1 shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs text-[var(--text-muted)] hover:text-white hover:bg-[var(--primary)] transition-all duration-200"
-          >
-            ‹
-          </button>
-        </div>
-
-        {/* Nav links */}
-        <nav className="flex-1 px-3 space-y-0.5">
-          {NAV_HREFS.map(({ href, icon, key }) => {
-            const active = isActive(href);
-            const label = t.nav[key];
-            return (
-              <Link
-                key={href}
-                href={href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-semibold ${
-                  active
-                    ? 'text-white'
-                    : 'text-[var(--text-muted)] hover:text-[var(--primary)] hover:bg-[var(--primary-bg)]'
-                }`}
-                style={active ? {
-                  background: 'linear-gradient(135deg, var(--primary), var(--primary-light))',
-                  boxShadow: '0 4px 16px rgba(108,99,255,0.38)',
-                } : undefined}
-              >
-                <span className={`transition-transform duration-200 ${active ? 'text-xl scale-110' : 'text-lg'}`}>{icon}</span>
-                <span>{label}</span>
-              </Link>
-            );
-          })}
-
-        </nav>
-
-        {/* ── Profile block ── */}
-        <div className="px-3 pb-4 pt-3 border-t border-[var(--border)]">
-          <Link
-            href="/profile"
-            className="block rounded-2xl p-3 transition-all duration-200 hover:bg-[var(--primary-bg)] group"
-          >
-            {/* Top row: avatar + name + gear */}
-            <div className="flex items-center gap-2.5 mb-3">
-              <div
-                className="w-9 h-9 rounded-full overflow-hidden shrink-0 flex items-center justify-center text-white text-sm font-black"
-                style={{
-                  background: profilePic ? undefined : `linear-gradient(135deg, var(--primary), ${levelColor})`,
-                  boxShadow: `0 0 0 2px var(--primary), 0 0 10px rgba(108,99,255,0.3)`,
-                }}
-              >
-                {profilePic
-                  ? <img src={profilePic} alt="Profile" className="w-full h-full object-cover" />
-                  : initial}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-[var(--text)] truncate leading-tight">{name}</p>
-                <span
-                  className="inline-block text-[10px] font-bold px-1.5 py-0.5 rounded-full mt-0.5"
-                  style={{ background: `${levelColor}22`, color: levelColor }}
-                >
-                  {langLevel}
-                </span>
-              </div>
-              <span className="text-base text-[var(--text-muted)] group-hover:text-[var(--text)] transition-colors shrink-0">⚙️</span>
-            </div>
-
-            {/* Stats row */}
-            <div className="flex items-center gap-3 mb-2.5">
-              <div className="flex items-center gap-1">
-                <span className="text-sm">🔥</span>
-                <span className="text-xs font-bold text-[var(--text)]">{streak}</span>
-                <span className="text-[10px] text-[var(--text-muted)]">{t.sidebar.day}</span>
-              </div>
-              <div className="w-px h-3 bg-[var(--border)]" />
-              <div className="flex items-center gap-1">
-                <span className="text-sm">⚡</span>
-                <span className="text-xs font-bold text-[var(--text)]">{displayXP(xp)}</span>
-                <span className="text-[10px] text-[var(--text-muted)]">XP</span>
-              </div>
-            </div>
-
-            {/* XP progress bar */}
-            <div>
-              <div className="h-1.5 bg-[var(--border)] rounded-full overflow-hidden">
-                <div
-                  className="h-full rounded-full transition-all"
-                  style={{
-                    width: `${levelInfo.progress}%`,
-                    background: `linear-gradient(90deg, var(--primary), ${levelColor})`,
-                  }}
-                />
-              </div>
-              <div className="flex items-center justify-between mt-1">
-                <span className="text-[10px] font-bold" style={{ color: levelColor }}>
-                  {levelInfo.level}
-                </span>
-                {levelInfo.next && (
-                  <span className="text-[10px] text-[var(--text-muted)]">
-                    {displayXP(levelInfo.xpToNext)} XP → {levelInfo.next}
-                  </span>
-                )}
-              </div>
-            </div>
-          </Link>
-
-          {/* Auth row */}
-          {user ? (
-            <div className="mt-2 space-y-1">
-              <div className="px-3 py-1.5 rounded-xl bg-[var(--surface-2)]">
-                <p className="text-[10px] text-[var(--text-muted)] font-medium">{t.sidebar.signedInAs}</p>
-                <p className="text-xs font-bold text-[var(--text)] truncate">{user.email}</p>
-              </div>
-              <button
-                onClick={handleSignOut}
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-[var(--text-muted)] hover:bg-[var(--surface-2)] hover:text-[var(--danger)] transition-colors"
-              >
-                <span>🚪</span>
-                <span>{t.sidebar.signOut}</span>
-              </button>
-            </div>
-          ) : (
+        {/* Nav links — icons only */}
+        {NAV_HREFS.map(({ href, icon, key }) => {
+          const active = isActive(href);
+          const label = t.nav[key];
+          return (
             <Link
-              href="/login"
-              className="mt-2 w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-[var(--text-muted)] hover:bg-[var(--primary-bg)] hover:text-[var(--primary)] transition-colors"
+              key={href}
+              href={href}
+              title={label}
+              className={`flex items-center justify-center w-12 h-12 rounded-xl text-xl transition-colors ${
+                active
+                  ? 'bg-[var(--primary-bg)] text-[var(--primary)]'
+                  : 'text-[var(--text-muted)] hover:bg-[var(--surface-2)]'
+              }`}
             >
-              <span>🔑</span>
-              <span>{t.sidebar.signIn}</span>
+              {icon}
             </Link>
-          )}
-        </div>
-        </div>
+          );
+        })}
+
+        {/* Profile avatar at bottom */}
+        <div className="flex-1" />
+        <Link
+          href="/profile"
+          title={name}
+          className="flex items-center justify-center w-10 h-10 rounded-full overflow-hidden shrink-0 text-white text-sm font-black transition-all hover:ring-2 hover:ring-[var(--primary)] hover:ring-offset-2 hover:ring-offset-[var(--surface)]"
+          style={{
+            background: profilePic ? undefined : `linear-gradient(135deg, var(--primary), ${levelColor})`,
+            boxShadow: `0 0 0 2px var(--primary)`,
+          }}
+        >
+          {profilePic
+            ? <img src={profilePic} alt="Profile" className="w-full h-full object-cover" />
+            : initial}
+        </Link>
       </aside>
     </>
   );
