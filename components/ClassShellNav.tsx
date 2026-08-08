@@ -41,7 +41,7 @@ export default function ClassShellNav({ classId }: { classId: string }) {
 
   const isActive = (seg: string) => {
     const full = `/classes/${classId}${seg ? `/${seg}` : ''}`;
-    return seg === '' ? pathname === full : pathname.startsWith(full);
+    return seg === '' ? pathname === full : pathname === full || pathname.startsWith(full + '/');
   };
 
   // Two-step back: subpage → class home → classes list
