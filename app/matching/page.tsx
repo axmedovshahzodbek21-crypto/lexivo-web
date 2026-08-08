@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
 import { getHardWords, getStarredWords, getCustomListWords, getImportedWords, getImportedWordsByCollection, getClassHWTemp, addXP, hasMatchXPAwarded, markMatchXPAwarded, markMatchComplete } from '@/lib/storage';
 import { getClassWordsFull, addClassHardWord } from '@/lib/class-srs';
+import { recordClassStudyDay } from '@/lib/class-xp';
 import { supabase } from '@/lib/supabase';
 import { checkAchievements } from '@/lib/gamification';
 import type { WordItem, WordCollection } from '@/lib/types';
@@ -250,6 +251,11 @@ function MatchingInner() {
             markMatchXPAwarded(collectionParam, dayParam);
             if (result.leveledUp) setPendingLevelUp({ level: result.newLevel, xp: result.newXp });
           }
+        }
+        if (isLast && sourceClass && classId) {
+          supabase.auth.getUser().then(({ data: { user } }) => {
+            if (user) void recordClassStudyDay(user.id, classId);
+          });
         }
         setPhase(isLast ? 'done' : 'round_done');
       }

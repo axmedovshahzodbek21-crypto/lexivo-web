@@ -8,6 +8,7 @@ import { speak, speakText } from '@/lib/speech';
 import { recordStudySession, markFlashcardComplete, getStarredWords, getHardWords, getCustomListWords, getUnitProgress, saveFlashcardProgress, getFlashcardProgress, clearFlashcardProgress, getImportedWords, getImportedWordsByCollection, getClassHWTemp, recordFlashcardSession, addXP, hasFlashcardXPAwarded, markFlashcardXPAwarded } from '@/lib/storage';
 import { supabase } from '@/lib/supabase';
 import { getClassWordsFull } from '@/lib/class-srs';
+import { recordClassStudyDay } from '@/lib/class-xp';
 import { pushLists, pushStats } from '@/lib/sync';
 import { checkAchievements } from '@/lib/gamification';
 import type { WordItem, WordCollection } from '@/lib/types';
@@ -253,6 +254,11 @@ export default function FlashcardsPage() {
       }
       pushLists();
       pushStats();
+      if (sourceClass && classId) {
+        supabase.auth.getUser().then(({ data: { user } }) => {
+          if (user) void recordClassStudyDay(user.id, classId);
+        });
+      }
       setDone(true);
     } else {
       if (collectionName && dayNumber !== undefined && cardsSinceLastPush.current === 0) {

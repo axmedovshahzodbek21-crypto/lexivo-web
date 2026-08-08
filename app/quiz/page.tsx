@@ -10,6 +10,7 @@ import { fireConfetti } from '@/lib/confetti';
 import { checkAchievements } from '@/lib/gamification';
 import { supabase } from '@/lib/supabase';
 import { getClassWordsFull, addClassHardWord } from '@/lib/class-srs';
+import { recordClassStudyDay } from '@/lib/class-xp';
 import type { WordItem, WordCollection, QuizType } from '@/lib/types';
 import Link from 'next/link';
 import UnitPicker from '@/components/UnitPicker';
@@ -309,8 +310,11 @@ export default function QuizPage() {
       newAchievements.forEach(pushAchievement);
       pushLists();
       pushStats();
-
-
+      if (sourceClass && classId) {
+        supabase.auth.getUser().then(({ data: { user } }) => {
+          if (user) void recordClassStudyDay(user.id, classId);
+        });
+      }
       setDone(true);
     } else {
       setIndex(i => i + 1);

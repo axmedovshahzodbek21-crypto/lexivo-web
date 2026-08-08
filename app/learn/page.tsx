@@ -18,6 +18,7 @@ import { supabase } from '@/lib/supabase';
 import { createSRSWord } from '@/lib/srs';
 import { addSRSWord as storeSRSWord } from '@/lib/storage';
 import { initClassSRSWord } from '@/lib/class-srs';
+import { recordClassStudyDay } from '@/lib/class-xp';
 import type { Accent } from '@/lib/speech';
 import { checkAchievements } from '@/lib/gamification';
 import type { WordItem, WordCollection } from '@/lib/types';
@@ -472,6 +473,11 @@ function LearnInner() {
       }
       pushLists();
       pushStats();
+      if (sourceClass && classIdParam) {
+        supabase.auth.getUser().then(({ data: { user } }) => {
+          if (user) void recordClassStudyDay(user.id, classIdParam);
+        });
+      }
       setDone(true);
     } else {
       setIndex(i => i + 1);
