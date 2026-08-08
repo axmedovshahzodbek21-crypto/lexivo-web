@@ -235,12 +235,14 @@ export default function FlashcardsPage() {
       if (cardsSinceLastPush.current >= 5) { cardsSinceLastPush.current = 0; }
     }
     recordStudySession();
-    recordFlashcardSession();
-    const newAchievements = checkAchievements();
-    newAchievements.forEach(pushAchievement);
+    if (!sourceClassHW && !sourceClass) {
+      recordFlashcardSession();
+      const newAchievements = checkAchievements();
+      newAchievements.forEach(pushAchievement);
+    }
     if (index + 1 >= deck.length) {
       const finalUnknown = wasKnown ? unknownWords.length : unknownWords.length + 1;
-      if (collectionName && dayNumber !== undefined && finalUnknown === 0) {
+      if (!sourceClassHW && !sourceClass && collectionName && dayNumber !== undefined && finalUnknown === 0) {
         if (!hasFlashcardXPAwarded(collectionName, dayNumber)) {
           const result = addXP(Math.round(originalWordCount.current * 3), 'Flashcard', `Unit ${dayNumber} · ${collectionName}`);
           markFlashcardXPAwarded(collectionName, dayNumber);

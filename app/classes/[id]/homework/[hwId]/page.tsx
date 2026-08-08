@@ -258,6 +258,8 @@ export default function UnitStudyHubPage() {
   const learnAssigned = modes.includes('learn');
   const learnDone = completedModes.has('learn');
   const gatedByLearn = (mode: string) => mode !== 'learn' && learnAssigned && !learnDone;
+  const nextMode = modes.find(m => !completedModes.has(m)) ?? null;
+  const skipMode = nextMode ? (modes.find(m => !completedModes.has(m) && m !== nextMode) ?? null) : null;
 
   return (
     <div className="flex flex-col min-h-screen animate-fade-in pb-24">
@@ -366,6 +368,54 @@ export default function UnitStudyHubPage() {
               <p className="font-bold text-green-700 dark:text-green-400 text-xs">All modes complete!</p>
               <p className="text-green-600 dark:text-green-500 text-[10px] mt-0.5">Great work on this unit.</p>
             </div>
+          </div>
+        )}
+
+        {/* Recommended next step */}
+        {!allDone && nextMode && completedModes.size > 0 && (
+          <div className="space-y-2">
+            <p className="text-[10px] font-bold text-[var(--text-muted)] tracking-widest uppercase">Recommended next step</p>
+            <button
+              onClick={() => startMode(nextMode)}
+              disabled={!!navigating || gatedByLearn(nextMode)}
+              className="w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all active:scale-[0.98] disabled:opacity-60"
+              style={{
+                background: 'var(--surface)',
+                border: `2px solid ${MODE_COLOR[nextMode] ?? 'var(--primary)'}`,
+                boxShadow: `0 0 0 3px ${(MODE_COLOR[nextMode] ?? 'var(--primary)') + '22'}`,
+              }}
+            >
+              <div
+                className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 text-base"
+                style={{ background: MODE_COLOR[nextMode] ?? 'var(--primary)' }}
+              >
+                {navigating === nextMode
+                  ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  : <span>{MODE_ICON[nextMode] ?? '📖'}</span>}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-bold text-[var(--text)] text-xs">{MODE_LABEL[nextMode] ?? nextMode}</p>
+                <p className="text-[10px] text-[var(--text-muted)] mt-0.5">{words.length} words · tap to start</p>
+              </div>
+              <span className="text-[var(--text-muted)] text-sm">→</span>
+            </button>
+            {skipMode && (
+              <button
+                onClick={() => startMode(skipMode)}
+                disabled={!!navigating || gatedByLearn(skipMode)}
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left transition-all active:scale-[0.98] disabled:opacity-60"
+                style={{ background: 'var(--surface)', border: '1.5px dashed var(--border)' }}
+              >
+                <span className="text-sm">{MODE_ICON[skipMode] ?? '📖'}</span>
+                <div className="flex-1">
+                  <p className="text-[11px] font-semibold text-[var(--text-muted)]">
+                    Skip to {MODE_LABEL[skipMode] ?? skipMode}
+                  </p>
+                  <p className="text-[9px] text-[var(--text-muted)] opacity-70">You&apos;ll skip {MODE_LABEL[nextMode] ?? nextMode}</p>
+                </div>
+                <span className="text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-wide">Skip</span>
+              </button>
+            )}
           </div>
         )}
 

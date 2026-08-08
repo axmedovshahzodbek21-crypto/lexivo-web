@@ -448,7 +448,7 @@ function LearnInner() {
       if (isNew) incrementTodayCount();
     }
 
-    if (isNew) {
+    if (isNew && !sourceClassHW && !sourceClass) {
       const learnXP = getLearnXPAmount();
       const { leveledUp, newLevel, newXp } = addXP(learnXP, 'Learn', `Unit ${current.dayNumber} · ${current.collectionName}`);
       if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
@@ -464,8 +464,10 @@ function LearnInner() {
       gate_correct_first: wordGateCorrectFirstRef.current,
     });
     setMarks(m => { const n = [...m]; n[index] = 'learned'; return n; });
-    const newAch = checkAchievements();
-    newAch.forEach(pushAchievement);
+    if (!sourceClassHW && !sourceClass) {
+      const newAch = checkAchievements();
+      newAch.forEach(pushAchievement);
+    }
     if (index + 1 >= words.length) {
       if (collectionName && words.length > 0) {
         markLearningComplete(collectionName, words[0].dayNumber);

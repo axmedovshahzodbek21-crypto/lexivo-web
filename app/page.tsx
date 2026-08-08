@@ -297,7 +297,10 @@ export default function HomePage() {
       setSectionOrder(prev => {
         const newIds = cards.map(c => `class_${c.classId}`).filter(id => !prev.includes(id));
         if (newIds.length === 0) return prev;
-        const updated = [...prev, ...newIds];
+        const insertAt = prev.indexOf('classes');
+        const updated = insertAt >= 0
+          ? [...prev.slice(0, insertAt), ...newIds, ...prev.slice(insertAt)]
+          : [...prev, ...newIds];
         localStorage.setItem('home_section_order', updated.join(','));
         return updated;
       });

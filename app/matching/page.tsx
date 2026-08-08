@@ -240,11 +240,11 @@ function MatchingInner() {
       if (next.size === roundWords.length) {
         // Round complete
         setTimerActive(false);
-        checkAchievements();
+        if (!sourceClassHW && !sourceClass) checkAchievements();
         setTotalMistakes(prev => prev + mistakes);
         setTotalTime(prev => prev + elapsed);
         const isLast = roundIndex + 1 >= Math.ceil(words.length / BATCH_SIZE);
-        if (isLast && collectionParam && dayParam !== undefined) {
+        if (isLast && !sourceClassHW && !sourceClass && collectionParam && dayParam !== undefined) {
           markMatchComplete(collectionParam, dayParam);
           if (!hasMatchXPAwarded(collectionParam, dayParam)) {
             const result = addXP(words.length * 4, 'Match', `Unit ${dayParam} · ${collectionParam}`);

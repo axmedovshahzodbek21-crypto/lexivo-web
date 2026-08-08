@@ -292,22 +292,24 @@ export default function QuizPage() {
     if (index + 1 >= questions.length) {
       const finalCorrect = correct + (selected === current?.correct ? 1 : 0);
       const isPerfect = finalCorrect === questions.length;
-      if (isPerfect) unlockAchievement('quiz_perfect', 100); // 10 XP
-      unlockAchievement('quiz_first', 30); // 3 XP
-      if (collectionName) {
-        const qDayNumber = dayNumber ?? questions[0]?.word.dayNumber ?? 1;
-        if (!hasQuizXPAwarded(collectionName, qDayNumber)) {
-          const result = addXP(questions.length * 5, 'Quiz', `Unit ${qDayNumber} · ${collectionName}`);
-          markQuizXPAwarded(collectionName, qDayNumber);
-          if (result.leveledUp) setPendingLevelUp({ level: result.newLevel, xp: result.newXp });
+      if (!sourceClassHW && !sourceClass) {
+        if (isPerfect) unlockAchievement('quiz_perfect', 100); // 10 XP
+        unlockAchievement('quiz_first', 30); // 3 XP
+        if (collectionName) {
+          const qDayNumber = dayNumber ?? questions[0]?.word.dayNumber ?? 1;
+          if (!hasQuizXPAwarded(collectionName, qDayNumber)) {
+            const result = addXP(questions.length * 5, 'Quiz', `Unit ${qDayNumber} · ${collectionName}`);
+            markQuizXPAwarded(collectionName, qDayNumber);
+            if (result.leveledUp) setPendingLevelUp({ level: result.newLevel, xp: result.newXp });
+          }
+          markQuizComplete(collectionName, qDayNumber);
+          const p = getUnitProgress(collectionName, qDayNumber);
+          if (p.learnDone && p.flashcardDone && p.quizDone) fireConfetti();
         }
-        markQuizComplete(collectionName, qDayNumber);
-        const p = getUnitProgress(collectionName, qDayNumber);
-        if (p.learnDone && p.flashcardDone && p.quizDone) fireConfetti();
+        recordQuizSession();
+        const newAchievements = checkAchievements();
+        newAchievements.forEach(pushAchievement);
       }
-      recordQuizSession();
-      const newAchievements = checkAchievements();
-      newAchievements.forEach(pushAchievement);
       pushLists();
       pushStats();
       if (sourceClass && classId) {
