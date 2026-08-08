@@ -647,7 +647,7 @@ function LearnInner() {
         skipped={skipped}
         pureSkipped={pureSkipped}
         backUrl={backUrl}
-        collectionName={sourceClass ? classNameParam : collectionName}
+        collectionName={sourceClassHW || sourceClass ? classNameParam : collectionName}
         dayNumber={sourceClass ? undefined : dayNumber}
         xpEarned={sessionXP}
         streak={getStreak()}
@@ -1223,13 +1223,13 @@ function SessionDone({
       </div>
 
       {/* Today's progress nudge */}
-      <div className="w-full card mb-4 flex items-center gap-3">
+      {!classHWNextUrl && <div className="w-full card mb-4 flex items-center gap-3">
         <span className="text-2xl">📅</span>
         <div>
           <p className="text-sm font-semibold text-[var(--text)]">{t.learn.wordsToday(todayCount)}</p>
           <p className="text-xs text-[var(--text-muted)]">{t.learn.keepGoing}</p>
         </div>
-      </div>
+      </div>}
 
       {/* Next step: Flashcards (regular) */}
       {collectionName && dayNumber !== undefined && (
