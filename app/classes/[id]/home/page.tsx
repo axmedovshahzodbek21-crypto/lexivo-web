@@ -540,7 +540,7 @@ export default function ClassHomePage() {
               ⚡ {(myClassXp / 10).toFixed(1)} XP
             </span>
           )}
-          {!isTeacher && myClassStreak > 0 && (
+          {!isTeacher && (
             <button
               onClick={() => router.push(`/classes/${id}/streak`)}
               className="text-xs font-semibold bg-black/20 text-white rounded-full px-3 py-1 hover:bg-black/35 transition-colors active:scale-95"
