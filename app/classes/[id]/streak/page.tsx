@@ -49,6 +49,16 @@ function calcLongestStreak(days: string[]): number {
   return longest;
 }
 
+function buildMonthGrid(year: number, month: number): (number | null)[] {
+  const firstDay = new Date(year, month, 1).getDay();
+  const offset = (firstDay + 6) % 7; // Mon-first
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const cells: (number | null)[] = Array(offset).fill(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+  return cells;
+}
+
+const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const MONTH_NAMES = [
   'January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December',
@@ -70,10 +80,8 @@ export default function ClassStreakPage() {
   const [currentStreak, setCurrentStreak] = useState(0);
   const [longestStreak, setLongestStreak] = useState(0);
   const [totalDays, setTotalDays] = useState(0);
-  const [month, setMonth] = useState(() => {
-    const n = new Date();
-    return new Date(n.getFullYear(), n.getMonth(), 1);
-  });
+  const [viewYear, setViewYear] = useState(() => new Date().getFullYear());
+  const [viewMonth, setViewMonth] = useState(() => new Date().getMonth());
 
   const accent = classAccentColor(id);
 
@@ -99,175 +107,132 @@ export default function ClassStreakPage() {
 
   const now = new Date();
   const todayStr = dateStr(now);
-  const set = new Set(studyDays);
-  const studiedToday = set.has(todayStr);
+  const studiedSet = new Set(studyDays);
 
-  const year = month.getFullYear();
-  const m = month.getMonth();
-  const daysInMonth = new Date(year, m + 1, 0).getDate();
-  const firstDayOfWeek = new Date(year, m, 1).getDay();
-  const offset = (firstDayOfWeek + 6) % 7;
-  const mm = String(m + 1).padStart(2, '0');
-  const canNext = !(year === now.getFullYear() && m === now.getMonth());
+  const monthName = `${MONTH_NAMES[viewMonth]} ${viewYear}`;
+  const cells = buildMonthGrid(viewYear, viewMonth);
+  const canGoNext = viewYear < now.getFullYear() || (viewYear === now.getFullYear() && viewMonth < now.getMonth());
+  const mm = String(viewMonth + 1).padStart(2, '0');
+
+  function prevMonth() {
+    if (viewMonth === 0) { setViewYear(y => y - 1); setViewMonth(11); }
+    else setViewMonth(m => m - 1);
+  }
+  function nextMonth() {
+    if (!canGoNext) return;
+    if (viewMonth === 11) { setViewYear(y => y + 1); setViewMonth(0); }
+    else setViewMonth(m => m + 1);
+  }
+
+  const title = viewUserName ? `${viewUserName} · ${className}` : `${className} Streak`;
 
   return (
     <div className="min-h-screen bg-[var(--bg)] pb-12">
 
-      {/* ── Hero ── */}
-      <div
-        className="relative px-5 pt-5 pb-10"
-        style={{
-          background: `linear-gradient(135deg, ${accent} 0%, ${accent}bb 100%)`,
-          boxShadow: `0 8px 32px ${accent}44`,
-        }}
-      >
-        {/* Back button */}
+      {/* Header */}
+      <div className="flex items-center gap-3 px-4 pt-5 pb-4">
         <button
           onClick={() => router.back()}
-          className="w-9 h-9 flex items-center justify-center rounded-xl mb-5 text-white/80 hover:text-white hover:bg-white/15 transition-colors text-lg font-semibold"
+          className="w-9 h-9 flex items-center justify-center rounded-xl bg-[var(--surface)] border border-[var(--border)] text-[var(--text)] hover:bg-[var(--surface-2)] transition-colors text-lg font-semibold shrink-0"
         >
           ←
         </button>
-
-        {/* Streak number */}
-        <div className="text-center">
-          <div className="text-7xl font-black text-white leading-none mb-1">
-            {loading ? '–' : currentStreak}
-          </div>
-          <div className="text-white/70 text-sm font-semibold mb-0.5">
-            {currentStreak === 1 ? 'day streak' : 'day streak'} 🔥
-          </div>
-          <div className="text-white font-black text-lg">
-            {viewUserName ?? className}
-          </div>
-          {viewUserName && (
-            <div className="text-white/60 text-xs mt-0.5">{className}</div>
-          )}
+        <div className="min-w-0">
+          <h1 className="text-base font-black text-[var(--text)] leading-tight truncate">{title}</h1>
+          <p className="text-xs text-[var(--text-muted)]">{viewUserName ? 'Class streak calendar' : 'Your class streak'}</p>
         </div>
       </div>
 
       {loading ? (
-        <div className="flex justify-center pt-16">
+        <div className="flex justify-center pt-20">
           <div className="w-7 h-7 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: accent }} />
         </div>
       ) : (
         <div className="px-4 space-y-4">
 
-          {/* ── Stat cards (float out of hero) ── */}
-          <div className="grid grid-cols-3 gap-3 -mt-5">
+          {/* ── Stat tiles ── */}
+          <div className="grid grid-cols-3 gap-3">
             {([
-              { emoji: '🔥', value: currentStreak, label: 'Current', color: accent },
-              { emoji: '⚡', value: longestStreak, label: 'Longest', color: '#0ea5e9' },
-              { emoji: '🏆', value: totalDays,     label: 'Total days', color: '#f59e0b' },
-            ] as const).map(({ emoji, value, label, color }) => (
+              { emoji: '🔥', value: currentStreak, label: 'Current Streak', bg: '#be123c', shadow: '#881337' },
+              { emoji: '⚡', value: longestStreak,  label: 'Longest streak',  bg: '#0369a1', shadow: '#0c4a6e' },
+              { emoji: '🏆', value: totalDays,      label: 'Full days',       bg: '#b45309', shadow: '#78350f' },
+            ] as const).map(({ emoji, value, label, bg, shadow }) => (
               <div
                 key={label}
-                className="bg-[var(--surface)] rounded-2xl p-3 flex flex-col items-center gap-1"
-                style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.15)' }}
+                className="rounded-2xl p-3 flex flex-col gap-1"
+                style={{ background: bg, boxShadow: `0 3px 0 ${shadow}` }}
               >
-                <span className="text-lg">{emoji}</span>
-                <span className="text-2xl font-black leading-none" style={{ color }}>{value}</span>
-                <span className="text-[10px] text-[var(--text-muted)] font-medium">{label}</span>
+                <span className="text-xl">{emoji}</span>
+                <div className="text-2xl font-black text-white leading-tight">{value}</div>
+                <div className="text-[10px] text-white/70 font-semibold leading-tight">{label}</div>
               </div>
             ))}
           </div>
 
-          {/* ── Today status ── */}
-          <div
-            className="rounded-2xl px-4 py-3 flex items-center gap-3 border"
-            style={{
-              background: studiedToday ? `color-mix(in srgb, ${accent} 10%, var(--surface))` : 'var(--surface)',
-              borderColor: studiedToday ? `color-mix(in srgb, ${accent} 35%, transparent)` : 'var(--border)',
-            }}
-          >
-            <span className="text-xl shrink-0">{studiedToday ? '✅' : '⏳'}</span>
-            <div className="min-w-0">
-              <p className="text-sm font-bold text-[var(--text)]">Today</p>
-              <p className="text-xs text-[var(--text-muted)] leading-snug">
-                {studiedToday
-                  ? (viewUserName ? `${viewUserName} studied ${className} today` : `You studied ${className} today`)
-                  : (viewUserName ? `${viewUserName} hasn't studied today` : `Study anything in ${className} to keep your streak`)}
-              </p>
-            </div>
-            {studiedToday && (
-              <span
-                className="ml-auto shrink-0 text-xs font-bold px-2.5 py-1 rounded-full"
-                style={{ background: `color-mix(in srgb, ${accent} 20%, transparent)`, color: accent }}
-              >
-                Done!
-              </span>
-            )}
-          </div>
-
           {/* ── Calendar ── */}
-          <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl overflow-hidden">
+          <div className="card">
             {/* Month nav */}
-            <div className="flex items-center justify-between px-4 pt-4 pb-2">
+            <div className="flex items-center justify-between mb-5">
               <button
-                onClick={() => setMonth(new Date(year, m - 1, 1))}
-                className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[var(--surface-2)] transition-colors text-[var(--text)] text-lg"
-              >
-                ‹
-              </button>
-              <span className="text-sm font-bold text-[var(--text)]">{MONTH_NAMES[m]} {year}</span>
+                onClick={prevMonth}
+                className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-[var(--surface-2)] transition-colors text-[var(--text)] text-xl font-bold"
+              >‹</button>
+              <span className="font-bold text-[var(--text)]">{monthName}</span>
               <button
-                onClick={() => canNext && setMonth(new Date(year, m + 1, 1))}
-                disabled={!canNext}
-                className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[var(--surface-2)] transition-colors disabled:opacity-25 text-[var(--text)] text-lg"
-              >
-                ›
-              </button>
+                onClick={nextMonth}
+                disabled={!canGoNext}
+                className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-[var(--surface-2)] transition-colors text-[var(--text)] text-xl font-bold disabled:opacity-30"
+              >›</button>
             </div>
 
-            {/* Day-of-week headers */}
-            <div className="grid grid-cols-7 px-2 pb-1">
-              {['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map((d, i) => (
-                <div key={i} className="text-center text-[10px] font-bold text-[var(--text-muted)] py-1">{d}</div>
-              ))}
-            </div>
+            <div className="max-w-[308px] mx-auto">
+              {/* Day headers */}
+              <div className="grid grid-cols-7 mb-1">
+                {DAY_LABELS.map(d => (
+                  <div key={d} className="w-10 h-7 flex items-center justify-center text-[10px] font-bold text-[var(--text-muted)]">{d}</div>
+                ))}
+              </div>
 
-            {/* Day grid */}
-            <div className="grid grid-cols-7 px-2 pb-3 gap-y-0.5">
-              {Array.from({ length: offset }).map((_, i) => <div key={`e-${i}`} />)}
-              {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(day => {
-                const dStr = `${year}-${mm}-${String(day).padStart(2, '0')}`;
-                const isToday = dStr === todayStr;
-                const isFuture = dStr > todayStr;
-                const studied = set.has(dStr);
-                return (
-                  <div key={day} className="aspect-square flex items-center justify-center">
+              {/* Day circles */}
+              <div className="grid grid-cols-7 gap-y-1.5">
+                {cells.map((day, i) => {
+                  if (!day) return <div key={i} className="w-10 h-10" />;
+                  const dStr = `${viewYear}-${mm}-${String(day).padStart(2, '0')}`;
+                  const isToday = dStr === todayStr;
+                  const isFuture = dStr > todayStr;
+                  const studied = studiedSet.has(dStr);
+                  return (
                     <div
-                      className="w-8 h-8 flex items-center justify-center rounded-full text-xs font-medium transition-all select-none"
+                      key={dStr}
+                      className="w-10 h-10 rounded-full relative overflow-hidden flex items-center justify-center"
                       style={{
-                        background: studied ? accent : isToday ? `color-mix(in srgb, ${accent} 15%, transparent)` : 'transparent',
-                        color: studied ? '#fff' : isToday ? accent : 'var(--text)',
-                        opacity: isFuture ? 0.22 : 1,
-                        fontWeight: isToday || studied ? 700 : 400,
-                        outline: isToday && !studied ? `2px solid ${accent}` : 'none',
-                        outlineOffset: '-1px',
+                        background: studied ? accent : 'transparent',
+                        outline: isToday ? '2.5px solid #6366f1' : 'none',
+                        outlineOffset: '2px',
+                        opacity: isFuture ? 0.2 : 1,
                       }}
                     >
-                      {day}
+                      <span
+                        className="relative z-10 text-xs font-bold leading-none"
+                        style={{ color: studied ? '#fff' : isToday ? 'var(--text)' : 'var(--text-muted)' }}
+                      >
+                        {day}
+                      </span>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
 
             {/* Legend */}
-            <div
-              className="flex items-center justify-center gap-4 py-3 border-t border-[var(--border)]"
-            >
+            <div className="flex items-center gap-4 mt-5 pt-3 border-t border-[var(--border)]">
               <div className="flex items-center gap-1.5">
-                <div className="w-3 h-3 rounded-full" style={{ background: accent }} />
-                <span className="text-[11px] text-[var(--text-muted)]">Studied</span>
+                <div className="w-3.5 h-3.5 rounded-full" style={{ background: accent }} />
+                <span className="text-[10px] text-[var(--text-muted)]">Studied in class</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <div
-                  className="w-3 h-3 rounded-full border-2"
-                  style={{ borderColor: accent, background: `color-mix(in srgb, ${accent} 15%, transparent)` }}
-                />
-                <span className="text-[11px] text-[var(--text-muted)]">Today</span>
+                <div className="w-3.5 h-3.5 rounded-full border-2 border-[#6366f1]" />
+                <span className="text-[10px] text-[var(--text-muted)]">Today</span>
               </div>
             </div>
           </div>
