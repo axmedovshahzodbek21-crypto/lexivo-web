@@ -1208,8 +1208,12 @@ function SessionDone({
       {/* Stats grid */}
       <div className="grid grid-cols-2 gap-3 w-full mb-4">
         <StatTile icon="📚" value={sessionCount} label={t.learn.wordsLearned} color="var(--primary)" />
-        <StatTile icon="⚡" value={`+${displayXP(xpEarned)}`} label={t.learn.xpEarned} color="var(--warning)" />
-        <StatTile icon="🔥" value={streak} label={t.learn.dayStreak} color="#FF6B35" />
+        {classHWNextUrl ? (
+          <StatTile icon="🎓" value="Class XP" label="awarded by class" color="var(--warning)" />
+        ) : (
+          <StatTile icon="⚡" value={`+${displayXP(xpEarned)}`} label={t.learn.xpEarned} color="var(--warning)" />
+        )}
+        {!classHWNextUrl && <StatTile icon="🔥" value={streak} label={t.learn.dayStreak} color="#FF6B35" />}
         <StatTile icon="😓" value={skipped.length} label={t.learn.hardWords} color={skipped.length > 0 ? 'var(--danger)' : 'var(--success)'} />
         {pureSkipped.length > 0 && (
           <div className="col-span-2">
