@@ -19,6 +19,7 @@ export default function ClassFolderHomeworkPage() {
 
   const [loading, setLoading] = useState(true);
   const [folderName, setFolderName] = useState('');
+  const [className, setClassName] = useState('');
   const [assigned, setAssigned] = useState<AssignedUnit[]>([]);
   const [unassigned, setUnassigned] = useState<UnassignedUnit[]>([]);
   const [completedModes, setCompletedModes] = useState<Record<string, Set<string>>>({});
@@ -30,9 +31,10 @@ export default function ClassFolderHomeworkPage() {
   }, [user, classId, folderId]);
 
   async function load() {
-    const [folderRes, unitsRes] = await Promise.all([
+    const [folderRes, unitsRes, classRes] = await Promise.all([
       supabase.from('teacher_folders').select('id, name').eq('id', folderId).maybeSingle(),
       supabase.from('teacher_units').select('id, name, teacher_unit_words(count)').eq('folder_id', folderId).order('created_at'),
+      supabase.from('classes').select('name').eq('id', classId).maybeSingle(),
     ]);
 
     const unitRows = (unitsRes.data ?? []) as any[];
@@ -87,6 +89,7 @@ export default function ClassFolderHomeworkPage() {
     });
 
     setFolderName((folderRes.data as any)?.name ?? 'Folder');
+    setClassName((classRes.data as any)?.name ?? '');
     setAssigned(builtAssigned);
     setUnassigned(builtUnassigned);
     setCompletedModes(modeMap);
@@ -122,6 +125,9 @@ export default function ClassFolderHomeworkPage() {
           ← Back
         </button>
 
+        {className && (
+          <p className="text-xs font-semibold text-white/60 uppercase tracking-widest mb-1">{className}</p>
+        )}
         <h1
           className="text-2xl font-black text-white leading-tight mb-1"
           style={{ textShadow: '0 2px 8px rgba(0,0,0,0.3)' }}
