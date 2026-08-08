@@ -19,17 +19,21 @@ export default function ClassShellNav({ classId }: { classId: string }) {
   const router = useRouter();
   const { user } = useAuth();
   const [isTeacher, setIsTeacher] = useState(false);
+  const [className, setClassName] = useState('');
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
 
   useEffect(() => {
     if (!user) return;
     supabase
       .from('classes')
-      .select('teacher_id')
+      .select('teacher_id, name')
       .eq('id', classId)
       .maybeSingle()
       .then(({ data }) => {
-        if (data) setIsTeacher(data.teacher_id === user.id);
+        if (data) {
+          setIsTeacher(data.teacher_id === user.id);
+          setClassName((data as any).name ?? '');
+        }
       });
   }, [classId, user]);
 
@@ -40,10 +44,7 @@ export default function ClassShellNav({ classId }: { classId: string }) {
     return seg === '' ? pathname === full : pathname.startsWith(full);
   };
 
-  // The top arrow is a two-step back: from any class subpage it first drops
-  // you at this class's home, and only from there does it leave the class
-  // entirely (back to /classes). Prevents an accidental single click from
-  // kicking you out of the class you're working in.
+  // Two-step back: subpage → class home → classes list
   const classHomeHref = `/classes/${classId}/home`;
   const classRootHref = `/classes/${classId}`;
   const atClassTop = pathname === classHomeHref || pathname === classRootHref;
@@ -59,8 +60,10 @@ export default function ClassShellNav({ classId }: { classId: string }) {
   return (
     <>
       {/* Mobile bottom bar */}
-      <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-[var(--surface)] border-t border-[var(--border)] flex justify-around items-center py-2 shadow-lg"
-        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+      <nav
+        className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-[var(--surface)] border-t border-[var(--border)] flex justify-around items-center py-2 shadow-lg"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      >
         {items.map(({ seg, icon, label }) => {
           const active = isActive(seg);
           const href = `/classes/${classId}${seg ? `/${seg}` : ''}`;
@@ -68,46 +71,89 @@ export default function ClassShellNav({ classId }: { classId: string }) {
             <Link
               key={seg || 'dashboard'}
               href={href}
-              className="flex flex-col items-center gap-0.5 px-3 py-1 min-w-[48px]"
+              className={`flex flex-col items-center gap-0.5 px-3 py-1 min-w-[48px] ${active ? 'text-[var(--primary)]' : 'text-[var(--text-muted)]'}`}
             >
               <span className="text-xl leading-none">{icon}</span>
-              <span className={`text-[10px] font-semibold ${active ? 'text-[var(--primary)]' : 'text-[var(--text-muted)]'}`}>
-                {label}
-              </span>
+              <span className="text-[10px] font-semibold">{label}</span>
               {active && <span className="w-1 h-1 rounded-full bg-[var(--primary)] mt-0.5" />}
             </Link>
           );
         })}
       </nav>
 
-      {/* Desktop sidebar */}
-      <nav className="hidden sm:flex fixed left-0 top-0 bottom-0 w-16 z-50 flex-col items-center py-4 gap-1 bg-[var(--surface)] border-r border-[var(--border)]">
-        <button
-          onClick={handleBackClick}
-          className="flex items-center justify-center w-10 h-10 rounded-xl text-[var(--text-muted)] hover:bg-[var(--surface-2)] mb-3 text-lg"
-          title={atClassTop ? 'Back to classes' : 'Back to class home'}
-        >
-          ←
-        </button>
-        {items.map(({ seg, icon, label }) => {
-          const active = isActive(seg);
-          const href = `/classes/${classId}${seg ? `/${seg}` : ''}`;
-          return (
-            <Link
-              key={seg || 'dashboard'}
-              href={href}
-              title={label}
-              className={`flex flex-col items-center justify-center w-12 h-12 rounded-xl text-xl transition-colors ${
-                active
-                  ? 'bg-[var(--primary-bg)] text-[var(--primary)]'
-                  : 'text-[var(--text-muted)] hover:bg-[var(--surface-2)]'
-              }`}
+      {/* Desktop sidebar — styled like main Navigation */}
+      <aside className="hidden sm:flex fixed left-0 top-0 bottom-0 w-56 z-50 flex-col p-3">
+        <div className="sidebar-glass flex flex-col w-full h-full rounded-2xl overflow-y-auto">
+
+          {/* Header: back arrow + class name */}
+          <div className="px-5 pt-6 pb-4 flex items-start gap-3">
+            <button
+              onClick={handleBackClick}
+              title={atClassTop ? 'Back to classes' : 'Back to class home'}
+              className="mt-1 shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs text-[var(--text-muted)] hover:text-white hover:bg-[var(--primary)] transition-all duration-200"
             >
-              {icon}
-            </Link>
-          );
-        })}
-      </nav>
+              ←
+            </button>
+            <div className="min-w-0">
+              <span
+                className="text-2xl font-black tracking-tight"
+                style={{
+                  background: 'linear-gradient(135deg, var(--primary), var(--primary-light))',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}
+              >
+                Class
+              </span>
+              {className && (
+                <div className="text-xs mt-0.5 truncate" style={{ color: 'var(--text-muted)' }}>
+                  {className}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Nav links with icon + label */}
+          <nav className="flex-1 px-3 space-y-0.5">
+            {items.map(({ seg, icon, label }) => {
+              const active = isActive(seg);
+              const href = `/classes/${classId}${seg ? `/${seg}` : ''}`;
+              return (
+                <Link
+                  key={seg || 'dashboard'}
+                  href={href}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-semibold ${
+                    active
+                      ? 'text-white'
+                      : 'text-[var(--text-muted)] hover:text-[var(--primary)] hover:bg-[var(--primary-bg)]'
+                  }`}
+                  style={active ? {
+                    background: 'linear-gradient(135deg, var(--primary), var(--primary-light))',
+                    boxShadow: '0 4px 16px rgba(108,99,255,0.38)',
+                  } : undefined}
+                >
+                  <span className={`transition-transform duration-200 ${active ? 'text-xl scale-110' : 'text-lg'}`}>
+                    {icon}
+                  </span>
+                  <span>{label}</span>
+                </Link>
+              );
+            })}
+          </nav>
+
+          {/* Exit button at bottom */}
+          <div className="px-3 pb-4 pt-3 border-t border-[var(--border)]">
+            <button
+              onClick={handleBackClick}
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-[var(--text-muted)] hover:bg-[var(--surface-2)] hover:text-[var(--danger)] transition-colors"
+            >
+              <span>🚪</span>
+              <span>{atClassTop ? 'Exit class' : 'Back to class home'}</span>
+            </button>
+          </div>
+        </div>
+      </aside>
 
       {/* Leave-class confirm modal */}
       {showLeaveConfirm && (
