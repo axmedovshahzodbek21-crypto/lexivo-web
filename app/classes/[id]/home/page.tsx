@@ -765,7 +765,7 @@ const [memberCount, setMemberCount] = useState(0);
         {isTeacher && (
           <section>
             <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--text-muted)] mb-3">📊 Quick Stats</h2>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="flex justify-center gap-3">
               {[
                 { icon: '👥', value: memberCount, label: 'Students', onClick: openStudentsSheet },
                 { icon: '✅', value: activeToday, label: 'Active today', onClick: undefined },
