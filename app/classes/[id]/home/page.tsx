@@ -104,9 +104,12 @@ export default function ClassHomePage() {
   const [xpHistoryStudent, setXpHistoryStudent] = useState<StudentProfile | null>(null);
   const [teacherXpHistory, setTeacherXpHistory] = useState<{ id: string; amount: number; reason: string; created_at: string }[]>([]);
   const [teacherXpHistoryLoading, setTeacherXpHistoryLoading] = useState(false);
-  const [myXpHistory, setMyXpHistory] = useState<{ id: string; amount: number; reason: string; created_at: string }[]>([]);
-  const [myXpHistoryLoading, setMyXpHistoryLoading] = useState(false);
-  const [myXpHistoryLoaded, setMyXpHistoryLoaded] = useState(false);
+  const [showXpCal, setShowXpCal] = useState(false);
+  const [xpCalData, setXpCalData] = useState<{ id: string; amount: number; reason: string; created_at: string }[]>([]);
+  const [xpCalLoading, setXpCalLoading] = useState(false);
+  const [xpCalLoaded, setXpCalLoaded] = useState(false);
+  const [xpCalMonth, setXpCalMonth] = useState(() => { const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), 1); });
+  const [xpCalSelectedDay, setXpCalSelectedDay] = useState<string | null>(null);
   const [pendingHwCount, setPendingHwCount] = useState(0);
   const memberIdsRef = useRef<string[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
@@ -283,19 +286,19 @@ export default function ClassHomePage() {
     setTeacherXpHistoryLoading(false);
   };
 
-  const loadMyXpHistory = async () => {
-    if (myXpHistoryLoaded || !user) return;
-    setMyXpHistoryLoading(true);
+  const openXpCal = async () => {
+    setShowXpCal(true);
+    if (xpCalLoaded || !user) return;
+    setXpCalLoading(true);
     const { data } = await supabase
       .from('class_xp_history')
       .select('id, amount, reason, created_at')
       .eq('user_id', user.id)
       .eq('class_id', id)
-      .order('created_at', { ascending: false })
-      .limit(30);
-    setMyXpHistory((data ?? []) as { id: string; amount: number; reason: string; created_at: string }[]);
-    setMyXpHistoryLoaded(true);
-    setMyXpHistoryLoading(false);
+      .order('created_at', { ascending: false });
+    setXpCalData((data ?? []) as typeof xpCalData);
+    setXpCalLoaded(true);
+    setXpCalLoading(false);
   };
 
   const openStudentsSheet = async () => {
@@ -321,7 +324,26 @@ export default function ClassHomePage() {
 
   const gradient = classGradient(id);
   const glow = GLOW[gradient] ?? '#6366f1';
+  const classAccent = GLOW[gradient] ?? '#6366f1';
   const pending = targets.filter(t => !t.completed_at);
+
+  // XP calendar helpers
+  const XP_REASON_ICON2: Record<string, string> = { Learn: '📖', Cards: '🃏', Quiz: '🧠', Match: '🎯', 'SRS Review': '🔄', Homework: '📋' };
+  const xpByDate: Record<string, typeof xpCalData> = {};
+  for (const e of xpCalData) {
+    const day = e.created_at.slice(0, 10);
+    if (!xpByDate[day]) xpByDate[day] = [];
+    xpByDate[day].push(e);
+  }
+  const xpCalYear = xpCalMonth.getFullYear();
+  const xpCalM = xpCalMonth.getMonth();
+  const xpCalDaysInMonth = new Date(xpCalYear, xpCalM + 1, 0).getDate();
+  const xpCalOffset = (new Date(xpCalYear, xpCalM, 1).getDay() + 6) % 7;
+  const xpCalMM = String(xpCalM + 1).padStart(2, '0');
+  const xpCalCanNext = !(xpCalYear === new Date().getFullYear() && xpCalM === new Date().getMonth());
+  const xpCalMonthLabel = ['January','February','March','April','May','June','July','August','September','October','November','December'][xpCalM];
+  const xpCalTodayStr = new Date().toISOString().slice(0, 10);
+  const selectedDayEntries = xpCalSelectedDay ? (xpByDate[xpCalSelectedDay] ?? []) : [];
   const sortedPending = [...pending].sort((a, b) => {
     if (!a.due_date && !b.due_date) return 0;
     if (!a.due_date) return 1;
@@ -331,6 +353,103 @@ export default function ClassHomePage() {
 
   return (
     <div className="flex flex-col min-h-screen animate-fade-in pb-6">
+      {/* XP Calendar sheet (student) */}
+      {showXpCal && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => { setShowXpCal(false); setXpCalSelectedDay(null); }}>
+          <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl flex flex-col max-h-[90dvh]" onClick={e => e.stopPropagation()}>
+            <div className="pt-4 px-5 pb-3 shrink-0">
+              <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto mb-4" />
+              {/* Total XP */}
+              <div className="text-center mb-4">
+                <p className="text-4xl font-black" style={{ color: classAccent }}>⚡ {(myClassXp / 10).toFixed(1)} XP</p>
+                <p className="text-xs text-[var(--text-muted)] font-semibold mt-0.5">Total class XP</p>
+              </div>
+            </div>
+
+            <div className="overflow-y-auto flex-1 px-5 pb-5 space-y-4">
+              {xpCalLoading ? (
+                <div className="flex justify-center py-10"><div className="w-6 h-6 border-2 border-[var(--primary)] border-t-transparent rounded-full animate-spin" /></div>
+              ) : (
+                <>
+                  {/* Calendar */}
+                  <div className="card !p-4">
+                    <div className="flex items-center justify-between mb-4">
+                      <button onClick={() => { setXpCalMonth(new Date(xpCalYear, xpCalM - 1, 1)); setXpCalSelectedDay(null); }}
+                        className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-[var(--surface-2)] transition-colors text-[var(--text)] text-xl font-bold">‹</button>
+                      <span className="font-bold text-[var(--text)] text-sm">{xpCalMonthLabel} {xpCalYear}</span>
+                      <button onClick={() => { if (xpCalCanNext) { setXpCalMonth(new Date(xpCalYear, xpCalM + 1, 1)); setXpCalSelectedDay(null); } }}
+                        disabled={!xpCalCanNext}
+                        className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-[var(--surface-2)] transition-colors text-[var(--text)] text-xl font-bold disabled:opacity-30">›</button>
+                    </div>
+                    <div className="max-w-[308px] mx-auto">
+                      <div className="grid grid-cols-7 mb-1">
+                        {['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d => (
+                          <div key={d} className="w-10 h-7 flex items-center justify-center text-[10px] font-bold text-[var(--text-muted)]">{d}</div>
+                        ))}
+                      </div>
+                      <div className="grid grid-cols-7 gap-y-1.5">
+                        {Array.from({ length: xpCalOffset }).map((_, i) => <div key={`e-${i}`} className="w-10 h-10" />)}
+                        {Array.from({ length: xpCalDaysInMonth }, (_, i) => i + 1).map(day => {
+                          const dStr = `${xpCalYear}-${xpCalMM}-${String(day).padStart(2, '0')}`;
+                          const isToday = dStr === xpCalTodayStr;
+                          const isFuture = dStr > xpCalTodayStr;
+                          const isSelected = xpCalSelectedDay === dStr;
+                          const entries = xpByDate[dStr] ?? [];
+                          const hasXp = entries.length > 0;
+                          const dayXp = entries.reduce((s, e) => s + e.amount, 0);
+                          return (
+                            <button key={dStr} disabled={isFuture || !hasXp}
+                              onClick={() => setXpCalSelectedDay(isSelected ? null : dStr)}
+                              className="w-10 h-10 rounded-full relative overflow-hidden flex flex-col items-center justify-center transition-all disabled:opacity-20"
+                              style={{
+                                background: hasXp ? classAccent : 'transparent',
+                                outline: isToday || isSelected ? '2.5px solid #6366f1' : 'none',
+                                outlineOffset: '2px',
+                                transform: isSelected ? 'scale(1.1)' : 'scale(1)',
+                              }}>
+                              <span className="text-xs font-bold leading-none" style={{ color: hasXp ? '#fff' : isToday ? 'var(--text)' : 'var(--text-muted)' }}>{day}</span>
+                              {hasXp && <span className="text-[7px] text-white/70 font-semibold leading-none">+{(dayXp / 10).toFixed(1)}</span>}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 mt-4 pt-3 border-t border-[var(--border)]">
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-3.5 h-3.5 rounded-full" style={{ background: classAccent }} />
+                        <span className="text-[10px] text-[var(--text-muted)]">XP earned</span>
+                      </div>
+                      <span className="text-[10px] text-[var(--text-muted)] ml-auto">Tap a day for details</span>
+                    </div>
+                  </div>
+
+                  {/* Selected day breakdown */}
+                  {xpCalSelectedDay && selectedDayEntries.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-[11px] font-bold uppercase tracking-widest text-[var(--text-muted)]">{xpCalSelectedDay}</p>
+                      {selectedDayEntries.map(e => (
+                        <div key={e.id} className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-[var(--surface-2)]">
+                          <span className="text-xl shrink-0">{XP_REASON_ICON2[e.reason] ?? '⚡'}</span>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-[var(--text)]">{e.reason}</p>
+                            <p className="text-[11px] text-[var(--text-muted)]">{timeAgo(e.created_at)}</p>
+                          </div>
+                          <p className="text-sm font-black shrink-0" style={{ color: classAccent }}>+{(e.amount / 10).toFixed(1)}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {xpCalLoaded && Object.keys(xpByDate).length === 0 && (
+                    <p className="text-sm text-center text-[var(--text-muted)] py-6">No XP earned in this class yet</p>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Teacher bio sheet */}
       {showTeacherBio && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setShowTeacherBio(false)}>
@@ -536,9 +655,12 @@ export default function ClassHomePage() {
             </button>
           )}
           {!isTeacher && (
-            <span className="text-xs font-semibold bg-black/20 text-white rounded-full px-3 py-1">
+            <button
+              onClick={openXpCal}
+              className="text-xs font-semibold bg-black/20 text-white rounded-full px-3 py-1 hover:bg-black/35 transition-colors active:scale-95"
+            >
               ⚡ {(myClassXp / 10).toFixed(1)} XP
-            </span>
+            </button>
           )}
           {!isTeacher && (
             <button
@@ -647,27 +769,6 @@ export default function ClassHomePage() {
           </section>
         )}
 
-        {/* My XP History (student only) */}
-        {!isTeacher && (
-          <section>
-            <button
-              className="w-full flex items-center justify-between mb-3"
-              onClick={() => { if (!myXpHistoryLoaded) loadMyXpHistory(); }}
-            >
-              <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--text-muted)]">⚡ My XP History</h2>
-              {!myXpHistoryLoaded && <span className="text-xs text-[var(--primary)] font-semibold">Load</span>}
-            </button>
-            {myXpHistoryLoading ? (
-              <div className="flex justify-center py-6"><div className="w-6 h-6 border-2 border-[var(--primary)] border-t-transparent rounded-full animate-spin" /></div>
-            ) : myXpHistoryLoaded && myXpHistory.length === 0 ? (
-              <p className="text-sm text-center text-[var(--text-muted)] py-4">No XP earned in this class yet</p>
-            ) : myXpHistoryLoaded ? (
-              <div className="space-y-2">
-                {myXpHistory.map(h => <XpHistoryRow key={h.id} entry={h} />)}
-              </div>
-            ) : null}
-          </section>
-        )}
 
         {/* Announcements */}
         <section>
