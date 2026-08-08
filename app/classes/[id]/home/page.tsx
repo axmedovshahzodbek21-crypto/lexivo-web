@@ -117,6 +117,7 @@ export default function ClassHomePage() {
   const [needsAttention, setNeedsAttention] = useState(0);
   const [readCounts, setReadCounts] = useState<Record<string, number>>({});
   const [myClassXp, setMyClassXp] = useState(0);
+  const [myClassStreak, setMyClassStreak] = useState(0);
 
   useEffect(() => {
     if (!user) return;
@@ -244,6 +245,30 @@ export default function ClassHomePage() {
             doneMap[p.homework_id].add(p.mode);
           }
           setPendingHwCount(myHw.filter(h => !h.modes.every((m: string) => doneMap[h.id]?.has(m))).length);
+        })();
+
+        // Student: async class streak computation
+        (async () => {
+          const { data: streakRows } = await supabase
+            .from('class_study_days')
+            .select('study_date')
+            .eq('student_id', user.id)
+            .eq('class_id', id);
+          const days = ((streakRows ?? []) as { study_date: string }[])
+            .map(r => r.study_date)
+            .sort();
+          if (!days.length) return;
+          const set = new Set(days);
+          const now = new Date(Date.now() - 2 * 3_600_000);
+          const fmt = (d: Date) =>
+            `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+          const today = fmt(now);
+          const yesterday = fmt(new Date(now.getTime() - 86_400_000));
+          if (!set.has(today) && !set.has(yesterday)) return;
+          let cursor = set.has(today) ? now : new Date(now.getTime() - 86_400_000);
+          let streak = 0;
+          while (set.has(fmt(cursor))) { streak++; cursor = new Date(cursor.getTime() - 86_400_000); }
+          setMyClassStreak(streak);
         })();
       }
     })();
@@ -514,6 +539,14 @@ export default function ClassHomePage() {
             <span className="text-xs font-semibold bg-black/20 text-white rounded-full px-3 py-1">
               ⚡ {(myClassXp / 10).toFixed(1)} XP
             </span>
+          )}
+          {!isTeacher && myClassStreak > 0 && (
+            <button
+              onClick={() => router.push(`/classes/${id}/streak`)}
+              className="text-xs font-semibold bg-black/20 text-white rounded-full px-3 py-1 hover:bg-black/35 transition-colors active:scale-95"
+            >
+              🔥 {myClassStreak} day streak
+            </button>
           )}
         </div>
         {memberCount > 0 && (

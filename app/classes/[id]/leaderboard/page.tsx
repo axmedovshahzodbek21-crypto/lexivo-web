@@ -213,7 +213,12 @@ export default function ClassLeaderboardPage() {
                   >
                     {row.name}
                   </p>
-                  <p className="text-xs text-[var(--text-muted)]">🔥 {row.streak} day streak</p>
+                  <button
+                    className="text-xs text-[var(--text-muted)] hover:underline underline-offset-2 text-left"
+                    onClick={() => router.push(`/classes/${id}/streak?userId=${row.student_id}&userName=${encodeURIComponent(row.name)}`)}
+                  >
+                    🔥 {row.streak} day streak
+                  </button>
                 </div>
                 {/* XP */}
                 <p
