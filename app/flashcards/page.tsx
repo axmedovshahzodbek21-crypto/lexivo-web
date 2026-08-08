@@ -331,7 +331,7 @@ export default function FlashcardsPage() {
           )}
           <div className="flex gap-3">
             <button onClick={() => { setIndex(0); setSide('front'); setKnown(0); setUnknown(0); setUnknownWords([]); setDone(false); }} className="btn-secondary flex-1">{t.common.again}</button>
-            <Link href={starredOnly ? '/starred' : hardOnly ? '/hard-words' : sourceClass ? `/classes/${classId}/words` : sourceClassHW ? (sp.get('hwId') ? `/classes/${sp.get('classId')}/homework/${sp.get('hwId')}` : '/classes') : sourceMyWords ? (myCollection ? (myFolder ? `/my-words/${encodeURIComponent(myFolder)}/${encodeURIComponent(myCollection)}` : `/my-words/${encodeURIComponent(myCollection)}`) : '/my-words') : collectionName ? `/collections/${encodeURIComponent(collectionName)}` : '/'} className="btn-primary flex-1 text-center">{t.common.back}</Link>
+            <Link href={starredOnly ? '/starred' : hardOnly ? '/hard-words' : sourceClass ? `/classes/${classId}/words` : sourceClassHW ? (sp.get('hwId') ? `/classes/${sp.get('classId')}/homework/${sp.get('hwId')}?completed=flashcard${sp.get('prevCompleted') ? '&alsoCompleted=' + sp.get('prevCompleted') : ''}` : '/classes') : sourceMyWords ? (myCollection ? (myFolder ? `/my-words/${encodeURIComponent(myFolder)}/${encodeURIComponent(myCollection)}` : `/my-words/${encodeURIComponent(myCollection)}`) : '/my-words') : collectionName ? `/collections/${encodeURIComponent(collectionName)}` : '/'} className="btn-primary flex-1 text-center">{t.common.back}</Link>
           </div>
         </div>
       </div>

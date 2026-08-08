@@ -628,7 +628,7 @@ function LearnInner() {
   if (done) {
     const backUrl = sourceClass
       ? `/classes/${classIdParam}/words`
-      : sourceClassHW ? (sp.get('hwId') ? `/classes/${sp.get('classId')}/homework/${sp.get('hwId')}` : '/classes')
+      : sourceClassHW ? (sp.get('hwId') ? `/classes/${sp.get('classId')}/homework/${sp.get('hwId')}?completed=learn` : '/classes')
       : hardOnly ? '/hard-words'
       : sourceMyWords ? (myCollection ? (myFolder ? `/my-words/${encodeURIComponent(myFolder)}/${encodeURIComponent(myCollection)}` : `/my-words/${encodeURIComponent(myCollection)}`) : '/my-words')
       : collectionName ? `/collections/${encodeURIComponent(collectionName)}`
@@ -645,7 +645,7 @@ function LearnInner() {
         streak={getStreak()}
         todayCount={getTodayLearnedCount()}
         onRestart={() => { setIndex(0); setMaxReached(0); setDone(false); setSessionCount(0); setSkipped([]); setPureSkipped([]); setMarks(new Array(words.length).fill(null)); }}
-        classHWNextUrl={sourceClassHW && sp.get('hwId') ? `/flashcards?source=class-hw&className=${encodeURIComponent(classNameParam)}&classId=${classIdParam}&hwId=${sp.get('hwId')}` : undefined}
+        classHWNextUrl={sourceClassHW && sp.get('hwId') ? `/flashcards?source=class-hw&className=${encodeURIComponent(classNameParam)}&classId=${classIdParam}&hwId=${sp.get('hwId')}&prevCompleted=learn` : undefined}
       />
     );
   }

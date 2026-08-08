@@ -290,7 +290,7 @@ function MatchingInner() {
     return (
       <div className="flex flex-col min-h-screen animate-fade-in">
         <div className="p-4 border-b border-[var(--border)]">
-          <button onClick={() => router.back()} className="flex items-center gap-2 text-sm text-[var(--text-muted)] mb-3 hover:text-[var(--text)] transition-colors">
+          <button onClick={() => sourceClassHW && searchParams.get('hwId') ? router.push(`/classes/${searchParams.get('classId')}/homework/${searchParams.get('hwId')}?completed=match`) : router.back()} className="flex items-center gap-2 text-sm text-[var(--text-muted)] mb-3 hover:text-[var(--text)] transition-colors">
             ← Back
           </button>
           <h1 className="text-xl font-bold text-[var(--text)]">🎯 Complete!</h1>
@@ -332,7 +332,7 @@ function MatchingInner() {
             >
               Play Again
             </button>
-            <button onClick={() => router.back()} className="flex-1 btn-secondary">
+            <button onClick={() => sourceClassHW && searchParams.get('hwId') ? router.push(`/classes/${searchParams.get('classId')}/homework/${searchParams.get('hwId')}?completed=match`) : router.back()} className="flex-1 btn-secondary">
               Done
             </button>
           </div>

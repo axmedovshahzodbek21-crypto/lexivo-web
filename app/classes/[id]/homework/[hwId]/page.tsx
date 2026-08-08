@@ -78,6 +78,33 @@ export default function UnitStudyHubPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, words, modes]);
 
+  // Handle ?completed=mode (and ?alsoCompleted=mode) set by study pages when a session finishes.
+  // This is how we record progress without marking it prematurely in startMode().
+  useEffect(() => {
+    const completed = searchParams.get('completed');
+    if (!completed || !user) return;
+    const alsoCompleted = searchParams.get('alsoCompleted');
+    const modesToRecord = [completed, ...(alsoCompleted ? [alsoCompleted] : [])];
+    const MODE_XP: Record<string, number> = { learn: 10, flashcard: 3, quiz: 5, match: 4 };
+    const MODE_REASON: Record<string, string> = { learn: 'Learn', flashcard: 'Cards', quiz: 'Quiz', match: 'Match' };
+    router.replace(`/classes/${classId}/homework/${hwId}`);
+    void (async () => {
+      const wordCount = _hwCache.get(hwId)?.words.length ?? words.length;
+      for (const mode of modesToRecord) {
+        const { data: existing } = await supabase.from('class_homework_progress').select('mode')
+          .eq('homework_id', hwId).eq('student_id', user.id).eq('mode', mode).maybeSingle();
+        if (!existing) {
+          const { error } = await supabase.from('class_homework_progress').insert({
+            homework_id: hwId, student_id: user.id, mode,
+          });
+          if (!error) void recordClassXP(user.id, classId, wordCount * (MODE_XP[mode] ?? 3), MODE_REASON[mode] ?? mode);
+        }
+      }
+      setCompletedModes(prev => new Set([...prev, ...modesToRecord]));
+    })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, user]);
+
   async function load() {
     const cached = _hwCache.get(hwId);
     if (cached) {
@@ -200,42 +227,6 @@ export default function UnitStudyHubPage() {
       className: unitName,
     }));
     saveClassHWTemp(hwWords);
-
-    // Record progress. Avoid upsert(onConflict) since there's no confirmed unique
-    // constraint on (homework_id, student_id, mode) — do a manual check-then-insert instead.
-    setProgressError(null);
-    const { data: existing, error: checkErr } = await supabase
-      .from('class_homework_progress')
-      .select('mode')
-      .eq('homework_id', hwId)
-      .eq('student_id', user!.id)
-      .eq('mode', mode)
-      .maybeSingle();
-
-    let progErr = checkErr;
-    let firstCompletion = false;
-    if (!checkErr && !existing) {
-      const { error: insertErr } = await supabase.from('class_homework_progress').insert({
-        homework_id: hwId,
-        student_id: user!.id,
-        mode,
-      });
-      progErr = insertErr;
-      firstCompletion = !insertErr;
-    }
-
-    if (!progErr) {
-      setCompletedModes(prev => new Set([...prev, mode]));
-      if (firstCompletion) {
-        const MODE_XP: Record<string, number> = { learn: 10, flashcard: 3, quiz: 5, match: 4 };
-        const MODE_REASON: Record<string, string> = { learn: 'Learn', flashcard: 'Cards', quiz: 'Quiz', match: 'Match' };
-        const xpPerWord = MODE_XP[mode] ?? 3;
-        void recordClassXP(user!.id, classId, words.length * xpPerWord, MODE_REASON[mode] ?? mode);
-      }
-    } else {
-      console.error('Progress save failed:', progErr.message);
-      setProgressError(progErr.message);
-    }
 
     const encodedName = encodeURIComponent(unitName);
     const hwBack = `/classes/${classId}/homework/${hwId}`;
