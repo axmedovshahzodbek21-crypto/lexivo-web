@@ -981,7 +981,6 @@ function CurriculumTab({
       modes: [...hwModes],
       due_date: hwDueDate || null,
       student_ids: hwWho === 'class' ? null : [...hwStudentIds],
-      teacher_id: user.id,
     });
     if (error) { console.error('[saveHomework]', error); alert(`Failed to save: ${error.message}`); setHwSaving(false); return; }
     closeHwModal();
