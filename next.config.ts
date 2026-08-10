@@ -11,7 +11,7 @@ const withPWA = withPWAInit({
     skipWaiting: true,
     clientsClaim: true,
     cleanupOutdatedCaches: true,
-    cacheId: "lexivo-v3",
+    cacheId: "lexivo-v4",
     runtimeCaching: [
       {
         urlPattern: ({ sameOrigin, url }: { sameOrigin: boolean; url: URL }) =>
