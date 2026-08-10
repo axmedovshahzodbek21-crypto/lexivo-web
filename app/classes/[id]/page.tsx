@@ -980,7 +980,7 @@ function CurriculumTab({
       modes: [...hwModes],
       due_date: hwDueDate || null,
       student_ids: hwWho === 'class' ? null : [...hwStudentIds],
-      assigned_by: user.id,
+      teacher_id: user.id,
     });
     closeHwModal();
     setHwSaving(false);
@@ -1918,6 +1918,7 @@ export default function ClassDashboardPage() {
   };
 
   const deleteAnnouncement = async (announcementId: string) => {
+    if (!confirm('Delete this announcement?')) return;
     await supabase.from('class_announcements').delete().eq('id', announcementId);
     setAnnouncements(prev => prev.filter(a => a.id !== announcementId));
   };
@@ -2100,6 +2101,7 @@ export default function ClassDashboardPage() {
   };
 
   const deleteTarget = async (targetId: string) => {
+    if (!confirm('Delete this target?')) return;
     await supabase.from('class_targets').delete().eq('id', targetId);
     await loadTargets();
   };

@@ -460,6 +460,7 @@ export default function ClassWordsPage() {
   };
 
   const deleteWord = async (wordId: string) => {
+    if (!confirm('Delete this word?')) return;
     await supabase.from('class_words').delete().eq('id', wordId);
     setWords(prev => {
       const next = prev.filter(w => w.id !== wordId);
