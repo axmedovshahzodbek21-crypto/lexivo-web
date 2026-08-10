@@ -980,7 +980,6 @@ function CurriculumTab({
         : hwUnit!.isClassWords ? { class_unit_id: hwUnit!.id } : { unit_id: hwUnit!.id }),
       modes: [...hwModes],
       due_date: hwDueDate || null,
-      assigned_to: hwWho,
       student_ids: hwWho === 'class' ? null : [...hwStudentIds],
       teacher_id: user.id,
     });
