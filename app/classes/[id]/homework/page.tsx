@@ -81,7 +81,7 @@ export default function ClassHomeworkPage() {
 
   const [loading, setLoading] = useState(cached === null);
   const [className, setClassName] = useState('');
-  const [isTeacher, setIsTeacher] = useState(cached?.isTeacher ?? false);
+  const [, setIsTeacher] = useState(cached?.isTeacher ?? false);
   const [folders, setFolders] = useState<AssignedFolder[]>(cached?.folders ?? []);
   const [cwUnits, setCwUnits] = useState<CWUnit[]>(cached?.cwUnits ?? []);
   const [collHwItems, setCollHwItems] = useState<CollHW[]>(cached?.collHwItems ?? []);
@@ -296,7 +296,7 @@ export default function ClassHomeworkPage() {
         )}
 
         {/* Empty */}
-        {folders.length === 0 && (
+        {folders.length === 0 && cwUnits.length === 0 && collFolders.length === 0 && (
           <div className="flex flex-col items-center justify-center py-20 gap-3 text-center">
             <span className="text-5xl">📚</span>
             <p className="text-base font-bold text-[var(--text)]">No homework yet</p>
