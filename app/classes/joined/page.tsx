@@ -66,6 +66,7 @@ export default function JoinedClassesPage() {
   const [expandedLeaderboard, setExpandedLeaderboard] = useState<string | null>(null);
   const [leaderboardLoading, setLeaderboardLoading] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [leaveTarget, setLeaveTarget] = useState<string | null>(null);
 
   useEffect(() => { if (user) load(); else setLoading(false); }, [user?.id]);
 
@@ -131,11 +132,12 @@ export default function JoinedClassesPage() {
     });
   };
 
-  const leaveClass = async (classId: string) => {
-    if (!user) return;
-    if (!confirm('Leave this class? You will need the class code to rejoin.')) return;
-    await supabase.from('class_members').delete().eq('class_id', classId).eq('student_id', user.id);
-    if (user) _cache.delete(user.id); load();
+  const leaveClass = async () => {
+    if (!user || !leaveTarget) return;
+    await supabase.from('class_members').delete().eq('class_id', leaveTarget).eq('student_id', user.id);
+    _cache.delete(user.id);
+    setLeaveTarget(null);
+    load();
   };
 
   const toggleLeaderboard = async (classId: string) => {
@@ -196,7 +198,7 @@ export default function JoinedClassesPage() {
                     <button onClick={() => router.push(`/classes/${cls.id}/home`)} className="bg-white text-gray-900 font-black text-xs px-3.5 py-1.5 rounded-xl hover:opacity-90 transition-opacity">Enter →</button>
                     <div className="flex gap-1">
                       <button onClick={() => toggleLeaderboard(cls.id)} className={`text-xs px-2 py-1 rounded-lg font-medium transition-all ${expandedLeaderboard === cls.id ? 'bg-white/30 text-white' : 'bg-black/20 text-white/80 hover:bg-black/30'}`}>🏆</button>
-                      <button onClick={() => leaveClass(cls.id)} className="text-xs px-2 py-1 rounded-lg bg-black/20 text-white/80 hover:bg-red-500/40 transition-colors font-medium">Leave</button>
+                      <button onClick={() => setLeaveTarget(cls.id)} className="text-xs px-2 py-1 rounded-lg bg-black/20 text-white/80 hover:bg-red-500/40 transition-colors font-medium">Leave</button>
                     </div>
                   </div>
                 </div>
@@ -296,6 +298,19 @@ export default function JoinedClassesPage() {
           );
         })}
       </div>
+
+      {leaveTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4" onClick={() => setLeaveTarget(null)}>
+          <div className="bg-[var(--surface)] rounded-2xl p-6 w-full max-w-sm shadow-xl space-y-4" onClick={e => e.stopPropagation()}>
+            <p className="font-bold text-[var(--text)] text-lg">Leave this class?</p>
+            <p className="text-sm text-[var(--text-muted)]">You will need the class code to rejoin.</p>
+            <div className="flex gap-3 justify-end">
+              <button onClick={() => setLeaveTarget(null)} className="px-4 py-2 rounded-xl text-sm font-semibold text-[var(--text-muted)] hover:bg-[var(--surface-2)] transition-colors">Cancel</button>
+              <button onClick={leaveClass} className="px-4 py-2 rounded-xl text-sm font-semibold bg-red-500 text-white hover:bg-red-600 transition-colors">Leave</button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );
