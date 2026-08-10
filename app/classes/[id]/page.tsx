@@ -1259,7 +1259,7 @@ function CurriculumTab({
       {(() => {
         const collHw = homework.filter(h => h.source === 'collection');
         const groups: Record<string, typeof homework> = {};
-        for (const h of collHw) { const n = h.collectionName!; (groups[n] ??= []).push(h); }
+        for (const h of collHw) { const n = h.collectionName!; if (!groups[n]) groups[n] = []; groups[n].push(h); }
         const groupEntries = Object.entries(groups);
         return (
           <div>
@@ -1277,7 +1277,8 @@ function CurriculumTab({
             ) : (
               <div className="space-y-3">
                 {groupEntries.map(([collName, days]) => {
-                  const [open, setOpen] = [collOpenStates[collName] ?? false, (v: boolean) => setCollOpenStates(p => ({ ...p, [collName]: v }))];
+                  const open = collOpenStates[collName] ?? false;
+                  const setOpen = (v: boolean) => setCollOpenStates(p => ({ ...p, [collName]: v }));
                   return (
                     <div key={collName} style={{ borderRadius: 16, overflow: 'hidden', background: 'linear-gradient(135deg, #166534, #15803d)', boxShadow: '0 4px 16px rgba(22,101,52,0.35)' }}>
                       <button onClick={() => setOpen(!open)} className="w-full flex items-center gap-3 px-4 py-3 text-left">
