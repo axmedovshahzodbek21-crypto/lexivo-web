@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
-import { getClassSRSAll, getClassStarredWordIds, getClassHardWordIds, stageLabel, stageColor } from '@/lib/class-srs';
+import { getClassSRSAll, getClassStarredWordIds, getClassHardWordIds } from '@/lib/class-srs';
 import type { ClassSRSEntry } from '@/lib/class-srs';
 
 const STAGE_COLORS = ['#9CA3AF', '#F59E0B', '#3B82F6', '#8B5CF6', '#EC4899', '#10B981'];
@@ -83,7 +83,7 @@ export default function ProgressPage() {
         </div>
       </div>
 
-      <div className="p-4 space-y-4">
+      <div className="p-4 space-y-4 max-w-2xl mx-auto w-full">
         {/* Summary stats */}
         <div className="grid grid-cols-3 gap-2">
           {[
