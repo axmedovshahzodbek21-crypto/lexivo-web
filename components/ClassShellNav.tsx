@@ -10,6 +10,7 @@ const STUDENT_ITEMS = [
   { seg: 'words',       icon: '📖', label: 'Words'    },
   { seg: 'leaderboard', icon: '🏆', label: 'Ranks'    },
   { seg: 'homework',    icon: '📋', label: 'Homework' },
+  { seg: 'progress',   icon: '📊', label: 'Progress' },
 ];
 
 const TEACHER_ITEMS = [
