@@ -973,16 +973,18 @@ function CurriculumTab({
   const saveHomework = async () => {
     if (!user || (!hwUnit && !hwCollectionName)) return;
     setHwSaving(true);
-    await supabase.from('class_homework').insert({
+    const { error } = await supabase.from('class_homework').insert({
       class_id: classId,
       ...(hwCollectionName
         ? { collection_name: hwCollectionName, day_number: hwDayNumber }
         : hwUnit!.isClassWords ? { class_unit_id: hwUnit!.id } : { unit_id: hwUnit!.id }),
       modes: [...hwModes],
       due_date: hwDueDate || null,
+      assigned_to: hwWho,
       student_ids: hwWho === 'class' ? null : [...hwStudentIds],
       teacher_id: user.id,
     });
+    if (error) { console.error('[saveHomework]', error); alert(`Failed to save: ${error.message}`); setHwSaving(false); return; }
     closeHwModal();
     setHwSaving(false);
     await loadCurriculum();
