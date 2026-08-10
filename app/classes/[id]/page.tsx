@@ -846,6 +846,7 @@ function CurriculumTab({
   const [hwDayNumber, setHwDayNumber] = useState<number | null>(null);
 
   // Collection picker
+  const [collOpenStates, setCollOpenStates] = useState<Record<string, boolean>>({});
   const [collPickerOpen, setCollPickerOpen] = useState(false);
   const [collPickerStep, setCollPickerStep] = useState<1 | 2>(1);
   const [collPickerCollName, setCollPickerCollName] = useState('');
@@ -1255,18 +1256,86 @@ function CurriculumTab({
       </div>
 
       {/* ── Collections ── */}
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">📗 Collections</p>
-          <button onClick={() => { setCollPickerOpen(true); setCollPickerStep(1); }} className="text-xs font-semibold text-green-600 dark:text-green-400 hover:opacity-70 transition-opacity">+ Assign Day</button>
-        </div>
-        <div className="card text-center py-8 space-y-2">
-          <div className="text-3xl">📗</div>
-          <p className="text-sm font-bold text-[var(--text)]">Pre-built Collection Days</p>
-          <p className="text-xs text-[var(--text-muted)]">Assign a day from 30 Days, A1, A2, B1, and more directly as homework.</p>
-          <button onClick={() => { setCollPickerOpen(true); setCollPickerStep(1); }} className="btn-primary text-xs px-4 py-2 !mt-3">+ Assign a Day</button>
-        </div>
-      </div>
+      {(() => {
+        const collHw = homework.filter(h => h.source === 'collection');
+        const groups: Record<string, typeof homework> = {};
+        for (const h of collHw) { const n = h.collectionName!; (groups[n] ??= []).push(h); }
+        const groupEntries = Object.entries(groups);
+        return (
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">📗 Collections</p>
+              <button onClick={() => { setCollPickerOpen(true); setCollPickerStep(1); }} className="text-xs font-semibold text-green-600 dark:text-green-400 hover:opacity-70 transition-opacity">+ Assign Day</button>
+            </div>
+            {groupEntries.length === 0 ? (
+              <div className="card text-center py-8 space-y-2">
+                <div className="text-3xl">📗</div>
+                <p className="text-sm font-bold text-[var(--text)]">Pre-built Collection Days</p>
+                <p className="text-xs text-[var(--text-muted)]">Assign a day from 30 Days, A1, A2, B1, and more directly as homework.</p>
+                <button onClick={() => { setCollPickerOpen(true); setCollPickerStep(1); }} className="btn-primary text-xs px-4 py-2 !mt-3">+ Assign a Day</button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {groupEntries.map(([collName, days]) => {
+                  const [open, setOpen] = [collOpenStates[collName] ?? false, (v: boolean) => setCollOpenStates(p => ({ ...p, [collName]: v }))];
+                  return (
+                    <div key={collName} style={{ borderRadius: 16, overflow: 'hidden', background: 'linear-gradient(135deg, #166534, #15803d)', boxShadow: '0 4px 16px rgba(22,101,52,0.35)' }}>
+                      <button onClick={() => setOpen(!open)} className="w-full flex items-center gap-3 px-4 py-3 text-left">
+                        <span className="text-xl shrink-0">📗</span>
+                        <div className="flex-1 min-w-0">
+                          <p style={{ fontWeight: 900, fontSize: 14, color: 'white', textShadow: '0 1px 3px rgba(0,0,0,0.4)' }} className="truncate">{collName}</p>
+                          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)' }}>{days.length} day{days.length !== 1 ? 's' : ''} assigned</p>
+                        </div>
+                        <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 11, fontWeight: 700 }}>{open ? '▲' : '▼'}</span>
+                      </button>
+                      {open && (
+                        <div className="space-y-2" style={{ background: 'var(--surface)', padding: '12px' }}>
+                          {days.sort((a, b) => (a.dayNumber ?? 0) - (b.dayNumber ?? 0)).map(hw => {
+                            const total = totalStudentsForHw(hw);
+                            const due = dueDateLabel(hw.dueDate);
+                            const allDone = hw.modes.every(m => (hw.progressByMode[m] ?? 0) >= total && total > 0);
+                            const avgDone = total > 0 ? Math.floor(hw.modes.reduce((s, m) => s + (hw.progressByMode[m] ?? 0), 0) / hw.modes.length) : 0;
+                            return (
+                              <button key={hw.id} onClick={() => openHwDetail(hw)} className="w-full text-left" style={{ borderRadius: 12, padding: '12px 14px', background: 'var(--surface-2)', border: allDone ? '1px solid rgba(34,197,94,0.3)' : '1px solid var(--border)' }}>
+                                <div className="flex items-start justify-between gap-2 mb-2">
+                                  <div className="flex-1 min-w-0">
+                                    <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }} className="truncate">Day {hw.dayNumber}: {hw.unitName.split(': ')[1] ?? hw.unitName}</p>
+                                    {due && <span style={{ fontSize: 10, color: due.overdue ? 'var(--danger)' : 'var(--text-muted)' }}>{due.text}</span>}
+                                  </div>
+                                  <div className="text-right shrink-0">
+                                    <p style={{ fontSize: 14, fontWeight: 900, color: allDone ? '#22c55e' : 'var(--text)' }}>{avgDone}/{total}</p>
+                                    <p style={{ fontSize: 9, color: 'var(--text-muted)' }}>avg done</p>
+                                  </div>
+                                </div>
+                                <div className="space-y-1.5">
+                                  {hw.modes.map(mode => {
+                                    const done = hw.progressByMode[mode] ?? 0;
+                                    const pct = total === 0 ? 0 : (done / total) * 100;
+                                    const color = HW_MODE_COLOR[mode] ?? 'var(--primary)';
+                                    return (
+                                      <div key={mode} className="flex items-center gap-2">
+                                        <span style={{ fontSize: 11, width: 60, color }}>{HW_MODE_ICON[mode]} {HW_MODE_LABEL[mode] ?? mode}</span>
+                                        <div className="flex-1 rounded-full overflow-hidden" style={{ height: 6, background: 'var(--surface)' }}>
+                                          <div style={{ width: `${pct}%`, height: '100%', background: color, borderRadius: 999 }} />
+                                        </div>
+                                        <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text)', width: 32, textAlign: 'right' }}>{done}/{total}</span>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {/* ── Homework ── */}
       <div>
