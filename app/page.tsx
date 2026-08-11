@@ -261,7 +261,6 @@ export default function HomePage() {
       const map: (string|null)[] = Array(200).fill(null);
       let si = 0;
       for (const id of order) {
-        if (si >= 20) break;
         if (localStorage.getItem('home_hide_' + id) !== '1') map[si++] = id;
       }
       setSlotMap(map);
@@ -628,7 +627,7 @@ export default function HomePage() {
             for (let col = 1; col <= 5; col++)
               FRAME_SLOTS.push({ gridColumn: String(col), gridRow: String(row) });
           if (lastCount > 0) {
-            const leftPad = Math.floor((5 - lastCount) / 2);
+            const leftPad = Math.round((5 - lastCount) / 2);
             for (let i = 0; i < lastCount; i++)
               FRAME_SLOTS.push({ gridColumn: String(leftPad + 1 + i), gridRow: String(row) });
           }
