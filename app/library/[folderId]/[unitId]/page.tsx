@@ -117,6 +117,7 @@ export default function UnitPage() {
   const [pasteText, setPasteText] = useState('');
   const [parsed, setParsed] = useState<ParsedWord[]>([]);
   const [importing, setImporting] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   // Word detail modal
   const [detailWord, setDetailWord] = useState<UnitWord | null>(null);
@@ -183,7 +184,8 @@ export default function UnitPage() {
   function copyPrompt() {
     const prompt = buildPrompt(wordLang, transLang, wordsInput.trim() || 'apple, book, water');
     navigator.clipboard.writeText(prompt);
-    alert('Prompt copied! Paste into an AI chatbot.');
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
   }
 
   if (loading) return (
@@ -333,6 +335,13 @@ export default function UnitPage() {
               {importing ? 'Importing…' : `Import All (${parsed.length} words)`}
             </button>
           )}
+        </div>
+      )}
+
+      {/* Copy toast */}
+      {copied && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl text-sm font-semibold text-white shadow-xl pointer-events-none" style={{ background: 'var(--primary)' }}>
+          📋 Prompt copied — paste into an AI chatbot
         </div>
       )}
 
