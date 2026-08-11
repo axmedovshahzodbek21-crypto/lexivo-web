@@ -1150,6 +1150,48 @@ export default function HomePage() {
                 <span className="text-sm font-semibold">Special hero layout (top 5 slots)</span>
                 <span className="text-lg">{heroEnabled ? '✦ On' : '○ Off'}</span>
               </button>
+              {/* Classes-only shortcut */}
+              <button
+                onClick={() => {
+                  const nonClassIds = [
+                    'collections','reading','day_streak','total_xp','words',
+                    'daily_goal','level','wod','learn','flashcards','srs','quiz',
+                    'starred','match','pomodoro','leaderboard','hard_words','lists',
+                    'grammar','classes','xp_history',
+                  ];
+                  setHideCollections(true);  localStorage.setItem('home_hide_collections','1');
+                  setHideReading(true);      localStorage.setItem('home_hide_reading','1');
+                  setHideDayStreak(true);    localStorage.setItem('home_hide_day_streak','1');
+                  setHideTotalXp(true);      localStorage.setItem('home_hide_total_xp','1');
+                  setHideWords(true);        localStorage.setItem('home_hide_words','1');
+                  setHideDailyGoal(true);    localStorage.setItem('home_hide_daily_goal','1');
+                  setHideLevel(true);        localStorage.setItem('home_hide_level','1');
+                  setHideWod(true);          localStorage.setItem('home_hide_wod','1');
+                  setHideLearn(true);        localStorage.setItem('home_hide_learn','1');
+                  setHideSrs(true);          localStorage.setItem('home_hide_srs','1');
+                  setHideFlashcards(true);   localStorage.setItem('home_hide_flashcards','1');
+                  setHideQuiz(true);         localStorage.setItem('home_hide_quiz','1');
+                  setHideMatch(true);        localStorage.setItem('home_hide_match','1');
+                  setHidePomodoro(true);     localStorage.setItem('home_hide_pomodoro','1');
+                  setHideLeaderboard(true);  localStorage.setItem('home_hide_leaderboard','1');
+                  setHideStarred(true);      localStorage.setItem('home_hide_starred','1');
+                  setHideHardWords(true);    localStorage.setItem('home_hide_hard_words','1');
+                  setHideLists(true);        localStorage.setItem('home_hide_lists','1');
+                  setHideGrammar(true);      localStorage.setItem('home_hide_grammar','1');
+                  setHideClasses(false);     localStorage.removeItem('home_hide_classes');
+                  setHideXpHistory(true);    localStorage.setItem('home_hide_xp_history','1');
+                  setSlotMap(prev => {
+                    const m = prev.map(id => (id && nonClassIds.includes(id)) ? null : id);
+                    localStorage.setItem('home_slot_map', JSON.stringify(m));
+                    return m;
+                  });
+                  setShowCustomize(false);
+                }}
+                className="w-full flex items-center justify-between px-4 py-3 rounded-2xl border border-[var(--border)] transition-all hover:border-[var(--primary)] hover:bg-[var(--primary-bg)] hover:text-[var(--primary)] text-[var(--text-muted)]"
+              >
+                <span className="text-sm font-semibold">Show classes only</span>
+                <span className="text-lg">👩‍🏫</span>
+              </button>
             </div>
 
             <div className="px-6 py-4 border-t border-[var(--border)] flex justify-end">
