@@ -4,6 +4,10 @@ import { getLevelInfo } from '@/lib/gamification';
 import { LEVEL_THRESHOLDS } from '@/lib/types';
 import { displayXP, fetchXPHistory, type XpEntry } from '@/lib/storage';
 
+const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAY_LABELS = ['M','T','W','T','F','S','S'];
+const REASON_ICONS: Record<string, string> = { Learn:'📖', Flashcard:'🃏', Quiz:'🧠', Match:'🎯', 'SRS Review':'🔄', 'Streak Bonus':'🔥', 'Level Complete':'🏆' };
+
 interface Props {
   xp: number;
   onClose: () => void;
@@ -12,7 +16,8 @@ interface Props {
 export default function XpModal({ xp, onClose }: Props) {
   const [peekLevel, setPeekLevel] = useState<string | null>(null);
   const [history, setHistory] = useState<XpEntry[]>([]);
-  const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
+  const [calMonth, setCalMonth] = useState(() => { const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), 1); });
+  const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const levelInfo = getLevelInfo(xp);
 
   useEffect(() => {
@@ -200,99 +205,107 @@ export default function XpModal({ xp, onClose }: Props) {
             </div>
           </div>
 
-          {/* XP History */}
+          {/* XP History Calendar */}
           {history.length > 0 && (() => {
-            type Session = { reason: string; source?: string; startTime: number; totalAmount: number; count: number };
-
-            const grouped: Record<string, XpEntry[]> = {};
+            const byDate: Record<string, XpEntry[]> = {};
             for (const e of history) {
               const d = new Date(e.timestamp);
-              const key = `${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}/${d.getFullYear()}`;
-              (grouped[key] ??= []).push(e);
+              const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+              (byDate[key] ??= []).push(e);
             }
-            const dateKeys = Object.keys(grouped).sort((a, b) => {
-              const [am,ad,ay] = a.split('/'); const [bm,bd,by] = b.split('/');
-              return new Date(+by,+bm-1,+bd).getTime() - new Date(+ay,+am-1,+ad).getTime();
-            });
+            const now = new Date();
+            const todayStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+            const canNext = calMonth.getFullYear() === now.getFullYear() && calMonth.getMonth() === now.getMonth();
+            const daysInMonth = new Date(calMonth.getFullYear(), calMonth.getMonth()+1, 0).getDate();
+            const firstWeekday = (new Date(calMonth.getFullYear(), calMonth.getMonth(), 1).getDay() + 6) % 7; // Mon=0
+            const mm = String(calMonth.getMonth()+1).padStart(2,'0');
 
-            const icon = (r: string) => ({ Learn:'📖', Quiz:'🧠', Flashcard:'🃏', 'SRS Review':'🔄', 'Streak Bonus':'🔥', 'Level Complete':'🏆' }[r] ?? '⭐');
-            const timeFmt = (ts: number) => { const d = new Date(ts); return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
-
-            const groupSessions = (entries: XpEntry[]): Session[] => {
-              const ordered = [...entries].reverse();
-              const sessions: Session[] = [];
-              for (const e of ordered) {
-                const last = sessions[sessions.length - 1];
-                if (!last || last.reason !== e.reason || last.source !== e.source || e.timestamp - last.startTime > 3600000) {
-                  sessions.push({ reason: e.reason, source: e.source, startTime: e.timestamp, totalAmount: e.amount, count: 1 });
-                } else {
-                  last.totalAmount += e.amount;
-                  last.count++;
-                }
-              }
-              return sessions.reverse();
-            };
+            const dayEntries = selectedDay ? (byDate[selectedDay] ?? []).slice().sort((a,b) => b.timestamp - a.timestamp) : [];
+            const dayTotal = dayEntries.reduce((s,e) => s + e.amount, 0);
 
             return (
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--text-muted)' }}>XP History</p>
-                <div className="space-y-2">
-                  {dateKeys.map(dk => {
-                    const entries = grouped[dk];
-                    const dayTotal = entries.reduce((s, e) => s + e.amount, 0);
-                    const isExpanded = expandedDays.has(dk);
-                    const sessions = isExpanded ? groupSessions(entries) : [];
-                    return (
-                      <div key={dk}>
-                        <button
-                          onClick={() => setExpandedDays(prev => {
-                            const next = new Set(prev);
-                            if (next.has(dk)) next.delete(dk); else next.add(dk);
-                            return next;
-                          })}
-                          className="w-full flex items-center gap-2 px-3.5 py-3 rounded-xl text-left"
-                          style={{ background: 'var(--surface-2)' }}
-                        >
-                          <span className="flex-1 text-sm font-bold" style={{ color: 'var(--text)' }}>{dk}</span>
-                          <span className="text-xs font-bold" style={{ color: 'var(--primary)' }}>+{displayXP(dayTotal)} XP</span>
-                          <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{isExpanded ? '▲' : '▼'}</span>
+                <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--text-muted)' }}>XP History</p>
+                <div className="rounded-2xl overflow-hidden" style={{ background: 'var(--surface-2)' }}>
+                  {/* Month nav */}
+                  <div className="flex items-center justify-between px-3 pt-3 pb-1">
+                    <button onClick={() => setCalMonth(m => new Date(m.getFullYear(), m.getMonth()-1, 1))}
+                      className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--border)] transition-colors text-lg"
+                      style={{ color: 'var(--primary)' }}>‹</button>
+                    <span className="text-sm font-bold" style={{ color: 'var(--text)' }}>
+                      {MONTH_NAMES[calMonth.getMonth()]} {calMonth.getFullYear()}
+                    </span>
+                    <button onClick={() => !canNext && setCalMonth(m => new Date(m.getFullYear(), m.getMonth()+1, 1))}
+                      className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--border)] transition-colors text-lg"
+                      style={{ color: canNext ? 'var(--border)' : 'var(--primary)', cursor: canNext ? 'default' : 'pointer' }}>›</button>
+                  </div>
+                  {/* Day labels */}
+                  <div className="grid grid-cols-7 px-2 pb-1">
+                    {DAY_LABELS.map((d,i) => (
+                      <div key={i} className="text-center text-[10px] font-bold py-1" style={{ color: 'var(--text-muted)' }}>{d}</div>
+                    ))}
+                  </div>
+                  {/* Day grid */}
+                  <div className="grid grid-cols-7 gap-1 px-2 pb-3">
+                    {Array.from({ length: firstWeekday }).map((_,i) => <div key={`e${i}`} />)}
+                    {Array.from({ length: daysInMonth }).map((_, i) => {
+                      const day = i + 1;
+                      const dateStr = `${calMonth.getFullYear()}-${mm}-${String(day).padStart(2,'0')}`;
+                      const isToday = dateStr === todayStr;
+                      const entries = byDate[dateStr];
+                      const hasXp = !!entries;
+                      const dayXp = hasXp ? entries.reduce((s,e) => s+e.amount, 0) : 0;
+                      const isSelected = selectedDay === dateStr;
+                      return (
+                        <button key={day} onClick={() => hasXp && setSelectedDay(isSelected ? null : dateStr)}
+                          className="flex flex-col items-center justify-center rounded-full aspect-square transition-all"
+                          style={{
+                            background: isSelected ? 'var(--primary)' : hasXp ? 'color-mix(in srgb, var(--primary) 85%, transparent)' : 'transparent',
+                            outline: isToday ? '2px solid var(--primary)' : 'none',
+                            outlineOffset: 1,
+                            cursor: hasXp ? 'pointer' : 'default',
+                          }}>
+                          <span className="text-[11px] font-bold leading-none" style={{ color: hasXp ? 'white' : 'var(--text)' }}>{day}</span>
+                          {hasXp && <span className="text-[7px] leading-none mt-0.5" style={{ color: 'rgba(255,255,255,0.8)' }}>+{displayXP(dayXp)}</span>}
                         </button>
-                        {isExpanded && (
-                          <div className="mt-1 rounded-xl overflow-hidden" style={{ background: 'var(--surface-2)' }}>
-                            {sessions.map((s, j) => {
-                              const showCount = s.count > 1 && (s.reason === 'Learn' || s.reason === 'SRS Review');
-                              return (
-                                <div key={j}>
-                                  {j > 0 && <div style={{ height: 1, background: 'var(--border)', marginLeft: 44 }} />}
-                                  <div className="flex items-center gap-2.5 px-3 py-2.5">
-                                    <span className="text-lg w-6 text-center shrink-0">{icon(s.reason)}</span>
-                                    <div className="flex-1 min-w-0">
-                                      <div className="flex items-center gap-1.5">
-                                        <p className="text-xs font-semibold" style={{ color: 'var(--text)' }}>{s.reason}</p>
-                                        {showCount && (
-                                          <span className="text-[10px] px-1.5 py-0.5 rounded-full" style={{ background: 'var(--border)', color: 'var(--text-muted)' }}>
-                                            {s.count} words
-                                          </span>
-                                        )}
-                                      </div>
-                                      <p className="text-[10px] truncate" style={{ color: 'var(--text-muted)' }}>
-                                        {timeFmt(s.startTime)}{s.source ? ` · ${s.source}` : ''}
-                                      </p>
-                                    </div>
-                                    <span className="text-xs font-bold px-2 py-0.5 rounded-full shrink-0"
-                                      style={{ color: 'var(--primary)', background: 'color-mix(in srgb, var(--primary) 12%, transparent)' }}>
-                                      +{displayXP(s.totalAmount)} XP
-                                    </span>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
+                  {/* Legend */}
+                  <div className="flex items-center justify-center gap-2 pb-3 text-[10px]" style={{ color: 'var(--text-muted)' }}>
+                    <span className="w-3 h-3 rounded-full inline-block" style={{ background: 'color-mix(in srgb, var(--primary) 85%, transparent)' }} />
+                    XP earned
+                  </div>
                 </div>
+
+                {/* Day detail */}
+                {selectedDay && (
+                  <div className="mt-2 rounded-2xl overflow-hidden" style={{ background: 'var(--surface-2)' }}>
+                    <div className="flex items-center justify-between px-4 py-3 border-b" style={{ borderColor: 'var(--border)' }}>
+                      <span className="text-xs font-bold tracking-wide" style={{ color: 'var(--primary)' }}>{selectedDay}</span>
+                      <span className="text-sm font-black" style={{ color: 'var(--primary)' }}>+{displayXP(dayTotal)} XP</span>
+                    </div>
+                    {dayEntries.map((e, j) => {
+                      const d = new Date(e.timestamp);
+                      const time = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+                      return (
+                        <div key={j}>
+                          {j > 0 && <div style={{ height: 1, background: 'var(--border)', marginLeft: 48 }} />}
+                          <div className="flex items-center gap-3 px-4 py-2.5">
+                            <span className="text-lg shrink-0">{REASON_ICONS[e.reason] ?? '⭐'}</span>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-semibold" style={{ color: 'var(--text)' }}>{e.reason}</p>
+                              <p className="text-[10px] truncate" style={{ color: 'var(--text-muted)' }}>
+                                {e.source ? e.source : time}
+                              </p>
+                            </div>
+                            <span className="text-xs font-black shrink-0" style={{ color: 'var(--primary)' }}>+{displayXP(e.amount)} XP</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             );
           })()}
