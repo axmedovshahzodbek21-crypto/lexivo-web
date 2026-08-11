@@ -101,7 +101,10 @@ export default function FolderPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-black text-[var(--text)]">{folderName}</h1>
-          <p className="text-sm text-[var(--text-muted)] mt-0.5">{units.length} {units.length === 1 ? 'unit' : 'units'}</p>
+          <p className="text-sm text-[var(--text-muted)] mt-0.5">
+            {units.length} {units.length === 1 ? 'unit' : 'units'}
+            {units.length > 0 && (() => { const total = units.reduce((s, u) => s + u.word_count, 0); return ` · ${total} ${total === 1 ? 'word' : 'words'}`; })()}
+          </p>
         </div>
         <button
           onClick={() => setShowCreate(true)}
