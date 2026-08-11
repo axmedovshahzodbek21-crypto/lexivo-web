@@ -133,6 +133,7 @@ export default function HomePage() {
   const [workingSlots, setWorkingSlots] = useState<(string|null)[]>(Array(200).fill(null));
   const [pickedCard, setPickedCard] = useState<string|null>(null);
   const [pickedFromSlot, setPickedFromSlot] = useState<number|'tray'|null>(null);
+  const [heroEnabled, setHeroEnabled] = useState(true);
   const [hideMode, setHideMode] = useState(false);
   const [hideSelection, setHideSelection] = useState<Set<string>>(new Set());
   const [unhideMode, setUnhideMode] = useState(false);
@@ -248,6 +249,9 @@ export default function HomePage() {
     setHideGrammar(localStorage.getItem('home_hide_grammar') === '1');
     setHideClasses(localStorage.getItem('home_hide_classes') === '1');
     setHideXpHistory(localStorage.getItem('home_hide_xp_history') === '1');
+
+    // Load hero toggle
+    setHeroEnabled(localStorage.getItem('home_hero_enabled') !== '0');
 
     // Load or build slot map
     const savedSlotMap = localStorage.getItem('home_slot_map');
@@ -598,19 +602,44 @@ export default function HomePage() {
       {(() => {
         // Generate enough slots for all built-in cards + all classes + generous buffer
         const totalSlots = Math.max(60, DEFINED_CARD_IDS.length + homeClasses.length + 20);
-        const FRAME_SLOTS: { gridColumn: string; gridRow: string }[] = [
-          { gridColumn: '1',     gridRow: '1'     },
-          { gridColumn: '1',     gridRow: '2'     },
-          { gridColumn: '2 / 5', gridRow: '1 / 3' },
-          { gridColumn: '5',     gridRow: '1'     },
-          { gridColumn: '5',     gridRow: '2'     },
-        ];
-        let _row = 3;
-        while (FRAME_SLOTS.length < totalSlots) {
-          for (let col = 1; col <= 5 && FRAME_SLOTS.length < totalSlots; col++)
-            FRAME_SLOTS.push({ gridColumn: String(col), gridRow: String(_row) });
-          _row++;
+        const FRAME_SLOTS: { gridColumn: string; gridRow: string }[] = [];
+        if (heroEnabled) {
+          FRAME_SLOTS.push(
+            { gridColumn: '1',     gridRow: '1'     },
+            { gridColumn: '1',     gridRow: '2'     },
+            { gridColumn: '2 / 5', gridRow: '1 / 3' },
+            { gridColumn: '5',     gridRow: '1'     },
+            { gridColumn: '5',     gridRow: '2'     },
+          );
+          let _row = 3;
+          while (FRAME_SLOTS.length < totalSlots) {
+            for (let col = 1; col <= 5 && FRAME_SLOTS.length < totalSlots; col++)
+              FRAME_SLOTS.push({ gridColumn: String(col), gridRow: String(_row) });
+            _row++;
+          }
+        } else {
+          let _row = 1;
+          while (FRAME_SLOTS.length < totalSlots) {
+            for (let col = 1; col <= 5 && FRAME_SLOTS.length < totalSlots; col++)
+              FRAME_SLOTS.push({ gridColumn: String(col), gridRow: String(_row) });
+            _row++;
+          }
         }
+
+        // Slot-map rendering (normal + arrange mode)
+        const useSlotMap = !hideMode && !unhideMode && !switchMode;
+        const activeSlots = arrangeMode ? workingSlots : slotMap;
+
+        // Trim FRAME_SLOTS to last filled row (+ extra rows in arrange for drop targets)
+        let lastFilledIdx = -1;
+        for (let i = 0; i < FRAME_SLOTS.length; i++) {
+          if (activeSlots[i]) lastFilledIdx = i;
+        }
+        const extraSlots = arrangeMode ? 5 : 0;
+        const trimTo = Math.max(5, lastFilledIdx + 1 + extraSlots);
+        // Round up to full rows of 5
+        const trimmedLen = Math.ceil(trimTo / 5) * 5;
+        const visibleSlots = FRAME_SLOTS.slice(0, Math.min(trimmedLen, FRAME_SLOTS.length));
         const HIDE_MAP: Record<string, boolean> = {
           collections: hideCollections, reading: hideReading, day_streak: hideDayStreak,
           total_xp: hideTotalXp, words: hideWords, daily_goal: hideDailyGoal,
@@ -627,10 +656,6 @@ export default function HomePage() {
           : switchMode
           ? workingOrder.filter(sId => !HIDE_MAP[sId])
           : visible;
-
-        // Slot-map rendering (normal + arrange mode)
-        const useSlotMap = !hideMode && !unhideMode && !switchMode;
-        const activeSlots = arrangeMode ? workingSlots : slotMap;
 
         type ActionDef = { href: string; icon: string; title: string; subtitle: string; gradient: string; edge: string; glow: string; badge?: string };
         const ACTION_MAP: Record<string, ActionDef> = {
@@ -917,8 +942,8 @@ export default function HomePage() {
               </div>
             )}
             <div className="grid gap-4"
-              style={{ gridTemplateColumns: 'repeat(5, 1fr)', gridTemplateRows: '140px 140px', gridAutoRows: '130px' }}>
-              {useSlotMap ? FRAME_SLOTS.map((slot, slotIdx) => {
+              style={{ gridTemplateColumns: 'repeat(5, 1fr)', gridTemplateRows: heroEnabled ? '140px 140px' : undefined, gridAutoRows: '130px' }}>
+              {useSlotMap ? visibleSlots.map((slot, slotIdx) => {
                 const sId = activeSlots[slotIdx] ?? null;
                 const isPicked = arrangeMode && pickedFromSlot === slotIdx;
                 const isTarget = arrangeMode && pickedCard !== null && !isPicked;
@@ -940,7 +965,7 @@ export default function HomePage() {
                     className={`h-full relative ${arrangeMode ? 'cursor-pointer' : ''}`}
                     onClick={arrangeMode ? () => handleSlotClick(slotIdx) : undefined}>
                     <div className={`h-full transition-all duration-150 ${arrangeMode ? 'pointer-events-none select-none' : ''} ${isPicked ? 'opacity-40 scale-95' : ''} ${isTarget ? 'ring-2 ring-white/30 rounded-2xl' : ''}`}>
-                      {renderCard(sId, slotIdx === 2)}
+                      {renderCard(sId, heroEnabled && slotIdx === 2)}
                     </div>
                     {arrangeMode && (
                       <div className={`absolute inset-0 rounded-2xl transition-all ${isPicked ? 'ring-2 ring-inset ring-white' : isTarget ? 'hover:bg-white/10' : ''}`}>
@@ -1108,6 +1133,23 @@ export default function HomePage() {
                   className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--primary)] hover:text-[var(--primary)] hover:bg-[var(--primary-bg)] transition-all"
                 ><span className="text-2xl">⇄</span><span className="text-xs font-semibold">Switch</span></button>
               </div>
+              {/* Hero section toggle */}
+              <button
+                onClick={() => {
+                  const next = !heroEnabled;
+                  setHeroEnabled(next);
+                  localStorage.setItem('home_hero_enabled', next ? '1' : '0');
+                }}
+                className="w-full flex items-center justify-between px-4 py-3 rounded-2xl border transition-all"
+                style={{
+                  borderColor: heroEnabled ? 'var(--primary)' : 'var(--border)',
+                  background: heroEnabled ? 'var(--primary-bg)' : 'transparent',
+                  color: heroEnabled ? 'var(--primary)' : 'var(--text-muted)',
+                }}
+              >
+                <span className="text-sm font-semibold">Special hero layout (top 5 slots)</span>
+                <span className="text-lg">{heroEnabled ? '✦ On' : '○ Off'}</span>
+              </button>
             </div>
 
             <div className="px-6 py-4 border-t border-[var(--border)] flex justify-end">
@@ -1145,6 +1187,7 @@ export default function HomePage() {
                   const defMap: (string|null)[] = Array(200).fill(null);
                   DEFINED_CARD_IDS.forEach((id, i) => { if (i < 20) defMap[i] = id; });
                   setSlotMap(defMap); localStorage.setItem('home_slot_map', JSON.stringify(defMap));
+                  setHeroEnabled(true); localStorage.setItem('home_hero_enabled', '1');
                 }}
                 className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors"
               >Reset to default</button>
