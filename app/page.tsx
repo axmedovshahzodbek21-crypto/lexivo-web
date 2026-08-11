@@ -622,10 +622,13 @@ export default function HomePage() {
           ? activeSlots
           : activeSlots.filter((id): id is string => !!id);
 
-        // Last filled index drives FRAME_SLOTS generation
+        // Last filled index drives FRAME_SLOTS generation.
+        // For legacy modes (hide/unhide/switch) use sectionOrder length so ghost cards get slots.
         const lastFilledIdx = arrangeMode
           ? (() => { let l = -1; for (let i = 0; i < 200; i++) if (activeSlots[i]) l = i; return l; })()
-          : displayCards.length - 1;
+          : useSlotMap
+          ? displayCards.length - 1
+          : sectionOrder.length - 1;
 
         // Build FRAME_SLOTS: hero (fixed) + uniform rows with centered partial last row
         const FRAME_SLOTS: { gridColumn: string; gridRow: string }[] = [];
@@ -1036,7 +1039,7 @@ export default function HomePage() {
                     <div className={`h-full transition-opacity duration-150
                       ${hideMode || switchMode || (unhideMode && !isHidden) ? 'pointer-events-none' : ''}
                       ${unhideMode && isHidden ? (isUnhideSelected ? 'opacity-65 pointer-events-none' : 'opacity-25 pointer-events-none') : ''}`}>
-                      {renderCard(sId, idx === 2)}
+                      {renderCard(sId, idx === 0)}
                     </div>
 
                     {/* Hide mode overlay */}
