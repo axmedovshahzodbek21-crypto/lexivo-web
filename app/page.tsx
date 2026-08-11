@@ -256,7 +256,20 @@ export default function HomePage() {
     // Load or build slot map
     const savedSlotMap = localStorage.getItem('home_slot_map');
     if (savedSlotMap) {
-      try { setSlotMap(JSON.parse(savedSlotMap)); } catch { /* fall through to build */ }
+      try {
+        const parsed: (string|null)[] = JSON.parse(savedSlotMap);
+        while (parsed.length < 200) parsed.push(null);
+        const inMap = new Set(parsed.filter((id): id is string => !!id));
+        const toAdd = DEFINED_CARD_IDS.filter(id => !inMap.has(id) && localStorage.getItem('home_hide_' + id) !== '1');
+        if (toAdd.length > 0) {
+          let lastFilled = -1;
+          for (let i = 0; i < 200; i++) if (parsed[i]) lastFilled = i;
+          let si = lastFilled + 1;
+          for (const id of toAdd) parsed[si++] = id;
+          localStorage.setItem('home_slot_map', JSON.stringify(parsed));
+        }
+        setSlotMap(parsed);
+      } catch { /* fall through to build */ }
     } else {
       const map: (string|null)[] = Array(200).fill(null);
       let si = 0;
