@@ -14,6 +14,7 @@ import { speak } from '@/lib/speech';
 import { getTheme, toggleTheme, type Theme } from '@/lib/theme';
 import type { WordItem, UserSettings } from '@/lib/types';
 import XpModal from '@/components/XpModal';
+import XpHistoryModal from '@/components/XpHistoryModal';
 import TiltCard from '@/components/TiltCard';
 import { supabase } from '@/lib/supabase';
 
@@ -81,6 +82,7 @@ export default function HomePage() {
   const [wodRevealed, setWodRevealed] = useState(false);
   const [theme, setThemeState] = useState<Theme>('light');
   const [showXpModal, setShowXpModal] = useState(false);
+  const [showXpHistoryModal, setShowXpHistoryModal] = useState(false);
   const [showBanner, setShowBanner] = useState(false);
   const [showReviewBanner, setShowReviewBanner] = useState(true);
   const [hideCollections, setHideCollections] = useState(false);
@@ -496,6 +498,7 @@ export default function HomePage() {
       )}
 
       {showXpModal && <XpModal xp={xp} onClose={() => setShowXpModal(false)} />}
+      {showXpHistoryModal && <XpHistoryModal xp={xp} onClose={() => setShowXpHistoryModal(false)} />}
 
       {(() => {
         const FRAME_SLOTS = [
@@ -690,7 +693,7 @@ export default function HomePage() {
           if (sId === 'xp_history') {
             const a = ACTION_MAP['xp_history'];
             return (
-              <button onClick={() => setShowXpModal(true)} className="block h-full w-full">
+              <button onClick={() => setShowXpHistoryModal(true)} className="block h-full w-full">
                 <div className="rounded-2xl h-full p-4 flex flex-col items-center justify-center text-center gap-2 hover:-translate-y-1 transition-all duration-200 animate-heartbeat"
                   style={{ background: a.gradient, boxShadow: `0 7px 0 ${a.edge}, 0 10px 24px ${a.glow}`, textShadow: '0 1px 3px rgba(0,0,0,0.35)' }}>
                   <div className="text-3xl">{a.icon}</div>
