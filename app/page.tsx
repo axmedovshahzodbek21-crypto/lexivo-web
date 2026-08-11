@@ -1227,7 +1227,7 @@ export default function HomePage() {
                   setHideClasses(false);      localStorage.removeItem('home_hide_classes');
                   setHideXpHistory(false);    localStorage.removeItem('home_hide_xp_history');
                   const defMap: (string|null)[] = Array(200).fill(null);
-                  DEFINED_CARD_IDS.forEach((id, i) => { if (i < 20) defMap[i] = id; });
+                  DEFINED_CARD_IDS.forEach((id, i) => { defMap[i] = id; });
                   setSlotMap(defMap); localStorage.setItem('home_slot_map', JSON.stringify(defMap));
                   setHeroEnabled(true); localStorage.setItem('home_hero_enabled', '1');
                 }}
