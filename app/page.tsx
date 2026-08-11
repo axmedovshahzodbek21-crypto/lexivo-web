@@ -128,9 +128,9 @@ export default function HomePage() {
   const [hideClasses, setHideClasses] = useState(false);
   const [hideXpHistory, setHideXpHistory] = useState(false);
   // Slot-map: 20-element array, each entry is a card ID or null (empty slot)
-  const [slotMap, setSlotMap] = useState<(string|null)[]>(Array(20).fill(null));
+  const [slotMap, setSlotMap] = useState<(string|null)[]>(Array(200).fill(null));
   const [arrangeMode, setArrangeMode] = useState(false);
-  const [workingSlots, setWorkingSlots] = useState<(string|null)[]>(Array(20).fill(null));
+  const [workingSlots, setWorkingSlots] = useState<(string|null)[]>(Array(200).fill(null));
   const [pickedCard, setPickedCard] = useState<string|null>(null);
   const [pickedFromSlot, setPickedFromSlot] = useState<number|'tray'|null>(null);
   const [hideMode, setHideMode] = useState(false);
@@ -254,7 +254,7 @@ export default function HomePage() {
     if (savedSlotMap) {
       try { setSlotMap(JSON.parse(savedSlotMap)); } catch { /* fall through to build */ }
     } else {
-      const map: (string|null)[] = Array(20).fill(null);
+      const map: (string|null)[] = Array(200).fill(null);
       let si = 0;
       for (const id of order) {
         if (si >= 20) break;
@@ -596,16 +596,21 @@ export default function HomePage() {
       {showXpHistoryModal && <XpHistoryModal xp={xp} onClose={() => setShowXpHistoryModal(false)} />}
 
       {(() => {
-        const FRAME_SLOTS = [
+        // Generate enough slots for all built-in cards + all classes + generous buffer
+        const totalSlots = Math.max(60, DEFINED_CARD_IDS.length + homeClasses.length + 20);
+        const FRAME_SLOTS: { gridColumn: string; gridRow: string }[] = [
           { gridColumn: '1',     gridRow: '1'     },
           { gridColumn: '1',     gridRow: '2'     },
           { gridColumn: '2 / 5', gridRow: '1 / 3' },
           { gridColumn: '5',     gridRow: '1'     },
           { gridColumn: '5',     gridRow: '2'     },
-          { gridColumn: '1', gridRow: '3' }, { gridColumn: '2', gridRow: '3' }, { gridColumn: '3', gridRow: '3' }, { gridColumn: '4', gridRow: '3' }, { gridColumn: '5', gridRow: '3' },
-          { gridColumn: '1', gridRow: '4' }, { gridColumn: '2', gridRow: '4' }, { gridColumn: '3', gridRow: '4' }, { gridColumn: '4', gridRow: '4' }, { gridColumn: '5', gridRow: '4' },
-          { gridColumn: '1', gridRow: '5' }, { gridColumn: '2', gridRow: '5' }, { gridColumn: '3', gridRow: '5' }, { gridColumn: '4', gridRow: '5' }, { gridColumn: '5', gridRow: '5' },
         ];
+        let _row = 3;
+        while (FRAME_SLOTS.length < totalSlots) {
+          for (let col = 1; col <= 5 && FRAME_SLOTS.length < totalSlots; col++)
+            FRAME_SLOTS.push({ gridColumn: String(col), gridRow: String(_row) });
+          _row++;
+        }
         const HIDE_MAP: Record<string, boolean> = {
           collections: hideCollections, reading: hideReading, day_streak: hideDayStreak,
           total_xp: hideTotalXp, words: hideWords, daily_goal: hideDailyGoal,
@@ -1137,7 +1142,7 @@ export default function HomePage() {
                   setHideGrammar(false);      localStorage.removeItem('home_hide_grammar');
                   setHideClasses(false);      localStorage.removeItem('home_hide_classes');
                   setHideXpHistory(false);    localStorage.removeItem('home_hide_xp_history');
-                  const defMap: (string|null)[] = Array(20).fill(null);
+                  const defMap: (string|null)[] = Array(200).fill(null);
                   DEFINED_CARD_IDS.forEach((id, i) => { if (i < 20) defMap[i] = id; });
                   setSlotMap(defMap); localStorage.setItem('home_slot_map', JSON.stringify(defMap));
                 }}
