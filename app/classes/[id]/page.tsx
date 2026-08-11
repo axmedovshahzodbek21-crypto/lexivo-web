@@ -1094,28 +1094,38 @@ function CurriculumTab({
             <button onClick={openFolderPicker} className="btn-primary">+ Assign Folder</button>
           </div>
         ) : (
-          <div className="space-y-2">
-            {folders.map(folder => {
+          <div className="space-y-3">
+            {folders.map((folder, fi) => {
               const isOpen = expanded.has(folder.id);
+              const FOLDER_COLORS = [
+                { gradient: 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)', edge: '#3730A3', glow: 'rgba(79,70,229,0.3)' },
+                { gradient: 'linear-gradient(135deg, #0891B2 0%, #0EA5E9 100%)', edge: '#0E7490', glow: 'rgba(8,145,178,0.3)' },
+                { gradient: 'linear-gradient(135deg, #D97706 0%, #F59E0B 100%)', edge: '#B45309', glow: 'rgba(217,119,6,0.3)' },
+                { gradient: 'linear-gradient(135deg, #DC2626 0%, #F87171 100%)', edge: '#B91C1C', glow: 'rgba(220,38,38,0.3)' },
+                { gradient: 'linear-gradient(135deg, #059669 0%, #34D399 100%)', edge: '#047857', glow: 'rgba(5,150,105,0.3)' },
+              ];
+              const colors = FOLDER_COLORS[fi % FOLDER_COLORS.length];
               return (
-                <div key={folder.id} className="card overflow-hidden p-0">
+                <div key={folder.id} style={{ borderRadius: 20, overflow: 'hidden', boxShadow: `0 6px 0 ${colors.edge}, 0 10px 30px ${colors.glow}` }}>
                   <button
-                    className="w-full flex items-center gap-3 text-left px-4 py-3 hover:bg-[var(--surface-2)] transition-colors"
+                    className="w-full flex items-center gap-3 text-left px-4 py-4 transition-opacity hover:opacity-90"
+                    style={{ background: colors.gradient }}
                     onClick={() => setExpanded(prev => { const next = new Set(prev); if (isOpen) { next.delete(folder.id); } else { next.add(folder.id); } return next; })}
                   >
-                    <span className="text-xl shrink-0">📁</span>
+                    <span className="text-2xl shrink-0" style={{ filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.3))' }}>📁</span>
                     <div className="flex-1 min-w-0">
-                      <p className="font-bold text-sm text-[var(--text)] truncate">{folder.name}</p>
-                      <p className="text-xs text-[var(--text-muted)]">{folder.units.length} unit{folder.units.length !== 1 ? 's' : ''}</p>
+                      <p className="font-black text-sm truncate" style={{ color: 'white', textShadow: '0 1px 3px rgba(0,0,0,0.35)' }}>{folder.name}</p>
+                      <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)' }}>{folder.units.length} unit{folder.units.length !== 1 ? 's' : ''}</p>
                     </div>
                     <button
                       onClick={e => { e.stopPropagation(); unassignFolder(folder.assignmentId); }}
-                      className="text-xs text-[var(--text-muted)] hover:text-[var(--danger)] px-2 py-1 rounded-lg hover:bg-red-500/10 transition-colors mr-1 shrink-0"
+                      className="text-xs px-2 py-1 rounded-lg transition-colors shrink-0 mr-1"
+                      style={{ color: 'rgba(255,255,255,0.7)', background: 'rgba(0,0,0,0.15)' }}
                     >Remove</button>
-                    <span className="text-[var(--text-muted)] text-xs shrink-0">{isOpen ? '▲' : '▼'}</span>
+                    <span className="shrink-0 text-xs" style={{ color: 'rgba(255,255,255,0.8)' }}>{isOpen ? '▲' : '▼'}</span>
                   </button>
                   {isOpen && (
-                    <div className="border-t border-[var(--border)] space-y-1 p-2">
+                    <div className="space-y-1 p-2" style={{ background: 'var(--surface)' }}>
                       {folder.units.length === 0 ? (
                         <p className="text-xs text-[var(--text-muted)] text-center py-4">No units in this folder</p>
                       ) : folder.units.map(unit => {
@@ -1157,29 +1167,30 @@ function CurriculumTab({
             <p className="text-sm text-[var(--text-muted)]">Create a unit to organise class words into homework groups.</p>
           </div>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {cwUnits.map(unit => {
               const isOpen = expandedCW.has(unit.id);
               const hw = homework.find(h => h.source === 'class' && h.classUnitId === unit.id);
               return (
-                <div key={unit.id} className="card overflow-hidden p-0">
+                <div key={unit.id} style={{ borderRadius: 20, overflow: 'hidden', boxShadow: '0 6px 0 #B45309, 0 10px 30px rgba(217,119,6,0.3)' }}>
                   <button
-                    className="w-full flex items-center gap-3 text-left px-4 py-3 hover:bg-[var(--surface-2)] transition-colors"
+                    className="w-full flex items-center gap-3 text-left px-4 py-4 transition-opacity hover:opacity-90"
+                    style={{ background: 'linear-gradient(135deg, #D97706 0%, #F59E0B 100%)' }}
                     onClick={() => setExpandedCW(prev => { const next = new Set(prev); if (isOpen) { next.delete(unit.id); } else { next.add(unit.id); } return next; })}
                   >
-                    <span className="text-xl shrink-0">📝</span>
+                    <span className="text-2xl shrink-0" style={{ filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.3))' }}>📝</span>
                     <div className="flex-1 min-w-0">
-                      <p className="font-bold text-sm text-[var(--text)] truncate">{unit.name}</p>
-                      <p className="text-xs text-[var(--text-muted)]">{unit.wordCount} word{unit.wordCount !== 1 ? 's' : ''}</p>
+                      <p className="font-black text-sm truncate" style={{ color: 'white', textShadow: '0 1px 3px rgba(0,0,0,0.35)' }}>{unit.name}</p>
+                      <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)' }}>{unit.wordCount} word{unit.wordCount !== 1 ? 's' : ''}</p>
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0">
-                      <button onClick={e => { e.stopPropagation(); setCwUnitRenameName(unit.name); setCwUnitRenaming(unit); }} className="text-xs text-[var(--text-muted)] hover:text-[var(--primary)] px-2 py-1 rounded-lg hover:bg-[var(--primary-bg)] transition-colors">Rename</button>
-                      <button onClick={e => { e.stopPropagation(); deleteCWUnit(unit); }} className="text-xs text-[var(--text-muted)] hover:text-[var(--danger)] px-2 py-1 rounded-lg hover:bg-red-500/10 transition-colors">Delete</button>
-                      <span className="text-[var(--text-muted)] text-xs ml-1">{isOpen ? '▲' : '▼'}</span>
+                      <button onClick={e => { e.stopPropagation(); setCwUnitRenameName(unit.name); setCwUnitRenaming(unit); }} className="text-xs px-2 py-1 rounded-lg transition-colors" style={{ color: 'rgba(255,255,255,0.7)', background: 'rgba(0,0,0,0.15)' }}>Rename</button>
+                      <button onClick={e => { e.stopPropagation(); deleteCWUnit(unit); }} className="text-xs px-2 py-1 rounded-lg transition-colors" style={{ color: 'rgba(255,255,255,0.7)', background: 'rgba(0,0,0,0.15)' }}>Delete</button>
+                      <span className="text-xs ml-1" style={{ color: 'rgba(255,255,255,0.8)' }}>{isOpen ? '▲' : '▼'}</span>
                     </div>
                   </button>
                   {isOpen && (
-                    <div className="border-t border-[var(--border)] flex gap-2 p-3">
+                    <div className="flex gap-2 p-3" style={{ background: 'var(--surface)' }}>
                       <button onClick={() => openManageWords(unit)} className="flex-1 text-sm font-semibold py-2 rounded-xl bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">✏️ Manage Words</button>
                       {hw ? (
                         <button onClick={() => openHwDetail(hw)} className="flex-1 text-sm font-semibold py-2 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 hover:bg-amber-500/25 transition-colors">📋 View Progress</button>
