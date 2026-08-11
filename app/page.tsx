@@ -55,7 +55,7 @@ function computeClassStreak(datesDesc: string[]): number {
 }
 
 const DEFINED_CARD_IDS = [
-  'collections','reading','day_streak','total_xp','words',
+  'day_streak','collections','total_xp','reading','words',
   'daily_goal','level','wod',
   'learn','flashcards','srs','quiz',
   'starred','match','pomodoro','leaderboard',
@@ -605,11 +605,11 @@ export default function HomePage() {
         const FRAME_SLOTS: { gridColumn: string; gridRow: string }[] = [];
         if (heroEnabled) {
           FRAME_SLOTS.push(
-            { gridColumn: '1',     gridRow: '1'     },
-            { gridColumn: '1',     gridRow: '2'     },
-            { gridColumn: '2 / 5', gridRow: '1 / 3' },
-            { gridColumn: '5',     gridRow: '1'     },
-            { gridColumn: '5',     gridRow: '2'     },
+            { gridColumn: '2 / 5', gridRow: '1 / 3' }, // slot 1 – large center
+            { gridColumn: '1',     gridRow: '1'     }, // slot 2 – top-left
+            { gridColumn: '5',     gridRow: '1'     }, // slot 3 – top-right
+            { gridColumn: '1',     gridRow: '2'     }, // slot 4 – bottom-left
+            { gridColumn: '5',     gridRow: '2'     }, // slot 5 – bottom-right
           );
           let _row = 3;
           while (FRAME_SLOTS.length < totalSlots) {
@@ -965,7 +965,7 @@ export default function HomePage() {
                     className={`h-full relative ${arrangeMode ? 'cursor-pointer' : ''}`}
                     onClick={arrangeMode ? () => handleSlotClick(slotIdx) : undefined}>
                     <div className={`h-full transition-all duration-150 ${arrangeMode ? 'pointer-events-none select-none' : ''} ${isPicked ? 'opacity-40 scale-95' : ''} ${isTarget ? 'ring-2 ring-white/30 rounded-2xl' : ''}`}>
-                      {renderCard(sId, heroEnabled && slotIdx === 2)}
+                      {renderCard(sId, heroEnabled && slotIdx === 0)}
                     </div>
                     {arrangeMode && (
                       <div className={`absolute inset-0 rounded-2xl transition-all ${isPicked ? 'ring-2 ring-inset ring-white' : isTarget ? 'hover:bg-white/10' : ''}`}>
