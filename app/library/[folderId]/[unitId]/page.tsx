@@ -98,7 +98,7 @@ Output only the formatted blocks. No commentary.`;
 }
 
 export default function UnitPage() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const params = useParams();
   const folderId = params.folderId as string;
@@ -123,9 +123,10 @@ export default function UnitPage() {
   const [detailWord, setDetailWord] = useState<UnitWord | null>(null);
 
   useEffect(() => {
+    if (authLoading) return;
     if (!user) { router.replace('/login'); return; }
     load();
-  }, [user, unitId]);
+  }, [user, authLoading, unitId]);
 
   useEffect(() => {
     setParsed(pasteText.trim() ? parseOutput(pasteText) : []);
