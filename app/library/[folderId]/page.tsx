@@ -17,6 +17,11 @@ const CARD_COLORS = [
   '#3D8BFF','#FF5E57','#00C9A7','#FFC75F',
 ];
 
+const darken = (hex: string, amt = 0.28) => {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return `rgb(${Math.round(r*(1-amt))},${Math.round(g*(1-amt))},${Math.round(b*(1-amt))})`;
+};
+
 // Module-level cache keyed by folderId
 const _cache: Record<string, { name: string; units: Unit[] }> = {};
 
@@ -163,8 +168,8 @@ export default function FolderPage() {
               <div key={unit.id} className="relative group">
                 <Link href={`/library/${folderId}/${unit.id}`}>
                   <div
-                    className="rounded-2xl p-4 cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98]"
-                    style={{ background: color, boxShadow: `0 6px 24px ${color}55` }}
+                    className="rounded-2xl p-4 cursor-pointer animate-heartbeat hover:-translate-y-1 transition-all duration-200"
+                    style={{ background: color, boxShadow: `0 7px 0 ${darken(color)}, 0 10px 24px ${color}66`, textShadow: '0 1px 3px rgba(0,0,0,0.25)' }}
                   >
                     <div className="text-2xl mb-6">📖</div>
                     <p className="text-white font-bold text-sm leading-tight line-clamp-2">{unit.name}</p>
