@@ -259,6 +259,8 @@ export default function HomePage() {
       try {
         const parsed: (string|null)[] = JSON.parse(savedSlotMap);
         while (parsed.length < 200) parsed.push(null);
+        let dirty = false;
+        // Migrate: add any DEFINED_CARD_IDS missing from the saved map
         const inMap = new Set(parsed.filter((id): id is string => !!id));
         const toAdd = DEFINED_CARD_IDS.filter(id => !inMap.has(id) && localStorage.getItem('home_hide_' + id) !== '1');
         if (toAdd.length > 0) {
@@ -266,8 +268,13 @@ export default function HomePage() {
           for (let i = 0; i < 200; i++) if (parsed[i]) lastFilled = i;
           let si = lastFilled + 1;
           for (const id of toAdd) parsed[si++] = id;
-          localStorage.setItem('home_slot_map', JSON.stringify(parsed));
+          dirty = true;
         }
+        // Migrate: slot 0 must be day_streak (large center). If it's elsewhere in the
+        // hero area (slots 0-4) but not at 0, swap it into position.
+        const dsIdx = parsed.slice(0, 5).indexOf('day_streak');
+        if (dsIdx > 0) { [parsed[0], parsed[dsIdx]] = [parsed[dsIdx], parsed[0]]; dirty = true; }
+        if (dirty) localStorage.setItem('home_slot_map', JSON.stringify(parsed));
         setSlotMap(parsed);
       } catch { /* fall through to build */ }
     } else {
