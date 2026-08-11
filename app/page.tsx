@@ -939,12 +939,12 @@ export default function HomePage() {
                   <div key={sId + slotIdx} style={slot}
                     className={`h-full relative ${arrangeMode ? 'cursor-pointer' : ''}`}
                     onClick={arrangeMode ? () => handleSlotClick(slotIdx) : undefined}>
-                    <div className={`h-full transition-all duration-150 ${isPicked ? 'opacity-40 scale-95' : ''} ${isTarget ? 'ring-2 ring-white/30 rounded-2xl' : ''}`}>
+                    <div className={`h-full transition-all duration-150 ${arrangeMode ? 'pointer-events-none select-none' : ''} ${isPicked ? 'opacity-40 scale-95' : ''} ${isTarget ? 'ring-2 ring-white/30 rounded-2xl' : ''}`}>
                       {renderCard(sId, slotIdx === 2)}
                     </div>
                     {arrangeMode && (
-                      <div className={`absolute inset-0 rounded-2xl pointer-events-none transition-all ${isPicked ? 'ring-2 ring-inset ring-white' : isTarget ? 'hover:bg-white/10' : ''}`}>
-                        {isPicked && <div className="flex items-center justify-center h-full"><div className="w-9 h-9 rounded-full bg-white/80 flex items-center justify-center text-lg shadow">✊</div></div>}
+                      <div className={`absolute inset-0 rounded-2xl transition-all ${isPicked ? 'ring-2 ring-inset ring-white' : isTarget ? 'hover:bg-white/10' : ''}`}>
+                        {isPicked && <div className="flex items-center justify-center h-full pointer-events-none"><div className="w-9 h-9 rounded-full bg-white/80 flex items-center justify-center text-lg shadow">✊</div></div>}
                       </div>
                     )}
                   </div>
