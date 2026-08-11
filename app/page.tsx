@@ -600,46 +600,47 @@ export default function HomePage() {
       {showXpHistoryModal && <XpHistoryModal xp={xp} onClose={() => setShowXpHistoryModal(false)} />}
 
       {(() => {
-        // Generate enough slots for all built-in cards + all classes + generous buffer
-        const totalSlots = Math.max(60, DEFINED_CARD_IDS.length + homeClasses.length + 20);
-        const FRAME_SLOTS: { gridColumn: string; gridRow: string }[] = [];
-        if (heroEnabled) {
-          FRAME_SLOTS.push(
-            { gridColumn: '2 / 5', gridRow: '1 / 3' }, // slot 1 – large center
-            { gridColumn: '1',     gridRow: '1'     }, // slot 2 – top-left
-            { gridColumn: '5',     gridRow: '1'     }, // slot 3 – top-right
-            { gridColumn: '1',     gridRow: '2'     }, // slot 4 – bottom-left
-            { gridColumn: '5',     gridRow: '2'     }, // slot 5 – bottom-right
-          );
-          let _row = 3;
-          while (FRAME_SLOTS.length < totalSlots) {
-            for (let col = 1; col <= 5 && FRAME_SLOTS.length < totalSlots; col++)
-              FRAME_SLOTS.push({ gridColumn: String(col), gridRow: String(_row) });
-            _row++;
-          }
-        } else {
-          let _row = 1;
-          while (FRAME_SLOTS.length < totalSlots) {
-            for (let col = 1; col <= 5 && FRAME_SLOTS.length < totalSlots; col++)
-              FRAME_SLOTS.push({ gridColumn: String(col), gridRow: String(_row) });
-            _row++;
-          }
-        }
-
         // Slot-map rendering (normal + arrange mode)
         const useSlotMap = !hideMode && !unhideMode && !switchMode;
         const activeSlots = arrangeMode ? workingSlots : slotMap;
 
-        // Trim FRAME_SLOTS to last filled row (+ extra rows in arrange for drop targets)
+        // Find last filled slot
         let lastFilledIdx = -1;
-        for (let i = 0; i < FRAME_SLOTS.length; i++) {
-          if (activeSlots[i]) lastFilledIdx = i;
-        }
+        for (let i = 0; i < 200; i++) { if (activeSlots[i]) lastFilledIdx = i; }
+
+        // Build FRAME_SLOTS: hero (fixed) + uniform rows with centered partial last row
+        const FRAME_SLOTS: { gridColumn: string; gridRow: string }[] = [];
         const extraSlots = arrangeMode ? 5 : 0;
-        const trimTo = Math.max(5, lastFilledIdx + 1 + extraSlots);
-        // Round up to full rows of 5
-        const trimmedLen = Math.ceil(trimTo / 5) * 5;
-        const visibleSlots = FRAME_SLOTS.slice(0, Math.min(trimmedLen, FRAME_SLOTS.length));
+
+        const buildUniformRows = (startRow: number, filledCount: number) => {
+          const total = filledCount + extraSlots;
+          const fullRows = Math.floor(total / 5);
+          const lastCount = total % 5;
+          let row = startRow;
+          for (let r = 0; r < fullRows; r++, row++)
+            for (let col = 1; col <= 5; col++)
+              FRAME_SLOTS.push({ gridColumn: String(col), gridRow: String(row) });
+          if (lastCount > 0) {
+            const leftPad = Math.floor((5 - lastCount) / 2);
+            for (let i = 0; i < lastCount; i++)
+              FRAME_SLOTS.push({ gridColumn: String(leftPad + 1 + i), gridRow: String(row) });
+          }
+        };
+
+        if (heroEnabled) {
+          FRAME_SLOTS.push(
+            { gridColumn: '2 / 5', gridRow: '1 / 3' }, // slot 0 – large center
+            { gridColumn: '1',     gridRow: '1'     }, // slot 1 – top-left
+            { gridColumn: '5',     gridRow: '1'     }, // slot 2 – top-right
+            { gridColumn: '1',     gridRow: '2'     }, // slot 3 – bottom-left
+            { gridColumn: '5',     gridRow: '2'     }, // slot 4 – bottom-right
+          );
+          buildUniformRows(3, Math.max(0, lastFilledIdx - 4));
+        } else {
+          buildUniformRows(1, Math.max(0, lastFilledIdx + 1));
+        }
+
+        const visibleSlots = FRAME_SLOTS;
         const HIDE_MAP: Record<string, boolean> = {
           collections: hideCollections, reading: hideReading, day_streak: hideDayStreak,
           total_xp: hideTotalXp, words: hideWords, daily_goal: hideDailyGoal,
