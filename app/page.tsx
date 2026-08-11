@@ -604,9 +604,16 @@ export default function HomePage() {
         const useSlotMap = !hideMode && !unhideMode && !switchMode;
         const activeSlots = arrangeMode ? workingSlots : slotMap;
 
-        // Find last filled slot
-        let lastFilledIdx = -1;
-        for (let i = 0; i < 200; i++) { if (activeSlots[i]) lastFilledIdx = i; }
+        // Normal mode: compact slots (no gaps from hidden cards).
+        // Arrange mode: preserve exact positions so empty slots show as drop targets.
+        const displayCards: (string | null)[] = arrangeMode
+          ? activeSlots
+          : activeSlots.filter((id): id is string => !!id);
+
+        // Last filled index drives FRAME_SLOTS generation
+        const lastFilledIdx = arrangeMode
+          ? (() => { let l = -1; for (let i = 0; i < 200; i++) if (activeSlots[i]) l = i; return l; })()
+          : displayCards.length - 1;
 
         // Build FRAME_SLOTS: hero (fixed) + uniform rows with centered partial last row
         const FRAME_SLOTS: { gridColumn: string; gridRow: string }[] = [];
@@ -945,7 +952,7 @@ export default function HomePage() {
             <div className="grid gap-4"
               style={{ gridTemplateColumns: 'repeat(5, 1fr)', gridTemplateRows: heroEnabled ? '140px 140px' : undefined, gridAutoRows: '130px' }}>
               {useSlotMap ? visibleSlots.map((slot, slotIdx) => {
-                const sId = activeSlots[slotIdx] ?? null;
+                const sId = displayCards[slotIdx] ?? null;
                 const isPicked = arrangeMode && pickedFromSlot === slotIdx;
                 const isTarget = arrangeMode && pickedCard !== null && !isPicked;
                 if (!sId) {
