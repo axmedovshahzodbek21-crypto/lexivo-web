@@ -21,6 +21,10 @@ const darken = (hex: string, amt = 0.45) => {
   const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
   return `rgb(${Math.round(r*(1-amt))},${Math.round(g*(1-amt))},${Math.round(b*(1-amt))})`;
 };
+const lighten = (hex: string, amt = 0.3) => {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return `rgb(${Math.round(r+(255-r)*amt)},${Math.round(g+(255-g)*amt)},${Math.round(b+(255-b)*amt)})`;
+};
 
 // Module-level cache keyed by folderId
 const _cache: Record<string, { name: string; units: Unit[] }> = {};
@@ -172,12 +176,14 @@ export default function FolderPage() {
               <div key={unit.id} className="relative group">
                 <Link href={`/library/${folderId}/${unit.id}`}>
                   <div
-                    className="rounded-2xl p-4 cursor-pointer animate-heartbeat hover:-translate-y-1 transition-all duration-200"
-                    style={{ background: color, boxShadow: `0 12px 0 ${darken(color)}, 0 16px 32px ${color}99`, textShadow: '0 1px 3px rgba(0,0,0,0.25)' }}
+                    className="rounded-2xl cursor-pointer animate-heartbeat hover:-translate-y-1 transition-all duration-200 relative overflow-hidden"
+                    style={{ background: `linear-gradient(135deg, ${lighten(color)}, ${color})`, boxShadow: `0 12px 0 ${darken(color)}, 0 16px 32px ${color}99`, minHeight: '120px' }}
                   >
-                    <div className="text-2xl mb-6">📖</div>
-                    <p className="text-white font-bold text-sm leading-tight line-clamp-2">{unit.name}</p>
-                    <p className="text-white/70 text-xs mt-1">{unit.word_count} {unit.word_count === 1 ? 'word' : 'words'}</p>
+                    <div className="p-4 text-2xl">📖</div>
+                    <div className="absolute bottom-0 left-0 right-0 px-4 py-3" style={{ background: 'rgba(0,0,0,0.18)', backdropFilter: 'blur(8px)' }}>
+                      <p className="text-white font-bold text-sm leading-tight line-clamp-2" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>{unit.name}</p>
+                      <p className="text-white/70 text-xs mt-0.5">{unit.word_count} {unit.word_count === 1 ? 'word' : 'words'}</p>
+                    </div>
                   </div>
                 </Link>
                 <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
