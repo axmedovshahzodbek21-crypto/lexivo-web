@@ -49,6 +49,51 @@ export default function XpHistoryModal({ xp, onClose }: Props) {
         style={{ maxHeight: '90vh', background: 'var(--surface)' }}
         onClick={e => e.stopPropagation()}
       >
+        {/* Day detail popup */}
+        {selectedDay && (
+          <div className="absolute inset-0 z-10 flex items-end rounded-t-3xl overflow-hidden"
+            onClick={() => setSelectedDay(null)}>
+            <div className="absolute inset-0 bg-black/40" />
+            <div
+              className="relative w-full rounded-t-3xl animate-slide-up"
+              style={{ background: 'var(--surface)', maxHeight: '75%', display: 'flex', flexDirection: 'column' }}
+              onClick={e => e.stopPropagation()}
+            >
+              {/* Handle */}
+              <div className="flex justify-center pt-3 pb-1 shrink-0">
+                <div className="w-10 h-1 rounded-full" style={{ background: 'var(--border)' }} />
+              </div>
+              {/* Header */}
+              <div className="flex items-center justify-between px-5 py-3 shrink-0 border-b" style={{ borderColor: 'var(--border)' }}>
+                <span className="text-sm font-black tracking-wide" style={{ color: 'var(--primary)' }}>{selectedDay}</span>
+                <span className="text-base font-black" style={{ color: 'var(--primary)' }}>+{displayXP(dayTotal)} XP</span>
+              </div>
+              {/* Entries */}
+              <div className="overflow-y-auto overscroll-contain pb-6">
+                {dayEntries.map((e, j) => {
+                  const d = new Date(e.timestamp);
+                  const time = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+                  return (
+                    <div key={j}>
+                      {j > 0 && <div style={{ height: 1, background: 'var(--border)', marginLeft: 56 }} />}
+                      <div className="flex items-center gap-3 px-5 py-3">
+                        <span className="text-xl shrink-0">{REASON_ICONS[e.reason] ?? '⭐'}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold" style={{ color: 'var(--text)' }}>{e.reason}</p>
+                          <p className="text-[11px] truncate" style={{ color: 'var(--text-muted)' }}>
+                            {e.source ? e.source : time}
+                          </p>
+                        </div>
+                        <span className="text-sm font-black shrink-0" style={{ color: 'var(--primary)' }}>+{displayXP(e.amount)} XP</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Drag handle */}
         <div className="flex justify-center pt-3 pb-1 shrink-0">
           <div className="w-10 h-1 rounded-full" style={{ background: 'var(--border)' }} />
@@ -106,7 +151,7 @@ export default function XpHistoryModal({ xp, onClose }: Props) {
                     const isSelected = selectedDay === dateStr;
                     return (
                       <button key={day}
-                        onClick={() => hasXp && setSelectedDay(isSelected ? null : dateStr)}
+                        onClick={() => hasXp && setSelectedDay(dateStr)}
                         className="flex flex-col items-center justify-center rounded-full aspect-square transition-all"
                         style={{
                           background: isSelected ? 'var(--primary)' : hasXp ? 'color-mix(in srgb, var(--primary) 85%, transparent)' : 'transparent',
@@ -127,34 +172,6 @@ export default function XpHistoryModal({ xp, onClose }: Props) {
                 </div>
               </div>
 
-              {/* Day detail */}
-              {selectedDay && (
-                <div className="rounded-2xl overflow-hidden" style={{ background: 'var(--surface-2)' }}>
-                  <div className="flex items-center justify-between px-4 py-3 border-b" style={{ borderColor: 'var(--border)' }}>
-                    <span className="text-xs font-bold tracking-wide" style={{ color: 'var(--primary)' }}>{selectedDay}</span>
-                    <span className="text-sm font-black" style={{ color: 'var(--primary)' }}>+{displayXP(dayTotal)} XP</span>
-                  </div>
-                  {dayEntries.map((e, j) => {
-                    const d = new Date(e.timestamp);
-                    const time = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-                    return (
-                      <div key={j}>
-                        {j > 0 && <div style={{ height: 1, background: 'var(--border)', marginLeft: 48 }} />}
-                        <div className="flex items-center gap-3 px-4 py-2.5">
-                          <span className="text-lg shrink-0">{REASON_ICONS[e.reason] ?? '⭐'}</span>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-xs font-semibold" style={{ color: 'var(--text)' }}>{e.reason}</p>
-                            <p className="text-[10px] truncate" style={{ color: 'var(--text-muted)' }}>
-                              {e.source ? e.source : time}
-                            </p>
-                          </div>
-                          <span className="text-xs font-black shrink-0" style={{ color: 'var(--primary)' }}>+{displayXP(e.amount)} XP</span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
             </>
           )}
 
