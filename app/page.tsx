@@ -208,7 +208,7 @@ export default function HomePage() {
     setHideLearn(localStorage.getItem('home_hide_learn') === '1');
     setHideSrs(localStorage.getItem('home_hide_srs') === '1');
     const DEFAULT_ORDER = [
-      'collections', 'reading', 'day_streak', 'total_xp', 'words',
+      'day_streak', 'collections', 'total_xp', 'reading', 'words',
       'daily_goal', 'level', 'wod',
       'learn', 'flashcards', 'srs', 'quiz',
       'starred', 'match', 'pomodoro', 'leaderboard',
@@ -260,7 +260,7 @@ export default function HomePage() {
     } else {
       const map: (string|null)[] = Array(200).fill(null);
       let si = 0;
-      for (const id of order) {
+      for (const id of DEFINED_CARD_IDS) {
         if (localStorage.getItem('home_hide_' + id) !== '1') map[si++] = id;
       }
       setSlotMap(map);
