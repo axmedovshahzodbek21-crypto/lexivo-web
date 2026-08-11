@@ -637,9 +637,13 @@ export default function HomePage() {
           ? displayCards.length - 1
           : sectionOrder.length - 1;
 
-        // Build FRAME_SLOTS: hero (fixed) + uniform rows with centered partial last row
+        // Build FRAME_SLOTS: hero (fixed) + uniform rows.
+        // In normal slot-map mode the partial last row is rendered in a flex container
+        // (outside the grid) so it can be truly centered — not in FRAME_SLOTS.
         const FRAME_SLOTS: { gridColumn: string; gridRow: string }[] = [];
         const extraSlots = arrangeMode ? 5 : 0;
+        // true only in normal mode; legacy/arrange modes keep partial row in the grid
+        const flexPartialRow = useSlotMap && !arrangeMode;
 
         const buildUniformRows = (startRow: number, filledCount: number) => {
           const total = filledCount + extraSlots;
@@ -649,11 +653,12 @@ export default function HomePage() {
           for (let r = 0; r < fullRows; r++, row++)
             for (let col = 1; col <= 5; col++)
               FRAME_SLOTS.push({ gridColumn: String(col), gridRow: String(row) });
-          if (lastCount > 0) {
+          if (!flexPartialRow && lastCount > 0) {
             const leftPad = Math.round((5 - lastCount) / 2);
             for (let i = 0; i < lastCount; i++)
               FRAME_SLOTS.push({ gridColumn: String(leftPad + 1 + i), gridRow: String(row) });
           }
+          // In flexPartialRow mode the last `lastCount` displayCards are rendered outside the grid.
         };
 
         if (heroEnabled) {
@@ -1092,6 +1097,21 @@ export default function HomePage() {
                 );
               })}
             </div>
+
+            {/* Partial last row — rendered outside the grid for true visual centering */}
+            {flexPartialRow && (() => {
+              const partialCards = displayCards.slice(FRAME_SLOTS.length) as string[];
+              if (partialCards.length === 0) return null;
+              return (
+                <div className="flex justify-center gap-4">
+                  {partialCards.map(sId => (
+                    <div key={sId} className="flex-none" style={{ width: 'calc((100% - 4rem) / 5)', height: '130px' }}>
+                      {renderCard(sId, false)}
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
 
             {/* Arrange mode tray — unplaced cards */}
             {arrangeMode && (() => {
