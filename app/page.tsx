@@ -54,6 +54,27 @@ function computeClassStreak(datesDesc: string[]): number {
   return streak;
 }
 
+const DEFINED_CARD_IDS = [
+  'collections','reading','day_streak','total_xp','words',
+  'daily_goal','level','wod',
+  'learn','flashcards','srs','quiz',
+  'starred','match','pomodoro','leaderboard',
+  'hard_words','lists','grammar','classes','xp_history',
+];
+const CARD_META: Record<string, { icon: string; label: string }> = {
+  collections:{ icon:'🗂️', label:'Collections' }, reading:{ icon:'📰', label:'Reading' },
+  day_streak: { icon:'🔥', label:'Day Streak'  }, total_xp:{ icon:'⚡', label:'Total XP'  },
+  words:      { icon:'📚', label:'Words'        }, daily_goal:{ icon:'🎯', label:'Daily Goal' },
+  level:      { icon:'⭐', label:'Level'        }, wod:{ icon:'💬', label:'Word of Day' },
+  learn:      { icon:'📖', label:'Learn'        }, srs:{ icon:'🔄', label:'SRS Review'  },
+  flashcards: { icon:'🃏', label:'Flashcards'   }, quiz:{ icon:'❓', label:'Quiz'        },
+  match:      { icon:'🎯', label:'Match'        }, pomodoro:{ icon:'🍅', label:'Pomodoro'    },
+  leaderboard:{ icon:'🏆', label:'Leaderboard'  }, starred:{ icon:'⭐', label:'Starred'      },
+  hard_words: { icon:'😓', label:'Hard Words'   }, lists:{ icon:'📋', label:'My Lists'    },
+  grammar:    { icon:'📚', label:'Grammar'      }, classes:{ icon:'👩‍🏫', label:'Classes'    },
+  xp_history: { icon:'📅', label:'XP History'   },
+};
+
 const COLLECTION_META: Record<string, { icon: string; color: string; desc: string }> = {
   '30 Days of Powerful Words': { icon: '🏆', color: 'var(--primary)', desc: 'Essential IELTS vocabulary by topic' },
   '24 Vocabulary Challenge':   { icon: '💡', color: '#FF6584', desc: 'Idioms and phrases for fluent speakers' },
@@ -106,6 +127,12 @@ export default function HomePage() {
   const [hideGrammar, setHideGrammar] = useState(false);
   const [hideClasses, setHideClasses] = useState(false);
   const [hideXpHistory, setHideXpHistory] = useState(false);
+  // Slot-map: 20-element array, each entry is a card ID or null (empty slot)
+  const [slotMap, setSlotMap] = useState<(string|null)[]>(Array(20).fill(null));
+  const [arrangeMode, setArrangeMode] = useState(false);
+  const [workingSlots, setWorkingSlots] = useState<(string|null)[]>(Array(20).fill(null));
+  const [pickedCard, setPickedCard] = useState<string|null>(null);
+  const [pickedFromSlot, setPickedFromSlot] = useState<number|'tray'|null>(null);
   const [hideMode, setHideMode] = useState(false);
   const [hideSelection, setHideSelection] = useState<Set<string>>(new Set());
   const [unhideMode, setUnhideMode] = useState(false);
@@ -222,6 +249,21 @@ export default function HomePage() {
     setHideClasses(localStorage.getItem('home_hide_classes') === '1');
     setHideXpHistory(localStorage.getItem('home_hide_xp_history') === '1');
 
+    // Load or build slot map
+    const savedSlotMap = localStorage.getItem('home_slot_map');
+    if (savedSlotMap) {
+      try { setSlotMap(JSON.parse(savedSlotMap)); } catch { /* fall through to build */ }
+    } else {
+      const map: (string|null)[] = Array(20).fill(null);
+      let si = 0;
+      for (const id of order) {
+        if (si >= 20) break;
+        if (localStorage.getItem('home_hide_' + id) !== '1') map[si++] = id;
+      }
+      setSlotMap(map);
+      localStorage.setItem('home_slot_map', JSON.stringify(map));
+    }
+
     const refreshState = () => {
       setXp(getXP());
       setStreak(getStreak());
@@ -308,6 +350,15 @@ export default function HomePage() {
         localStorage.setItem('home_section_order', updated.join(','));
         return updated;
       });
+      // Add newly discovered class cards to first empty slots in slotMap
+      setSlotMap(prev => {
+        const toAdd = cards.map(c => `class_${c.classId}`).filter(id => !prev.includes(id));
+        if (toAdd.length === 0) return prev;
+        const m = [...prev];
+        for (const id of toAdd) { const i = m.indexOf(null); if (i !== -1) m[i] = id; }
+        localStorage.setItem('home_slot_map', JSON.stringify(m));
+        return m;
+      });
     })();
   }, [user]);
 
@@ -359,6 +410,12 @@ export default function HomePage() {
         setHiddenClassIds(prev => new Set([...prev, cId]));
       }
     });
+    setSlotMap(prev => {
+      const m = [...prev];
+      hideSelection.forEach(sId => { const i = m.indexOf(sId); if (i !== -1) m[i] = null; });
+      localStorage.setItem('home_slot_map', JSON.stringify(m));
+      return m;
+    });
     setHideMode(false);
     setHideSelection(new Set());
   };
@@ -406,6 +463,14 @@ export default function HomePage() {
         setHiddenClassIds(prev => { const n = new Set(prev); n.delete(cId); return n; });
       }
     });
+    setSlotMap(prev => {
+      const m = [...prev];
+      unhideSelection.forEach(sId => {
+        if (!m.includes(sId)) { const i = m.indexOf(null); if (i !== -1) m[i] = sId; }
+      });
+      localStorage.setItem('home_slot_map', JSON.stringify(m));
+      return m;
+    });
     setUnhideMode(false);
     setUnhideSelection(new Set());
   };
@@ -416,6 +481,36 @@ export default function HomePage() {
     setSwitchMode(false);
     setSwitchFirst(null);
     setWorkingOrder([]);
+  };
+
+  const handleArrangeSave = () => {
+    const m = [...workingSlots];
+    setSlotMap(m);
+    localStorage.setItem('home_slot_map', JSON.stringify(m));
+    setArrangeMode(false);
+    setPickedCard(null);
+    setPickedFromSlot(null);
+  };
+
+  const handleSlotClick = (slotIdx: number) => {
+    const cardAtSlot = workingSlots[slotIdx] ?? null;
+    if (pickedCard === null) {
+      if (cardAtSlot) { setPickedCard(cardAtSlot); setPickedFromSlot(slotIdx); }
+    } else {
+      const m = [...workingSlots];
+      m[slotIdx] = pickedCard;
+      if (typeof pickedFromSlot === 'number') m[pickedFromSlot] = cardAtSlot;
+      setWorkingSlots(m);
+      setPickedCard(null); setPickedFromSlot(null);
+    }
+  };
+
+  const handleTrayCardClick = (cardId: string) => {
+    if (pickedCard === cardId && pickedFromSlot === 'tray') {
+      setPickedCard(null); setPickedFromSlot(null);
+    } else {
+      setPickedCard(cardId); setPickedFromSlot('tray');
+    }
   };
 
   return (
@@ -527,6 +622,10 @@ export default function HomePage() {
           : switchMode
           ? workingOrder.filter(sId => !HIDE_MAP[sId])
           : visible;
+
+        // Slot-map rendering (normal + arrange mode)
+        const useSlotMap = !hideMode && !unhideMode && !switchMode;
+        const activeSlots = arrangeMode ? workingSlots : slotMap;
 
         type ActionDef = { href: string; icon: string; title: string; subtitle: string; gradient: string; edge: string; glow: string; badge?: string };
         const ACTION_MAP: Record<string, ActionDef> = {
@@ -770,6 +869,24 @@ export default function HomePage() {
                 </div>
               </div>
             )}
+            {arrangeMode && (
+              <div className="flex items-center justify-between px-4 py-3 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)]">
+                <div>
+                  <p className="text-sm font-bold text-[var(--text)]">
+                    {pickedCard ? `Moving "${CARD_META[pickedCard]?.label ?? pickedCard}" — tap a slot` : 'Tap a card to pick it up'}
+                  </p>
+                  <p className="text-xs text-[var(--text-muted)] mt-0.5">
+                    {pickedCard ? 'Tap any slot to place it, or tap another card to swap' : 'Then tap any slot (including empty ones) to place it'}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <button onClick={() => { setArrangeMode(false); setPickedCard(null); setPickedFromSlot(null); }}
+                    className="px-3 py-1.5 rounded-xl text-sm font-semibold bg-[var(--surface)] border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">Discard</button>
+                  <button onClick={handleArrangeSave}
+                    className="px-3 py-1.5 rounded-xl text-sm font-bold text-white" style={{ background: 'var(--primary)' }}>Save</button>
+                </div>
+              </div>
+            )}
             {switchMode && (
               <div className="flex items-center justify-between px-4 py-3 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)]">
                 <div>
@@ -796,7 +913,38 @@ export default function HomePage() {
             )}
             <div className="grid gap-4"
               style={{ gridTemplateColumns: 'repeat(5, 1fr)', gridTemplateRows: '140px 140px', gridAutoRows: '130px' }}>
-              {displaySections.map((sId, idx) => {
+              {useSlotMap ? FRAME_SLOTS.map((slot, slotIdx) => {
+                const sId = activeSlots[slotIdx] ?? null;
+                const isPicked = arrangeMode && pickedFromSlot === slotIdx;
+                const isTarget = arrangeMode && pickedCard !== null && !isPicked;
+                if (!sId) {
+                  // Empty slot
+                  return (
+                    <div key={`empty-${slotIdx}`} style={slot}>
+                      {arrangeMode && (
+                        <button onClick={() => handleSlotClick(slotIdx)}
+                          className={`h-full w-full rounded-2xl border-2 border-dashed flex items-center justify-center transition-all ${isTarget ? 'border-[var(--primary)] bg-[var(--primary-bg)] cursor-pointer' : 'border-[var(--border)] bg-transparent cursor-default'}`}>
+                          {isTarget && <span className="text-3xl" style={{ color: 'var(--primary)' }}>↓</span>}
+                        </button>
+                      )}
+                    </div>
+                  );
+                }
+                return (
+                  <div key={sId + slotIdx} style={slot}
+                    className={`h-full relative ${arrangeMode ? 'cursor-pointer' : ''}`}
+                    onClick={arrangeMode ? () => handleSlotClick(slotIdx) : undefined}>
+                    <div className={`h-full transition-all duration-150 ${isPicked ? 'opacity-40 scale-95' : ''} ${isTarget ? 'ring-2 ring-white/30 rounded-2xl' : ''}`}>
+                      {renderCard(sId, slotIdx === 2)}
+                    </div>
+                    {arrangeMode && (
+                      <div className={`absolute inset-0 rounded-2xl pointer-events-none transition-all ${isPicked ? 'ring-2 ring-inset ring-white' : isTarget ? 'hover:bg-white/10' : ''}`}>
+                        {isPicked && <div className="flex items-center justify-center h-full"><div className="w-9 h-9 rounded-full bg-white/80 flex items-center justify-center text-lg shadow">✊</div></div>}
+                      </div>
+                    )}
+                  </div>
+                );
+              }) : displaySections.map((sId, idx) => {
                 const slot = FRAME_SLOTS[idx];
                 if (!slot) return null;
                 const isHidden = HIDE_MAP[sId];
@@ -884,6 +1032,39 @@ export default function HomePage() {
                 );
               })}
             </div>
+
+            {/* Arrange mode tray — unplaced cards */}
+            {arrangeMode && (() => {
+              const placed = new Set(workingSlots.filter(Boolean));
+              const allIds = [...DEFINED_CARD_IDS, ...homeClasses.map(c => `class_${c.classId}`)];
+              const trayIds = allIds.filter(id => !placed.has(id));
+              if (trayIds.length === 0) return null;
+              return (
+                <div className="mt-2 p-3 rounded-2xl" style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}>
+                  <p className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--text-muted)' }}>Unplaced — tap to pick up, then tap a slot</p>
+                  <div className="flex gap-2 flex-wrap">
+                    {trayIds.map(id => {
+                      const classCard = homeClasses.find(c => `class_${c.classId}` === id);
+                      const icon = classCard ? '🎓' : (CARD_META[id]?.icon ?? '📦');
+                      const label = classCard ? classCard.className : (CARD_META[id]?.label ?? id);
+                      const isPicked = pickedCard === id && pickedFromSlot === 'tray';
+                      return (
+                        <button key={id} onClick={() => handleTrayCardClick(id)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all"
+                          style={{
+                            background: isPicked ? 'var(--primary)' : 'var(--surface)',
+                            color: isPicked ? 'white' : 'var(--text)',
+                            border: isPicked ? '2px solid white' : '1px solid var(--border)',
+                            boxShadow: isPicked ? '0 0 0 3px color-mix(in srgb, var(--primary) 30%, transparent)' : 'none',
+                          }}>
+                          <span>{icon}</span><span>{label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })()}
           </>
         );
       })()}
@@ -904,7 +1085,7 @@ export default function HomePage() {
                 <button onClick={() => setShowCustomize(false)}
                   className="w-8 h-8 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">✕</button>
               </div>
-              <div className="grid grid-cols-3 gap-3 mb-4">
+              <div className="grid grid-cols-4 gap-3 mb-4">
                 <button
                   onClick={() => { setShowCustomize(false); setHideMode(true); setHideSelection(new Set()); }}
                   className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--danger)] hover:text-[var(--danger)] hover:bg-red-500/5 transition-all"
@@ -913,6 +1094,10 @@ export default function HomePage() {
                   onClick={() => { setShowCustomize(false); setUnhideMode(true); setUnhideSelection(new Set()); }}
                   className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-[var(--border)] text-[var(--text-muted)] hover:border-green-500 hover:text-green-500 hover:bg-green-500/5 transition-all"
                 ><span className="text-2xl">👁</span><span className="text-xs font-semibold">Unhide</span></button>
+                <button
+                  onClick={() => { setShowCustomize(false); setArrangeMode(true); setWorkingSlots([...slotMap]); setPickedCard(null); setPickedFromSlot(null); }}
+                  className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--primary)] hover:text-[var(--primary)] hover:bg-[var(--primary-bg)] transition-all"
+                ><span className="text-2xl">⊞</span><span className="text-xs font-semibold">Arrange</span></button>
                 <button
                   onClick={() => { setShowCustomize(false); setSwitchMode(true); setWorkingOrder([...sectionOrder]); setSwitchFirst(null); }}
                   className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--primary)] hover:text-[var(--primary)] hover:bg-[var(--primary-bg)] transition-all"
@@ -952,6 +1137,9 @@ export default function HomePage() {
                   setHideGrammar(false);      localStorage.removeItem('home_hide_grammar');
                   setHideClasses(false);      localStorage.removeItem('home_hide_classes');
                   setHideXpHistory(false);    localStorage.removeItem('home_hide_xp_history');
+                  const defMap: (string|null)[] = Array(20).fill(null);
+                  DEFINED_CARD_IDS.forEach((id, i) => { if (i < 20) defMap[i] = id; });
+                  setSlotMap(defMap); localStorage.setItem('home_slot_map', JSON.stringify(defMap));
                 }}
                 className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors"
               >Reset to default</button>
