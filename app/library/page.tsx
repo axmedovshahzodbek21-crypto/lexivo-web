@@ -26,7 +26,7 @@ const darken = (hex: string, amt = 0.28) => {
 const _cache: Record<string, Folder[]> = {};
 
 export default function LibraryPage() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const cached = user ? (_cache[user.id] ?? null) : null;
   const [folders, setFolders] = useState<Folder[]>(cached ?? []);
@@ -38,9 +38,10 @@ export default function LibraryPage() {
   const [renameName, setRenameName] = useState('');
 
   useEffect(() => {
+    if (authLoading) return;
     if (!user) { router.replace('/login'); return; }
     load();
-  }, [user]);
+  }, [user, authLoading]);
 
   async function load() {
     if (!user) return;

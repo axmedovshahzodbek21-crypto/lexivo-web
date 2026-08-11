@@ -26,7 +26,7 @@ const darken = (hex: string, amt = 0.28) => {
 const _cache: Record<string, { name: string; units: Unit[] }> = {};
 
 export default function FolderPage() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const params = useParams();
   const folderId = params.folderId as string;
@@ -42,9 +42,10 @@ export default function FolderPage() {
   const [renameName, setRenameName] = useState('');
 
   useEffect(() => {
+    if (authLoading) return;
     if (!user) { router.replace('/login'); return; }
     load();
-  }, [user, folderId]);
+  }, [user, authLoading, folderId]);
 
   async function load() {
     if (!user) return;
