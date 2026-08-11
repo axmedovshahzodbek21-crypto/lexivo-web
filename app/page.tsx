@@ -103,6 +103,7 @@ export default function HomePage() {
   const [hideLists, setHideLists] = useState(false);
   const [hideGrammar, setHideGrammar] = useState(false);
   const [hideClasses, setHideClasses] = useState(false);
+  const [hideXpHistory, setHideXpHistory] = useState(false);
   const [hideMode, setHideMode] = useState(false);
   const [hideSelection, setHideSelection] = useState<Set<string>>(new Set());
   const [unhideMode, setUnhideMode] = useState(false);
@@ -118,7 +119,7 @@ export default function HomePage() {
     'daily_goal', 'level', 'wod',
     'learn', 'flashcards', 'srs', 'quiz',
     'starred', 'match', 'pomodoro', 'leaderboard',
-    'hard_words', 'lists', 'grammar', 'classes',
+    'hard_words', 'lists', 'grammar', 'classes', 'xp_history',
   ]);
 
   useEffect(() => {
@@ -181,7 +182,7 @@ export default function HomePage() {
       'daily_goal', 'level', 'wod',
       'learn', 'flashcards', 'srs', 'quiz',
       'starred', 'match', 'pomodoro', 'leaderboard',
-      'hard_words', 'lists', 'grammar', 'classes',
+      'hard_words', 'lists', 'grammar', 'classes', 'xp_history',
     ];
     const ALL_IDS = new Set(DEFAULT_ORDER);
     const savedOrder = localStorage.getItem('home_section_order');
@@ -217,6 +218,7 @@ export default function HomePage() {
     setHideLists(localStorage.getItem('home_hide_lists') === '1');
     setHideGrammar(localStorage.getItem('home_hide_grammar') === '1');
     setHideClasses(localStorage.getItem('home_hide_classes') === '1');
+    setHideXpHistory(localStorage.getItem('home_hide_xp_history') === '1');
 
     const refreshState = () => {
       setXp(getXP());
@@ -324,6 +326,7 @@ export default function HomePage() {
       leaderboard: 'home_hide_leaderboard', starred: 'home_hide_starred',
       hard_words: 'home_hide_hard_words',   lists: 'home_hide_lists',
       grammar: 'home_hide_grammar',         classes: 'home_hide_classes',
+      xp_history: 'home_hide_xp_history',
     };
     hideSelection.forEach(sId => {
       if (LS[sId]) localStorage.setItem(LS[sId], '1');
@@ -347,6 +350,7 @@ export default function HomePage() {
       else if (sId === 'lists')        setHideLists(true);
       else if (sId === 'grammar')      setHideGrammar(true);
       else if (sId === 'classes')      setHideClasses(true);
+      else if (sId === 'xp_history')   setHideXpHistory(true);
       else if (sId.startsWith('class_')) {
         const cId = sId.replace('class_', '');
         localStorage.setItem(`home_hide_class_${cId}`, '1');
@@ -369,6 +373,7 @@ export default function HomePage() {
       leaderboard: 'home_hide_leaderboard', starred: 'home_hide_starred',
       hard_words: 'home_hide_hard_words',   lists: 'home_hide_lists',
       grammar: 'home_hide_grammar',         classes: 'home_hide_classes',
+      xp_history: 'home_hide_xp_history',
     };
     unhideSelection.forEach(sId => {
       if (LS[sId]) localStorage.removeItem(LS[sId]);
@@ -392,6 +397,7 @@ export default function HomePage() {
       else if (sId === 'lists')        setHideLists(false);
       else if (sId === 'grammar')      setHideGrammar(false);
       else if (sId === 'classes')      setHideClasses(false);
+      else if (sId === 'xp_history')   setHideXpHistory(false);
       else if (sId.startsWith('class_')) {
         const cId = sId.replace('class_', '');
         localStorage.removeItem(`home_hide_class_${cId}`);
@@ -509,6 +515,7 @@ export default function HomePage() {
           flashcards: hideFlashcards, quiz: hideQuiz, match: hideMatch,
           pomodoro: hidePomodoro, leaderboard: hideLeaderboard, starred: hideStarred,
           hard_words: hideHardWords, lists: hideLists, grammar: hideGrammar, classes: hideClasses,
+          xp_history: hideXpHistory,
           ...Object.fromEntries(homeClasses.map(c => [`class_${c.classId}`, hiddenClassIds.has(c.classId)])),
         };
         const visible = sectionOrder.filter(sId => !HIDE_MAP[sId]);
@@ -532,6 +539,7 @@ export default function HomePage() {
           lists:       { href: '/lists',        icon: '📋', title: t.home.listsTitle,      subtitle: t.home.listsSub,       gradient: 'linear-gradient(135deg, #7c3aed, #8b5cf6)', edge: '#4c1d95', glow: 'rgba(124,58,237,0.4)' },
           grammar:     { href: '/grammar-tips', icon: '📚', title: t.home.grammarTitle,    subtitle: t.home.grammarSub,     gradient: 'linear-gradient(135deg, #1a9a50, #2ECC71)', edge: '#0f6634', glow: 'rgba(46,204,113,0.4)' },
           classes:     { href: '/classes',      icon: '👩‍🏫', title: t.home.classesTitle,  subtitle: t.home.classesSub,     gradient: 'linear-gradient(135deg, #0284c7, #38bdf8)', edge: '#0369a1', glow: 'rgba(2,132,199,0.4)' },
+          xp_history:  { href: '#xp-history',   icon: '📅', title: 'XP History',           subtitle: 'Your XP calendar',    gradient: 'linear-gradient(135deg, #4c1d95, #6c63ff)', edge: '#2e1065', glow: 'rgba(108,99,255,0.4)' },
         };
 
         const renderCard = (sId: string, isLarge: boolean) => {
@@ -677,6 +685,19 @@ export default function HomePage() {
                   </div>
                 </Link>
               </div>
+            );
+          }
+          if (sId === 'xp_history') {
+            const a = ACTION_MAP['xp_history'];
+            return (
+              <button onClick={() => setShowXpModal(true)} className="block h-full w-full">
+                <div className="rounded-2xl h-full p-4 flex flex-col items-center justify-center text-center gap-2 hover:-translate-y-1 transition-all duration-200 animate-heartbeat"
+                  style={{ background: a.gradient, boxShadow: `0 7px 0 ${a.edge}, 0 10px 24px ${a.glow}`, textShadow: '0 1px 3px rgba(0,0,0,0.35)' }}>
+                  <div className="text-3xl">{a.icon}</div>
+                  <div className="font-bold text-sm text-white leading-tight">{a.title}</div>
+                  <div className="text-[10px] text-white/70">{a.subtitle}</div>
+                </div>
+              </button>
             );
           }
           if (sId in ACTION_MAP) {
@@ -904,7 +925,7 @@ export default function HomePage() {
                     'daily_goal', 'level', 'wod',
                     'learn', 'flashcards', 'srs', 'quiz',
                     'starred', 'match', 'pomodoro', 'leaderboard',
-                    'hard_words', 'lists', 'grammar', 'classes',
+                    'hard_words', 'lists', 'grammar', 'classes', 'xp_history',
                   ];
                   setSectionOrder(def); localStorage.setItem('home_section_order', def.join(','));
                   setHideCollections(false);  localStorage.removeItem('home_hide_collections');
@@ -927,6 +948,7 @@ export default function HomePage() {
                   setHideLists(false);        localStorage.removeItem('home_hide_lists');
                   setHideGrammar(false);      localStorage.removeItem('home_hide_grammar');
                   setHideClasses(false);      localStorage.removeItem('home_hide_classes');
+                  setHideXpHistory(false);    localStorage.removeItem('home_hide_xp_history');
                 }}
                 className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors"
               >Reset to default</button>
