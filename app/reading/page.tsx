@@ -1,5 +1,5 @@
 'use client';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { readingPassages, type ReadingPassage } from '@/lib/reading-data';
 
@@ -16,9 +16,209 @@ const CARD_COLORS = [
 
 const allTopics = ['All', ...Array.from(new Set(readingPassages.map(p => p.topic))).sort()];
 
+type Tooltip = { text: string; x: number; y: number };
+
+function PassageView({ passage, onBack }: { passage: ReadingPassage; onBack: () => void }) {
+  const [revealed, setRevealed] = useState<Set<number>>(new Set());
+  const [collected, setCollected] = useState<string[]>([]);
+  const [tooltip, setTooltip] = useState<Tooltip | null>(null);
+  const [copied, setCopied] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  const handleSelection = useCallback(() => {
+    const sel = window.getSelection();
+    const text = sel?.toString().trim();
+    if (!text || !sel || sel.rangeCount === 0) { setTooltip(null); return; }
+    // Only capture selections inside the passage content
+    const range = sel.getRangeAt(0);
+    if (!contentRef.current?.contains(range.commonAncestorContainer)) { setTooltip(null); return; }
+    const rect = range.getBoundingClientRect();
+    setTooltip({ text, x: rect.left + rect.width / 2, y: rect.top + window.scrollY - 8 });
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener('mouseup', handleSelection);
+    document.addEventListener('touchend', handleSelection);
+    return () => {
+      document.removeEventListener('mouseup', handleSelection);
+      document.removeEventListener('touchend', handleSelection);
+    };
+  }, [handleSelection]);
+
+  const addToCollected = () => {
+    if (!tooltip) return;
+    const text = tooltip.text;
+    setCollected(prev => prev.includes(text) ? prev : [...prev, text]);
+    setTooltip(null);
+    window.getSelection()?.removeAllRanges();
+  };
+
+  const removeCollected = (i: number) => setCollected(prev => prev.filter((_, idx) => idx !== i));
+
+  const copyAll = () => {
+    navigator.clipboard.writeText(collected.join('\n'));
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const paragraphs = passage.content.split('\n').map(p => p.trim()).filter(Boolean);
+
+  return (
+    <div className="max-w-2xl mx-auto px-4 py-6 pb-32 relative">
+      {/* Floating add tooltip */}
+      {tooltip && (
+        <div
+          className="fixed z-50 -translate-x-1/2 -translate-y-full"
+          style={{ left: tooltip.x, top: tooltip.y }}
+        >
+          <button
+            onMouseDown={e => e.preventDefault()}
+            onClick={addToCollected}
+            className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full shadow-lg"
+            style={{ background: 'var(--primary)', color: 'white' }}
+          >
+            + Collect
+          </button>
+          <div className="flex justify-center">
+            <div className="w-2 h-2 rotate-45 -mt-1" style={{ background: 'var(--primary)' }} />
+          </div>
+        </div>
+      )}
+
+      <button
+        onClick={onBack}
+        className="flex items-center gap-1.5 text-sm mb-6"
+        style={{ color: 'var(--text-muted)' }}
+      >
+        ← Back to Library
+      </button>
+
+      <span
+        className="inline-block text-xs font-bold px-3 py-1 rounded-full mb-4"
+        style={{ background: 'var(--primary-bg)', color: 'var(--primary)' }}
+      >
+        {passage.topic}
+      </span>
+
+      <h1 className="text-2xl font-black mb-2" style={{ color: 'var(--text)' }}>
+        {passage.title}
+      </h1>
+      <p className="text-xs mb-6" style={{ color: 'var(--text-muted)' }}>
+        Select any word or phrase to collect it
+      </p>
+
+      <div ref={contentRef} className="space-y-5 mb-10">
+        {paragraphs.map((para, i) => (
+          <p key={i} className="text-base leading-[1.85]" style={{ color: 'var(--text)', textAlign: 'justify' }}>
+            {para}
+          </p>
+        ))}
+      </div>
+
+      {passage.questions.length > 0 && (
+        <>
+          <div className="border-t mb-8" style={{ borderColor: 'var(--border)' }} />
+          <h2 className="text-lg font-black mb-1" style={{ color: 'var(--text)' }}>
+            Comprehension Questions
+          </h2>
+          <p className="text-sm mb-6" style={{ color: 'var(--text-muted)' }}>
+            Think about your answer, then reveal the explanation.
+          </p>
+          <div className="space-y-3">
+            {passage.questions.map((q, i) => {
+              const isRevealed = revealed.has(i);
+              return (
+                <div
+                  key={i}
+                  className="rounded-2xl overflow-hidden border"
+                  style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}
+                >
+                  <div className="flex gap-3 p-4">
+                    <span
+                      className="shrink-0 w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black"
+                      style={{ background: 'var(--primary-bg)', color: 'var(--primary)' }}
+                    >
+                      {i + 1}
+                    </span>
+                    <p className="text-sm font-semibold leading-relaxed" style={{ color: 'var(--text)' }}>
+                      {q.question}
+                    </p>
+                  </div>
+                  {isRevealed && (
+                    <div className="flex gap-2 px-4 pb-4" style={{ borderTop: '1px solid var(--border)', paddingTop: '12px' }}>
+                      <span className="text-sm shrink-0">💡</span>
+                      <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+                        {q.explanation}
+                      </p>
+                    </div>
+                  )}
+                  <button
+                    onClick={() => {
+                      const next = new Set(revealed);
+                      if (isRevealed) next.delete(i); else next.add(i);
+                      setRevealed(next);
+                    }}
+                    className="w-full py-3 text-sm font-bold transition-colors"
+                    style={{
+                      borderTop: '1px solid var(--border)',
+                      color: 'var(--primary)',
+                      background: isRevealed ? 'var(--surface)' : 'var(--primary-bg)',
+                    }}
+                  >
+                    {isRevealed ? 'Hide explanation' : 'Show explanation'}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
+
+      {/* Collected words tray — fixed at bottom */}
+      {collected.length > 0 && (
+        <div
+          className="fixed bottom-0 left-0 right-0 z-40 px-4 py-3 border-t"
+          style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
+        >
+          <div className="max-w-2xl mx-auto">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-bold" style={{ color: 'var(--text-muted)' }}>
+                {collected.length} collected
+              </span>
+              <button
+                onClick={copyAll}
+                className="text-xs font-bold px-3 py-1.5 rounded-xl transition-all"
+                style={{ background: 'var(--primary)', color: 'white' }}
+              >
+                {copied ? '✓ Copied!' : 'Copy all'}
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {collected.map((item, i) => (
+                <span
+                  key={i}
+                  className="flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full"
+                  style={{ background: 'var(--primary-bg)', color: 'var(--primary)' }}
+                >
+                  {item}
+                  <button
+                    onClick={() => removeCollected(i)}
+                    className="opacity-60 hover:opacity-100 ml-0.5"
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function ReadingPage() {
   const [selected, setSelected] = useState<ReadingPassage | null>(null);
-  const [revealed, setRevealed] = useState<Set<number>>(new Set());
   const [search, setSearch] = useState('');
   const [topic, setTopic] = useState('All');
 
@@ -29,96 +229,7 @@ export default function ReadingPage() {
   }), [search, topic]);
 
   if (selected) {
-    const paragraphs = selected.content.split('\n').map(p => p.trim()).filter(Boolean);
-    return (
-      <div className="max-w-2xl mx-auto px-4 py-6 pb-24">
-        <button
-          onClick={() => { setSelected(null); setRevealed(new Set()); }}
-          className="flex items-center gap-1.5 text-sm mb-6"
-          style={{ color: 'var(--text-muted)' }}
-        >
-          ← Back to Library
-        </button>
-
-        <span
-          className="inline-block text-xs font-bold px-3 py-1 rounded-full mb-4"
-          style={{ background: 'var(--primary-bg)', color: 'var(--primary)' }}
-        >
-          {selected.topic}
-        </span>
-
-        <h1 className="text-2xl font-black mb-6" style={{ color: 'var(--text)' }}>
-          {selected.title}
-        </h1>
-
-        <div className="space-y-5 mb-10">
-          {paragraphs.map((para, i) => (
-            <p key={i} className="text-base leading-[1.85]" style={{ color: 'var(--text)', textAlign: 'justify' }}>
-              {para}
-            </p>
-          ))}
-        </div>
-
-        {selected.questions.length > 0 && (
-          <>
-            <div className="border-t mb-8" style={{ borderColor: 'var(--border)' }} />
-            <h2 className="text-lg font-black mb-1" style={{ color: 'var(--text)' }}>
-              Comprehension Questions
-            </h2>
-            <p className="text-sm mb-6" style={{ color: 'var(--text-muted)' }}>
-              Think about your answer, then reveal the explanation.
-            </p>
-            <div className="space-y-3">
-              {selected.questions.map((q, i) => {
-                const isRevealed = revealed.has(i);
-                return (
-                  <div
-                    key={i}
-                    className="rounded-2xl overflow-hidden border"
-                    style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}
-                  >
-                    <div className="flex gap-3 p-4">
-                      <span
-                        className="shrink-0 w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black"
-                        style={{ background: 'var(--primary-bg)', color: 'var(--primary)' }}
-                      >
-                        {i + 1}
-                      </span>
-                      <p className="text-sm font-semibold leading-relaxed" style={{ color: 'var(--text)' }}>
-                        {q.question}
-                      </p>
-                    </div>
-                    {isRevealed && (
-                      <div className="flex gap-2 px-4 pb-4" style={{ borderTop: '1px solid var(--border)', paddingTop: '12px' }}>
-                        <span className="text-sm shrink-0">💡</span>
-                        <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                          {q.explanation}
-                        </p>
-                      </div>
-                    )}
-                    <button
-                      onClick={() => {
-                        const next = new Set(revealed);
-                        if (isRevealed) next.delete(i); else next.add(i);
-                        setRevealed(next);
-                      }}
-                      className="w-full py-3 text-sm font-bold transition-colors"
-                      style={{
-                        borderTop: '1px solid var(--border)',
-                        color: 'var(--primary)',
-                        background: isRevealed ? 'var(--surface)' : 'var(--primary-bg)',
-                      }}
-                    >
-                      {isRevealed ? 'Hide explanation' : 'Show explanation'}
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          </>
-        )}
-      </div>
-    );
+    return <PassageView passage={selected} onBack={() => setSelected(null)} />;
   }
 
   return (
@@ -188,7 +299,7 @@ export default function ReadingPage() {
             return (
               <button
                 key={passage.id}
-                onClick={() => { setSelected(passage); setRevealed(new Set()); }}
+                onClick={() => setSelected(passage)}
                 className="w-full text-left rounded-2xl px-4 py-3.5 flex items-center gap-3 transition-transform hover:-translate-y-0.5 active:scale-[0.99] animate-heartbeat"
                 style={{
                   background: `linear-gradient(135deg, ${c1}, ${c2})`,
