@@ -45,7 +45,7 @@ export default function ReadingPage() {
         {/* Passage */}
         <div className="space-y-5 mb-10">
           {paragraphs.map((para, i) => (
-            <p key={i} className="text-base leading-[1.85]" style={{ color: 'var(--text)' }}>
+            <p key={i} className="text-base leading-[1.85]" style={{ color: 'var(--text)', textAlign: 'justify' }}>
               {para}
             </p>
           ))}
