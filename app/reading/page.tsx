@@ -18,18 +18,26 @@ const allTopics = ['All', ...Array.from(new Set(readingPassages.map(p => p.topic
 
 type Tooltip = { text: string; x: number; y: number };
 
+const storageKey = (id: number) => `lexivo_collected_${id}`;
+
 function PassageView({ passage, onBack }: { passage: ReadingPassage; onBack: () => void }) {
   const [revealed, setRevealed] = useState<Set<number>>(new Set());
-  const [collected, setCollected] = useState<string[]>([]);
+  const [collected, setCollected] = useState<string[]>(() => {
+    try { return JSON.parse(localStorage.getItem(storageKey(passage.id)) ?? '[]'); }
+    catch { return []; }
+  });
   const [tooltip, setTooltip] = useState<Tooltip | null>(null);
   const [copied, setCopied] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    localStorage.setItem(storageKey(passage.id), JSON.stringify(collected));
+  }, [collected, passage.id]);
 
   const handleSelection = useCallback(() => {
     const sel = window.getSelection();
     const text = sel?.toString().trim();
     if (!text || !sel || sel.rangeCount === 0) { setTooltip(null); return; }
-    // Only capture selections inside the passage content
     const range = sel.getRangeAt(0);
     if (!contentRef.current?.contains(range.commonAncestorContainer)) { setTooltip(null); return; }
     const rect = range.getBoundingClientRect();
