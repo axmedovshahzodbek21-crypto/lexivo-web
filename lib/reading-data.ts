@@ -70,15 +70,37 @@ In conclusion, childhood is a formative stage of life that shapes the person an 
     ],
   },
 
-  // ── Passage 2 ──────────────────────────────────────────────────────────────
-  // {
-  //   id: 2,
-  //   title: '',
-  //   topic: '',
-  //   content: ``,
-  //   questions: [
-  //     { question: '', explanation: '' },
-  //   ],
-  // },
+{
+    id: 2,
+    title: 'Child Care',
+    topic: 'Society & Family',
+    content: `2. Child Care Child care refers to the supervision and nurturing of children, typically from infancy to early school age, by individuals other than the child's parents. It plays a vital role in child development, family life, and modern economies. As more parents engage in full-time work or education, the need for reliable, affordable, and high-quality child care continues to grow. There are several types of child care arrangements. The most common include daycare centers, home-based care, nannies, and relatives providing informal care. Shahzod t.me/mindzod Each option varies in terms of cost, flexibility, quality, and accessibility. For many families, choosing the right child care involves balancing financial limitations with the desire to ensure a safe and stimulating environment for their children. High-quality child care provides more than just supervision—it contributes significantly to a child‘s social, emotional, cognitive, and physical development. In structured child care settings, children engage in activities that promote language skills, early literacy, and social interaction. Exposure to diverse environments and caregivers can also enhance adaptability and emotional intelligence. Governments and researchers recognize the importance of early childhood development, which begins well before formal schooling. Studies consistently show that children who attend quality child care programs are more likely to succeed academically, enjoy better health, and display stronger social skills later in life. As a result, many countries have implemented policies and subsidies to support child care services. However, access to quality child care is uneven, particularly in low-income communities or rural areas. In many countries, child care remains expensive and out of reach for families with limited resources. The cost of full-time child care often rivals or exceeds the average rent or mortgage payment, placing a significant financial burden on working parents—especially single mothers. Child care workers are essential but often underpaid. Despite their responsibility in shaping young minds, many early childhood educators receive low wages and limited benefits. This can lead to high staff turnover, which negatively affects consistency and attachment between children and caregivers. Improving the status and training of child care professionals is a priority for advocates of early childhood education. Health and safety are fundamental components of child care. Facilities must meet strict standards regarding hygiene, nutrition, emergency preparedness, and staff-to child ratios. Licensing, inspections, and background checks are mechanisms used to ensure compliance. During public health crises, such as the COVID-19 pandemic, child care centers had to adapt quickly to minimize risks while continuing to serve essential workers and families. Child care policies vary widely across countries. In Scandinavian nations, child care is often publicly funded and considered a universal right. Countries like Sweden and Norway offer generous parental leave followed by affordable, high quality early education programs. In contrast, countries such as the United States and United Kingdom rely more heavily on private providers, with limited public subsidies. Parental leave is closely related to child care. The availability and duration of paid leave affect when and how parents return to work, and whether they rely on child care services. In some cases, grandparents or extended family step in to help, especially in cultures where multigenerational living is common. Shahzod t.me/mindzod Technology is changing the landscape of child care. Apps and digital platforms allow parents to monitor their child‘s daily activities, communicate with caregivers, and access resources on child development. Some startups offer flexible or on-demand care options, which can be particularly useful for shift workers or freelancers. Yet, not all parents have the same needs or preferences. Some choose to care for their children at home due to cultural, religious, or personal beliefs. Others worry about the emotional impact of long hours in institutional settings. Quality home based care or co-operative arrangements between families are often seen as alternatives that provide both nurturing and structure. In addition to regular child care, after-school programs, summer camps, and early intervention services provide support for working parents and children with special needs. These programs can offer tutoring, sports, arts, and enrichment activities, reducing the risks associated with unsupervised time after school. The debate about who should bear the cost of child care continues. Some argue that governments should fund universal child care as a public good—just like primary education—because of its long-term benefits to society. Others believe that families should be responsible for making their own arrangements without relying on taxpayer support. This debate influences national budgets, election platforms, and labor policies. In conclusion, child care is a crucial aspect of modern life that affects children‘s development, gender equality, and economic productivity. While challenges remain—particularly regarding affordability, accessibility, and quality—investing in child care pays dividends for individuals and society. As the world changes, flexible, inclusive, and well-regulated child care systems will be essential for supporting families and shaping the next generation.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose is to explain the role of child care in child development, family life, and economies, describe its types and benefits, highlight challenges such as cost, access, and worker conditions, compare policies across countries, and emphasize the value of investing in quality, flexible child care systems.',
+      },
+      {
+        question: 'According to the passage, what are the most common types of child care arrangements?',
+        explanation: 'The most common include daycare centers, home-based care, nannies, and relatives providing informal care.',
+      },
+      {
+        question: 'The word uneven in paragraph 5 most likely means',
+        explanation: 'Not equal or fairly distributed, as access to quality child care is particularly limited in low-income communities or rural areas.',
+      },
+      {
+        question: 'What can be inferred about child care workers from the passage?',
+        explanation: 'They are essential for shaping young minds but are often underpaid with low wages and limited benefits, leading to high staff turnover that harms consistency and attachment with children.',
+      },
+      {
+        question: 'According to the passage, how do child care policies in Scandinavian nations differ from those in the United States and United Kingdom?',
+        explanation: 'In Scandinavian nations, child care is often publicly funded and viewed as a universal right, with countries like Sweden and Norway providing generous parental leave and affordable high-quality early education; the United States and United Kingdom rely more on private providers with limited public subsidies.',
+      },
+      {
+        question: 'What can be inferred about the long-term effects of quality child care programs?',
+        explanation: 'Children who attend them are more likely to succeed academically, enjoy better health, and display stronger social skills later in life.',
+      },
+    ],
+  },
 
 ];
