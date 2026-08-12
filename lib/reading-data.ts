@@ -2987,5 +2987,612 @@ In conclusion, cultural heritage is more than old buildings or costumes—it is 
       explanation: 'Preserving cultural heritage strengthens national identity and pride, supports education and research, boosts tourism and economic benefits, and promotes creativity by inspiring artists, designers, and musicians to create new works based on traditional forms.',
     },
   ],
+},{
+    id: 51,
+    title: 'Culture Shock',
+    topic: 'Society & Culture',
+    content: `Culture shock is the emotional and psychological discomfort people experience when they enter a culture very different from their own. Because everyday routines, values, and communication styles suddenly change, people may feel confused, isolated, or overwhelmed. This reaction is common among international students, immigrants, travelers, and even professionals working abroad.
+Culture shock usually happens in four stages:
+1.    Honeymoon stage – At first, people are excited. Everything feels new and interesting. They enjoy the food, language, and customs.
+2.    Frustration stage – After some time, misunderstandings and daily struggles begin. People miss home and may feel irritated or lonely.
+3.    Adjustment stage – Gradually, they start understanding how the new culture works and adapt their behavior.
+4.    Acceptance stage – Finally, they feel more comfortable, make connections, and even appreciate cultural differences.
+Not everyone experiences these stages in the same way, and the process can take weeks or months depending on the individual and the environment. Language is often the biggest challenge. Even if someone speaks the local language, understanding jokes, slang, or social cues can still be difficult. Miscommunication can lead to embarrassment or feelings of isolation. For example, in some cultures, people speak directly; in others, they communicate in more indirect or polite ways. If someone misreads this, they might seem rude or confused.
+Social customs are another major cause of culture shock. In some cultures, it‘s normal to greet strangers with a handshake or eye contact. In others, this could be seen as disrespectful or inappropriate. Because people carry deep habits from their own culture, adjusting to new rules of behavior takes time and effort.
+Food, clothing, weather, and even the pace of life can all be surprising. Some people struggle with unfamiliar meals or eating times. Others may find local clothing uncomfortable or the climate difficult to handle. These small daily differences build up, leading to stress.
+Homesickness adds to the problem. Missing family, friends, and familiar places can make even a positive experience feel difficult. Without strong support, people may become depressed or want to return home. Emotional well-being is closely linked to a sense of belonging.
+However, culture shock is not all negative. It can lead to personal growth, better understanding, and new friendships. When people overcome cultural barriers, they often become more open-minded, flexible, and confident. They learn how to view the world through different eyes.
+Schools, companies, and governments can reduce culture shock through orientation programs, language classes, and support groups. When newcomers are guided through the early stages, they adjust faster and feel more welcomed.
+Technology can also help. Translation apps, video calls, and online communities allow people to stay connected and informed. Still, relying too much on one's own language and culture may slow down the process of adaptation. True cultural understanding requires effort and exposure.
+It‘s also important to respect both cultures—the one you come from and the one you‘re entering. Some people try to reject the new culture completely; others may forget their own traditions to fit in. Neither extreme is healthy. A balanced identity includes pride in your roots and respect for your new environment.
+Discrimination and racism can make culture shock worse. When people face judgment or exclusion, they may feel unsafe or unwanted. Host societies must work toward inclusion and equality if they want to benefit from cultural diversity. In contrast, people in multicultural cities may experience less culture shock because diversity is normal. In places like Toronto, London, or Dubai, encountering different traditions is part of daily life. Exposure to many cultures reduces fear and builds tolerance.
+Reverse culture shock is also real. When people return home after spending time abroad, they may feel out of place. Family and friends may not understand the changes they‘ve gone through. Adapting back to one‘s original culture can be surprisingly difficult.
+In conclusion, culture shock is a natural reaction to a major life change. It involves emotional struggle—but also opportunity. By facing discomfort, people grow stronger and wiser. Understanding culture shock is not just useful for travelers— it‘s essential in an increasingly globalized world.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose of this passage is to explain culture shock as the emotional and psychological discomfort experienced when entering a different culture, describe its four stages, identify major causes such as language barriers and social customs, discuss both negative effects and opportunities for growth, and outline ways to reduce it through support programs, technology, and balanced cultural respect in a globalized world.',
+      },
+      {
+        question: 'According to the passage, what are the four stages of culture shock?',
+        explanation: 'The four stages are the honeymoon stage, where people feel excited about new experiences; the frustration stage, marked by misunderstandings, homesickness, irritation, or loneliness; the adjustment stage, where people begin understanding and adapting to the new culture; and the acceptance stage, where they feel comfortable, make connections, and appreciate cultural differences.',
+      },
+      {
+        question: 'The word \'isolation\' in the passage most likely means?',
+        explanation: 'It most likely means a feeling of being alone or separated from others, as the passage describes how miscommunication can lead to embarrassment or feelings of isolation, and how homesickness and lack of support can make people feel disconnected from their new environment.',
+      },
+      {
+        question: 'What can be inferred about reverse culture shock?',
+        explanation: 'It can be inferred that reverse culture shock occurs when people return home after time abroad and feel out of place because family and friends may not understand the personal changes they have undergone, making readjustment to the original culture surprisingly difficult.',
+      },
+      {
+        question: 'According to the passage, how can schools, companies, and governments help reduce culture shock?',
+        explanation: 'They can reduce culture shock through orientation programs, language classes, and support groups that guide newcomers through the early stages, helping them adjust faster and feel more welcomed.',
+      },
+      {
+        question: 'What can be inferred about the long-term effects of overcoming culture shock?',
+        explanation: 'It can be inferred that overcoming cultural barriers leads to personal growth, as people often become more open-minded, flexible, and confident, learning to view the world through different perspectives and forming new friendships.',
+      },
+    ],
+  },{
+    id: 52,
+    title: 'Art',
+    topic: 'Arts & Culture',
+    content: `Art is a powerful form of human expression. It includes painting, sculpture, music, dance, theatre, film, literature, and even architecture. Because art reflects how people see and feel about the world, it plays a key role in shaping culture, identity, and society.
+Throughout history, art has served many purposes. It has been used to record events, express emotions, question beliefs, and inspire change. From the cave paintings of early humans to digital installations in modern galleries, art continues to evolve while staying deeply personal.
+One of the main debates surrounding art is its value. Some people believe art should be beautiful and enjoyable, while others see it as a tool for political or social commentary. Because beauty is subjective, opinions about what qualifies as "real art" often differ.
+Another question is whether art should be funded by governments. Supporters argue that public funding makes art accessible to everyone, not just the wealthy. It also helps preserve national culture and history. When governments invest in museums, theatres, and cultural programs, they strengthen civic pride and creativity.
+Critics, however, say that public money should focus on essential services like healthcare or education. They argue that artists can find private sponsors or sell their work. This raises the question of whether art is a necessity or a luxury.
+In education, the role of art is also debated. Some schools reduce art classes to focus on science and math, thinking they are more useful for future careers. But research shows that creative subjects improve problem-solving, communication, and emotional intelligence. Students who study art often perform better overall, especially in innovation and teamwork.
+Art is also closely linked to mental health. Creating or experiencing art can reduce stress, improve mood, and build self-confidence. In hospitals and care homes, art therapy is often used to support recovery. Because art helps people express emotions they cannot put into words, it is a powerful healing tool.
+In the digital age, art is more accessible than ever. People can share paintings, music, or short films online with global audiences. At the same time, technology raises new questions about ownership, originality, and copyright. When AI or digital tools create artworks, who owns the result?
+Street art is another example of how the definition of art has expanded. Once considered vandalism, graffiti is now celebrated in major cities as a form of social or political commentary. Artists like Banksy have blurred the line between illegal acts and public expression. This challenges traditional views of where art belongs and who it is for.
+Art can also unite or divide people. It can celebrate cultural identity or challenge existing norms. In times of conflict, art has been used both to protest injustice and to support propaganda. Because it speaks to emotion more than logic, art can influence public opinion more deeply than speeches or statistics.
+Economic value matters, too. The global art market is worth billions of dollars. Famous artworks are sold at auctions for record prices. However, many artists struggle to make a living. The gap between commercial success and creative freedom is often wide.
+Tourism is another factor. Cities with rich artistic histories—like Paris, Florence, or Kyoto—attract millions of visitors every year. Art boosts the local economy, creates jobs, and promotes cultural exchange. Heritage sites, galleries, and festivals all benefit from this connection.
+But commercialization also has its downsides. Some believe that turning art into a product weakens its meaning. When the goal becomes profit, not expression, artistic quality may suffer. Authenticity is sometimes sacrificed for popularity.
+In many societies, art is still under threat. War, censorship, and discrimination silence voices and destroy cultural works. Protecting artistic freedom is essential, not only for artists, but for a healthy, democratic society.
+In conclusion, art is not just decoration—it is reflection, resistance, and identity. Whether it's a mural on a street wall or a symphony in a concert hall, art continues to shape how people feel, think, and connect. As long as humans exist, they will create—and that creation will always matter.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose is to explain the significance of art as a form of human expression, discuss debates about its value and funding, examine its roles in education, mental health, society, and the economy, and emphasize its lasting importance in shaping culture and identity.',
+      },
+      {
+        question: 'According to the passage, what purposes has art served throughout history?',
+        explanation: 'Art has been used to record events, express emotions, question beliefs, and inspire change, evolving from early cave paintings to modern digital installations while remaining deeply personal.',
+      },
+      {
+        question: 'The word \'subjective\' in the third paragraph most likely means...',
+        explanation: 'Based on personal feelings or opinions rather than objective facts. The passage states that because beauty is subjective, opinions about what qualifies as "real art" often differ.',
+      },
+      {
+        question: 'What can be inferred about the debate over government funding of art?',
+        explanation: 'Supporters believe public funding makes art accessible to everyone and preserves culture, while critics argue public money should prioritize essential services like healthcare or education and that artists can seek private sponsors, raising the question of whether art is a necessity or a luxury.',
+      },
+      {
+        question: 'According to the passage, how does studying art benefit students?',
+        explanation: 'Research shows that creative subjects improve problem-solving, communication, and emotional intelligence, and students who study art often perform better overall, especially in innovation and teamwork.',
+      },
+      {
+        question: 'The word \'vandalism\' in the ninth paragraph most likely means...',
+        explanation: 'Deliberate destruction or damage of property. The passage notes that street art and graffiti, once considered vandalism, are now celebrated in major cities as social or political commentary.',
+      },
+      {
+        question: 'What can be inferred about art\'s relationship with mental health?',
+        explanation: 'Creating or experiencing art can reduce stress, improve mood, and build self-confidence; art therapy is used in hospitals and care homes to support recovery because art helps people express emotions they cannot put into words.',
+      },
+      {
+        question: 'According to the passage, what new questions does technology raise about art?',
+        explanation: 'Technology makes art more accessible online but raises questions about ownership, originality, and copyright, including who owns artworks created by AI or digital tools.',
+      },
+      {
+        question: 'What can be inferred about the economic side of art?',
+        explanation: 'The global art market is worth billions and famous works sell for record prices, yet many artists struggle to make a living, creating a wide gap between commercial success and creative freedom; commercialization can also weaken meaning when profit becomes the goal.',
+      },
+      {
+        question: 'According to the passage, why is protecting artistic freedom important?',
+        explanation: 'In many societies art is under threat from war, censorship, and discrimination that silence voices and destroy cultural works; protecting artistic freedom is essential not only for artists but for a healthy, democratic society.',
+      },
+    ],
+  },{
+    id: 53,
+    title: 'History',
+    topic: 'Society & Culture',
+    content: `History is the study of past events, civilizations, cultures, and people. It helps us understand how the world has changed over time and why societies function the way they do today. Because history provides context for current events, it is a key subject in education, politics, and public debate.
+Some believe that history repeats itself. Wars, economic crises, and social conflicts often follow similar patterns. By studying the causes and consequences of past events, people can avoid repeating mistakes. For example, examining the roots of world wars can help prevent future global conflicts.
+Others argue that each historical period is unique. New technology, values, and circumstances mean that past solutions may not work today. While history offers lessons, it cannot predict the future with certainty.
+There are different ways to study history. Some focus on political leaders and major events—wars, revolutions, treaties. Others emphasize the lives of ordinary people: workers, farmers, women, and minorities. This ―bottom-up‖ approach gives a fuller picture of society, not just the actions of the powerful.
+History can be written and interpreted in many ways. Textbooks, films, museums, and monuments often present a selective version of the past. Because history is told by people with different views, it may include bias, omission, or even propaganda. That‘s why it‘s important to study multiple sources and ask critical questions.
+Debates about history are common. In some countries, people argue over how colonialism, slavery, or wars should be remembered. Statues may be removed, holidays renamed, or school curriculums changed. These debates show that history is not just about facts—but about identity and power.
+National history is often used to build pride and unity. Governments highlight achievements and heroic figures to inspire patriotism. While this can create a sense of belonging, it can also lead to nationalism or historical distortion. Glorifying the past without recognizing its problems is dangerous.
+In schools, history helps students develop research and analytical skills. They learn how to read sources, identify causes and effects, and build arguments. These skills are useful beyond the classroom, especially in law, journalism, and politics.
+Some question the practical value of history. They say students should focus on science, business, or technology to get jobs. But history teaches people how to think, not just what to know. Understanding the past helps people make better decisions in the present.
+History also plays a major role in international relations. Disputes between countries often involve historical claims. Conflicts over land, identity, and responsibility are linked to past events. For example, territorial tensions in Asia and Eastern Europe often reference centuries-old history.
+Preserving historical sites and documents is important for cultural memory. Museums, archives, and monuments help people connect with their heritage. When history is lost—through war, neglect, or natural disasters—so is a part of national identity.
+However, not all history is celebrated. Some periods involve shame, injustice, or trauma. Facing this truth can be painful, but it is necessary. Countries that openly discuss their past are often more democratic and inclusive, because they recognize the harm done and aim to improve.
+Digital technology is changing how people access history. Online archives, virtual museums, and podcasts bring the past to life for new audiences. At the same time, misinformation can spread easily. Critical thinking and fact-checking are more important than ever.
+Family history is also popular. Many people research their ancestry through DNA tests or historical records. This personal connection to the past helps individuals understand where they come from, and how their ancestors lived, migrated, or struggled.
+Tourism based on history—like visiting ancient cities, castles, or battlefields—is a growing industry. It brings income and awareness, but also responsibility. Sites must be preserved and explained respectfully, not turned into entertainment.
+In conclusion, history is more than a list of dates and names—it is the story of humanity. To understand who we are and where we are going, we must know where we‘ve been. A society that ignores its past risks losing its future.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose is to explain the importance of history as the study of the past that provides context for the present, discuss different approaches to studying and interpreting it, explore its roles in education, national identity, international relations, and cultural memory, and emphasize that understanding history is essential for making better decisions and shaping a better future.',
+      },
+      {
+        question: 'According to the passage, why do some people believe that history repeats itself?',
+        explanation: 'Wars, economic crises, and social conflicts often follow similar patterns, so by studying the causes and consequences of past events, people can avoid repeating mistakes, such as examining the roots of world wars to help prevent future global conflicts.',
+      },
+      {
+        question: 'The phrase "bottom-up" approach in the fourth paragraph most likely means',
+        explanation: 'In contrast to focusing on political leaders and major events, the bottom-up approach emphasizes the lives of ordinary people such as workers, farmers, women, and minorities, giving a fuller picture of society rather than only the actions of the powerful.',
+      },
+      {
+        question: 'What can be inferred about the interpretation of history from the passage?',
+        explanation: 'It can be inferred that history is often selective and may include bias, omission, or propaganda because it is told by people with different views; therefore, studying multiple sources and asking critical questions is important.',
+      },
+      {
+        question: 'According to the passage, how is national history sometimes used by governments?',
+        explanation: 'Governments highlight achievements and heroic figures to inspire patriotism and build pride and unity; while this can create a sense of belonging, it can also lead to nationalism or historical distortion if the past is glorified without recognizing its problems.',
+      },
+      {
+        question: 'The word "distortion" in the seventh paragraph most likely means',
+        explanation: 'In the context of nationalism or historical distortion from glorifying the past without recognizing its problems, the word means a misleading or inaccurate representation of historical facts.',
+      },
+      {
+        question: 'What can be inferred about the practical value of studying history?',
+        explanation: 'Although some question its practical value compared to science, business, or technology, history teaches people how to think critically, develop research and analytical skills, and understand the past in order to make better decisions in the present.',
+      },
+      {
+        question: 'According to the passage, what role does history play in international relations?',
+        explanation: 'Disputes between countries often involve historical claims, and conflicts over land, identity, and responsibility are linked to past events; for example, territorial tensions in Asia and Eastern Europe often reference centuries-old history.',
+      },
+      {
+        question: 'What can be inferred about countries that openly discuss difficult periods in their past?',
+        explanation: 'It can be inferred that such countries are often more democratic and inclusive because they recognize the harm done in periods of shame, injustice, or trauma and aim to improve, even though facing these truths can be painful.',
+      },
+      {
+        question: 'According to the passage, how is digital technology changing access to history?',
+        explanation: 'Online archives, virtual museums, and podcasts bring the past to life for new audiences, but misinformation can also spread easily, making critical thinking and fact-checking more important than ever.',
+      },
+    ],
+  },{
+    id: 54,
+    title: 'Film',
+    topic: 'Arts & Media',
+    content: `Film is one of the most influential forms of modern art and entertainment. Because it combines storytelling, visuals, music, and performance, film has the unique ability to capture human emotions and spread ideas across cultures and generations.
+Cinema began in the late 19th century as silent black-and-white footage. Over time, it evolved into a multi-billion-dollar global industry. Today, films are produced in nearly every country and shown in cinemas, streamed online, or shared through social media. As technology advanced, so did the power of film to reach global audiences.
+Films can serve many purposes:
+•        Entertainment – People watch films to relax, escape reality, or laugh.
+•        Education – Documentaries and historical dramas can teach facts and raise awareness.
+•        Inspiration – Films can motivate people to change, dream, or take action.
+•        Expression – Directors and writers often use film to explore personal or political themes.
+The impact of film on society is significant. Movies influence fashion, language, values, and behavior. For example, superhero films have shaped how children see bravery and justice. Romantic dramas affect how people think about love. Because film shapes public opinion, it is often used to promote cultural values or challenge stereotypes.
+However, the industry also faces criticism. Some argue that many mainstream films lack originality, relying on predictable plots, violence, or special effects. When profits come before creativity, quality can suffer. Independent films, on the other hand, are often praised for their fresh ideas and deeper messages, even if they reach smaller audiences.
+Hollywood is considered the global center of film, but other industries are growing rapidly. Bollywood in India produces more films per year than any other country. Korean cinema, especially after the global success of films like Parasite, has gained international respect. These industries reflect local culture while competing on a global stage.
+Censorship is a controversial issue. In some countries, governments control which films are shown or edit scenes that they consider immoral or politically sensitive. Supporters say this protects social values, but critics argue it limits artistic freedom. Because film is a form of speech, many believe it should not be restricted.
+Violence and inappropriate content in films are also debated. Some believe watching violent or sexual scenes can affect young viewers negatively. Others say the problem lies not in the content itself, but in poor education or lack of guidance. Parental controls and age ratings can help, but they are not always followed.
+Film also raises questions about cultural representation. Stereotypes and lack of diversity have long been problems. In many movies, certain groups are shown in limited or negative roles. When films fail to reflect real societies, they reinforce inequality. Recently, filmmakers and audiences have demanded better representation in casting and storytelling.
+Streaming services like Netflix, Disney+, and Amazon Prime have transformed the industry. People now watch films at home, anytime. This offers flexibility and access—but also threatens traditional cinemas. Because audiences are moving online, cinemas must adapt to survive.
+Animation is another powerful branch of film. It appeals to both children and adults, and often deals with deep emotional or philosophical topics. Studios like Pixar, Ghibli, and DreamWorks have created classics that continue to shape childhood memories around the world. Animation proves that film is not limited by age, language, or realism.
+Film festivals also play an important role. Events like Cannes, Sundance, and the Venice Film Festival celebrate artistic cinema and give a platform to new voices. Winning awards at these festivals can launch careers and bring attention to hidden stories. They remind the world that film is not just business—it is art.
+Making a film involves many roles: director, writer, actor, editor, composer, set designer, and more. It is a team effort requiring creativity, technical skill, and vision. The success of a film depends not just on the story—but on how it is told.
+In conclusion, film is more than just entertainment. It is a mirror of society, a tool for education, and a global language. As technology and culture continue to change, film will continue to shape and reflect the human experience.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The passage explores the history, purposes, social impact, criticisms, global industries, and evolving forms of film, concluding that it is a mirror of society and a global language that shapes human experience.',
+      },
+      {
+        question: 'According to the passage, what purposes can films serve?',
+        explanation: 'Films can serve as entertainment for relaxation and escape, education through documentaries and historical dramas, inspiration to motivate change, and expression for exploring personal or political themes.',
+      },
+      {
+        question: 'The word "mainstream" in the fifth paragraph most likely means',
+        explanation: 'In context, mainstream refers to popular, widely distributed commercial films that often prioritize profits and may rely on predictable plots, violence, or special effects rather than originality.',
+      },
+      {
+        question: 'What can be inferred about independent films from the passage?',
+        explanation: 'Independent films are often praised for their fresh ideas and deeper messages, even though they typically reach smaller audiences compared to mainstream productions.',
+      },
+      {
+        question: 'According to the passage, how has Korean cinema gained international recognition?',
+        explanation: 'Korean cinema gained international respect especially after the global success of films like Parasite, reflecting local culture while competing on the world stage.',
+      },
+      {
+        question: 'What can be inferred about the debate over film censorship?',
+        explanation: 'Supporters of censorship believe it protects social values by controlling immoral or politically sensitive content, while critics argue it restricts artistic freedom because film is a form of speech.',
+      },
+      {
+        question: 'According to the passage, what problems exist regarding cultural representation in films?',
+        explanation: 'Stereotypes and lack of diversity have long been issues, with certain groups shown in limited or negative roles, which can reinforce inequality when films fail to reflect real societies.',
+      },
+      {
+        question: 'The word "transformed" in the tenth paragraph most likely means',
+        explanation: 'In context, transformed means that streaming services have fundamentally changed the film industry by enabling people to watch movies at home anytime, offering flexibility while threatening traditional cinemas.',
+      },
+      {
+        question: 'What can be inferred about the role of film festivals?',
+        explanation: 'Film festivals such as Cannes, Sundance, and Venice celebrate artistic cinema, provide platforms for new voices, can launch careers, and emphasize that film is art as well as business.',
+      },
+      {
+        question: 'According to the passage, why is animation considered a powerful branch of film?',
+        explanation: 'Animation appeals to both children and adults, often addresses deep emotional or philosophical topics, and is not limited by age, language, or realism, as shown by studios like Pixar, Ghibli, and DreamWorks.',
+      },
+    ],
+  },{
+    id: 55,
+    title: 'Tourism',
+    topic: 'Society & Culture',
+    content: `Tourism is one of the world‘s largest industries, contributing significantly to global employment, culture exchange, and economic growth. Because millions of people travel across borders every year, tourism has the power to shape economies, environments, and societies.
+There are many types of tourism—leisure, cultural, adventure, religious, medical, and ecotourism. Some people travel to relax on beaches, while others seek historic landmarks, religious sites, or extreme experiences. The reasons people travel may differ, but the impact of tourism is global.
+One of the main advantages of tourism is economic. When tourists spend money on hotels, food, transportation, and entertainment, they support local businesses. In developing countries, tourism creates jobs and stimulates development, especially in areas with few other industries.
+Cultural exchange is another key benefit. Tourism allows people to experience different ways of life, learn new languages, and understand other traditions. Because travel brings people together, it promotes tolerance, cooperation, and global awareness.
+However, tourism also brings serious challenges. Mass tourism can damage natural environments. Crowds, pollution, and litter harm fragile ecosystems. When too many visitors enter protected areas, plants and animals may be disturbed or destroyed. The beauty that attracts tourists can quickly disappear if not managed properly.
+Cultural heritage sites are also at risk. Historical buildings and sacred places can be damaged by careless visitors. In some cases, traditional customs may be turned
+into performances to please tourists, losing their meaning. This process, known as cultural commodification, threatens the authenticity of local cultures.
+Over-tourism is a growing concern in popular cities like Venice, Barcelona, and Kyoto. Local residents may be pushed out of their neighborhoods as property prices rise and short-term rentals increase. When tourism takes over everyday life, quality of life for locals suffers.
+To solve these issues, many cities and countries are promoting sustainable tourism—a model that balances economic growth with environmental protection and cultural respect. This includes limiting visitor numbers, encouraging ecofriendly travel, and involving local communities in tourism planning. If tourism is to last, it must be managed responsibly.
+Technology is changing how people travel. Booking platforms, travel blogs, and digital maps make it easier to plan trips. Social media also plays a major role. When people post pictures online, they often influence others to visit the same places. This can cause sudden waves of tourists in previously unknown areas.
+The COVID-19 pandemic had a massive impact on tourism. Borders were closed, flights canceled, and millions of jobs lost. While travel is now recovering, the crisis forced the industry to rethink its approach. There is now a stronger focus on health, safety, and sustainability.
+Local tourism is gaining popularity. More people are choosing to explore their own countries rather than travel abroad. This reduces environmental damage and supports local economies. Because domestic travel is often cheaper and easier, it may become a long-term trend.
+Tourism also plays a role in diplomacy and international image. Countries often use advertising to promote their culture, nature, and hospitality. Hosting global events like the Olympics or World Expo can attract millions of visitors. This form of ―soft power‖ strengthens international relationships.
+Education and awareness are key to improving tourism. Tourists must be taught how to respect local customs, behave in sensitive areas, and minimize waste. Governments and businesses must also ensure that tourism benefits all parts of society—not just the wealthy or urban areas. Only then can tourism be truly inclusive.
+Some argue that tourism is a modern form of colonialism. Wealthy tourists from developed nations often visit poorer regions, spending little time understanding the local culture. If tourism becomes a one-sided relationship, it can reinforce stereotypes and inequality instead of breaking them.
+In conclusion, tourism can be a force for good—but only if managed wisely. It brings income, connection, and knowledge—but also pressure, pollution, and risk. The challenge is not to stop tourism, but to shape it in a way that respects people, protects places, and promotes peace.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The passage describes the economic, cultural, and social benefits of tourism, examines its environmental and social challenges including over-tourism and cultural commodification, discusses sustainable approaches and the impact of technology and the pandemic, and concludes that tourism must be managed responsibly to respect people and places.',
+      },
+      {
+        question: 'According to the passage, what is one of the main advantages of tourism?',
+        explanation: 'The passage states that one of the main advantages is economic, as tourist spending on hotels, food, transportation, and entertainment supports local businesses and creates jobs, especially in developing countries.',
+      },
+      {
+        question: 'The term \"cultural commodification\" in the passage most likely means',
+        explanation: 'The passage explains that cultural commodification occurs when traditional customs are turned into performances to please tourists, causing them to lose their meaning and threatening the authenticity of local cultures.',
+      },
+      {
+        question: 'What can be inferred about the effects of mass tourism on the environment?',
+        explanation: 'The passage notes that mass tourism can damage natural environments through crowds, pollution, and litter, and that excessive visitors to protected areas may disturb or destroy plants and animals, potentially destroying the beauty that attracts tourists.',
+      },
+      {
+        question: 'According to the passage, what problems does over-tourism create for local residents?',
+        explanation: 'The passage states that in cities like Venice, Barcelona, and Kyoto, local residents may be pushed out of their neighborhoods as property prices rise and short-term rentals increase, harming their quality of life.',
+      },
+      {
+        question: 'The word \"sustainable\" in the phrase \"sustainable tourism\" most likely means',
+        explanation: 'In context, sustainable tourism refers to a model that balances economic growth with environmental protection and cultural respect, including limiting visitor numbers and involving local communities.',
+      },
+      {
+        question: 'What can be inferred about the impact of the COVID-19 pandemic on the tourism industry?',
+        explanation: 'The passage explains that borders were closed, flights canceled, and millions of jobs lost, and that the crisis forced the industry to rethink its approach with a stronger focus on health, safety, and sustainability.',
+      },
+      {
+        question: 'According to the passage, why is local or domestic tourism gaining popularity?',
+        explanation: 'The passage states that more people are choosing to explore their own countries, which reduces environmental damage, supports local economies, and is often cheaper and easier, potentially becoming a long-term trend.',
+      },
+      {
+        question: 'What can be inferred about the role of social media in tourism?',
+        explanation: 'The passage notes that when people post pictures online they often influence others to visit the same places, which can cause sudden waves of tourists in previously unknown areas.',
+      },
+      {
+        question: 'According to the passage, what is required for tourism to be truly inclusive?',
+        explanation: 'The passage states that governments and businesses must ensure tourism benefits all parts of society—not just the wealthy or urban areas—and that education and awareness about respecting local customs and minimizing waste are also key.',
+      },
+    ],
+  },{
+    id: 56,
+    title: 'Festivals',
+    topic: 'Society & Culture',
+    content: `Festivals are a vital part of human culture. They are special occasions that bring communities together to celebrate religion, tradition, history, or national pride. Because festivals are repeated regularly, they create a shared rhythm of life and strengthen social bonds.
+Festivals can be religious, seasonal, cultural, or even political. For example:
+•        Religious festivals like Eid, Christmas, or Diwali mark sacred events and promote spiritual reflection.
+•        Seasonal festivals such as Nowruz or harvest celebrations recognize the changes in nature and honor agricultural life.
+•        National festivals like Independence Day or Constitution Day foster unity and patriotism.
+•        Modern events like film festivals, music festivals, or food fairs showcase art and innovation.
+Each festival has its own unique customs, foods, clothing, and rituals. These cultural elements keep traditions alive and pass them to future generations. Because of this, festivals are essential in preserving heritage.
+One key benefit of festivals is community engagement. They give people a chance to gather, relax, and celebrate their identity. In a world where digital life often replaces real connections, festivals remind us of the value of face-to-face joy and shared experience.
+Economically, festivals can support local businesses, attract tourism, and create jobs. Hotels, restaurants, performers, and shops all benefit during large-scale events. This economic boost is especially valuable in rural areas, where festivals may be the main attraction of the year.
+However, festivals also come with challenges. Large crowds can lead to traffic, pollution, and noise. Waste management becomes difficult when thousands gather in one place. If events are not well organized, they may harm the environment and disrupt daily life.
+Religious festivals, in particular, can sometimes create division if they are not inclusive. When one group‘s celebration ignores or disrespects others, tension can rise in multicultural societies. Organizers must ensure that festivals bring people together—not drive them apart.
+Another issue is commercialization. As festivals become more popular, businesses often turn them into profit-making events. Traditional practices may be replaced by advertisements, concerts, and mass-produced goods. When cultural meaning is replaced by commercial interest, the original purpose of the festival may fade.
+Globalization has both enriched and changed festivals. On one hand, people around the world can now learn about and participate in different cultural celebrations. For instance, Halloween and Valentine‘s Day are celebrated in many countries outside their origin. On the other hand, global influence may weaken local customs, especially among younger generations who follow international trends.
+Modern festivals are also increasingly digital. People post photos, livestream ceremonies, or attend virtual events. This can help preserve traditions during times like the COVID-19 pandemic, but it also raises questions about authenticity. Is a digital celebration the same as a real one?
+Despite these challenges, festivals continue to play a powerful role in shaping identity and social values. They remind people of their history, beliefs, and shared future. Even in times of crisis or conflict, festivals provide hope, unity, and a break from routine.
+Schools and educators often use festivals to teach cultural awareness. By explaining the meaning behind holidays from different traditions, students develop respect and understanding. This helps reduce prejudice and builds stronger, more inclusive communities.
+Governments and cultural organizations must protect traditional festivals. Funding, space, and media coverage are all tools they can use to promote local events. Because once a tradition disappears, it is hard to revive.
+In multicultural societies, celebrating festivals from various backgrounds builds harmony. Public events that include different cultural performances, foods, and music allow everyone to share their heritage. This not only educates the public but also strengthens social unity.
+In conclusion, festivals are more than just fun—they are culture in action. They reflect values, preserve identity, and bring people together across time and space. To keep festivals meaningful in the modern world, we must balance celebration with respect, tradition with innovation, and joy with responsibility.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose is to explain the cultural importance of festivals, their various types and benefits, the challenges they face such as commercialization and environmental impact, and the need to preserve their meaning in modern society.',
+      },
+      {
+        question: 'According to the passage, how do festivals help preserve heritage?',
+        explanation: 'Festivals preserve heritage by featuring unique customs, foods, clothing, and rituals that keep traditions alive and pass them on to future generations.',
+      },
+      {
+        question: 'The word "rhythm" in the first paragraph most likely means...',
+        explanation: 'In the context of the passage, "rhythm" means a regular pattern or recurring cycle of life created by the repeated celebration of festivals.',
+      },
+      {
+        question: 'What can be inferred about the economic impact of festivals?',
+        explanation: 'It can be inferred that festivals provide significant economic benefits by supporting local businesses, attracting tourism, creating jobs, and offering a major boost especially in rural areas.',
+      },
+      {
+        question: 'According to the passage, what challenges can large festivals create?',
+        explanation: 'Large festivals can lead to traffic, pollution, noise, and difficulties with waste management; if poorly organized, they may harm the environment and disrupt daily life.',
+      },
+      {
+        question: 'The word "commercialization" in the eighth paragraph most likely means...',
+        explanation: 'In the context of the passage, "commercialization" refers to the process of turning festivals into profit-making events where traditional practices are replaced by advertisements and mass-produced goods.',
+      },
+      {
+        question: 'What can be inferred about the effect of globalization on festivals?',
+        explanation: 'It can be inferred that globalization allows people worldwide to experience different cultural celebrations but may also weaken local customs, particularly among younger generations following international trends.',
+      },
+      {
+        question: 'According to the passage, how can schools use festivals?',
+        explanation: 'Schools and educators use festivals to teach cultural awareness by explaining the meaning behind holidays from different traditions, helping students develop respect, reduce prejudice, and build inclusive communities.',
+      },
+      {
+        question: 'What can be inferred about digital festivals?',
+        explanation: 'It can be inferred that digital formats such as livestreams and virtual events can help preserve traditions during crises like the COVID-19 pandemic, but they raise questions about whether they offer the same authenticity as in-person celebrations.',
+      },
+      {
+        question: 'According to the passage, what is needed to keep festivals meaningful in the modern world?',
+        explanation: 'To keep festivals meaningful, society must balance celebration with respect, tradition with innovation, and joy with responsibility while protecting traditional events through funding, space, and media coverage.',
+      },
+    ],
+  },{
+    id: 57,
+    title: 'Astrology',
+    topic: 'Beliefs & Culture',
+    content: `Astrology is the belief that the positions and movements of celestial bodies—such as stars, planets, and the moon—can influence human behavior, personality, and life events. Because astrology connects human life with the universe, it has fascinated people for thousands of years.
+Astrology dates back to ancient civilizations such as Babylon, Egypt, and Greece.
+Early astronomers observed patterns in the sky and linked them to events on Earth. For example, eclipses were believed to predict wars or natural disasters. In many cultures, rulers used astrologers to guide decisions, including when to go to war or whom to marry.
+One of the most popular forms of astrology is the zodiac system. It divides the year into twelve signs, each associated with certain traits. People born under Aries, for example, are said to be energetic and bold, while those under Cancer are thought to be emotional and caring. Daily horoscopes use these signs to make predictions about relationships, careers, or health.
+Despite its popularity, astrology is highly controversial. Scientists generally reject astrology as a pseudoscience—a belief system that lacks empirical evidence. Because astrological claims cannot be consistently tested or proven, many experts argue it has no scientific basis.
+Still, millions of people believe in astrology. Some read horoscopes daily or consult astrologers before making important choices. For them, astrology provides comfort, guidance, and a sense of control. In a world full of uncertainty, looking to the stars offers emotional support.
+Astrology also plays a role in culture and identity. In places like India and China, astrological systems are deeply connected to religion and tradition. For example, Hindu astrology (Jyotish) is used to plan weddings and name children. In many Asian countries, people avoid certain dates or colors based on their birth charts.
+The rise of social media has made astrology even more popular, especially among young people. Platforms like Instagram, TikTok, and YouTube feature content about zodiac signs, compatibility, and personality types. Astrology memes and posts often go viral, turning ancient beliefs into modern entertainment.
+However, some critics argue that astrology encourages irrational thinking. People may base serious life choices—like quitting a job or ending a relationship—on vague predictions. When personal responsibility is replaced by superstition, critical thinking can suffer.
+Others say astrology can be used as a tool for self-reflection. Even if the predictions are not accurate, reading about personality traits or life patterns may help people think about their emotions and goals. Because astrology invites people to ask questions about themselves, it can promote self-awareness.
+The Barnum effect explains why astrology often feels accurate. It refers to the tendency to accept vague, general statements as personal truths. For example, ―You often feel misunderstood‖ or ―You are sometimes shy, but can also be outgoing‖ could apply to almost anyone. Because horoscopes are written to sound specific yet universal, people often believe they are true.
+There is also a commercial side to astrology. Books, apps, personal chart readings, and jewelry based on zodiac signs generate significant income. Some companies target consumers based on their birth signs or astrological preferences. This blend of belief and business can raise ethical concerns.
+In education, astrology is not taught as science, but it appears in literature, history, and cultural studies. Famous writers like Shakespeare and Dante referenced astrology in their work. Understanding astrology can help students analyze historical beliefs and cultural symbolism.
+In medicine, astrology has no proven role. Some people use ―medical astrology‖ to explain health issues or choose treatment times, but mainstream doctors warn that this can delay proper care. Health decisions should be based on science—not the stars.
+In conclusion, astrology continues to attract strong interest and strong criticism. It blends tradition, belief, psychology, and pop culture into one complex system. Whether seen as spiritual guidance or superstition, astrology reflects a deep human desire to find meaning in the universe..`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose of the passage is to explore astrology as an ancient belief system connecting celestial bodies to human life, discussing its history, popularity, cultural role, scientific criticism, psychological appeal, and modern commercial and social aspects.',
+      },
+      {
+        question: 'According to the passage, what is the zodiac system?',
+        explanation: 'According to the passage, the zodiac system is one of the most popular forms of astrology that divides the year into twelve signs, each associated with certain personality traits, and is used in daily horoscopes to make predictions about relationships, careers, or health.',
+      },
+      {
+        question: 'The word "pseudoscience" in the fifth paragraph most likely means',
+        explanation: 'In the context of the fifth paragraph, "pseudoscience" means a belief system that lacks empirical evidence and cannot be consistently tested or proven, which is how scientists generally classify astrology.',
+      },
+      {
+        question: 'What can be inferred about why many people continue to believe in astrology?',
+        explanation: 'It can be inferred that astrology provides comfort, guidance, and a sense of control in an uncertain world, offering emotional support that keeps millions of people engaged with horoscopes and astrologers despite scientific rejection.',
+      },
+      {
+        question: 'According to the passage, how has social media affected astrology?',
+        explanation: 'According to the passage, the rise of social media has made astrology more popular especially among young people, with platforms like Instagram, TikTok, and YouTube featuring zodiac content that often goes viral and turns ancient beliefs into modern entertainment.',
+      },
+      {
+        question: 'The term "Barnum effect" in the eleventh paragraph most likely refers to',
+        explanation: 'In the context of the eleventh paragraph, the Barnum effect refers to the tendency to accept vague, general statements as highly personal truths, which explains why horoscopes often feel accurate even though they could apply to almost anyone.',
+      },
+      {
+        question: 'What can be inferred about the use of astrology in cultures like India and China?',
+        explanation: 'It can be inferred that astrology is deeply integrated into religion and tradition in places like India and China, where systems such as Hindu astrology (Jyotish) guide important decisions like planning weddings, naming children, and avoiding certain dates or colors based on birth charts.',
+      },
+      {
+        question: 'According to the passage, why do some critics argue that astrology can be harmful?',
+        explanation: 'According to the passage, critics argue that astrology encourages irrational thinking by leading people to base serious life choices on vague predictions, which can replace personal responsibility with superstition and weaken critical thinking.',
+      },
+      {
+        question: 'What can be inferred about the commercial aspect of astrology?',
+        explanation: 'It can be inferred that astrology has become a significant business generating income through books, apps, chart readings, and jewelry, with companies targeting consumers by birth signs, raising ethical concerns about blending belief with commerce.',
+      },
+      {
+        question: 'According to the passage, what is the recommended basis for health decisions?',
+        explanation: 'According to the passage, health decisions should be based on science rather than the stars, as mainstream doctors warn that relying on medical astrology can delay proper care and astrology has no proven role in medicine.',
+      },
+    ],
+  },{
+    id: 58,
+    title: 'Fame',
+    topic: 'Society & Culture',
+    content: `Fame is the state of being widely known by the public, often due to achievements in entertainment, sports, politics, or social media. Because fame brings attention, influence, and money, it has become one of the most desired goals in modern society.
+Traditionally, people became famous through talent, hard work, or leadership. Artists, writers, scientists, and national leaders were respected for their contributions. In contrast, today‘s fame is often instant and based on appearance, controversy, or viral content. Reality TV stars and social media influencers can gain millions of followers overnight—with little proven skill.
+The rise of the internet has changed the path to fame. Platforms like YouTube,
+Instagram, TikTok, and Twitter allow anyone to broadcast themselves to the world. Because fame is now more accessible, it has lost some of its mystery and value.
+Being ―famous‖ does not always mean being respected. Fame can bring many benefits:
+•        Financial success – Celebrities often earn large amounts through sponsorships, brand deals, and product lines.
+•        Social influence – Public figures can raise awareness, promote causes, or influence trends and behaviors.
+•        Opportunities – Fame opens doors to travel, meet powerful people, and access elite circles.
+However, fame also comes with heavy costs. Privacy disappears, as every move may be captured by cameras or shared online. Rumors, false stories, and public criticism can affect mental health. The pressure to stay relevant and perfect can become overwhelming, especially for young or unprepared individuals.
+Famous people often face unrealistic expectations. The public may view them as role models or expect them to act in a certain way. When they fail to meet these standards, they are judged harshly. Even small mistakes can lead to public backlash or ―cancel culture.‖
+Children and teenagers are especially influenced by fame. Many dream of becoming famous rather than becoming teachers, doctors, or engineers. Because fame is often linked to luxury and excitement, it may appear more attractive than traditional careers. But few understand the sacrifices involved.
+Media plays a major role in shaping ideas about fame. Magazines, websites, and TV shows often celebrate celebrity lifestyles, showing luxury, beauty, and success. This creates unrealistic comparisons, leading to dissatisfaction or envy among viewers.
+In some cultures, fame is tied to social status. Families may encourage children to enter sports or entertainment to gain recognition. However, this can place pressure on young people, pushing them into careers they may not truly enjoy.
+Not all famous people enjoy being in the spotlight. Some actors, writers, and athletes prefer privacy and try to avoid public attention. Fame can be accidental or unwanted, especially for those involved in news scandals or tragedies.
+There is also a difference between short-term and long-term fame. Viral fame— such as becoming a meme or trending online—often disappears quickly. In contrast, those who build their reputation through years of work tend to be remembered longer.
+Society often confuses fame with value. Just because someone is well-known does not mean they are important or wise. This creates a dangerous situation, where people with no expertise are given a platform to influence public opinion.
+On the other hand, some use fame responsibly. Celebrities who speak about mental health, social justice, or education can make a real difference. When fame is used for good, it becomes a powerful tool for change.
+In education, fame can be both a distraction and a topic for discussion. Teachers can help students understand the difference between meaningful success and superficial popularity. Critical thinking is essential in a world full of influencers and filtered images.
+In conclusion, fame is a double-edged sword. It offers rewards—but also risks. In a time where anyone can become famous, it‘s more important than ever to ask: Famous for what? and At what cost? Real value comes not from being seen—but from what you give to the world.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose of the passage is to examine the nature of fame in modern society, contrasting traditional and contemporary paths to fame, listing its benefits and heavy costs, discussing its influence on young people and media, distinguishing short-term from long-term fame, and concluding that fame is a double-edged sword whose real value lies in what one contributes rather than mere visibility.',
+      },
+      {
+        question: 'According to the passage, how has the path to fame changed with the rise of the internet?',
+        explanation: 'According to the passage, platforms like YouTube, Instagram, TikTok, and Twitter allow anyone to broadcast themselves to the world, making fame more accessible and causing it to lose some of its mystery and value; today‘s fame is often instant and based on appearance, controversy, or viral content rather than proven skill.',
+      },
+      {
+        question: 'The phrase "cancel culture" in the passage most likely refers to',
+        explanation: 'In the passage, "cancel culture" refers to the harsh public judgment and backlash that can result even from small mistakes when famous people fail to meet the unrealistic expectations placed on them as role models.',
+      },
+      {
+        question: 'What can be inferred about the costs of fame?',
+        explanation: 'It can be inferred that fame brings heavy costs including the loss of privacy, exposure to rumors and public criticism that can harm mental health, and overwhelming pressure to stay relevant and perfect, especially for young or unprepared individuals.',
+      },
+      {
+        question: 'According to the passage, what benefits can fame bring?',
+        explanation: 'According to the passage, fame can bring financial success through sponsorships, brand deals, and product lines; social influence that allows public figures to raise awareness, promote causes, or influence trends; and opportunities such as travel, meeting powerful people, and accessing elite circles.',
+      },
+      {
+        question: 'What can be inferred about the difference between short-term and long-term fame?',
+        explanation: 'It can be inferred that short-term or viral fame, such as becoming a meme or trending online, often disappears quickly, whereas those who build their reputation through years of work tend to be remembered longer and achieve more lasting recognition.',
+      },
+      {
+        question: 'According to the passage, how does media shape ideas about fame?',
+        explanation: 'According to the passage, magazines, websites, and TV shows often celebrate celebrity lifestyles by showing luxury, beauty, and success, which creates unrealistic comparisons and can lead to dissatisfaction or envy among viewers.',
+      },
+      {
+        question: 'The word "superficial" in the education paragraph most likely means',
+        explanation: 'In the context of the passage, "superficial" most likely means shallow or lacking depth, as teachers are encouraged to help students distinguish between meaningful success and superficial popularity in a world full of influencers and filtered images.',
+      },
+      {
+        question: 'What can be inferred about the relationship between fame and value?',
+        explanation: 'It can be inferred that society often confuses fame with value, mistakenly equating being well-known with being important or wise, which creates a dangerous situation in which people with no expertise are given platforms to influence public opinion.',
+      },
+      {
+        question: 'According to the passage, when can fame become a powerful tool for change?',
+        explanation: 'According to the passage, fame becomes a powerful tool for change when it is used responsibly, such as when celebrities speak about mental health, social justice, or education and thereby make a real difference.',
+      },
+    ],
+  },{
+  id: 59,
+  title: 'Generation Gap',
+  topic: 'Society & Culture',
+  content: `The generation gap refers to the differences in beliefs, values, habits, and communication styles between people of different age groups. Because each generation grows up with different experiences and technologies, misunderstandings often arise between parents and children, teachers and students, or older and younger workers.
+Generations are often shaped by the major events of their youth. For example:
+•        People born after World War II grew up with radio and printed newspapers.
+•        Those born in the 1980s and 1990s experienced the rise of the internet.  Today‘s teenagers have never known a world without smartphones and social media.
+Because each generation is influenced by different tools and problems, they develop unique attitudes toward education, work, relationships, and authority.
+Communication is one of the biggest issues. Older people often prefer face-to-face conversations or phone calls. Younger generations rely more on texting, voice messages, or social media. This can create the impression that young people are impatient or disrespectful, even when that is not the case.
+Values and priorities also differ. Many older people value stability, loyalty, and hard work. They often expect respect for hierarchy and tradition. In contrast, younger generations may prioritize flexibility, self-expression, and equality. These opposing views can lead to conflict in both families and workplaces.
+For example, parents may expect their children to follow a traditional career path—doctor, engineer, or lawyer. But young people might choose creative fields, start-ups, or freelance jobs. Because the economy and job market have changed, old advice may not work anymore.
+Technology widens the gap further. Older people may struggle to adapt to new tools or feel left behind. Some even see modern habits—like spending hours online—as lazy or harmful. Younger generations, however, see technology as essential, not just for entertainment but for learning, social life, and even activism. Despite these challenges, the generation gap is not always negative. It can lead to dialogue, growth, and innovation—if approached with mutual respect. Older people bring experience, while younger ones bring new ideas. When both sides listen, progress happens.
+In the workplace, multigenerational teams are becoming more common. Employers must learn to manage different expectations. While some workers value job security, others prefer work–life balance or remote options. Understanding these needs can improve cooperation.
+Education systems also reflect the generation gap. Teachers trained decades ago may struggle to engage students raised on fast, interactive media. Because attention spans and learning styles have changed, traditional methods may need to evolve. Culture and fashion can also cause tension. Music, clothing, slang, and opinions about dating or marriage often differ sharply. Older people may view modern behavior as rude or shallow, while the young may see elders as strict or out of touch.
+Media plays a role, too. News reports often portray young people as lazy or addicted to screens, while older people are described as stubborn or resistant to change. These stereotypes increase misunderstanding, instead of encouraging empathy.
+Bridging the generation gap requires effort from both sides. Young people must understand that older generations were shaped by hardship, war, or poverty. Elders must accept that change is part of life. When both generations show patience and curiosity, mutual understanding becomes possible.
+Family traditions can help connect generations. Sharing stories, cooking meals together, or celebrating holidays builds bonds. Schools can also encourage intergenerational projects, such as interviews or mentoring programs. These activities reduce prejudice and build mutual respect.
+Some cultures manage the generation gap better. In many Asian and African societies, elders are respected and cared for. Their wisdom is seen as valuable, not outdated. In contrast, in some Western countries, older people may be isolated or ignored.
+Migration adds another layer. Children born in a new country may adopt different values and languages than their parents. This creates not just a generation gap—but a cultural one, leading to identity conflict within families.
+In conclusion, the generation gap is a natural part of social evolution. It reflects how the world changes—and how people adapt to it. While it may create tension, it also offers a chance to learn, connect, and grow together.`,
+  questions: [
+    {
+      question: 'What is the main purpose of this passage?',
+      explanation: 'The main purpose of the passage is to explain the generation gap as differences in beliefs, values, habits, and communication styles between age groups, explore its causes such as technology and life experiences, describe its effects in families, workplaces, and education, and show that it can be bridged through mutual respect and understanding.',
+    },
+    {
+      question: 'According to the passage, how are generations shaped?',
+      explanation: 'According to the passage, generations are often shaped by the major events and technologies of their youth; for example, people born after World War II grew up with radio and newspapers, those born in the 1980s and 1990s experienced the rise of the internet, and today\'s teenagers have never known a world without smartphones and social media.',
+    },
+    {
+      question: 'The word "hierarchy" in the paragraph about values most likely means',
+      explanation: 'In the context of the passage, "hierarchy" most likely means a system of ranking or levels of authority, as older people are described as expecting respect for hierarchy and tradition in contrast to younger generations who may prioritize equality.',
+    },
+    {
+      question: 'What can be inferred about communication differences between generations?',
+      explanation: 'It can be inferred that differences in preferred communication methods—face-to-face or phone calls for older people versus texting, voice messages, or social media for younger ones—can create the false impression that young people are impatient or disrespectful even when that is not intended.',
+    },
+    {
+      question: 'According to the passage, why may traditional career advice from parents no longer work?',
+      explanation: 'According to the passage, traditional career advice may no longer work because the economy and job market have changed, leading young people to choose creative fields, start-ups, or freelance jobs instead of traditional paths such as doctor, engineer, or lawyer.',
+    },
+    {
+      question: 'What can be inferred about the generation gap in the workplace?',
+      explanation: 'It can be inferred that multigenerational teams require employers to manage different expectations—some workers value job security while others prefer work–life balance or remote options—and that understanding these needs can improve cooperation.',
+    },
+    {
+      question: 'The word "stereotypes" in the paragraph about media most likely means',
+      explanation: 'In the context of the passage, "stereotypes" most likely means oversimplified and fixed ideas about groups of people, as the text states that media portrayals of young people as lazy or screen-addicted and older people as stubborn increase misunderstanding rather than encouraging empathy.',
+    },
+    {
+      question: 'According to the passage, how can the generation gap be bridged?',
+      explanation: 'According to the passage, bridging the gap requires effort from both sides: young people must understand that older generations were shaped by hardship, war, or poverty, while elders must accept that change is part of life, and both should show patience and curiosity.',
+    },
+    {
+      question: 'What can be inferred about cultural differences in managing the generation gap?',
+      explanation: 'It can be inferred that some cultures, particularly many Asian and African societies, manage the generation gap better by respecting and caring for elders and valuing their wisdom, whereas in some Western countries older people may be isolated or ignored.',
+    },
+    {
+      question: 'According to the passage, how does migration affect the generation gap?',
+      explanation: 'According to the passage, migration adds another layer because children born in a new country may adopt different values and languages than their parents, creating not just a generation gap but also a cultural one that can lead to identity conflict within families.',
+    },
+  ],
+},{
+  id: 60,
+  title: 'Pets',
+  topic: 'Animals & Society',
+  content: `Keeping pets is a common practice around the world. Whether one lives in a busy city or a rural village, people often form strong emotional bonds with animals. Dogs, cats, birds, fish, and even reptiles can become part of the family. Although motivations for owning pets vary, the emotional, social, and health-related benefits are widely recognized.
+Many people view pets as companions, not property. This shift in perspective reflects broader changes in how humans interact with animals. In many societies, pets now receive medical care, special diets, toys, and emotional support— treatment that was once reserved for humans. Because people are living more isolated lives, especially in urban settings, pets help fill emotional gaps.
+Numerous studies suggest that pets improve mental health. Not only do they reduce feelings of loneliness, but they also encourage routine and responsibility. For example, walking a dog every morning provides exercise and structure, which can be especially helpful for people suffering from depression or anxiety. In fact, some doctors recommend pet ownership as part of mental health therapy.
+Children also benefit from living with animals. By caring for a pet, they learn empathy, patience, and respect for other living beings. Moreover, growing up with animals has been linked to stronger immune systems and reduced risk of allergies. Pets are often used for practical purposes as well. Dogs guard property, guide the blind, and assist the disabled. In some countries, cats are kept in shops or homes to control pests. These roles demonstrate that pets are not just decorative—they can serve vital functions.
+However, pet ownership also comes with responsibilities. Animals require time, money, and care. If people adopt pets without understanding these needs, the consequences can be serious. Neglected animals may become aggressive, sick, or depressed. That is why animal shelters are often full of abandoned pets.
+In recent years, the ethical treatment of animals has become a hot topic. Many argue that breeding animals for profit is morally wrong, especially when so many stray animals are in need of homes. Pet shops and breeders often prioritize appearance over health, leading to genetic problems in animals like pugs, bulldogs, or Persian cats.
+Another issue is exotic pets. Some people buy snakes, monkeys, or wild birds to stand out or feel unique. However, these animals usually require specialized care and environments. Keeping them in domestic spaces can lead to stress, illness, and even aggression. Moreover, the trade in exotic animals is often illegal and harmful to biodiversity.
+Pet culture varies across countries. In the UK and USA, pets are commonly viewed as family members. In Japan, pet cafés allow people to spend time with animals without owning them. In some developing countries, animals are still seen more as workers or tools than companions. This cultural diversity affects laws, attitudes, and expectations about pet ownership.
+Technology is changing how people interact with pets. Smart collars, healthmonitoring devices, and even pet cameras allow owners to check on their animals remotely. Because of busy lifestyles, services like pet-sitting, dog walking, and even pet hotels are growing in popularity.
+Despite the benefits, not everyone supports keeping pets. Some environmentalists argue that domestic animals consume large amounts of resources—food, water, energy—without contributing to society. Others point out that pet waste, especially from dogs in cities, creates hygiene problems. As urban populations rise, questions about the sustainability of pet ownership will become more pressing. Still, the human–animal connection appears to be deeply rooted. Throughout history, pets have served not only practical roles, but also symbolic ones. In literature, pets often represent loyalty, innocence, or emotional support. In politics and social media, leaders frequently use pet photos to appear more relatable or kind-hearted.
+In sum, keeping pets involves more than just affection. It requires knowledge, time, and ethical awareness. While pets offer companionship and emotional benefits, they also raise complex questions about responsibility, environment, and animal rights. How we treat our pets often reflects how we treat each other—and the world around us.`,
+  questions: [
+    {
+      question: 'What is the main purpose of this passage?',
+      explanation: 'The passage explores the practice of keeping pets, discussing emotional, social, and health benefits, practical roles, responsibilities, ethical concerns such as breeding and exotic pets, cultural variations, technology\'s influence, environmental criticisms, and the broader human-animal connection.',
+    },
+    {
+      question: 'According to the passage, how do pets improve mental health?',
+      explanation: 'Pets reduce feelings of loneliness, encourage routine and responsibility, and provide exercise and structure—such as walking a dog every morning—which can help people with depression or anxiety; some doctors even recommend pet ownership as part of mental health therapy.',
+    },
+    {
+      question: 'The word "exotic" in the paragraph about certain pets most likely means',
+      explanation: 'It refers to unusual or non-traditional animals that are not commonly kept as pets, such as snakes, monkeys, or wild birds, which often require specialized care and environments.',
+    },
+    {
+      question: 'What can be inferred about the shift in how people view pets?',
+      explanation: 'Many people now view pets as companions rather than property, reflecting broader changes in human-animal interactions; pets receive medical care, special diets, toys, and emotional support once reserved for humans, helping fill emotional gaps in increasingly isolated urban lives.',
+    },
+    {
+      question: 'According to the passage, what benefits do children gain from living with animals?',
+      explanation: 'By caring for a pet, children learn empathy, patience, and respect for other living beings, and growing up with animals has been linked to stronger immune systems and a reduced risk of allergies.',
+    },
+    {
+      question: 'The phrase "hot topic" in the paragraph about ethical treatment most likely means',
+      explanation: 'It means a subject of intense current debate or interest, as the ethical treatment of animals, including criticisms of breeding for profit when many strays need homes, has become widely discussed.',
+    },
+    {
+      question: 'What can be inferred about the risks of owning exotic pets?',
+      explanation: 'Exotic pets usually require specialized care and environments; keeping them in domestic spaces can lead to stress, illness, and aggression, and the trade is often illegal and harmful to biodiversity.',
+    },
+    {
+      question: 'According to the passage, how does pet culture differ across countries?',
+      explanation: 'In the UK and USA, pets are commonly viewed as family members; in Japan, pet cafés allow interaction without ownership; in some developing countries, animals are still seen more as workers or tools than companions, affecting laws, attitudes, and expectations.',
+    },
+    {
+      question: 'What can be inferred about environmental concerns related to pet ownership?',
+      explanation: 'Some environmentalists argue that domestic animals consume large amounts of resources like food, water, and energy without contributing to society, and pet waste in cities creates hygiene problems; as urban populations rise, sustainability questions will become more pressing.',
+    },
+    {
+      question: 'According to the passage, why do animal shelters often fill with abandoned pets?',
+      explanation: 'People sometimes adopt pets without understanding the time, money, and care required; neglected animals may become aggressive, sick, or depressed, leading to abandonment and full shelters.',
+    },
+  ],
 },
 ];
