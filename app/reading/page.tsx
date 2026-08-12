@@ -126,7 +126,7 @@ export default function ReadingPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h1 className="text-2xl font-black" style={{ color: 'var(--text)' }}>📖 Reading</h1>
+          <h1 className="text-2xl font-black" style={{ color: 'var(--text)' }}>💡 Ideas</h1>
           <p className="text-sm mt-0.5" style={{ color: 'var(--text-muted)' }}>
             {filtered.length} of {readingPassages.length} {readingPassages.length === 1 ? 'passage' : 'passages'}
           </p>
