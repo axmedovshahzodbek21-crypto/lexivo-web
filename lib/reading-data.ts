@@ -4172,5 +4172,600 @@ Ultimately, bribery is not just a legal issue—it is a moral and structural one
       explanation: 'Bribery reflects weak institutions, poor governance, and a lack of accountability; societies must fix conditions such as low salaries, unchecked power, and limited transparency to reduce it.',
     },
   ],
+},{
+    id: 71,
+    title: 'Charity',
+    topic: 'Society & Culture',
+    content: `Charity refers to the voluntary giving of help—usually money, time, or services— to those in need. Whether supporting disaster victims, the poor, or medical research, charitable work plays a vital role in reducing suffering and promoting social welfare. Because governments cannot solve every problem alone, charitable organizations fill important gaps in education, healthcare, housing, and humanitarian aid.
+Although charity is often viewed as an act of kindness, it also reflects deeper values such as solidarity, justice, and compassion. Not only does it help those in immediate need, but it also raises awareness of long-term issues like poverty, inequality, and climate change.
+There are many forms of charity. Individuals may donate money to organizations, sponsor a child, or volunteer their time at shelters or hospitals. Others may organize fundraising events or start campaigns on social media. Because technology has made giving easier, even small contributions can reach global causes in seconds.
+International charities play a major role in crisis response. When natural disasters, conflicts, or epidemics strike, aid agencies provide food, water, medical care, and shelter. The Red Cross, Médecins Sans Frontières, and UNICEF are examples of organizations that operate across borders. Without such support, many lives would be lost.
+However, charity is not without criticism. Some argue that it creates dependency rather than solving root problems. For instance, handing out food may help today, but it doesn‘t fix unemployment or poor infrastructure. Others claim that some charities lack transparency, with too much money spent on administration rather than aid.
+Large corporations also engage in charitable giving, often through Corporate Social Responsibility (CSR) programs. While this can generate positive impact, critics argue that some companies use charity to distract from unethical practices. This raises the question: is the motivation genuine—or just a public relations strategy?
+Religion has historically played a major role in charity. Most major faiths encourage believers to give a portion of their wealth to the poor. In Islam, this is called zakat; in Christianity, tithing. Because these acts are seen as moral obligations, religious giving remains a powerful source of aid in many communities.
+Youth involvement in charity is also increasing. Many young people join volunteer programs, donate through crowdfunding, or advocate for causes they believe in.
+Schools and universities often encourage community service as part of education. This helps build empathy, teamwork, and a sense of social responsibility.
+Yet, the debate continues: Should wealthy individuals and corporations be expected to give? Some believe the rich have a moral duty to help the less fortunate. Others argue that charity is voluntary and should not replace fair taxation or government responsibility. After all, public services should not depend on private generosity.
+There is also a growing trend toward ―effective altruism.‖ This approach emphasizes giving where impact is greatest, using data and evidence to decide how and where to donate. For example, some donors focus on distributing malaria nets in Africa rather than funding art museums. The goal is not to give emotionally, but intelligently.
+Despite its challenges, charity remains a powerful force for good. It connects people across cultures and countries, builds stronger communities, and gives hope to those in despair. Even a small act of kindness—such as buying a meal for someone in need—can make a difference.
+In the future, the role of charity may evolve. Technology, transparency tools, and global networks may allow for more efficient, accountable, and inclusive giving. However, the core idea will remain the same: that helping others is not only a moral choice, but a social necessity.
+Ultimately, charity is more than giving money—it is about building a better world. When done wisely and ethically, it empowers both the giver and the receiver.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose of this passage is to explain the concept of charity as voluntary help given to those in need, discuss its various forms and roles in society, examine both its benefits and criticisms, explore the influences of technology, religion, and effective altruism, and conclude that wise and ethical charity helps build a better world by empowering both givers and receivers.',
+      },
+      {
+        question: 'According to the passage, what role do international charities play during crises?',
+        explanation: 'International charities play a major role in crisis response by providing food, water, medical care, and shelter when natural disasters, conflicts, or epidemics strike. Organizations such as the Red Cross, Médecins Sans Frontières, and UNICEF operate across borders, and without such support many lives would be lost.',
+      },
+      {
+        question: 'The word \'dependency\' in the passage most likely means?',
+        explanation: 'It most likely means a state of relying on external help rather than becoming self-sufficient, as the passage notes that some argue charity creates dependency rather than solving root problems like unemployment or poor infrastructure.',
+      },
+      {
+        question: 'What can be inferred about the concept of effective altruism?',
+        explanation: 'It can be inferred that effective altruism prioritizes measurable impact over emotional giving, as it uses data and evidence to decide where donations will do the most good, such as distributing malaria nets in Africa rather than funding less impactful causes like art museums.',
+      },
+      {
+        question: 'According to the passage, how has technology affected charitable giving?',
+        explanation: 'Technology has made giving easier, allowing even small contributions to reach global causes in seconds. It also enables crowdfunding and social media campaigns, and in the future, technology and transparency tools may support more efficient, accountable, and inclusive giving.',
+      },
+      {
+        question: 'What can be inferred about the relationship between religion and charity?',
+        explanation: 'It can be inferred that religion remains a strong motivator for charitable giving because most major faiths encourage believers to give a portion of their wealth to the poor as a moral obligation, with practices such as zakat in Islam and tithing in Christianity continuing to provide powerful sources of aid in many communities.',
+      },
+    ],
+  },{
+    id: 72,
+    title: 'Computerization',
+    topic: 'Technology & Society',
+    content: `Computerization refers to the process of replacing manual systems with computerbased technologies. Whether applied to banking, education, healthcare, or manufacturing, it has radically transformed how people live and work. Because computers can process information faster and more accurately than humans, they are now central to nearly every sector of modern society.
+Although computerization began in the mid-20th century, its real impact has been felt over the past few decades. Not only has it increased efficiency, but it has also changed expectations. Tasks that once took hours can now be completed in minutes—or even seconds. This speed has become the new standard.
+Businesses were among the first to adopt computer systems. Accounting, inventory, communication, and project management are now largely digitized.
+Automation of repetitive tasks has reduced human error and operating costs. Because companies that fail to adapt often fall behind, computerization is seen as essential for competitiveness.
+Governments have also embraced digital systems. Online tax filing, digital IDs, and e-governance portals improve public service delivery and reduce corruption. Citizens can access services without standing in long lines or dealing with paperwork. However, this shift assumes that everyone has access to technology— which is not always the case.
+Education is being reshaped as well. Classrooms now use digital tools such as interactive whiteboards, online platforms, and video lessons. Computer literacy has become a basic requirement. Because the future job market demands tech-savvy workers, schools are under pressure to modernize. Yet, not all educators are equally prepared for this change.
+Healthcare, too, has seen major improvements. Patient records, diagnostics, and treatment plans are increasingly stored and managed electronically. This allows for faster access, better coordination, and reduced medical errors. Still, concerns about data security and privacy remain, especially when sensitive health information is stored online.
+One major outcome of computerization is automation. Machines, guided by algorithms, can now perform tasks once done by people—from driving cars to analyzing legal documents. While this increases productivity, it also raises fears about job loss. If workers are replaced by software, what happens to employment? Many argue that new jobs will be created in areas such as IT, cybersecurity, and data science. However, these jobs often require specialized skills, which not all displaced workers possess. This highlights the need for re-skilling programs, so people can transition into new roles rather than being left behind.
+Computerization also affects social interaction. Emails, messaging apps, and video calls have replaced many face-to-face conversations. While communication is now faster and more convenient, some worry that it lacks depth or emotional connection. Not only are relationships becoming more digital, but attention spans and human empathy may be declining.
+In developing countries, computerization offers both opportunity and challenge. On one hand, digital tools can support education, agriculture, and health services in remote areas. On the other, lack of infrastructure, electricity, and digital literacy can slow progress. Bridging this digital divide is essential for inclusive growth.
+Another concern is over-reliance. As more systems become automated, humans risk losing basic skills. For example, many people no longer remember phone numbers or directions, relying entirely on apps. While convenience is valuable, total dependence can lead to vulnerability—especially during system failures or cyberattacks.
+Cybersecurity has become a top priority. As more data moves online, so do threats.
+From identity theft to ransomware attacks, the risks of digital systems are real. That is why strong encryption, regulation, and public awareness are critical.
+Ethical questions also arise. Should machines be allowed to make life-or-death decisions? For instance, in self-driving cars or medical AI, who is responsible if something goes wrong? Because computers follow code—not conscience—human oversight is still essential.
+Despite challenges, the benefits of computerization are undeniable. It enables innovation, expands access to information, and opens new possibilities in every field. Used wisely, it can improve lives and solve complex problems.
+Ultimately, computerization is not just a technical shift—it is a social and cultural one. How we adapt to it will determine whether it leads to progress or division. If managed responsibly, it can serve as a tool for equality, efficiency, and empowerment.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose is to explain computerization as the replacement of manual systems with computer-based technologies, describe its transformative effects across business, government, education, and healthcare, and examine both its benefits and the challenges it creates regarding jobs, social interaction, equity, and ethics.',
+      },
+      {
+        question: 'According to the passage, why is computerization considered essential for businesses?',
+        explanation: 'Automation of repetitive tasks has reduced human error and operating costs, and companies that fail to adapt often fall behind, making computerization essential for competitiveness.',
+      },
+      {
+        question: 'The word \'digitized\' in the third paragraph most likely means...',
+        explanation: 'Converted into a digital or computer-based form. The passage states that accounting, inventory, communication, and project management are now largely digitized.',
+      },
+      {
+        question: 'What can be inferred about the impact of computerization on employment?',
+        explanation: 'Automation raises fears of job loss as machines perform tasks once done by people, but new jobs may be created in IT, cybersecurity, and data science; however, these require specialized skills, highlighting the need for re-skilling so displaced workers can transition.',
+      },
+      {
+        question: 'According to the passage, how has computerization affected healthcare?',
+        explanation: 'Patient records, diagnostics, and treatment plans are increasingly stored and managed electronically, allowing faster access, better coordination, and reduced medical errors, though concerns about data security and privacy remain.',
+      },
+      {
+        question: 'The phrase \'digital divide\' in the tenth paragraph most likely means...',
+        explanation: 'The gap between those who have access to digital technology, infrastructure, electricity, and digital literacy and those who do not, which must be bridged for inclusive growth in developing countries.',
+      },
+      {
+        question: 'What can be inferred about over-reliance on computer systems?',
+        explanation: 'As systems become automated, humans risk losing basic skills such as remembering phone numbers or directions; total dependence can lead to vulnerability during system failures or cyberattacks despite the convenience.',
+      },
+      {
+        question: 'According to the passage, what ethical questions does computerization raise?',
+        explanation: 'Questions include whether machines should make life-or-death decisions, such as in self-driving cars or medical AI, and who is responsible if something goes wrong, since computers follow code rather than conscience and human oversight remains essential.',
+      },
+      {
+        question: 'What can be inferred about computerization in developing countries?',
+        explanation: 'It offers opportunities to support education, agriculture, and health services in remote areas, but lack of infrastructure, electricity, and digital literacy can slow progress, making the bridging of the digital divide essential for inclusive growth.',
+      },
+      {
+        question: 'According to the passage, how has computerization changed social interaction?',
+        explanation: 'Emails, messaging apps, and video calls have replaced many face-to-face conversations, making communication faster and more convenient, yet some worry it lacks depth or emotional connection and that attention spans and human empathy may be declining.',
+      },
+    ],
+  },{
+    id: 73,
+    title: 'Computer Games',
+    topic: 'Technology & Society',
+    content: `Computer games, once seen as a niche hobby, have now become a global industry worth billions of dollars. Whether played on consoles, mobile phones, or PCs, games are a common form of entertainment for children, teenagers, and adults alike. Because of their growing influence on culture, behavior, and education, debates about the role of computer games are intensifying.
+Although computer games were originally designed for fun, they now serve a variety of functions—from relaxation to social connection, from education to professional competition. Not only do they entertain, but they also engage players mentally and emotionally. Games today feature complex storylines, lifelike graphics, and multiplayer cooperation across countries.
+One major concern is addiction. Because games are designed to reward players frequently, they can be highly engaging—and even addictive. Some players spend several hours a day gaming, sometimes skipping sleep, school, or social interaction. This excessive use can lead to poor academic performance, social withdrawal, or even mental health problems.
+Violence in video games is another common issue. First-person shooters and war simulations often involve graphic scenes, which some believe can desensitize players to real-world violence. While research is mixed, some studies suggest a temporary increase in aggressive thoughts after playing violent games. However, others argue that no clear link exists between gaming and real-life behavior.
+Despite these concerns, many experts point to the positive effects of computer games. Strategy games, puzzles, and simulations can improve critical thinking, decision-making, and problem-solving skills. Multiplayer games promote teamwork, communication, and leadership. Because players must plan, adapt, and cooperate, they often build useful real-world skills.
+Educational games, in particular, are growing in popularity. Used in schools and training programs, these games teach languages, math, science, and history in engaging ways. Instead of passive learning, students become active participants in the learning process. This method, known as ―gamification,‖ is now widely supported by educators.
+Esports (electronic sports) have become a professional career path. Top players, often in their teens or twenties, earn income through competitions, sponsorships, and streaming. Some universities even offer scholarships for skilled gamers. Because of this trend, gaming is no longer just a pastime—it is a serious profession for some.
+Parents and educators, however, are concerned about screen time. The World Health Organization recommends limits on daily screen exposure, especially for young children. Excessive gaming, particularly late at night, has been linked to sleep problems, poor diet, and decreased physical activity.
+Still, not all screen time is equal. Interactive games require focus, memory, and coordination, unlike passive screen activities like watching TV. When chosen carefully and played in moderation, games can actually support healthy development.
+Social aspects of gaming are often overlooked. Online games allow players to build friendships, join communities, and compete with others across the globe. For some, gaming is a safe space to connect, especially for shy or isolated individuals. However, toxic behavior, cyberbullying, and exposure to inappropriate content remain real risks.
+Regulation and parental control are necessary. Game rating systems, such as PEGI or ESRB, help guide age-appropriate content. Parental control tools can limit screen time and block harmful features like in-game purchases or chat functions. Because children may not understand financial or emotional risks, adult supervision is essential.
+Another concern is commercialization. Many modern games include microtransactions—small payments for items or features. While these seem minor, they can lead to large expenses over time, especially when players feel pressured to
+―pay to win.‖ This raises ethical questions about marketing strategies targeted at young users.
+Ultimately, the impact of computer games depends on content, time spent, and player behavior. Just as books, films, and sports can educate or harm, so can games. The key is not banning games, but guiding their use.
+In a balanced lifestyle, computer games can be both entertaining and enriching.
+But when they replace physical activity, social life, or schoolwork, problems arise. Managing this balance is a shared responsibility between players, parents, educators, and developers.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose is to discuss the rise of computer games as a major industry and form of entertainment, examining both concerns such as addiction, violence, screen time, and commercialization, and positive aspects including skill development, education, social connection, and professional opportunities, while emphasizing the need for balanced and guided use.',
+      },
+      {
+        question: 'According to the passage, what functions do computer games serve beyond entertainment?',
+        explanation: 'Games now serve functions from relaxation to social connection, education to professional competition; they engage players mentally and emotionally and feature complex storylines, lifelike graphics, and multiplayer cooperation across countries.',
+      },
+      {
+        question: 'The word "desensitize" in the fourth paragraph most likely means',
+        explanation: 'In the context of graphic scenes in violent games that some believe can desensitize players to real-world violence, the word means to make less sensitive or responsive to something, reducing emotional reaction to violence.',
+      },
+      {
+        question: 'What can be inferred about the research on violence in video games?',
+        explanation: 'Research is mixed: some studies suggest a temporary increase in aggressive thoughts after playing violent games, but others argue there is no clear link between gaming and real-life violent behavior.',
+      },
+      {
+        question: 'According to the passage, what positive skills can computer games help develop?',
+        explanation: 'Strategy games, puzzles, and simulations can improve critical thinking, decision-making, and problem-solving; multiplayer games promote teamwork, communication, and leadership as players plan, adapt, and cooperate.',
+      },
+      {
+        question: 'The term "gamification" in the sixth paragraph most likely means',
+        explanation: 'In the context of educational games that make students active participants rather than passive learners and teach subjects in engaging ways, gamification refers to the method of applying game elements and design to education or other non-game contexts.',
+      },
+      {
+        question: 'What can be inferred about esports from the passage?',
+        explanation: 'Esports have become a professional career path where top players earn income through competitions, sponsorships, and streaming, and some universities offer scholarships, showing that gaming is now a serious profession for some rather than just a pastime.',
+      },
+      {
+        question: 'According to the passage, why is not all screen time considered equal?',
+        explanation: 'Interactive games require focus, memory, and coordination, unlike passive activities such as watching TV; when chosen carefully and played in moderation, games can support healthy development rather than simply being harmful.',
+      },
+      {
+        question: 'What can be inferred about the social aspects of online gaming?',
+        explanation: 'Online games allow players to build friendships, join communities, and compete globally, providing a safe space especially for shy or isolated individuals, but risks such as toxic behavior, cyberbullying, and inappropriate content also exist.',
+      },
+      {
+        question: 'According to the passage, what is the key to managing the impact of computer games?',
+        explanation: 'The impact depends on content, time spent, and player behavior; the key is not banning games but guiding their use so that in a balanced lifestyle they can be entertaining and enriching, while preventing them from replacing physical activity, social life, or schoolwork through shared responsibility among players, parents, educators, and developers.',
+      },
+    ],
+  },{
+    id: 74,
+    title: 'Automation',
+    topic: 'Technology & Society',
+    content: `Automation refers to the use of machines, software, or technology to perform tasks that were previously done by humans. Whether in factories, offices, hospitals, or homes, automation is reshaping the global workforce. Because machines can operate faster, longer, and more precisely than people, many industries now rely heavily on automated systems.
+Although automation increases productivity and reduces costs, it also creates serious challenges for employment. Not only are repetitive manual jobs disappearing, but some white-collar roles—such as data entry or customer service—are being replaced by software. This trend has sparked debates about the future of work.
+Manufacturing was one of the first sectors to embrace automation. Robots now assemble cars, package products, and manage warehouses with high speed and accuracy. As a result, production has become more efficient and cheaper.
+However, millions of factory workers have lost their jobs, especially in regions that failed to adapt quickly.
+Service industries are also changing. Self-checkout machines in supermarkets, chatbots on websites, and automated phone systems have replaced many human workers. While these systems improve convenience, they reduce human interaction and eliminate entry-level jobs. This raises concerns about social inequality and job access.
+Some argue that automation creates as many jobs as it destroys. For every job lost in manufacturing, new roles emerge in robotics, software development, and maintenance. However, these new jobs often require advanced skills, which many displaced workers do not have. Unless retraining programs are widely available, large groups of people may be left behind.
+Education and training must evolve. Because the job market is changing rapidly, traditional qualifications are no longer enough. People now need digital literacy, adaptability, and problem-solving abilities. Governments and employers must invest in lifelong learning to help workers transition to new roles.
+Another concern is income inequality. Highly skilled professionals benefit from automation, while low-skilled workers face job insecurity. In many countries, the wealth gap is widening. Some economists suggest taxing robots or introducing universal basic income as ways to protect those most affected.
+Automation is not only about job loss. It also improves safety, accuracy, and convenience. In dangerous environments—like mining, firefighting, or deep-sea exploration—robots can perform tasks without risking human lives. In healthcare, surgical robots assist doctors, reducing errors and recovery time. These advancements would not be possible without automation.
+In agriculture, automated tractors, drones, and irrigation systems are boosting productivity. Farmers can now monitor crops and soil using real-time data, leading to smarter and more sustainable practices. This is especially important in countries facing labor shortages or climate challenges.
+Despite the benefits, there are ethical concerns. If machines begin making decisions independently, who is responsible when something goes wrong? In selfdriving cars, for example, how should the system respond in a life-or-death scenario? Because algorithms lack moral judgment, human oversight remains essential.
+Privacy is another issue. As more systems become automated and connected, vast amounts of personal data are collected. This data can be used to improve services—but also to control or exploit users. Without strict regulations, the risks of surveillance and manipulation increase.
+Small businesses may also struggle to keep up. Large corporations can afford to automate quickly, gaining an edge over local shops and startups. This could lead to market monopolies and reduced diversity in business. To prevent this, governments may need to offer support or incentives for small firms.
+Cultural impacts are also worth noting. As machines take over everyday tasks, people may lose traditional skills, such as cooking, driving, or repairing items. While convenience is appealing, dependence on technology may reduce selfreliance and human interaction.
+Ultimately, automation is neither good nor bad—it is a tool. Its impact depends on how society manages the transition. If used responsibly, it can improve quality of life, free people from dull tasks, and create space for creativity and innovation.
+However, if left unchecked, it can deepen inequality, destroy communities, and make workers feel disposable. Balancing progress with fairness is the challenge of our time.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The passage examines the benefits, challenges, and societal impacts of automation, concluding that it is a tool whose effects depend on responsible management to balance progress with fairness.',
+      },
+      {
+        question: 'According to the passage, what is one major advantage of automation in manufacturing?',
+        explanation: 'Robots assemble cars, package products, and manage warehouses with high speed and accuracy, making production more efficient and cheaper.',
+      },
+      {
+        question: 'The word "displaced" in the sixth paragraph most likely means',
+        explanation: 'In context, displaced refers to workers who have lost their jobs due to automation and need new opportunities or retraining.',
+      },
+      {
+        question: 'What can be inferred about the new jobs created by automation?',
+        explanation: 'New roles in robotics, software development, and maintenance often require advanced skills that many workers who lost jobs in traditional sectors do not possess, so retraining is essential to avoid leaving people behind.',
+      },
+      {
+        question: 'According to the passage, how does automation affect service industries?',
+        explanation: 'Self-checkout machines, chatbots, and automated phone systems replace human workers, improving convenience but reducing human interaction and eliminating entry-level jobs, which raises concerns about inequality.',
+      },
+      {
+        question: 'What can be inferred about the relationship between automation and income inequality?',
+        explanation: 'Highly skilled professionals benefit from automation while low-skilled workers face insecurity, widening the wealth gap; some economists propose taxing robots or universal basic income as protective measures.',
+      },
+      {
+        question: 'According to the passage, in what ways does automation improve safety?',
+        explanation: 'In dangerous environments such as mining, firefighting, or deep-sea exploration, robots can perform tasks without risking human lives, and surgical robots in healthcare reduce errors and recovery time.',
+      },
+      {
+        question: 'The word "algorithms" in the eleventh paragraph most likely means',
+        explanation: 'In context, algorithms refer to the decision-making rules or programs that control automated systems, which lack moral judgment and therefore require human oversight.',
+      },
+      {
+        question: 'What can be inferred about the challenges faced by small businesses?',
+        explanation: 'Large corporations can afford rapid automation and gain competitive advantages, potentially leading to market monopolies and reduced business diversity unless governments provide support or incentives for smaller firms.',
+      },
+      {
+        question: 'According to the passage, what cultural impact might automation have?',
+        explanation: 'As machines take over everyday tasks, people may lose traditional skills such as cooking, driving, or repairing items, and increased dependence on technology could reduce self-reliance and human interaction.',
+      },
+    ],
+  },{
+    id: 75,
+    title: 'Satellites',
+    topic: 'Technology & Science',
+    content: `Satellites are man-made objects placed in orbit around the Earth or other celestial bodies. Whether used for communication, navigation, weather forecasting, or scientific research, satellites have become essential to modern life. Because they provide services most people rely on daily, their role is far more important than many realize.
+Although satellites operate far above the Earth, their effects are felt everywhere. Not only do they enable GPS systems and live television broadcasts, but they also support mobile networks, internet access, and emergency response systems. In fact, without satellites, much of the world‘s digital infrastructure would collapse.
+There are several types of satellites. Communication satellites transmit data for phones, internet, and broadcasting. Weather satellites monitor climate patterns, track storms, and help predict natural disasters. Navigation satellites, such as those in the Global Positioning System (GPS), allow accurate location tracking. Scientific satellites observe the Earth, the Sun, or distant galaxies to expand our understanding of the universe.
+Governments and private companies both launch satellites. While early space missions were dominated by state agencies like NASA or the Soviet space program, the rise of private firms—such as SpaceX, Blue Origin, and OneWeb— has revolutionized the industry. Because of cheaper launch costs and technological advancements, thousands of new satellites are now being launched every year. This growth brings benefits—but also problems. The number of satellites in orbit has increased dramatically, especially with the rise of ―satellite constellations‖ used to deliver global internet. However, this expansion creates space debris— fragments of old satellites, rocket parts, or broken components. If not managed properly, space debris could damage functioning satellites or even cause dangerous chain collisions, known as the ―Kessler Syndrome.‖
+Environmental concerns also apply. Each satellite launch burns fuel and releases emissions, contributing to pollution. Although space is vast, the low Earth orbit region is becoming increasingly crowded. Some experts argue that regulations are urgently needed to ensure that space remains usable and safe.
+Satellites also raise ethical and security issues. Surveillance satellites can monitor activity on Earth, including troop movements, city infrastructure, or private property. While this can improve security and disaster response, it also raises questions about privacy and misuse. Who controls this data, and how is it used? Military satellites add another layer of complexity. Countries use satellites for reconnaissance, communication, and even missile guidance. In theory, satellites could be targeted or disabled during conflicts. Because many countries rely on them for national defense, space is becoming a potential battleground. Some analysts have already warned of a future ―space arms race.‖
+Despite these risks, the advantages of satellites are undeniable. They allow scientists to monitor deforestation, ocean temperatures, and pollution levels, helping governments address climate change. In agriculture, satellite imagery is used to track crop health and predict harvests, improving food security. In disaster zones, they support rescue operations by identifying affected areas.
+Developing countries also benefit. In places with poor infrastructure, satellites can provide remote education, healthcare, and internet access. This helps reduce inequality and connects isolated communities to global services. Because they bypass the need for roads or cables, satellites are especially useful in mountainous or rural regions.
+However, access is still unequal. Most satellites are owned by wealthy countries or corporations, giving them control over critical information and services. To ensure fair access, international cooperation is needed—along with global standards for ownership, usage, and sustainability.
+In education and research, satellites continue to play a major role. Students and scientists use satellite data to study geography, physics, climate, and space. International missions like the Hubble Space Telescope or the James Webb Space Telescope have expanded human knowledge in extraordinary ways. These projects show what is possible when nations collaborate rather than compete.
+Ultimately, satellites reflect both the potential and the responsibility of modern technology. They have transformed communication, defense, science, and daily life. Yet, if mismanaged, they could create environmental, political, and ethical problems.
+Because space is a shared resource, managing it wisely is in everyone‘s interest. As the number of satellites continues to grow, the need for international dialogue, responsible policies, and scientific cooperation becomes more urgent than ever.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The passage explains what satellites are and the services they provide, describes different types and the shift to private launches, examines problems such as space debris and security risks, highlights benefits for science, agriculture, and developing countries, and concludes that responsible international management of space is essential.',
+      },
+      {
+        question: 'According to the passage, what would happen without satellites?',
+        explanation: 'The passage states that without satellites, much of the world‘s digital infrastructure would collapse, as they enable GPS, live television, mobile networks, internet access, and emergency response systems.',
+      },
+      {
+        question: 'The term \"Kessler Syndrome\" in the passage most likely refers to',
+        explanation: 'The passage describes the Kessler Syndrome as dangerous chain collisions that could result if space debris from old satellites, rocket parts, or broken components is not managed properly and damages functioning satellites.',
+      },
+      {
+        question: 'What can be inferred about the growth of private companies in the satellite industry?',
+        explanation: 'The passage notes that private firms such as SpaceX, Blue Origin, and OneWeb have revolutionized the industry through cheaper launch costs and technological advancements, leading to thousands of new satellites being launched every year.',
+      },
+      {
+        question: 'According to the passage, what types of satellites exist and what do they do?',
+        explanation: 'The passage lists communication satellites that transmit data for phones, internet, and broadcasting; weather satellites that monitor climate and track storms; navigation satellites such as GPS for location tracking; and scientific satellites that observe the Earth, Sun, or distant galaxies.',
+      },
+      {
+        question: 'The word \"constellations\" in the phrase \"satellite constellations\" most likely means',
+        explanation: 'In context, satellite constellations refer to large groups of satellites used to deliver global internet, contributing to the dramatic increase in the number of satellites in orbit.',
+      },
+      {
+        question: 'What can be inferred about the environmental impact of satellites?',
+        explanation: 'The passage states that each satellite launch burns fuel and releases emissions contributing to pollution, and that the low Earth orbit region is becoming crowded, leading some experts to call for urgent regulations to keep space usable and safe.',
+      },
+      {
+        question: 'According to the passage, how do satellites benefit developing countries?',
+        explanation: 'The passage explains that in places with poor infrastructure, satellites can provide remote education, healthcare, and internet access, helping reduce inequality and connect isolated communities, especially in mountainous or rural regions.',
+      },
+      {
+        question: 'What can be inferred about military use of satellites?',
+        explanation: 'The passage notes that countries use satellites for reconnaissance, communication, and missile guidance, that satellites could be targeted or disabled in conflicts, and that some analysts warn of a future space arms race because many nations rely on them for defense.',
+      },
+      {
+        question: 'According to the passage, why is international cooperation needed regarding satellites?',
+        explanation: 'The passage states that most satellites are owned by wealthy countries or corporations, creating unequal access, and that international cooperation along with global standards for ownership, usage, and sustainability is needed to ensure fair access and responsible management of space as a shared resource.',
+      },
+    ],
+  },{
+    id: 76,
+    title: 'Space Exploration',
+    topic: 'Science & Technology',
+    content: `Space exploration is the investigation of the universe beyond Earth, using satellites, telescopes, robotic missions, and human spaceflight. Whether driven by scientific curiosity, national pride, or commercial ambition, the exploration of space has long fascinated humanity. Because it pushes the boundaries of technology and knowledge, space exploration remains one of the most ambitious and controversial fields of modern science.
+Although early missions were motivated by military rivalry, especially during the Cold War, space programs today are more diverse. Not only do they aim to study planets and stars, but they also focus on climate monitoring, asteroid defense, and commercial development. This shift reflects a broader understanding of space as both a scientific frontier and a practical resource.
+Governments have historically led space missions. NASA, Roscosmos, the European Space Agency (ESA), and China‘s CNSA have launched satellites, probes, and astronauts into orbit and beyond. The 1969 Apollo 11 mission, which landed humans on the Moon, remains one of the most iconic moments in history. Since then, progress has expanded to include Mars rovers, deep space telescopes, and long-term space stations.
+In recent years, the private sector has entered the field. Companies like SpaceX, Blue Origin, and Virgin Galactic are revolutionizing access to space. Their reusable rockets and commercial launches have lowered costs and increased frequency. Because of these innovations, space is no longer the exclusive domain of superpowers—it is becoming a global and commercial arena.
+Supporters of space exploration point to its many benefits. Satellites launched during space missions provide vital data for weather forecasting, navigation, communication, and environmental monitoring. Technologies developed for space have also led to everyday applications—such as water purification systems, medical imaging, and advanced materials. In this sense, investment in space fuels progress on Earth.
+Furthermore, space exploration addresses profound scientific questions. Where did the universe come from? Are we alone? Could humans live on other planets? Missions to Mars, Europa, and exoplanets aim to answer these mysteries. Because such questions cannot be answered through Earth-based research alone, sending instruments and probes into space is essential.
+However, critics argue that space exploration is a waste of resources. At a time when poverty, climate change, and healthcare remain urgent global problems, spending billions on space missions can seem irresponsible. Why search for life on other planets, they ask, when millions struggle to survive on this one?
+Additionally, space missions carry risks. Rocket launches release harmful emissions, and satellites contribute to space debris. The growing number of objects in Earth‘s orbit raises the risk of collisions and may one day make space travel more dangerous or impossible. Unless international rules are established and followed, outer space could become polluted and militarized.
+Another concern is inequality. Only a few countries and companies currently have the capacity for large-scale space missions. This could lead to a new form of colonialism, where powerful actors claim resources—such as minerals on the Moon or Mars—without global agreement. Such scenarios raise ethical and legal questions about ownership, access, and fairness in space.
+Yet, others argue that space exploration could provide long-term solutions. As Earth's resources are depleted, mining asteroids or establishing space-based solar energy systems could become viable alternatives. Colonizing Mars, while still theoretical, is seen by some as a backup plan for humanity. Although this may sound extreme, climate change and geopolitical conflict have made the idea more plausible.
+International cooperation is key. Projects like the International Space Station (ISS), involving the US, Russia, Europe, Japan, and Canada, show that space can unite rather than divide. Shared missions reduce costs, promote peace, and advance science more efficiently than competition ever could.
+Education and inspiration are additional benefits. Space exploration excites young minds and encourages interest in science, technology, engineering, and math (STEM). It gives humanity a sense of shared purpose and wonder. When people watch a rocket launch or see images from a distant planet, they are reminded of what human creativity can achieve.
+Ultimately, space exploration reflects our desire to understand the unknown. While not without cost or controversy, it represents a bold vision of progress. If managed wisely, it can drive innovation, strengthen global cooperation, and offer solutions to Earth‘s biggest problems.
+Because the future of space belongs to everyone, ensuring it is peaceful, sustainable, and inclusive should be a global priority.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose is to examine the history, benefits, criticisms, and future potential of space exploration, highlighting both its scientific and practical value and the need for responsible, cooperative management.',
+      },
+      {
+        question: 'According to the passage, what motivated early space missions?',
+        explanation: 'Early space missions were motivated by military rivalry, especially during the Cold War.',
+      },
+      {
+        question: 'The word "iconic" in the third paragraph most likely means...',
+        explanation: 'In the context of the passage, "iconic" means widely recognized and symbolically important, referring to the lasting historical significance of the Apollo 11 Moon landing.',
+      },
+      {
+        question: 'What can be inferred about the role of private companies in space exploration?',
+        explanation: 'It can be inferred that private companies have made space more accessible and affordable through innovations like reusable rockets, transforming space from an exclusive government domain into a global commercial arena.',
+      },
+      {
+        question: 'According to the passage, what practical benefits do satellites provide on Earth?',
+        explanation: 'Satellites provide vital data for weather forecasting, navigation, communication, and environmental monitoring.',
+      },
+      {
+        question: 'The word "debris" in the eighth paragraph most likely means...',
+        explanation: 'In the context of the passage, "debris" refers to discarded or leftover objects in space, such as inactive satellites and fragments that increase the risk of collisions.',
+      },
+      {
+        question: 'What can be inferred about critics\' main objection to space exploration?',
+        explanation: 'It can be inferred that critics believe resources spent on space missions would be better used to address urgent Earth-based problems such as poverty, climate change, and healthcare.',
+      },
+      {
+        question: 'According to the passage, what risk does the growing number of objects in Earth\'s orbit pose?',
+        explanation: 'The growing number of objects raises the risk of collisions and may one day make space travel more dangerous or even impossible if international rules are not established.',
+      },
+      {
+        question: 'What can be inferred about international cooperation in space?',
+        explanation: 'It can be inferred that cooperative projects like the International Space Station demonstrate that shared missions can reduce costs, promote peace, and advance science more effectively than competition.',
+      },
+      {
+        question: 'According to the passage, why is education considered a benefit of space exploration?',
+        explanation: 'Space exploration excites young minds, encourages interest in STEM fields, and gives humanity a sense of shared purpose and wonder about human creativity and the unknown.',
+      },
+    ],
+  },{
+    id: 77,
+    title: 'Agriculture',
+    topic: 'Environment & Economy',
+    content: `Agriculture, the practice of cultivating land and raising livestock, has been the foundation of human civilization for thousands of years. Whether it involves growing crops or breeding animals, agriculture remains essential for food security, economic development, and rural employment. Because it supports billions of lives globally, its importance cannot be overstated.
+Although modern agriculture is more productive than ever, it faces serious challenges. Not only does it depend heavily on land, water, and climate, but it also contributes to environmental problems such as deforestation, water pollution, and greenhouse gas emissions. This means that agriculture must evolve if it is to remain sustainable.
+The Green Revolution of the 20th century dramatically increased food production. By introducing high-yield crops, chemical fertilizers, and irrigation systems, many countries managed to reduce hunger and feed growing populations. While this was a breakthrough at the time, over-reliance on chemicals and monoculture farming has since raised concerns.
+Today, one of the most pressing issues is land degradation. Because of overfarming, soil erosion, and poor land management, fertile land is being lost at alarming rates. This affects not only food production but also biodiversity and water retention. Unless more sustainable farming methods are adopted, future generations may face serious food shortages.
+Water scarcity is another major concern. Agriculture accounts for around 70% of global freshwater use. In dry regions, inefficient irrigation and climate change have worsened the problem. To solve this, farmers need access to modern technologies like drip irrigation, water recycling, and drought-resistant crops.
+Climate change further complicates the picture. Rising temperatures, unpredictable rainfall, and extreme weather events threaten crops and livestock worldwide. Smallholder farmers in developing countries are especially vulnerable, since they often lack insurance, savings, or technical support to cope with these disruptions. In response, many experts promote climate-smart agriculture—a set of practices that aim to increase productivity while reducing environmental impact. These include crop rotation, organic farming, reduced tillage, and agroforestry. Not only do such methods protect natural resources, but they also strengthen resilience to climate shocks.
+Technology is playing an increasingly important role. Precision farming uses sensors, drones, and data analytics to monitor soil, weather, and plant health. This allows farmers to apply water and fertilizer only where needed, improving yields and reducing waste. Because access to such tools is still limited in poor regions, bridging the digital divide is a major goal.
+Another emerging field is genetically modified organisms (GMOs). These crops are engineered to resist pests, diseases, or harsh climates. Supporters argue that GMOs can boost food security and reduce pesticide use. However, critics raise concerns about safety, biodiversity, and corporate control of seeds. The debate continues in many countries.
+Agriculture is not only about producing food—it is also an economic engine. In many developing nations, farming employs over half the population. Supporting rural areas with infrastructure, training, and fair markets is crucial for reducing poverty. If farmers receive fair prices and reliable access to buyers, they are more likely to invest in sustainable practices.
+Urban agriculture is also gaining attention. With more people living in cities, rooftop gardens, vertical farms, and community plots offer new ways to grow food locally. Not only do these methods reduce transportation costs, but they also promote food education and healthier eating habits.
+Food waste is another hidden issue. Roughly one-third of all food produced globally is lost or wasted. Improving storage, transport, and consumer awareness can help reduce this waste and make food systems more efficient. Because reducing waste is often cheaper than increasing production, it is a priority for many governments.
+Trade and globalization affect agriculture as well. While international trade allows countries to access foods they cannot grow, it also exposes local farmers to global price swings and competition. Some argue that subsidies in rich countries distort markets and harm farmers in poorer nations, making trade policy a controversial topic.
+Ultimately, agriculture is more than just an industry—it is a lifeline. It feeds the world, employs millions, and shapes the environment. If managed wisely, it can provide enough for all without destroying the planet.
+However, if business continues as usual, soil will degrade, water will run out, and climate impacts will worsen. The future of agriculture depends on innovation, fairness, and sustainability.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose of the passage is to discuss agriculture as the foundation of civilization, highlighting its importance for food security and economies while examining challenges such as environmental impact, climate change, and the need for sustainable innovations.',
+      },
+      {
+        question: 'According to the passage, what was the Green Revolution?',
+        explanation: 'According to the passage, the Green Revolution of the 20th century dramatically increased food production by introducing high-yield crops, chemical fertilizers, and irrigation systems, helping many countries reduce hunger, though it later raised concerns about chemical over-reliance and monoculture.',
+      },
+      {
+        question: 'The word "degradation" in the fourth paragraph most likely means',
+        explanation: 'In the context of the fourth paragraph, "degradation" refers to the decline or deterioration of land quality due to overfarming, soil erosion, and poor management, leading to loss of fertile land at alarming rates.',
+      },
+      {
+        question: 'What can be inferred about the vulnerability of smallholder farmers?',
+        explanation: 'It can be inferred that smallholder farmers in developing countries are especially at risk from climate change impacts because they often lack insurance, savings, or technical support needed to cope with rising temperatures, unpredictable rainfall, and extreme weather.',
+      },
+      {
+        question: 'According to the passage, what percentage of global freshwater use is accounted for by agriculture?',
+        explanation: 'According to the passage, agriculture accounts for around 70% of global freshwater use, making water scarcity a major concern especially in dry regions affected by inefficient irrigation and climate change.',
+      },
+      {
+        question: 'The term "climate-smart agriculture" in the sixth paragraph most likely refers to',
+        explanation: 'In the context of the sixth paragraph, "climate-smart agriculture" refers to a set of practices such as crop rotation, organic farming, reduced tillage, and agroforestry that aim to increase productivity while reducing environmental impact and strengthening resilience to climate shocks.',
+      },
+      {
+        question: 'What can be inferred about precision farming?',
+        explanation: 'It can be inferred that precision farming improves efficiency by using sensors, drones, and data analytics to apply water and fertilizer only where needed, boosting yields and cutting waste, though limited access in poor regions creates a digital divide that needs to be bridged.',
+      },
+      {
+        question: 'According to the passage, what are the main arguments for and against GMOs?',
+        explanation: 'According to the passage, supporters argue that GMOs can boost food security and reduce pesticide use by resisting pests, diseases, or harsh climates, while critics raise concerns about safety, biodiversity, and corporate control of seeds.',
+      },
+      {
+        question: 'What can be inferred about the benefits of urban agriculture?',
+        explanation: 'It can be inferred that urban agriculture through rooftop gardens, vertical farms, and community plots reduces transportation costs while also promoting food education and healthier eating habits as more people live in cities.',
+      },
+      {
+        question: 'According to the passage, why is reducing food waste considered a priority?',
+        explanation: 'According to the passage, roughly one-third of all food produced globally is lost or wasted, and reducing this waste through better storage, transport, and consumer awareness is often cheaper than increasing production, making it a priority for many governments.',
+      },
+    ],
+  },{
+    id: 78,
+    title: 'GM Food',
+    topic: 'Science & Society',
+    content: `Genetically Modified (GM) food refers to crops and animals whose DNA has been altered in a laboratory to introduce desired traits, such as pest resistance, faster growth, or improved nutrition. Whether it's corn that resists insects or rice enriched with vitamins, GM food is now found in many supermarkets around the world. Because global food demand is rising, supporters claim that GM technology is a necessary innovation.
+Although GM food has been around for decades, public opinion remains deeply divided. Not only are there concerns about safety, but ethical, environmental, and economic questions also shape the debate. This controversy reflects deeper tensions between science, policy, and consumer trust.
+Proponents of GM food argue that it offers several advantages. First, it can increase agricultural productivity by making crops resistant to pests, diseases, or drought. This reduces the need for pesticides and increases food supply, especially in regions suffering from food insecurity. Because GM crops can survive in harsh climates, they may also help farmers adapt to climate change.
+Another benefit is enhanced nutrition. Golden Rice, for example, is genetically engineered to contain vitamin A, which can help prevent blindness in children in developing countries. Such innovations could save lives, especially where malnutrition is widespread.
+GM food may also reduce food waste. Crops can be engineered to have longer shelf lives, resist bruising, or tolerate transportation better. In a world where nearly one-third of food is lost or wasted, this could make food systems more efficient and sustainable.
+However, critics raise several concerns. One of the most common objections is safety. Opponents argue that long-term health effects of GM food are not fully understood. Although most scientific studies show no proven harm, the possibility of allergic reactions or unintended side effects continues to worry consumers.
+Environmental issues are also debated. Some GM crops are engineered to resist herbicides, leading to heavier use of chemicals in farming. This can damage ecosystems, kill beneficial insects, and create herbicide-resistant weeds. In addition, the widespread planting of genetically identical crops can reduce biodiversity, making food systems more vulnerable to disease outbreaks.
+Another concern involves corporate control. A handful of biotech companies hold patents on GM seeds, which means farmers must buy them every season rather than saving seeds from previous harvests. This dependence gives large firms significant power over global food supply, raising questions of fairness, especially for small-scale farmers in poor countries.
+Labelling and transparency are also key issues. Some countries require clear labelling of GM foods, while others do not. Because many consumers want to make informed choices, advocates argue that people have the right to know what's in their food. Opponents claim that such labelling causes unnecessary fear, even when products are scientifically proven to be safe.
+International trade has also been affected. Many European countries restrict or ban GM imports, while others embrace the technology. This difference has led to trade disputes and confusion over global food standards. It also reflects cultural attitudes toward risk, nature, and food.
+In response to concerns, strict regulations govern the development and approval of GM foods in most countries. Before a GM crop reaches the market, it must pass extensive testing for health and environmental impact. Still, because regulation varies across borders, some experts call for more global coordination and transparency.
+A growing area of interest is gene editing. Unlike older GM techniques that insert foreign DNA, new methods like CRISPR can make precise changes within a species. Supporters claim this is more natural and less risky, but the ethical and legal questions remain similar.
+Public trust is critical. Scientific evidence alone is not enough to change opinions.
+Cultural values, media influence, and misinformation all shape public perception.
+To build confidence, open communication, labelling, and inclusive policymaking are needed.
+Ultimately, the question is not just whether GM food is safe—but whether it is necessary, ethical, and fairly managed. The world must feed a growing population while protecting the environment and respecting individual rights. If used responsibly, GM technology can be part of the solution.
+However, if driven solely by profit and without proper oversight, it risks deepening inequalities, damaging ecosystems, and eroding public trust.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose of the passage is to explain what genetically modified (GM) food is, present the arguments for its benefits such as increased productivity, enhanced nutrition, and reduced waste, outline critics\' concerns about safety, environment, corporate control, and labelling, discuss regulation, gene editing, and public trust, and conclude that responsible use could help address global food needs while unmanaged use risks inequalities and eroded trust.',
+      },
+      {
+        question: 'According to the passage, what advantages do proponents claim for GM food?',
+        explanation: 'According to the passage, proponents argue that GM food can increase agricultural productivity by making crops resistant to pests, diseases, or drought (reducing pesticide need and boosting supply in food-insecure regions), help farmers adapt to climate change, enhance nutrition (as with Golden Rice containing vitamin A), and reduce food waste through longer shelf lives and better transport tolerance.',
+      },
+      {
+        question: 'The word "proponents" in the third paragraph most likely means',
+        explanation: 'In the third paragraph, "proponents" most likely means supporters or advocates of GM food who argue that it offers several advantages.',
+      },
+      {
+        question: 'What can be inferred about environmental concerns related to GM crops?',
+        explanation: 'It can be inferred that environmental issues are significant: some GM crops engineered to resist herbicides may lead to heavier chemical use that damages ecosystems, kills beneficial insects, and creates herbicide-resistant weeds, while widespread planting of genetically identical crops can reduce biodiversity and increase vulnerability to disease outbreaks.',
+      },
+      {
+        question: 'According to the passage, why is corporate control a concern with GM seeds?',
+        explanation: 'According to the passage, a handful of biotech companies hold patents on GM seeds, forcing farmers to buy them every season rather than saving seeds, which gives large firms significant power over the global food supply and raises fairness questions, especially for small-scale farmers in poor countries.',
+      },
+      {
+        question: 'What can be inferred about labelling of GM foods?',
+        explanation: 'It can be inferred that labelling and transparency are contested: some countries require clear labelling while others do not; advocates argue consumers have the right to know what\'s in their food to make informed choices, whereas opponents claim labelling causes unnecessary fear even for scientifically safe products.',
+      },
+      {
+        question: 'According to the passage, how does gene editing differ from older GM techniques?',
+        explanation: 'According to the passage, unlike older GM techniques that insert foreign DNA, new methods like CRISPR can make precise changes within a species; supporters claim this is more natural and less risky, though ethical and legal questions remain similar.',
+      },
+      {
+        question: 'The phrase "public trust" in the passage most likely refers to',
+        explanation: 'In the passage, "public trust" refers to consumer confidence in GM food and technology, which is critical because scientific evidence alone is not enough to change opinions; cultural values, media influence, and misinformation shape perception, so open communication, labelling, and inclusive policymaking are needed to build it.',
+      },
+      {
+        question: 'What can be inferred about international differences regarding GM food?',
+        explanation: 'It can be inferred that international trade is affected by differing approaches: many European countries restrict or ban GM imports while others embrace the technology, leading to trade disputes, confusion over global standards, and reflections of cultural attitudes toward risk, nature, and food; regulation also varies, prompting calls for more global coordination.',
+      },
+      {
+        question: 'According to the passage, what is the ultimate question surrounding GM food?',
+        explanation: 'According to the passage, the ultimate question is not just whether GM food is safe, but whether it is necessary, ethical, and fairly managed, given the need to feed a growing population while protecting the environment and respecting individual rights; responsible use can be part of the solution, but profit-driven use without oversight risks inequalities, ecosystem damage, and eroded public trust.',
+      },
+    ],
+  },{
+  id: 79,
+  title: 'Energy',
+  topic: 'Energy & Environment',
+  content: `Energy powers modern life. Whether it's used to heat homes, fuel vehicles, or run factories, energy is essential for economic development and human well-being. Because demand is rising globally, finding reliable, affordable, and sustainable sources of energy has become a top priority.
+Although fossil fuels—such as coal, oil, and natural gas—still dominate global energy use, they are also the main contributors to air pollution and climate change. Not only do they release greenhouse gases, but they also cause environmental degradation through mining, drilling, and transportation. As a result, governments and scientists are pushing for a shift to cleaner alternatives.
+Renewable energy sources offer a potential solution. These include solar, wind, hydroelectric, geothermal, and biomass energy, which can be replenished naturally and have lower environmental impact. Because they emit little or no carbon dioxide, renewables are central to efforts to reduce global warming.
+Solar power has seen rapid growth. Thanks to falling costs and improved technology, solar panels are now used in homes, businesses, and large solar farms. Not only are they easy to install, but they can also operate independently in remote or off-grid areas.
+Wind energy is another key option. Modern wind turbines can generate large amounts of electricity, especially in coastal or open areas. However, some people object to their visual appearance or noise, and they rely on favorable weather conditions.
+Hydropower, generated from rivers and dams, is one of the oldest forms of renewable energy. While it provides consistent power, it can damage ecosystems and displace communities. Because of these concerns, new projects must carefully balance benefits and risks.
+Nuclear power is another low-carbon option. Although it does not emit greenhouse gases, it remains controversial due to the risk of accidents, radioactive waste, and high construction costs. Supporters argue that it is efficient and reliable, while critics worry about safety and long-term environmental damage.
+One major challenge is energy storage. Because solar and wind power depend on the weather, energy must be stored for times when the sun isn‘t shining or the wind isn‘t blowing. Advances in battery technology are helping, but large-scale storage remains expensive and complex.
+Energy access is also a global concern. Over 700 million people still lack electricity, mostly in sub-Saharan Africa and parts of Asia. Without reliable power, communities struggle to access healthcare, education, and clean water. Solving energy poverty is essential for achieving global development goals.
+Affordability is another issue. As energy prices fluctuate due to conflict or supply disruptions, low-income households often suffer the most. To address this, some governments offer subsidies or invest in public infrastructure, while others promote local solutions like mini-grids or home-based solar systems.
+Energy efficiency plays a vital role. By using appliances, buildings, and vehicles that consume less energy, societies can lower their carbon footprint and reduce demand. Not only does this save money, but it also helps slow environmental damage.
+Transportation is a major energy consumer. The shift toward electric vehicles (EVs) aims to reduce oil dependence and emissions. However, charging infrastructure and battery production still pose challenges. If powered by renewable electricity, EVs can offer a greener future for mobility.
+Industrial energy use is another area for reform. Factories, chemical plants, and data centers use vast amounts of electricity and heat. Transitioning these sectors to cleaner energy requires innovation, investment, and strong policy support. Without action, industrial emissions could continue rising.
+Energy policies vary worldwide. Some countries have set ambitious goals for carbon neutrality, investing heavily in renewables and energy research. Others remain dependent on coal or oil due to economic or political reasons. This creates global tensions, especially as the effects of climate change become more severe.
+International cooperation is essential. Climate agreements like the Paris Accord set shared targets, but success depends on national action. Because energy decisions affect everyone, collaboration on research, technology transfer, and investment is needed.
+Fossil fuel industries resist change. They argue that their products are still necessary, especially in developing countries. However, critics say that continued investment in coal and oil locks the world into a dangerous path. The debate reflects deep divisions about responsibility, fairness, and the pace of transition.
+Ultimately, the future of energy lies in balance. Societies must meet growing needs without destroying the environment. If managed wisely, energy can power sustainable growth, reduce inequality, and protect the planet.
+However, if current trends continue unchecked, climate disasters, pollution, and energy shortages may worsen. The decisions made today will shape the energy landscape for generations to come.`,
+  questions: [
+    {
+      question: 'What is the main purpose of this passage?',
+      explanation: 'The main purpose of the passage is to explain the importance of energy in modern life, discuss the problems associated with fossil fuels, present renewable and other low-carbon alternatives, examine challenges such as storage, access, and affordability, and emphasize the need for a balanced, sustainable energy future.',
+    },
+    {
+      question: 'According to the passage, why are fossil fuels problematic despite dominating global energy use?',
+      explanation: 'According to the passage, fossil fuels such as coal, oil, and natural gas are the main contributors to air pollution and climate change because they release greenhouse gases and cause environmental degradation through mining, drilling, and transportation.',
+    },
+    {
+      question: 'The word "replenished" in the paragraph about renewable energy most likely means',
+      explanation: 'In the context of the passage, "replenished" most likely means naturally restored or renewed, as renewable energy sources like solar, wind, hydroelectric, geothermal, and biomass can be replenished naturally and have lower environmental impact.',
+    },
+    {
+      question: 'What can be inferred about solar power from the passage?',
+      explanation: 'It can be inferred that solar power has become more practical and widespread due to falling costs and improved technology, allowing solar panels to be used in homes, businesses, and large farms, and to operate independently in remote or off-grid areas.',
+    },
+    {
+      question: 'According to the passage, what is one major challenge of relying on solar and wind power?',
+      explanation: 'According to the passage, one major challenge is energy storage because solar and wind power depend on the weather, so energy must be stored for times when the sun isn\'t shining or the wind isn\'t blowing, and large-scale storage remains expensive and complex despite advances in battery technology.',
+    },
+    {
+      question: 'What can be inferred about energy access around the world?',
+      explanation: 'It can be inferred that energy poverty remains a serious global problem, with over 700 million people—mostly in sub-Saharan Africa and parts of Asia—still lacking electricity, which limits access to healthcare, education, and clean water and hinders development goals.',
+    },
+    {
+      question: 'The phrase "carbon footprint" in the paragraph about energy efficiency most likely means',
+      explanation: 'In the context of the passage, "carbon footprint" most likely means the total amount of greenhouse gas emissions produced by energy use, which societies can lower by using more efficient appliances, buildings, and vehicles.',
+    },
+    {
+      question: 'According to the passage, what potential do electric vehicles offer if powered by renewable electricity?',
+      explanation: 'According to the passage, if powered by renewable electricity, electric vehicles can offer a greener future for mobility by reducing oil dependence and emissions, although challenges remain with charging infrastructure and battery production.',
+    },
+    {
+      question: 'What can be inferred about the role of international cooperation in energy transition?',
+      explanation: 'It can be inferred that international cooperation is essential because climate agreements like the Paris Accord set shared targets, but success depends on national action, and collaboration on research, technology transfer, and investment is needed since energy decisions affect everyone.',
+    },
+    {
+      question: 'According to the passage, why do fossil fuel industries resist change?',
+      explanation: 'According to the passage, fossil fuel industries resist change by arguing that their products are still necessary, especially in developing countries, while critics counter that continued investment in coal and oil locks the world into a dangerous path, reflecting deep divisions about responsibility, fairness, and the pace of transition.',
+    },
+  ],
+},{
+  id: 80,
+  title: 'Climate',
+  topic: 'Environment & Society',
+  content: `Climate refers to the long-term patterns of temperature, precipitation, humidity, and wind in a particular region. Whether discussing rising sea levels, melting glaciers, or extreme weather events, climate issues have become central to global debates on sustainability and development. Because the climate affects every aspect of human life, managing its impact is one of the greatest challenges of the 21st century.
+Although climate has always changed over time, scientists agree that the current changes are primarily driven by human activity. Not only are greenhouse gases from burning fossil fuels heating the planet, but deforestation and industrial practices are intensifying the effect. This phenomenon is known as climate change, and its consequences are already visible.
+One major impact is global warming. Average global temperatures have risen significantly over the last century, causing glaciers to melt and sea levels to rise. As a result, low-lying coastal regions face increased risk of flooding, erosion, and even disappearance. Countries such as Bangladesh, the Maldives, and parts of Indonesia are particularly vulnerable.
+Another consequence is the increase in extreme weather. More frequent droughts, hurricanes, heatwaves, and floods are affecting both rich and poor countries. Because these events destroy homes, disrupt agriculture, and damage infrastructure, they lead to economic instability and human suffering. In some cases, they also trigger migration and conflict.
+Agriculture is directly affected by climate. Changes in rainfall patterns and soil quality reduce crop yields, putting pressure on food systems. Farmers must adapt quickly, using drought-resistant seeds, new irrigation methods, or shifting to different crops. However, small-scale farmers in developing countries often lack the resources to make such changes.
+Health is also at risk. Rising temperatures can increase the spread of diseases like malaria and dengue fever, especially in tropical areas. Air pollution and heat stress, both linked to climate change, contribute to respiratory and cardiovascular problems. As vulnerable groups suffer the most, climate change is also a social justice issue.
+Despite the urgency, progress on climate action remains uneven. Some countries have committed to reducing carbon emissions, investing in renewable energy and promoting sustainability. Others, especially those dependent on fossil fuels, have been slower to act. Because climate change is a global issue, international cooperation is essential.
+Agreements such as the Paris Accord aim to limit global temperature rise to 1.5– 2°C above pre-industrial levels. To achieve this, countries must reduce emissions, transition to clean energy, and protect natural carbon sinks like forests and oceans.
+However, implementing these goals requires political will, financial investment, and public support.
+Technological solutions are part of the answer. Solar panels, wind turbines, electric vehicles, and carbon capture systems offer ways to reduce emissions. Yet these tools alone are not enough. Lifestyle changes—such as reducing meat consumption, using public transport, and cutting energy waste—are also necessary. Economic policies must change too. Subsidies for fossil fuels need to be removed, and carbon taxes or emissions trading systems should be expanded. Such measures can encourage businesses to adopt cleaner technologies, while generating funds for climate adaptation and disaster relief.
+Adaptation is as important as prevention. Communities must prepare for the effects of climate change that are already inevitable—by building flood barriers, managing water resources, and developing early-warning systems. If ignored, climate risks will continue to grow, hitting the poorest and most vulnerable first.
+Public awareness is rising. Young people, in particular, are demanding stronger climate policies, organizing protests and influencing elections. This generational shift is pushing climate to the top of political agendas in many countries. However, without consistent action, awareness alone will not solve the problem. Some critics question the science behind climate change or argue that climate action harms economic growth. While scientific consensus is strong, misinformation continues to circulate online. In reality, the cost of inaction— through disaster recovery, health impacts, and lost productivity—is far higher than the cost of prevention.
+Ultimately, climate is not just an environmental issue—it is an economic, social, and moral one. It shapes the future of food, water, health, migration, and security. If addressed with urgency and fairness, climate action can lead to innovation, green jobs, and a more sustainable world.
+However, if delayed or ignored, the consequences will become irreversible. The window for meaningful change is closing, and the decisions made today will shape the climate for generations.`,
+  questions: [
+    {
+      question: 'What is the main purpose of this passage?',
+      explanation: 'The passage defines climate and climate change, explains human-driven causes and major impacts such as global warming, extreme weather, effects on agriculture and health, discusses uneven progress and international agreements, and emphasizes the need for technological, lifestyle, economic, and adaptive measures to address this economic, social, and moral issue.',
+    },
+    {
+      question: 'According to the passage, what primarily drives current climate changes according to scientists?',
+      explanation: 'Scientists agree that current changes are primarily driven by human activity, including greenhouse gases from burning fossil fuels that heat the planet, as well as deforestation and industrial practices that intensify the effect.',
+    },
+    {
+      question: 'The word "vulnerable" in the paragraph about global warming most likely means',
+      explanation: 'It means exposed to the possibility of being harmed or damaged, as low-lying coastal regions and countries such as Bangladesh, the Maldives, and parts of Indonesia face increased risk of flooding, erosion, and even disappearance.',
+    },
+    {
+      question: 'What can be inferred about the effects of extreme weather events caused by climate change?',
+      explanation: 'More frequent droughts, hurricanes, heatwaves, and floods destroy homes, disrupt agriculture, and damage infrastructure, leading to economic instability, human suffering, and in some cases migration and conflict, affecting both rich and poor countries.',
+    },
+    {
+      question: 'According to the passage, how does climate change affect agriculture?',
+      explanation: 'Changes in rainfall patterns and soil quality reduce crop yields and put pressure on food systems; farmers must adapt with drought-resistant seeds, new irrigation methods, or different crops, but small-scale farmers in developing countries often lack the resources to do so.',
+    },
+    {
+      question: 'The phrase "carbon sinks" in the paragraph about the Paris Accord most likely means',
+      explanation: 'It refers to natural systems that absorb and store carbon, such as forests and oceans, which countries must protect along with reducing emissions and transitioning to clean energy to limit global temperature rise.',
+    },
+    {
+      question: 'What can be inferred about the role of international cooperation in addressing climate change?',
+      explanation: 'Because climate change is a global issue, international cooperation is essential; agreements like the Paris Accord aim to limit temperature rise, but implementing goals requires political will, financial investment, and public support across countries.',
+    },
+    {
+      question: 'According to the passage, why is adaptation as important as prevention?',
+      explanation: 'Communities must prepare for climate change effects that are already inevitable by building flood barriers, managing water resources, and developing early-warning systems; if ignored, climate risks will continue to grow and hit the poorest and most vulnerable first.',
+    },
+    {
+      question: 'What can be inferred about public awareness and climate action?',
+      explanation: 'Public awareness is rising, especially among young people who demand stronger policies, organize protests, and influence elections, pushing climate to the top of political agendas; however, without consistent action, awareness alone will not solve the problem.',
+    },
+    {
+      question: 'According to the passage, how does the cost of inaction compare to the cost of prevention?',
+      explanation: 'The cost of inaction—through disaster recovery, health impacts, and lost productivity—is far higher than the cost of prevention, despite some critics arguing that climate action harms economic growth or questioning the science.',
+    },
+  ],
 },
 ];
