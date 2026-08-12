@@ -2383,5 +2383,609 @@ In conclusion, violence is not just a personal problem—it is a social, economi
       explanation: 'Worldwide, one in three women experiences physical or sexual violence in her lifetime, and many are attacked by their own partners; ending this crisis requires both legal action and cultural change.',
     },
   ],
+},{
+    id: 41,
+    title: 'City Life',
+    topic: 'Society & Culture',
+    content: `City life offers a mix of opportunity, diversity, and challenge. As the global population becomes increasingly urban, more people are choosing—or being forced—to live in cities. Because cities are centers of economic activity, education, and culture, they attract millions every year from rural and suburban areas.
+One of the main advantages of city life is access. Cities provide better access to jobs, schools, hospitals, and public services. Whether it‘s a university or a specialist doctor, city residents can usually find what they need nearby. This convenience can lead to higher living standards and improved quality of life.
+Cities are also hubs of innovation and creativity. People from different backgrounds bring unique skills, languages, and ideas. Art galleries, theaters, and music venues offer constant stimulation. Because of this cultural richness, city dwellers are often more exposed to global trends, movements, and perspectives. Public transport is another benefit. Unlike rural areas where owning a car is essential, cities often provide buses, subways, and bike lanes. This reduces traffic congestion, cuts down pollution, and makes commuting more affordable. Efficient transport systems are a major reason why cities remain attractive.
+However, city life is not without problems. One of the biggest issues is overcrowding. As urban populations grow, housing becomes limited and expensive. In many cities, people are forced to live in cramped apartments or informal settlements. This leads to poor sanitation, limited privacy, and increased stress.
+Noise and pollution are other major concerns. Cars, factories, and construction sites make city life loud and chaotic. Air quality in urban areas is often poor, which can cause health problems like asthma or heart disease. Because green space is limited, city residents may lack access to parks, trees, and clean air.
+Crime is another drawback. High population density, inequality, and unemployment can lead to increased rates of theft, assault, or drug use. While some cities are safe, others struggle to maintain law and order. Fear of crime can reduce social trust and make city life feel dangerous.
+Social isolation can also occur. Ironically, despite being surrounded by millions, many city residents feel lonely. Fast-paced lifestyles, long working hours, and constant movement can weaken social bonds. People may know their neighbors less, and personal connections may feel superficial.
+Cost of living is yet another challenge. Rent, food, transportation, and entertainment are often far more expensive in cities than in rural areas. This puts pressure on working-class families and young people. Some find themselves working multiple jobs just to cover basic expenses.
+Still, for many people, the benefits outweigh the drawbacks. Cities continue to offer better career prospects, advanced healthcare, and access to global networks. Urban areas create more than 80% of global GDP, making them critical engines of development.
+Governments around the world are trying to make cities more livable through urban planning and investment. Initiatives like smart cities, bike-sharing programs, and green roofs aim to reduce congestion and improve sustainability. Public housing projects and urban gardens are also being introduced to support lowincome communities.
+Education is another area where cities excel. From elite universities to vocational training centers, cities offer more educational choices. Because access to information and learning opportunities is higher, urban youth often have better chances at success.
+The rise of megacities—urban areas with over 10 million people—brings both opportunity and danger. While they may offer global influence and economic power, they also face extreme inequality, environmental degradation, and infrastructure overload. Managing such large populations requires smart governance and long-term vision.
+Technology plays a growing role in shaping city life. From mobile apps for transport to AI-powered traffic lights, cities are becoming more connected. But these advancements also raise concerns about surveillance, privacy, and social inequality. Not everyone benefits equally from digital innovation.
+In conclusion, city life is full of contrast—convenience and chaos, culture and congestion, growth and inequality. Whether it brings success or stress depends largely on how well cities are managed, and how individuals adapt to their fastchanging environments. As more of the world becomes urban, understanding how to live well in cities will become increasingly important.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose of this passage is to discuss the advantages and challenges of city life, covering access to opportunities and services, cultural richness, public transport benefits, problems such as overcrowding, pollution, crime, isolation, and high costs, as well as efforts to improve urban living through planning, technology, and education, concluding that successful city life depends on effective management and individual adaptation.',
+      },
+      {
+        question: 'According to the passage, what are some advantages of living in a city?',
+        explanation: 'Cities provide better access to jobs, schools, hospitals, and public services, leading to higher living standards. They are hubs of innovation and creativity with cultural richness from diverse people. Public transport reduces congestion and pollution while making commuting more affordable. Cities also offer better career prospects, advanced healthcare, access to global networks, and more educational choices.',
+      },
+      {
+        question: 'The word \'overcrowding\' in paragraph 4 most likely means?',
+        explanation: 'It most likely means a situation where too many people live in a limited space, as the passage explains that as urban populations grow, housing becomes limited and expensive, forcing people into cramped apartments or informal settlements that lead to poor sanitation, limited privacy, and increased stress.',
+      },
+      {
+        question: 'What can be inferred about the cost of living in cities?',
+        explanation: 'It can be inferred that the high cost of living in cities creates significant financial pressure, as rent, food, transportation, and entertainment are far more expensive than in rural areas, forcing some working-class families and young people to work multiple jobs just to cover basic expenses.',
+      },
+      {
+        question: 'According to the passage, how are governments trying to improve city life?',
+        explanation: 'Governments are trying to make cities more livable through urban planning and investment, including initiatives like smart cities, bike-sharing programs, and green roofs to reduce congestion and improve sustainability, as well as public housing projects and urban gardens to support low-income communities.',
+      },
+      {
+        question: 'What can be inferred about megacities from the passage?',
+        explanation: 'It can be inferred that megacities, defined as urban areas with over 10 million people, present both significant opportunities such as global influence and economic power, and serious dangers including extreme inequality, environmental degradation, and infrastructure overload, requiring smart governance and long-term vision to manage.',
+      },
+    ],
+  },{
+    id: 42,
+    title: 'Country Life',
+    topic: 'Society & Lifestyle',
+    content: `Country life, often associated with simplicity, nature, and peace, stands in sharp contrast to the speed and noise of urban living. While some people see rural life as outdated, others value its strong sense of community and closeness to nature. As modern society continues to urbanize, debates over rural versus urban living have grown more intense.
+One of the biggest advantages of living in the countryside is peace and quiet. Unlike cities, where noise pollution is constant, rural areas tend to be calm and clean. Because traffic is minimal and buildings are widely spaced, people experience less stress and fewer distractions. Many believe this environment supports mental health and emotional well-being.
+Another benefit is the connection to nature. Countryside residents often live near rivers, forests, or mountains. This allows for outdoor activities like hiking, fishing, or farming. Fresh air, green landscapes, and slower routines are part of daily life. For many, this natural rhythm is more satisfying than city routines filled with deadlines and digital screens.
+Community ties are typically stronger in the country. In rural villages, people often know each other well. Because of smaller populations, social relationships are more personal and supportive. Neighbors help each other, and traditions are passed down through generations. In times of crisis, rural communities tend to show more unity and cooperation.
+Cost of living is usually lower. Housing is more affordable, land is more available, and everyday expenses like food and transport tend to be cheaper. This makes country life attractive for families, retirees, or those seeking a simpler lifestyle. People can grow their own food, raise animals, and depend less on supermarkets and services.
+However, rural living also has its challenges. Access to healthcare is limited in many areas. Small villages may not have hospitals or even clinics. In emergencies, patients often need to travel long distances. This lack of services can be lifethreatening, especially for the elderly or chronically ill.
+Education can be another issue. Country schools often have fewer resources, outdated facilities, and difficulty attracting skilled teachers. Students in rural areas may have fewer academic and extracurricular opportunities, making it harder for them to compete with urban peers.
+Employment opportunities are limited as well. Many rural economies depend on agriculture or small local businesses. There are fewer jobs in finance, technology, or international trade. Because of this, young people often move to cities for better prospects, leaving rural areas with aging populations and labor shortages.
+Public transportation is also weak or nonexistent. Most country residents need private vehicles to travel to work, school, or hospitals. For those without cars— especially the poor, disabled, or elderly—this isolation can be severe. In some villages, a trip to the nearest town may take over an hour.
+Social life in rural areas can feel limited. There may be fewer entertainment options, such as cinemas, cafés, or museums. In some places, conservative traditions may restrict personal freedom or discourage diversity. This can create feelings of boredom, loneliness, or exclusion—especially for newcomers or young adults.
+Despite these drawbacks, rural life continues to attract people searching for peace, health, and meaning. Some urban residents have begun relocating to the countryside, especially since the rise of remote work. Technology has made it easier to live in rural areas while staying connected to city jobs or services.
+Governments in many countries are trying to improve rural life. Investments in infrastructure, internet access, education, and healthcare aim to reduce the urbanrural gap. Support for farmers, small businesses, and rural tourism can also boost local economies and preserve rural cultures.
+The environmental benefits of country living are also worth noting. Less pollution, more green space, and lower population density help protect natural resources and biodiversity. Many rural communities practice sustainable living—relying on solar panels, local food, and minimal waste. These practices may serve as models for more eco-friendly lifestyles.
+In conclusion, country life offers peace, community, and a connection to nature— but also faces serious challenges like limited services, job scarcity, and social isolation. While rural areas may not suit everyone, they provide a valuable alternative to city life, especially for those who value simplicity and space. As societies evolve, balancing development between rural and urban regions will be crucial.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose is to compare country life with urban living by describing the advantages of rural areas such as peace, nature, community, and lower costs, while also examining challenges like limited healthcare, education, jobs, and transportation, and noting ongoing efforts to improve rural conditions.',
+      },
+      {
+        question: 'According to the passage, what is one of the biggest advantages of living in the countryside?',
+        explanation: 'Peace and quiet. Unlike cities with constant noise pollution, rural areas tend to be calm and clean with minimal traffic and widely spaced buildings, which many believe supports mental health and emotional well-being.',
+      },
+      {
+        question: 'The word \'isolation\' in the ninth paragraph most likely means...',
+        explanation: 'A state of being separated or cut off from others or services. The passage notes that for those without cars, especially the poor, disabled, or elderly, the weak or nonexistent public transportation can cause severe isolation.',
+      },
+      {
+        question: 'What can be inferred about community life in rural areas?',
+        explanation: 'Community ties are typically stronger because smaller populations lead to more personal and supportive relationships; neighbors help each other, traditions are passed down, and rural communities tend to show more unity and cooperation in times of crisis.',
+      },
+      {
+        question: 'According to the passage, why do many young people leave rural areas?',
+        explanation: 'Employment opportunities are limited, as many rural economies depend on agriculture or small local businesses with fewer jobs in finance, technology, or international trade, so young people move to cities for better prospects, leaving aging populations and labor shortages.',
+      },
+      {
+        question: 'The phrase \'urbanrural gap\' in the twelfth paragraph most likely means...',
+        explanation: 'The differences or disparities between urban and rural areas in areas such as infrastructure, internet access, education, and healthcare that governments aim to reduce through investments and support.',
+      },
+      {
+        question: 'What can be inferred about the impact of remote work on country life?',
+        explanation: 'The rise of remote work has encouraged some urban residents to relocate to the countryside, and technology has made it easier to live in rural areas while remaining connected to city jobs or services.',
+      },
+      {
+        question: 'According to the passage, what environmental benefits does country living offer?',
+        explanation: 'Less pollution, more green space, and lower population density help protect natural resources and biodiversity; many rural communities practice sustainable living with solar panels, local food, and minimal waste that may serve as models for eco-friendly lifestyles.',
+      },
+      {
+        question: 'What can be inferred about education in rural areas?',
+        explanation: 'Country schools often have fewer resources, outdated facilities, and difficulty attracting skilled teachers, so students may have fewer academic and extracurricular opportunities and find it harder to compete with urban peers.',
+      },
+      {
+        question: 'According to the passage, what makes country life attractive despite its challenges?',
+        explanation: 'It continues to attract people seeking peace, health, and meaning through lower cost of living, connection to nature, stronger community ties, and the possibility of a simpler lifestyle, including growing food and depending less on external services.',
+      },
+    ],
+  },{
+    id: 43,
+    title: 'Housing',
+    topic: 'Society & Economy',
+    content: `Housing is a basic human need, but in many parts of the world, finding affordable, safe, and comfortable living space has become a serious challenge. Whether in wealthy nations or developing countries, access to adequate housing shapes quality of life, health, and economic stability.
+In urban areas, housing demand has outpaced supply. As more people move to cities for work and education, real estate prices have soared. Because land is limited and construction costs are high, apartments and homes have become unaffordable for average workers. In some cities, even professionals cannot buy or rent homes near their workplace.
+This has led to a rise in overcrowding. Families are forced to share small flats, live far from city centers, or remain in poor-quality buildings. When people live in cramped, unsafe spaces, it affects their physical and mental health. Lack of ventilation, poor sanitation, and structural issues can lead to disease, injury, and stress.
+At the same time, many governments struggle with housing inequality. Wealthy individuals often own multiple properties, while low-income families cannot afford even one. In extreme cases, entire neighborhoods are gentrified—transformed by wealthy buyers—forcing long-term residents to move out. This process widens the gap between rich and poor.
+In developing countries, the problem is more severe. Millions of people live in informal settlements or slums without legal ownership, clean water, or electricity. These communities grow rapidly, often without planning or infrastructure. Because of their illegal status, residents may face eviction, violence, or disaster risks such as flooding or fires.
+Social housing is one possible solution. These are homes built or subsidized by the government for low-income citizens. In countries like Sweden or the Netherlands, social housing plays a large role in maintaining affordability. However, when poorly managed or underfunded, public housing can fall into disrepair and become unsafe.
+Some experts believe that the housing crisis is a result of poor urban planning. In many cities, land is not used efficiently. Too much space is given to roads, parking, or luxury buildings, while affordable housing is ignored. Urban areas must prioritize mixed-use development and inclusionary zoning to balance needs.
+Others argue that the private market alone cannot solve the crisis. When housing becomes an investment instead of a right, prices rise and speculation increases. Regulation is needed to prevent property hoarding and keep homes accessible to ordinary people.
+Home ownership remains a goal for many, but the reality is changing. In the past, buying a house was seen as a sign of success and security. Today, especially among young people, renting is more common due to high prices, job instability, and urban mobility. As economic conditions change, so do attitudes toward housing.
+Technology has introduced both solutions and complications. Smart homes, energy-efficient buildings, and modular construction can make housing more sustainable. However, luxury developments often focus on profit rather than accessibility. Digital platforms have also driven up rental prices by turning homes into vacation properties.
+The environment must also be considered. Construction is one of the most polluting industries in the world. Building green homes using local materials, solar power, and efficient design can reduce emissions and long-term costs. Sustainable housing is not only a climate issue—it‘s an economic and social one. Governments have several tools to improve housing access:
+•        Investing in affordable housing projects
+•        Offering subsidies or tax breaks for first-time buyers
+•        Controlling rent prices through legislation
+•        Promoting rural housing to reduce urban pressure
+•        Supporting homeless shelters and emergency housing
+Homelessness remains a tragic and growing crisis in many countries. Rising costs, unemployment, and mental illness contribute to the issue. Sleeping rough should not exist in wealthy societies where resources are available but poorly distributed. Cultural expectations also shape housing norms. In some cultures, extended families live together under one roof. In others, independence is valued and young adults move out early. These preferences influence the size, location, and design of homes. Policies must reflect cultural realities, not just economic models.
+In conclusion, housing is not just about walls and roofs—it is about stability, dignity, and opportunity. While the private market plays a role, governments and communities must ensure that housing is fair, affordable, and sustainable for all.
+The true measure of progress is not in luxury towers, but in how well a society houses its most vulnerable.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose is to examine the global housing crisis, describing challenges of affordability, overcrowding, inequality, and informal settlements, exploring causes such as urban demand and poor planning, discussing solutions like social housing and government policies, and emphasizing that housing is essential for stability, dignity, and opportunity.',
+      },
+      {
+        question: 'According to the passage, why has housing become unaffordable in many urban areas?',
+        explanation: 'Housing demand has outpaced supply as more people move to cities; limited land and high construction costs have driven up real estate prices, making apartments and homes unaffordable even for average workers and some professionals.',
+      },
+      {
+        question: 'The word "gentrified" in the fourth paragraph most likely means',
+        explanation: 'In the context of neighborhoods being "gentrified—transformed by wealthy buyers—forcing long-term residents to move out", the word means changed by an influx of wealthier people that raises property values and displaces original lower-income residents.',
+      },
+      {
+        question: 'What can be inferred about informal settlements in developing countries?',
+        explanation: 'It can be inferred that these settlements, often lacking legal ownership, clean water, electricity, planning, and infrastructure, leave residents vulnerable to eviction, violence, and disasters such as flooding or fires, making the housing problem more severe than in wealthier nations.',
+      },
+      {
+        question: 'According to the passage, what is social housing and how can it help?',
+        explanation: 'Social housing consists of homes built or subsidized by the government for low-income citizens; in places like Sweden and the Netherlands it helps maintain affordability, though poor management or underfunding can lead to disrepair and unsafe conditions.',
+      },
+      {
+        question: 'The phrase "inclusionary zoning" in the seventh paragraph most likely refers to',
+        explanation: 'In the context of prioritizing mixed-use development and inclusionary zoning to balance needs and provide affordable housing, it refers to planning rules that require or encourage the inclusion of affordable housing units within new developments.',
+      },
+      {
+        question: 'What can be inferred about changing attitudes toward home ownership?',
+        explanation: 'While buying a house was once a sign of success and security, today especially among young people renting is more common due to high prices, job instability, and urban mobility, showing that economic conditions are shifting traditional views of housing.',
+      },
+      {
+        question: 'According to the passage, how does technology both help and complicate housing issues?',
+        explanation: 'Technology enables sustainable solutions such as smart homes, energy-efficient buildings, and modular construction, but luxury developments often prioritize profit over accessibility, and digital platforms have raised rental prices by converting homes into vacation properties.',
+      },
+      {
+        question: 'What can be inferred about the environmental impact of housing construction?',
+        explanation: 'Construction is one of the most polluting industries; building green homes with local materials, solar power, and efficient design can reduce emissions and long-term costs, making sustainable housing an economic and social issue as well as a climate one.',
+      },
+      {
+        question: 'According to the passage, what tools can governments use to improve housing access?',
+        explanation: 'Governments can invest in affordable housing projects, offer subsidies or tax breaks for first-time buyers, control rent prices through legislation, promote rural housing to ease urban pressure, and support homeless shelters and emergency housing.',
+      },
+    ],
+  },{
+    id: 44,
+    title: 'High-Rise Buildings',
+    topic: 'Urban Development',
+    content: `High-rise buildings, also known as skyscrapers, have become a defining feature of modern urban landscapes. From New York and Dubai to Shanghai and London, cities around the world compete to build taller and more iconic towers. These structures symbolize progress, ambition, and economic power—but they also raise questions about practicality, sustainability, and quality of life.
+The main reason for building upwards is space. As urban populations grow, available land becomes scarce and expensive. Because horizontal expansion is limited, cities turn to vertical construction to house more people and businesses. High-rise buildings allow more residents or workers to occupy a smaller footprint, which is especially valuable in dense city centers.
+Skyscrapers are often seen as efficient solutions for housing and commercial needs. They combine residential, office, retail, and leisure spaces into one location, creating ―vertical cities.‖ This mixed-use design can reduce commuting, promote local business, and improve urban mobility.
+Modern high-rises are also architectural achievements. With advances in engineering, materials, and design, buildings can now reach over 800 meters in height while withstanding earthquakes, high winds, and temperature extremes. These innovations make skyscrapers more durable, energy-efficient, and visually stunning.
+However, critics argue that high-rise buildings are not always the best option. One concern is human well-being. Living or working in tall towers can feel isolating or stressful. Long elevator waits, lack of green space, and poor ventilation may negatively affect mental and physical health. Because natural interaction is limited, community bonds can weaken.
+Another issue is safety. In the event of a fire, earthquake, or terrorist attack, evacuating tall buildings is extremely difficult. Emergency services face serious challenges in reaching upper floors quickly. While safety regulations have improved, the risk can never be completely eliminated.
+High-rise buildings are also energy-intensive. Elevators, lighting, and airconditioning systems run constantly, consuming large amounts of power. Although newer buildings often use smart technologies to reduce waste, older towers remain environmentally costly. From an urban planning perspective, skyscrapers may disrupt the city‘s character. They can block sunlight, ruin historic skylines, and create wind tunnels at street level. Critics argue that beauty and cultural identity are sacrificed for height and profit.
+Some economists question the value of high-rises. Construction and maintenance costs are extremely high. Developers often focus on luxury buildings aimed at the rich, which does not solve housing shortages for average citizens. In many cities, entire high-rises sit empty while millions struggle to afford basic housing. Culturally, attitudes toward tall buildings differ. In the West, they often symbolize capitalism, power, and global ambition. In Asia and the Middle East, they reflect national pride, rapid development, and modern identity. Because cultural meaning varies, so do policies and preferences.
+Governments play a role in regulating high-rise development. Some cities, like Paris and Vienna, have height restrictions to preserve historic views and architectural balance. Others, like Hong Kong or Singapore, actively promote vertical living due to limited land. Urban design must reflect the needs and values of its population.
+There are also psychological effects to consider. Studies suggest that people living on higher floors may experience more loneliness, anxiety, or detachment. Children growing up in towers may have less outdoor playtime and social interaction. While not all residents are affected, these risks deserve attention.
+To address these problems, architects and planners are rethinking vertical design. The concept of the ―vertical village‖ includes shared gardens, schools, gyms, and meeting areas built into high-rises. Such features encourage community and improve the quality of life.
+Green skyscrapers are also emerging. These use renewable energy, rainwater harvesting, and natural ventilation. Some even have trees or vertical farms built into their walls. These eco-friendly innovations reduce environmental impact and make cities more sustainable.
+In conclusion, high-rise buildings reflect both the possibilities and problems of modern urban life. They offer space-saving, innovative, and iconic solutions—but also come with social, environmental, and ethical concerns. Whether skyscrapers improve cities or damage them depends on how wisely they are designed, built, and used. True progress lies not in building taller—but in building smarter.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The passage discusses the advantages, disadvantages, cultural meanings, and future directions of high-rise buildings, concluding that true progress depends on designing and using them wisely rather than simply building taller.',
+      },
+      {
+        question: 'According to the passage, what is the main reason cities build high-rise buildings?',
+        explanation: 'The main reason is limited and expensive land as urban populations grow; vertical construction allows more people and businesses to occupy a smaller footprint in dense city centers.',
+      },
+      {
+        question: 'The phrase "vertical cities" in the third paragraph most likely means',
+        explanation: 'Vertical cities refer to high-rise buildings that combine residential, office, retail, and leisure spaces into one location, creating mixed-use environments that reduce commuting and support local activity.',
+      },
+      {
+        question: 'What can be inferred about the safety of high-rise buildings?',
+        explanation: 'Evacuating tall buildings during emergencies such as fire, earthquake, or attack is extremely difficult, and while safety regulations have improved, the risk can never be completely eliminated.',
+      },
+      {
+        question: 'According to the passage, how can high-rise buildings affect human well-being?',
+        explanation: 'Living or working in tall towers can feel isolating or stressful due to long elevator waits, lack of green space, poor ventilation, and limited natural interaction, which may weaken community bonds and harm mental and physical health.',
+      },
+      {
+        question: 'What can be inferred about the economic value of many high-rises?',
+        explanation: 'Construction and maintenance costs are very high, and developers often focus on luxury buildings for the wealthy, which fails to address housing shortages for average citizens and can leave entire towers empty.',
+      },
+      {
+        question: 'According to the passage, how do cultural attitudes toward skyscrapers differ?',
+        explanation: 'In the West they often symbolize capitalism, power, and global ambition, while in Asia and the Middle East they reflect national pride, rapid development, and modern identity.',
+      },
+      {
+        question: 'The phrase "vertical village" in the eleventh paragraph most likely means',
+        explanation: 'A vertical village is a high-rise design concept that incorporates shared gardens, schools, gyms, and meeting areas to encourage community interaction and improve residents\' quality of life.',
+      },
+      {
+        question: 'What can be inferred about green skyscrapers?',
+        explanation: 'Green skyscrapers use renewable energy, rainwater harvesting, natural ventilation, and features such as trees or vertical farms to reduce environmental impact and promote urban sustainability.',
+      },
+      {
+        question: 'According to the passage, why do some cities impose height restrictions on buildings?',
+        explanation: 'Cities like Paris and Vienna restrict building heights to preserve historic views and maintain architectural balance, reflecting local needs and cultural values.',
+      },
+    ],
+  },{
+    id: 45,
+    title: 'Homelessness',
+    topic: 'Society & Culture',
+    content: `Homelessness refers to the condition of not having a stable or permanent place to live. While it may appear as people sleeping on sidewalks or in shelters, the reality is more complex and widespread than many assume. Homelessness exists in nearly every country, regardless of wealth or development level.
+There are many causes of homelessness. Poverty is the most obvious. When people cannot afford rent, utility bills, or basic necessities, they may lose their homes. Because the cost of living keeps rising while wages stay the same, many lowincome families live on the edge of eviction.
+Unemployment is another major factor. Job loss, especially without savings or government support, can quickly lead to housing instability. For those already living paycheck to paycheck, even a minor emergency can cause financial collapse. In such cases, homelessness is not a choice—but a consequence.
+Mental illness and addiction also play significant roles. People suffering from depression, anxiety, schizophrenia, or substance abuse disorders often struggle to maintain jobs and relationships. Without access to treatment or support, they may become trapped in a cycle of instability. Lack of affordable mental healthcare deepens the crisis.
+Family conflict is another cause. Victims of domestic violence—especially women and children—may flee unsafe homes, only to end up in temporary shelters or on the street. LGBTQ+ youth are also overrepresented in the homeless population, often after being rejected by family members. Because home is not always safe, some choose homelessness over abuse.
+In some cases, structural issues make housing impossible. A shortage of affordable housing, rising rents, and gentrification force people out of neighborhoods they‘ve lived in for years. As cities focus on luxury development, ordinary residents are pushed aside.
+Homelessness affects different groups in different ways. Children who experience homelessness often fall behind in school, suffer from poor nutrition, and face emotional stress. Veterans may struggle with trauma or disability. The elderly face health risks from sleeping outside in extreme weather. Every case of homelessness is personal—but the patterns are systemic.
+The consequences are severe. Homeless individuals face higher rates of illness, injury, and death. Access to hygiene, food, and medical care is limited. Employment is almost impossible without a stable address. Social stigma and isolation make it even harder to escape the cycle.
+Governments have responded in various ways. Emergency shelters provide shortterm beds, but they are often overcrowded, unsafe, or restrictive. Long-term solutions like affordable housing programs or rent subsidies are more effective— but also more expensive. Because funding is limited and political will is weak, progress is slow.
+Some cities have adopted the ―Housing First‖ model. This approach gives people permanent housing immediately—without requiring sobriety, employment, or counseling first. Once stable, residents can then access support services. Evidence shows that Housing First reduces long-term homelessness more than traditional methods.
+However, not all responses are helpful. In some places, local governments criminalize homelessness—issuing fines or jail time for sleeping in public, loitering, or panhandling. Critics argue this punishes the vulnerable instead of solving the root causes. You cannot arrest someone out of homelessness.
+Nonprofit organizations, religious groups, and volunteers also play a major role. They provide food banks, outreach, and emergency services. But they cannot solve homelessness alone. Systemic problems require systemic solutions.
+Technology can also help. Apps that connect people to shelters, job listings, or legal aid are growing in popularity. Governments can use data to track housing needs, monitor risk zones, and allocate resources more effectively. Smart strategies combined with human compassion can drive real change.
+Public attitudes matter, too. Many people wrongly believe that all homeless individuals are lazy or dangerous. In fact, most are simply struggling with circumstances beyond their control. Changing the narrative—from blame to understanding—is crucial for lasting solutions.
+Prevention is key. Offering support before people lose housing—through eviction protection, job training, or mental health services—costs less and works better than emergency aid. It is more efficient to prevent a fire than to rebuild the house after it burns down.
+In conclusion, homelessness is not just a housing issue—it is a reflection of social failure. A society cannot call itself developed while its people sleep in the streets. Solving homelessness requires not only homes, but justice, compassion, and policy that puts people first..`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The passage defines homelessness, examines its multiple causes and effects on different groups, reviews government and community responses including the Housing First model, critiques unhelpful approaches, and argues that prevention and systemic solutions rooted in justice and compassion are essential.',
+      },
+      {
+        question: 'According to the passage, what is the most obvious cause of homelessness?',
+        explanation: 'The passage states that poverty is the most obvious cause, explaining that when people cannot afford rent, utility bills, or basic necessities, they may lose their homes.',
+      },
+      {
+        question: 'The term \"Housing First\" in the passage most likely refers to',
+        explanation: 'The passage describes the Housing First model as an approach that gives people permanent housing immediately without requiring sobriety, employment, or counseling first, after which they can access support services.',
+      },
+      {
+        question: 'What can be inferred about the relationship between mental illness and homelessness?',
+        explanation: 'The passage notes that people with conditions such as depression, anxiety, schizophrenia, or substance abuse disorders often struggle to maintain jobs and relationships, and without treatment or support they may become trapped in a cycle of instability.',
+      },
+      {
+        question: 'According to the passage, how does homelessness affect children?',
+        explanation: 'The passage states that children who experience homelessness often fall behind in school, suffer from poor nutrition, and face emotional stress.',
+      },
+      {
+        question: 'The word \"gentrification\" in the passage most likely means',
+        explanation: 'In context, gentrification refers to neighborhood changes driven by luxury development that force ordinary residents out of areas they have lived in for years through rising rents and reduced affordable housing.',
+      },
+      {
+        question: 'What can be inferred about criminalizing homelessness?',
+        explanation: 'The passage explains that some local governments issue fines or jail time for sleeping in public or panhandling, and critics argue this punishes the vulnerable instead of solving root causes, noting that one cannot arrest someone out of homelessness.',
+      },
+      {
+        question: 'According to the passage, why is prevention considered more effective than emergency aid?',
+        explanation: 'The passage states that offering support before people lose housing—through eviction protection, job training, or mental health services—costs less and works better than emergency aid, comparing it to preventing a fire rather than rebuilding afterward.',
+      },
+      {
+        question: 'What can be inferred about public attitudes toward homelessness?',
+        explanation: 'The passage notes that many people wrongly believe all homeless individuals are lazy or dangerous, whereas most are struggling with circumstances beyond their control, and changing the narrative from blame to understanding is crucial for lasting solutions.',
+      },
+      {
+        question: 'According to the passage, what role do nonprofit organizations play in addressing homelessness?',
+        explanation: 'The passage states that nonprofit organizations, religious groups, and volunteers provide food banks, outreach, and emergency services, but emphasizes that they cannot solve homelessness alone because systemic problems require systemic solutions.',
+      },
+    ],
+  },{
+    id: 46,
+    title: 'Urban Sprawl',
+    topic: 'Cities & Environment',
+    content: `Urban sprawl refers to the uncontrolled expansion of cities into surrounding rural or undeveloped land. As populations grow and demand for housing increases, cities tend to spread outward, often in a disorganized and inefficient way. This phenomenon has reshaped landscapes, economies, and lifestyles in both developed and developing nations.
+One of the key drivers of urban sprawl is the desire for affordable housing. In many major cities, property prices in the center have become unaffordable for average families. Because people seek larger homes and lower costs, they move to the outskirts—leading to the rapid development of suburbs and residential zones far from the city core.
+Another cause is car culture. In areas where public transportation is weak or underdeveloped, personal vehicles become essential. This encourages low-density housing, wide roads, and shopping malls designed for cars rather than people. As a result, communities are spread out, and walking becomes impractical.
+Urban planning policies—or lack of them—also play a major role. Poor zoning laws, weak regulation, and short-term political decisions can lead to haphazard growth. When development is left to the market without a long-term vision, land gets used inefficiently, and public services become overstretched.
+While urban sprawl offers some benefits, such as cheaper housing and more space, it creates serious problems for the environment, infrastructure, and social life. One of the most visible impacts is the loss of natural land. Forests, farms, and wetlands are often destroyed to make way for roads, houses, and shopping centers. This leads to habitat destruction, reduced biodiversity, and higher carbon emissions. Traffic congestion is another major issue. As more people live farther from the city, they must drive longer distances to work, school, or shops. This increases fuel consumption, air pollution, and time wasted in traffic jams. In cities with little public transport, commuting becomes a daily struggle.
+Urban sprawl also puts pressure on public services. Schools, hospitals, police, and fire departments must stretch their resources to serve scattered populations.
+Building new infrastructure in remote areas is expensive and time-consuming. Because services are spread thin, quality and access often decline.
+Socially, urban sprawl can weaken communities. Low-density neighborhoods may lack gathering places like parks, libraries, or town squares. People may not know their neighbors or feel connected to their surroundings. Isolation and loneliness can rise, especially among the elderly or those without cars.
+Economically, sprawl increases inequality. Wealthier residents can afford long commutes or private transport, while low-income individuals may be stuck in poorly connected areas with fewer job opportunities. Unequal access to services, education, and employment can deepen social divides.
+In response, many urban planners advocate for ―smart growth.‖ This model promotes compact, mixed-use development that combines housing, shops, schools, and parks in walkable areas. It also supports investment in public transport, green space, and renewable energy. The goal is to create cities that are efficient, inclusive, and sustainable.
+Some cities have introduced policies to control sprawl. For example:
+•        Green belts: protected areas around cities that prevent construction           Urban growth boundaries: limits beyond which development is restricted
+•        Tax incentives for infill development (building within the existing urban area)
+•        High-density zoning in public transport corridors
+Such strategies encourage cities to grow upward rather than outward, preserving land and reducing infrastructure costs.
+Technology can also play a role. Geographic information systems (GIS), data analytics, and AI tools help planners track growth, analyze land use, and forecast needs. These tools improve decision-making and help avoid wasteful expansion.
+However, changing existing patterns is difficult. Developers often prefer building on cheap, undeveloped land. Homebuyers are attracted to quiet suburbs with big homes. Politicians may resist reforms that appear restrictive or unpopular. Overcoming these challenges requires public education and long-term commitment.
+Climate change adds urgency to the issue. Urban sprawl contributes to deforestation, energy waste, and car dependency—all of which worsen global warming. Dense, transit-oriented cities emit less carbon per capita than sprawling ones. Rethinking how cities grow is critical for climate action.
+In conclusion, urban sprawl reflects both opportunity and failure. While it provides space and affordability, it also leads to inefficiency, environmental damage, and inequality. Smart planning, public investment, and community engagement are needed to ensure that urban growth benefits everyone—not just the wealthy or well-connected.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose is to explain what urban sprawl is, its main causes and negative impacts on the environment, infrastructure, society, and economy, and the smart growth strategies proposed to control it.',
+      },
+      {
+        question: 'According to the passage, what is one key driver of urban sprawl related to housing?',
+        explanation: 'One key driver is the desire for affordable housing; high property prices in city centers push average families to seek larger, cheaper homes on the outskirts.',
+      },
+      {
+        question: 'The word "haphazard" in the fourth paragraph most likely means...',
+        explanation: 'In the context of the passage, "haphazard" means disorganized, random, or lacking careful planning, referring to uncontrolled urban growth.',
+      },
+      {
+        question: 'What can be inferred about the relationship between car culture and urban sprawl?',
+        explanation: 'It can be inferred that reliance on personal vehicles encourages low-density, car-oriented development that spreads communities outward and makes walking impractical.',
+      },
+      {
+        question: 'According to the passage, how does urban sprawl affect the environment?',
+        explanation: 'Urban sprawl destroys forests, farms, and wetlands for development, leading to habitat destruction, reduced biodiversity, and higher carbon emissions.',
+      },
+      {
+        question: 'The term "smart growth" in the passage most likely refers to...',
+        explanation: 'Smart growth refers to a planning model that promotes compact, mixed-use, walkable development with investment in public transport, green space, and renewable energy to create efficient and sustainable cities.',
+      },
+      {
+        question: 'What can be inferred about the social effects of urban sprawl?',
+        explanation: 'It can be inferred that low-density neighborhoods often lack community gathering places, which can lead to weaker social connections, isolation, and loneliness, especially for the elderly or those without cars.',
+      },
+      {
+        question: 'According to the passage, what policies have some cities used to control sprawl?',
+        explanation: 'Cities have used green belts, urban growth boundaries, tax incentives for infill development, and high-density zoning in public transport corridors to encourage upward rather than outward growth.',
+      },
+      {
+        question: 'What can be inferred about the difficulty of controlling urban sprawl?',
+        explanation: 'It can be inferred that controlling sprawl is challenging because developers prefer cheap undeveloped land, homebuyers favor spacious suburbs, and politicians may avoid unpopular restrictions, requiring public education and long-term commitment.',
+      },
+      {
+        question: 'According to the passage, why does climate change add urgency to addressing urban sprawl?',
+        explanation: 'Urban sprawl contributes to deforestation, energy waste, and car dependency, all of which worsen global warming, while dense, transit-oriented cities emit less carbon per capita.',
+      },
+    ],
+  },{
+    id: 47,
+    title: 'Traffic',
+    topic: 'Urban Planning',
+    content: `Traffic congestion is one of the most frustrating and persistent problems in modern cities. As urban populations and car ownership continue to rise, roads become increasingly crowded, causing delays, pollution, and stress. Whether in megacities or smaller towns, managing traffic has become a central challenge for urban planners and governments.
+The main cause of traffic is simple: too many vehicles and not enough road space. Because cities were not designed to handle millions of cars, roads quickly become overwhelmed during peak hours. Commuters stuck in daily traffic jams lose valuable time, fuel, and productivity.
+Public transport systems can reduce the number of cars on the road. However, in many places, buses, trains, or subways are unreliable, overcrowded, or unavailable. When people do not trust the public system, they rely on private vehicles, making the situation worse. In developing countries, this problem is often more severe due to underfunded infrastructure.
+Another factor is poor urban planning. In cities without proper zoning, workplaces, schools, and homes may be scattered across long distances. This forces people to travel far every day, increasing road usage and fuel consumption. Additionally, many cities lack dedicated bike lanes, walkable paths, or intelligent traffic systems. Traffic has many negative effects. Air pollution from car exhaust leads to respiratory problems, especially in children and the elderly. Because cars release carbon dioxide and other harmful gases, traffic contributes significantly to climate change. Noise pollution from engines and honking also harms mental health and quality of life.
+Economically, traffic causes billions in lost time and fuel each year. Delivery delays, late arrivals, and fuel waste damage productivity. In cities like Los Angeles, Jakarta, or Mumbai, commuters may spend more than two hours per day in traffic, reducing their personal and professional time.
+Governments have tried several solutions to reduce traffic. One popular method is improving public transport—making it faster, cleaner, and more frequent. Cities like Seoul, Tokyo, and Zurich have shown that when public transport is affordable and efficient, people leave their cars at home.
+Another approach is congestion pricing. Drivers pay to enter busy areas during peak times, as seen in London and Singapore. This encourages people to travel during off-peak hours or use alternative transport. However, critics argue that it may punish low-income drivers more than wealthy ones.
+Carpooling is another strategy. Apps and incentives can encourage people to share rides, reducing the number of vehicles on the road. In some countries, carpool lanes allow shared vehicles to travel faster. If more people ride together, traffic and emissions drop sharply.
+Technology also plays a growing role. Smart traffic lights that adjust to real-time conditions can reduce wait times. Navigation apps help drivers avoid busy roads. In the future, autonomous vehicles may improve traffic flow by eliminating human error and reducing sudden braking or unnecessary lane changes.
+Urban design matters too. Creating compact, mixed-use neighborhoods means people can walk or cycle to work, school, or shops. When cities prioritize pedestrians and cyclists, traffic naturally decreases. European cities like
+Copenhagen and Amsterdam have successfully done this through careful planning. However, changing behavior is difficult. Many people are emotionally attached to their cars. For some, driving is not just about transport—it‘s about freedom, privacy, or social status. Public campaigns are needed to shift mindsets and promote sustainable habits.
+Some governments have taken extreme steps. Car-free days, odd-even license systems, and driving bans in certain areas aim to reduce pressure on roads. While these can work in the short term, long-term solutions require better infrastructure and policy.
+Electric vehicles (EVs) offer environmental benefits but do not solve congestion. Even if all cars were electric, roads would still be crowded. Thus, the focus must be not just on cleaner cars, but on fewer cars.
+Education and enforcement are essential. Drivers must follow road rules and respect other users. Pedestrians, cyclists, and public transport riders also need safety and support. When all users share the road responsibly, traffic flows more smoothly.
+In conclusion, traffic is not just a transport issue—it is a public health, economic, and environmental crisis. While there is no single solution, a mix of planning, investment, technology, and cultural change is needed. A future with less traffic is not only possible—it‘s essential for healthier and more livable cities.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose of the passage is to examine traffic congestion as a major urban problem, explaining its causes, negative effects, and various solutions involving public transport, planning, technology, and behavioral change.',
+      },
+      {
+        question: 'According to the passage, what is the main cause of traffic congestion?',
+        explanation: 'According to the passage, the main cause of traffic is too many vehicles and not enough road space, as cities were not designed to handle millions of cars and become overwhelmed during peak hours.',
+      },
+      {
+        question: 'The word "congestion" in the first paragraph most likely means',
+        explanation: 'In the context of the first paragraph, "congestion" means overcrowding or blockage of roads by excessive vehicles, leading to delays, pollution, and stress in modern cities.',
+      },
+      {
+        question: 'What can be inferred about the effectiveness of public transport in reducing traffic?',
+        explanation: 'It can be inferred that when public transport is made affordable, efficient, faster, cleaner, and more frequent, as in cities like Seoul, Tokyo, and Zurich, people are more likely to leave their cars at home and reduce road congestion.',
+      },
+      {
+        question: 'According to the passage, what are some negative effects of traffic on health and the environment?',
+        explanation: 'According to the passage, air pollution from car exhaust causes respiratory problems especially in children and the elderly, contributes to climate change through carbon dioxide emissions, and noise pollution harms mental health and quality of life.',
+      },
+      {
+        question: 'The word "zoning" in the fourth paragraph most likely means',
+        explanation: 'In the context of the fourth paragraph, "zoning" refers to the planning and designation of different areas for specific uses such as workplaces, schools, and homes; poor zoning scatters these locations and forces longer daily travel.',
+      },
+      {
+        question: 'What can be inferred about congestion pricing as a traffic solution?',
+        explanation: 'It can be inferred that congestion pricing, used in places like London and Singapore, can encourage off-peak travel or alternative transport by charging drivers to enter busy areas, though it faces criticism for potentially burdening low-income drivers more than wealthy ones.',
+      },
+      {
+        question: 'According to the passage, why do electric vehicles not fully solve the traffic problem?',
+        explanation: 'According to the passage, electric vehicles offer environmental benefits but do not solve congestion because even if all cars were electric, roads would still be crowded; the focus must therefore be on fewer cars overall.',
+      },
+      {
+        question: 'What can be inferred about the role of urban design in reducing traffic?',
+        explanation: 'It can be inferred that creating compact, mixed-use neighborhoods and prioritizing pedestrians and cyclists, as successfully done in European cities like Copenhagen and Amsterdam, allows people to walk or cycle for daily needs and naturally decreases traffic.',
+      },
+      {
+        question: 'According to the passage, why is changing driving behavior particularly difficult?',
+        explanation: 'According to the passage, many people are emotionally attached to their cars, viewing driving as providing freedom, privacy, or social status rather than just transport, which makes public campaigns necessary to shift mindsets toward sustainable habits.',
+      },
+    ],
+  },{
+    id: 48,
+    title: 'Public Transport',
+    topic: 'Urban Planning',
+    content: `Public transport plays a vital role in the functioning of modern cities. Buses, trains, subways, and trams allow people to move efficiently without relying on private vehicles. Because well-developed public transport reduces congestion, pollution, and travel time, it is considered a cornerstone of sustainable urban planning.
+The benefits of public transport are wide-ranging. First and foremost, it is costeffective. Compared to owning and maintaining a private car, using public systems is significantly cheaper. This makes it especially important for students, workers, and the elderly, who may not afford personal vehicles.
+Environmental impact is another major advantage. Public transport produces fewer carbon emissions per passenger than cars or motorcycles. When more people choose buses or trains, cities can reduce greenhouse gas emissions, lower air pollution, and combat climate change. This is especially crucial as urban populations continue to grow.
+Public transport also improves traffic flow. In cities where most residents rely on private cars, roads become overcrowded. But when commuters switch to mass transit, fewer vehicles occupy the road, reducing delays and accidents. As a result, cities become safer, cleaner, and more livable.
+In terms of energy use, public systems are more efficient. Trains and buses can transport dozens or hundreds of people using less fuel per head than cars. Because they operate on fixed schedules and routes, they optimize space and reduce unnecessary travel.
+Moreover, public transport promotes social inclusion. In areas where jobs, education, and healthcare are far from residential zones, reliable transit allows people from all backgrounds to participate in society. It ensures equal access to opportunities, regardless of income, age, or disability.
+However, not all public transport systems are effective. In many cities, services are slow, unreliable, or unsafe. Buses may arrive late or be overcrowded. Trains may suffer from poor maintenance or frequent breakdowns. When public transport fails to meet expectations, people turn to private alternatives, worsening traffic and pollution.
+Another issue is coverage. Rural areas and low-income neighborhoods are often underserved, lacking proper infrastructure or investment. This creates a gap between those who can afford to live near transit hubs and those who cannot. As a result, inequality deepens and mobility becomes a privilege.
+Some people avoid public transport due to safety concerns. Pickpocketing, harassment, or violence may occur in crowded stations or on late-night routes. Cleanliness and hygiene are also issues—especially since the COVID-19 pandemic. Public trust must be rebuilt through cleanliness, security, and reliability. Modernization can improve these systems. Many cities are introducing contactless payment, real-time tracking apps, and electric or hybrid vehicles. These features make transport more convenient and eco-friendly. When systems are modern, people are more likely to use them regularly.
+Governments play a key role in supporting public transport. Investment in infrastructure, subsidies for low-income riders, and policies that prioritize buses or trains over cars are essential. If cities spend more on roads than on transit, car dependency will only increase.
+Urban design also matters. Walkable streets, protected bike lanes, and well-placed stations make it easier to access public transport. A city where people can easily move without cars is healthier and more efficient. Planners must integrate transport into all areas of city life—not treat it as an afterthought.
+There are debates over whether public transport should be free. Some argue that removing fares increases usage and reduces inequality. Others claim it puts too much pressure on public budgets. Still, many cities offer discounted or free rides to students, seniors, or unemployed citizens.
+Cultural attitudes influence usage as well. In some countries, public transport is seen as low-status or only for the poor. In others, it is viewed as smart, efficient, and modern. Changing how people see public systems is part of the long-term solution.
+The future of public transport may include autonomous vehicles, high-speed trains, or even underground hyperloops. However, the most urgent task is to fix what already exists. Before dreaming of flying buses, cities must make sure ordinary trains run on time.
+In conclusion, public transport is not just about moving people—it is about fairness, sustainability, and smart planning. A city without strong public transport cannot truly serve its people. Investing in buses, trains, and subways today is an investment in cleaner, fairer, and more livable cities tomorrow.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose of the passage is to explain the vital role and wide-ranging benefits of public transport for cost, environment, traffic, energy efficiency, and social inclusion, while discussing challenges such as unreliability, poor coverage, safety concerns, and cultural attitudes, and concluding that investment in strong public transport systems is essential for fairness, sustainability, and livable cities.',
+      },
+      {
+        question: 'According to the passage, why is public transport considered a cornerstone of sustainable urban planning?',
+        explanation: 'According to the passage, well-developed public transport reduces congestion, pollution, and travel time, which is why it is considered a cornerstone of sustainable urban planning.',
+      },
+      {
+        question: 'The word "costeffective" in the second paragraph most likely means',
+        explanation: 'In the second paragraph, "costeffective" most likely means providing good value or being significantly cheaper compared to owning and maintaining a private car, making public transport especially important for students, workers, and the elderly who may not afford personal vehicles.',
+      },
+      {
+        question: 'What can be inferred about the environmental benefits of public transport?',
+        explanation: 'It can be inferred that public transport has major environmental advantages because it produces fewer carbon emissions per passenger than cars or motorcycles; greater use of buses or trains allows cities to reduce greenhouse gas emissions, lower air pollution, and combat climate change, which is especially important as urban populations grow.',
+      },
+      {
+        question: 'According to the passage, how does public transport promote social inclusion?',
+        explanation: 'According to the passage, public transport promotes social inclusion by allowing people from all backgrounds to access jobs, education, and healthcare that may be far from residential zones, thereby ensuring equal access to opportunities regardless of income, age, or disability.',
+      },
+      {
+        question: 'What can be inferred about problems with coverage in public transport systems?',
+        explanation: 'It can be inferred that uneven coverage creates inequality, as rural areas and low-income neighborhoods are often underserved with inadequate infrastructure or investment, leading to a gap between those who can afford to live near transit hubs and those who cannot, making mobility a privilege.',
+      },
+      {
+        question: 'According to the passage, what modernization features can improve public transport systems?',
+        explanation: 'According to the passage, many cities are introducing contactless payment, real-time tracking apps, and electric or hybrid vehicles, which make transport more convenient and eco-friendly and increase the likelihood that people will use the systems regularly.',
+      },
+      {
+        question: 'The phrase "car dependency" in the passage most likely refers to',
+        explanation: 'In the passage, "car dependency" refers to a situation in which people rely heavily on private cars; the text warns that if cities spend more on roads than on transit, this dependency will only increase.',
+      },
+      {
+        question: 'What can be inferred about cultural attitudes toward public transport?',
+        explanation: 'It can be inferred that cultural attitudes strongly influence usage: in some countries public transport is seen as low-status or only for the poor, while in others it is viewed as smart, efficient, and modern, so changing public perception is part of the long-term solution to increasing ridership.',
+      },
+      {
+        question: 'According to the passage, what is the most urgent task regarding the future of public transport?',
+        explanation: 'According to the passage, while the future may include autonomous vehicles, high-speed trains, or underground hyperloops, the most urgent task is to fix existing systems so that ordinary trains run on time before pursuing more advanced ideas.',
+      },
+    ],
+  },{
+  id: 49,
+  title: 'Culture',
+  topic: 'Society & Culture',
+  content: `Culture shapes how we think, act, and relate to the world. It includes language, traditions, beliefs, art, food, clothing, religion, and social behavior. Because culture is passed down from one generation to another, it helps maintain identity and provides a sense of belonging.
+Each country, region, or ethnic group has its own unique culture. These differences can enrich global society, offering diversity in thought, expression, and values. At the same time, cultural misunderstandings can lead to conflict or discrimination, especially in today‘s globalized world.
+Language is at the heart of culture. It‘s more than just a tool for communication— it‘s a way of thinking. When a language dies, a whole worldview disappears with it. That‘s why many believe preserving minority languages is essential for protecting cultural heritage.
+Traditions also play a key role. Festivals, rituals, and ceremonies strengthen community ties and express shared beliefs. For example, weddings, funerals, and New Year celebrations vary across cultures but serve similar purposes—marking important life events and transitions. Because traditions provide continuity, they help people feel rooted and stable.
+Art is another core part of culture. Through music, painting, literature, dance, and film, people share their experiences, struggles, and dreams. Cultural products often reflect the values and emotions of a society. Whether it‘s Japanese haiku or Nigerian drumming, every artistic form carries a deep cultural message.
+Food is one of the most visible and enjoyable aspects of culture. Every region has distinct ingredients, cooking methods, and meal customs. Eating habits reflect religion, climate, history, and even economic conditions. Because food is shared, it connects people, both locally and globally.
+However, culture is not fixed. It evolves over time due to migration, technology, trade, and media. Globalization has accelerated this process, bringing cultures into closer contact. As people travel, study, and work across borders, they bring their customs with them—and adopt new ones.
+This has both positive and negative effects. On one hand, cultural exchange can lead to innovation, tolerance, and understanding. People can enjoy foreign music, cuisine, and fashion while appreciating different ways of life. On the other hand, local cultures may be weakened or replaced, especially by dominant global forces like Western media or consumer brands.
+Some people worry about ―cultural imperialism,‖ where powerful countries export their values and erase others. Hollywood movies, English-language music, and global fast food chains often spread one lifestyle at the expense of others. Because young people are especially influenced by global trends, traditional customs may be abandoned or forgotten.
+At the same time, some cultures resist change. They may see outside influence as a threat and try to preserve old ways through education, law, or religion. National identity is often linked to culture, and any perceived attack on it can lead to strong emotional reactions. Striking a balance between preserving tradition and embracing modernity is not easy.
+Multicultural societies face both opportunities and challenges. In countries like Canada, Singapore, or the UK, people of different backgrounds live side by side. If integration is successful, these societies benefit from creativity, productivity, and innovation. However, if differences are ignored or suppressed, tensions may arise. Education plays a major role in cultural understanding. Learning about other customs and histories promotes respect and curiosity. Schools that celebrate cultural diversity help reduce prejudice and build stronger communities. When children grow up appreciating different ways of life, they are less likely to fear or reject them.
+Tourism is another way culture spreads. When people visit foreign countries, they experience new languages, foods, and traditions. However, tourism can also commercialize or distort cultures for profit. Sacred ceremonies may become performances, and local crafts may be mass-produced. Responsible tourism should support—not exploit—cultural heritage.
+Technology is changing how culture is created and shared. Social media allows anyone to post songs, dances, or opinions with a global audience. While this promotes freedom and diversity, it also leads to cultural blending or even appropriation. The line between appreciation and disrespect is sometimes unclear.
+Cultural preservation is a growing concern. UNESCO (the United Nations Educational, Scientific and Cultural Organization) lists World Heritage Sites and supports the protection of cultural traditions. Governments and NGOs are also working to save endangered languages, rebuild ancient monuments, and document oral histories. Because once a culture disappears, it is almost impossible to bring back.
+In conclusion, culture is not just about tradition—it is a living, breathing force that shapes our daily lives. As the world becomes more connected, respecting and protecting cultural differences becomes even more important. Culture is what makes us human, and its richness is worth preserving.`,
+  questions: [
+    {
+      question: 'What is the main purpose of this passage?',
+      explanation: 'The main purpose of the passage is to explain what culture is and how it shapes identity and society, describe its key elements such as language, traditions, art, and food, examine how globalization and technology affect it, and emphasize the importance of respecting and preserving cultural differences.',
+    },
+    {
+      question: 'According to the passage, why is language considered central to culture?',
+      explanation: 'According to the passage, language is at the heart of culture because it is more than a tool for communication—it is a way of thinking, and when a language dies, a whole worldview disappears with it, making the preservation of minority languages essential for protecting cultural heritage.',
+    },
+    {
+      question: 'The phrase "cultural imperialism" in the passage most likely means',
+      explanation: 'In the context of the passage, "cultural imperialism" most likely means the process by which powerful countries export their values, media, and lifestyles in ways that weaken or erase other cultures, as illustrated by the spread of Hollywood movies, English-language music, and global fast-food chains.',
+    },
+    {
+      question: 'What can be inferred about the effects of globalization on culture?',
+      explanation: 'It can be inferred that globalization has both positive and negative effects: it can promote innovation, tolerance, and understanding through cultural exchange, but it can also weaken or replace local cultures through dominant global forces such as Western media and consumer brands.',
+    },
+    {
+      question: 'According to the passage, what role do traditions play in culture?',
+      explanation: 'According to the passage, traditions such as festivals, rituals, and ceremonies strengthen community ties, express shared beliefs, mark important life events and transitions, and provide continuity that helps people feel rooted and stable.',
+    },
+    {
+      question: 'What can be inferred about multicultural societies from the passage?',
+      explanation: 'It can be inferred that multicultural societies can benefit from creativity, productivity, and innovation when integration is successful, but tensions may arise if cultural differences are ignored or suppressed, and education that celebrates diversity helps reduce prejudice.',
+    },
+    {
+      question: 'The word "appropriation" in the paragraph about technology most likely means',
+      explanation: 'In the context of the passage, "appropriation" most likely means the taking or use of elements from another culture in a way that may cross the line into disrespect, as the text notes that social media can lead to cultural blending or appropriation where the boundary between appreciation and disrespect is unclear.',
+    },
+    {
+      question: 'According to the passage, how can tourism affect culture?',
+      explanation: 'According to the passage, tourism allows people to experience new languages, foods, and traditions, but it can also commercialize or distort cultures for profit—turning sacred ceremonies into performances and mass-producing local crafts—so responsible tourism should support rather than exploit cultural heritage.',
+    },
+    {
+      question: 'What can be inferred about cultural preservation from the passage?',
+      explanation: 'It can be inferred that cultural preservation is urgent because once a culture disappears it is almost impossible to bring back, which is why organizations like UNESCO list World Heritage Sites and governments and NGOs work to save endangered languages, rebuild monuments, and document oral histories.',
+    },
+    {
+      question: 'According to the passage, why do some cultures resist outside influence?',
+      explanation: 'According to the passage, some cultures resist change because they may see outside influence as a threat to their identity and try to preserve old ways through education, law, or religion; national identity is often linked to culture, and any perceived attack on it can lead to strong emotional reactions.',
+    },
+  ],
+},{
+  id: 50,
+  title: 'Cultural Heritage',
+  topic: 'Culture & Society',
+  content: `Cultural heritage refers to the traditions, monuments, languages, knowledge, and practices that have been passed down from one generation to the next. It is a record of human creativity, identity, and history. Because cultural heritage reflects who we are and where we come from, protecting it is essential for both present and future societies.
+There are two main types of cultural heritage: tangible and intangible.
+Tangible heritage includes physical objects such as historical buildings, ancient manuscripts, paintings, monuments, temples, and artifacts. Examples include the Pyramids of Egypt, the Great Wall of China, and the architecture of Samarkand. These structures provide physical evidence of past civilizations, helping us understand how people lived, believed, and built their worlds.
+Intangible heritage refers to non-physical elements like oral traditions, music, dance, rituals, festivals, crafts, and languages. For instance, the Japanese tea ceremony, Uzbek embroidery (do‗ppi tikish), and the Indian classical dance Bharatanatyam are all forms of intangible heritage. Even though they cannot be touched, they are just as valuable, as they carry cultural memory and identity.
+Preserving cultural heritage is important for many reasons:
+•        It strengthens national identity. People feel pride and unity when they see their culture respected and preserved.
+•        It supports education and research. Schools and universities rely on historical materials to teach history, art, language, and social values.
+•        It boosts tourism. Many countries earn billions through visitors who come to see heritage sites and experience traditional life.
+•        It promotes creativity. Artists, designers, and musicians often take inspiration from traditional forms to create new works.
+However, cultural heritage is constantly under threat. Natural disasters like earthquakes and floods can destroy centuries-old buildings. Because many sites are made of fragile materials, they need constant care and maintenance.
+Human activities are also a major danger. Wars, terrorism, and looting can wipe out cultural treasures in days. The destruction of ancient sites in Syria or Iraq, for example, shocked the world. Once a site is destroyed, it is gone forever.
+Urban development is another issue. In fast-growing cities, traditional buildings may be demolished to make room for shopping malls or highways. Governments often prioritize economic growth over heritage preservation. This short-term thinking can lead to permanent cultural loss.
+Globalization adds another layer of complexity. As the world becomes more connected, dominant cultures—especially Western ones—spread rapidly. Local traditions, crafts, and languages may fade away, especially among younger generations who adopt global trends.
+To protect cultural heritage, international cooperation is crucial. Organizations like UNESCO (United Nations Educational, Scientific and Cultural Organization) have created lists of World Heritage Sites and Intangible Heritage Practices. These lists raise awareness and encourage preservation. Countries that protect their heritage gain not only pride—but also global recognition.
+Legal measures can help too. Governments can pass laws that prevent illegal excavation, export, or destruction of cultural property. Museums and institutions can ensure that artifacts are stored properly and shown respectfully. Communities can also be involved in caring for local traditions, especially when it comes to festivals, storytelling, and crafts.
+Digital technology is becoming a powerful tool in heritage conservation. 3D scanning, digital archives, and virtual reality can preserve images and structures even if the physical originals are lost. This allows future generations to access and learn from cultural materials, no matter where they live.
+Education plays a vital role as well. When children learn about their own and others‘ heritage in school, they develop respect, curiosity, and pride. A society that values its past is more likely to protect it.
+Debates sometimes arise about the ownership of cultural items. Many museums in Europe and North America hold artifacts taken from colonies or war zones. Some countries, like Egypt or Nigeria, are demanding the return of their cultural treasures. The question of who owns heritage is both legal and moral.
+There‘s also a risk of commercializing culture. Festivals may be turned into tourist shows, and traditional music or clothing may be marketed in ways that lose meaning. While tourism can bring money, it must be managed carefully to protect authenticity.
+In conclusion, cultural heritage is more than old buildings or costumes—it is the soul of a people. Losing it means losing part of humanity‘s shared history. While modernization and globalization are inevitable, they should not come at the cost of cultural identity. Protecting heritage is not just about the past—it is about the future.`,
+  questions: [
+    {
+      question: 'What is the main purpose of this passage?',
+      explanation: 'The passage defines cultural heritage, distinguishes between tangible and intangible forms, explains why preservation is important, identifies threats such as natural disasters, war, urban development, and globalization, and discusses strategies including international cooperation, legal measures, digital technology, and education to protect it for the future.',
+    },
+    {
+      question: 'According to the passage, what is the difference between tangible and intangible cultural heritage?',
+      explanation: 'Tangible heritage includes physical objects such as historical buildings, manuscripts, paintings, monuments, temples, and artifacts, while intangible heritage refers to non-physical elements like oral traditions, music, dance, rituals, festivals, crafts, and languages that carry cultural memory and identity.',
+    },
+    {
+      question: 'The word "fragile" in the paragraph about natural disasters most likely means',
+      explanation: 'It means easily damaged or delicate, as many heritage sites are made of fragile materials that need constant care and maintenance to avoid destruction from events like earthquakes and floods.',
+    },
+    {
+      question: 'What can be inferred about the impact of globalization on cultural heritage?',
+      explanation: 'As the world becomes more connected, dominant cultures—especially Western ones—spread rapidly, causing local traditions, crafts, and languages to fade away, particularly among younger generations who adopt global trends.',
+    },
+    {
+      question: 'According to the passage, how does UNESCO contribute to protecting cultural heritage?',
+      explanation: 'UNESCO has created lists of World Heritage Sites and Intangible Heritage Practices that raise awareness and encourage preservation; countries that protect their heritage gain pride and global recognition through this international cooperation.',
+    },
+    {
+      question: 'The word "authenticity" in the paragraph about commercializing culture most likely means',
+      explanation: 'It means genuineness or remaining true to original meaning and form, as tourism and marketing of festivals, music, or clothing must be managed carefully to protect authenticity and avoid losing cultural meaning.',
+    },
+    {
+      question: 'What can be inferred about debates over the ownership of cultural items?',
+      explanation: 'Many museums in Europe and North America hold artifacts taken from colonies or war zones, and countries like Egypt or Nigeria are demanding their return; the question of who owns heritage is described as both legal and moral.',
+    },
+    {
+      question: 'According to the passage, why is education important for preserving cultural heritage?',
+      explanation: 'When children learn about their own and others\' heritage in school, they develop respect, curiosity, and pride, and a society that values its past is more likely to protect it.',
+    },
+    {
+      question: 'What can be inferred about the role of digital technology in heritage conservation?',
+      explanation: 'Tools such as 3D scanning, digital archives, and virtual reality can preserve images and structures even if physical originals are lost, allowing future generations to access and learn from cultural materials regardless of location.',
+    },
+    {
+      question: 'According to the passage, what are some reasons for preserving cultural heritage?',
+      explanation: 'Preserving cultural heritage strengthens national identity and pride, supports education and research, boosts tourism and economic benefits, and promotes creativity by inspiring artists, designers, and musicians to create new works based on traditional forms.',
+    },
+  ],
 },
 ];
