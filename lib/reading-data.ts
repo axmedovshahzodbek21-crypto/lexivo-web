@@ -3594,5 +3594,583 @@ In sum, keeping pets involves more than just affection. It requires knowledge, t
       explanation: 'People sometimes adopt pets without understanding the time, money, and care required; neglected animals may become aggressive, sick, or depressed, leading to abandonment and full shelters.',
     },
   ],
+},{
+    id: 61,
+    title: 'Language',
+    topic: 'Society & Culture',
+    content: `Language is one of the most important features that separates humans from other species. Whether spoken, written, or signed, it allows people to share ideas, express emotions, and build communities. Because language is both a personal and social tool, it shapes the way we think, learn, and interact.
+There are over 7,000 languages spoken today, but many are in danger of disappearing. According to UNESCO, one language dies every two weeks, often because younger generations switch to more dominant tongues. If this trend continues, thousands of unique cultures and traditions may be lost forever.
+Although all languages serve the same basic purpose—communication—they differ in structure, sound, and style. Some use tones, like Mandarin; others rely heavily on word order, like English. Languages also vary in how they express politeness, time, or gender. These differences can influence the way people view the world. For example, in some languages, future events must be marked clearly ("I will go"); in others, the future can be implied. This may affect how speakers of different languages think about time and planning.
+Language is not static. It constantly evolves as societies change. New words enter a language through technology, migration, or social trends. For instance, terms like "selfie," "influencer," or "AI" didn't exist twenty years ago. At the same time, old words can fade away. Because language reflects culture, every social shift leaves a linguistic trace.
+Multilingualism—the ability to speak more than one language—is increasingly common. In globalized societies, people often need multiple languages for work, study, or travel. Children who grow up bilingual tend to develop better problemsolving skills and mental flexibility. Not only does knowing more than one language open doors to opportunity, but it also builds empathy and cultural awareness.
+Still, language can also divide people. When one language is seen as more
+―prestigious‖ than another, those who speak minority languages may feel inferior. In many countries, local dialects or indigenous languages are ignored in education and media. This leads to linguistic discrimination, which can reduce access to jobs and education.
+Governments play a key role in language policy. Some promote a single national language for unity, while others support multilingualism. For example, Switzerland has four official languages, and India recognizes more than twenty. Whether a country supports or suppresses linguistic diversity often reflects deeper political goals.
+The digital age has transformed how we use language. Text messaging, social media, and voice assistants have created new forms of expression. Abbreviations, emojis, and memes now carry meaning as efficiently as full sentences. However, some argue this leads to a decline in formal grammar and writing skills.
+Language learning has also changed. With mobile apps, online tutors, and AI tools, people can now learn languages anytime, anywhere. Because of this shift, formal classrooms are no longer the only place to master a foreign language. Motivation and exposure often matter more than textbooks.
+But learning a language is not just about vocabulary and grammar. It involves understanding how people think, behave, and relate to each other. Idioms, jokes, and expressions reveal cultural attitudes. For instance, the phrase ―time is money‖ reflects a Western view of efficiency. In contrast, other cultures may value patience and relationships over speed.
+Language also influences identity. The way we speak often signals where we come from, how we see ourselves, and how others see us. Accents, dialects, and word choices can build trust—or cause bias. In job interviews, for instance, people may be judged not only on what they say, but how they say it.
+Despite its complexity, language remains a powerful connector. It enables cooperation, conflict resolution, and the passing down of knowledge. It can be used to build peace—or spread hate. Political speeches, advertising slogans, and media headlines all show how language shapes opinion and behavior.
+Ultimately, language is not just a tool for communication—it is a mirror of who we are. The words we choose, the tone we use, and the silence we allow all reveal our values and worldview. If we pay attention to language, we can better understand both ourselves and others.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose of this passage is to explore the fundamental role of language in human communication, identity, and society, while discussing the diversity and evolution of languages, the benefits and challenges of multilingualism, the impact of digital technology, the influence of language on thought and culture, and its power both to connect people and to divide them.',
+      },
+      {
+        question: 'According to the passage, why are many languages in danger of disappearing?',
+        explanation: 'Many languages are in danger because younger generations switch to more dominant tongues. According to UNESCO, one language dies every two weeks, and if this trend continues, thousands of unique cultures and traditions may be lost forever.',
+      },
+      {
+        question: 'The word \'static\' in paragraph 4 most likely means?',
+        explanation: 'It most likely means unchanging or fixed, as the passage states that language is not static but constantly evolves as societies change, with new words entering through technology, migration, or social trends while old words fade away.',
+      },
+      {
+        question: 'What can be inferred about the benefits of bilingualism for children?',
+        explanation: 'It can be inferred that growing up bilingual provides cognitive and social advantages, as children tend to develop better problem-solving skills and mental flexibility, while also gaining greater empathy and cultural awareness that open doors to opportunity.',
+      },
+      {
+        question: 'According to the passage, how has the digital age affected language use?',
+        explanation: 'The digital age has created new forms of expression through text messaging, social media, and voice assistants, where abbreviations, emojis, and memes carry meaning efficiently. However, some argue this contributes to a decline in formal grammar and writing skills.',
+      },
+      {
+        question: 'What can be inferred about the relationship between language and identity?',
+        explanation: 'It can be inferred that language strongly shapes personal and social identity, as the way people speak—including accents, dialects, and word choices—signals where they come from and how they are perceived, which can build trust or cause bias in situations such as job interviews.',
+      },
+    ],
+  },{
+    id: 62,
+    title: 'Mass Media',
+    topic: 'Media & Society',
+    content: `Mass media refers to the various platforms used to communicate information to a large audience. This includes newspapers, television, radio, social media, and online news sites. Because media reaches millions of people simultaneously, it has enormous power to inform, shape opinions, and influence behavior.
+Throughout history, mass media has played a key role in shaping society. In the past, newspapers and radio were the main sources of information. Later, television brought visual content into people‘s homes, changing how news, entertainment, and advertising were delivered. With the rise of the internet, media has become more immediate, interactive, and personalized.
+Although media was once controlled by a few powerful organizations, today almost anyone can publish content online. Social media platforms allow individuals to become creators, influencers, or even journalists. This shift has democratized information—but also increased the spread of misinformation.
+Mass media affects politics, culture, and even personal identity. Not only does it report events, but it also decides which events are worth reporting. This selection process—known as agenda-setting—can influence what people care about. For example, when news outlets repeatedly cover crime stories, the public may feel society is becoming more dangerous, even if crime rates are falling.
+Media also affects how people see the world. Because it shapes public opinion, it can create or reinforce stereotypes. For instance, certain groups may be shown in negative or simplistic ways, leading to bias and misunderstanding. The language, images, and tone used in media stories deeply impact perception.
+Advertising is another powerful part of mass media. Companies spend billions each year to promote their products through television, websites, and social platforms. While some ads simply inform, others use emotional appeals, celebrity endorsements, or social pressure to influence choices. Young people, in particular, are highly affected by targeted ads online.
+Mass media is not just about entertainment or news. It plays a major role in education, public health, and social awareness. Campaigns about smoking, seat belts, or climate change have used television and online platforms to reach large audiences. Because of media, these messages can spread rapidly and change public behavior.
+However, media also has negative effects. Sensationalism, bias, and fake news can distort reality. In the rush to get attention, some media sources prioritize speed over accuracy. This creates confusion, mistrust, and division among the public. In recent years, the spread of conspiracy theories through online platforms has raised concerns about democracy and truth.
+Children and teenagers are particularly vulnerable. Excessive exposure to media— especially violent or unrealistic content—can affect mental health, behavior, and self-esteem. Social media platforms, for example, often present idealized images that lead to comparison and anxiety. Although these platforms offer connection and creativity, they also raise serious concerns about privacy and mental wellbeing.
+Media freedom varies widely across countries. In democratic societies, journalists can investigate, criticize, and challenge authority. This freedom supports transparency and accountability. In contrast, authoritarian regimes often control or censor the media, limiting access to information. Where press freedom is restricted, corruption and human rights abuses are more likely to go unnoticed.
+Governments, therefore, face a difficult balance. On one hand, they must protect freedom of expression. On the other, they must fight harmful content such as hate speech, terrorism, or false information. This balance between liberty and regulation is one of the biggest challenges of modern media policy.
+In the digital era, the media landscape is changing rapidly. Traditional outlets are losing audiences to online platforms. People now consume information in short clips, headlines, or posts. Algorithms decide what users see, often reinforcing their existing beliefs. As a result, individuals may live in ―echo chambers,‖ only exposed to ideas they already agree with.
+Despite these issues, mass media remains essential in a globalized world. It connects people across borders, highlights injustice, and celebrates human achievement. The challenge is not whether we need media—but how to make it more responsible, diverse, and trustworthy.
+Ultimately, media reflects society—but also shapes it. The stories it tells, the voices it includes, and the values it promotes all have long-term effects. If we consume media critically and demand higher standards, we can ensure it remains a force for good.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose is to explain what mass media is, how it has evolved, its powerful influence on society, politics, and individuals, the benefits and harms it can produce, and the challenges of balancing freedom with responsibility in the digital age.',
+      },
+      {
+        question: 'According to the passage, what is agenda-setting in mass media?',
+        explanation: 'Agenda-setting is the selection process by which media decides which events are worth reporting, thereby influencing what people care about; for example, repeated coverage of crime can make the public feel society is more dangerous even if crime rates are falling.',
+      },
+      {
+        question: 'The word \'democratized\' in the third paragraph most likely means...',
+        explanation: 'Made accessible to ordinary people rather than controlled by a few. The passage states that the shift allowing almost anyone to publish content online has democratized information but also increased misinformation.',
+      },
+      {
+        question: 'What can be inferred about the effects of social media on young people?',
+        explanation: 'Children and teenagers are particularly vulnerable; excessive exposure to idealized images can lead to comparison, anxiety, and lower self-esteem, while platforms also raise concerns about privacy and mental wellbeing despite offering connection and creativity.',
+      },
+      {
+        question: 'According to the passage, how does mass media contribute to public health and social awareness?',
+        explanation: 'Campaigns about smoking, seat belts, or climate change have used television and online platforms to reach large audiences, allowing messages to spread rapidly and change public behavior.',
+      },
+      {
+        question: 'The phrase \'echo chambers\' in the twelfth paragraph most likely means...',
+        explanation: 'Environments in which people are mainly exposed to ideas and information that match their existing beliefs. Algorithms reinforce this by deciding what users see, limiting exposure to differing viewpoints.',
+      },
+      {
+        question: 'What can be inferred about media freedom in different political systems?',
+        explanation: 'In democratic societies journalists can investigate and challenge authority, supporting transparency, whereas authoritarian regimes often control or censor media, making corruption and human rights abuses more likely to go unnoticed.',
+      },
+      {
+        question: 'According to the passage, what negative effects can result from sensationalism and fake news?',
+        explanation: 'Sensationalism, bias, and fake news can distort reality; prioritizing speed over accuracy creates confusion, mistrust, and division, and the spread of conspiracy theories has raised concerns about democracy and truth.',
+      },
+      {
+        question: 'What can be inferred about the role of advertising in mass media?',
+        explanation: 'Advertising is powerful; companies spend billions and use emotional appeals, celebrity endorsements, or social pressure, and young people are especially affected by targeted online ads that influence their choices.',
+      },
+      {
+        question: 'According to the passage, what balance must governments try to achieve regarding media?',
+        explanation: 'Governments must protect freedom of expression while also fighting harmful content such as hate speech, terrorism, or false information; this balance between liberty and regulation is one of the biggest challenges of modern media policy.',
+      },
+    ],
+  },{
+    id: 63,
+    title: 'Advertising',
+    topic: 'Media & Society',
+    content: `Advertising is a powerful tool used by companies, governments, and organizations to influence public behavior. Whether promoting a product, an idea, or a political message, advertising is everywhere: on TV, websites, billboards, buses, and even inside mobile apps. Because it reaches people across age, class, and culture, its impact is both wide and deep.
+Although the goal of advertising is often to boost sales, its influence goes far beyond economics. It affects how people think, feel, and even live. By repeatedly showing certain images or messages, advertising can shape public attitudes, cultural norms, and personal desires.
+Modern advertising is more than just showing a product. It often sells a lifestyle, a dream, or a feeling. For example, an ad for perfume may focus less on the scent and more on romance, confidence, or beauty. This emotional appeal makes the message more memorable—and more persuasive.
+Technology has completely transformed advertising. In the past, companies paid for space in newspapers or airtime on television. Today, digital platforms allow for personalized, targeted ads based on search history, location, and even emotional state. Because ads are now algorithm-driven, companies can reach the exact audience most likely to buy.
+However, this personalization comes with a cost. Many people feel their privacy is being invaded, especially when ads seem to ―follow‖ them online. Not only does this raise ethical questions, but it also creates mistrust in how personal data is collected and used.
+Children and teenagers are particularly vulnerable. Since their critical thinking skills are still developing, they may not recognize the persuasive intent behind advertisements. Some ads use cartoons, bright colors, or catchy music to appeal to younger viewers. This has led to concern about fast food, soft drink, and toy marketing, which may encourage unhealthy habits or unrealistic expectations.
+Advertising is also criticized for creating false needs. By constantly telling people they need to be richer, thinner, or more stylish, ads can increase dissatisfaction and materialism. This pressure to consume—whether through fashion, gadgets, or cosmetic products—can lead to debt, anxiety, or low self-esteem.
+Gender stereotypes in advertising remain a serious issue. Despite progress in recent years, many ads still portray women as objects of beauty or caretakers, while men are shown as strong, dominant, or successful. These repeated images reinforce outdated roles, limiting how people see themselves and each other.
+On the other hand, advertising can serve positive goals. Public service announcements have been used to promote seatbelt use, discourage smoking, or raise awareness about mental health. These campaigns prove that advertising can inform and educate—not just sell.
+Companies have also begun using advertising to show social responsibility. By including messages about sustainability, diversity, or equality, brands try to align themselves with public values. While some critics call this ―woke marketing,‖ others see it as a step toward a more responsible media environment.
+Regulation plays a crucial role. Most countries have laws to prevent misleading or harmful advertising. For example, tobacco ads are banned in many places. Ads for alcohol, gambling, or medication often come with strict rules. However, online ads are harder to control, especially across borders.
+The question of whether advertising should be limited is widely debated. Some argue that people must learn to think critically instead of banning ads. Others say that certain types of advertising—especially those targeting children or promoting harmful products—should not be allowed at all.
+In schools, teaching media literacy is becoming more important. If students learn how to analyze and question ads, they are less likely to be manipulated. Critical thinking, not censorship, may be the best defense against harmful advertising.
+Despite its problems, advertising remains a central part of modern life. It funds media, drives the economy, and introduces people to new products and ideas. The real challenge is not whether to allow advertising—but how to make it more honest, ethical, and inclusive.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose is to examine the power and influence of advertising in modern society, describing how it shapes attitudes and desires, the effects of technology and personalization, criticisms regarding privacy, vulnerable audiences, false needs, and stereotypes, its positive uses, the role of regulation, and the need for more honest, ethical, and inclusive practices.',
+      },
+      {
+        question: 'According to the passage, how does modern advertising often go beyond simply showing a product?',
+        explanation: 'Modern advertising often sells a lifestyle, a dream, or a feeling; for example, a perfume ad may focus more on romance, confidence, or beauty than on the scent itself, using emotional appeal to make the message more memorable and persuasive.',
+      },
+      {
+        question: 'The word "algorithm-driven" in the fourth paragraph most likely means',
+        explanation: 'In the context of digital platforms allowing personalized, targeted ads based on search history, location, and emotional state so companies can reach the exact audience most likely to buy, algorithm-driven means controlled or determined by computer algorithms that process user data.',
+      },
+      {
+        question: 'What can be inferred about the impact of personalized advertising on privacy?',
+        explanation: 'It can be inferred that many people feel their privacy is invaded when ads seem to follow them online, raising ethical questions and creating mistrust about how personal data is collected and used.',
+      },
+      {
+        question: 'According to the passage, why are children and teenagers particularly vulnerable to advertising?',
+        explanation: 'Their critical thinking skills are still developing, so they may not recognize the persuasive intent behind ads; some ads use cartoons, bright colors, or catchy music to appeal to them, raising concerns about marketing that encourages unhealthy habits or unrealistic expectations.',
+      },
+      {
+        question: 'The phrase "false needs" in the seventh paragraph most likely refers to',
+        explanation: 'In the context of ads constantly telling people they need to be richer, thinner, or more stylish, increasing dissatisfaction and materialism, false needs are artificial desires created by advertising rather than genuine requirements.',
+      },
+      {
+        question: 'What can be inferred about gender stereotypes in advertising?',
+        explanation: 'Despite some progress, many ads still portray women as objects of beauty or caretakers and men as strong, dominant, or successful; these repeated images reinforce outdated roles and limit how people see themselves and others.',
+      },
+      {
+        question: 'According to the passage, how can advertising serve positive goals?',
+        explanation: 'Public service announcements have promoted seatbelt use, discouraged smoking, and raised awareness about mental health, showing that advertising can inform and educate rather than only sell products.',
+      },
+      {
+        question: 'What can be inferred about the debate over limiting advertising?',
+        explanation: 'Some argue people should learn critical thinking instead of banning ads, while others believe certain types—especially those targeting children or promoting harmful products—should not be allowed at all; media literacy in schools is presented as a key defense against manipulation.',
+      },
+      {
+        question: 'According to the passage, what is the real challenge regarding advertising in modern life?',
+        explanation: 'Despite its problems, advertising remains central because it funds media, drives the economy, and introduces new products and ideas; the real challenge is not whether to allow it, but how to make it more honest, ethical, and inclusive.',
+      },
+    ],
+  },{
+    id: 64,
+    title: 'Law',
+    topic: 'Society & Justice',
+    content: `Law is the foundation of modern society. It sets clear rules about what people can and cannot do, and provides a system for resolving disputes. Whether dealing with theft, contracts, or civil rights, laws are essential for order, stability, and justice. Without laws, societies would face chaos. People would settle arguments with violence, and the weak would have no protection. Because laws apply equally to everyone—at least in theory—they create fairness. For example, both rich and poor are subject to the same criminal codes. This principle of equality before the law is central to democratic systems.
+Laws differ from one country to another. Some legal systems are based on religion; others rely on written constitutions or centuries of court decisions. Although legal traditions vary, the basic goals are often the same: to prevent harm, protect rights, and promote peace.
+Criminal law deals with actions that are considered harmful to society, such as assault, theft, or fraud. When someone breaks a criminal law, the government prosecutes them on behalf of the public. If found guilty, the person may face a fine, imprisonment, or another penalty.
+Civil law, by contrast, handles disputes between individuals or organizations. These cases often involve issues like property, contracts, or family matters. Instead of punishment, the goal is compensation or resolution.
+Because laws must reflect changing values, they are often updated or reformed. For example, many countries have changed their laws on marriage, gender rights, or drug use in recent decades. What was illegal fifty years ago may be accepted today. This shows that law is not fixed—it evolves with society.
+Still, the process of making and enforcing laws is not always fair. In some countries, laws are used to silence critics, control the media, or limit freedom of expression. Even in democracies, powerful groups may influence legislation for their own benefit. That is why independent courts and free press are essential— they act as checks on government power.
+Enforcing the law requires a strong and honest justice system. Police, judges, and lawyers all play important roles. If the system is corrupt, public trust disappears. For instance, when wealthy individuals avoid punishment through bribes or connections, ordinary people lose faith in the rule of law.
+International law is another important area. It deals with agreements between countries, such as trade, war, or environmental protection. Although international law lacks a global police force, it relies on treaties, courts, and cooperation to manage global conflicts. The International Criminal Court, for example, prosecutes war crimes and crimes against humanity.
+Some people argue that there are too many laws. They believe that excessive regulation restricts freedom and innovation. Others say that laws are too soft, especially on serious crimes. This debate often appears in discussions about sentencing, prison reform, or the death penalty.
+Another controversial issue is whether laws always reflect morality. Just because something is legal does not mean it is right. For example, in the past, slavery and segregation were legal in many countries. Today, many argue that laws should go further to ensure fairness—for instance, by protecting the environment or reducing inequality.
+Technology also creates legal challenges. Cybercrime, online privacy, and artificial intelligence are areas where the law struggles to keep up. New tools like facial recognition or digital tracking raise questions about surveillance, consent, and data security.
+Education about the law is essential. If people don‘t understand their rights or responsibilities, they cannot fully participate in society. That‘s why many schools include basic legal education, such as how to interact with police or sign a contract. Ultimately, the law reflects the values of a society—but also shapes them. It tells people not only what is allowed, but also what is important. When used fairly and wisely, law protects freedom and ensures justice. When abused or ignored, it becomes a tool of power and fear.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The passage explains the role, types, evolution, challenges, and importance of law in society, emphasizing that fair and wise application of law protects freedom and justice while abuse turns it into a tool of power.',
+      },
+      {
+        question: 'According to the passage, what is the principle of equality before the law?',
+        explanation: 'Equality before the law means that laws apply equally to everyone, at least in theory, so that both rich and poor are subject to the same criminal codes, creating fairness central to democratic systems.',
+      },
+      {
+        question: 'The word "prosecutes" in the third paragraph most likely means',
+        explanation: 'In context, prosecutes means that the government formally charges and takes legal action against a person who has broken a criminal law on behalf of the public.',
+      },
+      {
+        question: 'What can be inferred about the difference between criminal and civil law?',
+        explanation: 'Criminal law addresses actions harmful to society and aims at punishment such as fines or imprisonment, whereas civil law handles private disputes and seeks compensation or resolution rather than punishment.',
+      },
+      {
+        question: 'According to the passage, why are laws often updated or reformed?',
+        explanation: 'Laws must reflect changing societal values, as shown by reforms on marriage, gender rights, or drug use, demonstrating that law is not fixed but evolves with society.',
+      },
+      {
+        question: 'What can be inferred about the role of independent courts and a free press?',
+        explanation: 'Independent courts and a free press act as essential checks on government power, helping prevent laws from being used unfairly to silence critics or benefit powerful groups.',
+      },
+      {
+        question: 'According to the passage, what happens when a justice system is corrupt?',
+        explanation: 'Corruption causes public trust to disappear; for example, when wealthy individuals avoid punishment through bribes or connections, ordinary people lose faith in the rule of law.',
+      },
+      {
+        question: 'The phrase "rule of law" in the seventh paragraph most likely means',
+        explanation: 'The rule of law refers to the principle that laws are applied fairly and consistently to everyone, without favoritism or corruption, so that public confidence in the justice system is maintained.',
+      },
+      {
+        question: 'What can be inferred about international law from the passage?',
+        explanation: 'Although international law lacks a global police force, it manages relations between countries through treaties, courts, and cooperation, as illustrated by the International Criminal Court prosecuting war crimes.',
+      },
+      {
+        question: 'According to the passage, why is education about the law important?',
+        explanation: 'If people do not understand their rights or responsibilities, they cannot fully participate in society, which is why many schools teach basic legal knowledge such as interacting with police or signing contracts.',
+      },
+    ],
+  },{
+    id: 65,
+    title: 'The Internet',
+    topic: 'Technology & Society',
+    content: `The internet has become a vital part of modern life. Whether used for work, study, communication, or entertainment, it connects billions of people across the globe. Because it is fast, flexible, and always available, the internet has changed how societies function.
+In less than three decades, the internet has transformed the world more than most inventions in human history. Businesses, governments, schools, and families rely on it every day. Not only does it provide instant access to information, but it also enables people to collaborate across borders.
+Education has been deeply affected. Online courses, video tutorials, and digital libraries give students access to knowledge once limited to elite institutions. Many universities now offer degrees fully online. Because learning is no longer restricted by time or place, people from remote or poor regions can study globally competitive content.
+Work has also shifted online. Remote jobs, freelance platforms, and virtual meetings are now common, especially since the COVID-19 pandemic. Employers save money on office space, while workers enjoy more flexibility. However, not everyone benefits equally, and some jobs have disappeared due to automation and digital tools.
+Social media is one of the internet‘s most influential developments. It allows people to share thoughts, photos, and opinions instantly. While this creates connection, it also fuels conflict, misinformation, and addiction. Because algorithms prioritize attention-grabbing content, users are often exposed to extreme views or false information.
+E-commerce is another major change. Buying and selling online has replaced traditional shopping for many people. From groceries to electronics, nearly everything can be delivered to your door. Although this is convenient, it raises concerns about data security, local businesses, and environmental impact due to packaging and delivery.
+One of the internet‘s greatest strengths is access to information. You can search for anything in seconds—from medical symptoms to historical facts. But just because information is available does not mean it is accurate. Fake news, conspiracy theories, and biased sources can mislead people. That is why digital literacy is becoming as important as reading and writing.
+Privacy is another growing concern. While people enjoy free access to apps, news, and social media, they often ―pay‖ with personal data. Companies track user behavior to target ads, influence decisions, and even manipulate emotions. Many users are unaware of how much of their life is being monitored.
+The internet also creates a digital divide. Although many people use smartphones daily, billions still lack stable internet access. This gap limits opportunities in education, work, and health. Bridging this divide is essential if the internet is to benefit everyone equally.
+Censorship and control are rising as governments react to the internet‘s power. In some countries, certain websites are blocked or monitored. Critics are silenced online, and access to foreign news is limited. While some restrictions are made for national security, others clearly violate freedom of speech.
+The legal system is struggling to keep up. Cybercrime—like hacking, identity theft, and online scams—is increasing. Laws that apply in one country may not apply in another. This raises serious questions about who controls the internet— and who should.
+Despite its problems, the internet offers hope. It has helped organize protests, educate millions, and connect families across oceans. During disasters or war, it can deliver real-time updates and mobilize aid. If used wisely, the internet can reduce inequality and promote understanding.
+However, the key word is ―if.‖ Whether the internet makes the world better or worse depends on how we use it. Like any powerful tool, it can build or destroy, connect or divide, inform or deceive.
+Ultimately, the internet is not good or bad by itself—it reflects the people who use it. The challenge for the future is not just access, but responsible, informed use. If we teach digital responsibility and protect individual rights, the internet can remain one of humanity‘s greatest achievements.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The passage describes the transformative effects of the internet on education, work, social interaction, commerce, and information access, examines challenges such as misinformation, privacy, the digital divide, and censorship, and concludes that its value depends on responsible use and the protection of individual rights.',
+      },
+      {
+        question: 'According to the passage, how has the internet affected education?',
+        explanation: 'The passage states that online courses, video tutorials, and digital libraries give students access to knowledge once limited to elite institutions, and that many universities now offer degrees fully online, allowing people from remote or poor regions to study globally competitive content.',
+      },
+      {
+        question: 'The word \"algorithms\" in the discussion of social media most likely means',
+        explanation: 'In context, algorithms refer to the systems that prioritize attention-grabbing content on social media, often exposing users to extreme views or false information.',
+      },
+      {
+        question: 'What can be inferred about the impact of social media?',
+        explanation: 'The passage notes that while social media creates connection, it also fuels conflict, misinformation, and addiction, and that algorithms can lead users to extreme or false information.',
+      },
+      {
+        question: 'According to the passage, what concerns does e-commerce raise?',
+        explanation: 'The passage states that although online buying and selling is convenient, it raises concerns about data security, local businesses, and environmental impact due to packaging and delivery.',
+      },
+      {
+        question: 'The phrase \"digital divide\" in the passage most likely means',
+        explanation: 'The passage describes the digital divide as the gap in which many people use smartphones daily while billions still lack stable internet access, limiting opportunities in education, work, and health.',
+      },
+      {
+        question: 'What can be inferred about privacy on the internet?',
+        explanation: 'The passage explains that people often \"pay\" for free access to apps and social media with personal data, as companies track behavior to target ads and influence decisions, and many users are unaware of how much they are monitored.',
+      },
+      {
+        question: 'According to the passage, why is digital literacy becoming important?',
+        explanation: 'The passage states that because available information is not always accurate—due to fake news, conspiracy theories, and biased sources—digital literacy is becoming as important as reading and writing.',
+      },
+      {
+        question: 'What can be inferred about government control of the internet?',
+        explanation: 'The passage notes that in some countries websites are blocked or monitored, critics are silenced, and foreign news access is limited, with some restrictions claimed for national security while others violate freedom of speech.',
+      },
+      {
+        question: 'According to the passage, what determines whether the internet makes the world better or worse?',
+        explanation: 'The passage states that whether the internet makes the world better or worse depends on how we use it, and that the challenge is responsible, informed use through teaching digital responsibility and protecting individual rights.',
+      },
+    ],
+  },{
+    id: 66,
+    title: 'Jobs',
+    topic: 'Work & Economy',
+    content: `Work plays a central role in most people‘s lives. Whether someone is a teacher, driver, doctor, or engineer, a job provides not only income, but also structure, purpose, and identity. Because jobs shape our routines and social status, they are often tied to personal dignity and long-term goals.
+In the past, people often stayed in one job for their entire career, especially in industrial or government sectors. However, modern economies demand flexibility. Many workers now change careers several times, work freelance, or juggle multiple roles. This shift reflects broader changes in technology, education, and lifestyle.
+Technology has had a major impact. Automation, artificial intelligence, and digital tools have replaced many traditional jobs, especially in manufacturing and retail. At the same time, new careers have emerged in fields like data science, app development, and cybersecurity. Because the job market evolves quickly, lifelong learning has become essential.
+Education systems are adapting slowly. Although schools still focus on academic subjects, employers often complain that graduates lack practical skills. Critical thinking, teamwork, and communication are now more valuable than memorizing facts. Some argue that education should prepare students for the real world—not just for exams.
+Work–life balance is another major issue. While older generations often accepted long hours and job stress, younger people are more focused on flexibility and wellbeing. Remote work, four-day workweeks, and mental health days are becoming more common. Not only do these changes reflect new values, but they also improve productivity and morale.
+Still, job insecurity remains a growing problem. Temporary contracts, part-time work, and gig economy platforms offer flexibility but little stability. Many workers lack benefits such as health insurance or paid leave. This uncertainty can lead to stress, anxiety, and long-term financial problems.
+Wages and income inequality are also controversial topics. In some industries, top executives earn hundreds of times more than regular employees. While some justify this gap by pointing to responsibility and skill, others see it as unfair and damaging to social trust. Governments are under pressure to raise minimum wages and reduce income gaps.
+Gender and diversity issues continue to affect the job market. Despite legal protections, women and minorities still face discrimination in hiring, pay, and promotion. Some industries remain dominated by men, while others struggle to attract diverse talent. Workplace equality is not just a moral issue—it also improves performance and innovation.
+Motivation is another key factor. People work not only for money, but also for personal growth, social connection, and meaning. Jobs that offer autonomy, recognition, and purpose tend to attract more loyalty. In contrast, boring or stressful jobs with poor management cause burnout and high turnover.
+Unemployment has both personal and social costs. When people lose their jobs, they may suffer from depression, isolation, or poverty. High unemployment rates can also increase crime, reduce tax revenue, and damage public services. That is why job creation is often a top political priority.
+Globalization has created both opportunities and challenges. Companies can now hire workers from anywhere, leading to more competition—but also job losses in certain regions. Outsourcing and automation may increase profits but often hurt local communities. Balancing global efficiency with local well-being is a constant challenge.
+Job satisfaction is often more important than job title. Even if someone earns a high salary, they may feel unhappy if the work is boring, stressful, or ethically questionable. On the other hand, people in modest jobs may feel proud if their work is meaningful. This shows that personal values matter more than prestige.
+Ultimately, jobs are not just about making a living—they are about making a life. The ideal job provides security, purpose, respect, and balance. While no job is perfect, the search for meaningful work is one of the most human pursuits.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose is to discuss the changing nature of work, including the impact of technology, education, work-life balance, inequality, and motivation, and to emphasize that jobs provide more than income—they shape identity and purpose.',
+      },
+      {
+        question: 'According to the passage, how has the nature of careers changed from the past to the present?',
+        explanation: 'In the past, people often stayed in one job for their entire career, but modern economies demand flexibility, with many workers changing careers several times, working freelance, or juggling multiple roles.',
+      },
+      {
+        question: 'The word "juggle" in the second paragraph most likely means...',
+        explanation: 'In the context of the passage, "juggle" means to handle or manage multiple roles or jobs at the same time.',
+      },
+      {
+        question: 'What can be inferred about the effect of technology on employment?',
+        explanation: 'It can be inferred that technology has eliminated many traditional jobs through automation while creating new opportunities in emerging fields, making lifelong learning essential for workers.',
+      },
+      {
+        question: 'According to the passage, what skills do employers often say graduates lack?',
+        explanation: 'Employers often complain that graduates lack practical skills such as critical thinking, teamwork, and communication, which are now more valuable than memorizing facts.',
+      },
+      {
+        question: 'The phrase "work–life balance" in the passage most likely refers to...',
+        explanation: 'It refers to the equilibrium between professional responsibilities and personal well-being, which younger workers prioritize through flexibility, remote work, and mental health support.',
+      },
+      {
+        question: 'What can be inferred about job insecurity in the modern economy?',
+        explanation: 'It can be inferred that temporary contracts, part-time work, and gig platforms provide flexibility but create instability by denying benefits and leading to stress and financial problems for many workers.',
+      },
+      {
+        question: 'According to the passage, why is workplace equality important beyond moral reasons?',
+        explanation: 'Workplace equality improves performance and innovation, in addition to being a moral issue, by addressing discrimination faced by women and minorities in hiring, pay, and promotion.',
+      },
+      {
+        question: 'What can be inferred about the relationship between job satisfaction and salary?',
+        explanation: 'It can be inferred that high salary alone does not guarantee happiness if the work is boring, stressful, or unethical, while meaningful work can bring pride even in modest-paying jobs.',
+      },
+      {
+        question: 'According to the passage, what are some social costs of high unemployment?',
+        explanation: 'High unemployment can increase crime, reduce tax revenue, and damage public services, in addition to causing personal problems such as depression, isolation, or poverty.',
+      },
+    ],
+  },{
+    id: 67,
+    title: 'Unemployment',
+    topic: 'Economy & Society',
+    content: `Unemployment remains one of the most serious challenges facing both developed and developing countries. Whether caused by economic crisis, automation, or poor education systems, joblessness affects not only individuals but entire communities. Because work provides income, purpose, and identity, being unemployed can have long-term social and psychological consequences.
+Although unemployment is often measured by national statistics, these numbers rarely tell the whole story. Not only do they ignore people who have stopped looking for work, but they also fail to reflect the quality or stability of available jobs. In fact, underemployment—when people work fewer hours than they need or take jobs below their skill level—is also a growing issue.
+There are many types of unemployment. Frictional unemployment refers to the short period when people are between jobs. This is normal in any economy.
+Structural unemployment, on the other hand, occurs when workers‘ skills no longer match available jobs—often due to technological change. Cyclical unemployment rises during economic downturns when companies cut jobs to reduce costs.
+Because automation and artificial intelligence are replacing many routine tasks, some experts fear that millions will lose their jobs in the near future. Retail, transportation, and manufacturing sectors are especially at risk. While new jobs may be created in tech-related industries, they often require skills that many workers do not yet have.
+Young people are among the most vulnerable groups. In many countries, youth unemployment rates are double or triple the national average. Even those with university degrees often struggle to find stable work. This can delay major life steps—like moving out, getting married, or starting a family—and lead to frustration or social unrest.
+Long-term unemployment can cause serious harm. The longer someone remains jobless, the harder it becomes to re-enter the workforce. Skills may fade, confidence may drop, and employers may view gaps in the résumé with suspicion. This creates a vicious cycle where people feel trapped and hopeless.
+Unemployment also has wider social impacts. High joblessness is linked to increased crime, mental health problems, and drug abuse. It reduces consumer spending, lowers tax revenue, and places pressure on public services. As a result, unemployment is not just an economic issue—it is a public health and social stability issue as well.
+Governments use various strategies to address unemployment. These include job training programs, public works projects, tax incentives for employers, and unemployment benefits. While financial support can help people survive shortterm gaps, what matters more is helping them gain skills and find long-term opportunities.
+Education reform is key. Many argue that schools and universities must prepare students for the actual job market—not just exams. Critical thinking, digital literacy, and adaptability are now more important than memorizing facts. By connecting education with real-world needs, countries can reduce skills mismatch.
+Entrepreneurship is often promoted as a solution. By encouraging people to start their own businesses, governments hope to create jobs from the ground up. However, starting a business is risky and often requires capital, knowledge, and support. Without the right infrastructure, few succeed.
+Migration can reduce unemployment in some cases. When people move from areas with few jobs to regions with labor shortages, both individuals and economies benefit. However, this can also lead to ―brain drain‖ in poorer areas and increased competition in wealthier ones.
+The informal economy—jobs that are not officially recorded or taxed—is another factor. While it provides income for millions, it often lacks stability, legal protection, and long-term prospects. People working in this sector may live in constant insecurity, even though they are technically ―employed.‖
+In the long term, solving unemployment requires more than just economic growth. It requires smart policies, investment in people, and a shift in how society views work. Instead of seeing jobs only as a way to survive, we must also see them as a path to dignity, contribution, and fulfillment.
+Ultimately, a society that fails to provide decent work for its citizens is at risk of losing trust, stability, and hope. While no country can eliminate unemployment entirely, reducing it must remain a top priority for anyone who cares about fairness, opportunity, and progress.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose of the passage is to examine unemployment as a serious economic and social challenge, describing its types, causes, impacts on individuals and society, and various strategies for addressing it.',
+      },
+      {
+        question: 'According to the passage, what is underemployment?',
+        explanation: 'According to the passage, underemployment occurs when people work fewer hours than they need or take jobs below their skill level, and it is described as a growing issue that national unemployment statistics often fail to reflect.',
+      },
+      {
+        question: 'The word "frictional" in the third paragraph most likely refers to',
+        explanation: 'In the context of the third paragraph, "frictional" unemployment refers to the normal, short-term period when people are between jobs in any economy.',
+      },
+      {
+        question: 'What can be inferred about the impact of automation on employment?',
+        explanation: 'It can be inferred that automation and artificial intelligence threaten millions of jobs especially in retail, transportation, and manufacturing by replacing routine tasks, while new tech-related jobs may require skills that many current workers lack.',
+      },
+      {
+        question: 'According to the passage, why are young people particularly vulnerable to unemployment?',
+        explanation: 'According to the passage, youth unemployment rates are often double or triple the national average, and even university graduates struggle to find stable work, which can delay life milestones and lead to frustration or social unrest.',
+      },
+      {
+        question: 'The phrase "vicious cycle" in the seventh paragraph most likely means',
+        explanation: 'In the context of the seventh paragraph, "vicious cycle" describes the self-reinforcing situation in which long-term unemployment causes skills to fade and confidence to drop, making re-entry into the workforce even harder and trapping people in hopelessness.',
+      },
+      {
+        question: 'What can be inferred about the limitations of unemployment benefits?',
+        explanation: 'It can be inferred that while unemployment benefits and financial support can help people survive short-term gaps, they are less important than programs that help individuals gain skills and secure long-term job opportunities.',
+      },
+      {
+        question: 'According to the passage, how can education reform help reduce unemployment?',
+        explanation: 'According to the passage, education reform can reduce skills mismatch by preparing students for the actual job market through emphasis on critical thinking, digital literacy, and adaptability rather than just exam performance or memorizing facts.',
+      },
+      {
+        question: 'What can be inferred about the informal economy?',
+        explanation: 'It can be inferred that although the informal economy provides income for millions, it leaves workers in constant insecurity because it lacks stability, legal protection, and long-term prospects, even when people are technically employed.',
+      },
+      {
+        question: 'According to the passage, what broader risks does a society face if it fails to provide decent work?',
+        explanation: 'According to the passage, a society that fails to provide decent work for its citizens risks losing trust, stability, and hope, making the reduction of unemployment a top priority for fairness, opportunity, and progress.',
+      },
+    ],
+  },{
+    id: 68,
+    title: 'Industrial Relations',
+    topic: 'Labor & Employment',
+    content: `Industrial relations refer to the relationship between employers, employees, and trade unions in the workplace. Whether in manufacturing, public services, or technology, how workers and management interact affects productivity, fairness, and workplace stability. Because the interests of employers and workers often conflict, industrial relations require constant negotiation and balance.
+In the past, industrial relations were defined by confrontation. Workers faced long hours, low wages, and unsafe conditions. In response, they formed trade unions to demand better treatment. Although conditions have improved in many countries, disputes over pay, safety, and job security remain common.
+Unions play a key role. Not only do they represent the collective voice of employees, but they also negotiate wages, working hours, and benefits. This process, known as collective bargaining, is central to industrial relations. When negotiations fail, strikes or protests may follow.
+Because strikes can disrupt services and damage the economy, many governments have laws to regulate industrial action. In some countries, strikes in essential sectors—like healthcare or transport—are limited or require notice. While such laws aim to protect public interest, they can also reduce workers‘ ability to push for change.
+Industrial relations vary by country and sector. In Scandinavian countries, cooperation between unions and employers is strong, and conflicts are rare. In contrast, in some developing nations, labor rights are weak, and unions are discouraged or even banned. The quality of industrial relations often reflects the level of democracy, legal protections, and economic development.
+Technology is changing the landscape. As automation and artificial intelligence reshape the job market, many workers fear job loss or skill mismatch. Employers may prefer machines for efficiency and cost, while employees worry about their future. This tension is becoming a new focus of industrial negotiation.
+Globalization adds further complexity. When companies outsource labor to countries with cheaper wages, workers in higher-income nations may lose jobs. Although globalization has increased profits for many firms, it has also reduced bargaining power for local workers. Unions now face the challenge of organizing across borders, which is difficult due to legal and cultural differences.
+Flexible work arrangements—such as freelancing, gig work, and remote jobs—are also changing industrial relations. Because gig workers are often not legally classified as employees, they lack access to traditional benefits like paid leave or health insurance. This raises questions about fairness, regulation, and modern definitions of ―employment.‖
+Disputes in industrial relations are not always about money. Workplace safety, discrimination, promotion opportunities, and mental health are increasingly important topics. Employees want respect and equality, while employers must maintain efficiency and competitiveness. When either side ignores the other‘s concerns, conflict is likely.
+Good industrial relations benefit everyone. Companies with strong employee– management communication tend to have higher morale, lower turnover, and better productivity. Employees are more engaged when they feel heard and valued. Rather than viewing unions as a threat, wise employers see them as partners in building a healthy workplace culture.
+Governments often act as mediators during major labor disputes. They may help resolve conflicts through arbitration or impose rules to ensure fairness. For example, minimum wage laws, working hour limits, and safety standards are tools to protect workers without harming businesses. The goal is not to pick sides—but to ensure that both sides follow rules and respect rights.
+However, not all industrial conflicts are handled peacefully. In some cases, strikes lead to violence, job losses, or long-term damage to relationships. When trust is broken, rebuilding cooperation takes time. That is why early dialogue and honest negotiation are essential.
+Training managers in labor law and communication skills can help prevent conflict. Just as employees are taught their rights, employers must understand their responsibilities. A lack of awareness often leads to misunderstandings, which could be avoided with better education on both sides.
+Ultimately, industrial relations are about balance. Workers want security, fairness, and respect. Employers want efficiency, flexibility, and profit. When both sides listen and adapt, progress is possible. When one side dominates, problems grow.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose of the passage is to explain industrial relations as the interactions between employers, employees, and trade unions, covering historical confrontation, the role of unions and collective bargaining, variations by country, impacts of technology and globalization, challenges with flexible work, benefits of good relations, the role of governments, and the need for balance between workers\' and employers\' interests.',
+      },
+      {
+        question: 'According to the passage, what is collective bargaining?',
+        explanation: 'According to the passage, collective bargaining is the process in which unions negotiate wages, working hours, and benefits on behalf of employees, and it is central to industrial relations; when negotiations fail, strikes or protests may follow.',
+      },
+      {
+        question: 'The word "confrontation" in the second paragraph most likely means',
+        explanation: 'In the second paragraph, "confrontation" most likely means conflict or opposition, referring to the past state of industrial relations in which workers faced long hours, low wages, and unsafe conditions and responded by forming trade unions.',
+      },
+      {
+        question: 'What can be inferred about industrial relations in Scandinavian countries compared to some developing nations?',
+        explanation: 'It can be inferred that industrial relations vary significantly: in Scandinavian countries cooperation between unions and employers is strong and conflicts are rare, whereas in some developing nations labor rights are weak and unions are discouraged or banned, reflecting differences in democracy, legal protections, and economic development.',
+      },
+      {
+        question: 'According to the passage, how is technology changing industrial relations?',
+        explanation: 'According to the passage, automation and artificial intelligence are reshaping the job market, causing workers to fear job loss or skill mismatch while employers may prefer machines for efficiency and cost; this tension is becoming a new focus of industrial negotiation.',
+      },
+      {
+        question: 'What can be inferred about the impact of globalization on workers?',
+        explanation: 'It can be inferred that globalization has reduced bargaining power for local workers in higher-income nations because companies outsource labor to countries with cheaper wages, leading to potential job losses, even though it has increased profits for many firms; unions face challenges organizing across borders due to legal and cultural differences.',
+      },
+      {
+        question: 'According to the passage, why do flexible work arrangements raise questions about fairness?',
+        explanation: 'According to the passage, flexible arrangements such as freelancing, gig work, and remote jobs raise questions about fairness and regulation because gig workers are often not legally classified as employees and therefore lack access to traditional benefits like paid leave or health insurance, challenging modern definitions of ―employment.‖',
+      },
+      {
+        question: 'The phrase "other‘s concerns" in the passage most likely refers to',
+        explanation: 'In the passage, "other‘s concerns" refers to the interests of the opposing side in industrial relations—employees seeking respect and equality versus employers needing to maintain efficiency and competitiveness—and ignoring these concerns is likely to lead to conflict.',
+      },
+      {
+        question: 'What can be inferred about the benefits of good industrial relations?',
+        explanation: 'It can be inferred that good industrial relations benefit both sides: companies with strong employee–management communication tend to have higher morale, lower turnover, and better productivity, while employees are more engaged when they feel heard and valued; wise employers therefore view unions as partners rather than threats.',
+      },
+      {
+        question: 'According to the passage, what is the ultimate nature of industrial relations?',
+        explanation: 'According to the passage, industrial relations are ultimately about balance: workers want security, fairness, and respect while employers want efficiency, flexibility, and profit; progress is possible when both sides listen and adapt, but problems grow when one side dominates.',
+      },
+    ],
+  },{
+  id: 69,
+  title: 'Brain Drain',
+  topic: 'Migration & Economy',
+  content: `Brain drain refers to the large-scale migration of educated, skilled, and talented individuals from one country to another—usually from developing nations to wealthier ones. Whether they are doctors, engineers, scientists, or researchers, these individuals often leave their home countries in search of better job opportunities, higher salaries, and improved living conditions. Because their departure can weaken the national workforce, brain drain is seen as a serious problem by many governments.
+Although migration is a personal choice, it creates a national dilemma. Not only do countries lose the people they invested in through education and training, but they also struggle to replace these skilled workers. This weakens sectors such as healthcare, education, and technology, which depend on highly qualified professionals.
+Developing countries are most affected. In many cases, talented individuals leave because they see no future at home. Corruption, limited research funding, political instability, and poor working conditions push people to seek better environments abroad. This is often referred to as a ―push factor.‖
+On the other side, wealthy nations offer attractive "pull factors." Higher wages, career growth, safety, and access to cutting-edge facilities draw talent from across the world. For instance, countries like the USA, Canada, Germany, and Australia actively recruit foreign professionals through visa programs and job offers. Because of this trend, some developing countries have lost a significant portion of their best minds.
+The healthcare sector offers a clear example. Many African and South Asian countries face shortages of doctors and nurses, as thousands move to richer countries for better pay and working conditions. While this helps solve labor shortages in destination countries, it leaves hospitals and clinics back home understaffed and under pressure.
+Education is also impacted. Universities lose professors, researchers, and students to institutions abroad. This weakens their ability to innovate, publish, or compete internationally. If the most capable minds leave, national progress slows down.
+Some argue that brain drain can have benefits. When migrants send money back home—known as remittances—it supports families and boosts local economies. Also, skilled migrants may return one day with new knowledge, networks, and capital. This is called ―brain gain‖ or ―brain circulation.‖ For example, several Asian countries, such as China and India, have benefited from return migration in the tech and business sectors.
+However, this return is never guaranteed. If professionals settle permanently abroad, their skills are lost forever. Moreover, even remittances do not fix the deeper problems: weak institutions, lack of opportunity, and poor governance. To tackle brain drain, some governments are investing in better conditions for professionals. By offering competitive salaries, modern infrastructure, and transparent promotion systems, they try to keep talent at home. Scholarships with return conditions, research grants, and professional development programs also help reduce the urge to migrate.
+International cooperation is also important. Some suggest that destination countries should invest in the education systems of the countries they recruit from, especially in sectors like medicine. Others call for ethical recruitment policies that avoid draining critical workers from the poorest nations.
+Digital technology may offer part of the solution. With remote work becoming more common, professionals can now contribute to global companies while living in their home countries. If managed correctly, this could allow countries to benefit from international salaries without losing their talent.
+Yet challenges remain. Brain drain is not just about money—it is also about dignity, opportunity, and trust. If people believe their country does not value or support them, they are more likely to leave. This shows that retaining talent requires deeper reforms—not just higher wages.
+Ultimately, brain drain reflects global inequality. Talented individuals move not only for personal gain, but also to escape systems that limit their growth. Unless these root causes are addressed, even the best retention strategies will fail.`,
+  questions: [
+    {
+      question: 'What is the main purpose of this passage?',
+      explanation: 'The main purpose of the passage is to define brain drain as the migration of skilled individuals from developing to wealthier countries, explain its causes through push and pull factors, describe its negative impacts on sectors like healthcare and education, discuss possible benefits such as remittances and brain circulation, and outline strategies to address it.',
+    },
+    {
+      question: 'According to the passage, what are some common push factors that lead to brain drain?',
+      explanation: 'According to the passage, push factors include corruption, limited research funding, political instability, and poor working conditions that cause talented individuals in developing countries to see no future at home and seek better environments abroad.',
+    },
+    {
+      question: 'The phrase "pull factors" in the passage most likely means',
+      explanation: 'In the context of the passage, "pull factors" most likely means the attractive conditions in wealthier nations—such as higher wages, career growth, safety, and access to cutting-edge facilities—that draw skilled talent from other countries.',
+    },
+    {
+      question: 'What can be inferred about the impact of brain drain on healthcare in developing countries?',
+      explanation: 'It can be inferred that brain drain causes serious shortages of doctors and nurses in many African and South Asian countries, leaving hospitals and clinics understaffed and under pressure while helping to solve labor shortages in richer destination countries.',
+    },
+    {
+      question: 'According to the passage, what is meant by "brain gain" or "brain circulation"?',
+      explanation: 'According to the passage, "brain gain" or "brain circulation" refers to the potential benefits when skilled migrants return home with new knowledge, networks, and capital, as seen in examples from China and India in the tech and business sectors.',
+    },
+    {
+      question: 'What can be inferred about the limitations of remittances as a solution to brain drain?',
+      explanation: 'It can be inferred that while remittances support families and boost local economies, they do not solve deeper problems such as weak institutions, lack of opportunity, and poor governance, and return migration itself is never guaranteed.',
+    },
+    {
+      question: 'The word "remittances" in the passage most likely means',
+      explanation: 'In the context of the passage, "remittances" most likely means money that migrants send back to their home countries, which supports families and helps boost local economies.',
+    },
+    {
+      question: 'According to the passage, how can digital technology help address brain drain?',
+      explanation: 'According to the passage, with remote work becoming more common, professionals can contribute to global companies while living in their home countries, potentially allowing nations to benefit from international salaries without permanently losing their talent.',
+    },
+    {
+      question: 'What can be inferred about the root causes of brain drain from the conclusion?',
+      explanation: 'It can be inferred that brain drain ultimately reflects global inequality and systems that limit growth, and that retaining talent requires deeper reforms addressing dignity, opportunity, and trust rather than higher wages alone; otherwise even the best retention strategies will fail.',
+    },
+    {
+      question: 'According to the passage, what strategies do some governments use to reduce brain drain?',
+      explanation: 'According to the passage, some governments invest in better conditions by offering competitive salaries, modern infrastructure, and transparent promotion systems, as well as scholarships with return conditions, research grants, and professional development programs to keep talent at home.',
+    },
+  ],
+},{
+  id: 70,
+  title: 'Bribery',
+  topic: 'Society & Governance',
+  content: `Bribery is the act of offering, giving, or receiving something of value—usually money—to influence a person in a position of power. Whether it happens in politics, business, or everyday services, bribery undermines fairness, trust, and accountability. Because it operates in secrecy, it is often difficult to detect or prove.
+Although bribery exists in almost every country, its effects are especially damaging in developing nations. Not only does it weaken public institutions, but it also deepens inequality and slows down development. When access to services depends on payments under the table, citizens lose confidence in their leaders and systems.
+Bribery takes many forms. In some cases, it may involve paying a government official to speed up paperwork, avoid taxes, or win a contract. In others, it could mean giving gifts or favors to judges, police, or teachers to gain special treatment. Because these actions distort decision-making, they prevent fair competition and punish those who follow the rules.
+In business, bribery often appears as corporate corruption. Companies may offer bribes to secure deals, bypass regulations, or hide illegal activity. Multinational firms operating in weak legal environments may use local ―fixers‖ to smooth operations through illegal payments. While this may increase short-term profits, it also exposes companies to legal risks and reputational damage.
+The public sector is especially vulnerable. When civil servants are underpaid and poorly supervised, they may turn to bribes to supplement their income. This creates a cycle where public services become unreliable or inaccessible. For example, a bribe may be required to get a driver‘s license, hospital bed, or school admission— even when these should be free or fairly distributed.
+Elections and political systems are also at risk. Bribes can influence who gets nominated, elected, or appointed. This damages democracy, as leaders are chosen based on money, not merit. If voters believe elections are bought, not earned, participation drops and cynicism grows.
+Bribery often goes hand in hand with a lack of transparency. When government budgets, contracts, or decisions are hidden from the public, corruption becomes easier to hide. Because there is no oversight, dishonest behavior can continue unchecked for years.
+To fight bribery, many countries have passed strict anti-corruption laws. These include penalties for both the giver and receiver of bribes, as well as protections for whistleblowers. International treaties like the UN Convention Against Corruption promote cooperation across borders. Still, laws alone are not enough. If enforcement is weak or biased, corruption thrives.
+Public awareness is key. Citizens must understand their rights and report illegal activity without fear. Media, education, and civil society play crucial roles in exposing bribery and holding officials accountable. In some countries, investigative journalism has uncovered massive corruption scandals, leading to resignations, trials, and reforms.
+Technology can also help. Online payment systems, open data platforms, and egovernance tools reduce human contact and improve transparency. For example, when people pay taxes or apply for permits online, the chance of being asked for a bribe decreases. Digital systems create clear records, which are harder to manipulate. However, in many cultures, the line between bribery and ―gift-giving‖ is unclear. In some societies, giving presents to officials is seen as polite or respectful. This cultural norm makes enforcement difficult. What matters is whether the gift influences a decision or creates an unfair advantage.
+Some argue that bribery is a necessary evil in systems that don‘t work. When processes are slow or rules are unclear, people may pay bribes just to get basic services. But this short-term solution leads to long-term damage. It discourages reform and keeps bad systems in place.
+Ultimately, bribery is not just a legal issue—it is a moral and structural one. It reflects weak institutions, poor governance, and a lack of accountability. If societies want to reduce bribery, they must fix the conditions that allow it to grow: low salaries, unchecked power, and limited transparency.`,
+  questions: [
+    {
+      question: 'What is the main purpose of this passage?',
+      explanation: 'The passage defines bribery, explains its various forms and damaging effects especially in developing nations and public institutions, discusses its presence in business, politics, and everyday services, and outlines strategies to combat it through laws, public awareness, technology, and addressing underlying structural problems.',
+    },
+    {
+      question: 'According to the passage, why is bribery especially damaging in developing nations?',
+      explanation: 'It weakens public institutions, deepens inequality, and slows down development; when access to services depends on payments under the table, citizens lose confidence in their leaders and systems.',
+    },
+    {
+      question: 'The word "distort" in the paragraph about forms of bribery most likely means',
+      explanation: 'It means to twist or alter improperly, as bribery actions distort decision-making, prevent fair competition, and punish those who follow the rules.',
+    },
+    {
+      question: 'What can be inferred about the vulnerability of the public sector to bribery?',
+      explanation: 'When civil servants are underpaid and poorly supervised, they may turn to bribes to supplement their income, creating a cycle where public services become unreliable or inaccessible, such as requiring bribes for licenses, hospital beds, or school admissions.',
+    },
+    {
+      question: 'According to the passage, how can technology help reduce bribery?',
+      explanation: 'Online payment systems, open data platforms, and egovernance tools reduce human contact and improve transparency; for example, paying taxes or applying for permits online decreases the chance of being asked for a bribe, and digital systems create clear records that are harder to manipulate.',
+    },
+    {
+      question: 'The phrase "necessary evil" in the paragraph about systems that do not work most likely means',
+      explanation: 'It refers to something undesirable that some people believe is unavoidable or required under the circumstances, as some argue bribery is needed when processes are slow or rules are unclear to obtain basic services, though it causes long-term damage.',
+    },
+    {
+      question: 'What can be inferred about the relationship between transparency and bribery?',
+      explanation: 'Bribery often goes hand in hand with a lack of transparency; when government budgets, contracts, or decisions are hidden from the public, corruption becomes easier to hide and can continue unchecked for years due to no oversight.',
+    },
+    {
+      question: 'According to the passage, why are laws alone not enough to fight bribery?',
+      explanation: 'If enforcement is weak or biased, corruption thrives; although many countries have strict anti-corruption laws and international treaties promote cooperation, effective reduction also requires public awareness, media exposure, and addressing structural conditions.',
+    },
+    {
+      question: 'What can be inferred about cultural attitudes toward gift-giving and bribery?',
+      explanation: 'In many cultures the line between bribery and gift-giving is unclear; giving presents to officials may be seen as polite or respectful, making enforcement difficult, but what matters is whether the gift influences a decision or creates an unfair advantage.',
+    },
+    {
+      question: 'According to the passage, what conditions allow bribery to grow, and how should societies address them?',
+      explanation: 'Bribery reflects weak institutions, poor governance, and a lack of accountability; societies must fix conditions such as low salaries, unchecked power, and limited transparency to reduce it.',
+    },
+  ],
 },
 ];
