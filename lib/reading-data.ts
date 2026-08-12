@@ -656,5 +656,544 @@ Collective fears, such as fear of terrorism, disease, or climate change, can sha
       explanation: 'Caregivers should provide reassurance, maintain routines, and avoid exposing children to disturbing content, as supportive parenting helps children build confidence and emotional control, even though many childhood fears are a normal part of development.',
     },
   ],
+  
+},{
+    id: 12,
+    title: 'Happiness',
+    topic: 'Psychology & Well-being',
+    content: `Happiness is a state of emotional well-being characterized by feelings of joy, satisfaction, and contentment. While the concept of happiness is universal, its meaning, causes, and measurement vary greatly across individuals and cultures. Some view happiness as a fleeting emotional response, while others see it as a long-term condition related to life satisfaction and purpose.
+Psychologists often distinguish between two types of happiness: hedonic and eudaimonic. Hedonic happiness focuses on pleasure and the absence of pain. It involves short-term gratification, such as enjoying good food, entertainment, or relaxation. Eudaimonic happiness, by contrast, relates to meaning, personal growth, and fulfillment. People who pursue long-term goals, contribute to others, or develop their talents often report higher levels of eudaimonic happiness.
+Many factors influence happiness, including genetics, environment, personality, and life circumstances. Research suggests that a portion of individual happiness is inherited, but much of it is shaped by intentional behavior and outlook. For example, people who are optimistic, grateful, and socially connected tend to report higher levels of happiness.
+Relationships are one of the strongest predictors of happiness. Supportive family, friendships, and community connections provide emotional support, reduce stress, and create a sense of belonging. Studies consistently show that people with strong social bonds are happier and healthier than those who are socially isolated. Quality of relationships often matters more than quantity.
+Work and achievement also contribute to happiness. People who find meaning in their work, feel competent, and receive recognition are more satisfied with life. However, job stress, unemployment, or a lack of autonomy can decrease happiness significantly. A balance between challenge and control is crucial for well-being in the workplace.
+Money and material wealth play a complex role in happiness. To a certain extent, financial stability increases happiness by reducing stress and enabling access to basic needs like food, shelter, and healthcare. However, beyond a certain income level, additional wealth has a limited effect on happiness. In fact, people who focus heavily on material success may experience anxiety, comparison, or dissatisfaction, especially in consumer-driven societies.
+Health is another key component. Physical and mental health significantly impact how people feel on a daily basis. Chronic illness, pain, or mental health conditions can reduce life satisfaction, while regular exercise, adequate sleep, and a nutritious diet contribute to positive mood and energy. Mental health support and stress management strategies are essential for maintaining emotional well-being.
+Culture influences how people define and pursue happiness. In individualistic cultures, such as those in North America or Western Europe, happiness is often linked to personal achievement and self-expression. In collectivist cultures, such as those in East Asia or Africa, happiness may be more closely tied to family harmony, social responsibility, and group belonging. These cultural differences affect how people report their happiness and what they value most in life.
+Spirituality and religion can also contribute to happiness. Many people find comfort, meaning, and hope through religious beliefs or spiritual practices. Participation in religious communities provides social support and a sense of purpose, which are linked to higher life satisfaction. However, this effect depends on individual beliefs and cultural context.
+In recent years, the study of happiness has gained attention in public policy. Governments are increasingly recognizing that economic indicators alone do not reflect the quality of life. Countries like Bhutan have introduced the concept of Gross National Happiness (GNH) to guide decision-making. Others use happiness surveys to measure well-being alongside GDP. This shift reflects a broader understanding of what makes life meaningful.
+Technology and social media have changed how people experience and evaluate happiness. On one hand, digital tools allow people to connect, share experiences, and access entertainment. On the other hand, constant exposure to others' curated lives can lead to unrealistic expectations, envy, and reduced self-esteem. Managing digital habits and focusing on real-life connections are important for emotional balance.
+People often overestimate the impact of life events on long-term happiness. This phenomenon, known as hedonic adaptation, suggests that individuals quickly return to a baseline level of happiness after major changes, whether positive or negative. For example, people may feel happier immediately after winning the lottery or getting a promotion, but the emotional boost often fades as they adjust to the new situation.
+To increase happiness, psychologists recommend practices such as gratitude, mindfulness, acts of kindness, and goal setting. Keeping a gratitude journal, meditating, helping others, or pursuing meaningful personal projects can significantly improve mood and life satisfaction. These activities promote positive emotions and a sense of purpose.
+In conclusion, happiness is a complex and deeply personal experience influenced by internal and external factors. While genetics and circumstances play a role, much of our happiness depends on how we think, relate to others, and live our daily lives. By focusing on relationships, health, purpose, and gratitude, individuals and societies can build a more satisfying and fulfilling life.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose is to explain the nature of happiness, distinguish between hedonic and eudaimonic types, examine the various factors that influence it, and suggest practices that can increase happiness for individuals and societies.',
+      },
+      {
+        question: 'According to the passage, what is the difference between hedonic and eudaimonic happiness?',
+        explanation: 'Hedonic happiness focuses on pleasure and the absence of pain through short-term gratification, while eudaimonic happiness relates to meaning, personal growth, and fulfillment from pursuing long-term goals, contributing to others, or developing talents.',
+      },
+      {
+        question: 'The word \'hedonic\' in the second paragraph most likely means...',
+        explanation: 'Related to pleasure or short-term gratification. The passage defines hedonic happiness as focusing on pleasure and the absence of pain, involving experiences such as enjoying good food, entertainment, or relaxation.',
+      },
+      {
+        question: 'What can be inferred about the role of relationships in happiness?',
+        explanation: 'Relationships are one of the strongest predictors of happiness because supportive connections provide emotional support, reduce stress, and create belonging; people with strong social bonds are happier and healthier than those who are isolated, and quality matters more than quantity.',
+      },
+      {
+        question: 'According to the passage, how does money affect happiness?',
+        explanation: 'Financial stability increases happiness up to a point by reducing stress and meeting basic needs, but beyond a certain income level additional wealth has a limited effect, and a heavy focus on material success may lead to anxiety, comparison, or dissatisfaction.',
+      },
+      {
+        question: 'The phrase \'hedonic adaptation\' in the twelfth paragraph most likely means...',
+        explanation: 'The tendency for people to quickly return to a baseline level of happiness after major positive or negative life changes, so that the emotional impact of events such as winning the lottery or getting a promotion often fades over time.',
+      },
+      {
+        question: 'What can be inferred about cultural differences in happiness?',
+        explanation: 'In individualistic cultures happiness is often linked to personal achievement and self-expression, whereas in collectivist cultures it is more closely tied to family harmony, social responsibility, and group belonging, affecting how people report and value happiness.',
+      },
+      {
+        question: 'According to the passage, what practices do psychologists recommend to increase happiness?',
+        explanation: 'Psychologists recommend practices such as gratitude, mindfulness, acts of kindness, and goal setting, including keeping a gratitude journal, meditating, helping others, or pursuing meaningful personal projects.',
+      },
+      {
+        question: 'What can be inferred about the relationship between health and happiness?',
+        explanation: 'Physical and mental health significantly affect daily feelings and life satisfaction; chronic illness or mental health conditions can reduce happiness, while exercise, sleep, nutritious diet, mental health support, and stress management contribute to positive mood and well-being.',
+      },
+      {
+        question: 'According to the passage, why have some governments begun to measure happiness?',
+        explanation: 'Governments recognize that economic indicators alone do not fully reflect quality of life, so concepts such as Bhutan\'s Gross National Happiness and happiness surveys used alongside GDP reflect a broader understanding of what makes life meaningful.',
+      },
+    ],
+  },{
+    id: 13,
+    title: 'Success',
+    topic: 'Personal Development',
+    content: `Success is the achievement of a desired goal or outcome, and it holds different meanings for different people. For some, success may be measured by wealth, status, or career accomplishments. For others, it might be defined by personal happiness, strong relationships, or a meaningful life. Regardless of the definition, success is often the result of effort, planning, and persistence.
+Traditional views of success are often linked to education, employment, and income. In many societies, individuals are considered successful if they attend prestigious universities, obtain high-paying jobs, and accumulate material wealth. Media and advertising frequently reinforce these ideas by portraying success as luxury, fame, and power. While these external indicators can reflect achievement, they do not necessarily guarantee personal fulfillment.
+Increasingly, people are redefining success in more personal and holistic terms. Emotional well-being, work-life balance, and a sense of purpose are now considered essential components. A person who earns less but finds joy and meaning in their work, or someone who prioritizes family and health over career advancement, may be seen as equally successful as a corporate executive or celebrity.
+Success is influenced by a range of factors, including talent, opportunity, environment, and mindset. Natural ability can provide an advantage, but it is rarely sufficient on its own. Successful individuals often combine skills with hard work, resilience, and adaptability. They set goals, overcome setbacks, and continue improving themselves over time.
+Mindset plays a critical role in achieving success. Psychologist Carol Dweck introduced the concept of the ―growth mindset‖—the belief that abilities and intelligence can be developed through effort and learning. People with a growth mindset are more likely to take on challenges, persist after failure, and view effort as a path to mastery. In contrast, a ―fixed mindset‖ assumes abilities are unchangeable, which may discourage risk-taking or personal growth.
+Failure is often part of the journey to success. Many well-known figures—such as inventors, athletes, and entrepreneurs—experienced repeated failures before achieving their goals. Learning from mistakes and adjusting strategies is essential. In some cultures, however, failure is heavily stigmatized, making individuals afraid to try new things. Creating a supportive environment that encourages experimentation and accepts setbacks can foster long-term success.
+Cultural background shapes how people define and pursue success. In individualistic cultures, success is often associated with personal achievement, independence, and self-promotion. In collectivist cultures, success may be viewed in terms of family honor, group harmony, and contribution to the community. These cultural values influence educational systems, parenting styles, and workplace expectations.
+Education is commonly regarded as a key to success. It provides knowledge, skills, and credentials that open doors to job opportunities and social mobility. However, formal education is not the only path. Many successful individuals achieve their goals through apprenticeships, self-learning, or unconventional careers. In today‘s digital age, access to information and skill-building has become more democratized through online platforms.
+Networking and social connections are also important. Knowing the right people can provide mentorship, open doors, and build support systems. Success is rarely achieved in isolation; collaboration, communication, and teamwork are vital in most professional and personal pursuits.
+Technology and globalization have expanded the ways people can succeed. Remote work, online businesses, and digital platforms have created opportunities for individuals to build careers and reputations from almost anywhere. At the same time, increased competition and rapidly changing industries mean that adaptability and lifelong learning are more important than ever.
+Health and well-being are often overlooked in discussions of success. Physical fitness, mental stability, and emotional resilience allow people to perform at their best. Burnout, anxiety, and poor health can undermine even the most impressive achievements. As a result, many people now seek success that includes not only professional goals but also a healthy and balanced lifestyle.
+Measuring success can be challenging. External metrics—such as salary, awards, or job titles—are visible and easy to compare. However, internal satisfaction, peace of mind, and personal growth are harder to quantify but often more meaningful. Self-reflection and goal-setting can help individuals define success on their own terms.
+Governments and institutions also promote success at a societal level. Public policies that support education, healthcare, and equal opportunity allow more individuals to reach their potential. Inequality, discrimination, or lack of access can prevent people from succeeding despite their talent and effort. Promoting fairness and inclusion is essential for creating a society where everyone has a chance to succeed.
+In conclusion, success is a deeply personal and evolving concept. It involves not only achieving external goals but also finding meaning, balance, and satisfaction in life. While hard work, education, and connections all contribute, the most lasting success often comes from within—through purpose, resilience, and the ability to grow. By redefining success in broader, more inclusive terms, individuals and societies can create healthier, more fulfilling paths forward.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose is to explore the concept of success as a personal and evolving idea, contrasting traditional external measures with more holistic definitions, examining factors that influence success such as mindset, culture, education, and health, and emphasizing the value of internal fulfillment and inclusive opportunities.',
+      },
+      {
+        question: 'According to the passage, how do traditional views often define success?',
+        explanation: 'Traditional views link success to education, employment, and income; individuals are considered successful if they attend prestigious universities, obtain high-paying jobs, and accumulate material wealth, with media and advertising reinforcing images of luxury, fame, and power.',
+      },
+      {
+        question: 'The term "growth mindset" in the fifth paragraph most likely means',
+        explanation: 'According to the passage, a growth mindset is the belief that abilities and intelligence can be developed through effort and learning; people with this mindset take on challenges, persist after failure, and view effort as a path to mastery.',
+      },
+      {
+        question: 'What can be inferred about the role of failure in achieving success?',
+        explanation: 'It can be inferred that failure is a common and often necessary part of the path to success; many accomplished people experienced repeated failures, and learning from mistakes while adjusting strategies is essential, though cultural stigma around failure can discourage risk-taking.',
+      },
+      {
+        question: 'According to the passage, how do individualistic and collectivist cultures differ in their views of success?',
+        explanation: 'In individualistic cultures, success is associated with personal achievement, independence, and self-promotion, while in collectivist cultures it is viewed in terms of family honor, group harmony, and contribution to the community; these values affect education, parenting, and workplaces.',
+      },
+      {
+        question: 'The word "stigmatized" in the sixth paragraph most likely means',
+        explanation: 'In the context of failure being "heavily stigmatized", the word means strongly disapproved of or marked by social disgrace, which makes people afraid to try new things.',
+      },
+      {
+        question: 'What can be inferred about the importance of health and well-being in relation to success?',
+        explanation: 'It can be inferred that health and well-being are essential yet often overlooked elements of success; physical fitness, mental stability, and emotional resilience enable peak performance, while burnout and poor health can undermine achievements, leading many to seek a balanced lifestyle alongside professional goals.',
+      },
+      {
+        question: 'According to the passage, why is formal education not the only path to success?',
+        explanation: 'While education provides knowledge, skills, and credentials that open doors, many successful people achieve goals through apprenticeships, self-learning, or unconventional careers, and digital platforms have further democratized access to information and skill-building.',
+      },
+      {
+        question: 'What can be inferred about measuring success from the passage?',
+        explanation: 'External metrics like salary, awards, or job titles are visible and easy to compare, but internal factors such as satisfaction, peace of mind, and personal growth are harder to quantify yet often more meaningful; self-reflection helps people define success on their own terms.',
+      },
+      {
+        question: 'According to the passage, what role do governments and institutions play in promoting success?',
+        explanation: 'They promote success at a societal level through public policies supporting education, healthcare, and equal opportunity, which help more people reach their potential; inequality or lack of access can block success despite talent, so fairness and inclusion are essential.',
+      },
+    ],
+  },{
+    id: 14,
+    title: 'Memory',
+    topic: 'Health & Science',
+    content: `Memory is the mental ability to store, retain, and recall information. It plays a central role in everyday life, allowing humans to learn from experience, make decisions, and maintain relationships. Without memory, individuals would struggle to function, as even simple tasks like recognizing faces or finding one‘s way home rely on recalling past events or knowledge.
+Psychologists generally divide memory into three main stages: encoding, storage, and retrieval. Encoding is the process of taking in information through the senses. Storage refers to maintaining that information over time. Retrieval is the act of accessing the stored information when needed. Problems in any of these stages can lead to forgetting or distorted memories.
+Memory can also be categorized into different types. One of the most widely accepted models identifies sensory memory, short-term memory, and long-term memory. Sensory memory holds information for just a few seconds, like the brief image of a street sign seen while driving. Short-term memory, sometimes called working memory, allows individuals to hold and manipulate information temporarily—for example, remembering a phone number just long enough to dial it. Long-term memory stores information over extended periods and includes everything from childhood memories to the names of world capitals.
+Long-term memory is further divided into explicit and implicit memory. Explicit memory involves conscious recall and includes two subtypes: episodic memory (personal experiences) and semantic memory (general knowledge and facts). Implicit memory, by contrast, refers to unconscious memories, such as riding a bicycle or typing on a keyboard—skills that become automatic over time. The brain structures involved in memory include the hippocampus, amygdala, and cerebral cortex. The hippocampus is essential for forming new long-term memories, while the amygdala plays a role in emotional memories. The cortex is involved in storing and retrieving information, especially in long-term storage. Damage to these areas, through injury or disease, can result in memory loss or impairment.
+Aging affects memory, but not all aspects decline equally. While older adults may take longer to recall names or learn new tasks, many retain strong long-term memories and life experiences. Memory decline becomes more concerning when it interferes with daily activities, as seen in conditions like Alzheimer‘s disease or dementia, which are characterized by progressive memory loss and cognitive decline.
+Stress, lack of sleep, and poor nutrition can also affect memory. Stress hormones like cortisol can interfere with the brain‘s ability to form and retrieve memories.
+Sleep is critical for memory consolidation, a process in which newly learned information is stabilized in the brain. A healthy diet that supports brain function— rich in omega-3 fatty acids, antioxidants, and vitamins—is also beneficial for memory.
+To improve memory, individuals can use various techniques. Mnemonics, such as acronyms or visual imagery, help encode information more effectively. Repetition and review strengthen neural connections, making retrieval easier. Chunking, or grouping related items together, allows the brain to process larger amounts of information. For example, breaking a long number into smaller parts makes it easier to remember.
+Technology has influenced how people use memory. With smartphones, calendars, and search engines, people rely less on remembering facts and more on accessing information when needed. While these tools improve efficiency, some experts worry they may reduce mental effort and weaken memory skills over time. Cultural differences influence how people remember and value certain experiences. In Western cultures, memory is often personal and focused on individual experiences. In contrast, many Asian cultures emphasize collective memory and social context, focusing more on group events or shared narratives. These cultural frameworks affect how people recall and interpret the past. Memory is not always accurate. False memories—memories of events that never happened or that are distorted—can occur due to suggestion, imagination, or emotional influence. Research shows that memory is reconstructive, meaning that the brain fills in gaps based on expectations or related knowledge. This has important implications in areas like eyewitness testimony, where inaccurate memories can have serious consequences.
+Memory also plays a key role in identity and learning. Personal memories give individuals a sense of self and continuity. Academic learning relies heavily on the ability to memorize facts and procedures. The ability to reflect on past experiences also supports personal growth and decision-making.
+Emerging research in neuroscience and artificial intelligence seeks to understand and replicate memory. Scientists are exploring how memories are formed, stored, and retrieved at the molecular level, with the aim of developing treatments for memory disorders. Meanwhile, AI systems are being designed to mimic human memory processes, potentially enhancing learning tools or supporting people with cognitive impairments.
+In conclusion, memory is a fundamental cognitive function that shapes how we live, learn, and relate to others. While it can be fragile and fallible, it is also adaptable and trainable. By understanding how memory works and what influences it, individuals can take steps to improve it, protect it, and use it more effectively in daily life.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The passage explains the stages, types, brain mechanisms, influences, improvement techniques, cultural aspects, and limitations of memory, concluding that it is a fundamental yet adaptable cognitive function.',
+      },
+      {
+        question: 'According to the passage, what are the three main stages of memory?',
+        explanation: 'Psychologists divide memory into encoding (taking in information through the senses), storage (maintaining information over time), and retrieval (accessing stored information when needed).',
+      },
+      {
+        question: 'The word "consolidation" in the seventh paragraph most likely means',
+        explanation: 'In context, consolidation refers to the process by which newly learned information is stabilized in the brain during sleep.',
+      },
+      {
+        question: 'What can be inferred about implicit memory from the passage?',
+        explanation: 'Implicit memory involves unconscious skills that become automatic over time, such as riding a bicycle or typing, and does not require conscious recall.',
+      },
+      {
+        question: 'According to the passage, which brain structure is essential for forming new long-term memories?',
+        explanation: 'The hippocampus is essential for forming new long-term memories, while the amygdala handles emotional memories and the cortex stores and retrieves information.',
+      },
+      {
+        question: 'What can be inferred about the effects of aging on memory?',
+        explanation: 'Aging does not affect all aspects of memory equally; older adults may recall names or learn new tasks more slowly but often retain strong long-term memories, with serious decline linked to conditions like Alzheimer\'s disease.',
+      },
+      {
+        question: 'According to the passage, how can stress affect memory?',
+        explanation: 'Stress hormones such as cortisol can interfere with the brain\'s ability to form and retrieve memories.',
+      },
+      {
+        question: 'The word "reconstructive" in the tenth paragraph most likely means',
+        explanation: 'In context, reconstructive means that memory is not a perfect recording but involves the brain filling in gaps based on expectations or related knowledge, which can lead to false or distorted memories.',
+      },
+      {
+        question: 'What can be inferred about the impact of technology on memory skills?',
+        explanation: 'Although smartphones and search engines improve efficiency by reducing the need to remember facts, some experts worry that reliance on them may decrease mental effort and weaken memory skills over time.',
+      },
+      {
+        question: 'According to the passage, how do cultural differences influence memory?',
+        explanation: 'Western cultures tend to focus on personal and individual experiences, whereas many Asian cultures emphasize collective memory, social context, group events, and shared narratives.',
+      },
+    ],
+  },{
+    id: 15,
+    title: 'Life Expectancy',
+    topic: 'Health & Science',
+    content: `Life expectancy refers to the average number of years a person is expected to live, based on statistical analysis of current mortality rates. It is often used as a key indicator of a population‘s overall health and well-being. Life expectancy varies greatly across countries, regions, and social groups, influenced by a range of biological, social, economic, and environmental factors.
+In recent centuries, global life expectancy has increased significantly. In the early 20th century, many countries had average life expectancies below 50 years. Thanks to improvements in sanitation, nutrition, medical care, and public health measures, people now live much longer. According to the World Health Organization (WHO), the global average life expectancy reached over 73 years in recent years, though the figure varies widely depending on location and income level.
+Healthcare access is one of the most important factors influencing life expectancy. Populations with access to affordable and high-quality medical services—such as vaccinations, emergency care, and treatments for chronic diseases—tend to live longer. Countries with universal healthcare systems often have higher life expectancy, as preventive care and early diagnosis reduce the risk of fatal illnesses. Nutrition and clean water also play a critical role. Malnutrition weakens the immune system and increases vulnerability to disease, especially among children. Contaminated water sources can lead to deadly illnesses such as cholera and typhoid. Investments in clean water infrastructure and food security have helped reduce mortality rates in many developing countries.
+Lifestyle choices significantly affect how long people live. Smoking, excessive alcohol consumption, poor diet, and lack of physical activity are associated with increased risks of heart disease, diabetes, cancer, and other non-communicable diseases. On the other hand, individuals who maintain a healthy weight, exercise regularly, and avoid harmful substances tend to live longer and enjoy better quality of life.
+Education and income are strong predictors of life expectancy. More educated individuals are generally better informed about health practices, more likely to seek medical help, and more capable of navigating healthcare systems. Higher income provides access to nutritious food, safe housing, and healthcare. In contrast, poverty and low education are linked to shorter lifespans due to limited resources and opportunities.
+Gender differences in life expectancy are notable. In almost every country, women tend to live longer than men. This is partly due to biological differences—such as hormonal and genetic factors—as well as behavioral patterns. Men are more likely to engage in risky behavior, work in dangerous occupations, and avoid medical checkups. However, women are more prone to certain chronic illnesses, and the gap in life expectancy may narrow in future generations.
+Mental health and social connection also impact longevity. People with strong social networks and a sense of purpose are less likely to suffer from depression and anxiety, which can lead to poor physical health. Loneliness and social isolation, particularly among the elderly, are linked to higher rates of illness and early death.
+Supportive communities, mental health care, and active lifestyles help mitigate these risks.
+Infant and maternal mortality rates are closely tied to national life expectancy.
+High rates of child mortality lower average life expectancy significantly. Improving maternal healthcare, prenatal services, and nutrition can dramatically increase survival rates and overall life expectancy in a population.
+Environmental factors such as air pollution, climate change, and exposure to toxic substances also influence life expectancy. People living in polluted areas are at greater risk of respiratory diseases and other health problems. Climate-related disasters—such as heatwaves, floods, and droughts—can disrupt healthcare services and access to food and water, particularly in vulnerable communities.
+Technological and medical advances continue to push the boundaries of human lifespan. New treatments, early disease detection, and personalized medicine offer promising avenues for extending life. Some researchers are exploring anti-aging therapies and genetic modifications aimed at slowing or reversing the aging process. However, ethical, social, and economic implications must be considered alongside scientific progress.
+Despite the progress, life expectancy is not evenly distributed. People in lowincome or conflict-affected regions still face high mortality rates due to preventable diseases, violence, or lack of healthcare. The COVID-19 pandemic, for instance, temporarily reduced life expectancy in many countries by overwhelming health systems and causing millions of premature deaths.
+Public policy plays a crucial role in determining life expectancy. Governments can promote longer, healthier lives by investing in healthcare, education, social welfare, and environmental protection. Policies that reduce inequality, ensure food and water security, and promote healthy behaviors contribute to better public health outcomes.
+In conclusion, life expectancy is a valuable measure of societal health and progress. While it has increased significantly over time, achieving higher and more equitable life expectancy for all requires continued investment in healthcare, education, infrastructure, and social support. As science and society evolve, the challenge is not only to extend life, but to ensure that those added years are healthy, meaningful, and accessible to everyone.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The passage defines life expectancy, explains the factors that influence it (healthcare, nutrition, lifestyle, education, gender, mental health, environment, and policy), describes historical increases and ongoing disparities, and concludes that equitable gains require continued investment in health and social systems.',
+      },
+      {
+        question: 'According to the passage, what was the global average life expectancy in recent years according to the WHO?',
+        explanation: 'The passage states that according to the World Health Organization (WHO), the global average life expectancy reached over 73 years in recent years.',
+      },
+      {
+        question: 'The word \"predictors\" in the sentence about education and income most likely means',
+        explanation: 'In context, \"predictors\" refers to factors that strongly indicate or forecast differences in life expectancy, as education and income are described as strong predictors linked to longer or shorter lifespans.',
+      },
+      {
+        question: 'What can be inferred about the relationship between gender and life expectancy?',
+        explanation: 'The passage notes that women tend to live longer than men in almost every country due to biological and behavioral differences, but also states that women are more prone to certain chronic illnesses and that the gap may narrow in future generations.',
+      },
+      {
+        question: 'According to the passage, how do lifestyle choices affect life expectancy?',
+        explanation: 'The passage explains that smoking, excessive alcohol consumption, poor diet, and lack of physical activity increase risks of heart disease, diabetes, cancer, and other diseases, while healthy weight, regular exercise, and avoiding harmful substances are linked to longer life and better quality of life.',
+      },
+      {
+        question: 'The word \"mitigate\" in the discussion of mental health most likely means',
+        explanation: 'In context, \"mitigate\" means to reduce or lessen the risks associated with loneliness and social isolation through supportive communities, mental health care, and active lifestyles.',
+      },
+      {
+        question: 'What can be inferred about the impact of infant and maternal mortality on national life expectancy?',
+        explanation: 'The passage states that high rates of child mortality lower average life expectancy significantly, and that improving maternal healthcare, prenatal services, and nutrition can dramatically increase survival rates and overall life expectancy.',
+      },
+      {
+        question: 'According to the passage, what role does public policy play in life expectancy?',
+        explanation: 'The passage states that public policy plays a crucial role and that governments can promote longer, healthier lives by investing in healthcare, education, social welfare, and environmental protection, as well as by reducing inequality and ensuring food and water security.',
+      },
+      {
+        question: 'What can be inferred about the uneven distribution of life expectancy?',
+        explanation: 'The passage notes that despite overall progress, people in low-income or conflict-affected regions still face high mortality rates due to preventable diseases, violence, or lack of healthcare, and that events like the COVID-19 pandemic temporarily reduced life expectancy in many countries.',
+      },
+      {
+        question: 'According to the passage, why is healthcare access important for life expectancy?',
+        explanation: 'The passage explains that populations with access to affordable and high-quality medical services tend to live longer, and that countries with universal healthcare systems often have higher life expectancy because preventive care and early diagnosis reduce the risk of fatal illnesses.',
+      },
+    ],
+  },{
+    id: 16,
+    title: 'Hobbies',
+    topic: 'Lifestyle & Well-being',
+    content: `Hobbies are activities that people engage in during their free time for enjoyment, relaxation, or personal development. They range widely—from physical activities like sports or gardening to creative pursuits such as painting, music, or writing. In today‘s fast-paced world, hobbies provide an important outlet for stress relief, selfexpression, and social connection.
+The concept of hobbies is not new. Throughout history, people have spent their leisure time practicing crafts, playing musical instruments, or participating in local games. However, the modern idea of hobbies as structured, personal interests became popular during the industrial era, when shorter working hours allowed people more time for recreation. Today, hobbies are an essential part of a balanced lifestyle.
+Hobbies contribute to mental and physical well-being. Engaging in a hobby helps individuals focus on something enjoyable, which can reduce anxiety, combat depression, and improve mood. For example, reading can stimulate the mind and expand knowledge, while playing an instrument may enhance concentration and emotional expression. Physical hobbies like swimming, hiking, or dancing also promote cardiovascular health and physical fitness.
+Hobbies are also important for personal growth and skill development. Learning a new language, building models, or mastering photography can increase confidence and self-esteem. Hobbies encourage problem-solving, creativity, and patience— qualities that are transferable to academic or professional settings. In fact, many employers view hobbies as indicators of a well-rounded, motivated individual.
+Social hobbies—such as joining a club, participating in team sports, or attending workshops—promote interaction and friendship. They offer a sense of community and belonging, particularly for people who may feel isolated. Shared interests often lead to meaningful conversations and lasting relationships. Even solitary hobbies, such as writing or painting, can be shared online, allowing individuals to connect with like-minded people across the globe.
+Technology has expanded the possibilities for hobbies. With access to the internet, people can learn almost any skill through online tutorials, courses, or forums. Digital hobbies like blogging, video editing, coding, or gaming have become increasingly popular. These activities not only entertain but can also evolve into professional skills or sources of income. For instance, some people turn their photography or content creation hobbies into freelance careers or small businesses. Despite their benefits, hobbies are often overlooked due to busy schedules or academic pressure. In many societies, people prioritize work and productivity, leaving little time for leisure activities. Students, in particular, may face pressure to focus solely on grades and exams, neglecting hobbies that could reduce stress and support overall development. Encouraging time for hobbies is essential for maintaining mental balance and preventing burnout.
+Children and teenagers benefit greatly from hobbies. Activities like drawing, puzzles, team sports, or music lessons support cognitive and emotional development. They help young people discover their interests and talents, develop discipline, and build self-confidence. Schools and parents can play a role in introducing children to a variety of activities, allowing them to explore different paths before choosing what suits them best.
+Retired individuals also find great value in hobbies. As people age and leave the workforce, hobbies provide purpose and routine. They combat loneliness, maintain mental sharpness, and keep older adults engaged in meaningful ways. Gardening, knitting, volunteering, or participating in community groups are popular pastimes among the elderly.
+In some cases, hobbies cross the line between leisure and livelihood. What begins as a simple interest can develop into a part-time job or full-time career. Writers, musicians, designers, or even gamers may start with a passion and eventually earn income from it. While turning a hobby into a profession can be rewarding, it also changes the nature of the activity, potentially introducing stress and deadlines that reduce enjoyment.
+Cultural factors influence the types of hobbies people pursue. In colder climates, indoor hobbies like board games, crafts, or cooking are more common. In warmer regions, people may prefer outdoor activities such as cycling or surfing. In some cultures, traditional arts or group activities play a significant role, while in others, individual hobbies are more popular. Socioeconomic status also affects access to certain hobbies, especially those requiring expensive equipment or training.
+Environmental awareness has led to a rise in sustainable hobbies. Activities like upcycling, eco-gardening, and crafting with recycled materials allow people to enjoy leisure time while contributing to environmental conservation. These hobbies align personal enjoyment with social responsibility, creating a deeper sense of fulfillment.
+In conclusion, hobbies are more than just a way to pass time—they are a valuable part of a healthy, fulfilling life. They support emotional well-being, skill development, and social interaction across all age groups. Despite busy lifestyles, making time for hobbies can enhance happiness, reduce stress, and improve overall quality of life. In a world full of demands and distractions, hobbies offer a unique space for creativity, relaxation, and personal enrichment.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose is to explain the value of hobbies for enjoyment, well-being, personal growth, and social connection across different ages and cultures, while noting challenges in finding time for them and their potential to become careers.',
+      },
+      {
+        question: 'According to the passage, when did the modern idea of hobbies as structured personal interests become popular?',
+        explanation: 'The modern idea of hobbies as structured, personal interests became popular during the industrial era, when shorter working hours allowed people more time for recreation.',
+      },
+      {
+        question: 'The word "outlet" in the first paragraph most likely means...',
+        explanation: 'In the context of the passage, "outlet" means a means of release or expression for stress, self-expression, and social connection.',
+      },
+      {
+        question: 'What can be inferred about the relationship between hobbies and employment?',
+        explanation: 'It can be inferred that hobbies can indicate a well-rounded and motivated individual to employers, and that some hobbies may evolve into professional skills, freelance careers, or small businesses.',
+      },
+      {
+        question: 'According to the passage, how do social hobbies benefit people?',
+        explanation: 'Social hobbies promote interaction and friendship, offer a sense of community and belonging, particularly for those who feel isolated, and can lead to meaningful conversations and lasting relationships.',
+      },
+      {
+        question: 'The word "burnout" in the sixth paragraph most likely means...',
+        explanation: 'In the context of the passage, "burnout" refers to a state of physical or mental exhaustion caused by prolonged stress, which can be prevented by making time for hobbies.',
+      },
+      {
+        question: 'What can be inferred about hobbies for retired individuals?',
+        explanation: 'It can be inferred that hobbies help retired people maintain purpose, routine, mental sharpness, and social engagement after leaving the workforce, combating loneliness in older age.',
+      },
+      {
+        question: 'According to the passage, what is a potential downside of turning a hobby into a profession?',
+        explanation: 'Turning a hobby into a profession can introduce stress and deadlines that reduce the original enjoyment of the activity.',
+      },
+      {
+        question: 'What can be inferred about the influence of culture and climate on hobbies?',
+        explanation: 'It can be inferred that climate affects preferred activities (indoor in colder regions, outdoor in warmer ones) and that cultural values shape whether traditional group arts or individual hobbies are more common.',
+      },
+      {
+        question: 'According to the passage, how have environmental concerns affected hobbies?',
+        explanation: 'Environmental awareness has led to a rise in sustainable hobbies such as upcycling, eco-gardening, and crafting with recycled materials, which combine personal enjoyment with contributions to conservation.',
+      },
+    ],
+  },{
+    id: 17,
+    title: 'Music',
+    topic: 'Arts & Culture',
+    content: `Music is a universal form of human expression that exists in every culture around the world. It can communicate emotions, tell stories, and bring people together, regardless of language or background. From ancient tribal rhythms to modern digital production, music has evolved over time but continues to play a vital role in society.
+The origins of music date back thousands of years. Archaeologists have discovered ancient instruments made from bones, wood, and animal skins, suggesting that early humans used music in rituals, celebrations, and daily life. Over time, music developed into more complex forms, influenced by geography, religion, and social structure. In many cultures, music was closely connected to storytelling, dance, and spiritual practices.
+One of the most powerful features of music is its emotional impact. Music can express joy, sadness, fear, hope, or nostalgia. A slow melody in a minor key may evoke sorrow, while a fast, upbeat rhythm can generate excitement. Because music engages multiple parts of the brain—memory, emotion, motor skills—it has the unique ability to influence mood and behavior. It is often used in therapy to help people manage stress, recover from trauma, or improve mental health.
+Cultural identity is closely linked to music. Each society has its own musical traditions, instruments, and styles that reflect its values and history. For example, traditional Chinese music uses instruments like the guzheng and erhu, while African drumming emphasizes rhythm and community participation. Music also plays an important role in religious ceremonies, national celebrations, and rites of passage such as weddings or funerals.
+With globalization and technology, music has become more diverse and accessible than ever. The rise of the internet and streaming platforms allows people to explore a wide variety of genres—from classical and jazz to hip-hop, pop, and electronic music. Musicians can now reach global audiences without needing a major record label, and listeners can discover artists from different countries with just a few clicks.
+Despite this diversity, some critics argue that commercial music has become repetitive and formulaic, focusing more on profit than creativity. Pop music, in particular, is often produced to appeal to mass audiences, sometimes at the cost of originality or cultural depth. However, independent artists and niche genres continue to push boundaries and explore new sounds, keeping the music world vibrant and dynamic.
+Learning music has cognitive and emotional benefits, especially for children. Studies show that playing an instrument improves memory, attention, and problem-solving skills. It also enhances coordination and discipline, as regular practice is essential to improvement. Music education encourages self-expression and collaboration, whether through solo performance or group ensembles like orchestras or choirs.
+Schools that include music programs often report better academic performance and higher student engagement. Yet, in many countries, arts education—including music—is underfunded or overlooked. Advocates argue that music is not a luxury, but a vital part of a well-rounded education. Access to music instruction can inspire creativity and build confidence in young people.
+Technology has transformed how music is created and consumed. Digital audio workstations, synthesizers, and mobile apps make it possible for anyone to compose, mix, and publish music from home. Sampling, remixing, and electronic production have given rise to new genres like EDM (electronic dance music) and lo-fi hip hop. While traditional music skills are still important, today‘s musicians must also understand software, social media, and digital marketing to succeed. Live performances remain a key part of music culture. Concerts, festivals, and street performances provide opportunities for shared experience and cultural exchange. The energy of a live show—complete with sound, visuals, and audience participation—creates a connection between performer and listener that digital music often lacks. During the COVID-19 pandemic, virtual concerts and livestreams became popular alternatives, showing the music industry‘s ability to adapt.
+Music also plays a significant role in social and political movements. Protest songs, national anthems, and freedom chants have united people and expressed collective hopes or frustrations. From civil rights marches in the United States to anti-apartheid rallies in South Africa, music has helped mobilize communities and give voice to the oppressed. It continues to serve as a form of resistance and empowerment.
+The business of music is a massive global industry, generating billions in revenue each year. While streaming services have made music more accessible, they have also changed how artists earn income. Album sales have declined, and musicians now rely more on live shows, merchandise, sponsorships, and online platforms to support their careers. Intellectual property and copyright issues remain hot topics in the digital age, as artists strive to protect their work in a rapidly changing market.
+In conclusion, music is an essential aspect of human life, offering entertainment, emotional expression, cultural identity, and social unity. It adapts across time and technology, bridging generations and geographies. Whether enjoyed in solitude or shared in a crowd, music has the power to inspire, heal, and connect. As technology and society continue to evolve, so too will the role of music in shaping how we experience the world.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose of the passage is to explore music as a universal form of human expression, covering its origins, emotional and cultural roles, benefits, technological changes, social impact, and ongoing significance in society.',
+      },
+      {
+        question: 'According to the passage, what evidence suggests that early humans used music?',
+        explanation: 'According to the passage, archaeologists have discovered ancient instruments made from bones, wood, and animal skins, suggesting that early humans used music in rituals, celebrations, and daily life.',
+      },
+      {
+        question: 'The word "evoke" in the third paragraph most likely means',
+        explanation: 'In the context of the third paragraph, "evoke" means to bring forth or produce a feeling or response, as a slow melody in a minor key may evoke sorrow.',
+      },
+      {
+        question: 'What can be inferred about the relationship between music and the brain?',
+        explanation: 'It can be inferred that music has a unique ability to influence mood and behavior because it engages multiple parts of the brain, including those responsible for memory, emotion, and motor skills.',
+      },
+      {
+        question: 'According to the passage, how has technology affected access to music?',
+        explanation: 'According to the passage, the rise of the internet and streaming platforms has made music more diverse and accessible, allowing people to explore many genres and enabling musicians to reach global audiences without a major record label.',
+      },
+      {
+        question: 'The word "formulaic" in the sixth paragraph most likely means',
+        explanation: 'In the context of the sixth paragraph, "formulaic" means following a set pattern or formula in a repetitive way, referring to commercial music that focuses more on profit than originality or creativity.',
+      },
+      {
+        question: 'What can be inferred about the value of music education in schools?',
+        explanation: 'It can be inferred that music education is considered vital rather than a luxury, as schools with music programs often report better academic performance and higher student engagement, and access to instruction can inspire creativity and build confidence.',
+      },
+      {
+        question: 'According to the passage, what additional skills must today‘s musicians understand to succeed?',
+        explanation: 'According to the passage, while traditional music skills remain important, today‘s musicians must also understand software, social media, and digital marketing to succeed.',
+      },
+      {
+        question: 'What can be inferred about the role of music in social and political movements?',
+        explanation: 'It can be inferred that music serves as a powerful tool for uniting people, expressing collective hopes or frustrations, mobilizing communities, and giving voice to the oppressed, acting as a form of resistance and empowerment.',
+      },
+      {
+        question: 'According to the passage, how have streaming services changed the way artists earn income?',
+        explanation: 'According to the passage, while streaming services have made music more accessible, album sales have declined, and musicians now rely more on live shows, merchandise, sponsorships, and online platforms to support their careers.',
+      },
+    ],
+  },{
+    id: 18,
+    title: 'Sport',
+    topic: 'Sports & Society',
+    content: `Sport refers to physical activities that involve skill, competition, and often teamwork. It plays a significant role in societies across the world, offering benefits that go beyond physical fitness. From local community matches to global tournaments like the Olympics or the World Cup, sport brings people together, promotes national pride, and influences culture, economy, and education.
+One of the primary benefits of sport is its positive effect on physical health. Regular participation in sports improves cardiovascular function, strengthens muscles and bones, and helps maintain a healthy weight. It also lowers the risk of chronic diseases such as diabetes, heart disease, and certain types of cancer. Children and teenagers who are active in sports often grow up with better physical coordination, flexibility, and overall health.
+In addition to physical benefits, sport contributes greatly to mental and emotional well-being. Exercise releases chemicals in the brain like endorphins and serotonin, which help reduce stress, anxiety, and depression. Team sports also teach important life skills, such as communication, leadership, resilience, and discipline. For many people, sport offers a productive outlet for emotional energy and a structured way to develop confidence.
+Sport also plays a crucial role in education. Many schools include sports as part of the curriculum, not just for health purposes but also to encourage teamwork and time management. Student athletes often perform better academically because they learn to balance practice with study. In some countries, scholarships allow talented students to access higher education through sport, giving them new opportunities for advancement.
+At the professional level, sport is a global industry. Athletes, coaches, advertisers, and media companies generate billions in revenue through events, sponsorships, broadcasting rights, and merchandise. Football, basketball, cricket, tennis, and other popular sports attract massive audiences both in stadiums and online. With the rise of digital platforms, fans can now follow their favorite teams and players from anywhere in the world.
+National and international sporting events promote unity and diplomacy. The Olympics, for instance, bring together athletes from diverse backgrounds to compete in a spirit of fairness and cooperation. Such events often foster a sense of national pride and shared identity. Governments may invest heavily in hosting tournaments to boost tourism, create jobs, and showcase their country's image on the world stage.
+However, sport is not without challenges. One of the major issues is inequality and lack of access. In many regions, girls and women have fewer opportunities to participate in sports due to cultural norms, lack of funding, or safety concerns. People with disabilities also face barriers, despite progress made through events like the Paralympics. Addressing these gaps requires inclusive policies, investment in facilities, and changing societal attitudes.
+Doping and corruption are additional concerns in professional sports. The use of performance-enhancing drugs undermines the fairness of competition and can damage the reputation of entire sports. Despite strict regulations, some athletes and teams still engage in unethical practices to gain an advantage. Anti-doping agencies and international sporting bodies work to detect violations and maintain integrity in competitions.
+Injury risk is another drawback of sport, especially in contact sports like rugby or boxing. Athletes face the possibility of long-term damage to joints, muscles, or even the brain. Proper training, safety gear, and medical supervision are essential to minimize risks. In recent years, growing attention has been paid to the long-term health of retired athletes and the need for better aftercare.
+Commercialization has also raised ethical questions about the role of money in sport. Top athletes earn millions, and some competitions are driven more by profit than by the spirit of the game. Critics argue that excessive sponsorship and advertising may overshadow the values of fair play and sportsmanship. Balancing business interests with integrity remains a challenge for the sports industry.
+Despite these issues, sport continues to be a powerful tool for social change. Programs that use sport to engage youth, promote gender equality, or support refugees have been successful in many parts of the world. Sport can bridge differences, teach conflict resolution, and provide a positive path for individuals at risk of violence or exclusion.
+The rise of technology in sport has changed how games are played, watched, and analyzed. Instant replays, goal-line technology, and wearable fitness trackers have improved fairness and performance. Data analysis helps coaches make informed decisions, while fans enjoy interactive experiences through virtual reality and social media. However, some argue that too much technology may reduce the human element of the game.
+In conclusion, sport is much more than physical activity. It is a global phenomenon that affects health, education, culture, and the economy. While challenges such as inequality, doping, and commercialization persist, the benefits of sport are undeniable. It promotes discipline, unity, and personal growth, making it an essential part of both individual lives and societies. Supporting inclusive, fair, and ethical sports systems is key to ensuring that the positive impact of sport continues into the future.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose of the passage is to describe the wide-ranging benefits of sport for physical health, mental well-being, education, the economy, and social unity, while also examining challenges such as inequality, doping, injury risk, and commercialization, and concluding that sport is a powerful global phenomenon whose positive impact depends on inclusive, fair, and ethical systems.',
+      },
+      {
+        question: 'According to the passage, what are some physical health benefits of regular participation in sports?',
+        explanation: 'According to the passage, regular participation in sports improves cardiovascular function, strengthens muscles and bones, helps maintain a healthy weight, and lowers the risk of chronic diseases such as diabetes, heart disease, and certain types of cancer. Children and teenagers who are active in sports often grow up with better physical coordination, flexibility, and overall health.',
+      },
+      {
+        question: 'The word "endorphins" in the third paragraph most likely refers to',
+        explanation: 'In the third paragraph, "endorphins" refers to chemicals released in the brain by exercise that help reduce stress, anxiety, and depression, alongside serotonin.',
+      },
+      {
+        question: 'What can be inferred about student athletes from the passage?',
+        explanation: 'It can be inferred that student athletes often perform better academically because they learn to balance practice with study, and that sports in schools encourage teamwork and time management in addition to health benefits; in some countries, scholarships also allow talented students to access higher education through sport.',
+      },
+      {
+        question: 'According to the passage, how do national and international sporting events promote unity and diplomacy?',
+        explanation: 'According to the passage, national and international sporting events such as the Olympics bring together athletes from diverse backgrounds to compete in a spirit of fairness and cooperation, foster a sense of national pride and shared identity, and may lead governments to invest in hosting tournaments to boost tourism, create jobs, and showcase their country\'s image.',
+      },
+      {
+        question: 'What can be inferred about inequality in sport?',
+        explanation: 'It can be inferred that inequality and lack of access remain major issues, as girls and women in many regions have fewer opportunities due to cultural norms, lack of funding, or safety concerns, and people with disabilities also face barriers despite progress through events like the Paralympics; addressing these gaps requires inclusive policies, investment in facilities, and changing societal attitudes.',
+      },
+      {
+        question: 'According to the passage, what undermines the fairness of competition in professional sports?',
+        explanation: 'According to the passage, the use of performance-enhancing drugs undermines the fairness of competition and can damage the reputation of entire sports, even though anti-doping agencies and international sporting bodies work to detect violations and maintain integrity.',
+      },
+      {
+        question: 'The phrase "commercialization" in the passage most likely refers to',
+        explanation: 'In the context of the passage, "commercialization" refers to the increasing role of money in sport, where top athletes earn millions, some competitions are driven more by profit than by the spirit of the game, and excessive sponsorship and advertising may overshadow the values of fair play and sportsmanship.',
+      },
+      {
+        question: 'What can be inferred about the role of technology in sport?',
+        explanation: 'It can be inferred that technology has improved fairness and performance through tools like instant replays, goal-line technology, and wearable fitness trackers, helps coaches make informed decisions via data analysis, and gives fans interactive experiences, though some argue that too much technology may reduce the human element of the game.',
+      },
+      {
+        question: 'According to the passage, why is supporting inclusive, fair, and ethical sports systems important?',
+        explanation: 'According to the passage, supporting inclusive, fair, and ethical sports systems is key to ensuring that the positive impact of sport—on health, education, culture, the economy, discipline, unity, and personal growth—continues into the future, despite ongoing challenges such as inequality, doping, and commercialization.',
+      },
+    ],
+  },{
+  id: 19,
+  title: 'Sportsmanship',
+  topic: 'Sports & Ethics',
+  content: `Sportsmanship refers to the ethical and respectful behavior expected of individuals involved in sports, whether they are athletes, coaches, officials, or spectators. It involves fair play, respect for opponents, graciousness in winning or losing, and a commitment to the values that sport is meant to promote. Good sportsmanship not only enhances the experience of competition but also teaches lessons that extend far beyond the playing field.
+At its core, sportsmanship is about respect—respect for the rules, for teammates and opponents, for referees, and for the game itself. It emphasizes honesty, selfcontrol, and humility. A player who admits a fault, congratulates an opponent, or helps someone who is injured demonstrates sportsmanship. Such actions show character and maturity and are widely admired both in amateur and professional sports.
+Sportsmanship is often tested in moments of high emotion—particularly in defeat or controversy. True sportsmanship is seen when individuals maintain dignity during loss, avoid blaming others, and continue to behave with integrity even when the outcome is unfavorable. Conversely, poor sportsmanship may involve cheating, arguing with officials, taunting opponents, or reacting aggressively. These behaviors not only damage the spirit of competition but can also negatively influence younger audiences.
+Youth sports play a crucial role in teaching sportsmanship. Children and teenagers are at a stage where they are forming habits and values. Coaches and parents have a responsibility to model respectful behavior and encourage fair play over winning at all costs. In environments where winning is excessively emphasized, young athletes may feel pressured to cheat or act aggressively. Instead, emphasizing effort, improvement, and teamwork helps build positive character traits.
+In professional sports, where high stakes and public attention are involved, examples of both good and bad sportsmanship are frequently on display. When well-known athletes demonstrate humility and generosity—such as helping an injured opponent or acknowledging a competitor‘s skills—it inspires millions. On the other hand, scandals involving doping, match-fixing, or unsportsmanlike conduct can tarnish a sport‘s reputation and undermine public trust.
+The concept of sportsmanship is also closely linked to ethics in competition. Playing by the rules is not only a matter of legality but of fairness. Cheating may bring short-term success, but it undermines the value of sport and can lead to serious consequences, including disqualification, loss of sponsorships, and damage to an athlete‘s legacy. Upholding ethical standards protects the credibility and integrity of sports.
+Cultural perspectives on sportsmanship may vary. In some countries, showing emotion or strong competitive spirit is valued, while in others, modesty and restraint are emphasized. Nevertheless, the core idea of treating others with fairness and respect remains universal. International sporting events, such as the Olympics, promote these shared values by highlighting unity, respect, and peaceful competition.
+Sportsmanship among spectators is also important. Fans who cheer positively, accept decisions, and show respect for both teams contribute to a healthy and enjoyable environment. Unfortunately, poor fan behavior—such as booing, insulting players, or inciting violence—can ruin the experience for everyone and even escalate into dangerous situations. Organizers, clubs, and communities must work together to promote respectful behavior among fans.
+The media has a powerful role in shaping public attitudes toward sportsmanship. When acts of respect and kindness are celebrated, they set a positive example for audiences. When unethical behavior is glorified or excused, it sends the wrong message—especially to young viewers. Broadcasters, journalists, and influencers should highlight values like honesty, humility, and teamwork alongside athletic achievement.
+Sportsmanship is not limited to the playing field. The values it promotes—respect, integrity, and fairness—are essential in everyday life. People who practice sportsmanship in sports often carry these values into their studies, workplaces, and relationships. For example, learning to accept failure, work with others, and show empathy are all traits that contribute to personal and professional success.
+Promoting sportsmanship requires effort from multiple stakeholders:
+•                  Coaches and educators must teach and model respectful behavior.
+•                  Parents should emphasize enjoyment and effort over results.
+•                  Sports organizations must enforce rules and promote ethical conduct.
+•                  Athletes must take personal responsibility for their actions and attitudes. Some countries and schools have introduced awards for sportsmanship, recognizing players who demonstrate outstanding character, regardless of performance or results. These awards help shift focus away from winning alone and towards how the game is played.
+In the digital era, social media has become a platform where sportsmanship is both praised and criticized. A single act of generosity or misconduct can go viral, influencing public opinion and shaping athletes‘ reputations. This online visibility increases the responsibility of athletes and teams to act thoughtfully and ethically at all times.
+In conclusion, sportsmanship is a fundamental aspect of sport that promotes fairness, respect, and ethical behavior. It enhances the spirit of competition and helps build character in athletes and fans alike. In a world often focused on winning, sportsmanship reminds us that how we play the game is just as important as the result. By nurturing these values at every level—from schoolyards to stadiums—sports can continue to be a positive force in individual lives and global society.`,
+  questions: [
+    {
+      question: 'What is the main purpose of this passage?',
+      explanation: 'The main purpose of the passage is to define sportsmanship as ethical and respectful behavior in sports, explain its importance for athletes, coaches, spectators, and society, discuss how it is taught and tested, and emphasize that how the game is played matters as much as the result.',
+    },
+    {
+      question: 'According to the passage, what does sportsmanship involve at its core?',
+      explanation: 'According to the passage, at its core sportsmanship is about respect—for the rules, teammates and opponents, referees, and the game itself—and it emphasizes honesty, self-control, and humility.',
+    },
+    {
+      question: 'The word "graciousness" in the first paragraph most likely means',
+      explanation: 'In the context of the passage, "graciousness" most likely means showing kindness, courtesy, and good manners when winning or losing, as the text links it to respectful behavior and fair play in sports.',
+    },
+    {
+      question: 'What can be inferred about the role of coaches and parents in youth sports?',
+      explanation: 'It can be inferred that coaches and parents have a responsibility to model respectful behavior and prioritize fair play, effort, improvement, and teamwork over winning at all costs, because excessive emphasis on winning can pressure young athletes to cheat or act aggressively.',
+    },
+    {
+      question: 'According to the passage, what are some examples of poor sportsmanship?',
+      explanation: 'According to the passage, poor sportsmanship may involve cheating, arguing with officials, taunting opponents, or reacting aggressively, and these behaviors damage the spirit of competition and can negatively influence younger audiences.',
+    },
+    {
+      question: 'What can be inferred about the consequences of cheating in sports?',
+      explanation: 'It can be inferred that while cheating may bring short-term success, it undermines the value of sport and can lead to serious long-term consequences such as disqualification, loss of sponsorships, and damage to an athlete\'s legacy.',
+    },
+    {
+      question: 'The word "tarnish" in the paragraph about professional sports most likely means',
+      explanation: 'In the context of the passage, "tarnish" most likely means to damage or harm the reputation of a sport, as the text states that scandals involving doping, match-fixing, or unsportsmanlike conduct can tarnish a sport\'s reputation and undermine public trust.',
+    },
+    {
+      question: 'According to the passage, how does the media influence attitudes toward sportsmanship?',
+      explanation: 'According to the passage, the media has a powerful role: celebrating acts of respect and kindness sets a positive example, while glorifying or excusing unethical behavior sends the wrong message, especially to young viewers. Broadcasters, journalists, and influencers should highlight honesty, humility, and teamwork.',
+    },
+    {
+      question: 'What can be inferred about sportsmanship beyond the playing field?',
+      explanation: 'It can be inferred that the values of respect, integrity, and fairness promoted by sportsmanship are useful in everyday life, as people who practice them in sports often carry these traits into their studies, workplaces, and relationships, aiding personal and professional success.',
+    },
+    {
+      question: 'According to the passage, why have some countries and schools introduced awards for sportsmanship?',
+      explanation: 'According to the passage, some countries and schools have introduced awards for sportsmanship to recognize players who demonstrate outstanding character regardless of performance or results, helping to shift focus away from winning alone and toward how the game is played.',
+    },
+  ],
+},{
+  id: 20,
+  title: 'Sporting Events',
+  topic: 'Sports & Society',
+  content: `Sporting events are organized competitions where athletes or teams compete in various disciplines, often in front of live audiences or broadcast to millions. These events range from local school tournaments to global spectacles like the Olympic Games, the FIFA World Cup, and the Super Bowl. They are not only about athletic performance but also about entertainment, national pride, economic impact, and cultural exchange.
+Large-scale sporting events serve multiple purposes. Firstly, they showcase talent and human achievement. Athletes from around the world train for years to compete at the highest levels. These events offer them a platform to test their abilities, break records, and represent their countries. Moments of victory or defeat often become part of national memory, inspiring future generations.
+Secondly, major sporting events promote unity and cultural exchange. International competitions bring people from different countries and backgrounds together. Spectators cheer for their teams, celebrate national identity, and often learn about other cultures in the process. The Olympic Games, for example, emphasize peace and cooperation, as athletes compete under shared values and mutual respect.
+Sporting events also have significant economic impact. Hosting a major event can boost local economies through tourism, job creation, and infrastructure development. Hotels, restaurants, transport systems, and entertainment venues all benefit from the influx of visitors. However, these benefits depend on careful planning and management. Poorly managed events may lead to debt and underused facilities once the games are over.
+Media and broadcasting play a central role in the reach and popularity of sporting events. Millions of viewers tune in to watch matches live, while highlights, interviews, and analysis are shared across television, radio, and social media. This global exposure attracts sponsors and advertisers who invest heavily in branding and promotion. Top events generate billions in revenue from broadcasting rights and commercial partnerships.
+In addition to professional competitions, community-level sporting events also play a vital role. Local school sports days, amateur leagues, and charity tournaments bring neighbors together and encourage grassroots participation. These events help promote fitness, teamwork, and community pride. They often serve as stepping stones for future professional athletes.
+Despite their many advantages, sporting events also face challenges and criticisms. One issue is the cost of hosting, especially for developing countries. Building stadiums, improving infrastructure, and meeting international standards can strain national budgets. In some cases, money spent on sports could arguably be better used for health, education, or social programs.
+Corruption and mismanagement are other concerns. There have been cases where bidding processes for hosting rights were influenced by bribery or political pressure. Organizers may also face criticism for poor planning, safety issues, or lack of transparency. These problems damage the reputation of international sports and discourage public trust.
+Another controversy relates to the environmental impact of large-scale events. Constructing facilities, flying in participants and fans, and producing large amounts of waste can harm ecosystems and increase carbon emissions. To address these concerns, some event organizers now implement sustainable practices, such as using renewable energy, encouraging public transport, and recycling materials. Security and crowd management are crucial for the success of any large sporting event. With massive gatherings of people, the risk of accidents, violence, or terrorism must be taken seriously. Organizers work closely with law enforcement to ensure safety through surveillance, emergency planning, and strict access control. Although necessary, heavy security can also raise concerns about privacy and civil liberties.
+Another significant issue is fairness and inclusion. Discrimination based on gender, disability, or nationality has historically excluded certain groups from full participation. Over time, progress has been made. Events like the Paralympic Games and the Women‘s World Cup have expanded opportunities for marginalized athletes. Nonetheless, ongoing efforts are needed to ensure equal representation and respect for all participants.
+Technology is reshaping the experience of sporting events. High-definition cameras, instant replay, and virtual reality provide fans with immersive experiences. Online ticketing, apps, and live statistics enhance engagement. For athletes, data analytics and wearable tech improve performance and reduce injury risk. However, technology also raises questions—such as whether video refereeing disrupts the flow of a game or replaces human judgment.
+Spectator behavior is another important factor. While most fans support their teams positively, some events have been marred by racism, violence, or offensive chants.
+Promoting respectful behavior through education, strict rules, and social campaigns is essential to maintaining the spirit of sportsmanship.
+In recent years, eSports (electronic sports) have emerged as a new kind of sporting event. Competitions in video games like Dota 2 or League of Legends attract huge audiences, with professional players and large cash prizes. While some debate whether eSports count as "real" sports, there is no doubt they share many features with traditional competitions: skill, training, strategy, and fan engagement.
+In conclusion, sporting events are much more than games—they are cultural, economic, and social phenomena. When well-managed, they inspire excellence, foster unity, and boost development. At the same time, challenges related to cost, fairness, and sustainability must be addressed. As the world changes, sporting events will continue to evolve, offering opportunities not only for athletes but for entire communities and nations to come together.`,
+  questions: [
+    {
+      question: 'What is the main purpose of this passage?',
+      explanation: 'The passage examines sporting events as cultural, economic, and social phenomena, discussing their benefits in showcasing talent, promoting unity, and boosting economies, while also addressing challenges such as costs, corruption, environmental impact, fairness, and the rise of eSports.',
+    },
+    {
+      question: 'According to the passage, what economic benefits can hosting a major sporting event provide?',
+      explanation: 'Hosting can boost local economies through tourism, job creation, and infrastructure development, benefiting hotels, restaurants, transport systems, and entertainment venues from the influx of visitors, though benefits depend on careful planning and management.',
+    },
+    {
+      question: 'The word "grassroots" in the paragraph about community-level events most likely means',
+      explanation: 'It refers to basic or local-level participation starting from ordinary community members, as community sporting events encourage grassroots participation that promotes fitness, teamwork, and community pride and can lead to future professional athletes.',
+    },
+    {
+      question: 'What can be inferred about the potential drawbacks of hosting major sporting events in developing countries?',
+      explanation: 'The high costs of building stadiums, improving infrastructure, and meeting international standards can strain national budgets, and money spent on sports might arguably be better used for health, education, or social programs, sometimes leading to debt and underused facilities.',
+    },
+    {
+      question: 'According to the passage, how do major sporting events promote cultural exchange?',
+      explanation: 'International competitions bring people from different countries and backgrounds together; spectators celebrate national identity while learning about other cultures, and events like the Olympic Games emphasize peace, cooperation, shared values, and mutual respect.',
+    },
+    {
+      question: 'The word "immersive" in the paragraph about technology most likely means',
+      explanation: 'It means deeply engaging or providing a sense of being fully involved in the experience, as high-definition cameras, instant replay, and virtual reality are said to provide fans with immersive experiences.',
+    },
+    {
+      question: 'What can be inferred about the role of media in sporting events?',
+      explanation: 'Media and broadcasting greatly expand the reach and popularity of events by allowing millions to watch live and share highlights, interviews, and analysis across platforms, which attracts sponsors and advertisers and generates billions in revenue from broadcasting rights and commercial partnerships.',
+    },
+    {
+      question: 'According to the passage, what progress has been made regarding fairness and inclusion in sporting events?',
+      explanation: 'Although discrimination based on gender, disability, or nationality historically excluded certain groups, progress includes events like the Paralympic Games and the Women\'s World Cup that have expanded opportunities for marginalized athletes, though ongoing efforts are still needed for equal representation and respect.',
+    },
+    {
+      question: 'What can be inferred about eSports from the passage?',
+      explanation: 'eSports have emerged as a new form of sporting event with professional players, large cash prizes, and huge audiences for games like Dota 2 or League of Legends; despite debate over whether they count as "real" sports, they share key features with traditional competitions such as skill, training, strategy, and fan engagement.',
+    },
+    {
+      question: 'According to the passage, why is security important at large sporting events, and what concern does it raise?',
+      explanation: 'With massive gatherings, the risks of accidents, violence, or terrorism require organizers to work with law enforcement on surveillance, emergency planning, and strict access control; however, heavy security can also raise concerns about privacy and civil liberties.',
+    },
+  ],
 },
 ];
