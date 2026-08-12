@@ -229,7 +229,7 @@ export default function ReadingPage() {
   }), [search, topic]);
 
   if (selected) {
-    return <PassageView passage={selected} onBack={() => setSelected(null)} />;
+    return <PassageView passage={selected} onBack={() => { setSelected(null); window.scrollTo(0, 0); }} />;
   }
 
   return (
@@ -299,7 +299,7 @@ export default function ReadingPage() {
             return (
               <button
                 key={passage.id}
-                onClick={() => setSelected(passage)}
+                onClick={() => { setSelected(passage); window.scrollTo(0, 0); }}
                 className="w-full text-left rounded-2xl px-4 py-3.5 flex items-center gap-3 transition-transform hover:-translate-y-0.5 active:scale-[0.99] animate-heartbeat"
                 style={{
                   background: `linear-gradient(135deg, ${c1}, ${c2})`,
