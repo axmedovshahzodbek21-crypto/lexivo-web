@@ -4767,5 +4767,595 @@ However, if delayed or ignored, the consequences will become irreversible. The w
       explanation: 'The cost of inaction—through disaster recovery, health impacts, and lost productivity—is far higher than the cost of prevention, despite some critics arguing that climate action harms economic growth or questioning the science.',
     },
   ],
+},{
+    id: 81,
+    title: 'Acid Rain',
+    topic: 'Environment & Science',
+    content: `Acid rain refers to rainfall made acidic by pollutants in the atmosphere, especially sulfur dioxide (SO₂) and nitrogen oxides (NOₓ). Whether falling as rain, snow, fog, or dust, this form of precipitation has damaging effects on ecosystems, human health, and buildings. Because it travels long distances through the atmosphere, acid rain is considered a transboundary environmental problem.
+Although the term ―acid rain‖ sounds dramatic, it often goes unnoticed. Not only is it invisible to the eye, but its harmful effects accumulate slowly over time. This makes it difficult for people to recognize the damage until it becomes severe.
+The main sources of acid rain are the burning of fossil fuels—especially in power plants, factories, and vehicles. When coal or oil is burned, sulfur dioxide and nitrogen oxides are released into the air. These gases react with water vapor and other chemicals in the atmosphere to form sulfuric and nitric acid. Eventually, they return to Earth in the form of acidic precipitation.
+One major impact of acid rain is on forests. It weakens trees by leaching essential nutrients from the soil, such as calcium and magnesium. It also damages leaves and bark, making trees more vulnerable to disease, cold, and insects. In high-altitude regions, where trees are already under stress, acid rain can be particularly destructive.
+Lakes and rivers are also affected. When acid rain falls into freshwater bodies, it lowers the pH level, making the water too acidic for many aquatic organisms. Fish, amphibians, and insects struggle to survive in these altered conditions. Because young fish are more sensitive to pH changes, reproduction rates drop and fish populations decline. In some lakes, life has vanished entirely.
+Soils suffer as well. Acid rain alters soil chemistry, washing away important minerals and releasing aluminum into the ground. Aluminum, in turn, can be toxic to plant roots. This chain reaction weakens ecosystems and reduces crop yields, posing a threat to agriculture.
+Human health is indirectly impacted. Although acid rain itself does not harm people directly, the pollutants that cause it—especially fine particulate matter—can lead to respiratory problems such as asthma, bronchitis, and lung damage. Because industrial regions often produce more of these emissions, urban populations may be at greater risk.
+Another consequence is damage to buildings and monuments. Acid rain reacts with the minerals in stone, concrete, and metal, causing erosion and discoloration. Historic structures made of limestone or marble are especially vulnerable. Famous landmarks like the Parthenon and the Taj Mahal have suffered visible damage due to acid deposition.
+Despite these challenges, acid rain is a problem that can be addressed effectively. The most successful example is the United States' Acid Rain Program, launched in the 1990s. By introducing a cap-and-trade system for sulfur dioxide emissions, it encouraged companies to reduce pollution using cleaner technology. As a result, acid rain levels dropped dramatically over two decades.
+Similar efforts in Europe also brought significant improvements. Because sulfur emissions declined by over 80% in many EU countries, many damaged lakes and forests are gradually recovering. However, problems remain in regions where industrial regulation is weak or absent. In parts of Asia and Eastern Europe, acid rain continues to pose a serious threat.
+Technology and policy both play critical roles. Cleaner energy sources—such as natural gas, wind, and solar—emit fewer pollutants. Installing scrubbers in smokestacks and using low-sulfur fuels can also help. But unless governments enforce strict regulations and invest in monitoring, progress may be limited. Public awareness is key. Many people are unaware of how their energy use contributes to acid rain. Educating citizens about emissions, energy efficiency, and transportation choices can lead to better environmental outcomes. Because acid rain is largely preventable, lifestyle changes—combined with policy—can make a real difference.
+Ultimately, acid rain highlights the hidden costs of industrial progress. It reminds us that pollution may travel far from its source, harming nature and people across borders. If action is taken early and collectively, ecosystems can be restored and future damage avoided.
+However, if ignored or underestimated, the effects will spread silently—weakening forests, killing lakes, and eroding the world‘s cultural heritage.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose of this passage is to explain what acid rain is, identify its main causes from fossil fuel burning, describe its damaging effects on forests, lakes, soils, human health, and buildings, and discuss how technology, policy, and public awareness can effectively reduce it as a preventable transboundary environmental problem.',
+      },
+      {
+        question: 'According to the passage, what are the main sources of the pollutants that cause acid rain?',
+        explanation: 'The main sources are the burning of fossil fuels, especially in power plants, factories, and vehicles. When coal or oil is burned, sulfur dioxide and nitrogen oxides are released into the air, which then react with water vapor and other chemicals to form sulfuric and nitric acid.',
+      },
+      {
+        question: 'The word \'leaching\' in the passage most likely means?',
+        explanation: 'It most likely means washing away or removing dissolved substances from the soil, as the passage states that acid rain weakens trees by leaching essential nutrients such as calcium and magnesium from the soil.',
+      },
+      {
+        question: 'What can be inferred about the success of efforts to reduce acid rain in the United States and Europe?',
+        explanation: 'It can be inferred that strong policy measures can significantly reduce acid rain, as the United States\' Acid Rain Program using a cap-and-trade system led to dramatic drops in acid rain levels over two decades, and similar European efforts reduced sulfur emissions by over 80%, allowing many damaged lakes and forests to gradually recover.',
+      },
+      {
+        question: 'According to the passage, how does acid rain affect lakes and rivers?',
+        explanation: 'Acid rain lowers the pH level of freshwater bodies, making the water too acidic for many aquatic organisms. Fish, amphibians, and insects struggle to survive, young fish are more sensitive so reproduction rates drop, populations decline, and in some lakes life has vanished entirely.',
+      },
+      {
+        question: 'What can be inferred about the role of public awareness in addressing acid rain?',
+        explanation: 'It can be inferred that public awareness is essential for progress because many people do not realize how their energy use contributes to acid rain, and educating citizens about emissions, energy efficiency, and transportation choices, combined with policy, can lead to better environmental outcomes since the problem is largely preventable.',
+      },
+    ],
+  },{
+    id: 82,
+    title: 'Air Pollution',
+    topic: 'Environment & Health',
+    content: `Air pollution refers to the release of harmful substances into the atmosphere, negatively affecting human health, the environment, and the global climate. Whether caused by factories, vehicles, or domestic activities, polluted air has become a serious issue in both developed and developing nations. Because air is a shared resource, pollution in one region can affect the health and environment of another.
+Although many people associate pollution with visible smoke or smog, most pollutants are invisible and odorless. Not only do they go unnoticed by the human senses, but they can also enter the lungs and bloodstream without immediate symptoms. This makes air pollution particularly dangerous.
+The most common pollutants include particulate matter (PM2.5 and PM10), nitrogen oxides (NOx), sulfur dioxide (SO₂), carbon monoxide (CO), and groundlevel ozone (O₃). Each of these substances harms the respiratory and cardiovascular systems, and some also damage crops, buildings, and ecosystems. Particulate matter, especially, has been linked to asthma, lung cancer, and reduced life expectancy.
+The major sources of air pollution vary by region. In urban areas, traffic congestion is often the leading cause. When cars, buses, and trucks burn fuel, they emit carbon monoxide and nitrogen oxides. Because public transportation is underdeveloped in many cities, people rely heavily on private vehicles, increasing emissions further. In industrial regions, factories and power plants release vast amounts of smoke, dust, and toxic gases. Coal-fired power stations, in particular, are major contributors of sulfur dioxide and fine particles. If these facilities are not equipped with proper filtration systems, they pollute surrounding air and water sources. In rural areas, air pollution often comes from open burning and agricultural practices. Burning crop residues, wood, or animal waste releases large amounts of smoke. Indoor pollution, caused by cooking with biomass in poorly ventilated spaces, is also a major concern—especially for women and children in low-income countries.
+The health effects of air pollution are severe. According to the World Health Organization, around 7 million people die prematurely each year due to air pollution-related causes. Children, the elderly, and people with pre-existing health conditions are especially vulnerable. Long-term exposure can cause chronic bronchitis, lung cancer, and even stroke.
+Environmental consequences are equally damaging. Air pollution harms forests, acidifies water sources, and reduces agricultural productivity. For instance, ground-level ozone interferes with photosynthesis, weakening plant growth and reducing crop yields. Because ecosystems depend on clean air, pollution disrupts the balance of entire natural systems.
+Air pollution is also a driver of climate change. Black carbon (soot) absorbs sunlight and contributes to atmospheric warming, while methane and ozone act as potent greenhouse gases. By reducing air pollution, countries can slow global warming and improve public health at the same time.
+Several strategies exist to reduce pollution. Transitioning to renewable energy sources, such as wind and solar, can drastically cut emissions from power generation. Improving public transport and promoting electric vehicles reduces traffic-related emissions. Because many pollutants come from outdated infrastructure, modernizing factories and introducing clean technology are essential.
+Policy and regulation play a key role. Countries with strict emission laws, like those in the European Union, have seen significant improvements in air quality. However, enforcement is often weak in developing regions, where economic growth is prioritized over environmental protection. Unless international standards are adopted, air pollution will continue to worsen globally.
+Public awareness and behavior also matter. When individuals reduce car usage, avoid burning waste, and conserve energy, they contribute to cleaner air. Recycling, using eco-friendly products, and planting trees can also help mitigate pollution locally. Because the issue is both global and personal, action is needed at all levels.
+Ultimately, air pollution is not just an environmental problem—it is a public health crisis. It shortens lives, damages ecosystems, and worsens climate change. If immediate and coordinated action is taken, much of the damage can still be reversed.
+However, if ignored, air pollution will silently continue to erode the quality of life for billions. Clean air is a basic human right, and protecting it should be treated as a global priority.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose is to explain what air pollution is, identify its common pollutants and sources, describe its severe effects on human health, the environment, and climate, and outline strategies and the need for action to reduce it.',
+      },
+      {
+        question: 'According to the passage, why is air pollution particularly dangerous even when it is invisible?',
+        explanation: 'Most pollutants are invisible and odorless, so they go unnoticed by human senses yet can enter the lungs and bloodstream without immediate symptoms.',
+      },
+      {
+        question: 'The word \'prematurely\' in the fifth paragraph most likely means...',
+        explanation: 'Earlier than expected or before the natural time. The passage states that around 7 million people die prematurely each year due to air pollution-related causes according to the World Health Organization.',
+      },
+      {
+        question: 'What can be inferred about the sources of air pollution in different areas?',
+        explanation: 'Sources vary by region: traffic congestion dominates in urban areas, factories and coal-fired power plants in industrial regions, and open burning plus indoor biomass cooking in rural and low-income settings, especially affecting women and children.',
+      },
+      {
+        question: 'According to the passage, how does air pollution affect the environment and agriculture?',
+        explanation: 'It harms forests, acidifies water sources, and reduces agricultural productivity; ground-level ozone interferes with photosynthesis, weakening plant growth and reducing crop yields, thereby disrupting entire ecosystems.',
+      },
+      {
+        question: 'The phrase \'groundlevel ozone\' in the third paragraph most likely refers to...',
+        explanation: 'Ozone present near the Earth\'s surface (as opposed to the protective ozone layer higher up), listed among common pollutants that harm respiratory and cardiovascular systems and damage crops and ecosystems.',
+      },
+      {
+        question: 'What can be inferred about the link between air pollution and climate change?',
+        explanation: 'Air pollution drives climate change because black carbon absorbs sunlight and warms the atmosphere while methane and ozone act as potent greenhouse gases; reducing air pollution can therefore slow global warming and improve public health simultaneously.',
+      },
+      {
+        question: 'According to the passage, what strategies can help reduce air pollution?',
+        explanation: 'Strategies include transitioning to renewable energy such as wind and solar, improving public transport and promoting electric vehicles, modernizing factories with clean technology, enforcing strict emission laws, and individual actions like reducing car use and planting trees.',
+      },
+      {
+        question: 'What can be inferred about policy differences between regions?',
+        explanation: 'Countries with strict emission laws, such as those in the European Union, have seen significant air-quality improvements, whereas enforcement is often weak in developing regions that prioritize economic growth, so international standards are needed to prevent worsening pollution.',
+      },
+      {
+        question: 'According to the passage, who is especially vulnerable to the health effects of air pollution?',
+        explanation: 'Children, the elderly, and people with pre-existing health conditions are especially vulnerable; long-term exposure can cause chronic bronchitis, lung cancer, and even stroke.',
+      },
+    ],
+  },{
+    id: 83,
+    title: 'Water Pollution',
+    topic: 'Environment & Health',
+    content: `Water pollution occurs when harmful substances contaminate rivers, lakes, oceans, or groundwater, making the water unsafe for humans, animals, and plants. Whether the pollutants come from factories, farms, or households, water pollution has become a serious threat to both the environment and public health. Because clean water is essential for life, this issue demands immediate global attention.
+Although water covers about 70% of the Earth‘s surface, only a small portion is suitable for drinking or irrigation. Not only is fresh water limited, but it is also under increasing pressure due to population growth, industrialization, and climate change. This makes water pollution not just an environmental problem—but also a social and economic one.
+The most common sources of water pollution include:
+•        Industrial waste: Many factories discharge chemicals, heavy metals, and toxic substances directly into rivers or lakes. When these pollutants are not treated properly, they poison aquatic life and contaminate drinking water supplies.
+•        Agricultural runoff: Fertilizers and pesticides used in farming often wash into nearby water bodies during rainfall. This runoff causes nutrient pollution, which can lead to algal blooms, oxygen depletion, and the death of fish.
+•        Sewage and wastewater: In many parts of the world, untreated human waste is dumped into open water. Because of poor infrastructure, millions of people rely on polluted rivers for bathing, cooking, or drinking.
+•        Plastic waste: Bottles, bags, and microplastics have reached even the deepest parts of the ocean. These materials take centuries to decompose, and marine animals often mistake them for food.
+One of the most dangerous effects of water pollution is the spread of disease. Contaminated water carries bacteria, viruses, and parasites, causing illnesses such as cholera, dysentery, and typhoid fever. In some developing countries, waterborne diseases are among the leading causes of death—especially among children.
+Water pollution also affects ecosystems. Toxic substances can kill fish, birds, and other wildlife, while disrupting the food chain. In some cases, entire aquatic ecosystems collapse. Coral reefs, for instance, are particularly sensitive to changes in water quality and temperature.
+Another major concern is groundwater contamination. Unlike rivers and lakes, underground water is harder to monitor and clean. When chemicals or waste seep into the soil, they can pollute wells and aquifers. Because groundwater provides drinking water for billions, protecting it is critical.
+Economic impacts are significant too. Polluted water hurts agriculture, tourism, and fishing industries. Farmers depend on clean water to grow crops and feed livestock. If irrigation water contains harmful substances, food safety can be compromised. Similarly, polluted beaches and lakes reduce tourism and recreational activities, affecting local economies.
+Governments have a key role to play. Stricter regulations on industrial discharge, investment in sewage treatment plants, and enforcement of anti-dumping laws are essential. In countries where these measures have been implemented, water quality has improved significantly.
+Technological solutions are available. Water purification systems, advanced filtration, and eco-friendly farming practices can reduce pollution. However, if these tools are too expensive or unavailable, poorer communities may not benefit from them.
+Public awareness is just as important. People often pollute water without realizing it—by pouring oil down drains, using chemical cleaners, or wasting plastic. Education and community engagement can lead to better waste management and conservation habits. Because everyone uses water, everyone must take part in protecting it.
+Climate change is making the problem worse. Rising temperatures, longer droughts, and extreme floods affect both the quantity and quality of water. If action is not taken, many regions will face both water scarcity and increased pollution.
+Some argue that economic growth justifies certain levels of pollution. They claim that industries must use natural resources to develop, and that regulation can hurt job creation. While this may be true in the short term, long-term damage to health and the environment is far more costly.
+Ultimately, water pollution threatens health, ecosystems, and economic stability. The causes are well-known, and the solutions exist. If immediate, coordinated action is taken, the world‘s water resources can be protected and restored.
+However, if ignored, polluted water will continue to kill, contaminate, and degrade life on Earth—drop by drop.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose is to explain water pollution as a serious environmental, social, and economic threat, outline its common sources and effects on health, ecosystems, and economies, discuss the roles of governments, technology, and public awareness, and urge immediate coordinated action to protect and restore water resources.',
+      },
+      {
+        question: 'According to the passage, what are the most common sources of water pollution?',
+        explanation: 'The most common sources include industrial waste (chemicals, heavy metals, toxic substances), agricultural runoff (fertilizers and pesticides causing nutrient pollution), sewage and wastewater (untreated human waste), and plastic waste (bottles, bags, and microplastics that harm marine life).',
+      },
+      {
+        question: 'The term "nutrient pollution" in the third paragraph most likely means',
+        explanation: 'In the context of fertilizers and pesticides washing into water bodies and leading to algal blooms, oxygen depletion, and the death of fish, nutrient pollution refers to excess nutrients in water that disrupt ecosystems by promoting excessive algae growth.',
+      },
+      {
+        question: 'What can be inferred about the availability of fresh water?',
+        explanation: 'Although water covers about 70% of the Earth\'s surface, only a small portion is suitable for drinking or irrigation, and it is under increasing pressure from population growth, industrialization, and climate change, making pollution both an environmental and a socio-economic problem.',
+      },
+      {
+        question: 'According to the passage, how does water pollution affect human health?',
+        explanation: 'Contaminated water spreads disease by carrying bacteria, viruses, and parasites that cause illnesses such as cholera, dysentery, and typhoid fever; in some developing countries, waterborne diseases are among the leading causes of death, especially among children.',
+      },
+      {
+        question: 'The word "aquifers" in the seventh paragraph most likely means',
+        explanation: 'In the context of chemicals or waste seeping into the soil and polluting wells and aquifers that provide drinking water for billions, aquifers refer to underground layers of water-bearing rock or sediment that hold groundwater.',
+      },
+      {
+        question: 'What can be inferred about the economic impacts of water pollution?',
+        explanation: 'Polluted water harms agriculture by compromising food safety through contaminated irrigation, damages tourism and recreational activities at polluted beaches and lakes, and hurts fishing industries, thereby affecting local economies significantly.',
+      },
+      {
+        question: 'According to the passage, what role should governments play in addressing water pollution?',
+        explanation: 'Governments should implement stricter regulations on industrial discharge, invest in sewage treatment plants, and enforce anti-dumping laws; where these measures have been applied, water quality has improved significantly.',
+      },
+      {
+        question: 'What can be inferred about the relationship between climate change and water pollution?',
+        explanation: 'Climate change worsens the problem through rising temperatures, longer droughts, and extreme floods that affect both the quantity and quality of water, potentially leading to both water scarcity and increased pollution in many regions if action is not taken.',
+      },
+      {
+        question: 'According to the passage, why is public awareness important in fighting water pollution?',
+        explanation: 'People often pollute water unknowingly by pouring oil down drains, using chemical cleaners, or wasting plastic; education and community engagement can improve waste management and conservation habits, and since everyone uses water, everyone must help protect it.',
+      },
+    ],
+  },{
+    id: 84,
+    title: 'Recycling',
+    topic: 'Environment & Sustainability',
+    content: `Recycling refers to the process of converting waste materials into reusable products. Whether it involves paper, plastic, glass, or metal, recycling plays a key role in managing waste and conserving resources. Because modern societies generate enormous amounts of garbage, recycling has become a critical part of sustainable development.
+Although many countries have implemented recycling programs, results vary greatly. Not only does recycling depend on technology and infrastructure, but also on public awareness and behavior. If properly supported, recycling can reduce pollution, save energy, and lower the pressure on landfills.
+One of the main benefits of recycling is environmental protection. When materials like paper and plastic are recycled, fewer natural resources are extracted from the Earth. For instance, recycling one ton of paper can save 17 trees and 7,000 gallons of water. This is especially important, given the ongoing deforestation and water scarcity in many regions.
+Recycling also helps reduce greenhouse gas emissions. Producing goods from recycled materials often uses less energy than making them from raw materials. For example, making aluminum from recycled metal uses 95% less energy than producing it from ore. Because energy production is a major source of carbon emissions, recycling supports the fight against climate change.
+Another advantage is waste reduction. Landfills are filling up quickly, and many cities are running out of space for new ones. By diverting waste from landfills, recycling extends their lifespan and reduces soil and water contamination. This is especially true for toxic materials, such as batteries and electronics, which should never be dumped in ordinary trash.
+Despite these benefits, recycling also has limitations. Not all materials are recyclable, and some, like mixed plastics or greasy food containers, can contaminate entire batches of recyclables. Although modern facilities can sort and clean waste, they require significant investment and advanced systems. Without such technology, recycling becomes inefficient or even counterproductive. In some cases, recycling costs more than disposal. Collection, sorting, and processing require time, labor, and machinery. If the market for recycled materials is weak, municipalities may lose money. Because of these concerns, some governments have reduced their recycling targets or outsourced waste processing to other countries.
+Another issue is public participation. Recycling programs depend heavily on individuals sorting their waste correctly. If people mix recyclables with regular garbage, or fail to clean them, the system breaks down. Education campaigns and incentives are needed, but success varies by region and culture.
+Some experts argue that recycling is only one part of the solution, and that reducing consumption is more important. They point out that avoiding waste in the first place—by buying less, reusing items, or choosing sustainable products—is more effective than dealing with waste afterward. This approach is often
+summarized by the slogan: ―Reduce, Reuse, Recycle.‖
+Technology offers potential improvements. Advanced sorting machines, chemical recycling methods, and biodegradable materials are making recycling more efficient. If widely adopted, these innovations could reduce dependence on landfills and incineration.
+Government policies are also critical. Banning single-use plastics, taxing landfill disposal, and setting recycling quotas can push businesses and individuals toward more sustainable practices. In countries like Germany, South Korea, and Sweden, strong regulation has led to high recycling rates and low landfill use.
+On the other hand, some critics argue that recycling is promoted as a distraction, allowing companies to continue producing excessive packaging and waste. They believe that real change must come from regulation, not just personal responsibility. Unless production is addressed, they say, recycling will remain a temporary fix.
+Ultimately, recycling is a practical and necessary tool for waste management—but it is not a complete solution. It works best when combined with waste reduction, sustainable design, and strong public policy. If integrated into a broader environmental strategy, recycling can significantly benefit both people and the planet.
+However, if treated as a quick fix or left to individuals alone, it risks becoming ineffective or even misleading.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The passage explains the benefits, limitations, and broader context of recycling, arguing that it is a useful but incomplete solution that works best when combined with waste reduction, sustainable design, and strong policy.',
+      },
+      {
+        question: 'According to the passage, what is one major environmental benefit of recycling paper?',
+        explanation: 'Recycling one ton of paper can save 17 trees and 7,000 gallons of water, which helps address deforestation and water scarcity.',
+      },
+      {
+        question: 'The word "diverting" in the fifth paragraph most likely means',
+        explanation: 'In context, diverting means redirecting or keeping waste away from landfills so that materials can be recycled instead of being buried.',
+      },
+      {
+        question: 'What can be inferred about the energy savings from recycling aluminum?',
+        explanation: 'Making aluminum from recycled metal uses 95% less energy than producing it from ore, which significantly reduces greenhouse gas emissions linked to energy production.',
+      },
+      {
+        question: 'According to the passage, why can recycling sometimes be inefficient?',
+        explanation: 'Not all materials are recyclable, and contaminants such as mixed plastics or greasy containers can spoil entire batches; without advanced sorting technology and investment, the process becomes inefficient or counterproductive.',
+      },
+      {
+        question: 'What can be inferred about the economic challenges of recycling?',
+        explanation: 'Collection, sorting, and processing involve high costs, and if the market for recycled materials is weak, municipalities may lose money, leading some governments to lower targets or outsource processing.',
+      },
+      {
+        question: 'According to the passage, why is public participation essential for recycling programs?',
+        explanation: 'Programs depend on individuals correctly sorting and cleaning recyclables; mixing them with regular garbage or failing to clean them causes the system to break down.',
+      },
+      {
+        question: 'The slogan "Reduce, Reuse, Recycle" in the eighth paragraph most likely emphasizes',
+        explanation: 'The slogan prioritizes avoiding waste by buying less and reusing items first, with recycling as a later step, because reducing consumption is more effective than managing waste afterward.',
+      },
+      {
+        question: 'What can be inferred about the role of government policies in recycling success?',
+        explanation: 'Strong regulations such as banning single-use plastics, taxing landfill disposal, and setting quotas have enabled high recycling rates and low landfill use in countries like Germany, South Korea, and Sweden.',
+      },
+      {
+        question: 'According to the passage, what do some critics believe about the promotion of recycling?',
+        explanation: 'Critics argue that recycling is sometimes promoted as a distraction that allows companies to keep producing excessive packaging and waste, and that real change requires addressing production through regulation rather than relying only on individual responsibility.',
+      },
+    ],
+  },{
+    id: 85,
+    title: 'Environment',
+    topic: 'Environment & Science',
+    content: `The environment includes all natural surroundings—air, water, soil, climate, and biodiversity—that support life on Earth. Whether we live in cities, villages, or forests, we depend on the environment for food, shelter, clean air, and water.
+Because human activity increasingly disrupts natural systems, environmental protection has become one of the most urgent global challenges.
+Although people have always interacted with nature, the scale and speed of environmental degradation in recent decades are unprecedented. Not only has deforestation accelerated, but air and water pollution, overfishing, and species extinction have also reached dangerous levels. If left unaddressed, these changes could permanently damage the Earth‘s ecosystems.
+One major concern is climate change. Caused primarily by the burning of fossil fuels, climate change leads to rising global temperatures, melting ice caps, and extreme weather. Because greenhouse gases trap heat in the atmosphere, they upset weather patterns, threaten food security, and increase the frequency of droughts, floods, and storms.
+Another issue is pollution. Industries, vehicles, and plastic waste all contribute to air, water, and soil contamination. When pollutants enter rivers or the atmosphere, they affect not only human health but also the survival of wildlife. This is especially harmful in developing countries, where waste treatment systems are often inadequate or non-existent.
+Deforestation is another threat. Forests act as carbon sinks, absorbing CO₂ and protecting biodiversity. When trees are cut down for agriculture, mining, or construction, ecosystems collapse, and soil quality declines. Tropical rainforests, in particular, are being lost at alarming rates, often to grow cash crops like soy or palm oil.
+Biodiversity loss is closely linked to environmental harm. As habitats are destroyed and climate changes, many plant and animal species are unable to adapt. Some scientists estimate that we are losing dozens of species every day, which weakens ecosystems and reduces genetic diversity.
+Urbanization contributes to these problems. As more people move to cities, green spaces are replaced by concrete, increasing air pollution and reducing access to nature. Although cities offer economic opportunities, they also produce large amounts of waste and consume vast energy resources. Unless urban planning becomes more sustainable, environmental stress will only worsen.
+The oceans are also under threat. Plastic waste, overfishing, and oil spills have damaged marine ecosystems, while rising temperatures cause coral bleaching and disrupt migration patterns. Because oceans regulate global temperatures and provide food, their degradation has global consequences.
+Governments have a key role in protecting the environment. By enforcing environmental laws, regulating emissions, and preserving natural areas, they can prevent damage and promote restoration. Some countries have made progress, introducing green energy, reducing deforestation, or investing in public transport. However, in many places, economic growth is still prioritized over ecological balance.
+Technology can offer solutions. Solar and wind energy reduce dependence on fossil fuels, while electric vehicles and energy-efficient buildings lower emissions. If such technologies become affordable and widely used, they could help shift economies towards sustainability.
+Individual actions matter too. Recycling, conserving water, reducing plastic use, and eating less meat are simple ways to reduce environmental impact. Because consumer behavior influences industry, widespread lifestyle changes can drive broader reforms.
+Education and awareness are essential. People need to understand the causes and consequences of environmental damage, as well as the steps they can take to help. Without public support and pressure, many governments will not act quickly enough to solve the crisis.
+Critics argue that some environmental measures are too expensive or unrealistic. They claim that strict regulations can slow economic growth or cause job losses, especially in sectors like mining or oil. While this may be true in the short term, long-term environmental damage will be far more costly and irreversible.
+Ultimately, protecting the environment is not a choice—it is a necessity. It requires cooperation between governments, businesses, communities, and individuals. If action is taken now, ecosystems can recover, and future generations can inherit a livable planet.
+However, if current trends continue, the damage may reach a point where recovery is no longer possible. The decisions made today will shape the Earth‘s future for centuries.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The passage defines the environment and explains major threats such as climate change, pollution, deforestation, biodiversity loss, urbanization, and ocean degradation, while outlining roles for governments, technology, individuals, and education, and concluding that protection is a necessity requiring immediate cooperation.',
+      },
+      {
+        question: 'According to the passage, what is the primary cause of climate change?',
+        explanation: 'The passage states that climate change is caused primarily by the burning of fossil fuels, which leads to rising global temperatures, melting ice caps, and extreme weather.',
+      },
+      {
+        question: 'The term \"carbon sinks\" in the passage most likely means',
+        explanation: 'In context, carbon sinks refers to forests that absorb CO₂ and protect biodiversity, so that when trees are cut down ecosystems collapse and soil quality declines.',
+      },
+      {
+        question: 'What can be inferred about the rate of biodiversity loss?',
+        explanation: 'The passage notes that some scientists estimate we are losing dozens of species every day as habitats are destroyed and climate changes, weakening ecosystems and reducing genetic diversity.',
+      },
+      {
+        question: 'According to the passage, how does urbanization contribute to environmental problems?',
+        explanation: 'The passage explains that as more people move to cities, green spaces are replaced by concrete, increasing air pollution and reducing access to nature, while cities produce large amounts of waste and consume vast energy resources.',
+      },
+      {
+        question: 'The word \"degradation\" in the discussion of the oceans most likely means',
+        explanation: 'In context, degradation refers to the damage to marine ecosystems from plastic waste, overfishing, oil spills, and rising temperatures that cause coral bleaching and disrupt migration patterns.',
+      },
+      {
+        question: 'What can be inferred about the role of technology in addressing environmental issues?',
+        explanation: 'The passage states that solar and wind energy reduce dependence on fossil fuels, while electric vehicles and energy-efficient buildings lower emissions, and that if such technologies become affordable and widely used they could help shift economies towards sustainability.',
+      },
+      {
+        question: 'According to the passage, what individual actions can help reduce environmental impact?',
+        explanation: 'The passage lists recycling, conserving water, reducing plastic use, and eating less meat as simple ways to reduce environmental impact, noting that consumer behavior influences industry.',
+      },
+      {
+        question: 'What can be inferred about the arguments of critics of environmental measures?',
+        explanation: 'The passage states that critics claim some measures are too expensive or unrealistic and that strict regulations can slow economic growth or cause job losses, but it counters that long-term environmental damage will be far more costly and irreversible.',
+      },
+      {
+        question: 'According to the passage, why is protecting the environment described as a necessity rather than a choice?',
+        explanation: 'The passage concludes that protection requires cooperation among governments, businesses, communities, and individuals, and that if action is taken now ecosystems can recover, but if current trends continue the damage may become irreversible, shaping the Earth‘s future for centuries.',
+      },
+    ],
+  },{
+    id: 86,
+    title: 'Natural Disasters',
+    topic: 'Environment & Science',
+    content: `Natural disasters are sudden and extreme events caused by natural forces that result in significant damage to life, property, and the environment. Whether it is an earthquake, hurricane, flood, drought, or wildfire, these events disrupt societies and economies across the world. Because their impact can be devastating and widespread, preparing for natural disasters is a major global concern.
+Although natural disasters have occurred throughout history, their frequency and intensity appear to be increasing. Not only are more people being affected, but the economic losses are also growing, especially in densely populated and poorly prepared regions. This trend raises questions about climate change, urban planning, and disaster management.
+Earthquakes are among the most destructive disasters. They strike without warning and can cause buildings to collapse, trigger landslides, and damage infrastructure. Regions along tectonic plate boundaries, such as Japan, Turkey, and Chile, are particularly vulnerable. If construction standards are weak, the death toll can be much higher.
+Floods are the most common natural disaster. Heavy rainfall, river overflow, and poor drainage systems can cause widespread flooding in both rural and urban areas. Because floods can destroy homes, contaminate water, and displace communities, their social and economic effects can last for years. In some places, entire villages are submerged.
+Tropical storms—known as hurricanes, typhoons, or cyclones depending on the region—bring powerful winds, heavy rain, and storm surges. Coastal cities are especially at risk. When a storm makes landfall, it can cut off electricity, flood roads, and damage hospitals, making emergency response extremely difficult.
+Droughts occur when there is a prolonged shortage of rainfall. This leads to water scarcity, crop failure, and food insecurity. Because many regions depend on rainfall for agriculture, droughts can destroy livelihoods and cause mass migration. Sub-Saharan Africa and parts of South Asia are frequently affected.
+Wildfires are another growing concern. Often sparked by heat, lightning, or human negligence, wildfires can spread rapidly, destroying forests, homes, and wildlife. In recent years, countries like Australia, the United States, and Greece have experienced record-breaking fire seasons, fueled by rising temperatures and dry conditions.
+Volcanic eruptions, though less frequent, can be highly destructive. Lava, ash, and toxic gases can threaten nearby populations and disrupt global air travel. If ash reaches the atmosphere, it can also influence climate patterns by blocking sunlight. The human cost of natural disasters is enormous. Thousands of lives are lost each year, and millions are left injured, homeless, or traumatized. The economic cost is also staggering—damaged infrastructure, lost productivity, and emergency aid create massive financial burdens for governments and communities. Developing countries suffer the most, as they often lack the resources for preparation and recovery.
+However, not all disasters are equally deadly. Countries with strong emergency systems, early warning technology, and public education campaigns tend to experience fewer casualties. Japan, for example, has invested heavily in earthquake-resistant buildings, which significantly reduce the damage when quakes occur. This shows that preparedness, not just wealth, determines outcomes.
+Climate change is believed to be increasing the severity and frequency of certain disasters. Warmer oceans feed stronger storms, and changing rainfall patterns lead to more intense floods and droughts. If greenhouse gas emissions continue unchecked, scientists warn that natural disasters will become more frequent and unpredictable.
+Governments play a central role in disaster management. They must invest in risk assessment, infrastructure, emergency training, and public education. Early warning systems and evacuation plans can save thousands of lives. Unfortunately, in many countries, disaster preparation is underfunded and poorly implemented.
+International cooperation is essential. When disasters strike, humanitarian aid, medical teams, and financial support are often needed from other nations.
+Organizations like the Red Cross, UN, and Médecins Sans Frontières play critical roles in response and recovery efforts. But long-term resilience requires more than just emergency aid—it needs planning and prevention.
+Technology offers new possibilities. Satellites, drones, and AI-based prediction systems can help detect risks and monitor damage in real time. If used effectively, these tools can improve decision-making and speed up emergency response.
+Individual action matters too. People can prepare emergency kits, follow safety protocols, and stay informed about risks in their region. Community-based disaster preparedness programs are especially useful in educating residents and building local resilience.
+Critics argue that governments focus too much on rebuilding and not enough on prevention. They suggest that money is often wasted on temporary relief, while long-term solutions—like reforestation, sustainable farming, and climate adaptation—are ignored. Without addressing root causes, disasters will continue to hit the same regions again and again.
+Ultimately, natural disasters are unavoidable—but their impact is not. With early warning systems, better planning, stronger infrastructure, and public education, many lives can be saved. If societies invest in resilience and act before disasters strike, the damage can be reduced and recovery made faster.
+However, if we continue to ignore science, delay action, and underfund disaster response, the next crisis may be even more deadly.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose is to describe various types of natural disasters, their increasing frequency and impacts, the role of climate change and preparedness, and the importance of prevention, technology, and international cooperation in reducing harm.',
+      },
+      {
+        question: 'According to the passage, why are earthquakes particularly dangerous?',
+        explanation: 'Earthquakes strike without warning and can cause buildings to collapse, trigger landslides, and damage infrastructure, with higher death tolls in regions that have weak construction standards.',
+      },
+      {
+        question: 'The word "submerged" in the fourth paragraph most likely means...',
+        explanation: 'In the context of the passage, "submerged" means completely covered or flooded by water, referring to entire villages being underwater during floods.',
+      },
+      {
+        question: 'What can be inferred about the relationship between preparedness and disaster outcomes?',
+        explanation: 'It can be inferred that preparedness, such as strong emergency systems and earthquake-resistant buildings, is more important than wealth alone in reducing casualties and damage.',
+      },
+      {
+        question: 'According to the passage, how does climate change affect natural disasters?',
+        explanation: 'Climate change is believed to increase the severity and frequency of certain disasters by warming oceans that feed stronger storms and altering rainfall patterns that lead to more intense floods and droughts.',
+      },
+      {
+        question: 'The word "resilience" in the passage most likely means...',
+        explanation: 'In the context of the passage, "resilience" means the ability of communities and systems to prepare for, withstand, and recover quickly from disasters through planning and prevention.',
+      },
+      {
+        question: 'What can be inferred about the challenges faced by developing countries?',
+        explanation: 'It can be inferred that developing countries suffer the most from natural disasters because they often lack the resources needed for effective preparation and recovery.',
+      },
+      {
+        question: 'According to the passage, what role do international organizations play?',
+        explanation: 'Organizations like the Red Cross, UN, and Médecins Sans Frontières provide humanitarian aid, medical teams, and financial support during disaster response and recovery efforts.',
+      },
+      {
+        question: 'What can be inferred about the authors\' view on prevention versus rebuilding?',
+        explanation: 'It can be inferred that the passage supports greater focus on prevention and long-term solutions such as reforestation and climate adaptation, rather than relying mainly on temporary relief and rebuilding after disasters occur.',
+      },
+      {
+        question: 'According to the passage, how can individuals contribute to disaster preparedness?',
+        explanation: 'Individuals can prepare emergency kits, follow safety protocols, stay informed about local risks, and participate in community-based disaster preparedness programs to build local resilience.',
+      },
+    ],
+  },{
+    id: 87,
+    title: 'Global Warming',
+    topic: 'Environment & Climate',
+    content: `Global warming refers to the long-term rise in Earth‘s average surface temperature, largely caused by human activities such as burning fossil fuels and deforestation. Whether it is melting glaciers, rising sea levels, or more frequent heatwaves, the signs of global warming are now visible on every continent. Because the Earth's climate is a delicate system, even small shifts in temperature can have widereaching consequences.
+Although climate has changed naturally throughout history, the current pace and scale of warming are unprecedented. Not only is the planet warming faster than ever, but scientists agree that human activity is the dominant cause. If emissions are not reduced, the damage could become irreversible within decades.
+The main cause of global warming is the greenhouse effect. When fossil fuels like coal, oil, and gas are burned, they release carbon dioxide (CO₂), methane (CH₄), and other gases into the atmosphere. These gases trap heat from the sun, preventing it from escaping into space and causing global temperatures to rise. Deforestation also plays a role, since trees absorb CO₂, and cutting them down reduces this capacity.
+The impacts of global warming are already being felt. Rising sea levels threaten low-lying coastal areas, while more frequent droughts and floods affect agriculture and food supply. Extreme weather events—such as hurricanes, wildfires, and heatwaves—have become more intense, causing billions in damage and displacing millions of people.
+Because polar regions are warming faster than the global average, ice sheets in Greenland and Antarctica are melting rapidly. If this trend continues, major cities like New York, Jakarta, and Dhaka could be underwater within a century. Island nations like the Maldives face an even more immediate threat.
+Ecosystems are also under stress. Warmer temperatures are shifting growing seasons, disrupting animal migration patterns, and causing coral reefs to bleach and die. Species that cannot adapt quickly enough may face extinction, reducing biodiversity and weakening natural ecosystems.
+The economic cost of global warming is enormous. Crop failures, property damage, healthcare costs, and disaster response all add up to billions of dollars annually. Developing countries suffer the most, as they often lack the infrastructure and resources to adapt.
+Global warming is also a social issue. As resources like water and farmland become scarce, conflicts over land and migration may increase. Climate refugees—people forced to leave their homes due to environmental changes—are becoming more common. This places additional pressure on governments and international organizations.
+Solutions exist, but they require coordinated effort. Reducing greenhouse gas emissions is the most urgent priority. This can be done by shifting to renewable energy sources, such as solar, wind, and hydro, improving energy efficiency, and reforming transportation systems. If countries work together, emissions can be cut while still supporting economic growth.
+The Paris Agreement, signed by nearly every nation, aims to limit global warming to below 2°C, and preferably 1.5°C, above pre-industrial levels. Although the goals are clear, progress has been slow. Some countries are taking bold action, while others continue to rely on coal and oil.
+Technology offers promising solutions. Carbon capture and storage (CCS), electric vehicles, sustainable agriculture, and green building practices can help reduce emissions. However, if these technologies remain expensive or underdeveloped, they may not be adopted quickly enough.
+Individual choices matter too. By conserving energy, reducing meat consumption, minimizing waste, and supporting eco-friendly products, people can reduce their personal carbon footprint. Public pressure on governments and companies can also lead to policy changes.
+Some argue that focusing on economic growth is more important than environmental protection. They claim that climate action may slow industrial development, especially in poor countries. While this may seem logical in the short term, the long-term cost of inaction will be far greater.
+Ultimately, global warming is the defining challenge of our time. It affects not just the environment, but also health, security, and the global economy. If we act decisively, reduce emissions, and adapt wisely, it is still possible to avoid the worst outcomes.
+However, if delay and denial continue, the consequences will reshape life on Earth for generations to come—and those who suffer most may be the ones least responsible.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose of the passage is to explain global warming as a human-caused rise in Earth‘s temperature, describing its causes, widespread impacts, and the urgent need for coordinated solutions involving emissions reductions, technology, and individual action.',
+      },
+      {
+        question: 'According to the passage, what is the main cause of global warming?',
+        explanation: 'According to the passage, the main cause is the greenhouse effect, in which burning fossil fuels releases gases like carbon dioxide and methane that trap heat in the atmosphere, with deforestation further reducing the planet‘s capacity to absorb CO₂.',
+      },
+      {
+        question: 'The word "unprecedented" in the second paragraph most likely means',
+        explanation: 'In the context of the second paragraph, "unprecedented" means never known or experienced before, emphasizing that the current pace and scale of warming are unlike any natural climate changes in history.',
+      },
+      {
+        question: 'What can be inferred about the threat to low-lying areas and island nations?',
+        explanation: 'It can be inferred that rapid melting of polar ice sheets could submerge major coastal cities within a century and poses an even more immediate existential threat to low-lying island nations such as the Maldives.',
+      },
+      {
+        question: 'According to the passage, what are some already visible impacts of global warming?',
+        explanation: 'According to the passage, visible impacts include rising sea levels, more frequent droughts and floods affecting agriculture, and intensified extreme weather events such as hurricanes, wildfires, and heatwaves that cause damage and displacement.',
+      },
+      {
+        question: 'The term "climate refugees" in the eighth paragraph most likely refers to',
+        explanation: 'In the context of the eighth paragraph, "climate refugees" refers to people forced to leave their homes due to environmental changes caused by global warming, adding pressure on governments and international organizations.',
+      },
+      {
+        question: 'What can be inferred about the Paris Agreement?',
+        explanation: 'It can be inferred that while nearly every nation has signed the Paris Agreement aiming to limit warming to below 2°C (preferably 1.5°C), progress remains slow because some countries continue heavy reliance on coal and oil despite the clear goals.',
+      },
+      {
+        question: 'According to the passage, how can individuals help address global warming?',
+        explanation: 'According to the passage, individuals can reduce their carbon footprint by conserving energy, reducing meat consumption, minimizing waste, and supporting eco-friendly products, while also applying public pressure on governments and companies for policy changes.',
+      },
+      {
+        question: 'What can be inferred about the economic argument against climate action?',
+        explanation: 'It can be inferred that although some claim climate action may slow industrial development especially in poor countries, the passage argues that the long-term cost of inaction will far outweigh any short-term economic concerns.',
+      },
+      {
+        question: 'According to the passage, why are developing countries particularly affected by global warming?',
+        explanation: 'According to the passage, developing countries suffer the most from the economic costs of global warming because they often lack the infrastructure and resources needed to adapt to crop failures, property damage, and other climate-related impacts.',
+      },
+    ],
+  },{
+    id: 88,
+    title: 'AIDS',
+    topic: 'Health & Science',
+    content: `AIDS, which stands for Acquired Immune Deficiency Syndrome, is a lifethreatening condition caused by the Human Immunodeficiency Virus (HIV). It weakens the immune system by attacking the body‘s defense cells, making it difficult to fight infections and diseases. Since it was first identified in the early 1980s, AIDS has become one of the most serious global health issues, affecting millions of people worldwide.
+HIV is transmitted through certain bodily fluids, including blood, semen, vaginal fluids, and breast milk. The most common ways it spreads are through unprotected sexual contact, sharing needles, transfusion of infected blood, and from mother to child during childbirth or breastfeeding. It is not transmitted through casual contact like hugging, shaking hands, or sharing food.
+Once a person is infected with HIV, the virus begins to destroy CD4 cells, which are crucial for immune defense. Over time, if untreated, the immune system becomes too weak to fight off infections or cancers. When this stage is reached, the person is said to have AIDS. Without treatment, AIDS is fatal. However, with proper care, people with HIV can live long and healthy lives without developing AIDS.
+The symptoms of HIV may not appear for years after infection. When they do, they often include fever, weight loss, fatigue, swollen lymph nodes, and recurring infections. Once AIDS develops, symptoms may include severe respiratory infections, neurological issues, cancers such as Kaposi's sarcoma, and opportunistic infections that a healthy immune system would normally control. Testing and early diagnosis are crucial. HIV can be detected through blood or saliva tests. Early treatment reduces the risk of complications and prevents the spread of the virus to others. It is recommended that people at higher risk—such as those with multiple sexual partners or who share needles—get tested regularly. Antiretroviral therapy (ART) is the standard treatment for HIV. It involves a combination of medications that reduce the amount of virus in the body. While ART does not cure HIV, it allows the immune system to recover and reduces the risk of transmission. People on ART can lead productive lives, work, and have families without infecting others if the treatment is properly followed.
+Preventing HIV involves several strategies. The most effective is using protection during sex and avoiding the sharing of needles. Education campaigns have helped raise awareness about how HIV spreads and how it can be prevented. Pre-exposure prophylaxis (PrEP), a medication taken by people at high risk, can prevent infection before exposure.
+Despite medical progress, stigma remains a major barrier. Many people living with HIV face discrimination at work, in healthcare settings, or within their communities. This stigma discourages people from getting tested, disclosing their status, or seeking treatment. Public education is essential to reduce fear and misinformation about HIV/AIDS.
+Globally, efforts to fight AIDS have improved, but the problem persists. SubSaharan Africa remains the most affected region, accounting for nearly two-thirds of all people living with HIV. Many people there still lack access to testing, treatment, and prevention tools. Women and young people are particularly vulnerable.
+International organizations such as UNAIDS, the World Health Organization, and non-governmental groups work together to fund treatment programs, distribute medication, and promote awareness. Advances in research continue, including efforts to develop vaccines or even a functional cure. So far, however, there is no vaccine or complete cure for HIV.
+Children born to HIV-positive mothers can now be protected through medical interventions during pregnancy and childbirth. These efforts have significantly reduced the number of new infections among infants, especially in high-income countries.
+The history of AIDS is also a story of human resilience. The disease once considered a death sentence is now manageable with lifelong treatment. People living with HIV are becoming educators, activists, and leaders. Communities around the world organize events such as World AIDS Day (December 1st) to honor those affected and push for continued progress.
+In conclusion, AIDS remains a global health challenge, but it is no longer a hopeless condition. With early diagnosis, effective treatment, and public education, people with HIV can live full and healthy lives. Ending the HIV/AIDS epidemic requires not only medical solutions but also social change to overcome stigma, increase access, and support vulnerable communities.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose of the passage is to explain what AIDS and HIV are, how the virus is transmitted and progresses, its symptoms, the importance of testing and antiretroviral therapy, prevention strategies, the problem of stigma, the global situation especially in Sub-Saharan Africa, ongoing efforts by organizations, protection of infants, and the conclusion that with treatment and education HIV is manageable while ending the epidemic also requires social change.',
+      },
+      {
+        question: 'According to the passage, how is HIV transmitted?',
+        explanation: 'According to the passage, HIV is transmitted through certain bodily fluids including blood, semen, vaginal fluids, and breast milk, most commonly via unprotected sexual contact, sharing needles, transfusion of infected blood, and from mother to child during childbirth or breastfeeding; it is not transmitted through casual contact such as hugging, shaking hands, or sharing food.',
+      },
+      {
+        question: 'The word "opportunistic" in the symptoms paragraph most likely means',
+        explanation: 'In the passage, "opportunistic" most likely means infections that take advantage of a weakened immune system and that a healthy immune system would normally control, which appear once AIDS develops.',
+      },
+      {
+        question: 'What can be inferred about the progression from HIV to AIDS?',
+        explanation: 'It can be inferred that HIV destroys CD4 cells crucial for immune defense, and if untreated the immune system eventually becomes too weak to fight infections or cancers, at which point the person has AIDS; without treatment AIDS is fatal, but with proper care people with HIV can live long healthy lives without developing AIDS.',
+      },
+      {
+        question: 'According to the passage, what does antiretroviral therapy (ART) do?',
+        explanation: 'According to the passage, ART involves a combination of medications that reduce the amount of virus in the body; while it does not cure HIV, it allows the immune system to recover and reduces the risk of transmission, enabling people on properly followed treatment to lead productive lives, work, and have families without infecting others.',
+      },
+      {
+        question: 'What can be inferred about the role of stigma in the HIV/AIDS epidemic?',
+        explanation: 'It can be inferred that stigma remains a major barrier because many people living with HIV face discrimination at work, in healthcare, or in communities, which discourages testing, disclosure of status, and seeking treatment; public education is therefore essential to reduce fear and misinformation.',
+      },
+      {
+        question: 'According to the passage, which region is most affected by HIV?',
+        explanation: 'According to the passage, Sub-Saharan Africa remains the most affected region, accounting for nearly two-thirds of all people living with HIV, and many people there still lack access to testing, treatment, and prevention tools, with women and young people particularly vulnerable.',
+      },
+      {
+        question: 'The phrase "functional cure" in the passage most likely refers to',
+        explanation: 'In the passage, "functional cure" refers to a potential treatment outcome sought in ongoing research (alongside vaccines) that would control HIV without continuous medication, although so far there is no vaccine or complete cure for HIV.',
+      },
+      {
+        question: 'What can be inferred about preventing mother-to-child transmission?',
+        explanation: 'It can be inferred that medical interventions during pregnancy and childbirth can protect children born to HIV-positive mothers and have significantly reduced the number of new infections among infants, especially in high-income countries.',
+      },
+      {
+        question: 'According to the passage, what is required to end the HIV/AIDS epidemic?',
+        explanation: 'According to the passage, ending the HIV/AIDS epidemic requires not only medical solutions such as early diagnosis and effective treatment but also social change to overcome stigma, increase access to care, and support vulnerable communities, so that people with HIV can live full and healthy lives.',
+      },
+    ],
+  },{
+  id: 89,
+  title: 'Accidents',
+  topic: 'Health & Safety',
+  content: `Accidents are unplanned events that cause injury, damage, or even death. They can happen anywhere—on roads, at home, in the workplace, or in public places. While some accidents are minor, others have life-changing or fatal consequences.
+Understanding the causes and impacts of accidents is essential for prevention and safety planning.
+One of the most common types of accidents occurs on the road. Traffic accidents involve cars, motorcycles, bicycles, or pedestrians. According to the World Health Organization, over 1.3 million people die every year in road crashes, and tens of millions suffer injuries. The leading causes include speeding, drunk driving, distracted driving (such as using mobile phones), and failure to obey traffic rules. Poor road conditions, vehicle defects, and weather also contribute to accidents.
+To reduce road accidents, governments have implemented safety measures such as speed limits, seat belt laws, and helmet requirements for motorcyclists. Traffic cameras and fines encourage compliance. Public education campaigns warn about the dangers of texting while driving or driving under the influence. Technology such as anti-lock braking systems (ABS), automatic emergency braking, and lane assist also enhance vehicle safety.
+Workplace accidents are another concern, especially in industries like construction, mining, or manufacturing. Falling from heights, exposure to hazardous substances, equipment malfunctions, or lack of protective gear can cause serious harm. Repetitive strain injuries and stress-related accidents are also common in office environments.
+Employers have a responsibility to ensure safe working conditions. This includes providing training, safety equipment, and proper supervision. Governments enforce occupational safety laws through inspections and penalties. Creating a culture of safety can reduce injuries and improve morale and productivity.
+Accidents at home are frequent but often overlooked. Slips and falls, burns, cuts, and poisoning are among the most reported incidents. Elderly people and young children are especially vulnerable. For example, leaving cleaning chemicals within a child‘s reach or failing to install grab bars in bathrooms can lead to avoidable injuries.
+Home safety requires awareness and precaution. Installing smoke detectors, locking away dangerous substances, and using child-proofing devices are simple but effective strategies. Public health campaigns often provide tips on creating safer living spaces.
+Accidents can also happen in schools, parks, or during sports and leisure activities. Children may get hurt during play, and athletes risk injury during training or competitions. Equipment failure, poor supervision, and overcrowding increase the likelihood of such events.
+Natural disasters, such as earthquakes or floods, can trigger accidents by collapsing buildings or blocking roads. In these cases, emergency response plans and infrastructure design are key to minimizing casualties. Fire drills, evacuation maps, and disaster preparedness kits help reduce risks in public buildings and homes. Accidents not only cause physical harm but also have economic and emotional costs. Victims may require medical treatment, rehabilitation, or long-term care.
+They may lose their ability to work or face psychological trauma. Families may struggle with financial burdens or emotional stress. National economies also suffer from reduced productivity and increased healthcare costs.
+Insurance systems help people recover financially after accidents. Health insurance, auto insurance, and worker compensation provide support for medical expenses, lost income, and legal claims. However, in many countries, access to insurance remains limited or unaffordable for large segments of the population.
+Technology plays a growing role in accident prevention and response. Surveillance cameras, GPS tracking, and emergency alert systems help detect and report incidents quickly. Mobile apps can guide users to nearby hospitals or contact emergency services. Artificial intelligence is being used to analyze accident data and predict high-risk areas, leading to better planning and prevention.
+Education is perhaps the most powerful tool in preventing accidents. Teaching people how to recognize hazards, use equipment safely, and respond to emergencies builds a culture of safety. Schools, employers, and media all have roles in promoting safety awareness.
+However, not all accidents can be prevented. In such cases, emergency services— such as ambulances, fire departments, and police—must respond quickly and effectively. Training emergency personnel, maintaining reliable communication systems, and investing in hospitals and trauma care are critical.
+In conclusion, accidents are a major cause of injury and death worldwide, but most are preventable. Whether on the road, at work, or at home, safety requires a combination of awareness, regulation, technology, and responsibility. By understanding the risks and acting to reduce them, societies can save lives, reduce suffering, and build safer environments for all.`,
+  questions: [
+    {
+      question: 'What is the main purpose of this passage?',
+      explanation: 'The main purpose of the passage is to define accidents as unplanned events causing injury or death, examine common types such as road, workplace, and home accidents along with their causes, discuss prevention measures involving regulation, technology, and education, and emphasize that most accidents are preventable through awareness and responsibility.',
+    },
+    {
+      question: 'According to the passage, what are the leading causes of road accidents?',
+      explanation: 'According to the passage, the leading causes of road accidents include speeding, drunk driving, distracted driving such as using mobile phones, and failure to obey traffic rules, with poor road conditions, vehicle defects, and weather also contributing.',
+    },
+    {
+      question: 'The word "compliance" in the paragraph about road safety measures most likely means',
+      explanation: 'In the context of the passage, "compliance" most likely means following or obeying the rules, as traffic cameras and fines are said to encourage compliance with safety measures like speed limits and seat belt laws.',
+    },
+    {
+      question: 'What can be inferred about workplace accidents from the passage?',
+      explanation: 'It can be inferred that workplace accidents are a serious concern especially in high-risk industries like construction, mining, or manufacturing, but they can be reduced when employers provide training, safety equipment, and supervision, and when governments enforce occupational safety laws.',
+    },
+    {
+      question: 'According to the passage, who is especially vulnerable to accidents at home?',
+      explanation: 'According to the passage, elderly people and young children are especially vulnerable to home accidents such as slips and falls, burns, cuts, and poisoning, which can result from hazards like accessible cleaning chemicals or missing grab bars.',
+    },
+    {
+      question: 'What can be inferred about the broader impacts of accidents beyond physical injury?',
+      explanation: 'It can be inferred that accidents impose economic and emotional costs, including medical treatment, rehabilitation, loss of work ability, psychological trauma for victims, financial and emotional stress for families, and reduced productivity plus higher healthcare costs for national economies.',
+    },
+    {
+      question: 'The phrase "culture of safety" in the passage most likely means',
+      explanation: 'In the context of the passage, "culture of safety" most likely means a shared set of attitudes and practices that prioritize preventing harm, as creating such a culture at work can reduce injuries and improve morale and productivity, and education builds it more broadly.',
+    },
+    {
+      question: 'According to the passage, how does technology help with accident prevention and response?',
+      explanation: 'According to the passage, technology helps through surveillance cameras, GPS tracking, and emergency alert systems that detect and report incidents quickly, mobile apps that guide users to hospitals or emergency services, and artificial intelligence that analyzes data to predict high-risk areas for better planning.',
+    },
+    {
+      question: 'What can be inferred about the role of education in accident prevention?',
+      explanation: 'It can be inferred that education is one of the most powerful tools because teaching people to recognize hazards, use equipment safely, and respond to emergencies builds a culture of safety, with schools, employers, and media all playing roles in promoting awareness.',
+    },
+    {
+      question: 'According to the passage, what is needed when accidents cannot be prevented?',
+      explanation: 'According to the passage, when accidents cannot be prevented, emergency services such as ambulances, fire departments, and police must respond quickly and effectively, which requires training personnel, maintaining reliable communication systems, and investing in hospitals and trauma care.',
+    },
+  ],
+},{
+  id: 90,
+  title: 'Mental Health',
+  topic: 'Health & Psychology',
+  content: `Mental health refers to a person‘s emotional, psychological, and social well-being. It affects how individuals think, feel, and act, as well as how they handle stress, relate to others, and make decisions. Good mental health allows people to cope with life‘s challenges, build strong relationships, and contribute to their communities. However, mental health issues are increasingly recognized as a major public concern across the globe.
+Mental health disorders include a wide range of conditions such as depression, anxiety, bipolar disorder, schizophrenia, eating disorders, and post-traumatic stress disorder (PTSD). These conditions vary in severity and duration. Some may be temporary and triggered by specific events, while others are chronic and require long-term treatment and support.
+The causes of mental health problems are complex and often involve a combination of factors. Biological influences such as genetics, brain chemistry, and hormonal imbalances can play a role. Environmental factors—including trauma, abuse, poverty, discrimination, and social isolation—can also have a profound impact. Lifestyle choices, such as lack of sleep, substance abuse, and poor diet, may contribute to mental distress.
+Signs of poor mental health include persistent sadness, mood swings, fatigue, changes in eating or sleeping patterns, withdrawal from social activities, and difficulty concentrating. In severe cases, individuals may have thoughts of selfharm or suicide. Recognizing these signs early is crucial to getting the help needed.
+Despite growing awareness, stigma remains a major barrier to mental health care. Many people fear being judged, misunderstood, or discriminated against if they admit to having a mental health problem. This often leads to silence, denial, and delayed treatment. Reducing stigma through education and open conversations is essential.
+Access to mental health services is another major challenge. In many countries, mental health care is underfunded and understaffed. There may be long waiting times, high costs, or a lack of trained professionals. In rural or low-income areas, services may be unavailable altogether. Mental health must be given the same priority as physical health in national healthcare policies.
+Treatment options vary depending on the condition and the individual. They may include psychotherapy (talk therapy), medication, lifestyle changes, or support groups. Cognitive-behavioral therapy (CBT) is one of the most widely used and effective methods. It helps individuals recognize and change negative thought patterns. Medications like antidepressants or mood stabilizers may also be prescribed, though they should be monitored for side effects.
+Mental health support in schools and workplaces is increasingly recognized as important. Students and employees often face stress from academic pressure or job demands. Providing counseling services, stress management programs, and mental health days can improve performance and reduce absenteeism. Encouraging worklife balance and healthy routines is equally important.
+Technology is transforming mental health care. Online counseling, mental health apps, and telepsychiatry provide greater access to support, especially for those in remote areas or during times of crisis like the COVID-19 pandemic. However, digital solutions should complement, not replace, face-to-face care.
+Prevention is just as important as treatment. Promoting mental wellness through healthy habits, supportive relationships, and emotional education helps build resilience. Teaching children how to express emotions, solve problems, and seek help creates a foundation for lifelong mental well-being.
+The global burden of mental health conditions is significant. According to the World Health Organization, depression is the leading cause of disability worldwide. Suicide is among the top causes of death among young people. The economic impact of lost productivity, healthcare costs, and disability payments runs into billions of dollars annually.
+Governments, health organizations, and communities must work together to create inclusive mental health systems. This includes training more professionals, integrating mental health into primary care, and ensuring services are culturally sensitive and accessible to all.
+In conclusion, mental health is a fundamental part of human well-being. It affects every aspect of life and should be treated with the same seriousness as physical health. Breaking stigma, expanding access, and supporting prevention are key steps in building a mentally healthier world.`,
+  questions: [
+    {
+      question: 'What is the main purpose of this passage?',
+      explanation: 'The passage defines mental health, describes various disorders and their causes and signs, discusses barriers such as stigma and limited access to care, outlines treatment and prevention strategies including technology and support in schools and workplaces, and emphasizes the need to treat mental health with the same seriousness as physical health.',
+    },
+    {
+      question: 'According to the passage, what are some biological influences that can contribute to mental health problems?',
+      explanation: 'Biological influences such as genetics, brain chemistry, and hormonal imbalances can play a role in the complex causes of mental health problems.',
+    },
+    {
+      question: 'The word "stigma" in the paragraph about barriers to care most likely means',
+      explanation: 'It means a mark of shame or negative social judgment, as many people fear being judged, misunderstood, or discriminated against if they admit to having a mental health problem, leading to silence, denial, and delayed treatment.',
+    },
+    {
+      question: 'What can be inferred about the importance of early recognition of mental health signs?',
+      explanation: 'Recognizing signs such as persistent sadness, mood swings, fatigue, changes in eating or sleeping patterns, withdrawal, or difficulty concentrating early is crucial to getting the help needed, especially since severe cases may involve thoughts of selfharm or suicide.',
+    },
+    {
+      question: 'According to the passage, why is access to mental health services a major challenge?',
+      explanation: 'In many countries, mental health care is underfunded and understaffed, with possible long waiting times, high costs, or a lack of trained professionals; in rural or low-income areas, services may be unavailable altogether, so mental health must be given the same priority as physical health.',
+    },
+    {
+      question: 'The word "resilience" in the paragraph about prevention most likely means',
+      explanation: 'It means the ability to recover from or adjust to difficulties, as promoting mental wellness through healthy habits, supportive relationships, and emotional education helps build resilience.',
+    },
+    {
+      question: 'What can be inferred about the role of technology in mental health care?',
+      explanation: 'Online counseling, mental health apps, and telepsychiatry provide greater access to support, especially for those in remote areas or during crises like the COVID-19 pandemic, but digital solutions should complement rather than replace face-to-face care.',
+    },
+    {
+      question: 'According to the passage, what does the World Health Organization report about depression?',
+      explanation: 'According to the World Health Organization, depression is the leading cause of disability worldwide, and suicide is among the top causes of death among young people, with the economic impact of mental health conditions running into billions of dollars annually.',
+    },
+    {
+      question: 'What can be inferred about mental health support in schools and workplaces?',
+      explanation: 'It is increasingly recognized as important because students and employees face stress from academic pressure or job demands; providing counseling, stress management programs, and mental health days can improve performance and reduce absenteeism, while encouraging worklife balance and healthy routines is also key.',
+    },
+    {
+      question: 'According to the passage, what are key steps in building a mentally healthier world?',
+      explanation: 'Breaking stigma, expanding access to care, and supporting prevention are key steps; governments, health organizations, and communities must work together to create inclusive systems by training more professionals, integrating mental health into primary care, and ensuring services are culturally sensitive and accessible to all.',
+    },
+  ],
 },
 ];
