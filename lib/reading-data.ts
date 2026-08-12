@@ -1792,5 +1792,596 @@ In conclusion, discipline in schools is essential—but the way it is enforced m
       explanation: 'Discipline should not be about control but about helping students become responsible, respectful members of society through a balanced approach that promotes fairness, emotional growth, and accountability rather than relying solely on punishment.',
     },
   ],
+},{
+    id: 31,
+    title: 'Distance Learning',
+    topic: 'Education & Technology',
+    content: `Distance learning—also known as online education or remote learning—has transformed how people access knowledge. With the rise of the internet and digital platforms, millions of students around the world can now study from home. Whether through university programs, language apps, or online courses, distance learning has opened the door to flexible, affordable, and global education.
+Traditionally, education required physical presence in classrooms. Students and teachers met face to face, following fixed schedules in a shared space. However, modern technology has challenged this model. Today, learners can access lectures, assignments, and discussions using just a laptop or smartphone. This flexibility is especially valuable for working adults, parents, or people in remote areas.
+The growth of distance learning accelerated sharply during the COVID-19 pandemic. With schools and universities closed, millions of learners shifted online almost overnight. While this change allowed education to continue, it also exposed deep inequalities in digital access. Not all students had internet connections, devices, or quiet environments at home. As a result, some fell behind or dropped out entirely.
+Despite these challenges, distance learning offers many advantages. First, it allows students to learn at their own pace. Some platforms offer recorded lessons, so learners can pause, rewind, or review difficult topics. This benefits people with different learning styles or schedules. Second, online education is often more affordable. Without the cost of transport, housing, or printed materials, more people can afford to continue their studies.
+Third, distance learning encourages digital literacy. Students must learn how to navigate software, submit assignments online, and communicate through email or video calls. These are essential skills in the modern workplace. In this sense, online learning prepares students not just academically, but professionally.
+However, distance learning also comes with significant drawbacks. One of the most common problems is lack of motivation and discipline. Without a teacher or classmates nearby, some students find it hard to focus, stay organized, or complete tasks on time. Isolation is another concern. Traditional schools provide social interaction, friendships, and emotional support. Online education, in contrast, can feel lonely and impersonal.
+Another issue is reduced engagement and communication. In physical classrooms, teachers can read students‘ body language, ask spontaneous questions, or hold group discussions. These natural interactions are harder to replicate online. Even with live video classes, some students stay silent or keep their cameras off. This makes it difficult for teachers to assess understanding or build relationships. Technical problems can also interrupt learning. Slow internet, outdated devices, or unfamiliar software can frustrate both students and teachers. Technical support is essential, but often unavailable, especially in underfunded schools or rural areas. In some cases, students must share one device with siblings or parents working from home.
+There is also debate about the quality and credibility of online education. While many online courses are excellent, some are poorly designed, outdated, or even fraudulent. Employers may view online degrees with skepticism, especially if the institution lacks accreditation. To maintain trust, online programs must meet high academic standards and ensure fairness in assessment.
+Despite these concerns, distance learning is expected to grow. Universities and companies are investing in more interactive, personalized, and user-friendly platforms. Artificial intelligence, gamification, and virtual reality are being explored to make online learning more immersive. Blended learning—which combines online and face-to-face education—is becoming increasingly popular.
+Teachers must also adapt. Online teaching requires different skills than traditional classroom instruction. Teachers need training in digital tools, student engagement, and online classroom management. Without proper support, they may feel overwhelmed or ineffective. Professional development is key to successful distance education.
+Parents play a larger role in remote learning, especially for young children. They may need to supervise lessons, provide feedback, or troubleshoot technical issues. This puts extra pressure on families, especially those with limited time, education, or resources. Policymakers must recognize that distance learning is not just about technology—it‘s about the whole learning environment.
+Cultural attitudes toward distance learning are also evolving. In the past, online education was seen as second-rate. Today, some of the world‘s top universities, like Harvard and MIT, offer online courses. Platforms like Coursera, edX, and Khan Academy reach millions of learners globally. As more people succeed through online education, its reputation continues to improve.
+In conclusion, distance learning is a powerful tool—but not a perfect one. It increases access, flexibility, and independence, but it also creates new challenges related to motivation, connection, and equity. As technology continues to develop, and as educators adapt to this new reality, the future of education will likely be a hybrid of online and in-person learning—combining the best of both worlds.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose of this passage is to examine how distance learning has transformed access to education, outlining its advantages such as flexibility, affordability, and digital skill development, its drawbacks including motivation issues, isolation, and technical barriers, the inequalities exposed during the COVID-19 pandemic, and the expected future growth of hybrid models that combine online and in-person learning.',
+      },
+      {
+        question: 'According to the passage, what advantages does distance learning offer to students?',
+        explanation: 'Distance learning allows students to learn at their own pace with recorded lessons that can be paused, rewound, or reviewed. It is often more affordable by eliminating costs of transport, housing, or printed materials. It also encourages digital literacy through navigating software, submitting assignments online, and communicating via email or video calls, preparing students both academically and professionally.',
+      },
+      {
+        question: 'The word \'accelerated\' in paragraph 3 most likely means?',
+        explanation: 'It most likely means increased or sped up rapidly, as the passage states that the growth of distance learning accelerated sharply during the COVID-19 pandemic when schools and universities closed and millions of learners shifted online almost overnight.',
+      },
+      {
+        question: 'What can be inferred about the impact of the COVID-19 pandemic on distance learning?',
+        explanation: 'It can be inferred that while the pandemic forced a rapid shift to online education that allowed learning to continue, it also revealed deep inequalities in digital access, as not all students had internet connections, devices, or quiet environments, causing some to fall behind or drop out entirely.',
+      },
+      {
+        question: 'According to the passage, why can distance learning feel lonely and impersonal?',
+        explanation: 'Traditional schools provide social interaction, friendships, and emotional support, whereas online education lacks a teacher or classmates nearby, making it hard for some students to focus and leading to isolation as a significant concern.',
+      },
+      {
+        question: 'What can be inferred about the future of education based on the passage?',
+        explanation: 'It can be inferred that the future of education will likely be a hybrid model combining online and in-person learning, as distance learning is expected to grow with investments in interactive platforms, AI, gamification, and virtual reality, while blended learning becomes increasingly popular and educators adapt to new skills.',
+      },
+    ],
+  },{
+    id: 32,
+    title: 'Home Schooling',
+    topic: 'Education & Society',
+    content: `Home schooling, or home education, refers to the practice of educating children outside the formal school system, usually by parents or private tutors. While traditional schools remain the most common form of education worldwide, home schooling has grown significantly in popularity, particularly in countries like the United States, Canada, and the UK.
+Families choose home schooling for many reasons. Some parents are dissatisfied with the quality of public education or disagree with the national curriculum. Others want to provide religious or moral instruction not offered in mainstream schools. In certain cases, children with special needs, chronic illnesses, or bullying experiences may find home schooling a safer and more supportive environment. The key appeal is flexibility and control over what and how children learn.
+One of the main advantages of home schooling is customized learning. Unlike large classrooms with 20 or 30 students, home schooling allows education to be tailored to a child‘s pace, interests, and abilities. A student who struggles in mathematics but excels in science can receive more time and attention in the areas where they need it. Lessons can also be built around real-life experiences—field trips, experiments, or family discussions—rather than textbooks alone.
+Supporters argue that home schooling promotes independent thinking and deeper learning. Without constant testing or peer pressure, students may become more curious, motivated, and confident. Additionally, home-schooled children often have more time for hobbies, sports, and community involvement, which may contribute to a well-rounded personality.
+However, home schooling also presents major challenges. One major concern is socialization. Critics argue that children educated at home may miss out on opportunities to interact with peers, develop communication skills, or learn how to handle conflict. Schools are not just about academics—they also teach teamwork, discipline, and emotional intelligence.
+Another issue is the academic standard and quality of instruction. Not all parents have the time, knowledge, or teaching ability to provide a well-rounded education.
+Some may lack expertise in subjects like math, science, or foreign languages. Without access to labs, libraries, or sports facilities, students might also miss out on resources that traditional schools provide.
+Moreover, monitoring and regulation of home schooling varies greatly by country. In some places, there are strict guidelines, regular testing, and inspections. In others, parents can educate their children with minimal oversight. This raises concerns about educational inequality, neglect, or even ideological isolation. Governments must balance the right to educate with the need to protect children‘s interests.
+Technology has improved the experience of home schooling. Online platforms, video lessons, and virtual tutors have made it easier for parents to deliver structured lessons. Students can now connect with others around the world, join virtual classes, or access global resources. Digital learning has made home education more efficient, but also more dependent on internet access and digital literacy.
+Another consideration is the role of parents. Home schooling requires a high level of commitment, patience, and planning. One parent often must reduce working hours or leave their job altogether. This can create financial pressure on the family. In single-parent homes or low-income households, home schooling may be unrealistic, even if the parents are willing.
+The long-term outcomes of home schooling are mixed. Some studies show that home-schooled students perform as well or better on standardized tests and in university admissions. Others point out that academic success depends heavily on the parent‘s education level, resources, and teaching style. Social outcomes also vary widely—some home-schooled students are highly social and confident, while others may struggle with group dynamics or public speaking.
+During the COVID-19 pandemic, millions of families were forced to try a form of home schooling. This experience gave many parents a deeper appreciation of teachers\' roles and the complexity of education. Some discovered that their children thrived at home, while others found it stressful and ineffective. As a result, interest in hybrid models of education has grown, combining elements of both home and school learning.
+Governments and education systems now face important questions. Should home schooling be encouraged as a valid alternative? How can we ensure educational standards and protect children\'s rights? What support should be offered to parents who choose this path? These issues are particularly urgent in societies where educational access is uneven or where school systems are underfunded.
+In conclusion, home schooling offers flexibility, personalized learning, and a safe environment for some families. However, it also raises questions about quality, social development, and equal opportunity. It is neither clearly better nor worse than traditional schooling—its success depends on the context, the child\'s needs, and the parent\'s ability to teach. For some, it\'s a life-changing solution. For others, it\'s an impractical dream. What\'s essential is that every child, no matter where they study, receives a rich, balanced, and meaningful education.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose is to explain what home schooling is, why families choose it, its advantages and challenges, the role of technology and parents, and the broader questions it raises about educational quality, socialization, and equal opportunity.',
+      },
+      {
+        question: 'According to the passage, what are some reasons families choose home schooling?',
+        explanation: 'Families may be dissatisfied with public education quality or the national curriculum, want to provide religious or moral instruction, or seek a safer environment for children with special needs, chronic illnesses, or bullying experiences; the key appeal is flexibility and control over learning.',
+      },
+      {
+        question: 'The word \'customized\' in the third paragraph most likely means...',
+        explanation: 'Tailored or adapted to the individual. The passage explains that home schooling allows education to be tailored to a child\'s pace, interests, and abilities, unlike large classrooms.',
+      },
+      {
+        question: 'What can be inferred about socialization concerns regarding home schooling?',
+        explanation: 'Critics argue that home-schooled children may miss opportunities to interact with peers, develop communication skills, handle conflict, and learn teamwork, discipline, and emotional intelligence that schools provide beyond academics.',
+      },
+      {
+        question: 'According to the passage, how has technology affected home schooling?',
+        explanation: 'Online platforms, video lessons, and virtual tutors make structured lessons easier; students can connect globally, join virtual classes, and access resources, making home education more efficient but more dependent on internet access and digital literacy.',
+      },
+      {
+        question: 'The word \'oversight\' in the seventh paragraph most likely means...',
+        explanation: 'Supervision or monitoring. The passage notes that in some places parents educate with minimal oversight, raising concerns about inequality, neglect, or ideological isolation.',
+      },
+      {
+        question: 'What can be inferred about the long-term outcomes of home schooling?',
+        explanation: 'Outcomes are mixed: some studies show home-schooled students perform as well or better on tests and university admissions, but success depends heavily on the parent\'s education, resources, and teaching style, and social outcomes also vary widely.',
+      },
+      {
+        question: 'According to the passage, what impact did the COVID-19 pandemic have on views of home schooling?',
+        explanation: 'Millions of families tried a form of home schooling, which gave parents a deeper appreciation of teachers\' roles; some children thrived while others found it stressful, leading to greater interest in hybrid models combining home and school learning.',
+      },
+      {
+        question: 'What can be inferred about the demands home schooling places on parents?',
+        explanation: 'It requires high commitment, patience, and planning; one parent often reduces work hours or leaves a job, creating financial pressure, and it may be unrealistic for single-parent or low-income households even if parents are willing.',
+      },
+      {
+        question: 'According to the passage, what is essential regardless of where a child studies?',
+        explanation: 'Every child, no matter where they study, should receive a rich, balanced, and meaningful education; home schooling is neither clearly better nor worse than traditional schooling, as its success depends on context, the child\'s needs, and the parent\'s ability to teach.',
+      },
+    ],
+  },{
+    id: 33,
+    title: 'Field Trips',
+    topic: 'Education & Learning',
+    content: `Field trips—educational visits to locations outside the classroom—have long been part of school culture. Whether it‘s a museum, factory, historical site, or nature reserve, these trips aim to enhance learning by offering real-world experiences. While some educators view field trips as optional extras, others see them as vital to holistic education.
+The main goal of a field trip is to make learning more engaging. Instead of reading about fossils in a textbook, students can observe them in a natural history museum. Instead of discussing farming techniques in theory, they can witness them on a working farm. These direct experiences help students connect classroom concepts to the real world, making lessons more meaningful and memorable.
+Another advantage is the development of soft skills. Field trips require planning, time management, teamwork, and curiosity. Students must follow instructions, behave responsibly in public, and interact with people outside their school. Such experiences build confidence, independence, and social awareness—qualities that can‘t always be taught in a classroom.
+Field trips also promote cross-disciplinary learning. A single trip to an art museum might include history, culture, creativity, and even marketing. In a science center, students might explore physics, biology, and environmental issues all at once. These rich environments encourage students to ask questions, think critically, and see how different subjects are connected.
+Teachers often note that students who struggle in academic settings may thrive on field trips. Some children are visual or hands-on learners, and they understand concepts better through observation or interaction. Others become more engaged outside the rigid classroom structure. This shift can improve motivation and even lead to better academic performance.
+Despite these benefits, field trips are not without drawbacks. One concern is cost. Transport, entry fees, and meals can add up, especially for schools with limited budgets. Parents may struggle to afford extra expenses, and some students may feel excluded if they cannot participate. This raises issues of equity and access.
+Safety is another concern. Taking a group of students off-campus requires risk assessments, extra supervision, and clear emergency plans. Even well-organized trips can face unexpected problems—bad weather, lost items, or injuries. As a result, some schools avoid field trips entirely, fearing legal responsibility or logistical stress.
+Time constraints also matter. With growing academic pressure and strict syllabi, teachers may feel that field trips take away from ―serious learning.‖ Planning a trip requires effort, paperwork, and classroom time. If the trip is not directly tied to the curriculum, it may be viewed as a distraction.
+Technology has changed the way some schools approach field trips. Virtual field trips—online tours of museums, landmarks, or factories—are now available through websites and apps. These experiences are cheaper and easier to arrange but lack the sensory richness of physical visits. No video can fully replace the feeling of standing in an ancient ruin or touching a historical artifact.
+Field trips can also support community connections. Visits to local businesses, hospitals, or government offices show students how their society functions. Such experiences build civic understanding and help young people see their place in the wider world. They may even inspire future careers or volunteer work.
+Some countries make field trips a regular part of the curriculum. In Finland, for example, outdoor learning and excursions are seen as essential. In Japan, group discipline and cultural experiences are emphasized during school trips. Cultural attitudes play a major role in how field trips are valued and implemented.
+To be effective, field trips must be well-planned. Educators should set clear goals, link the trip to classroom content, and prepare students in advance. After returning, teachers can assign follow-up activities—presentations, reports, or discussions—to reinforce what was learned. Reflection is key to turning a fun outing into a deep learning experience.
+Environmental education is one area where field trips are especially valuable. Visiting a forest, recycling center, or wildlife park helps students understand environmental issues firsthand. Seeing the effects of pollution or conservation efforts in real life often has a stronger impact than reading statistics in a book.
+In conclusion, field trips are more than just breaks from routine—they are powerful tools for experiential learning. While they come with costs and risks, their potential to spark curiosity, strengthen learning, and broaden horizons is immense. To create well-rounded learners, schools should make room for both theory and experience—inside and outside the classroom.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose is to discuss the educational value of field trips, outlining their benefits for engagement, soft skills, cross-disciplinary learning, and motivation, while also addressing drawbacks such as cost, safety, and time constraints, and concluding that they are powerful tools for experiential learning when well-planned.',
+      },
+      {
+        question: 'According to the passage, what is the main goal of a field trip?',
+        explanation: 'The main goal is to make learning more engaging by offering real-world experiences that help students connect classroom concepts to the real world, making lessons more meaningful and memorable.',
+      },
+      {
+        question: 'The phrase "soft skills" in the third paragraph most likely refers to',
+        explanation: 'In the context of field trips requiring planning, time management, teamwork, and curiosity, and building confidence, independence, and social awareness, soft skills refer to personal and interpersonal abilities that are not strictly academic or technical.',
+      },
+      {
+        question: 'What can be inferred about students who struggle in traditional academic settings?',
+        explanation: 'It can be inferred that some of these students, particularly visual or hands-on learners, may thrive on field trips because they understand concepts better through observation or interaction and become more engaged outside the rigid classroom structure, which can improve motivation and academic performance.',
+      },
+      {
+        question: 'According to the passage, what are some drawbacks of field trips?',
+        explanation: 'Drawbacks include high costs for transport, entry fees, and meals that raise equity issues; safety concerns requiring risk assessments and supervision; and time constraints that may conflict with academic pressure and strict syllabi, leading some schools to avoid them.',
+      },
+      {
+        question: 'The word "equity" in the sixth paragraph most likely means',
+        explanation: 'In the context of parents struggling to afford expenses and some students feeling excluded if they cannot participate, equity refers to fairness and equal access or opportunity for all students.',
+      },
+      {
+        question: 'What can be inferred about virtual field trips compared to physical ones?',
+        explanation: 'Virtual field trips are cheaper and easier to arrange but lack the sensory richness of physical visits; no video can fully replace the experience of standing in an ancient ruin or touching a historical artifact.',
+      },
+      {
+        question: 'According to the passage, how can field trips support community connections?',
+        explanation: 'Visits to local businesses, hospitals, or government offices show students how society functions, build civic understanding, help young people see their place in the wider world, and may inspire future careers or volunteer work.',
+      },
+      {
+        question: 'What can be inferred about the importance of planning for effective field trips?',
+        explanation: 'Effective field trips require clear goals, links to classroom content, advance preparation of students, and follow-up activities such as presentations or discussions; reflection is essential to turn a fun outing into deep learning.',
+      },
+      {
+        question: 'According to the passage, why are field trips especially valuable for environmental education?',
+        explanation: 'Visiting places like a forest, recycling center, or wildlife park allows students to understand environmental issues firsthand; seeing the effects of pollution or conservation in real life often has a stronger impact than reading statistics in a book.',
+      },
+    ],
+  },{
+    id: 34,
+    title: 'Illiteracy',
+    topic: 'Society & Education',
+    content: `Illiteracy—the inability to read and write—remains one of the most urgent global challenges in the 21st century. Although tremendous progress has been made in expanding education access, millions of people around the world still lack basic literacy skills. The consequences are severe, affecting not only individuals but also entire societies and economies.
+According to UNESCO, over 770 million adults worldwide are functionally illiterate, most of them in developing countries. Women and girls make up nearly two-thirds of this population. Because education is often deprioritized for girls in certain cultures, gender inequality continues to drive illiteracy across generations. The causes of illiteracy are varied. Poverty is one of the main factors. Families who cannot afford school fees, books, or transportation often keep their children at home. In rural or conflict-affected regions, schools may be too far away, poorly staffed, or even unsafe. Children who grow up without regular schooling often enter adulthood without learning to read or write at all.
+Another cause is limited support at home. If parents are illiterate, they may be unable to help their children with reading or homework. In some communities, education is not seen as necessary—especially if the main source of income is farming or manual labor. In such cases, children are expected to work rather than study.
+The effects of illiteracy go far beyond academics. Illiterate individuals may struggle to fill out job applications, read safety instructions, or understand medicine labels. Their lack of literacy limits their access to information, legal rights, and healthcare. As a result, they are more vulnerable to exploitation, unemployment, and poverty.
+From an economic perspective, widespread illiteracy slows national development. Countries with high illiteracy rates often suffer from low productivity, weak institutions, and poor public health outcomes. Investing in literacy is not only a human right but also an economic necessity. The more literate a population is, the more capable it becomes of driving innovation, governance, and sustainable growth.
+Illiteracy also affects democracy. People who cannot read are less likely to understand political platforms, news articles, or voting procedures. This reduces their ability to participate in civic life. A truly democratic society depends on an educated, informed population that can make reasoned decisions and hold leaders accountable.
+Technology has both helped and hindered the fight against illiteracy. On one hand, smartphones and online platforms offer access to free learning materials, digital libraries, and literacy apps. On the other hand, digital tools often require basic literacy to use in the first place. In many low-income areas, digital illiteracy and traditional illiteracy go hand in hand.
+Governments and NGOs have launched various programs to reduce illiteracy. These include:
+•        Adult literacy classes, often held in the evenings for working adults
+•        Mobile libraries and learning vans, which bring books to rural communities
+•        Teacher training initiatives, aimed at improving literacy instruction in early grades
+•        Conditional cash transfers, rewarding families for keeping children in school Some countries have made remarkable progress. Bangladesh, for example, has significantly raised female literacy through community-led programs. In Brazil, a national campaign used TV, radio, and celebrities to encourage adult reading. Political will, investment, and local engagement have proven essential for longterm success.
+Despite these efforts, challenges remain. Some people feel ashamed to admit they cannot read, making them reluctant to join adult classes. Others may start learning but drop out due to work, health, or family duties. In conflict zones or refugee camps, education is often disrupted or completely unavailable. Illiteracy is not just about lack of access—it‘s also about stigma, instability, and survival.
+Early childhood education plays a crucial role in preventing illiteracy. Research shows that children who are exposed to books, storytelling, and early writing at home or in preschool are far more likely to become fluent readers. This means that literacy efforts must begin before primary school—and continue throughout life.
+Multilingual environments present another challenge. In some countries, children speak one language at home but are taught to read and write in another. Without support in both languages, these students may fall behind. Inclusive and culturally relevant teaching strategies are necessary to make literacy accessible to all.
+In conclusion, illiteracy is not just a lack of reading skills—it is a barrier to dignity, opportunity, and participation. Solving it requires more than building schools. It demands investment, political commitment, social awareness, and above all, the belief that every human being deserves the power of words. Literacy opens doors—not only to jobs and education, but to freedom, understanding, and selfexpression.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The passage explains the scale, causes, effects, and solutions related to illiteracy, emphasizing that it is a barrier to dignity and opportunity that requires comprehensive social and political efforts to overcome.',
+      },
+      {
+        question: 'According to the passage, how many adults worldwide are functionally illiterate according to UNESCO?',
+        explanation: 'UNESCO reports that over 770 million adults worldwide are functionally illiterate, with most living in developing countries and nearly two-thirds being women and girls.',
+      },
+      {
+        question: 'The word "functionally" in the second paragraph most likely means',
+        explanation: 'In context, functionally illiterate refers to people who lack the practical reading and writing skills needed for everyday tasks and participation in society, even if they may have some minimal literacy.',
+      },
+      {
+        question: 'What can be inferred about the relationship between gender and illiteracy?',
+        explanation: 'Gender inequality contributes to higher illiteracy rates among women and girls because education is often deprioritized for them in certain cultures, perpetuating the problem across generations.',
+      },
+      {
+        question: 'According to the passage, how does illiteracy affect democratic participation?',
+        explanation: 'People who cannot read are less likely to understand political platforms, news, or voting procedures, which reduces their ability to participate in civic life and hold leaders accountable.',
+      },
+      {
+        question: 'What can be inferred about technology\'s dual role in addressing illiteracy?',
+        explanation: 'Technology provides free learning materials and literacy apps, but it also requires basic literacy skills to use, so digital and traditional illiteracy often reinforce each other in low-income areas.',
+      },
+      {
+        question: 'According to the passage, what are some programs used to reduce illiteracy?',
+        explanation: 'Programs include adult literacy classes, mobile libraries and learning vans, teacher training initiatives, and conditional cash transfers that reward families for keeping children in school.',
+      },
+      {
+        question: 'The phrase "conditional cash transfers" in the eighth paragraph most likely means',
+        explanation: 'Conditional cash transfers are financial rewards given to families on the condition that they keep their children in school, serving as an incentive to promote education and reduce illiteracy.',
+      },
+      {
+        question: 'What can be inferred about the importance of early childhood education?',
+        explanation: 'Children exposed to books, storytelling, and early writing at home or in preschool are far more likely to become fluent readers, so literacy efforts must begin before primary school and continue throughout life.',
+      },
+      {
+        question: 'According to the passage, why do some adults remain reluctant to join literacy classes?',
+        explanation: 'Some people feel ashamed to admit they cannot read, while others drop out due to work, health, or family responsibilities, and education may be unavailable in conflict zones or refugee camps.',
+      },
+    ],
+  },{
+    id: 35,
+    title: 'Child Labor',
+    topic: 'Society & Culture',
+    content: `Child labor refers to the employment of children in work that deprives them of their childhood, education, and dignity. Despite international laws and rising global awareness, millions of children around the world are still trapped in labor, especially in developing countries. This issue remains one of the most serious human rights concerns of our time.
+According to the International Labour Organization (ILO), there are over 160 million child laborers worldwide. Nearly half of them are engaged in hazardous work—jobs that involve exposure to harmful chemicals, dangerous machinery, or long hours. Because these children are often forced to work under poor conditions, their health, development, and safety are severely at risk.
+Child labor exists for many reasons. The most common is poverty. Families living in extreme poverty may rely on their children‘s income to survive. If parents cannot afford school fees or materials, they may choose work over education. In some regions, school is seen as a luxury rather than a right. As a result, children may spend their days in fields, factories, or streets instead of classrooms.
+Another factor is weak law enforcement. Even where child labor laws exist, they are often ignored due to corruption, lack of monitoring, or economic pressure. Employers may prefer children because they are cheaper, easier to control, and less likely to protest. Without strong regulations, unethical labor practices continue unchecked.
+Cultural norms also play a role. In some societies, it is considered normal for children to contribute to the family business, work on farms, or look after siblings. While light work may be acceptable, it becomes harmful when it interferes with education or endangers the child‘s well-being. The line between responsibility and exploitation is often blurred.
+The consequences of child labor are long-lasting. Children who miss school often remain illiterate or semi-literate for life. This limits their future job opportunities and increases their risk of poverty in adulthood. The cycle continues across generations, as uneducated parents are more likely to send their own children to work.
+Child labor also affects mental and emotional development. Many young workers experience stress, fatigue, abuse, or even trauma. They may lose their sense of play, trust, and hope. In extreme cases, children are trafficked or forced into criminal activities, such as begging or drug smuggling. These experiences can leave deep psychological scars.
+Efforts to reduce child labor have shown mixed results. Some countries have made progress by increasing access to free primary education, improving social protection, and supporting poor families. Bangladesh, for example, has reduced child labor by investing in girls‘ education and vocational training. In Brazil, a cash transfer program rewards families who keep children in school. These policies demonstrate that prevention is possible when governments act boldly.
+However, global crises like armed conflict, climate disasters, and pandemics have reversed some of this progress. During the COVID-19 pandemic, millions of children dropped out of school and entered the labor market. As families lost income, education was no longer a priority—and the risk of exploitation rose sharply.
+One controversial question is whether all child work should be banned. Some experts argue that certain forms of work—like helping at a family shop for a few hours—can teach responsibility and skills. Others say that any labor that replaces schooling or puts children in danger must be eliminated completely. The challenge lies in setting clear, enforceable boundaries.
+International organizations like UNICEF and the ILO have called for an end to child labor through coordinated global efforts. Their goals include:
+•        Ensuring free, quality education for all children
+•        Providing financial support to poor families
+•        Enforcing labor laws and punishing offenders
+•        Raising public awareness through campaigns and media
+Corporations also have a role to play. Many global brands rely on supply chains that include child labor, especially in industries like textiles, agriculture, and mining. Pressure from consumers and watchdog groups has led some companies to adopt ethical sourcing policies and conduct factory inspections. Still, many abuses remain hidden in informal sectors.
+Technology can help expose illegal child labor. Satellite imagery, smartphone reporting, and blockchain tracking are being tested to increase transparency in supply chains. But technology alone is not enough. A moral commitment is needed—from governments, companies, communities, and individuals—to protect the rights of every child.
+In conclusion, child labor is not simply an economic issue—it is a moral one. While some families and cultures may see it as necessary, the long-term damage to children's lives is undeniable. No child should have to choose between survival and education. Ending child labor requires global cooperation, strong laws, and public compassion. Only then can we ensure that children are learning, growing, and dreaming—not working in silence.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The passage defines child labor, presents its scale and causes, describes its long-term consequences, reviews efforts and challenges in reducing it, and argues that ending it requires global cooperation, strong laws, and moral commitment.',
+      },
+      {
+        question: 'According to the passage, how many child laborers are there worldwide according to the ILO?',
+        explanation: 'The passage states that according to the International Labour Organization (ILO), there are over 160 million child laborers worldwide.',
+      },
+      {
+        question: 'The word \"hazardous\" in the passage most likely means',
+        explanation: 'In context, \"hazardous\" describes work involving exposure to harmful chemicals, dangerous machinery, or long hours that puts children\'s health, development, and safety at severe risk.',
+      },
+      {
+        question: 'What can be inferred about the relationship between poverty and child labor?',
+        explanation: 'The passage identifies poverty as the most common reason for child labor, noting that families in extreme poverty may rely on children\'s income and choose work over education when they cannot afford school costs.',
+      },
+      {
+        question: 'According to the passage, what are some long-term consequences of child labor?',
+        explanation: 'The passage explains that children who miss school often remain illiterate or semi-literate, limiting future job opportunities and increasing the risk of poverty in adulthood, which can continue the cycle across generations.',
+      },
+      {
+        question: 'The word \"exploitation\" in the discussion of cultural norms most likely means',
+        explanation: 'In context, \"exploitation\" refers to situations where children\'s work interferes with education or endangers their well-being, crossing the line from acceptable responsibility into harmful use of their labor.',
+      },
+      {
+        question: 'What can be inferred about the impact of the COVID-19 pandemic on child labor?',
+        explanation: 'The passage states that during the pandemic millions of children dropped out of school and entered the labor market as families lost income, causing education to lose priority and sharply raising the risk of exploitation.',
+      },
+      {
+        question: 'According to the passage, what goals have international organizations like UNICEF and the ILO set to end child labor?',
+        explanation: 'The passage lists ensuring free quality education for all children, providing financial support to poor families, enforcing labor laws and punishing offenders, and raising public awareness through campaigns and media.',
+      },
+      {
+        question: 'What can be inferred about the role of corporations in addressing child labor?',
+        explanation: 'The passage notes that many global brands rely on supply chains that include child labor, and that pressure from consumers and watchdog groups has led some companies to adopt ethical sourcing policies, though many abuses remain hidden in informal sectors.',
+      },
+      {
+        question: 'According to the passage, why is child labor described as a moral issue as well as an economic one?',
+        explanation: 'The passage concludes that while some families and cultures may see child labor as necessary, the long-term damage to children\'s lives is undeniable, and no child should have to choose between survival and education.',
+      },
+    ],
+  },{
+    id: 36,
+    title: 'Juvenile Delinquency',
+    topic: 'Crime & Society',
+    content: `Juvenile delinquency refers to illegal or antisocial behavior committed by individuals under the age of 18. It includes crimes such as theft, vandalism, assault, drug use, and gang involvement. While many young offenders commit minor acts, others engage in serious criminal activity. The causes and consequences of juvenile delinquency are complex and widely debated.
+One major cause is family background. Children raised in unstable or violent homes are more likely to engage in criminal behavior. Because parental neglect, abuse, or lack of supervision can weaken a child‘s sense of right and wrong, many young people turn to risky behavior in search of attention or escape. In some cases, parents may themselves be involved in crime, setting a dangerous example. Another key factor is peer influence. During adolescence, the desire to fit in can be extremely strong. Teenagers who associate with delinquent peers may feel pressured to break the law to gain approval. Even those who would not normally commit crimes may do so under the influence of a group. Gangs, in particular, offer a false sense of belonging and identity, especially in poor or violent neighborhoods.
+Education also plays a significant role. School failure, low academic achievement, and dropping out are linked to higher rates of juvenile delinquency. Students who feel alienated or humiliated in school may develop resentment and act out. Without positive role models or future goals, many lose hope and see crime as the only way forward.
+Poverty is another powerful driver. In low-income areas, opportunities for legal success may be limited. Young people without jobs, money, or access to social services may resort to theft or drug dealing simply to survive. Because they see no alternative, crime becomes a form of economic survival.
+Mental health problems often go unnoticed in juvenile offenders. Depression, trauma, ADHD, and substance abuse can increase the risk of criminal behavior if left untreated. Many young people in the justice system have experienced emotional pain or psychological distress, yet few receive the support they need.
+The media and environment also contribute. Exposure to violence in films, games, or the news may normalize aggressive behavior. Living in neighborhoods with high crime rates can also desensitize youth to lawbreaking. If a child grows up seeing crime as a daily part of life, their moral boundaries may shift.
+Governments deal with juvenile crime in different ways. Some focus on punishment—placing young offenders in detention centers or juvenile prisons. Others emphasize rehabilitation through counseling, education, and community service. The debate continues over which approach is more effective.
+Supporters of rehabilitation argue that young people are still developing emotionally and mentally, and deserve a second chance. Harsh punishment, they say, often makes things worse by exposing youth to hardened criminals and damaging their self-esteem. By contrast, education and mentoring programs have been shown to reduce repeat offenses and help teens build a better future.
+However, critics of soft approaches believe that leniency sends the wrong message. If crimes go unpunished, they argue, youth will not learn responsibility. Serious crimes must have serious consequences, even if committed by minors. Otherwise, justice is not served, and public safety is threatened.
+Juvenile justice systems must find a balance between accountability and rehabilitation. Some countries use ―restorative justice‖ programs, where offenders meet victims to understand the harm they caused. Others invest in diversion programs that keep youth out of court by offering therapy, education, and life skills training. These models aim to break the cycle of crime rather than simply punish it. Education remains a crucial tool. School-based programs that teach emotional regulation, conflict resolution, and career planning can reduce dropout rates and prevent crime. When students feel supported and seen, they are less likely to fall into delinquency. After-school activities—sports, arts, and mentoring—also offer positive alternatives to street life.
+Families and communities also have a role. Parenting classes, financial support, and youth centers can strengthen family bonds and offer safe spaces for teenagers. Religious institutions, sports clubs, and volunteer organizations can provide purpose and direction. It takes a whole society to guide youth away from crime.
+In conclusion, juvenile delinquency is not caused by a single factor, but by a mix of family issues, social pressure, poverty, mental health, and environment. While punishment has its place, a focus on prevention, education, and emotional support is more likely to reduce youth crime in the long term. Every young person deserves the chance to learn from their mistakes and choose a better path.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose is to examine the causes of juvenile delinquency, the debate between punishment and rehabilitation, and the importance of prevention, education, and community support in addressing youth crime.',
+      },
+      {
+        question: 'According to the passage, what is one major cause of juvenile delinquency related to the home?',
+        explanation: 'One major cause is family background; children raised in unstable or violent homes, or those experiencing parental neglect, abuse, or lack of supervision, are more likely to engage in criminal behavior.',
+      },
+      {
+        question: 'The word "desensitize" in the sixth paragraph most likely means...',
+        explanation: 'In the context of the passage, "desensitize" means to make less sensitive or less reactive to crime and lawbreaking through repeated exposure.',
+      },
+      {
+        question: 'What can be inferred about the role of gangs in juvenile delinquency?',
+        explanation: 'It can be inferred that gangs attract vulnerable youth by offering a false sense of belonging and identity, particularly in poor or violent neighborhoods where other positive options may be lacking.',
+      },
+      {
+        question: 'According to the passage, how does education relate to juvenile delinquency?',
+        explanation: 'School failure, low academic achievement, and dropping out are linked to higher rates of juvenile delinquency, as students who feel alienated may develop resentment and see crime as their only path forward.',
+      },
+      {
+        question: 'The word "leniency" in the ninth paragraph most likely means...',
+        explanation: 'In the context of the passage, "leniency" means a soft or merciful approach that does not impose strong punishment, which critics believe fails to teach responsibility.',
+      },
+      {
+        question: 'What can be inferred about restorative justice programs?',
+        explanation: 'It can be inferred that restorative justice programs aim to help offenders understand the harm they caused by meeting victims, focusing on breaking the cycle of crime rather than only punishing the offender.',
+      },
+      {
+        question: 'According to the passage, why do supporters of rehabilitation favor that approach over harsh punishment?',
+        explanation: 'Supporters argue that young people are still developing emotionally and mentally and deserve a second chance, while harsh punishment can expose them to hardened criminals and damage their self-esteem.',
+      },
+      {
+        question: 'What can be inferred about the importance of community involvement?',
+        explanation: 'It can be inferred that families, schools, religious institutions, sports clubs, and volunteer organizations all play essential roles in providing support, purpose, and positive alternatives that guide youth away from crime.',
+      },
+      {
+        question: 'According to the passage, what overall approach is more likely to reduce youth crime in the long term?',
+        explanation: 'A focus on prevention, education, and emotional support is more likely to reduce youth crime in the long term than relying primarily on punishment.',
+      },
+    ],
+  },{
+    id: 37,
+    title: 'Disability',
+    topic: 'Society & Rights',
+    content: `Disability refers to any physical, mental, intellectual, or sensory condition that limits a person's ability to perform everyday tasks. Globally, more than one billion people live with some form of disability. Despite being one of the largest minority groups, persons with disabilities often face discrimination, exclusion, and inequality in nearly every area of life.
+Disabilities vary greatly. Some are visible, such as those requiring wheelchairs or prosthetic limbs. Others, like autism, hearing loss, or depression, are less obvious but equally challenging. Some are present from birth, while others result from accidents, illnesses, or aging. Because disability can affect anyone at any time, creating an inclusive society is not just a matter of compassion—it‘s a necessity.
+Access to education is a major concern. Children with disabilities are significantly less likely to attend school, especially in developing countries. Many schools are not equipped with ramps, sign language interpreters, or special education staff. Without inclusive policies and proper resources, these children are left behind.
+Employment is another key issue. People with disabilities often struggle to find work, even when they are qualified. Employers may assume they are less productive, more costly, or difficult to accommodate. This stigma leads to high unemployment rates and economic dependence. Inclusive hiring practices, flexible work environments, and anti-discrimination laws are essential for equal opportunity.
+Public spaces and transportation systems can also be difficult to navigate. Inaccessible buildings, buses without ramps, or sidewalks without tactile markings make daily life more stressful and isolating. When infrastructure excludes people, so does society. Urban planning must prioritize universal design—spaces usable by everyone, regardless of ability.
+Technology has brought both opportunities and challenges. Assistive technologies like screen readers, hearing aids, and mobility devices help millions live independently. However, many websites, apps, and services are still not designed with accessibility in mind. Digital exclusion is becoming a new form of inequality. Healthcare access is another barrier. People with disabilities often face medical staff who are not trained to understand their specific needs. Clinics may lack equipment for wheelchair users or staff fluent in sign language. In poorer areas, people with disabilities may be seen as a burden or ignored altogether. Health systems must treat disability not as a problem to fix, but as a human reality to support.
+Social attitudes can be even harder to change than laws or buildings. In some cultures, disability is seen as a punishment, curse, or shame. These views lead to bullying, isolation, or even abandonment. In others, people with disabilities are seen as weak, dependent, or incapable. This mindset blocks progress, even when tools and laws are available.
+Fortunately, global awareness is growing. The United Nations Convention on the Rights of Persons with Disabilities (CRPD) outlines the rights of disabled individuals and calls on governments to take action. Many countries now have disability rights laws, though enforcement remains uneven. Legal progress is meaningless without real-world change.
+Representation matters, too. When people with disabilities are visible in politics, media, and leadership, stereotypes begin to fade. Paralympic athletes, disabled actors, and advocates have shown that disability does not equal inability. Their stories inspire not just empathy—but respect.
+Inclusive education is a powerful tool. When children grow up learning alongside classmates with different abilities, they develop empathy, patience, and cooperation. Inclusion is not about lowering standards, but expanding access. With the right support, students with disabilities can thrive academically and socially.
+Another debate is whether society should focus more on "fixing" the individual or changing the environment. This reflects the difference between the medical model of disability, which sees the disability as a problem in the person, and the social model, which sees barriers in society as the real issue. Most experts now favor the social model. The problem isn‘t the wheelchair—it‘s the stairs.
+Support systems matter. Families caring for disabled children or adults need emotional, financial, and logistical help. Without it, they may feel overwhelmed or isolated. Governments can support families through caregiver allowances, therapy access, and respite services. Caring for people with disabilities is a shared social responsibility.
+In conclusion, disability is not just a health condition—it‘s a human rights issue. People with disabilities deserve the same opportunities, dignity, and freedom as everyone else. While much progress has been made, true inclusion requires effort in every part of society—from schools and workplaces to laws and language. When we design a world for everyone, everyone benefits.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose of the passage is to examine disability as a widespread human rights issue, highlighting barriers in education, employment, infrastructure, healthcare, and attitudes, while advocating for inclusive policies and the social model of disability.',
+      },
+      {
+        question: 'According to the passage, how many people globally live with some form of disability?',
+        explanation: 'According to the passage, more than one billion people live with some form of disability, making them one of the largest minority groups.',
+      },
+      {
+        question: 'The word "stigma" in the fourth paragraph most likely means',
+        explanation: 'In the context of the fourth paragraph, "stigma" refers to negative assumptions and prejudices that lead employers to view people with disabilities as less productive, more costly, or difficult to accommodate, resulting in high unemployment.',
+      },
+      {
+        question: 'What can be inferred about the importance of universal design?',
+        explanation: 'It can be inferred that universal design is essential because inaccessible infrastructure excludes people with disabilities from society, and prioritizing spaces usable by everyone reduces isolation and stress in daily life.',
+      },
+      {
+        question: 'According to the passage, what is the difference between the medical model and the social model of disability?',
+        explanation: 'According to the passage, the medical model sees disability as a problem in the person that needs fixing, while the social model sees barriers in society as the real issue; most experts now favor the social model, illustrated by the idea that the problem is not the wheelchair but the stairs.',
+      },
+      {
+        question: 'The word "assistive" in the sixth paragraph most likely means',
+        explanation: 'In the context of the sixth paragraph, "assistive" means helping or supporting, referring to technologies like screen readers, hearing aids, and mobility devices that enable millions of people with disabilities to live independently.',
+      },
+      {
+        question: 'What can be inferred about the role of representation in changing attitudes toward disability?',
+        explanation: 'It can be inferred that when people with disabilities appear in politics, media, and leadership roles, such as Paralympic athletes and disabled actors, stereotypes fade and inspire respect rather than just empathy, showing that disability does not equal inability.',
+      },
+      {
+        question: 'According to the passage, why is inclusive education considered a powerful tool?',
+        explanation: 'According to the passage, inclusive education is powerful because children who learn alongside classmates with different abilities develop empathy, patience, and cooperation, and with the right support, students with disabilities can thrive academically and socially without lowering standards.',
+      },
+      {
+        question: 'What can be inferred about the challenges faced by families caring for people with disabilities?',
+        explanation: 'It can be inferred that without emotional, financial, and logistical support, families may feel overwhelmed or isolated, and governments can help through measures like caregiver allowances, therapy access, and respite services as part of a shared social responsibility.',
+      },
+      {
+        question: 'According to the passage, what document outlines the rights of persons with disabilities and calls on governments to take action?',
+        explanation: 'According to the passage, the United Nations Convention on the Rights of Persons with Disabilities (CRPD) outlines these rights and urges governments to act, though enforcement of related national laws remains uneven.',
+      },
+    ],
+  },{
+    id: 38,
+    title: 'Doping',
+    topic: 'Sports & Ethics',
+    content: `Doping refers to the use of banned substances or methods by athletes to improve their performance. From professional cycling to Olympic sprinting, doping scandals have repeatedly shaken the sports world, raising serious questions about fairness, ethics, and the true meaning of competition.
+Athletes who dope often take drugs like steroids, hormones, or stimulants to increase strength, speed, or endurance. Some use blood transfusions or advanced medical treatments to enhance oxygen delivery to muscles. These techniques are usually hidden and difficult to detect. Because of this, many athletes escape punishment—at least for a time.
+The main argument in favor of banning doping is fairness. Sport is meant to be a test of natural talent, hard work, and discipline. When athletes use artificial aids, they gain an unfair advantage over their clean competitors. This not only ruins the level playing field, but also damages public trust in the sport.
+Health risks are another major concern. Many performance-enhancing drugs have serious side effects, including liver damage, heart problems, infertility, and psychological disorders. Some athletes have even died as a result of doping. Because the long-term effects are often unknown, the danger is greater than most athletes realize.
+There is also the issue of pressure. In high-level sports, where success can bring fame and fortune, athletes may feel forced to dope just to keep up. If one competitor is cheating and winning, others may feel they have no choice but to follow. This creates a toxic environment where ethics are sacrificed for medals.
+To fight doping, organizations like the World Anti-Doping Agency (WADA) were created. WADA maintains a list of banned substances, conducts random drug tests, and supports research into detection methods. Athletes who test positive can face suspensions, stripped titles, or lifetime bans. However, enforcing these rules is a constant battle.
+Some doping methods are extremely sophisticated. In the case of Russian athletics, entire national programs were found guilty of state-sponsored doping. Labs were altered, samples were swapped, and results were faked. Such large-scale corruption shows that doping is not just a personal issue—it can be political.
+Technology has made doping harder to detect. Micro-dosing, gene editing, and new designer drugs often go undetected by traditional tests. This has led to the introduction of the biological passport, a digital record of an athlete‘s body levels over time. Sudden changes may signal foul play, even without a positive test. Still, no system is perfect.
+Not everyone agrees that doping should be banned. Some argue that the line between legal and illegal performance aids is unclear. For example, altitude training, strict diets, and legal supplements all enhance performance—but are allowed. Why should synthetic hormones be treated differently?
+Others argue for legalization and regulation. If doping were made legal under medical supervision, they claim, the playing field would level out and health risks could be reduced. Athletes would no longer need to hide or lie. But critics say this would send the wrong message to young athletes—that cheating is acceptable if it works.
+Ethics remain at the center of the doping debate. Is sport still meaningful if it becomes a competition of chemistry, not character? Should we reward those who push science further—or punish them for betraying tradition? These are not just athletic questions, but cultural and moral ones.
+Doping also affects public perception. When a famous athlete is caught, fans feel betrayed. Records lose meaning, medals seem fake, and trust disappears. Spectators want to believe in heroes—but doping turns them into frauds.
+Young athletes are especially vulnerable. Teenagers who see doped champions may think success is impossible without drugs. This can lead to early substance abuse, health problems, and even criminal activity. Role models must set a clean example—or risk destroying the future of the sport.
+Education is essential. Anti-doping campaigns in schools, sports clubs, and training academies help raise awareness about the risks and consequences. Athletes should be taught that true success comes from effort, not shortcuts.
+In conclusion, doping is a serious threat to the integrity, health, and spirit of sport. While science may offer new ways to cheat, rules and values must evolve to keep competition fair. The goal of sport is not just to win—but to do so with honor, dignity, and respect for others. Without that, the meaning of victory disappears.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose of the passage is to explain what doping is, why it is banned, its health risks and pressures, the efforts of organizations like WADA to combat it, sophisticated methods and detection challenges, arguments for and against legalization, its effects on public perception and young athletes, and the conclusion that doping threatens the integrity and spirit of sport, which should value honor and fairness.',
+      },
+      {
+        question: 'According to the passage, what is the main argument in favor of banning doping?',
+        explanation: 'According to the passage, the main argument in favor of banning doping is fairness: sport is meant to be a test of natural talent, hard work, and discipline, and artificial aids give athletes an unfair advantage that ruins the level playing field and damages public trust.',
+      },
+      {
+        question: 'The word "toxic" in the fifth paragraph most likely means',
+        explanation: 'In the fifth paragraph, "toxic" most likely means harmful or destructive, describing an environment created by doping pressure where ethics are sacrificed for medals.',
+      },
+      {
+        question: 'What can be inferred about the role of WADA?',
+        explanation: 'It can be inferred that the World Anti-Doping Agency (WADA) plays a central role in fighting doping by maintaining a list of banned substances, conducting random drug tests, supporting research into detection methods, and imposing penalties such as suspensions, stripped titles, or lifetime bans, though enforcing the rules remains a constant battle.',
+      },
+      {
+        question: 'According to the passage, what does the biological passport involve?',
+        explanation: 'According to the passage, the biological passport is a digital record of an athlete‘s body levels over time; sudden changes may signal foul play even without a positive test, and it was introduced because technology has made methods like micro-dosing, gene editing, and designer drugs harder to detect with traditional tests.',
+      },
+      {
+        question: 'What can be inferred about state-sponsored doping?',
+        explanation: 'It can be inferred that doping can be political and large-scale rather than purely personal, as shown by the case of Russian athletics where entire national programs were found guilty of state-sponsored doping involving altered labs, swapped samples, and faked results.',
+      },
+      {
+        question: 'According to the passage, what health risks are associated with performance-enhancing drugs?',
+        explanation: 'According to the passage, many performance-enhancing drugs have serious side effects including liver damage, heart problems, infertility, and psychological disorders; some athletes have even died as a result of doping, and the long-term effects are often unknown, increasing the danger.',
+      },
+      {
+        question: 'The phrase "level playing field" in the passage most likely refers to',
+        explanation: 'In the passage, "level playing field" refers to a fair competitive situation in which all athletes compete under the same conditions without artificial advantages from doping, which the text says is ruined when athletes use banned substances or methods.',
+      },
+      {
+        question: 'What can be inferred about the impact of doping on young athletes?',
+        explanation: 'It can be inferred that young athletes are especially vulnerable because seeing doped champions may lead them to believe success is impossible without drugs, potentially resulting in early substance abuse, health problems, and even criminal activity; therefore role models must set a clean example to protect the future of the sport.',
+      },
+      {
+        question: 'According to the passage, why do some people argue for legalizing and regulating doping?',
+        explanation: 'According to the passage, some argue that if doping were made legal under medical supervision, the playing field would level out, health risks could be reduced, and athletes would no longer need to hide or lie; however, critics counter that this would send the wrong message to young athletes that cheating is acceptable if it works.',
+      },
+    ],
+  },{
+  id: 39,
+  title: 'Crime',
+  topic: 'Crime & Society',
+  content: `Crime is a global issue that affects every society, regardless of wealth, culture, or political system. From petty theft to organized gangs, from cybercrime to violent assaults, criminal activity shapes how people live, work, and interact with one another. Understanding the causes and consequences of crime is essential for creating safer, more just societies.
+One of the most widely discussed causes of crime is poverty. When people lack access to food, shelter, or employment, they may turn to illegal means of survival. Because economic desperation limits legal choices, some view crime as the only way to support themselves or their families. However, poverty alone does not explain all crime.
+Education plays a major role in crime prevention. Individuals who complete secondary or higher education are less likely to commit crimes. Schools provide not only knowledge but also structure, life skills, and social development. In communities where education is underfunded or inaccessible, youth are more vulnerable to criminal influences.
+Family background is another important factor. Children raised in violent or unstable homes often experience emotional trauma, lack discipline, and struggle with authority. Without guidance or support, they may fall into crime at an early age. The absence of strong role models increases the risk of delinquency.
+Peer pressure and social environment also matter. Young people surrounded by gangs, drugs, or crime are more likely to become involved themselves. In such areas, illegal behavior can be seen as normal or even necessary for survival. Changing the environment can change the behavior.
+Not all crime is committed out of need. Some people break the law for power, revenge, or thrill. White-collar criminals, for example, may be wealthy individuals who commit fraud, embezzlement, or tax evasion. These crimes may not involve physical violence but cause massive harm to the economy and society.
+Technology has introduced new types of crime. Cybercrime, such as hacking, identity theft, and online scams, is now one of the fastest-growing forms of criminal activity. Criminals no longer need to leave their homes to commit offenses. Because digital evidence is harder to trace and laws are often outdated, catching online criminals can be difficult.
+Law enforcement agencies use various strategies to fight crime. These include community policing, surveillance systems, undercover operations, and intelligence gathering. In some countries, heavy punishment such as long prison terms or even the death penalty is used to deter criminals. However, the effectiveness of harsh penalties remains controversial.
+Some experts argue that prevention is more effective than punishment. Investing in education, job training, mental health support, and social services can address the root causes of crime. Rather than waiting for crimes to happen, societies can build systems that reduce the likelihood of criminal behavior in the first place.
+The justice system is responsible for ensuring that those who commit crimes are fairly tried and, if guilty, appropriately punished. But justice is not always equal. In many countries, wealthy or powerful individuals are less likely to be punished, while the poor face harsher treatment. This leads to public mistrust in legal institutions.
+Prisons are meant to punish and rehabilitate. However, overcrowded and underfunded prisons often fail to reform inmates. In some cases, prisoners return to crime shortly after being released. Rehabilitation programs that teach skills, offer counseling, and support reintegration are more successful in reducing repeat offenses.
+The media plays a powerful role in shaping how people view crime. News outlets often focus on violent crimes, creating fear and exaggerating risk. While public awareness is important, sensational reporting can lead to prejudice, panic, and demands for overly harsh laws.
+In recent years, some countries have experimented with restorative justice. This system focuses on repairing harm between the victim and offender, rather than punishment alone. Offenders are encouraged to accept responsibility and make amends. Restorative practices aim to heal, not just punish.
+Cultural and legal views on crime vary widely. In some countries, theft may lead to long prison terms; in others, minor crimes may be handled with warnings or community service. Some legal systems focus on rehabilitation, while others emphasize strict control. There is no single solution—but all societies must find a balance between justice, safety, and human rights.
+In conclusion, crime is a complex issue with many root causes: poverty, education, family, peer pressure, and personal choice. While policing and punishment are necessary, long-term solutions must focus on prevention, equality, and rehabilitation. A safer society is not just one with more police—but one with more opportunity, fairness, and support.`,
+  questions: [
+    {
+      question: 'What is the main purpose of this passage?',
+      explanation: 'The main purpose of the passage is to examine crime as a global issue, explore its various causes such as poverty, education, family, and peer pressure, discuss types of crime including cybercrime and white-collar crime, and argue that long-term solutions require prevention, equality, and rehabilitation rather than punishment alone.',
+    },
+    {
+      question: 'According to the passage, why is education considered important in preventing crime?',
+      explanation: 'According to the passage, individuals who complete secondary or higher education are less likely to commit crimes because schools provide knowledge, structure, life skills, and social development; in communities where education is underfunded or inaccessible, youth are more vulnerable to criminal influences.',
+    },
+    {
+      question: 'The word "delinquency" in the paragraph about family background most likely means',
+      explanation: 'In the context of the passage, "delinquency" most likely means minor crime or antisocial behavior by young people, as the text links the absence of strong role models and unstable homes to an increased risk of children falling into crime at an early age.',
+    },
+    {
+      question: 'What can be inferred about white-collar crime from the passage?',
+      explanation: 'It can be inferred that white-collar crime is not driven by economic need, since it is committed by wealthy individuals for reasons such as power, and although it may not involve physical violence, it causes massive harm to the economy and society through acts like fraud, embezzlement, or tax evasion.',
+    },
+    {
+      question: 'According to the passage, why can catching cybercriminals be difficult?',
+      explanation: 'According to the passage, catching online criminals can be difficult because digital evidence is harder to trace and laws are often outdated, even though cybercrime such as hacking, identity theft, and online scams is one of the fastest-growing forms of criminal activity.',
+    },
+    {
+      question: 'What can be inferred about the effectiveness of prisons from the passage?',
+      explanation: 'It can be inferred that overcrowded and underfunded prisons often fail at rehabilitation, leading some prisoners to return to crime after release, whereas programs that teach skills, offer counseling, and support reintegration are more successful in reducing repeat offenses.',
+    },
+    {
+      question: 'The phrase "restorative justice" in the passage most likely refers to',
+      explanation: 'In the context of the passage, "restorative justice" refers to a system that focuses on repairing harm between the victim and offender rather than punishment alone, encouraging offenders to accept responsibility and make amends with the aim of healing.',
+    },
+    {
+      question: 'According to the passage, how does the media influence public views on crime?',
+      explanation: 'According to the passage, the media often focuses on violent crimes, creating fear and exaggerating risk; while public awareness is important, sensational reporting can lead to prejudice, panic, and demands for overly harsh laws.',
+    },
+    {
+      question: 'What can be inferred about justice systems from the passage?',
+      explanation: 'It can be inferred that justice is not always equal, because in many countries wealthy or powerful individuals are less likely to be punished while the poor face harsher treatment, which leads to public mistrust in legal institutions.',
+    },
+    {
+      question: 'According to the passage, what do some experts believe is more effective than punishment in addressing crime?',
+      explanation: 'According to the passage, some experts argue that prevention is more effective than punishment, and that investing in education, job training, mental health support, and social services can address the root causes of crime and reduce the likelihood of criminal behavior.',
+    },
+  ],
+},{
+  id: 40,
+  title: 'Violence',
+  topic: 'Society & Culture',
+  content: `Violence is the intentional use of force or power that causes harm, injury, or death to others. It can be physical, emotional, or psychological—and it affects individuals, families, and societies. Despite global efforts to reduce it, violence remains a daily reality in many parts of the world.
+Violence takes many forms. It can occur between individuals (domestic abuse, assault), within communities (gang violence, riots), or at the national level (civil wars, terrorism). It can be visible, such as shootings or fights, or invisible, like emotional abuse or online harassment. Because violence can be both direct and indirect, it is often hard to measure or control.
+One of the most common types is domestic violence. Women and children are especially vulnerable to abuse at home, where it is hidden from public view. Victims often suffer in silence, fearing shame or retaliation. Cultural norms, economic dependence, and lack of legal protection make it difficult for them to escape.
+Youth violence is also a serious problem. Teenagers involved in gangs or exposed to violent environments may turn to weapons, drugs, and aggression. Because many lack access to education, role models, or employment, violence can become their way of life.
+Another rising concern is media violence. Violent video games, films, and online content may desensitize viewers or normalize aggression. Some studies suggest a link between media exposure and aggressive behavior, especially in children. Others argue that the connection is weak or exaggerated. The debate continues, but the influence of media is undeniable.
+Terrorism and political violence cause mass destruction and fear. In some regions, armed groups use violence to gain control, send messages, or fight against governments. Civilians often suffer the most, as they are caught between opposing forces. When political goals are pursued through fear and death, society breaks down.
+The causes of violence are complex. Poverty, inequality, and unemployment are major contributors. People who feel excluded, powerless, or hopeless may become angry or violent. When justice, opportunity, and respect are missing, violence fills the gap.
+Substance abuse is another factor. Alcohol and drugs lower self-control and increase impulsive behavior. Many violent crimes occur under the influence. Addiction does not excuse violence, but it helps explain it.
+Mental health can also play a role. Some individuals with untreated psychological conditions may act out violently. But it is important not to generalize—most people with mental illness are not violent, and most violent people are not mentally ill.
+Preventing violence requires long-term, coordinated efforts. Education is key. Teaching children emotional intelligence, respect, and non-violent communication from an early age helps build peaceful habits. Schools must become safe spaces— not only for learning, but for emotional growth.
+Community programs that offer youth mentoring, sports, and job training can reduce crime and gang activity. When people have hope and structure, they are less likely to turn to violence.
+Law enforcement plays a major role in responding to violence. But police brutality or excessive force can create more conflict. Trust must be built between communities and the police, or justice becomes fear. Training officers in deescalation, diversity, and ethics is essential.
+Internationally, peacekeeping missions, diplomacy, and humanitarian aid help reduce large-scale violence. But military intervention alone cannot solve deeprooted problems. True peace requires rebuilding trust, infrastructure, and shared identity.
+Technology has introduced new forms of violence. Cyberbullying, online threats, and digital hate speech can cause real psychological damage. Because online spaces are often unregulated, victims have little protection. Social media platforms must do more to monitor and block harmful behavior.
+Legal systems must also adapt. In some countries, violence—especially against women or minorities—is tolerated or ignored. Laws must be updated, enforced, and supported by public education campaigns. No act of violence should be accepted as normal.
+Gender-based violence deserves special attention. Worldwide, one in three women experiences physical or sexual violence in her lifetime. Many are attacked by their own partners. Ending this crisis requires both legal action and cultural change.
+In conclusion, violence is not just a personal problem—it is a social, economic, and political one. Reducing it demands education, fairness, opportunity, and compassion. A safer world is not built by fear or force—but by dignity, justice, and the will to protect others.`,
+  questions: [
+    {
+      question: 'What is the main purpose of this passage?',
+      explanation: 'The passage defines violence, describes its various forms and causes, examines specific types such as domestic, youth, media, and political violence, and discusses prevention strategies involving education, community programs, law enforcement, technology regulation, and legal reforms to reduce violence through dignity, justice, and compassion.',
+    },
+    {
+      question: 'According to the passage, why is domestic violence often difficult for victims to escape?',
+      explanation: 'Victims often suffer in silence due to fear of shame or retaliation, and cultural norms, economic dependence, and lack of legal protection make it difficult for them to escape abuse that is hidden from public view.',
+    },
+    {
+      question: 'The word "desensitize" in the paragraph about media violence most likely means',
+      explanation: 'It means to make less sensitive or emotionally responsive, as violent video games, films, and online content may desensitize viewers or normalize aggression.',
+    },
+    {
+      question: 'What can be inferred about the relationship between poverty and violence?',
+      explanation: 'Poverty, inequality, and unemployment are major contributors to violence; people who feel excluded, powerless, or hopeless may become angry or violent when justice, opportunity, and respect are missing.',
+    },
+    {
+      question: 'According to the passage, what role does substance abuse play in violence?',
+      explanation: 'Alcohol and drugs lower self-control and increase impulsive behavior, and many violent crimes occur under the influence; while addiction does not excuse violence, it helps explain it.',
+    },
+    {
+      question: 'The word "deeprooted" in the paragraph about international efforts most likely means',
+      explanation: 'It means firmly established or deeply embedded, as military intervention alone cannot solve deeprooted problems, and true peace requires rebuilding trust, infrastructure, and shared identity.',
+    },
+    {
+      question: 'What can be inferred about the connection between media violence and aggressive behavior?',
+      explanation: 'Some studies suggest a link between media exposure and aggressive behavior, especially in children, while others argue the connection is weak or exaggerated; the debate continues, but the influence of media is described as undeniable.',
+    },
+    {
+      question: 'According to the passage, how can education help prevent violence?',
+      explanation: 'Teaching children emotional intelligence, respect, and non-violent communication from an early age helps build peaceful habits, and schools must become safe spaces not only for learning but for emotional growth.',
+    },
+    {
+      question: 'What can be inferred about the challenges of using law enforcement to address violence?',
+      explanation: 'While law enforcement plays a major role in responding to violence, police brutality or excessive force can create more conflict; trust must be built between communities and police, and officers need training in deescalation, diversity, and ethics.',
+    },
+    {
+      question: 'According to the passage, what statistic highlights the scale of gender-based violence?',
+      explanation: 'Worldwide, one in three women experiences physical or sexual violence in her lifetime, and many are attacked by their own partners; ending this crisis requires both legal action and cultural change.',
+    },
+  ],
 },
 ];
