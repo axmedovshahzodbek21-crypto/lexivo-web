@@ -5357,5 +5357,631 @@ In conclusion, mental health is a fundamental part of human well-being. It affec
       explanation: 'Breaking stigma, expanding access to care, and supporting prevention are key steps; governments, health organizations, and communities must work together to create inclusive systems by training more professionals, integrating mental health into primary care, and ensuring services are culturally sensitive and accessible to all.',
     },
   ],
-},
+},{
+    id: 91,
+    title: 'Vaccination',
+    topic: 'Health & Science',
+    content: `Vaccination is the process of administering a vaccine to help the immune system develop protection against a specific infectious disease. Vaccines are one of the most effective public health tools in human history, responsible for preventing millions of deaths and reducing the spread of deadly illnesses.
+The basic idea behind vaccination is to expose the body to a harmless form of a pathogen, such as a weakened or inactivated virus, or a small part of it like a protein. This stimulates the immune system to produce antibodies and memory cells that recognize and fight the real disease if encountered in the future. This process is called immunization.
+Vaccines have successfully controlled or eliminated many dangerous diseases. For example, smallpox, a deadly virus that killed millions throughout history, was declared eradicated in 1980 thanks to a global vaccination campaign. Polio is now close to being eliminated, and vaccines have dramatically reduced cases of measles, tetanus, diphtheria, and whooping cough.
+Vaccination programs benefit not only individuals but also communities through what is called ―herd immunity.‖ When a large portion of the population is immune to a disease, the spread of the disease slows or stops. This protects vulnerable groups, such as newborns, the elderly, or people with weakened immune systems who cannot be vaccinated themselves.
+Despite its proven success, vaccination remains a controversial issue in some parts of the world. Vaccine hesitancy—the reluctance or refusal to vaccinate despite availability—has been identified as a global health threat. Reasons include misinformation, fear of side effects, religious or philosophical beliefs, and lack of trust in healthcare systems.
+Misinformation spreads easily, especially through social media. False claims about vaccine ingredients, exaggerated risks, or conspiracy theories can cause public fear. As a result, some parents choose not to vaccinate their children, leading to outbreaks of diseases that were once under control. The measles outbreaks in Europe and the United States in recent years are examples of this.
+Vaccines, like all medical treatments, can have side effects. However, serious reactions are extremely rare. The vast majority of side effects are mild, such as a sore arm or low fever. Health authorities such as the World Health Organization and national health agencies conduct rigorous testing before approving vaccines. Continued monitoring ensures safety after vaccines are in use.
+The COVID-19 pandemic brought vaccination into global focus. Scientists developed several vaccines in record time, using both traditional and new technologies, such as mRNA-based vaccines. Mass vaccination campaigns helped reduce hospitalizations and deaths, although global distribution faced challenges. Inequality in vaccine access between rich and poor countries became a major issue, highlighting the need for global cooperation.
+Vaccination is also important in preparing for future pandemics. Researchers are now working on universal flu vaccines, new malaria vaccines, and updated versions of existing ones. These efforts are part of a broader strategy to strengthen public health systems and respond quickly to emerging threats.
+Mandatory vaccination policies vary by country. Some governments require vaccination for school entry, travel, or certain jobs, especially in healthcare. Others rely on public education and voluntary participation. Balancing individual freedom with public health responsibility is a complex issue that continues to be debated. Public trust is essential to the success of vaccination programs. Clear communication from health authorities, transparency about vaccine development, and respectful engagement with communities help increase acceptance. Involving religious leaders, community health workers, and schools can build support at the local level.
+Vaccines not only prevent illness but also have economic benefits. They reduce the cost of medical treatment, lower the burden on hospitals, and keep workers and students healthy and productive. According to the World Bank, every dollar spent on immunization returns up to $44 in economic benefits.
+In conclusion, vaccination is a powerful tool for preventing disease, protecting communities, and saving lives. While challenges such as hesitancy and inequality remain, continued investment in research, education, and public health infrastructure is key to maintaining and expanding the benefits of vaccines for current and future generations.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose of this passage is to explain how vaccination works to protect against infectious diseases, highlight its historical successes in controlling or eliminating illnesses, discuss the concept of herd immunity, address challenges such as vaccine hesitancy and misinformation, examine issues of access and policy, and emphasize the ongoing importance of vaccines for public health and economic benefits.',
+      },
+      {
+        question: 'According to the passage, how does vaccination work to protect the body?',
+        explanation: 'Vaccination exposes the body to a harmless form of a pathogen, such as a weakened or inactivated virus or a protein from it. This stimulates the immune system to produce antibodies and memory cells that recognize and fight the real disease if encountered in the future, a process called immunization.',
+      },
+      {
+        question: 'The word \'hesitancy\' in the passage most likely means?',
+        explanation: 'It most likely means reluctance or unwillingness to act, as the passage defines vaccine hesitancy as the reluctance or refusal to vaccinate despite availability, which has been identified as a global health threat due to reasons like misinformation and lack of trust.',
+      },
+      {
+        question: 'What can be inferred about the impact of misinformation on vaccination rates?',
+        explanation: 'It can be inferred that misinformation, especially through social media, contributes to lower vaccination rates by causing public fear through false claims, exaggerated risks, or conspiracy theories, leading some parents not to vaccinate their children and resulting in outbreaks of previously controlled diseases like measles.',
+      },
+      {
+        question: 'According to the passage, what is herd immunity and why is it important?',
+        explanation: 'Herd immunity occurs when a large portion of the population is immune to a disease, slowing or stopping its spread. It is important because it protects vulnerable groups such as newborns, the elderly, or people with weakened immune systems who cannot be vaccinated themselves.',
+      },
+      {
+        question: 'What can be inferred about the economic benefits of vaccination?',
+        explanation: 'It can be inferred that vaccination provides substantial economic returns by reducing medical treatment costs, lowering the burden on hospitals, and keeping workers and students healthy and productive, with the World Bank estimating that every dollar spent on immunization returns up to $44 in economic benefits.',
+      },
+    ],
+  },{
+    id: 92,
+    title: 'Vaccination',
+    topic: 'Health & Science',
+    content: `Vaccination is the process of administering a vaccine to help the immune system develop protection against a specific infectious disease. Vaccines are one of the most effective public health tools in human history, responsible for preventing millions of deaths and reducing the spread of deadly illnesses.
+The basic idea behind vaccination is to expose the body to a harmless form of a pathogen, such as a weakened or inactivated virus, or a small part of it like a protein. This stimulates the immune system to produce antibodies and memory cells that recognize and fight the real disease if encountered in the future. This process is called immunization.
+Vaccines have successfully controlled or eliminated many dangerous diseases. For example, smallpox, a deadly virus that killed millions throughout history, was declared eradicated in 1980 thanks to a global vaccination campaign. Polio is now close to being eliminated, and vaccines have dramatically reduced cases of measles, tetanus, diphtheria, and whooping cough.
+Vaccination programs benefit not only individuals but also communities through what is called ―herd immunity.‖ When a large portion of the population is immune to a disease, the spread of the disease slows or stops. This protects vulnerable groups, such as newborns, the elderly, or people with weakened immune systems who cannot be vaccinated themselves.
+Despite its proven success, vaccination remains a controversial issue in some parts of the world. Vaccine hesitancy—the reluctance or refusal to vaccinate despite availability—has been identified as a global health threat. Reasons include misinformation, fear of side effects, religious or philosophical beliefs, and lack of trust in healthcare systems.
+Misinformation spreads easily, especially through social media. False claims about vaccine ingredients, exaggerated risks, or conspiracy theories can cause public fear. As a result, some parents choose not to vaccinate their children, leading to outbreaks of diseases that were once under control. The measles outbreaks in Europe and the United States in recent years are examples of this.
+Vaccines, like all medical treatments, can have side effects. However, serious reactions are extremely rare. The vast majority of side effects are mild, such as a sore arm or low fever. Health authorities such as the World Health Organization and national health agencies conduct rigorous testing before approving vaccines. Continued monitoring ensures safety after vaccines are in use.
+The COVID-19 pandemic brought vaccination into global focus. Scientists developed several vaccines in record time, using both traditional and new technologies, such as mRNA-based vaccines. Mass vaccination campaigns helped reduce hospitalizations and deaths, although global distribution faced challenges. Inequality in vaccine access between rich and poor countries became a major issue, highlighting the need for global cooperation.
+Vaccination is also important in preparing for future pandemics. Researchers are now working on universal flu vaccines, new malaria vaccines, and updated versions of existing ones. These efforts are part of a broader strategy to strengthen public health systems and respond quickly to emerging threats.
+Mandatory vaccination policies vary by country. Some governments require vaccination for school entry, travel, or certain jobs, especially in healthcare. Others rely on public education and voluntary participation. Balancing individual freedom with public health responsibility is a complex issue that continues to be debated.
+Public trust is essential to the success of vaccination programs. Clear communication from health authorities, transparency about vaccine development, and respectful engagement with communities help increase acceptance. Involving religious leaders, community health workers, and schools can build support at the local level.
+Vaccines not only prevent illness but also have economic benefits. They reduce the cost of medical treatment, lower the burden on hospitals, and keep workers and students healthy and productive. According to the World Bank, every dollar spent on immunization returns up to $44 in economic benefits.
+In conclusion, vaccination is a powerful tool for preventing disease, protecting communities, and saving lives. While challenges such as hesitancy and inequality remain, continued investment in research, education, and public health infrastructure is key to maintaining and expanding the benefits of vaccines for current and future generations.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose is to explain how vaccination works, highlight its historical successes in controlling diseases, describe benefits such as herd immunity, address challenges like hesitancy and misinformation, and emphasize its ongoing importance for public health and future pandemic preparedness.',
+      },
+      {
+        question: 'According to the passage, how does vaccination stimulate the immune system?',
+        explanation: 'It exposes the body to a harmless form of a pathogen, such as a weakened or inactivated virus or a protein, which stimulates the production of antibodies and memory cells that recognize and fight the real disease if encountered later; this process is called immunization.',
+      },
+      {
+        question: 'The phrase \'herd immunity\' in the fourth paragraph most likely means...',
+        explanation: 'The protection of a community that occurs when a large portion of the population is immune to a disease, slowing or stopping its spread and thereby protecting vulnerable groups who cannot be vaccinated.',
+      },
+      {
+        question: 'What can be inferred about the impact of vaccine hesitancy?',
+        explanation: 'Vaccine hesitancy, driven by misinformation, fear of side effects, beliefs, or lack of trust, can lead parents to refuse vaccination for their children and result in outbreaks of diseases that were once under control, as seen with recent measles outbreaks.',
+      },
+      {
+        question: 'According to the passage, what are the typical side effects of vaccines?',
+        explanation: 'Serious reactions are extremely rare; the vast majority of side effects are mild, such as a sore arm or low fever, and vaccines undergo rigorous testing and continued monitoring by health authorities to ensure safety.',
+      },
+      {
+        question: 'The word \'eradicated\' in the third paragraph most likely means...',
+        explanation: 'Completely eliminated or wiped out. The passage states that smallpox was declared eradicated in 1980 thanks to a global vaccination campaign.',
+      },
+      {
+        question: 'What can be inferred about vaccine access during the COVID-19 pandemic?',
+        explanation: 'Although mass vaccination campaigns reduced hospitalizations and deaths, global distribution faced challenges and inequality in access between rich and poor countries became a major issue, highlighting the need for global cooperation.',
+      },
+      {
+        question: 'According to the passage, what economic benefits do vaccines provide?',
+        explanation: 'They reduce the cost of medical treatment, lower the burden on hospitals, and keep workers and students healthy and productive; according to the World Bank, every dollar spent on immunization returns up to $44 in economic benefits.',
+      },
+      {
+        question: 'What can be inferred about mandatory vaccination policies?',
+        explanation: 'Policies vary by country: some governments require vaccination for school entry, travel, or certain jobs, while others rely on education and voluntary participation, reflecting an ongoing debate about balancing individual freedom with public health responsibility.',
+      },
+      {
+        question: 'According to the passage, why is public trust important for vaccination programs?',
+        explanation: 'Clear communication from health authorities, transparency about vaccine development, and respectful engagement with communities help increase acceptance; involving religious leaders, community health workers, and schools can build local support.',
+      },
+    ],
+  },{
+    id: 93,
+    title: 'Hygiene',
+    topic: 'Health & Science',
+    content: `Hygiene refers to practices and conditions that help maintain health and prevent the spread of diseases. It includes personal hygiene, such as washing hands and bathing, as well as public hygiene practices like waste disposal, water sanitation, and food safety. Good hygiene is a fundamental aspect of public health and plays a critical role in preventing infections and promoting well-being.
+Personal hygiene is the daily practice of keeping one‘s body clean. This includes bathing, brushing teeth, washing hands, wearing clean clothes, and keeping hair and nails tidy. Handwashing is especially important, as hands can carry bacteria and viruses from one surface to another. According to the World Health
+Organization, handwashing with soap can reduce the risk of diarrheal diseases by up to 40%.
+Oral hygiene, such as brushing and flossing teeth regularly, prevents cavities, gum disease, and bad breath. Poor dental hygiene has also been linked to other health issues, including heart disease and diabetes. Teaching children the importance of these routines helps establish lifelong habits.
+Environmental hygiene is equally important. Safe drinking water, clean public spaces, and proper waste management reduce the spread of diseases. In areas where sanitation is poor, outbreaks of waterborne illnesses like cholera and typhoid are common. Ensuring proper sewage systems and clean toilets is crucial, especially in densely populated or low-income regions.
+Food hygiene involves the safe handling, preparation, and storage of food to prevent contamination. Foodborne illnesses, such as salmonella or E. coli, can result from improper cooking, unclean surfaces, or expired ingredients. Restaurants and food manufacturers are required to follow strict hygiene standards to ensure public safety.
+During pandemics, such as COVID-19, hygiene becomes even more important. Guidelines like frequent handwashing, disinfecting surfaces, wearing masks, and maintaining physical distance help prevent viral transmission. These measures have shown how basic hygiene can save lives on a global scale.
+Hygiene also impacts mental and social well-being. People who maintain good personal hygiene often feel more confident and are more accepted in social and professional settings. In contrast, poor hygiene can lead to isolation, bullying, and reduced self-esteem. In schools, teaching hygiene helps children stay healthy and attend regularly.
+Cultural and religious beliefs often influence hygiene practices. For instance, many cultures have specific rituals for cleanliness before prayer or meals. While these practices vary, the common theme is the link between cleanliness and health, morality, or spiritual purity.
+Challenges to good hygiene exist in many parts of the world. In low-income countries, lack of access to clean water, soap, and sanitation facilities makes maintaining hygiene difficult. Girls and women are particularly affected, especially during menstruation when safe hygiene is essential for dignity and health.
+Organizations like UNICEF and the World Bank support programs to improve hygiene infrastructure in underserved areas. These include building latrines, providing soap, and promoting hygiene education in schools and communities. Even simple interventions—like teaching children to wash their hands—can have a huge impact on reducing disease.
+Technology has also contributed to better hygiene. Innovations like no-touch soap dispensers, antibacterial fabrics, and air purifiers help prevent contamination in homes, hospitals, and public spaces. Smart sanitation systems are being developed to manage waste more efficiently in growing cities.
+Workplace hygiene is another important area. Employers are responsible for providing clean and safe environments for their workers. This includes regular cleaning, access to clean restrooms, and safe handling of chemicals or waste. During outbreaks, companies may provide masks, hand sanitizer, and remote work options to protect staff.
+In healthcare settings, hygiene can mean the difference between life and death. Hospitals follow strict protocols to prevent infections, such as sterilizing equipment, isolating patients, and ensuring that staff follow hand hygiene rules. Hospital-acquired infections (HAIs) are a serious threat, and proper hygiene is the first line of defense.
+Despite its importance, hygiene is often neglected or underestimated. Public awareness campaigns, such as Global Handwashing Day, aim to remind people of its value. Schools, media, and governments play essential roles in educating citizens and encouraging responsible hygiene behavior.
+In conclusion, hygiene is a simple yet powerful tool for protecting health and preventing disease. From personal routines to national infrastructure, hygiene affects every aspect of life. Investing in hygiene is not only about cleanliness—it is about dignity, safety, and the foundation of a healthy society.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose is to explain the importance of hygiene as a fundamental aspect of public health, covering personal, environmental, food, and other forms of hygiene, their role in preventing disease, impacts on well-being, challenges in access, and the need for education, technology, and investment to promote a healthy society.',
+      },
+      {
+        question: 'According to the passage, what does personal hygiene include?',
+        explanation: 'Personal hygiene is the daily practice of keeping one\'s body clean and includes bathing, brushing teeth, washing hands, wearing clean clothes, and keeping hair and nails tidy.',
+      },
+      {
+        question: 'The word "sanitation" in the fourth paragraph most likely means',
+        explanation: 'In the context of poor sanitation leading to outbreaks of waterborne illnesses and the need for proper sewage systems and clean toilets, sanitation refers to systems and practices for maintaining clean and healthy conditions through waste disposal and water management.',
+      },
+      {
+        question: 'What can be inferred about the importance of handwashing from the passage?',
+        explanation: 'It can be inferred that handwashing is especially critical because hands carry bacteria and viruses, and according to the World Health Organization, handwashing with soap can reduce the risk of diarrheal diseases by up to 40%, making it a key practice for preventing infections.',
+      },
+      {
+        question: 'According to the passage, how does poor oral hygiene affect overall health?',
+        explanation: 'Poor dental hygiene can lead to cavities, gum disease, and bad breath, and has also been linked to other health issues including heart disease and diabetes.',
+      },
+      {
+        question: 'The term "foodborne illnesses" in the fifth paragraph most likely refers to',
+        explanation: 'In the context of illnesses such as salmonella or E. coli resulting from improper cooking, unclean surfaces, or expired ingredients, foodborne illnesses are diseases caused by contaminated food.',
+      },
+      {
+        question: 'What can be inferred about the role of hygiene during pandemics?',
+        explanation: 'It can be inferred that basic hygiene measures such as frequent handwashing, disinfecting surfaces, wearing masks, and physical distancing become even more important during pandemics like COVID-19 because they help prevent viral transmission and can save lives on a global scale.',
+      },
+      {
+        question: 'According to the passage, how does hygiene impact mental and social well-being?',
+        explanation: 'People who maintain good personal hygiene often feel more confident and are more accepted in social and professional settings, while poor hygiene can lead to isolation, bullying, and reduced self-esteem; teaching hygiene in schools helps children stay healthy and attend regularly.',
+      },
+      {
+        question: 'What can be inferred about challenges to hygiene in low-income countries?',
+        explanation: 'Lack of access to clean water, soap, and sanitation facilities makes maintaining hygiene difficult, and girls and women are particularly affected during menstruation when safe hygiene is essential for dignity and health.',
+      },
+      {
+        question: 'According to the passage, why is hygiene especially critical in healthcare settings?',
+        explanation: 'Hygiene can mean the difference between life and death in hospitals, where strict protocols such as sterilizing equipment, isolating patients, and ensuring staff follow hand hygiene rules are used to prevent infections; hospital-acquired infections are a serious threat and proper hygiene is the first line of defense.',
+      },
+    ],
+  },{
+    id: 94,
+    title: 'Migration',
+    topic: 'Society & Global Issues',
+    content: `Migration is the movement of people from one place to another, often across borders, in search of better living conditions, employment, safety, or education. It is one of the most significant social, economic, and political phenomena of the modern world. Migration affects individuals, families, societies, and nations in complex and far-reaching ways.
+There are two main types of migration: internal and international. Internal migration occurs within a country, such as people moving from rural to urban areas in search of jobs or services. This is common in developing nations where cities offer more opportunities. International migration involves crossing national borders and may be temporary or permanent.
+People migrate for various reasons, commonly categorized as ―push‖ and ―pull‖ factors. Push factors include poverty, unemployment, war, political persecution, and natural disasters. Pull factors involve better job prospects, higher education, safety, or a higher standard of living in the destination country. For example, many people from Latin America move to the United States for better economic opportunities, while refugees from conflict zones like Syria seek safety in Europe or neighboring countries.
+Economic migration is one of the most common forms. Migrants often take on jobs that are in high demand but less attractive to locals, such as agricultural labor, domestic work, or construction. While these workers contribute to the economy, they often face low wages, limited rights, and poor working conditions.
+Another type is forced migration. Refugees and asylum seekers are people forced to flee their countries due to violence, conflict, or persecution. According to the United Nations, there are more than 100 million displaced people globally. Many live in temporary shelters or camps and face long waits for legal status, education, and integration into society.
+Migration has both positive and negative effects. On the positive side, it can reduce labor shortages, fill skill gaps, and contribute to cultural diversity. Migrants often send remittances—money sent back home—to support their families, which strengthens local economies. Migrants also bring new ideas, languages, and cultural practices, enriching the host country‘s society.
+On the negative side, migration can strain public services such as housing, healthcare, and education, especially if numbers increase rapidly. In some countries, political tensions rise when locals perceive migrants as a threat to jobs or national identity. Cultural misunderstandings, xenophobia, or discrimination may also occur, making it harder for migrants to integrate.
+Legal migration is governed by strict rules. Many countries have visa systems that allow entry based on employment, education, family reunification, or humanitarian reasons. However, irregular or undocumented migration is also common, often involving dangerous journeys and vulnerability to exploitation by traffickers.
+Managing migration effectively requires international cooperation. Border security must be balanced with humanitarian obligations. Integration policies—such as language training, job support, and anti-discrimination laws—can help migrants become productive members of society. Education systems must accommodate students from diverse backgrounds, while healthcare providers must address different cultural needs.
+Technology is changing migration patterns. Social media helps migrants stay connected with their families and share information about job opportunities or safe routes. Online job applications and remote work options are also creating new forms of mobility, such as digital nomads who work online while living abroad. Climate change is emerging as a major driver of migration. Rising sea levels, extreme weather, and resource scarcity are forcing people to leave their homes. These climate migrants are not always recognized under international refugee laws, creating legal and humanitarian challenges.
+Public opinion about migration varies widely. Some people view it as a threat, especially during times of economic difficulty or social change. Others see it as an opportunity for growth, innovation, and global understanding. Media coverage, political rhetoric, and economic conditions all shape how migration is perceived. Policies that support safe, orderly, and regular migration benefit everyone. Host countries gain economic and cultural advantages, while migrants achieve personal and professional growth. At the same time, addressing the root causes of forced migration—such as conflict, inequality, and environmental degradation—remains essential.
+In conclusion, migration is a powerful force shaping the modern world. It brings both opportunities and challenges that must be managed through fair laws, inclusive policies, and international cooperation. As people continue to move in search of better lives, building societies that are open, resilient, and just becomes more important than ever.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The passage explains the types, causes, effects, and management of migration, concluding that it is a powerful force requiring fair laws, inclusive policies, and international cooperation to maximize benefits and address challenges.',
+      },
+      {
+        question: 'According to the passage, what are the two main types of migration?',
+        explanation: 'The two main types are internal migration, which occurs within a country such as rural-to-urban movement, and international migration, which involves crossing national borders and may be temporary or permanent.',
+      },
+      {
+        question: 'The phrase "push factors" in the third paragraph most likely means',
+        explanation: 'Push factors are negative conditions in the home country—such as poverty, unemployment, war, political persecution, or natural disasters—that compel people to leave.',
+      },
+      {
+        question: 'What can be inferred about economic migrants from the passage?',
+        explanation: 'Economic migrants often fill high-demand but less desirable jobs such as agricultural labor, domestic work, or construction, contributing to the host economy while frequently facing low wages, limited rights, and poor conditions.',
+      },
+      {
+        question: 'According to the passage, how many people are displaced globally according to the United Nations?',
+        explanation: 'According to the United Nations, there are more than 100 million displaced people globally, many of whom live in temporary shelters or camps while awaiting legal status and integration.',
+      },
+      {
+        question: 'What can be inferred about the positive economic impact of migration on origin countries?',
+        explanation: 'Migrants send remittances—money transferred back home—to support their families, which strengthens local economies in the countries they left.',
+      },
+      {
+        question: 'According to the passage, what negative effects can rapid migration have on host countries?',
+        explanation: 'Rapid increases in migrant numbers can strain public services such as housing, healthcare, and education, and may raise political tensions if locals perceive migrants as threats to jobs or national identity.',
+      },
+      {
+        question: 'The word "xenophobia" in the seventh paragraph most likely means',
+        explanation: 'In context, xenophobia refers to fear, dislike, or prejudice against people from other countries or cultures, which can hinder migrant integration alongside discrimination and cultural misunderstandings.',
+      },
+      {
+        question: 'What can be inferred about climate migrants from the passage?',
+        explanation: 'Climate migrants are people forced to leave their homes due to rising sea levels, extreme weather, or resource scarcity, yet they are not always recognized under international refugee laws, creating legal and humanitarian challenges.',
+      },
+      {
+        question: 'According to the passage, what is needed for effective management of migration?',
+        explanation: 'Effective management requires international cooperation that balances border security with humanitarian obligations, along with integration policies such as language training, job support, and anti-discrimination laws.',
+      },
+    ],
+  },{
+    id: 95,
+    title: 'Famine',
+    topic: 'Society & Culture',
+    content: `Famine is a severe shortage of food that results in widespread hunger, malnutrition, and increased mortality. It is one of the most serious humanitarian crises, affecting millions of people throughout history and continuing to threaten lives today. Famines are rarely caused by a single factor; they typically arise from a combination of natural disasters, economic instability, political conflict, and poor governance.
+Historically, famines were often triggered by crop failures due to droughts, floods, pests, or disease. In agrarian societies, where communities depended heavily on local harvests, even one season of poor weather could lead to starvation. A wellknown example is the Great Irish Famine (1845–1852), which was caused by a potato blight and led to over a million deaths and massive emigration.
+Today, many famines are man-made or worsened by human factors. Armed conflict is a leading cause of food shortages. War disrupts farming, displaces populations, and damages infrastructure. Food supply chains are interrupted, and access to aid is often blocked. The famine in Yemen, for instance, has been driven largely by civil war and economic collapse, leaving millions on the brink of starvation.
+Climate change is also a growing contributor. Rising temperatures, desertification, erratic rainfall, and extreme weather events reduce agricultural productivity. Prolonged droughts in parts of East Africa have led to repeated food crises, particularly affecting nomadic herders who rely on livestock. Climate-related food insecurity is expected to increase in the coming decades unless urgent action is taken.
+Economic instability and poverty can prevent people from accessing food even when it is available. In many developing countries, food prices fluctuate wildly due to inflation or currency devaluation. When wages remain low and prices rise, poor households are forced to reduce meals, rely on low-nutrition diets, or go without food entirely. In countries like Venezuela and Sudan, economic crises have contributed to severe food shortages.
+Governance and policy failures also play a critical role. Corruption, mismanagement, and lack of planning can turn food shortages into full-scale famines. Governments that fail to invest in agriculture, storage systems, or disaster response put their populations at greater risk. Sometimes, political leaders deliberately use food as a weapon—controlling access or withholding aid to punish opponents, as seen in several historical and modern conflicts.
+Early warning systems and international aid can prevent food crises from turning into famines. Organizations like the World Food Programme (WFP) and FAO monitor weather patterns, harvests, and conflict zones to detect signs of famine. When high risk is identified, emergency food aid, cash assistance, and nutritional support are delivered to vulnerable areas. However, aid can be delayed or restricted due to political obstacles or lack of funding.
+Malnutrition, especially among children, is a key indicator of famine. In affected areas, people—especially children under five—suffer from stunted growth, weakened immune systems, and diseases like cholera or measles. Pregnant and breastfeeding women are also at high risk due to increased nutritional needs. Without proper intervention, long-term effects can include developmental delays and increased mortality rates.
+Addressing famine requires both short-term relief and long-term solutions. In the short term, emergency food aid, medical treatment, and safe water must be delivered quickly and efficiently. Mobile clinics, feeding centers, and community health workers are vital in crisis zones.
+In the long term, investment in agriculture is essential. This includes training farmers, improving irrigation, using drought-resistant crops, and building better storage and distribution systems. Education and family planning also play a role— smaller, healthier families are more resilient in times of crisis.
+Another long-term strategy is building resilient communities. Empowering women, promoting local food production, improving infrastructure, and creating social safety nets help reduce dependence on external aid. Governments and international partners must also work together to resolve conflicts and strengthen peacekeeping efforts.
+Technology and innovation offer new tools to fight famine. Satellite imagery, data analytics, and mobile apps can track crop health, forecast droughts, and deliver alerts to aid agencies. Cash transfer programs using mobile money allow families to buy food locally, supporting both consumers and local markets.
+Despite the progress in early warning systems and aid response, famine remains a threat. According to the United Nations, regions at high risk include Horn of Africa, Sahel, South Asia, and conflict zones across the Middle East. The COVID19 pandemic, war in Ukraine, and global inflation have further disrupted food supply chains and increased hunger worldwide.
+In conclusion, famine is a preventable tragedy that reflects a combination of environmental stress, political failure, and social inequality. While the causes are complex, the solutions are known: proactive governance, investment in food security, conflict resolution, and international solidarity. In a world capable of producing enough food for everyone, no one should die of hunger.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The passage defines famine, explains its historical and modern causes including natural disasters, conflict, climate change, economic instability, and governance failures, describes impacts and indicators, outlines short- and long-term solutions, and concludes that famine is preventable through known measures and international solidarity.',
+      },
+      {
+        question: 'According to the passage, what caused the Great Irish Famine?',
+        explanation: 'The passage states that the Great Irish Famine (1845–1852) was caused by a potato blight and led to over a million deaths and massive emigration.',
+      },
+      {
+        question: 'The word \"agrarian\" in the passage most likely means',
+        explanation: 'In context, agrarian refers to societies that depended heavily on local harvests, so that even one season of poor weather could lead to starvation.',
+      },
+      {
+        question: 'What can be inferred about the role of armed conflict in modern famines?',
+        explanation: 'The passage identifies armed conflict as a leading cause of food shortages because war disrupts farming, displaces populations, damages infrastructure, interrupts supply chains, and often blocks access to aid, as illustrated by the famine in Yemen.',
+      },
+      {
+        question: 'According to the passage, how does climate change contribute to famine?',
+        explanation: 'The passage explains that rising temperatures, desertification, erratic rainfall, and extreme weather events reduce agricultural productivity, with prolonged droughts in East Africa leading to repeated food crises, especially for nomadic herders.',
+      },
+      {
+        question: 'The phrase \"food as a weapon\" in the passage most likely refers to',
+        explanation: 'The passage describes political leaders deliberately controlling access to food or withholding aid to punish opponents, turning food shortages into full-scale famines as seen in historical and modern conflicts.',
+      },
+      {
+        question: 'What can be inferred about the importance of early warning systems?',
+        explanation: 'The passage states that organizations like the WFP and FAO monitor weather, harvests, and conflict zones to detect signs of famine so that emergency food aid, cash assistance, and nutritional support can be delivered, though aid can still be delayed by political obstacles or lack of funding.',
+      },
+      {
+        question: 'According to the passage, why is malnutrition among children a key indicator of famine?',
+        explanation: 'The passage notes that children under five in affected areas suffer from stunted growth, weakened immune systems, and diseases, and that without intervention long-term effects can include developmental delays and increased mortality rates.',
+      },
+      {
+        question: 'What can be inferred about long-term solutions to famine?',
+        explanation: 'The passage emphasizes investment in agriculture (training farmers, irrigation, drought-resistant crops, storage), education and family planning, building resilient communities through empowering women and local production, conflict resolution, and the use of technology such as satellite imagery and cash transfers.',
+      },
+      {
+        question: 'According to the passage, why is famine described as a preventable tragedy?',
+        explanation: 'The passage concludes that while causes are complex, the solutions are known—proactive governance, investment in food security, conflict resolution, and international solidarity—and that in a world capable of producing enough food for everyone, no one should die of hunger.',
+      },
+    ],
+  },{
+    id: 96,
+    title: 'Poverty',
+    topic: 'Society & Economy',
+    content: `Poverty is a condition in which individuals or communities lack the financial resources necessary to meet basic living standards such as food, shelter, healthcare, and education. It is one of the most widespread and persistent global problems, affecting over 700 million people worldwide. Poverty is not just about low income; it also reflects a lack of opportunity, access, and security.
+Poverty is commonly divided into two categories: absolute poverty and relative poverty. Absolute poverty refers to a situation where individuals cannot afford the basic necessities of life. This is usually measured using the international poverty line set by the World Bank, which is currently $2.15 per day. Relative poverty, on the other hand, is based on income inequality within a particular society. People are considered relatively poor if their income is significantly below the national average, affecting their ability to participate fully in society.
+The causes of poverty are numerous and interconnected. Low levels of education, unemployment, and lack of access to land or credit prevent people from earning a stable income. In rural areas, many families depend on subsistence farming, which is vulnerable to droughts, floods, and changing weather patterns. In urban settings, informal labor markets often provide low and unpredictable wages without job security.
+Historical and political factors also contribute to poverty. Colonization, war, and corruption have shaped unequal development across regions. In some cases, governments fail to invest in public services or infrastructure, leaving entire communities without schools, hospitals, or clean water. Gender inequality further compounds poverty, as women and girls often face discrimination in education, employment, and property rights.
+Health and poverty are closely linked. Poor communities are more exposed to diseases due to inadequate sanitation, unsafe drinking water, and limited healthcare access. Illness reduces people's ability to work or attend school, creating a cycle that traps families in poverty. Malnutrition, especially in children, leads to stunted growth and cognitive delays, which affect long-term development.
+Education is one of the most powerful tools to fight poverty. Children who attend school are more likely to find employment, earn higher incomes, and escape poverty as adults. However, in many low-income countries, families cannot afford school fees, uniforms, or supplies. Girls are especially at risk of dropping out due to early marriage or domestic responsibilities.
+Poverty has wide-reaching consequences. It increases social instability, fuels crime, and contributes to political unrest. In democratic societies, economic inequality can weaken public trust and reduce participation in civic life. Globally, poverty limits economic growth, as poor populations have low purchasing power and limited ability to invest in their futures.
+Efforts to reduce poverty involve both short-term relief and long-term development. Humanitarian aid provides food, shelter, and emergency healthcare in times of crisis. Development programs focus on building roads, schools, and hospitals, as well as creating job opportunities. Microfinance initiatives help small entrepreneurs start or expand businesses with small loans.
+Social protection policies, such as cash transfers, pensions, and unemployment benefits, play a vital role in preventing families from falling into extreme poverty. In countries like Brazil and Mexico, conditional cash transfer programs have successfully improved school attendance and health outcomes among low-income families.
+The global community has recognized poverty as a priority issue. The United
+Nations Sustainable Development Goals (SDGs) aim to end extreme poverty by 2030. This goal requires coordinated efforts among governments, nongovernmental organizations, businesses, and communities. Climate action, education, gender equality, and economic growth are all interconnected with poverty reduction.
+Technology and innovation offer new opportunities to address poverty. Mobile banking allows people in remote areas to save money and access loans. E-learning platforms provide education to students in underserved regions. Agricultural innovations, such as drought-resistant seeds and smart irrigation systems, help farmers increase yields and incomes.
+Despite progress, challenges remain. Income inequality is rising in many countries, even as poverty rates decline. The COVID-19 pandemic reversed years of improvement by increasing job loss, food insecurity, and school closures. Conflicts in regions like the Middle East and sub-Saharan Africa have displaced millions and disrupted development efforts.
+In conclusion, poverty is a complex and urgent global issue that affects health, education, equality, and peace. It cannot be solved by charity alone; sustainable solutions require investment, good governance, social inclusion, and international cooperation. A world without poverty is possible—but only if we address its root causes and ensure that progress reaches even the most vulnerable.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose is to define poverty, explain its causes and consequences, describe efforts to reduce it, and emphasize that sustainable solutions require addressing root causes through investment, governance, and international cooperation.',
+      },
+      {
+        question: 'According to the passage, what is the difference between absolute poverty and relative poverty?',
+        explanation: 'Absolute poverty is the inability to afford basic necessities of life, measured by the international poverty line of $2.15 per day, while relative poverty is based on income significantly below the national average within a society, limiting full participation.',
+      },
+      {
+        question: 'The word "interconnected" in the third paragraph most likely means...',
+        explanation: 'In the context of the passage, "interconnected" means linked or related to one another, referring to the multiple causes of poverty that influence and reinforce each other.',
+      },
+      {
+        question: 'What can be inferred about the relationship between health and poverty?',
+        explanation: 'It can be inferred that poor health and poverty form a cycle, as disease and malnutrition reduce the ability to work or learn, which in turn keeps families trapped in poverty.',
+      },
+      {
+        question: 'According to the passage, why is education considered a powerful tool against poverty?',
+        explanation: 'Children who attend school are more likely to find employment, earn higher incomes, and escape poverty as adults, although barriers such as costs and gender discrimination often prevent access.',
+      },
+      {
+        question: 'The word "stunted" in the fifth paragraph most likely means...',
+        explanation: 'In the context of the passage, "stunted" means slowed or hindered in growth and development, referring to the physical and cognitive effects of malnutrition on children.',
+      },
+      {
+        question: 'What can be inferred about the impact of the COVID-19 pandemic on poverty?',
+        explanation: 'It can be inferred that the pandemic reversed years of progress by causing job losses, food insecurity, and school closures, thereby increasing poverty levels.',
+      },
+      {
+        question: 'According to the passage, what role do social protection policies play?',
+        explanation: 'Social protection policies such as cash transfers, pensions, and unemployment benefits help prevent families from falling into extreme poverty and have improved school attendance and health outcomes in countries like Brazil and Mexico.',
+      },
+      {
+        question: 'What can be inferred about the role of technology in fighting poverty?',
+        explanation: 'It can be inferred that technology provides practical tools—such as mobile banking, e-learning, and agricultural innovations—that improve access to finance, education, and higher farm yields for people in poverty.',
+      },
+      {
+        question: 'According to the passage, what is required for sustainable solutions to poverty?',
+        explanation: 'Sustainable solutions require investment, good governance, social inclusion, and international cooperation rather than charity alone, in order to address root causes and reach the most vulnerable.',
+      },
+    ],
+  },{
+    id: 97,
+    title: 'Overpopulation',
+    topic: 'Society & Environment',
+    content: `Overpopulation occurs when the number of people in a given area exceeds the resources and capacity needed to support them. This phenomenon is often discussed in the context of global population growth and its impact on food supply, housing, environment, and public services. Although population growth has slowed in many developed countries, global numbers continue to rise, particularly in developing regions.
+The world‘s population surpassed 8 billion in 2022 and is projected to keep increasing, especially in countries across Africa and South Asia. While population growth itself is not inherently negative, rapid and unmanaged growth can place immense strain on natural resources, infrastructure, and social systems.
+One of the primary concerns of overpopulation is the pressure on resources. As population increases, so does the demand for food, water, and energy. Agricultural land becomes overused, forests are cleared for farming or settlement, and water sources are depleted or polluted. In many densely populated areas, this leads to soil degradation, loss of biodiversity, and scarcity of drinking water.
+Urban areas experience significant impacts. Overcrowded cities face challenges in housing, transportation, sanitation, and waste management. Slums and informal settlements grow when housing cannot keep up with demand. These areas often lack clean water, electricity, and sewage systems, increasing the risk of disease and poor living conditions. Traffic congestion, air pollution, and overburdened public services become common features of life in megacities.
+Unemployment and poverty are also linked to overpopulation. When the labor force grows faster than job creation, unemployment rises, and wages fall. This leads to higher rates of poverty, especially among young people and women. In rural areas, land fragmentation can make farming unprofitable, pushing people to migrate to cities in search of work, further increasing urban pressures.
+Healthcare and education systems struggle to keep up with population growth. In regions with high birth rates, hospitals and schools are often overcrowded, underfunded, and understaffed. Children may receive poor-quality education, and maternal and child health services become overstretched, leading to higher rates of illness and mortality.
+Overpopulation also contributes significantly to environmental degradation. More people means more cars, more waste, and higher energy consumption. Greenhouse gas emissions increase, driving climate change. Deforestation and habitat destruction accelerate as land is cleared for housing and agriculture. Wildlife faces extinction due to loss of habitat and overexploitation of resources.
+Despite these challenges, some experts argue that the problem is not simply population numbers but how resources are used and distributed. For example, a relatively small portion of the global population consumes the majority of the world‘s resources and produces most of its pollution. Wealthy nations with stable or declining populations still have a large environmental footprint. Therefore, addressing overconsumption and inequality is as important as managing population size.
+Family planning is one of the most effective tools for addressing overpopulation. Access to contraception, reproductive healthcare, and education—particularly for women and girls—leads to lower birth rates and more sustainable population growth. Studies have shown that when women are educated and empowered, they tend to marry later and have fewer children.
+Government policies also influence population trends. In the past, some countries introduced controversial measures to control growth. China‘s former one-child policy is one such example. While it helped slow population growth, it also led to negative social consequences, such as gender imbalance and an aging population. Today, more humane and rights-based approaches to family planning are promoted.
+Technology and innovation offer potential solutions to cope with overpopulation. Advances in agriculture—such as vertical farming, genetically modified crops, and efficient irrigation—can increase food production. Renewable energy, smart city planning, and public transportation systems can reduce environmental impacts and improve quality of life in urban areas.
+Migration policies and regional development can also help. Encouraging people to settle in less populated or rural areas, investing in small towns, and decentralizing economic activity can relieve pressure on major cities. However, such efforts require careful planning and adequate resources.
+Education is a key component of any long-term solution. Teaching people about sustainability, resource management, and reproductive health equips them to make informed choices. Public awareness campaigns, media engagement, and school curricula can all promote responsible behaviors and policy support.
+In conclusion, overpopulation remains a pressing global issue, particularly in regions where population growth outpaces development. Its consequences affect health, education, the environment, and social stability. However, with smart planning, technological innovation, investment in education, and international cooperation, it is possible to manage population growth sustainably and improve quality of life for future generations.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose of the passage is to examine overpopulation as a global challenge, describing its causes, impacts on resources, cities, economy, health, and environment, while outlining solutions such as family planning, technology, and education.',
+      },
+      {
+        question: 'According to the passage, when did the world‘s population surpass 8 billion?',
+        explanation: 'According to the passage, the world‘s population surpassed 8 billion in 2022 and is projected to keep increasing, especially in countries across Africa and South Asia.',
+      },
+      {
+        question: 'The word "depleted" in the third paragraph most likely means',
+        explanation: 'In the context of the third paragraph, "depleted" means used up or reduced to a low level, referring to water sources that become exhausted or polluted due to rising population demand.',
+      },
+      {
+        question: 'What can be inferred about the relationship between overpopulation and urban living conditions?',
+        explanation: 'It can be inferred that rapid population growth leads to overcrowded cities where housing shortages create slums lacking basic services, resulting in higher disease risks, traffic congestion, air pollution, and strained public infrastructure.',
+      },
+      {
+        question: 'According to the passage, how does overpopulation contribute to environmental degradation?',
+        explanation: 'According to the passage, more people lead to more cars, waste, and energy use, increasing greenhouse gas emissions and climate change, while deforestation and habitat destruction accelerate, threatening wildlife with extinction.',
+      },
+      {
+        question: 'The phrase "land fragmentation" in the fifth paragraph most likely refers to',
+        explanation: 'In the context of the fifth paragraph, "land fragmentation" refers to the division of farmland into smaller, less viable plots, which can make farming unprofitable and push rural people to migrate to cities.',
+      },
+      {
+        question: 'What can be inferred about the role of women‘s education in addressing overpopulation?',
+        explanation: 'It can be inferred that educating and empowering women is highly effective because studies show they then tend to marry later and have fewer children, leading to lower birth rates and more sustainable population growth.',
+      },
+      {
+        question: 'According to the passage, what were some negative consequences of China‘s former one-child policy?',
+        explanation: 'According to the passage, while the policy helped slow population growth, it led to negative social consequences such as gender imbalance and an aging population, which is why more rights-based approaches are now promoted.',
+      },
+      {
+        question: 'What can be inferred about the argument that overconsumption matters as much as population size?',
+        explanation: 'It can be inferred that a relatively small wealthy portion of the global population consumes most resources and produces most pollution, so addressing inequality and overconsumption in rich nations is as important as controlling population growth in developing regions.',
+      },
+      {
+        question: 'According to the passage, how can technology help cope with overpopulation?',
+        explanation: 'According to the passage, advances such as vertical farming, genetically modified crops, efficient irrigation, renewable energy, smart city planning, and public transportation can increase food production, reduce environmental impacts, and improve urban quality of life.',
+      },
+    ],
+  },{
+    id: 98,
+    title: 'Globalization',
+    topic: 'Economy & Society',
+    content: `Globalization refers to the growing interconnection of the world‘s economies, cultures, and populations, brought about by cross-border trade, investment, information technology, and the movement of people and ideas. Over the past few decades, globalization has transformed how countries interact and how individuals live and work.
+At its core, globalization is driven by technological advances and economic liberalization. Innovations in transport and communication—such as jet travel, container shipping, the internet, and mobile technology—have dramatically reduced the barriers of time and space. At the same time, many countries have reduced tariffs, opened their markets to foreign investment, and adopted policies that encourage international business.
+One of the most visible effects of globalization is international trade. Goods produced in one country are sold all over the world. For example, smartphones may be designed in the United States, manufactured in China, and assembled with parts from Japan, South Korea, and Germany. Global supply chains connect producers and consumers across continents.
+Multinational corporations (MNCs) are major players in globalization. Companies like Apple, Toyota, and Unilever operate in multiple countries, creating jobs and transferring technology. Foreign direct investment (FDI) by such firms often helps developing countries grow by bringing in capital, skills, and access to new markets.
+Cultural exchange is another significant aspect of globalization. Through films, music, fashion, and cuisine, people around the world are exposed to different ways of life. American fast food chains, Korean pop music, Indian cinema, and Japanese video games are examples of cultural products that have global reach. This exposure fosters mutual understanding but also raises concerns about cultural erosion and loss of local identity.
+Labor mobility is part of the globalization process. People migrate for work, education, or safety, contributing to global knowledge-sharing and economic activity. Many economies rely on migrant workers to fill labor gaps, especially in agriculture, construction, and healthcare. At the same time, this movement has led to debates about immigration, national security, and cultural integration.
+The digital revolution has accelerated globalization. Online platforms enable instant communication, remote work, and e-commerce. Small businesses can sell products internationally with the help of digital payment systems and global logistics. Educational institutions offer online courses to students worldwide, breaking down barriers to knowledge.
+Despite these benefits, globalization has also led to economic inequality. While some countries and individuals have gained enormously, others have been left behind. Jobs in manufacturing have moved from high-income to low-income countries, leading to unemployment and social tension in some regions. In the Global South, workers may face poor working conditions and low wages in factories supplying goods to richer nations.
+Environmental concerns are another major issue. Increased production and transportation contribute to carbon emissions and resource depletion. Critics argue that globalization promotes a model of overconsumption and unsustainable growth. Global supply chains can make it difficult to enforce environmental standards or hold polluters accountable.
+The global financial system is more interconnected than ever, but also more vulnerable to shocks. The 2008 financial crisis showed how economic problems in one country can spread rapidly across borders. During the COVID-19 pandemic, disruptions in trade and travel exposed weaknesses in global supply chains and healthcare coordination.
+Nationalism and protectionism have gained popularity in response to the perceived downsides of globalization. Some governments have implemented tariffs, tightened immigration rules, or withdrawn from international agreements. Brexit, for instance, reflected concerns over sovereignty, immigration, and economic dependence. The challenge is to balance national interests with the benefits of cooperation.
+International institutions play a key role in managing globalization. Organizations such as the World Trade Organization (WTO), International Monetary Fund (IMF), and United Nations (UN) help countries work together on trade rules, financial stability, and global challenges like climate change. However, these institutions face criticism for being dominated by powerful countries or failing to protect vulnerable populations.
+To make globalization more inclusive and sustainable, many experts advocate for reforms. These include fairer trade agreements, stronger labor and environmental protections, corporate accountability, and support for education and infrastructure in poorer regions. Technology must be harnessed to close—not widen—gaps between and within countries.
+Education is crucial. A globalized world requires workers who can adapt, innovate, and collaborate across cultures. Language skills, digital literacy, and cross-cultural understanding are becoming essential in the modern workforce.
+In conclusion, globalization is a complex and dynamic process that has reshaped the world. It offers opportunities for growth, connection, and innovation, but also presents serious challenges in terms of inequality, environmental impact, and cultural preservation. How societies manage globalization in the years ahead will determine whether its benefits are shared widely or remain concentrated among the few.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose of the passage is to define globalization as the growing interconnection of economies, cultures, and populations, describe its drivers and effects such as trade, multinational corporations, cultural exchange, labor mobility, and digital acceleration, examine challenges including inequality, environmental harm, and financial vulnerability, discuss responses like nationalism and the role of international institutions, and conclude that managing it inclusively will determine whether benefits are widely shared.',
+      },
+      {
+        question: 'According to the passage, what drives globalization at its core?',
+        explanation: 'According to the passage, globalization is driven by technological advances and economic liberalization: innovations in transport and communication have reduced barriers of time and space, while many countries have reduced tariffs, opened markets to foreign investment, and adopted policies encouraging international business.',
+      },
+      {
+        question: 'The word "interconnection" in the first paragraph most likely means',
+        explanation: 'In the first paragraph, "interconnection" most likely means the growing links and interdependence among the world‘s economies, cultures, and populations brought about by cross-border trade, investment, information technology, and the movement of people and ideas.',
+      },
+      {
+        question: 'What can be inferred about the role of multinational corporations in globalization?',
+        explanation: 'It can be inferred that multinational corporations are major players because they operate in multiple countries, create jobs, transfer technology, and through foreign direct investment help developing countries grow by bringing capital, skills, and access to new markets.',
+      },
+      {
+        question: 'According to the passage, what are some effects of cultural exchange under globalization?',
+        explanation: 'According to the passage, cultural exchange through films, music, fashion, and cuisine exposes people to different ways of life (examples include American fast food, Korean pop music, Indian cinema, and Japanese video games), fostering mutual understanding while also raising concerns about cultural erosion and loss of local identity.',
+      },
+      {
+        question: 'What can be inferred about economic inequality resulting from globalization?',
+        explanation: 'It can be inferred that globalization has produced uneven gains: while some countries and individuals have benefited enormously, others have been left behind, with manufacturing jobs moving from high-income to low-income countries causing unemployment and social tension, and workers in the Global South sometimes facing poor conditions and low wages.',
+      },
+      {
+        question: 'According to the passage, how has the digital revolution accelerated globalization?',
+        explanation: 'According to the passage, online platforms enable instant communication, remote work, and e-commerce; small businesses can sell internationally via digital payments and global logistics, and educational institutions offer online courses worldwide, breaking down barriers to knowledge.',
+      },
+      {
+        question: 'The phrase "protectionism" in the passage most likely refers to',
+        explanation: 'In the passage, "protectionism" refers to policies such as implementing tariffs, tightening immigration rules, or withdrawing from international agreements that some governments have adopted in response to the perceived downsides of globalization, reflecting a preference for national interests over open cooperation.',
+      },
+      {
+        question: 'What can be inferred about the vulnerability of the global financial system?',
+        explanation: 'It can be inferred that greater interconnection makes the system more vulnerable to shocks, as shown by the 2008 financial crisis spreading rapidly across borders and by COVID-19 disruptions exposing weaknesses in global supply chains and healthcare coordination.',
+      },
+      {
+        question: 'According to the passage, what do experts advocate to make globalization more inclusive and sustainable?',
+        explanation: 'According to the passage, experts advocate reforms including fairer trade agreements, stronger labor and environmental protections, corporate accountability, support for education and infrastructure in poorer regions, and harnessing technology to close rather than widen gaps between and within countries.',
+      },
+    ],
+  },{
+  id: 99,
+  title: 'Animal Testing',
+  topic: 'Science & Ethics',
+  content: `Animal testing, also known as animal experimentation, refers to the use of nonhuman animals in scientific research and product development. It is commonly used to test the safety and effectiveness of medical treatments, cosmetics, chemicals, and household products. While supporters argue it is essential for scientific progress, critics believe it is unethical and unnecessary in the modern world.
+Historically, animal testing has played a central role in the development of vaccines, antibiotics, and surgical procedures. For example, insulin was discovered through experiments on dogs, and polio vaccines were developed using monkeys. Many scientific breakthroughs would not have been possible without animal research, and it continues to contribute to treatments for diseases such as cancer,
+HIV/AIDS, and Alzheimer‘s.
+Animals are used in a wide range of research. Rodents such as mice and rats make up the majority of test subjects due to their small size, short lifespans, and genetic similarities to humans. Rabbits, monkeys, dogs, and pigs are also used for specific types of testing. Procedures may involve administering drugs, performing surgeries, or observing behavior under controlled conditions.
+Supporters of animal testing argue that it provides valuable insights into biological systems and disease processes. Animal models allow researchers to study the effects of substances on living organisms before moving to human trials. They claim that without such testing, the development of medicines and treatments would be slower and riskier.
+Furthermore, regulatory agencies in many countries require animal testing before new drugs or products are approved for human use. This is seen as a necessary step to ensure public safety. For example, pharmaceutical companies must demonstrate that their products are not toxic, carcinogenic, or harmful to organs before beginning clinical trials in humans.
+However, animal testing is highly controversial and raises serious ethical concerns.
+Opponents argue that it is cruel to subject animals to pain, suffering, or death for human benefit. They point out that animals are sentient beings with the capacity to feel fear and distress, and that they should be protected from unnecessary harm. Critics also question the scientific reliability of animal experiments. They argue that differences in biology, genetics, and metabolism between humans and animals can lead to misleading results. In some cases, drugs that passed animal tests later failed in human trials, either because they were ineffective or caused unexpected side effects. This has led some scientists to advocate for alternative methods.
+In recent years, non-animal testing alternatives have advanced significantly. These include in vitro (test tube) methods using human cells and tissues, computer modeling, and organ-on-a-chip technologies. These systems aim to replicate human responses more accurately and avoid ethical issues associated with animal use. While not yet capable of replacing all forms of testing, they are increasingly being adopted in research and development.
+Many countries now have regulations to reduce animal testing. The ―3Rs‖ principle—Replacement, Reduction, and Refinement—guides researchers to seek alternatives, use fewer animals, and minimize suffering whenever possible. The European Union has banned the sale of cosmetics tested on animals and funds research into humane testing methods. In the United States and other regions, laws require ethical review and justification before animal experiments are approved.
+Despite these developments, animal testing still persists in large quantities. Globally, tens of millions of animals are used in research each year. In some countries, enforcement of ethical standards is weak or non-existent, leading to unregulated and inhumane practices. Animal rights organizations continue to campaign for stricter laws and greater transparency.
+The debate over animal testing involves a complex balance between scientific advancement, human safety, and animal welfare. On one hand, researchers argue that the risks of skipping animal trials could lead to public health disasters. On the other, animal rights advocates stress the moral obligation to treat all living beings with respect and compassion.
+Public opinion on the issue varies. Surveys show that many people support animal testing when it is used for medical research but oppose it for cosmetics or nonessential products. Awareness campaigns, documentaries, and celebrity endorsements have helped shift attitudes, especially among younger generations.
+Educational institutions are also adapting. Some universities now use simulations and virtual dissections instead of live animals in biology classes. Medical training is increasingly conducted using realistic mannequins or computer software, reducing the need for animal models.
+In conclusion, animal testing remains a deeply controversial but evolving practice. It has contributed significantly to scientific and medical progress, yet it also poses ethical dilemmas that cannot be ignored. As technology advances, the future may see a decline in animal testing and greater reliance on humane, effective alternatives. Achieving this will require global cooperation, investment in innovation, and a commitment to both science and compassion.`,
+  questions: [
+    {
+      question: 'What is the main purpose of this passage?',
+      explanation: 'The main purpose of the passage is to explain animal testing as the use of non-human animals in research and product development, outline its historical contributions and current uses, present arguments for and against it, discuss ethical concerns and scientific limitations, and describe emerging alternatives and regulations that may reduce its use.',
+    },
+    {
+      question: 'According to the passage, what historical medical advances depended on animal testing?',
+      explanation: 'According to the passage, animal testing played a central role in the development of vaccines, antibiotics, and surgical procedures; for example, insulin was discovered through experiments on dogs and polio vaccines were developed using monkeys, and it continues to contribute to treatments for diseases such as cancer, HIV/AIDS, and Alzheimer\'s.',
+    },
+    {
+      question: 'The word "sentient" in the paragraph about ethical concerns most likely means',
+      explanation: 'In the context of the passage, "sentient" most likely means capable of feeling or experiencing sensations such as fear and distress, as opponents argue that animals are sentient beings that should be protected from unnecessary harm.',
+    },
+    {
+      question: 'What can be inferred about the reliability of animal testing from the passage?',
+      explanation: 'It can be inferred that animal testing is not always scientifically reliable because differences in biology, genetics, and metabolism between humans and animals can produce misleading results, and some drugs that passed animal tests later failed in human trials due to ineffectiveness or unexpected side effects.',
+    },
+    {
+      question: 'According to the passage, what is the "3Rs" principle?',
+      explanation: 'According to the passage, the "3Rs" principle—Replacement, Reduction, and Refinement—guides researchers to seek alternatives to animal testing, use fewer animals, and minimize suffering whenever possible.',
+    },
+    {
+      question: 'What can be inferred about public opinion on animal testing?',
+      explanation: 'It can be inferred that public support for animal testing is conditional: many people accept it for medical research but oppose it for cosmetics or non-essential products, and awareness campaigns have helped shift attitudes, particularly among younger generations.',
+    },
+    {
+      question: 'The phrase "in vitro" in the paragraph about alternatives most likely means',
+      explanation: 'In the context of the passage, "in vitro" most likely means experiments conducted in a test tube or outside a living organism, using human cells and tissues as one of the non-animal testing alternatives that aim to replicate human responses more accurately.',
+    },
+    {
+      question: 'According to the passage, why do regulatory agencies require animal testing?',
+      explanation: 'According to the passage, regulatory agencies in many countries require animal testing before new drugs or products are approved for human use as a necessary step to ensure public safety, for example by demonstrating that products are not toxic, carcinogenic, or harmful to organs before clinical trials begin.',
+    },
+    {
+      question: 'What can be inferred about the future of animal testing from the conclusion?',
+      explanation: 'It can be inferred that as technology advances, animal testing may decline in favor of more humane and effective alternatives, but achieving this shift will require global cooperation, investment in innovation, and a commitment to both scientific progress and compassion.',
+    },
+    {
+      question: 'According to the passage, how are educational institutions reducing the use of animals?',
+      explanation: 'According to the passage, some universities now use simulations and virtual dissections instead of live animals in biology classes, and medical training increasingly relies on realistic mannequins or computer software, thereby reducing the need for animal models.',
+    },
+  ],
+},{
+  id: 100,
+  title: 'Zoos',
+  topic: 'Animals & Conservation',
+  content: `Zoos are facilities that house animals for public viewing, education, research, and conservation. They have existed in various forms for thousands of years, from royal menageries in ancient civilizations to the modern zoological parks found across the world today. While zoos offer opportunities for recreation and learning, they are also subjects of ongoing ethical debate regarding animal welfare and conservation effectiveness.
+The traditional purpose of zoos was entertainment. People visited to see exotic animals from distant parts of the world, many of which they could not otherwise encounter. Over time, however, the mission of zoos has expanded to include education, species preservation, and scientific research. Today, many zoos present themselves as conservation centers, playing a role in protecting endangered species and raising public awareness of environmental issues.
+Education is one of the main justifications for zoos. By observing animals up close, visitors—especially children—can learn about biodiversity, ecosystems, and animal behavior. Informational signs, guided tours, and interactive exhibits aim to increase public understanding of wildlife. Proponents argue that this exposure fosters a connection between people and animals, encouraging conservationminded behavior.
+Conservation is another key function. Zoos are involved in breeding programs for endangered species, often in cooperation with global networks. These programs help preserve genetic diversity and may provide animals for future reintroduction into the wild. The reintroduction of species such as the Arabian oryx and the California condor are cited as success stories made possible by zoo-based conservation efforts.
+Scientific research conducted in zoos contributes to veterinary science, animal behavior studies, and wildlife management. Studying animals in a controlled environment allows scientists to collect data that would be difficult or impossible to gather in the wild. This research can improve care practices and inform conservation strategies.
+Despite these benefits, zoos face criticism, particularly from animal rights advocates who question the ethics of keeping wild animals in captivity. Opponents argue that many zoo enclosures are too small or lack environmental complexity, causing stress, boredom, or abnormal behaviors—known as "zoochosis"—such as pacing or self-harm.
+Even in modern, well-funded zoos, some animals do not thrive. Large, wideranging species like elephants, polar bears, and big cats often suffer in confined spaces. Critics also question whether breeding endangered animals in captivity— without realistic plans for release—truly contributes to conservation or merely maintains populations for display purposes.
+Animal welfare concerns are heightened in poorly managed zoos or roadside attractions, where conditions can be inhumane. In some regions, zoos operate with little oversight, inadequate funding, or no veterinary care. International organizations like the World Association of Zoos and Aquariums (WAZA) set ethical guidelines and accreditation standards, but enforcement varies widely by country.
+Another criticism is that zoos can give the public a misleading view of animals. Animals in enclosures behave differently from those in the wild, and their surroundings are often artificial. This may reduce visitors‘ understanding of true animal behavior or the challenges wildlife faces in natural habitats.
+In recent years, alternatives to traditional zoos have gained popularity. Wildlife sanctuaries, nature reserves, and safari parks offer more naturalistic environments, allowing animals to roam freely while still being protected and observed. Virtual reality and high-definition nature documentaries also provide new ways to educate the public without keeping animals in captivity.
+Supporters of zoos counter that not all species can be protected or studied in the wild due to habitat destruction, poaching, or human conflict. For some animals, captivity may be the only option for survival. Zoos can serve as a last refuge for animals threatened by extinction, while also promoting broader environmental awareness.
+Zoos also contribute economically and socially. They attract tourism, provide jobs, and support local economies. In urban areas, zoos offer accessible green spaces and educational resources, especially for children who may never have the chance to see wildlife in natural settings.
+Efforts are ongoing to improve zoo practices. Modern zoos are increasingly investing in enrichment programs to stimulate animals mentally and physically. Larger, more naturalistic enclosures are becoming the standard, and many zoos now prioritize the welfare of animals over the size or rarity of their collections.
+Public expectations are shifting as well. Many visitors now demand higher ethical standards, transparency, and evidence of genuine conservation work. Zoos that fail to adapt to these expectations may lose public trust, funding, and attendance.
+In conclusion, zoos are complex institutions that play multiple roles in society. They offer educational value, support conservation, and contribute to scientific knowledge. At the same time, they raise serious ethical questions about animal rights and the effectiveness of captivity. The future of zoos depends on their ability to balance these roles, improve animal welfare, and evolve into truly responsible centers for conservation and learning.`,
+  questions: [
+    {
+      question: 'What is the main purpose of this passage?',
+      explanation: 'The passage examines zoos as facilities for viewing, education, research, and conservation, discusses their historical evolution and benefits, presents ethical criticisms regarding animal welfare and captivity, explores alternatives, and concludes that their future depends on balancing roles while improving welfare and becoming responsible conservation centers.',
+    },
+    {
+      question: 'According to the passage, how has the mission of zoos expanded over time?',
+      explanation: 'The traditional purpose was entertainment for viewing exotic animals, but the mission has expanded to include education, species preservation, and scientific research; today many zoos present themselves as conservation centers protecting endangered species and raising environmental awareness.',
+    },
+    {
+      question: 'The word "zoochosis" in the paragraph about animal rights criticism most likely means',
+      explanation: 'It refers to abnormal behaviors caused by stress, boredom, or inadequate enclosures in captivity, such as pacing or self-harm, as described by opponents of keeping wild animals in zoos.',
+    },
+    {
+      question: 'What can be inferred about the effectiveness of zoo-based conservation programs?',
+      explanation: 'Breeding programs help preserve genetic diversity and may provide animals for reintroduction into the wild, with success stories like the Arabian oryx and California condor, though critics question whether breeding without realistic release plans truly contributes to conservation or mainly maintains display populations.',
+    },
+    {
+      question: 'According to the passage, why do some large species struggle in zoos?',
+      explanation: 'Even in modern, well-funded zoos, large, wide-ranging species like elephants, polar bears, and big cats often suffer in confined spaces that are too small or lack environmental complexity.',
+    },
+    {
+      question: 'The word "enrichment" in the paragraph about improving zoo practices most likely means',
+      explanation: 'It refers to programs designed to stimulate animals mentally and physically, as modern zoos invest in enrichment to improve welfare along with larger, more naturalistic enclosures.',
+    },
+    {
+      question: 'What can be inferred about alternatives to traditional zoos?',
+      explanation: 'Wildlife sanctuaries, nature reserves, and safari parks offer more naturalistic environments where animals can roam freely while being protected and observed; virtual reality and nature documentaries also educate the public without captivity.',
+    },
+    {
+      question: 'According to the passage, what economic and social contributions do zoos make?',
+      explanation: 'Zoos attract tourism, provide jobs, and support local economies; in urban areas they offer accessible green spaces and educational resources, especially for children who may never see wildlife in natural settings.',
+    },
+    {
+      question: 'What can be inferred about public expectations of zoos?',
+      explanation: 'Public expectations are shifting as many visitors now demand higher ethical standards, transparency, and evidence of genuine conservation work; zoos that fail to adapt may lose public trust, funding, and attendance.',
+    },
+    {
+      question: 'According to the passage, what role does scientific research in zoos play?',
+      explanation: 'Research in controlled environments contributes to veterinary science, animal behavior studies, and wildlife management by allowing data collection that would be difficult or impossible in the wild, improving care practices and informing conservation strategies.',
+    },
+  ],
+},{
+    id: 101,
+    title: 'Privacy and Surveillance',
+    topic: 'Society & Technology',
+    content: `Privacy refers to an individual‘s right to control their personal information, communications, and daily activities without unwanted intrusion. Surveillance, in contrast, involves monitoring individuals or groups—often by governments or corporations—for purposes such as national security, law enforcement, or commercial profit. Because modern technology enables constant data collection, the balance between privacy and surveillance has become one of the most debated issues of the 21st century.
+Although surveillance is often justified in the name of public safety, it raises serious concerns about human rights and democratic values. Not only can it be used to detect crime, but it may also be misused to suppress dissent, invade private lives, or manipulate public behavior. If left unchecked, surveillance can lead to authoritarian control and loss of civil liberties.
+Governments increasingly use surveillance systems such as CCTV cameras, phone tapping, internet monitoring, and biometric tracking. While these tools may deter crime or terrorism, they also monitor ordinary citizens. In many countries, data is collected without consent and stored indefinitely. Because legal safeguards are often weak or outdated, individuals may not even know they are being watched.
+Mass surveillance has become especially widespread in the digital age. Every time a person uses a smartphone, sends an email, or browses the internet, data is collected. Search engines, social media platforms, and mobile apps track user behavior to generate profit through targeted advertising. Even though users agree to terms and conditions, many are unaware of how their data is used or shared. National security is the most common justification for surveillance. Following major terrorist attacks, countries have passed laws granting intelligence agencies expanded powers to monitor communication. Supporters argue that such measures are necessary to protect the public and prevent future attacks. They believe that if a person has nothing to hide, they have nothing to fear.
+However, critics argue this logic is dangerous. They point out that privacy is not about hiding wrongdoing—but about protecting personal freedom. If governments or corporations know every detail about someone‘s life, they can control or influence that person in subtle ways. This may lead to self-censorship, social pressure, or political fear.
+Another major concern is data breaches. When sensitive personal information is stored on government or corporate servers, it becomes a target for hackers. Identity theft, blackmail, and financial fraud are just some of the consequences. Because security is never perfect, collecting large amounts of data always carries risks. Surveillance technology is also being used in controversial ways. Facial recognition systems, predictive policing, and artificial intelligence are used to identify potential threats before crimes occur. Although such tools promise efficiency, they often rely on biased algorithms or flawed data, leading to wrongful accusations or discrimination—particularly against minorities.
+Some countries have implemented strong privacy laws. The European Union‘s General Data Protection Regulation (GDPR) gives individuals more control over their personal data and requires companies to be transparent. If similar regulations were adopted globally, users could protect their privacy more effectively.
+Nevertheless, enforcement remains a challenge. Even in countries with strong laws, powerful companies often operate across borders and avoid responsibility. Unless global standards are created, data privacy will remain inconsistent and difficult to defend.
+Public awareness is rising. Many people are now using encrypted apps, disabling location services, or rejecting cookies to limit tracking. However, complete privacy is almost impossible in a connected world. Even if someone avoids social media, their information may still be collected by others or leaked online.
+Some argue that privacy is outdated in the digital age. They claim that total transparency improves safety, efficiency, and convenience. For example, smart cities use surveillance to manage traffic, detect emergencies, and reduce crime. While this may be true, it raises the question: who controls the data, and for what purpose?
+Ultimately, the challenge is not choosing between privacy and security—but balancing the two. Surveillance may be necessary in some contexts, but it must be limited, transparent, and subject to democratic oversight. If surveillance becomes too powerful, society may sacrifice the very freedoms it seeks to protect.
+However, if privacy is fully ignored, individuals lose autonomy, dignity, and control over their own lives. Democracies depend on free thought, open debate, and the ability to live without constant observation.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose of this passage is to examine the tension between privacy as an individual right and surveillance by governments and corporations, discuss the justifications and risks of modern surveillance technologies, highlight concerns such as data breaches, bias, and loss of civil liberties, and argue for a balanced approach that limits surveillance through transparency, legal safeguards, and democratic oversight.',
+      },
+      {
+        question: 'According to the passage, what are some common forms of government surveillance?',
+        explanation: 'Governments use systems such as CCTV cameras, phone tapping, internet monitoring, and biometric tracking. These tools may deter crime or terrorism but also monitor ordinary citizens, often collecting data without consent and storing it indefinitely.',
+      },
+      {
+        question: 'The word \'transboundary\' is not used, but the word \'indefinitely\' in the passage most likely means?',
+        explanation: 'It most likely means without a set end or for an unlimited period of time, as the passage states that in many countries data is collected without consent and stored indefinitely because legal safeguards are often weak or outdated.',
+      },
+      {
+        question: 'What can be inferred about the author\'s view on the argument that people with nothing to hide have nothing to fear?',
+        explanation: 'It can be inferred that the author considers this argument dangerous, because privacy is presented as a protection of personal freedom rather than a way to hide wrongdoing, and extensive knowledge of someone\'s life by governments or corporations can lead to control, self-censorship, social pressure, or political fear.',
+      },
+      {
+        question: 'According to the passage, what risks are associated with collecting large amounts of personal data?',
+        explanation: 'Collecting large amounts of data always carries risks because security is never perfect. Sensitive information stored on servers becomes a target for hackers, potentially leading to identity theft, blackmail, and financial fraud.',
+      },
+      {
+        question: 'What can be inferred about the effectiveness of current privacy protections?',
+        explanation: 'It can be inferred that privacy protections remain limited and inconsistent, as even strong laws like the GDPR face enforcement challenges when companies operate across borders, and without global standards data privacy is difficult to defend fully in a connected world where complete privacy is almost impossible.',
+      },
+    ],
+  },
 ];
