@@ -1195,5 +1195,602 @@ In conclusion, sporting events are much more than games—they are cultural, eco
       explanation: 'With massive gatherings, the risks of accidents, violence, or terrorism require organizers to work with law enforcement on surveillance, emergency planning, and strict access control; however, heavy security can also raise concerns about privacy and civil liberties.',
     },
   ],
+},{
+    id: 21,
+    title: 'Fashion and Clothing',
+    topic: 'Society & Culture',
+    content: `Fashion is not just about what people wear. It is a dynamic cultural and economic force that reflects identity, values, and social trends. Clothing choices can express personality, group belonging, and even political views. From high-end designer brands to fast fashion outlets, what people wear often says more about them than words ever could.
+Throughout history, fashion has played a central role in defining eras and societies. In ancient civilizations, clothing indicated status and function. Royalty wore elaborate garments made from expensive materials, while commoners had simple, practical attire. During the Renaissance, fashion in Europe was driven by nobility and used to display wealth and taste. Today, although class distinctions remain, the fashion industry has become more democratized, with trends spreading quickly through media and online platforms.
+One reason people care so much about fashion is that clothing helps construct personal identity. Teenagers, for example, often choose styles that reflect their subcultures—whether that‘s punk, skater, minimalist, or vintage. Adults may use clothing to appear professional, confident, or creative. Even subtle changes—like wearing glasses, a watch, or a certain color—can shape how others perceive someone.
+The influence of globalization has created a fashion landscape that blends styles from around the world. Traditional clothing like the Japanese kimono or the Indian sari is now worn with modern twists, and Western trends influence streetwear in Asia, Africa, and Latin America. However, this has also led to the problem of cultural appropriation, where fashion brands borrow elements of other cultures without understanding their meaning, often for commercial gain.
+The rise of fast fashion has completely transformed how people consume clothing. Brands such as Zara, H&M, and Shein produce low-cost, trendy items at lightning speed, releasing new collections weekly. This makes fashionable clothing accessible to the average consumer. However, the environmental and ethical costs are severe. Fast fashion encourages overconsumption, and millions of garments end up in landfills each year. Factories often exploit workers in developing countries, paying extremely low wages and operating in unsafe conditions. In response, sustainable fashion is becoming more popular. Consumers are increasingly aware of how their buying habits affect the environment. Many now prefer to buy second-hand clothes, choose eco-friendly brands, or wear garments made from organic or recycled materials. Social media influencers and activists encourage the ―slow fashion‖ movement, which promotes buying fewer, higherquality pieces and keeping them longer.
+Technology is also redefining the fashion industry. 3D printing, virtual fashion shows, and AI-generated designs are changing how clothes are made and sold. Online shopping, once a novelty, is now the norm. Some retailers offer virtual tryons using augmented reality. Digital fashion—clothes that only exist online—is becoming popular among gamers and metaverse users who want to dress their avatars.
+Fashion is often criticized for promoting unrealistic beauty standards.
+Advertisements and runways have historically featured thin, tall models, excluding people with different body types, races, or disabilities. Fortunately, recent years have seen a push for greater inclusivity. Brands now include diverse models in their campaigns and create clothing lines for all sizes. While progress is slow, fashion is beginning to reflect the real-world diversity of its customers.
+Gender norms in fashion are also shifting. Unisex clothing and gender-fluid fashion are growing in popularity, challenging the traditional divide between ―men‘s‖ and ―women‘s‖ styles. Many young people see fashion as a way to express themselves freely, without being limited by outdated labels or expectations.
+School uniforms are another area where fashion meets social debate. Some argue that uniforms promote equality and reduce bullying. Others believe they restrict self-expression and make students feel controlled. While many schools in the UK, Japan, and other countries require uniforms, others take a more relaxed approach, letting students wear what they want within limits.
+In the workplace, dress codes still matter, though they are becoming more flexible. While formal suits were once the standard, many companies now allow smartcasual or even fully casual dress, especially in creative or tech industries. Some argue that how someone dresses should not affect how they are judged at work. Others believe clothing still influences professionalism and respect.
+Fashion also plays a role in protest and activism. From the black outfits of feminist movements to climate protestors wearing recycled materials, clothes can be a powerful symbol. What someone wears in public can send a message louder than words—especially in today‘s media-heavy world.
+Despite all these changes, fashion remains personal. It can bring joy, boost confidence, and help people belong. Yet it can also pressure people to conform, overspend, or feel insecure. Whether a person follows trends or ignores them, the fact remains: we all make fashion choices every day, and those choices matter more than we might think.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose of this passage is to explore fashion as a cultural and economic force that reflects identity, values, and social trends, while examining its historical role, the impact of globalization and fast fashion, technological changes, issues of inclusivity and gender norms, debates around uniforms and dress codes, its use in activism, and its personal significance in everyday life.',
+      },
+      {
+        question: 'According to the passage, what are some negative consequences of fast fashion?',
+        explanation: 'Fast fashion encourages overconsumption, with millions of garments ending up in landfills each year. Factories often exploit workers in developing countries by paying extremely low wages and operating in unsafe conditions. The environmental and ethical costs are described as severe.',
+      },
+      {
+        question: 'The word \'democratized\' in paragraph 2 most likely means?',
+        explanation: 'It most likely means made more accessible or available to a wider range of people, as the passage states that although class distinctions remain, the fashion industry has become more democratized, with trends spreading quickly through media and online platforms.',
+      },
+      {
+        question: 'What can be inferred about the slow fashion movement?',
+        explanation: 'It can be inferred that the slow fashion movement is a response to the problems of fast fashion, as it promotes buying fewer, higher-quality pieces and keeping them longer, and is encouraged by social media influencers and activists concerned about environmental and ethical impacts.',
+      },
+      {
+        question: 'According to the passage, how has fashion historically reflected social status?',
+        explanation: 'In ancient civilizations, clothing indicated status and function, with royalty wearing elaborate garments made from expensive materials while commoners had simple, practical attire. During the Renaissance, fashion in Europe was driven by nobility and used to display wealth and taste.',
+      },
+      {
+        question: 'What can be inferred about current trends in gender and fashion?',
+        explanation: 'It can be inferred that traditional gender divides in clothing are being challenged, as unisex clothing and gender-fluid fashion are growing in popularity, and many young people use fashion to express themselves freely without being limited by outdated labels or expectations.',
+      },
+    ],
+  },{
+    id: 22,
+    title: 'Diet',
+    topic: 'Health & Nutrition',
+    content: `A person‘s diet refers to the types and quantities of food they consume on a regular basis. While individual diets vary widely around the world, the choices people make about what they eat have major consequences for health, culture, the environment, and the economy.
+In recent decades, diets have changed dramatically, especially in urban and industrialized areas. Traditional meals, once based on local grains, fruits, and vegetables, have been replaced by processed foods, sugary snacks, and fast food. These new eating habits are often convenient and affordable—but they also contribute to rising rates of obesity, diabetes, heart disease, and other lifestylerelated illnesses.
+A healthy diet typically includes a balance of carbohydrates, proteins, fats, vitamins, and minerals. Nutritionists emphasize the importance of variety and moderation. For example, fruits and vegetables provide essential vitamins, while whole grains offer fiber and slow-release energy. Proteins—whether from meat, fish, beans, or tofu—support growth and repair. Fats are needed too, but in small amounts and ideally from sources like nuts, seeds, or olive oil.
+Despite this knowledge, many people struggle to maintain a nutritious diet. One reason is marketing. Food companies invest billions in advertising unhealthy products, especially to children. Supermarkets place sweets and snacks near checkouts to increase impulse buying. Meanwhile, healthy foods like fresh produce are often more expensive and less accessible, especially in low-income areas. Cultural habits and social pressures also shape diet. In some cultures, large portions or meat-heavy meals are associated with hospitality or wealth. Religious rules may forbid certain foods. In others, slimness is idealized, leading to restrictive dieting or eating disorders. Because food is so closely tied to identity, changing diet can be difficult—even when people know it would benefit their health.
+Another growing concern is the environmental cost of modern diets. Livestock farming produces large amounts of greenhouse gases, especially methane. Forests are cut down to grow animal feed. Overfishing threatens marine life. As a result, many environmentalists and scientists support plant-based diets. Reducing meat and dairy consumption, even slightly, can lower one‘s carbon footprint significantly.
+Governments and public health agencies have tried to improve national diets through various strategies. These include:
+•        Food labeling laws that show sugar, salt, and fat content
+•        Public awareness campaigns encouraging five portions of fruits and vegetables a day
+•        School lunch reforms to promote healthier eating habits from a young age
+•        Taxation on sugary drinks or junk food to discourage overconsumption Some countries, like Japan and the Mediterranean nations, still maintain diets linked to longer life expectancy. These diets tend to be rich in vegetables, fish, rice or grains, and relatively low in red meat and sugar. Studies suggest that diet may be the single most important lifestyle factor in predicting long-term health—more so than exercise, sleep, or even genetics.
+Technology has also affected the way people eat. Online food delivery apps allow people to order meals in minutes. While this is convenient, it often promotes fast food over home cooking. Meanwhile, social media is filled with influencers promoting extreme diets, detox plans, or supplements without scientific support. This makes it harder for the public to know what to trust.
+Intermittent fasting, keto, paleo, veganism—these are just a few of the popular diets that have gained attention in recent years. While some people report benefits, such diets are not suitable for everyone. Experts generally recommend a balanced, flexible approach rather than strict rules, unless there is a medical reason.
+Another trend is the rise of functional foods—items with added health benefits, like probiotic yogurt or fortified cereal. These are marketed as improving digestion, boosting immunity, or enhancing brain power. While some claims are backed by science, others are exaggerated or misleading.
+For athletes or people with special conditions (e.g. diabetes, allergies, pregnancy), dietary needs become even more specific. Sports nutrition, for example, focuses on timing meals around performance, while diabetic patients must control blood sugar through careful meal planning.
+Education plays a vital role in changing dietary behavior. People who understand the long-term effects of their choices are more likely to cook at home, read labels, and choose healthier options. Yet in many countries, basic nutrition is not taught in schools, leaving young people unprepared to make informed decisions about food. Finally, there is a social side to diet. Sharing meals with family or friends has emotional and psychological benefits. People tend to eat more slowly and healthily when they dine together. In contrast, eating alone, while watching screens, can lead to mindless overeating and poor digestion.
+In conclusion, diet is not simply about calories or nutrients—it is connected to almost every aspect of human life: culture, health, the planet, and even how we feel day to day. While no single diet is perfect for everyone, one truth remains: what we eat shapes who we are, and the better we eat, the better we live.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose is to explain what diet is, how modern diets have changed and their health and environmental consequences, the challenges of maintaining a healthy diet, and the cultural, social, and policy factors that influence what people eat.',
+      },
+      {
+        question: 'According to the passage, what has replaced traditional meals in many urban and industrialized areas?',
+        explanation: 'Traditional meals based on local grains, fruits, and vegetables have been replaced by processed foods, sugary snacks, and fast food.',
+      },
+      {
+        question: 'The word \'moderation\' in the third paragraph most likely means...',
+        explanation: 'Avoiding extremes and consuming foods in reasonable amounts. Nutritionists emphasize variety and moderation as key principles of a healthy diet that balances carbohydrates, proteins, fats, vitamins, and minerals.',
+      },
+      {
+        question: 'What can be inferred about the environmental impact of modern diets?',
+        explanation: 'Modern diets, especially those high in meat and dairy, contribute significantly to greenhouse gas emissions, deforestation for animal feed, and overfishing, so reducing meat and dairy consumption can lower one\'s carbon footprint.',
+      },
+      {
+        question: 'According to the passage, what strategies have governments used to improve national diets?',
+        explanation: 'Strategies include food labeling laws showing sugar, salt, and fat content; public awareness campaigns encouraging five portions of fruits and vegetables a day; school lunch reforms; and taxation on sugary drinks or junk food.',
+      },
+      {
+        question: 'The phrase \'functional foods\' in the tenth paragraph most likely means...',
+        explanation: 'Foods that have been enhanced with additional health benefits, such as probiotic yogurt or fortified cereal, which are marketed as improving digestion, immunity, or brain function.',
+      },
+      {
+        question: 'What can be inferred about popular diets such as intermittent fasting, keto, or veganism?',
+        explanation: 'While some people report benefits, these diets are not suitable for everyone, and experts generally recommend a balanced, flexible approach rather than strict rules unless there is a medical reason.',
+      },
+      {
+        question: 'According to the passage, why do many people struggle to maintain a nutritious diet?',
+        explanation: 'Reasons include heavy marketing of unhealthy products, placement of sweets near checkouts, higher cost and lower accessibility of healthy foods in low-income areas, and cultural habits or social pressures tied to food and identity.',
+      },
+      {
+        question: 'What can be inferred about the role of education in dietary behavior?',
+        explanation: 'People who understand the long-term effects of their food choices are more likely to cook at home, read labels, and choose healthier options, yet basic nutrition is often not taught in schools, leaving young people unprepared.',
+      },
+      {
+        question: 'According to the passage, how does sharing meals with others affect eating habits?',
+        explanation: 'Sharing meals with family or friends has emotional and psychological benefits; people tend to eat more slowly and healthily when they dine together, whereas eating alone while watching screens can lead to mindless overeating and poor digestion.',
+      },
+    ],
+  },{
+    id: 23,
+    title: 'Obesity',
+    topic: 'Health & Science',
+    content: `Obesity is a growing global health crisis. It is defined as having excessive body fat that may impair health, usually measured using the Body Mass Index (BMI). A BMI over 30 is considered obese. Although once common only in wealthier countries, obesity is now rising sharply in both developed and developing nations. The causes of obesity are complex. While genetics may influence body shape or metabolism, the main drivers are poor diet and lack of physical activity. Many people consume far more calories than they burn. Highly processed foods—rich in sugar, fat, and salt—are cheap, convenient, and heavily marketed. At the same time, daily routines have become more sedentary. Desk jobs, screen time, and carbased lifestyles have drastically reduced physical movement.
+Obesity increases the risk of serious diseases. These include type 2 diabetes, heart disease, high blood pressure, stroke, and even some cancers. In fact, obesity is now one of the leading preventable causes of death worldwide. Children who are obese are also more likely to suffer from joint problems, low self-esteem, and bullying at school.
+What makes obesity particularly challenging is that it is often linked to social, economic, and environmental factors. In low-income communities, healthy food is often more expensive and harder to access. Fast food chains, meanwhile, are easily available and affordable. Public spaces may lack safe areas for walking, biking, or exercising. In this way, obesity is not simply a personal issue but a public one.
+Governments have taken a variety of steps to address the obesity epidemic. Some countries have introduced a sugar tax on soft drinks to discourage overconsumption. Others have banned junk food advertising targeted at children. In schools, healthier meals are being promoted and physical education is being strengthened. Yet despite these efforts, obesity rates continue to climb in many areas.
+Experts suggest that public education must be combined with structural changes. Teaching people about calories and nutrition is useful—but not enough. People also need access to healthy, affordable food and safe spaces for exercise. Urban planning, workplace wellness programs, and food labeling laws all play a role.
+There is also disagreement about how obesity should be discussed. Some health campaigns use fear-based messages, showing graphic images of disease. Critics argue that this approach promotes fat-shaming and increases stigma. They point out that mental health and emotional eating are often overlooked in obesity discussions. Instead of blame, they call for compassion-based health promotion that supports people in making long-term lifestyle changes.
+Another controversy surrounds the body positivity movement, which promotes acceptance of all body types. Supporters say it helps reduce shame and encourages self-confidence, especially among young people. However, some argue that it may also normalize unhealthy weight and distract from the real medical risks linked to obesity.
+Technology has created both problems and solutions. On one hand, screen-based entertainment keeps people inactive for long hours. Food delivery apps increase the convenience of fast food. On the other hand, fitness trackers, health apps, and online coaching can help people monitor their diet and activity. When used wisely, technology can support healthier lifestyles.
+The food industry also plays a key role. Many companies now offer ―lighter‖ menu options or publish calorie information. However, some critics accuse the industry of greenwashing—pretending to care about health while continuing to push unhealthy products. Without strong regulations, profit often outweighs public health.
+In the case of children, parents have a major responsibility. Family habits around meals, snacks, screen time, and physical activity strongly influence a child‘s weight. Experts advise parents to lead by example—cooking at home, limiting junk food, and encouraging outdoor play. Schools can also help by integrating food education and regular exercise into the curriculum.
+Obesity is not only a health problem—it is an economic burden. Countries spend billions every year treating obesity-related illnesses. Productivity is reduced when people are too unwell to work. Insurance systems, hospitals, and employers all face rising costs. Long-term, preventing obesity could save far more money than treating it.
+One key question remains: is obesity a personal failure, or a result of a broken system? While individuals are responsible for their choices, those choices are shaped by environment, culture, and policy. It is increasingly clear that solving obesity requires a collective effort—from individuals, families, businesses, governments, and healthcare providers.
+In conclusion, obesity is not caused by laziness or lack of willpower. It is a complex, multi-layered problem driven by modern food systems, inactive lifestyles, and social inequalities. Addressing it will require more than just diet advice—it demands a serious, coordinated response across all levels of society. Until that happens, obesity will remain one of the most urgent health threats of our time.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose is to examine obesity as a complex global health crisis, outlining its definition, causes, health and economic consequences, social and environmental factors, government and industry responses, related controversies, and the need for a coordinated societal effort rather than individual blame.',
+      },
+      {
+        question: 'According to the passage, how is obesity usually measured and defined?',
+        explanation: 'Obesity is defined as having excessive body fat that may impair health and is usually measured using the Body Mass Index (BMI); a BMI over 30 is considered obese.',
+      },
+      {
+        question: 'The word "sedentary" in the first paragraph most likely means',
+        explanation: 'In the context of daily routines becoming more sedentary due to desk jobs, screen time, and car-based lifestyles that reduce physical movement, the word means involving little physical activity or characterized by sitting and inactivity.',
+      },
+      {
+        question: 'What can be inferred about the causes of obesity from the passage?',
+        explanation: 'While genetics may play a role, the main drivers are poor diet (especially highly processed foods) and lack of physical activity; social, economic, and environmental factors such as limited access to healthy food and safe exercise spaces also contribute, making obesity more than just a personal issue.',
+      },
+      {
+        question: 'According to the passage, what are some health risks associated with obesity?',
+        explanation: 'Obesity increases the risk of type 2 diabetes, heart disease, high blood pressure, stroke, and some cancers; it is one of the leading preventable causes of death worldwide, and obese children are more likely to face joint problems, low self-esteem, and bullying.',
+      },
+      {
+        question: 'The term "greenwashing" in the ninth paragraph most likely means',
+        explanation: 'In the context of critics accusing the food industry of greenwashing by pretending to care about health while continuing to push unhealthy products, the term means making misleading or false claims about being environmentally or health-conscious to improve public image.',
+      },
+      {
+        question: 'What can be inferred about the body positivity movement from the passage?',
+        explanation: 'Supporters believe it reduces shame and builds self-confidence, especially for young people, by promoting acceptance of all body types; however, critics argue it may normalize unhealthy weight and divert attention from the medical risks of obesity.',
+      },
+      {
+        question: 'According to the passage, what steps have governments taken to address obesity?',
+        explanation: 'Some countries have introduced a sugar tax on soft drinks, banned junk food advertising aimed at children, promoted healthier school meals, and strengthened physical education; experts also stress the need for structural changes like better access to healthy food and safe exercise spaces.',
+      },
+      {
+        question: 'What can be inferred about the role of technology in relation to obesity?',
+        explanation: 'Technology contributes to the problem through screen-based inactivity and food delivery apps that increase fast-food convenience, but it can also help via fitness trackers, health apps, and online coaching that support monitoring diet and activity when used wisely.',
+      },
+      {
+        question: 'According to the passage, why is obesity described as an economic burden?',
+        explanation: 'Countries spend billions treating obesity-related illnesses, productivity falls when people are too unwell to work, and insurance systems, hospitals, and employers face rising costs; preventing obesity could save far more money in the long term than treating it.',
+      },
+    ],
+  },{
+    id: 24,
+    title: 'Aging',
+    topic: 'Society & Culture',
+    content: `Aging is a natural biological process that affects all living organisms. For humans, it involves a gradual decline in physical and sometimes mental function over time. While many associate aging with wrinkles, gray hair, or frailty, the truth is that aging has far deeper social, economic, and medical implications, especially as global life expectancy continues to rise.
+Thanks to modern healthcare, improved nutrition, and safer working conditions, people now live much longer than in the past. In many countries, the average life expectancy exceeds 80 years. However, living longer does not always mean living healthier. Aging is often accompanied by chronic diseases such as arthritis, diabetes, dementia, or heart conditions, which require ongoing care and support.
+This shift in demographics has led to what experts call an ―aging population‖—a situation where a growing percentage of a country‘s people are over the age of 65. Japan, Italy, and Germany are notable examples. In such societies, the workforce shrinks while the number of retired people grows. This creates challenges for pension systems, healthcare services, and economic productivity.
+Governments are under pressure to adapt. In many countries, retirement ages are being raised to reduce pressure on pension funds. Some countries also offer incentives for older adults to stay in the labor force longer. Meanwhile, healthcare systems must prepare for a surge in age-related diseases. Elderly care, both at home and in institutions, requires trained professionals, accessible housing, and social support systems.
+Aging is not only a burden—it also offers opportunities. Older adults bring experience, wisdom, and emotional stability. Many contribute to society by volunteering, mentoring, or helping raise grandchildren. In fact, research shows that intergenerational contact—when young and old people interact regularly—can reduce loneliness and increase empathy across age groups.
+Despite this, ageism remains a serious issue. Older people are often seen as slow, outdated, or incapable, particularly in technology-driven workplaces. Age-based discrimination can prevent capable individuals from finding work or being promoted. This not only harms individuals but also wastes valuable skills in the labor market.
+In the field of science, researchers are exploring how and why we age. Some theories focus on genetic programming, while others highlight damage from free radicals or the shortening of telomeres (protective caps at the ends of DNA strands). Anti-aging research has become a booming industry, with companies offering supplements, gene therapies, and even cryopreservation in the hope of extending human lifespan.
+However, critics warn that this obsession with staying young may ignore deeper questions. Instead of asking how to avoid aging, perhaps society should focus on how to age with dignity, purpose, and support. Mental health in older adults is one key area often overlooked. Depression, anxiety, and isolation are common but underdiagnosed, especially among those who live alone or have lost a spouse.
+One concept gaining popularity is ―active aging‖, which promotes staying physically, mentally, and socially active in later life. Activities like walking, learning new skills, socializing, or volunteering can improve quality of life. Governments and communities are now investing in age-friendly programs and infrastructure—like public benches, elevator access, and adult learning courses—to support active lifestyles.
+Technology, too, can help. From telemedicine to smart home devices, innovations are enabling older adults to live independently for longer. Simple tools—like pill reminders, fall detectors, or video calls—can bridge the gap between independence and care. However, digital literacy remains a barrier, as many elderly people struggle to use smartphones or apps without proper training.
+Family remains the main source of elderly care in many cultures. In countries like India or Uzbekistan, it is common for multiple generations to live under one roof. While this strengthens family ties, it can also put financial and emotional stress on caregivers. In Western societies, by contrast, many elderly people live alone or in care facilities, which may result in social isolation.
+Economically, the aging population has both negative and positive effects. On one hand, healthcare and pensions become more expensive. On the other, the so-called ―silver economy‖—goods and services aimed at older consumers—is booming.
+Travel, healthcare, insurance, wellness, and entertainment tailored to older adults are fast-growing markets.
+Culturally, aging is viewed very differently around the world. In East Asia, older people are traditionally respected and cared for by younger generations. In contrast, Western culture often celebrates youth and views aging as something to hide. Media representation plays a major role in shaping these attitudes. Portraying elderly people as active, intelligent, and capable can change how society views the aging process.
+In conclusion, aging is inevitable—but how we handle it is not. As the world‘s population grows older, societies must rethink healthcare, employment, housing, and social values. By embracing aging rather than fearing it, we can build a world where people live not just longer lives, but better ones. After all, growing old is a privilege many never reach—and it deserves to be treated with care and respect.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The passage examines the biological, social, economic, and cultural aspects of aging, highlighting both challenges and opportunities while arguing that societies should focus on aging with dignity and support rather than merely avoiding it.',
+      },
+      {
+        question: 'According to the passage, what is an "aging population"?',
+        explanation: 'An aging population is a demographic situation in which a growing percentage of a country\'s people are over the age of 65, as seen in countries like Japan, Italy, and Germany.',
+      },
+      {
+        question: 'The word "ageism" in the sixth paragraph most likely means',
+        explanation: 'In context, ageism refers to discrimination or prejudice against older people based on stereotypes that they are slow, outdated, or incapable.',
+      },
+      {
+        question: 'What can be inferred about the economic impact of an aging population?',
+        explanation: 'While an aging population increases costs for healthcare and pensions, it also creates opportunities through the growing "silver economy" of goods and services targeted at older consumers.',
+      },
+      {
+        question: 'According to the passage, what is "active aging"?',
+        explanation: 'Active aging is a concept that promotes remaining physically, mentally, and socially active in later life through activities such as walking, learning new skills, socializing, or volunteering to improve quality of life.',
+      },
+      {
+        question: 'What can be inferred about intergenerational contact from the passage?',
+        explanation: 'Regular interaction between young and old people can reduce loneliness among the elderly and increase empathy across age groups.',
+      },
+      {
+        question: 'According to the passage, how do cultural views of aging differ?',
+        explanation: 'In East Asia, older people are traditionally respected and cared for by younger generations, whereas Western culture often celebrates youth and treats aging as something to hide.',
+      },
+      {
+        question: 'The word "telomeres" in the seventh paragraph most likely refers to',
+        explanation: 'Telomeres are described as protective caps at the ends of DNA strands whose shortening is one theory related to the aging process.',
+      },
+      {
+        question: 'What can be inferred about technology\'s role in elderly care?',
+        explanation: 'Innovations such as telemedicine, smart home devices, pill reminders, and fall detectors can help older adults live independently longer, though limited digital literacy remains a barrier for many.',
+      },
+      {
+        question: 'According to the passage, why is mental health in older adults often overlooked?',
+        explanation: 'Depression, anxiety, and isolation are common among older adults, especially those living alone or who have lost a spouse, yet these issues are frequently underdiagnosed.',
+      },
+    ],
+  },{
+    id: 25,
+    title: 'Stress',
+    topic: 'Health & Science',
+    content: `Stress is a natural physical and emotional response to challenging or threatening situations. While it can sometimes be helpful—motivating people to focus, act quickly, or meet deadlines—chronic stress can have serious consequences for both mental and physical health. In today‘s fast-paced world, stress has become a widespread issue across all age groups.
+Stress is often caused by external pressures such as work, school, relationships, financial difficulties, or health problems. It can also result from internal factors, such as perfectionism, fear of failure, or negative self-talk. Each person responds to stress differently. What feels overwhelming to one person might seem manageable to another.
+When the brain perceives a threat, it activates the ―fight-or-flight‖ response, releasing hormones like adrenaline and cortisol. These chemicals increase heart rate, sharpen focus, and prepare the body to react. This response was useful for early humans facing danger in the wild. However, when the body remains in a state of alert for too long, it leads to exhaustion, anxiety, depression, sleep problems, and weakened immunity.
+One major source of stress today is work. Employees face long hours, tight deadlines, constant emails, and fear of losing their jobs. In competitive industries, the pressure to perform can lead to burnout—a condition marked by emotional exhaustion, detachment, and reduced effectiveness. Some companies now offer wellness programs or mental health support to reduce workplace stress, but not all employers recognize its seriousness.
+Academic stress is also on the rise. Students worry about grades, exams, future careers, and social acceptance. In some countries, pressure from parents or teachers can be intense, especially when education is linked to social status. High-stakes testing environments often prioritize results over well-being, leaving little room for rest, creativity, or emotional growth.
+Technology plays a complex role in stress. On one hand, it improves convenience and access to information. On the other, it can create constant distractions and pressure to stay connected. Many people check work messages late at night, struggle to disconnect from social media, or compare themselves to unrealistic online images. This digital overload contributes to mental fatigue, low self-esteem, and a feeling of never being ―enough.‖
+There are also societal factors. In fast-moving economies, people often link selfworth to productivity. Taking breaks, resting, or asking for help is sometimes seen as weakness. This toxic culture of overachievement encourages people to ignore early warning signs of stress until it turns into a crisis.
+Physical health suffers too. Chronic stress has been linked to heart disease, obesity, diabetes, and digestive issues. It affects sleep patterns and appetite. Many people cope by smoking, drinking, or overeating—behaviors that provide short-term relief but worsen health long-term. The mind and body are deeply connected; treating one without the other is rarely effective.
+Fortunately, stress can be managed. Experts recommend a combination of strategies, including:
+•        Regular physical activity, which reduces stress hormones and boosts mood
+•        Mindfulness and meditation, which help calm the mind and increase awareness
+•        Healthy eating, which supports brain function and energy levels
+•        Social support, whether through friends, family, or counseling
+•        Time management skills, such as prioritizing tasks and setting boundaries Small daily habits—like getting enough sleep, spending time in nature, or keeping a gratitude journal—can also reduce stress levels. For severe stress or trauma, professional help may be necessary. Cognitive-behavioral therapy (CBT) is one evidence-based method that helps people reframe negative thought patterns and develop healthier coping mechanisms.
+Schools and workplaces are beginning to recognize the need for mental health education and emotional resilience training. Teaching young people how to handle failure, regulate emotions, and ask for help is key to long-term well-being. Meanwhile, companies that support mental health often see better productivity, lower turnover, and stronger employee satisfaction.
+Another growing concept is ―stress resilience‖—the ability to adapt and recover from adversity. Some people are naturally more resilient, but resilience can also be developed. Having a purpose, staying flexible, and learning from failure are important traits that help people bounce back under pressure.
+In many cultures, talking about stress or mental health is still taboo. This makes it harder for individuals to seek help or admit they are struggling. Changing these attitudes requires open conversation, public education, and media representation that breaks down stereotypes and normalizes vulnerability.
+It‘s also important to note that not all stress is bad. Short-term or ―acute‖ stress can sharpen focus and improve performance in situations like interviews, sports, or public speaking. The goal is not to eliminate all stress, but to manage it so it doesn‘t become harmful.
+In conclusion, stress is a normal part of life—but when unmanaged, it can damage our health, relationships, and happiness. As modern life grows more demanding, learning how to handle stress is no longer optional—it‘s a survival skill. By understanding its causes and practicing healthy coping strategies, individuals and societies can build greater emotional strength, balance, and peace of mind.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The passage explains what stress is, its causes and effects on mental and physical health, the roles of work, academics, technology, and society, and outlines management strategies and the concept of resilience, concluding that managing stress is essential in modern life.',
+      },
+      {
+        question: 'According to the passage, what happens when the brain perceives a threat?',
+        explanation: 'The passage states that the brain activates the ―fight-or-flight‖ response, releasing hormones like adrenaline and cortisol that increase heart rate, sharpen focus, and prepare the body to react.',
+      },
+      {
+        question: 'The word \"burnout\" in the passage most likely means',
+        explanation: 'In context, \"burnout\" is described as a condition marked by emotional exhaustion, detachment, and reduced effectiveness resulting from prolonged workplace pressure.',
+      },
+      {
+        question: 'What can be inferred about the role of technology in stress?',
+        explanation: 'The passage indicates that while technology improves convenience, it also creates constant distractions, pressure to stay connected, and digital overload that contributes to mental fatigue, low self-esteem, and feelings of inadequacy.',
+      },
+      {
+        question: 'According to the passage, how does chronic stress affect physical health?',
+        explanation: 'The passage links chronic stress to heart disease, obesity, diabetes, and digestive issues, and notes that it affects sleep patterns and appetite.',
+      },
+      {
+        question: 'The word \"resilience\" in the phrase \"stress resilience\" most likely means',
+        explanation: 'The passage defines \"stress resilience\" as the ability to adapt and recover from adversity, noting that it can be developed through purpose, flexibility, and learning from failure.',
+      },
+      {
+        question: 'What can be inferred about societal attitudes toward stress and mental health?',
+        explanation: 'The passage states that in many cultures talking about stress or mental health is still taboo, which makes it harder for individuals to seek help, and that changing these attitudes requires open conversation, public education, and media representation.',
+      },
+      {
+        question: 'According to the passage, which strategies do experts recommend for managing stress?',
+        explanation: 'The passage lists regular physical activity, mindfulness and meditation, healthy eating, social support, and time management skills, along with small daily habits and professional help such as CBT when needed.',
+      },
+      {
+        question: 'What can be inferred about short-term or acute stress?',
+        explanation: 'The passage notes that not all stress is bad and that short-term or \"acute\" stress can sharpen focus and improve performance in situations like interviews, sports, or public speaking, so the goal is management rather than elimination.',
+      },
+      {
+        question: 'According to the passage, why is learning to handle stress considered a survival skill?',
+        explanation: 'The passage concludes that as modern life grows more demanding, unmanaged stress can damage health, relationships, and happiness, making the ability to handle stress essential rather than optional.',
+      },
+    ],
+  },{
+    id: 26,
+    title: 'Smoking',
+    topic: 'Health & Science',
+    content: `Smoking, particularly tobacco use, is one of the leading causes of preventable death worldwide. It is responsible for millions of deaths each year and contributes to a wide range of serious health problems. Despite decades of public health campaigns, smoking remains a major global issue, especially in low- and middleincome countries.
+Tobacco contains nicotine, a highly addictive chemical that stimulates the brain and creates a temporary feeling of pleasure or relaxation. Because of its addictive nature, quitting smoking can be extremely difficult—even when people are aware of its dangers. Once a person becomes dependent on nicotine, both physical cravings and psychological habits make quitting a challenge.
+Cigarettes are the most common form of tobacco consumption, but other products like cigars, pipes, chewing tobacco, and, more recently, e-cigarettes (or vapes) are also widely used. All of these products contain harmful substances. Cigarette smoke, for example, contains over 7,000 chemicals—many of them toxic, and at least 70 known to cause cancer.
+The health consequences of smoking are severe. It increases the risk of lung cancer, heart disease, stroke, chronic bronchitis, and many other conditions. Smoking also affects reproductive health, weakens the immune system, and accelerates aging. Secondhand smoke, which occurs when non-smokers inhale smoke from nearby smokers, also poses significant risks—especially to children and pregnant women.
+Despite these facts, smoking remains popular for several reasons. In many societies, smoking is linked to social identity, rebellion, or relaxation.
+Advertising—especially in the past—portrayed smoking as glamorous, masculine, or sophisticated. Although tobacco advertising is now banned in many countries, its historical influence still lingers. Peer pressure, stress, and curiosity also play a role in getting people started.
+Governments and health organizations have implemented a wide range of measures to reduce smoking rates. These include:
+•        Raising tobacco taxes, which makes cigarettes more expensive and less accessible
+•        Banning smoking in public places, such as restaurants, offices, and public transport
+•        Requiring graphic health warnings on cigarette packages
+•        Running public awareness campaigns that highlight the dangers of smoking
+•        Offering support programs for people who want to quit, such as counseling or nicotine replacement therapy
+These strategies have proven effective in many countries. For example, in the UK and Australia, smoking rates have declined significantly over the last two decades. However, in some developing countries, tobacco use continues to rise—partly due to weak regulations and aggressive marketing by tobacco companies.
+A more recent development is the rise of electronic cigarettes, or vaping devices. These are often marketed as safer alternatives to smoking. While vaping does not involve burning tobacco, the health risks are still being studied. Some experts argue that vaping may help smokers quit. Others worry that e-cigarettes could become a gateway to nicotine addiction among young people, especially since many products come in sweet flavors and colorful packaging.
+One of the major challenges in combating smoking is the influence of the tobacco industry, which is extremely powerful and profitable. Tobacco companies often lobby against stricter laws and fund misleading research. In some cases, they sponsor events, sports, or charities to improve their public image. Critics argue that these strategies distract attention from the true health impact of their products. Smoking is not only a personal health issue—it also has economic and environmental consequences. Treating smoking-related diseases costs healthcare systems billions of dollars each year. Lost productivity due to illness or early death adds to this burden. Environmentally, cigarette production and consumption contribute to deforestation, pollution, and littering. Cigarette butts are one of the most common forms of plastic waste in the world.
+Another concern is youth smoking. Studies show that most adult smokers began before the age of 18. Preventing young people from starting is key to reducing long-term smoking rates. Many experts recommend education programs in schools, stricter age restrictions, and removing flavored tobacco products from the market.
+Some people argue that smoking is a personal choice and that governments should not interfere. However, because smoking harms not only the smoker but also the wider public, most countries treat it as a public health issue. Just as laws exist to ensure food safety or clean water, restrictions on tobacco aim to protect society as a whole.
+In conclusion, smoking remains one of the most dangerous yet preventable threats to global health. While progress has been made through legislation, education, and public campaigns, challenges persist—especially with new products like e-cigarettes and the ongoing influence of the tobacco industry. To create a smokefree future, society must combine strict policies, support for quitting, and a cultural shift away from nicotine dependence.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose is to describe the health risks of smoking, the reasons it persists, government measures to reduce it, challenges from the tobacco industry and e-cigarettes, and the need for continued efforts toward a smoke-free future.',
+      },
+      {
+        question: 'According to the passage, why is quitting smoking extremely difficult?',
+        explanation: 'Quitting is extremely difficult because nicotine is highly addictive, creating physical cravings and psychological habits even when people know the dangers.',
+      },
+      {
+        question: 'The word "gateway" in the paragraph about e-cigarettes most likely means...',
+        explanation: 'In the context of the passage, "gateway" means something that can lead or open the way to nicotine addiction among young people.',
+      },
+      {
+        question: 'What can be inferred about secondhand smoke?',
+        explanation: 'It can be inferred that secondhand smoke is harmful to non-smokers, particularly children and pregnant women, because it exposes them to the same toxic chemicals present in cigarette smoke.',
+      },
+      {
+        question: 'According to the passage, what measures have governments used to reduce smoking rates?',
+        explanation: 'Governments have raised tobacco taxes, banned smoking in public places, required graphic health warnings on packages, run public awareness campaigns, and offered support programs such as counseling or nicotine replacement therapy.',
+      },
+      {
+        question: 'The word "lingers" in the fifth paragraph most likely means...',
+        explanation: 'In the context of the passage, "lingers" means continues to remain or have an effect, referring to the lasting historical influence of tobacco advertising.',
+      },
+      {
+        question: 'What can be inferred about the tobacco industry\'s role in the smoking problem?',
+        explanation: 'It can be inferred that the tobacco industry actively works against stricter regulations through lobbying, funding misleading research, and improving its public image, which hinders efforts to reduce smoking.',
+      },
+      {
+        question: 'According to the passage, why is preventing youth smoking especially important?',
+        explanation: 'Preventing youth smoking is key because studies show that most adult smokers began before the age of 18, so stopping young people from starting helps reduce long-term smoking rates.',
+      },
+      {
+        question: 'What can be inferred about the economic impact of smoking?',
+        explanation: 'It can be inferred that smoking places a heavy financial burden on society through high healthcare costs for treating related diseases and lost productivity from illness or early death.',
+      },
+      {
+        question: 'According to the passage, how do most countries view smoking in terms of policy?',
+        explanation: 'Most countries treat smoking as a public health issue rather than purely a personal choice, because it harms both the smoker and the wider public, justifying restrictions similar to those for food safety or clean water.',
+      },
+    ],
+  },{
+    id: 27,
+    title: 'Addiction',
+    topic: 'Health & Society',
+    content: `Addiction is a condition in which a person is unable to stop engaging in a behavior or using a substance, despite harmful consequences. It affects the brain‘s reward system, making the person feel temporary pleasure or relief, followed by a cycle of craving, use, and withdrawal. While addiction was once seen mainly as a moral weakness, it is now recognized as a complex medical and psychological disorder. There are two main categories of addiction: substance addiction and behavioral addiction. Substance addiction includes drugs, alcohol, and nicotine. Behavioral addictions involve activities such as gambling, gaming, shopping, or even internet use. Although these may seem less dangerous, they can still lead to serious consequences—financial ruin, broken relationships, depression, and even suicide. Addiction often begins with curiosity or social influence. A teenager may start smoking to fit in, or a stressed worker may drink alcohol to relax. Over time, the brain adapts, and the person needs more of the substance or activity to feel the same effect. This tolerance leads to dependence, and eventually, the person feels unable to function without it.
+The causes of addiction are both biological and environmental. Genetics play a role—some people are more vulnerable due to their brain chemistry. Childhood trauma, neglect, or growing up in an environment where addiction is common can also increase the risk. Mental health conditions, such as anxiety, depression, or PTSD, often occur alongside addiction, making recovery even more difficult.
+One of the most harmful forms of addiction is opioid dependence. Opioids are powerful painkillers, including morphine, heroin, and fentanyl. In countries like the United States, overprescription of these drugs has led to a major health crisis. Thousands of people have died from overdoses. Families, communities, and entire healthcare systems have been deeply affected.
+The rise of technology addiction is another growing concern. Many people, especially young adults, spend hours each day on social media, video games, or streaming platforms. While not physically harmful, these behaviors can lead to social isolation, poor sleep, and a decline in academic or work performance. In some countries, digital detox centers have been created to help people disconnect. Addiction not only affects the individual—it also impacts families, workplaces, and society at large. Family members often suffer emotional distress, financial problems, or abuse. Employers face lost productivity and higher medical costs. Healthcare systems struggle with rising demand for treatment, especially in areas with limited resources.
+Treating addiction is a long and complex process. Detoxification (removing the substance from the body) is often the first step, followed by therapy or medication. Cognitive-behavioral therapy (CBT) helps individuals recognize and change harmful thought patterns. Support groups, such as Alcoholics Anonymous (AA), provide a sense of community and shared understanding.
+In some cases, medication is used to reduce cravings or block the effects of drugs. For example, methadone is often prescribed for heroin addicts. However, treatment must be long-term and holistic. Without addressing the root causes—such as trauma, poverty, or mental illness—relapse is likely. Recovery is rarely a straight line; it requires patience, support, and access to ongoing care.
+Stigma remains a major barrier. Many people still view addiction as a choice or a failure of willpower. This attitude discourages people from seeking help and increases feelings of shame. Changing public opinion is key—addiction should be treated like any other health condition, with compassion and medical care.
+Governments have responded to addiction in different ways. Some follow a punitive approach, focusing on criminal punishment. Others emphasize harm reduction, which includes clean needle programs, safe injection sites, and access to therapy. Portugal, for example, decriminalized drug use in 2001 and invested heavily in treatment. Since then, drug-related deaths and HIV infections have dropped sharply.
+Prevention is just as important as treatment. Schools can provide education on the risks of substance abuse. Parents can model healthy coping skills and monitor their children‘s behavior. Media can play a role too—responsible portrayal of addiction can reduce stigma and promote understanding.
+Addiction is a deeply human problem. It reveals how people deal with pain, stress, and disconnection. As society becomes faster, more pressured, and more digital, the risk of addiction grows. The question is not whether we will face it—but how we will respond.
+In conclusion, addiction is not limited to drugs or alcohol. It can take many forms and affect anyone, regardless of age, background, or wealth. Tackling addiction requires more than just willpower—it demands social support, medical care, education, and a shift in mindset. To truly overcome it, society must stop blaming and start helping.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose of the passage is to explain addiction as a complex medical and psychological disorder, covering its types, causes, effects, treatment approaches, stigma, prevention, and the need for a compassionate societal response.',
+      },
+      {
+        question: 'According to the passage, what are the two main categories of addiction?',
+        explanation: 'According to the passage, the two main categories of addiction are substance addiction, which includes drugs, alcohol, and nicotine, and behavioral addiction, which involves activities such as gambling, gaming, shopping, or internet use.',
+      },
+      {
+        question: 'The word "tolerance" in the first paragraph most likely means',
+        explanation: 'In the context of the first paragraph, "tolerance" refers to the process by which the brain adapts so that a person needs more of the substance or activity to feel the same effect, leading to dependence.',
+      },
+      {
+        question: 'What can be inferred about the relationship between mental health and addiction?',
+        explanation: 'It can be inferred that mental health conditions such as anxiety, depression, or PTSD often occur alongside addiction and make recovery more difficult, indicating a complex interplay between the two.',
+      },
+      {
+        question: 'According to the passage, what has contributed to the opioid crisis in the United States?',
+        explanation: 'According to the passage, overprescription of powerful painkillers such as morphine, heroin, and fentanyl has led to a major health crisis involving thousands of overdose deaths and widespread effects on families, communities, and healthcare systems.',
+      },
+      {
+        question: 'The word "stigma" in the seventh paragraph most likely means',
+        explanation: 'In the context of the seventh paragraph, "stigma" means a mark of shame or negative social attitude that views addiction as a choice or failure of willpower, discouraging people from seeking help.',
+      },
+      {
+        question: 'What can be inferred about Portugal‘s approach to drug use?',
+        explanation: 'It can be inferred that Portugal‘s shift to decriminalization and investment in treatment since 2001 has been effective, as evidenced by sharp drops in drug-related deaths and HIV infections, supporting a harm-reduction model over purely punitive measures.',
+      },
+      {
+        question: 'According to the passage, why must addiction treatment be long-term and holistic?',
+        explanation: 'According to the passage, treatment must be long-term and holistic because without addressing root causes such as trauma, poverty, or mental illness, relapse is likely, and recovery requires patience, support, and ongoing care.',
+      },
+      {
+        question: 'What can be inferred about the impact of technology addiction?',
+        explanation: 'It can be inferred that although technology addiction is not physically harmful like substance abuse, it can still cause serious problems including social isolation, poor sleep, and declines in academic or work performance, prompting the creation of digital detox centers in some countries.',
+      },
+      {
+        question: 'According to the passage, what roles can schools, parents, and media play in preventing addiction?',
+        explanation: 'According to the passage, schools can educate on the risks of substance abuse, parents can model healthy coping skills and monitor behavior, and media can responsibly portray addiction to reduce stigma and promote understanding.',
+      },
+    ],
+  },{
+    id: 28,
+    title: 'Television',
+    topic: 'Media & Culture',
+    content: `Television has been one of the most influential inventions of the 20th century. Since its rise in popularity during the 1950s, TV has shaped culture, politics, education, and entertainment across the world. Even today, despite competition from the internet, television continues to play a central role in many people‘s daily lives.
+The impact of TV on society is complex. On the one hand, television has served as a powerful educational tool. Documentaries, science programs, and historical series have helped millions learn about topics they might never study in school. Educational TV for children—such as ―Sesame Street‖ or ―Dora the Explorer‖— has been shown to improve language skills, cognitive development, and social awareness.
+TV also acts as a window to the world. People can follow global news, discover different cultures, or witness live events without leaving their homes. During major events like elections, sporting tournaments, or natural disasters, television brings people together, creating a shared sense of experience. In this way, TV contributes to national identity and global connection.
+However, not all content is positive. Critics argue that much of modern television promotes violence, materialism, and unhealthy lifestyles. Reality shows, soap operas, and crime dramas often exaggerate conflict and reward shallow behavior. Children who watch violent programs may become desensitized or more aggressive. Adults who consume too much TV may suffer from reduced attention span, poor physical health, or even depression.
+Another concern is the passive nature of watching TV. Unlike reading, which activates imagination and critical thinking, television delivers images and sound directly to the viewer, requiring little mental effort. Long hours in front of the screen can lead to a sedentary lifestyle. This has been linked to obesity, back pain, and heart disease, especially when combined with unhealthy snacking habits.
+Advertising is another powerful influence. Commercials on TV shape consumer behavior by promoting products, lifestyles, and beauty standards. Children are especially vulnerable to persuasive marketing, which can affect their food choices, body image, and spending habits. Although some countries have introduced regulations, advertising remains a core part of the TV industry‘s business model.
+The rise of streaming platforms, such as Netflix, Amazon Prime, and Disney+, has changed how people watch TV. Viewers are no longer limited to scheduled broadcasts. Instead, they can choose what to watch, when to watch, and how much to watch. This flexibility has increased viewer satisfaction, but also raised concerns about binge-watching—a habit where people watch multiple episodes or even entire seasons in one sitting. Binge-watching can disrupt sleep, reduce productivity, and harm mental health.
+TV has also influenced politics and public opinion. Debates, interviews, and campaign ads are broadcast to millions, helping voters form opinions. In some cases, television has been used to spread propaganda or misinformation, especially in countries with limited press freedom. At the same time, investigative journalism and documentaries can expose corruption, raise awareness, and promote social change.
+Despite these issues, many people still view television as an essential part of life.
+Families often gather around the TV in the evening, sharing time and conversation. Watching favorite shows can be relaxing, comforting, or emotionally engaging. Well-produced series and films can explore deep human themes, build empathy, and spark global discussion.
+There is also growing diversity in TV content. Series now feature more characters from different backgrounds, genders, and identities. Storylines address important topics like mental health, racism, and climate change. While this representation is still not perfect, television is slowly becoming more inclusive and reflective of real society.
+The quality of TV production has improved as well. Advances in technology, writing, and acting have turned television into an art form. Shows like ―Breaking Bad,‖ ―Chernobyl,‖ or ―The Crown‖ are praised not only for entertainment but for cinematic excellence and storytelling. In many ways, television has closed the gap between small screens and big cinema.
+In education, schools and universities have begun using TV programs and documentaries as teaching tools. Platforms like YouTube and educational channels offer content that supports learning in subjects like geography, history, and biology. When used correctly, television can make learning more visual, engaging, and memorable.
+In conclusion, television is neither entirely good nor entirely bad. It has educated, entertained, informed, and influenced billions of people. At the same time, it has promoted harmful ideas, distracted minds, and encouraged passivity. Like any tool, its impact depends on how it is used. For individuals and families, the key is balance—choosing quality content, limiting screen time, and being mindful of what we watch.`,
+    questions: [
+      {
+        question: 'What is the main purpose of this passage?',
+        explanation: 'The main purpose of the passage is to examine the complex impact of television on society, covering its educational value, role as a window to the world, influence on politics and culture, negative effects such as promoting violence or passivity, the rise of streaming and binge-watching, improvements in diversity and production quality, and the conclusion that its effects depend on balanced, mindful use.',
+      },
+      {
+        question: 'According to the passage, how has educational television benefited children?',
+        explanation: 'According to the passage, educational TV for children—such as ―Sesame Street‖ or ―Dora the Explorer‖—has been shown to improve language skills, cognitive development, and social awareness.',
+      },
+      {
+        question: 'The word "desensitized" in the fourth paragraph most likely means',
+        explanation: 'In the fourth paragraph, "desensitized" most likely means becoming less sensitive or less responsive to violence, as the passage states that children who watch violent programs may become desensitized or more aggressive.',
+      },
+      {
+        question: 'What can be inferred about the passive nature of watching TV?',
+        explanation: 'It can be inferred that watching TV is more passive than reading because it delivers images and sound directly and requires little mental effort, whereas reading activates imagination and critical thinking; long hours of TV viewing can lead to a sedentary lifestyle linked to obesity, back pain, and heart disease.',
+      },
+      {
+        question: 'According to the passage, what concerns have been raised by the rise of streaming platforms?',
+        explanation: 'According to the passage, while streaming platforms increase viewer satisfaction through flexibility in choosing what, when, and how much to watch, they have also raised concerns about binge-watching, which can disrupt sleep, reduce productivity, and harm mental health.',
+      },
+      {
+        question: 'What can be inferred about television\'s influence on politics?',
+        explanation: 'It can be inferred that television influences politics and public opinion by broadcasting debates, interviews, and campaign ads that help voters form opinions, and that it can be used either to spread propaganda or misinformation in countries with limited press freedom or, through investigative journalism and documentaries, to expose corruption, raise awareness, and promote social change.',
+      },
+      {
+        question: 'According to the passage, how has diversity in TV content changed?',
+        explanation: 'According to the passage, there is growing diversity in TV content as series now feature more characters from different backgrounds, genders, and identities, and storylines address important topics like mental health, racism, and climate change, though representation is still not perfect.',
+      },
+      {
+        question: 'The phrase "binge-watching" in the passage most likely refers to',
+        explanation: 'In the passage, "binge-watching" refers to a habit where people watch multiple episodes or even entire seasons in one sitting, a practice made more common by streaming platforms and linked to disrupted sleep, reduced productivity, and harm to mental health.',
+      },
+      {
+        question: 'What can be inferred about the quality of modern television production?',
+        explanation: 'It can be inferred that the quality of TV production has improved significantly through advances in technology, writing, and acting, turning television into an art form; shows like ―Breaking Bad,‖ ―Chernobyl,‖ or ―The Crown‖ are praised for cinematic excellence and storytelling, closing the gap between small screens and big cinema.',
+      },
+      {
+        question: 'According to the passage, what is the key to managing television\'s impact?',
+        explanation: 'According to the passage, television is neither entirely good nor entirely bad and its impact depends on how it is used; for individuals and families, the key is balance—choosing quality content, limiting screen time, and being mindful of what we watch.',
+      },
+    ],
+  },{
+  id: 29,
+  title: 'Education',
+  topic: 'Education & Society',
+  content: `Education is one of the most powerful tools for personal growth, social mobility, and national development. From early childhood to higher education, schools and
+universities play a critical role in shaping the skills, values, and future opportunities of individuals. Without access to quality education, entire generations may remain trapped in cycles of poverty and inequality.
+The purpose of education goes beyond academic knowledge. While learning maths, science, or history is essential, students also develop critical thinking, creativity, discipline, and communication skills. In modern societies, education prepares individuals not only for employment but also for civic life, helping them make informed decisions and participate actively in their communities.
+There are various models of education around the world. In some countries, strict discipline, uniforms, and high-stakes exams define the school experience. In others, student-centered learning, group projects, and creativity are prioritized. Regardless of the approach, the ultimate goal is to equip young people with the tools they need to thrive in a rapidly changing world.
+One major debate in education is whether schools should focus more on academic subjects or life skills. Some argue that students spend too much time memorizing facts and not enough time learning practical things—like how to manage money, resolve conflicts, or cook healthy meals. As societies evolve, so too must their education systems.
+Technology has brought major changes to education. Online courses, digital textbooks, and interactive learning platforms have made education more flexible and accessible. During the COVID-19 pandemic, millions of students around the world attended classes from home. While this shift allowed learning to continue, it also highlighted the digital divide—not all students have internet access or devices at home.
+Another issue is the gap in educational quality between rich and poor areas. In many countries, students in wealthy neighborhoods attend well-funded schools with experienced teachers, modern facilities, and a wide range of extracurricular activities. Meanwhile, those in poorer areas may face overcrowded classrooms, outdated materials, and underpaid staff. Educational inequality reinforces existing social and economic divisions.
+Higher education presents both opportunities and challenges. A university degree can open doors to better jobs, higher income, and greater status. However, in many countries, tuition fees have become unaffordable. Student debt is a growing problem, especially in places like the United States. Some experts question whether university is still worth the cost, especially when skilled trades and online certifications offer cheaper, faster paths to employment.
+Standardized testing is another controversial topic. Supporters say it allows fair comparison across schools and students. Critics argue that exams create pressure, limit creativity, and encourage rote learning. In response, some countries are moving toward continuous assessment or project-based learning models that evaluate real-world skills.
+Teachers are central to the education system, yet their role is often undervalued. In many places, they work long hours for low pay and face constant pressure to improve results. Without investing in teacher training and well-being, no education reform can succeed. Respecting and supporting teachers is crucial to improving outcomes for students.
+The classroom is not the only place where education happens. Parents, communities, media, and even peer groups all influence how children learn and grow. Values like honesty, cooperation, and responsibility are often learned outside formal schooling. This is why a holistic view of education—one that includes both academic and emotional development—is essential.
+Another global challenge is ensuring equal access to education for all, including girls, refugees, children with disabilities, and those living in conflict zones. Around the world, millions of children are still out of school. Some are forced to work, others are kept at home due to cultural norms or safety concerns. International organizations, such as UNESCO, work to promote universal education, but progress remains slow in some regions.
+Education also plays a major role in shaping future economies. Countries with strong education systems tend to have more innovation, higher productivity, and greater social stability. Investing in education is not just a moral decision—it is also a smart economic strategy. The more educated a population is, the more capable it becomes of solving complex problems and adapting to new technologies.
+However, education must also keep pace with the changing world. The jobs of tomorrow will likely require creativity, emotional intelligence, and digital literacy. Memorizing facts will no longer be enough. Lifelong learning—the idea that people must continue to learn throughout their careers—is becoming essential in the 21st century.
+In conclusion, education is far more than schooling. It shapes who we are, how we think, and what kind of societies we build. While challenges like inequality, outdated methods, and underfunding remain, the potential of education to transform lives is undeniable. If we want a better future, we must start by rethinking how we teach, what we value, and who we empower to learn.`,
+  questions: [
+    {
+      question: 'What is the main purpose of this passage?',
+      explanation: 'The main purpose of the passage is to explain the importance of education for personal growth, social mobility, and national development, discuss its purposes beyond academics, examine challenges such as inequality, technology gaps, and costs, and argue that education systems must evolve to prepare people for a changing world.',
+    },
+    {
+      question: 'According to the passage, what skills does education help students develop beyond academic knowledge?',
+      explanation: 'According to the passage, beyond academic subjects like maths, science, or history, students also develop critical thinking, creativity, discipline, and communication skills, and education prepares them for employment as well as civic life.',
+    },
+    {
+      question: 'The phrase "digital divide" in the paragraph about technology most likely means',
+      explanation: 'In the context of the passage, "digital divide" most likely refers to the gap between students who have internet access and devices at home and those who do not, as the text notes that the shift to online learning during the COVID-19 pandemic highlighted this inequality.',
+    },
+    {
+      question: 'What can be inferred about educational inequality from the passage?',
+      explanation: 'It can be inferred that educational inequality between wealthy and poorer areas reinforces existing social and economic divisions, because students in rich neighborhoods often have better-funded schools, experienced teachers, and modern facilities, while those in poorer areas face overcrowded classrooms and outdated materials.',
+    },
+    {
+      question: 'According to the passage, why do some experts question the value of university education?',
+      explanation: 'According to the passage, some experts question whether university is still worth the cost because tuition fees have become unaffordable in many countries, student debt is a growing problem (especially in the United States), and skilled trades and online certifications offer cheaper, faster paths to employment.',
+    },
+    {
+      question: 'What can be inferred about the role of teachers from the passage?',
+      explanation: 'It can be inferred that teachers are essential to the education system and that reforms cannot succeed without investing in their training and well-being, since they are often undervalued, work long hours for low pay, and face constant pressure to improve results.',
+    },
+    {
+      question: 'The word "holistic" in the paragraph about education outside the classroom most likely means',
+      explanation: 'In the context of the passage, "holistic" most likely means comprehensive or complete, referring to a view of education that includes both academic and emotional development and recognizes influences from parents, communities, media, and peers beyond formal schooling.',
+    },
+    {
+      question: 'According to the passage, what is becoming essential in the 21st century regarding learning?',
+      explanation: 'According to the passage, lifelong learning—the idea that people must continue to learn throughout their careers—is becoming essential in the 21st century, because future jobs will require creativity, emotional intelligence, and digital literacy rather than just memorizing facts.',
+    },
+    {
+      question: 'What can be inferred about the economic impact of education from the passage?',
+      explanation: 'It can be inferred that investing in education is both a moral decision and a smart economic strategy, since countries with strong education systems tend to have more innovation, higher productivity, and greater social stability, and educated populations are better at solving complex problems and adapting to new technologies.',
+    },
+    {
+      question: 'According to the passage, what global challenge remains in ensuring access to education?',
+      explanation: 'According to the passage, a major global challenge is ensuring equal access for all, including girls, refugees, children with disabilities, and those in conflict zones; millions of children are still out of school due to work, cultural norms, or safety concerns, and progress by organizations like UNESCO remains slow in some regions.',
+    },
+  ],
+},{
+  id: 30,
+  title: 'School Discipline',
+  topic: 'Education & Society',
+  content: `Discipline is a key part of any successful education system. It helps create a safe, focused, and respectful environment where learning can take place. Without discipline, classrooms can become chaotic, and both students and teachers may struggle to meet their goals. However, how discipline should be enforced in schools remains a highly debated topic.
+Traditionally, discipline in schools relied on strict rules, punishment, and authority. Teachers were expected to control the classroom firmly. Misbehavior was met with detentions, suspensions, or even physical punishment. While these methods were once common, many have been criticized for being too harsh or damaging to students‘ mental health.
+In recent years, there has been a shift toward more student-centered approaches to discipline. Instead of punishment, these methods focus on understanding the reasons behind bad behavior and helping students learn from their mistakes. This is often referred to as ―restorative discipline‖, where the goal is to repair harm, build responsibility, and restore relationships.
+Supporters of this approach argue that strict punishment often fails to change behavior. A student who is suspended may fall behind in class, feel rejected, or become more rebellious. In contrast, involving students in conversations about their actions and consequences can lead to deeper understanding and long-term change.
+However, not everyone agrees. Some educators believe that lenient discipline creates more problems than it solves. If students are not held accountable, they may continue to disrupt the classroom. A lack of clear consequences may also send the message that rules don‘t matter. Striking the right balance between fairness and firmness is one of the biggest challenges schools face.
+One of the most controversial forms of school discipline is corporal punishment— physical punishment such as hitting, slapping, or paddling. This practice is banned in many countries but still allowed in some regions. Human rights groups and child psychologists have strongly opposed it, arguing that it causes fear, trauma, and long-term harm. Research shows that corporal punishment does not improve behavior but instead increases aggression and anxiety.
+Another key issue is disproportionate discipline. Studies in countries like the US and UK have found that students from minority backgrounds, particularly Black or low-income students, are more likely to be suspended or expelled than their peers. These patterns raise serious concerns about bias, discrimination, and equality in school discipline systems.
+Modern schools are experimenting with new ways to manage behavior. These include:
+•        Positive Behavior Support (PBS) – where schools reward good behavior instead of just punishing bad behavior
+•        Peer mediation programs – where students help resolve conflicts through dialogue
+•        Counseling and mental health support – to address the root causes of misbehavior
+•        Classroom management training for teachers – helping them respond calmly and effectively
+Technology is also changing the way discipline is tracked. Digital systems allow schools to monitor attendance, behavior, and performance more accurately. Parents can be informed in real time about incidents or progress. While this increases transparency, it also raises questions about student privacy and data misuse.
+Parental involvement is another important factor. Students are more likely to behave well when parents are engaged in their education and support school rules at home. However, some parents defend their children unconditionally, even when they are clearly at fault. Effective discipline often depends on a partnership between school and family.
+Cultural values influence how discipline is viewed. In some Asian cultures, for example, respect for teachers and obedience are highly emphasized. In Scandinavian countries, discipline tends to be more relaxed, focusing on cooperation and emotional intelligence. There is no one-size-fits-all model, and discipline policies must consider local norms, values, and student needs.
+One promising approach is teaching emotional regulation and conflict resolution as part of the curriculum. If students are taught how to handle anger, stress, and disagreement from a young age, they may be less likely to act out. Programs like
+―social-emotional learning‖ (SEL) aim to build self-awareness, empathy, and decision-making skills.
+At the same time, schools must support teachers. Managing student behavior requires patience, training, and support from school leadership. When teachers feel overwhelmed, they may rely on discipline out of frustration rather than strategy. Investing in teacher development is critical to creating respectful, well-managed classrooms.
+In conclusion, discipline in schools is essential—but the way it is enforced matters. While punishment alone may offer quick results, it rarely produces lasting change. A balanced approach that promotes fairness, emotional growth, and accountability is more effective in the long run. Discipline should not be about control—it should be about helping students become responsible, respectful members of society.`,
+  questions: [
+    {
+      question: 'What is the main purpose of this passage?',
+      explanation: 'The passage discusses the importance of discipline in schools, contrasts traditional punitive methods with modern student-centered and restorative approaches, examines controversies such as corporal punishment and disproportionate discipline, and advocates for a balanced approach that promotes fairness, emotional growth, and accountability.',
+    },
+    {
+      question: 'According to the passage, what is the goal of restorative discipline?',
+      explanation: 'Restorative discipline focuses on understanding the reasons behind bad behavior and helping students learn from their mistakes, with the specific goals of repairing harm, building responsibility, and restoring relationships.',
+    },
+    {
+      question: 'The word "disproportionate" in the paragraph about discipline patterns most likely means',
+      explanation: 'It means unequal or excessive relative to the situation, as studies show that students from minority backgrounds, particularly Black or low-income students, are more likely to be suspended or expelled than their peers, raising concerns about bias and discrimination.',
+    },
+    {
+      question: 'What can be inferred about the effects of corporal punishment according to the passage?',
+      explanation: 'Research shows that corporal punishment does not improve behavior but instead increases aggression and anxiety; human rights groups and child psychologists oppose it because it causes fear, trauma, and long-term harm.',
+    },
+    {
+      question: 'According to the passage, why do some educators oppose lenient discipline?',
+      explanation: 'Some educators believe that lenient discipline creates more problems than it solves because if students are not held accountable, they may continue to disrupt the classroom, and a lack of clear consequences may send the message that rules do not matter.',
+    },
+    {
+      question: 'The phrase "one-size-fits-all" in the paragraph about cultural values most likely means',
+      explanation: 'It means a single approach or model that works equally well for everyone, as the passage states there is no such model for discipline and that policies must consider local norms, values, and student needs.',
+    },
+    {
+      question: 'What can be inferred about the role of technology in school discipline?',
+      explanation: 'Digital systems allow schools to monitor attendance, behavior, and performance more accurately and inform parents in real time, increasing transparency, but this also raises questions about student privacy and potential data misuse.',
+    },
+    {
+      question: 'According to the passage, how do cultural values influence views on discipline?',
+      explanation: 'In some Asian cultures, respect for teachers and obedience are highly emphasized, while in Scandinavian countries discipline tends to be more relaxed and focused on cooperation and emotional intelligence; thus, discipline policies must consider local norms and values.',
+    },
+    {
+      question: 'What can be inferred about the importance of supporting teachers in managing discipline?',
+      explanation: 'Managing student behavior requires patience, training, and support from school leadership; when teachers feel overwhelmed, they may rely on discipline out of frustration rather than strategy, so investing in teacher development is critical for creating respectful, well-managed classrooms.',
+    },
+    {
+      question: 'According to the passage, what is the long-term goal of school discipline?',
+      explanation: 'Discipline should not be about control but about helping students become responsible, respectful members of society through a balanced approach that promotes fairness, emotional growth, and accountability rather than relying solely on punishment.',
+    },
+  ],
 },
 ];
