@@ -34,9 +34,11 @@ function esc(s) {
     .replace(/'/g, "\\'");
 }
 
-// Escape content for Dart triple-quoted string (avoid ''')
+// Escape content for Dart triple-quoted string (avoid ''' and $ interpolation)
 function escTriple(s) {
-  return String(s).replace(/'''/g, "''\\x27''");
+  return String(s)
+    .replace(/\$/g, '\\$')
+    .replace(/'''/g, "''\\x27''");
 }
 
 // Build Dart file
