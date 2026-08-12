@@ -31,7 +31,8 @@ if (!passages || passages.length === 0) {
 function esc(s) {
   return String(s)
     .replace(/\\/g, '\\\\')
-    .replace(/'/g, "\\'");
+    .replace(/'/g, "\\'")
+    .replace(/\$/g, '\\$');
 }
 
 // Escape content for Dart triple-quoted string (avoid ''' and $ interpolation)
