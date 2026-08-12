@@ -189,7 +189,7 @@ export default function ReadingPage() {
               <button
                 key={passage.id}
                 onClick={() => { setSelected(passage); setRevealed(new Set()); }}
-                className="w-full text-left rounded-2xl px-4 py-3.5 flex items-center gap-3 transition-transform hover:-translate-y-0.5 active:scale-[0.99]"
+                className="w-full text-left rounded-2xl px-4 py-3.5 flex items-center gap-3 transition-transform hover:-translate-y-0.5 active:scale-[0.99] animate-heartbeat"
                 style={{
                   background: `linear-gradient(135deg, ${c1}, ${c2})`,
                   boxShadow: `0 5px 0 ${c1}99, 0 8px 20px ${c1}44`,
