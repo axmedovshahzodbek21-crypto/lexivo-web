@@ -3,7 +3,7 @@ const en = {
   nav: {
     home: 'Home',
     learn: 'Learn',
-    reading: 'Reading',
+    reading: 'Ideas',
     review: 'Review',
     search: 'Search',
     progress: 'Progress',
@@ -439,7 +439,7 @@ const uz: typeof en = {
   nav: {
     home: 'Bosh sahifa',
     learn: "O'rganish",
-    reading: "O'qish",
+    reading: "G'oyalar",
     review: 'Takrorlash',
     search: 'Qidirish',
     progress: 'Natijalar',

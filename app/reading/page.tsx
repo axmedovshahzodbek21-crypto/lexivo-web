@@ -140,38 +140,38 @@ export default function ReadingPage() {
         </Link>
       </div>
 
-      {/* Search + topic filter */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-6">
-        <input
-          type="text"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          placeholder="Search passages…"
-          className="flex-1 px-4 py-2.5 rounded-xl text-sm border outline-none transition-colors"
-          style={{
-            background: 'var(--surface)',
-            border: '1px solid var(--border)',
-            color: 'var(--text)',
-          }}
-          onFocus={e => (e.target.style.borderColor = 'var(--primary)')}
-          onBlur={e => (e.target.style.borderColor = 'var(--border)')}
-        />
-        <div className="flex gap-2 overflow-x-auto pb-1 sm:pb-0 flex-wrap">
-          {allTopics.map(t => (
-            <button
-              key={t}
-              onClick={() => setTopic(t)}
-              className="shrink-0 text-xs font-bold px-3 py-2 rounded-xl transition-all"
-              style={{
-                background: topic === t ? 'var(--primary)' : 'var(--surface)',
-                color: topic === t ? 'white' : 'var(--text-muted)',
-                border: `1px solid ${topic === t ? 'var(--primary)' : 'var(--border)'}`,
-              }}
-            >
-              {t}
-            </button>
-          ))}
-        </div>
+      {/* Search */}
+      <input
+        type="text"
+        value={search}
+        onChange={e => setSearch(e.target.value)}
+        placeholder="Search passages…"
+        className="w-full px-4 py-2.5 rounded-xl text-sm border outline-none transition-colors mb-3"
+        style={{
+          background: 'var(--surface)',
+          border: '1px solid var(--border)',
+          color: 'var(--text)',
+        }}
+        onFocus={e => (e.target.style.borderColor = 'var(--primary)')}
+        onBlur={e => (e.target.style.borderColor = 'var(--border)')}
+      />
+
+      {/* Topic filter — single scrollable row */}
+      <div className="flex gap-2 overflow-x-auto pb-2 mb-5" style={{ scrollbarWidth: 'none' }}>
+        {allTopics.map(t => (
+          <button
+            key={t}
+            onClick={() => setTopic(t)}
+            className="shrink-0 text-xs font-bold px-3 py-2 rounded-xl transition-all"
+            style={{
+              background: topic === t ? 'var(--primary)' : 'var(--surface)',
+              color: topic === t ? 'white' : 'var(--text-muted)',
+              border: `1px solid ${topic === t ? 'var(--primary)' : 'var(--border)'}`,
+            }}
+          >
+            {t}
+          </button>
+        ))}
       </div>
 
       {/* 2-column grid */}
