@@ -177,15 +177,113 @@ pulp*: wood which is crushed until soft enough to form the basis of paper.`,
       explanation: 'In addition to other wood producers, New Zealand faces competition from wood substitutes such as steel framing.',
     },
   ],
-}
+},
 
       // ── Test 2 ─────────────────────────────────────────────────────────────
-      // {
-      //   testNumber: 2,
-      //   title: '...',
-      //   content: `...`,
-      //   questions: [],
-      // },
+{
+  testNumber: 2,
+  title: 'The Early History of Olive Oil',
+  questionRange: '1–12',
+  content: `Olive oil is produced from the fruit of the olive tree, which is a member of the Oleaceae plant family. The trees require some cold weather during the year, but also tolerate hot, dry conditions, and do not like moisture when they are flowering. They actually produce better when subjected to these stressful conditions, and as a result, olive trees have traditionally been grown on land where little else will survive.
+
+Archaeologists today are divided over exactly where the first domestication of the olive occurred: Some say it was in the area which is now Iran, Syria, Jordan and Egypt, while others contend it was in mainland Greece or on the island of Crete. The one thing that can be said with certainty is that cultivation began at least 6,000 years ago and spread slowly westward across the lands bordering on the Mediterranean Sea. Olive oil was used for a variety of purposes during these early times, including as a pharmacological ointment and in rituals for anointing royalty.
+
+The ancient Greeks believed the olive tree was a priceless gift from the goddess Athena and used its oil in sacred religious rituals. In fact, the Greek poet Homer called olive oil 'liquid gold', and during the 6th and 7th centuries BC Greek law forbade the cutting down of olive trees and made it punishable by death. The ancient Middle Eastern ruler King David valued his groves of olive trees and his olive oil warehouses so much that he posted guards around the clock to protect them.
+
+Over the years, olive oil developed other uses. Its employment in cooking dates at least as far back as the 5th century BC, as described by the Greek philosopher Plato. Its use as an aid to beauty and health later became ingrained in many Mediterranean cultures. The Romans, for example, are said to have used generous amounts on their bodies to moisturise their skin after bathing. With the spread of the Roman Empire, olive oil became a major commodity and its trade promoted commerce throughout the ancient world. It is generally believed that in the 1st-2nd century BC, olive trees were taken to North Africa and then to Spain, which was later to become the world's largest producer of olive oil.
+
+Artefacts found at various Mediterranean archaeological sites include olive oil storage vessels with olive plant residue still in them. Historical evidence still in existence in the form of wall paintings and ancient manuscripts (including the works of the Roman naturalist and philosopher, Pliny the Elder) all record production techniques and the various uses of olive oil.
+
+Making olive oil in those early days was a laborious process accomplished without mechanisation. Processing or milling the fruit involved several distinct steps to extract the liquid. The olives were harvested from the trees by hand or by beating the fruit from the trees with long sticks. The olives were then rinsed and crushed to separate out the large seed found in the centre of each. The remaining seedless flesh was put in woven bags and pressed. Hot water was then poured over the bags to separate the oil from the solid bits of olive. The liquid produced in this process, consisting of oil and water, was drained into stone basins or tanks, where it was allowed to settle and separate. In cold weather a bit of salt was added to speed up the process. As much oil as possible was drawn off the water, but the result was still not pure oil. Therefore, this impure mixture was allowed once more to settle in vats and then separated in order to refine the product.
+
+The waste water from the milling process, which is called amurca, is a bitter-tasting and foul-smelling liquid. In many ancient civilisations it was often simply discarded, causing serious pollution because of its acidity and high salt content. However, in the Roman period it was regarded as a very useful substance. When spread on surfaces, amurca forms a hard finish and therefore it was often applied to the floors of grain storage buildings where it hardened, keeping out water, mud and pests. When boiled down amurca was applied to leather to soften it so that it was easier to shape into articles of clothing and shoes. It could also be eaten by farm animals and was, in fact, fed to livestock suffering from malnutrition. According to ancient texts, amurca was also utilised in moderate amounts by farmers as a fertiliser or as a pesticide helping them to protect their crops from insects and even small rodents.`,
+  questions: [
+    {
+      type: 'true_false_not_given',
+      question: 'In the cultivation of olives, a period without rain is advantageous.',
+      answer: 'TRUE',
+      passage_excerpt: 'They actually produce better when subjected to these stressful conditions… tolerate hot, dry conditions, and do not like moisture when they are flowering.',
+      explanation: 'The passage states that olive trees produce better under stressful dry conditions and dislike moisture during flowering, so a period without rain is advantageous.',
+    },
+    {
+      type: 'true_false_not_given',
+      question: 'The most fertile fields are usually chosen for growing olives.',
+      answer: 'FALSE',
+      passage_excerpt: '…olive trees have traditionally been grown on land where little else will survive.',
+      explanation: 'The text says olives are grown on poor land where little else will grow, not on the most fertile fields.',
+    },
+    {
+      type: 'true_false_not_given',
+      question: 'In ancient Greece, the olive tree was said to have divine origins.',
+      answer: 'TRUE',
+      passage_excerpt: 'The ancient Greeks believed the olive tree was a priceless gift from the goddess Athena…',
+      explanation: 'The Greeks regarded the olive tree as a divine gift from the goddess Athena, so it was said to have divine origins.',
+    },
+    {
+      type: 'true_false_not_given',
+      question: 'Olive oil was more costly to buy in Greece than gold.',
+      answer: 'NOT GIVEN',
+      passage_excerpt: '…the Greek poet Homer called olive oil \'liquid gold\'…',
+      explanation: 'Homer used the phrase "liquid gold" as a metaphor, but the passage does not say olive oil was more expensive than actual gold.',
+    },
+    {
+      type: 'true_false_not_given',
+      question: 'Plato mentions the use of olive oil in the preparation of food.',
+      answer: 'TRUE',
+      passage_excerpt: 'Its employment in cooking dates at least as far back as the 5th century BC, as described by the Greek philosopher Plato.',
+      explanation: 'The passage explicitly states that Plato described the use of olive oil in cooking.',
+    },
+    {
+      type: 'true_false_not_given',
+      question: 'North African farmers initially resisted the introduction of olive trees.',
+      answer: 'NOT GIVEN',
+      passage_excerpt: 'It is generally believed that in the 1st-2nd century BC, olive trees were taken to North Africa…',
+      explanation: 'The text only says olive trees were taken to North Africa; it gives no information about any resistance from local farmers.',
+    },
+    {
+      type: 'sentence_completion',
+      question: 'olives are harvested by picking them or ___ the trees',
+      answer: 'beating',
+      passage_excerpt: 'The olives were harvested from the trees by hand or by beating the fruit from the trees with long sticks.',
+      explanation: 'Harvesting was done by hand or by beating the trees.',
+    },
+    {
+      type: 'sentence_completion',
+      question: 'Olive flesh is placed in ___ and pressed',
+      answer: 'bags',
+      passage_excerpt: 'The remaining seedless flesh was put in woven bags and pressed.',
+      explanation: 'The olive flesh was placed in woven bags before pressing.',
+    },
+    {
+      type: 'sentence_completion',
+      question: 'Resulting liquid is given time to settle and separate, and ___ is used to aid the process',
+      answer: 'salt',
+      passage_excerpt: 'In cold weather a bit of salt was added to speed up the process.',
+      explanation: 'Salt was added to help the liquid settle and separate more quickly in cold weather.',
+    },
+    {
+      type: 'sentence_completion',
+      question: 'when dried, created hard surface, so used on ___ of certain buildings',
+      answer: 'floors',
+      passage_excerpt: '…it was often applied to the floors of grain storage buildings where it hardened…',
+      explanation: 'When dried, amurca formed a hard surface and was used on the floors of certain buildings.',
+    },
+    {
+      type: 'sentence_completion',
+      question: 'used when making ___ into goods to wear',
+      answer: 'leather',
+      passage_excerpt: 'When boiled down amurca was applied to leather to soften it so that it was easier to shape into articles of clothing and shoes.',
+      explanation: 'Amurca was used on leather to soften it for making wearable goods.',
+    },
+    {
+      type: 'sentence_completion',
+      question: 'used on farms as a ___ to stop insects or animals damaging crops',
+      answer: 'pesticide',
+      passage_excerpt: '…amurca was also utilised… as a pesticide helping them to protect their crops from insects and even small rodents.',
+      explanation: 'On farms it was used as a pesticide to stop insects and animals from damaging crops.',
+    },
+  ],
+},
 
     ],
   },
