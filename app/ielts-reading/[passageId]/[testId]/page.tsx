@@ -239,8 +239,9 @@ function highlightChunk(nodes: { node: Text; start: number }[], accumulated: str
 }
 
 function findAndHighlightExcerpt(container: HTMLElement, excerpt: string): HTMLElement[] {
-  // Split on mid-excerpt ellipsis to handle multi-chunk excerpts
-  const chunks = excerpt.split(/\s*[…\.]{3}\s*/).map(c => c.trim()).filter(Boolean);
+  // Strip trailing ellipsis, then split on mid-excerpt ellipsis
+  const trimmed = excerpt.replace(/\s*(?:…|\.{3})$/, '').trim();
+  const chunks = trimmed.split(/\s*(?:…|\.{3})\s*/).map(c => c.trim()).filter(c => c.length > 8);
   if (chunks.length === 0) return [];
 
   const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
