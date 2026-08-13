@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { use, useState, useEffect, useCallback, Suspense } from 'react';
+import { use, useState, useEffect, useCallback, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { ieltsData, IeltsQuestion } from '@/lib/ielts-data';
 
@@ -311,6 +311,24 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
   const [contrast, setContrast] = useState('Black on white');
   const [textSize, setTextSize] = useState('Medium');
 
+  // Resizable columns
+  const [passageWidthPct, setPassageWidthPct] = useState(50);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isDragging = useRef(false);
+
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => {
+      if (!isDragging.current || !containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const pct = ((e.clientX - rect.left) / rect.width) * 100;
+      setPassageWidthPct(Math.min(Math.max(pct, 25), 75));
+    };
+    const onUp = () => { isDragging.current = false; document.body.style.cursor = ''; };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+    return () => { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); };
+  }, []);
+
   const setAnswer = useCallback((i: number, val: string) => {
     setAnswers(prev => ({ ...prev, [i]: val }));
   }, []);
@@ -408,22 +426,28 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
       </div>
 
       {/* Two-column layout — fixed height, both panels scroll independently */}
-      <div className="flex" style={{ height: 'calc(100vh - 185px)', background: passageStyle.bg }}>
+      <div ref={containerRef} className="flex" style={{ height: 'calc(100vh - 185px)', background: passageStyle.bg }}>
 
         {/* Passage */}
-        <div className="flex-1 min-w-0 overflow-y-auto p-6 transition-colors"
-          style={{ background: passageStyle.bg, color: passageStyle.color }}>
+        <div className="overflow-y-auto p-6 transition-colors"
+          style={{ width: `${passageWidthPct}%`, background: passageStyle.bg, color: passageStyle.color }}>
           <div className="space-y-4 leading-[1.85]" style={{ fontSize }}>
             {paragraphs.map((para, i) => <p key={i}>{para}</p>)}
           </div>
         </div>
 
-        {/* Divider */}
-        <div className="w-px shrink-0" style={{ background: `${passageStyle.color}25` }} />
+        {/* Draggable divider */}
+        <div
+          onMouseDown={e => { e.preventDefault(); isDragging.current = true; document.body.style.cursor = 'col-resize'; }}
+          className="w-2 shrink-0 flex items-center justify-center cursor-col-resize group select-none"
+          style={{ background: passageStyle.bg }}
+        >
+          <div className="w-px h-full group-hover:w-1 transition-all rounded-full" style={{ background: `${passageStyle.color}30` }} />
+        </div>
 
         {/* Questions */}
-        <div className="w-[440px] shrink-0 flex flex-col gap-4 p-4 overflow-y-auto"
-          style={{ background: passageStyle.bg }}>
+        <div className="flex flex-col gap-4 p-4 overflow-y-auto"
+          style={{ width: `${100 - passageWidthPct}%`, background: passageStyle.bg }}>
           {(() => {
             const groups = buildGroups(test.questions);
             let qIndex = 0;
