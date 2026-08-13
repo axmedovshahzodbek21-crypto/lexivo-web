@@ -6,22 +6,113 @@ import { ieltsData, IeltsQuestion } from '@/lib/ielts-data';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
-const TYPE_INSTRUCTIONS: Record<string, string> = {
-  true_false_not_given:
-    'Do the following statements agree with the information given in the passage? Write TRUE if the statement agrees with the information, FALSE if the statement contradicts the information, or NOT GIVEN if there is no information on this.',
-  yes_no_not_given:
-    'Do the following statements agree with the views of the writer? Write YES if the statement agrees with the views of the writer, NO if the statement contradicts the views of the writer, or NOT GIVEN if it is impossible to say what the writer thinks about this.',
-  multiple_choice:      'Choose the correct letter, A, B, C or D.',
-  multiple_choice_multi: 'Choose TWO letters, A–E.',
-  matching_information:
-    'The passage has several paragraphs. Which paragraph contains the following information? Write the correct letter in boxes on your answer sheet.',
-  matching_headings:    'Choose the correct heading for each paragraph from the list of headings below.',
-  matching_features:    'Match each statement with the correct option from the list. You may use any letter more than once.',
-  matching_sentence_endings: 'Complete each sentence with the correct ending from the box below.',
-  sentence_completion:  'Complete the sentences below. Choose NO MORE THAN TWO WORDS from the passage for each answer.',
-  summary_completion:   'Complete the summary below. Choose NO MORE THAN TWO WORDS from the passage for each answer.',
-  short_answer:         'Answer the questions below. Choose NO MORE THAN THREE WORDS from the passage for each answer.',
-};
+function QuestionInstruction({ type, start, end, passageId, color }: {
+  type: string; start: number; end: number; passageId: string; color: string;
+}) {
+  const range = end > start ? `${start}–${end}` : `${start}`;
+  const it: React.CSSProperties = { fontStyle: 'italic', color, display: 'block', marginBottom: 6 };
+  const key: React.CSSProperties = { fontWeight: 900, fontStyle: 'italic', color, minWidth: 90, display: 'inline-block' };
+  const val: React.CSSProperties = { fontStyle: 'italic', color };
+
+  const head = (
+    <span style={{ ...it, fontStyle: 'italic', marginBottom: 10 }}>Questions {range}</span>
+  );
+
+  switch (type) {
+    case 'true_false_not_given':
+      return <div style={{ fontSize: 13, lineHeight: 1.6 }}>
+        {head}
+        <span style={it}>Do the following statements agree with the information given in Reading Passage {passageId}?</span>
+        <span style={it}>In boxes {range} on your answer sheet, write</span>
+        <div style={{ paddingLeft: 16, marginTop: 4 }}>
+          {[['TRUE','if the statement agrees with the information'],['FALSE','if the statement contradicts the information'],['NOT GIVEN','if there is no information on this']].map(([k,v]) => (
+            <div key={k} style={{ display: 'flex', gap: 16, marginBottom: 2 }}><span style={key}>{k}</span><span style={val}>{v}</span></div>
+          ))}
+        </div>
+      </div>;
+
+    case 'yes_no_not_given':
+      return <div style={{ fontSize: 13, lineHeight: 1.6 }}>
+        {head}
+        <span style={it}>Do the following statements agree with the views of the writer in Reading Passage {passageId}?</span>
+        <span style={it}>In boxes {range} on your answer sheet, write</span>
+        <div style={{ paddingLeft: 16, marginTop: 4 }}>
+          {[['YES','if the statement agrees with the views of the writer'],['NO','if the statement contradicts the views of the writer'],['NOT GIVEN','if it is impossible to say what the writer thinks about this']].map(([k,v]) => (
+            <div key={k} style={{ display: 'flex', gap: 16, marginBottom: 2 }}><span style={key}>{k}</span><span style={val}>{v}</span></div>
+          ))}
+        </div>
+      </div>;
+
+    case 'multiple_choice':
+      return <div style={{ fontSize: 13, lineHeight: 1.6 }}>
+        {head}
+        <span style={it}>Choose the correct letter, <strong>A</strong>, <strong>B</strong>, <strong>C</strong> or <strong>D</strong>.</span>
+      </div>;
+
+    case 'multiple_choice_multi':
+      return <div style={{ fontSize: 13, lineHeight: 1.6 }}>
+        {head}
+        <span style={it}>Choose <strong>TWO</strong> letters, <strong>A–E</strong>.</span>
+      </div>;
+
+    case 'matching_information':
+      return <div style={{ fontSize: 13, lineHeight: 1.6 }}>
+        {head}
+        <span style={it}>Reading Passage {passageId} has several paragraphs, <strong>A–</strong>…</span>
+        <span style={it}>Which paragraph contains the following information?</span>
+        <span style={it}>Write the correct letter, <strong>A–</strong>…, in boxes {range} on your answer sheet.</span>
+      </div>;
+
+    case 'matching_headings':
+      return <div style={{ fontSize: 13, lineHeight: 1.6 }}>
+        {head}
+        <span style={it}>Choose the correct heading for each paragraph from the list of headings below.</span>
+        <span style={it}>Write the correct number, <strong>i–x</strong>, in boxes {range} on your answer sheet.</span>
+      </div>;
+
+    case 'matching_features':
+      return <div style={{ fontSize: 13, lineHeight: 1.6 }}>
+        {head}
+        <span style={it}>Match each statement with the correct person or category.</span>
+        <span style={it}>Write the correct letter in boxes {range} on your answer sheet.</span>
+        <span style={it}>You may use any letter <strong>more than once</strong>.</span>
+      </div>;
+
+    case 'matching_sentence_endings':
+      return <div style={{ fontSize: 13, lineHeight: 1.6 }}>
+        {head}
+        <span style={it}>Complete each sentence with the correct ending, <strong>A–</strong>…, from the box below.</span>
+        <span style={it}>Write the correct letter in boxes {range} on your answer sheet.</span>
+      </div>;
+
+    case 'sentence_completion':
+      return <div style={{ fontSize: 13, lineHeight: 1.6 }}>
+        {head}
+        <span style={it}>Complete the sentences below.</span>
+        <span style={it}>Choose <strong>NO MORE THAN TWO WORDS</strong> from the passage for each answer.</span>
+        <span style={it}>Write your answers in boxes {range} on your answer sheet.</span>
+      </div>;
+
+    case 'summary_completion':
+      return <div style={{ fontSize: 13, lineHeight: 1.6 }}>
+        {head}
+        <span style={it}>Complete the summary below.</span>
+        <span style={it}>Choose <strong>NO MORE THAN TWO WORDS</strong> from the passage for each answer.</span>
+        <span style={it}>Write your answers in boxes {range} on your answer sheet.</span>
+      </div>;
+
+    case 'short_answer':
+      return <div style={{ fontSize: 13, lineHeight: 1.6 }}>
+        {head}
+        <span style={it}>Answer the questions below.</span>
+        <span style={it}>Choose <strong>NO MORE THAN THREE WORDS</strong> from the passage for each answer.</span>
+        <span style={it}>Write your answers in boxes {range} on your answer sheet.</span>
+      </div>;
+
+    default:
+      return <div style={{ fontSize: 13, lineHeight: 1.6 }}>{head}</div>;
+  }
+}
 
 const CONTRAST_STYLES: Record<string, { bg: string; color: string }> = {
   'Black on white': { bg: '#ffffff', color: '#000000' },
@@ -454,10 +545,13 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
             return groups.map((group, gi) => (
               <div key={gi} className="flex flex-col gap-3">
                 <div className="px-2 py-3 border-b" style={{ borderColor: `${passageStyle.color}25` }}>
-                  <p className="text-xs font-black mb-1" style={{ color: passageStyle.color }}>
-                    Questions {group.start}{group.end > group.start ? `–${group.end}` : ''}
-                  </p>
-                  <p className="text-xs leading-relaxed" style={{ color: passageStyle.color, opacity: 0.7 }}>{TYPE_INSTRUCTIONS[group.type]}</p>
+                  <QuestionInstruction
+                    type={group.type}
+                    start={group.start}
+                    end={group.end}
+                    passageId={passageId}
+                    color={passageStyle.color}
+                  />
                 </div>
 
                 {test.questions.slice(group.start - 1, group.end).map((q) => {
