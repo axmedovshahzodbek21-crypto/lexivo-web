@@ -407,24 +407,23 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
         )}
       </div>
 
-      {/* Two-column layout */}
-      <div className="flex items-stretch" style={{ color: passageStyle.color, minHeight: 'calc(100vh - 200px)' }}>
+      {/* Two-column layout — fixed height, both panels scroll independently */}
+      <div className="flex" style={{ height: 'calc(100vh - 185px)', background: passageStyle.bg }}>
 
         {/* Passage */}
-        <div
-          className="flex-1 min-w-0 p-6 overflow-y-auto transition-colors"
-          style={{ background: passageStyle.bg, color: passageStyle.color, maxHeight: 'calc(100vh - 160px)', position: 'sticky', top: '0' }}
-        >
+        <div className="flex-1 min-w-0 overflow-y-auto p-6 transition-colors"
+          style={{ background: passageStyle.bg, color: passageStyle.color }}>
           <div className="space-y-4 leading-[1.85]" style={{ fontSize }}>
             {paragraphs.map((para, i) => <p key={i}>{para}</p>)}
           </div>
         </div>
 
         {/* Divider */}
-        <div className="w-px shrink-0 self-stretch" style={{ background: `${passageStyle.color}25` }} />
+        <div className="w-px shrink-0" style={{ background: `${passageStyle.color}25` }} />
 
         {/* Questions */}
-        <div className="w-[440px] shrink-0 flex flex-col gap-4 p-4 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 160px)' }}>
+        <div className="w-[440px] shrink-0 flex flex-col gap-4 p-4 overflow-y-auto"
+          style={{ background: passageStyle.bg }}>
           {(() => {
             const groups = buildGroups(test.questions);
             let qIndex = 0;
