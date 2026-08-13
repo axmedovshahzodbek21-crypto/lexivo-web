@@ -82,38 +82,45 @@ function OptionsModal({ contrast, textSize, onContrast, onTextSize, onClose }: {
 }) {
   const [screen, setScreen] = useState<OptionsScreen>('main');
 
+  // Modal adopts the currently active contrast theme
+  const cs = CONTRAST_STYLES[contrast];
+  const modalBg = cs?.bg ?? '#ffffff';
+  const modalColor = cs?.color ?? '#000000';
+  const modalBorder = contrast === 'Black on white' ? '#e5e7eb' : `${modalColor}30`;
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center" onClick={onClose}>
       <div className="absolute inset-0 bg-black/40" />
       <div
         className="relative rounded-2xl shadow-2xl w-80 overflow-hidden"
-        style={{ background: 'var(--surface)' }}
+        style={{ background: modalBg, color: modalColor }}
         onClick={e => e.stopPropagation()}
       >
         {/* Title bar */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)]">
+        <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: `1px solid ${modalBorder}` }}>
           {screen !== 'main' ? (
-            <button onClick={() => setScreen('main')} className="text-lg text-[var(--text-muted)] hover:text-[var(--text)] transition-colors w-6">‹</button>
+            <button onClick={() => setScreen('main')} className="text-lg w-6 opacity-60 hover:opacity-100 transition-opacity" style={{ color: modalColor }}>‹</button>
           ) : <div className="w-6" />}
-          <p className="text-sm font-black text-[var(--text)]">
+          <p className="text-sm font-black" style={{ color: modalColor }}>
             {screen === 'main' ? 'Options' : screen === 'contrast' ? 'Contrast' : 'Text size'}
           </p>
-          <button onClick={onClose} className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">✕</button>
+          <button onClick={onClose} className="text-sm opacity-60 hover:opacity-100 transition-opacity" style={{ color: modalColor }}>✕</button>
         </div>
 
         {/* Main screen */}
         {screen === 'main' && (
-          <div className="divide-y divide-[var(--border)]">
+          <div>
             {[
               { label: 'Contrast', value: contrast, next: 'contrast' as OptionsScreen },
               { label: 'Text size', value: textSize, next: 'textsize' as OptionsScreen },
-            ].map(row => (
+            ].map((row, idx) => (
               <button key={row.label} onClick={() => setScreen(row.next)}
-                className="w-full flex items-center justify-between px-5 py-4 hover:bg-[var(--surface-2)] transition-colors text-left">
-                <span className="text-sm font-black text-[var(--text)]">{row.label}</span>
+                className="w-full flex items-center justify-between px-5 py-4 transition-opacity hover:opacity-70 text-left"
+                style={{ borderTop: idx > 0 ? `1px solid ${modalBorder}` : undefined }}>
+                <span className="text-sm font-black" style={{ color: modalColor }}>{row.label}</span>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-[var(--text-muted)]">{row.value}</span>
-                  <span className="text-[var(--text-muted)]">›</span>
+                  <span className="text-sm opacity-60" style={{ color: modalColor }}>{row.value}</span>
+                  <span className="opacity-60" style={{ color: modalColor }}>›</span>
                 </div>
               </button>
             ))}
@@ -122,12 +129,13 @@ function OptionsModal({ contrast, textSize, onContrast, onTextSize, onClose }: {
 
         {/* Contrast screen */}
         {screen === 'contrast' && (
-          <div className="divide-y divide-[var(--border)]">
-            {Object.keys(CONTRAST_STYLES).map(opt => (
+          <div>
+            {Object.keys(CONTRAST_STYLES).map((opt, idx) => (
               <button key={opt} onClick={() => { onContrast(opt); setScreen('main'); }}
-                className="w-full flex items-center justify-between px-5 py-4 hover:bg-[var(--surface-2)] transition-colors text-left">
-                <span className="text-sm font-black text-[var(--text)]">{opt}</span>
-                {contrast === opt && <span className="text-sm text-[var(--text-muted)] font-bold">✓</span>}
+                className="w-full flex items-center justify-between px-5 py-4 transition-opacity hover:opacity-70 text-left"
+                style={{ borderTop: idx > 0 ? `1px solid ${modalBorder}` : undefined }}>
+                <span className="text-sm font-black" style={{ color: modalColor }}>{opt}</span>
+                {contrast === opt && <span className="text-sm font-bold" style={{ color: modalColor }}>?</span>}
               </button>
             ))}
           </div>
@@ -135,12 +143,13 @@ function OptionsModal({ contrast, textSize, onContrast, onTextSize, onClose }: {
 
         {/* Text size screen */}
         {screen === 'textsize' && (
-          <div className="divide-y divide-[var(--border)]">
-            {Object.keys(TEXT_SIZES).map(opt => (
+          <div>
+            {Object.keys(TEXT_SIZES).map((opt, idx) => (
               <button key={opt} onClick={() => { onTextSize(opt); setScreen('main'); }}
-                className="w-full flex items-center justify-between px-5 py-4 hover:bg-[var(--surface-2)] transition-colors text-left">
-                <span className="text-sm font-black text-[var(--text)]">{opt}</span>
-                {textSize === opt && <span className="text-sm text-[var(--text-muted)] font-bold">✓</span>}
+                className="w-full flex items-center justify-between px-5 py-4 transition-opacity hover:opacity-70 text-left"
+                style={{ borderTop: idx > 0 ? `1px solid ${modalBorder}` : undefined }}>
+                <span className="text-sm font-black" style={{ color: modalColor }}>{opt}</span>
+                {textSize === opt && <span className="text-sm font-bold" style={{ color: modalColor }}>?</span>}
               </button>
             ))}
           </div>
