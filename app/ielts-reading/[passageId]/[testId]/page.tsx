@@ -439,14 +439,6 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
     const span = document.createElement('span');
     span.style.backgroundColor = color;
     span.dataset.highlight = 'true';
-    span.style.cursor = 'pointer';
-    span.title = 'Click to remove highlight';
-    span.onclick = () => {
-      const parent = span.parentNode;
-      if (!parent) return;
-      while (span.firstChild) parent.insertBefore(span.firstChild, span);
-      parent.removeChild(span);
-    };
     try { range.surroundContents(span); }
     catch { const frag = range.extractContents(); span.appendChild(frag); range.insertNode(span); }
     sel.removeAllRanges();
