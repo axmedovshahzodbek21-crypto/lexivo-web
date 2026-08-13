@@ -408,7 +408,7 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
       </div>
 
       {/* Two-column layout */}
-      <div className="flex gap-6 items-start">
+      <div className="flex gap-6 items-start" style={{ color: passageStyle.color }}>
 
         {/* Passage */}
         <div
@@ -427,11 +427,11 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
             let qIndex = 0;
             return groups.map((group, gi) => (
               <div key={gi} className="flex flex-col gap-3">
-                <div className="rounded-xl px-4 py-3 border border-[var(--border)]" style={{ background: 'var(--surface-2)' }}>
-                  <p className="text-xs font-black text-[var(--text)] mb-1">
+                <div className="rounded-xl px-4 py-3 border" style={{ background: passageStyle.bg, borderColor: `${passageStyle.color}25` }}>
+                  <p className="text-xs font-black mb-1" style={{ color: passageStyle.color }}>
                     Questions {group.start}{group.end > group.start ? `–${group.end}` : ''}
                   </p>
-                  <p className="text-xs text-[var(--text-muted)] leading-relaxed">{TYPE_INSTRUCTIONS[group.type]}</p>
+                  <p className="text-xs leading-relaxed" style={{ color: passageStyle.color, opacity: 0.7 }}>{TYPE_INSTRUCTIONS[group.type]}</p>
                 </div>
 
                 {test.questions.slice(group.start - 1, group.end).map((q) => {
@@ -441,18 +441,20 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
                   const isRev = revealed.has(i);
 
                   return (
-                    <div key={i} className={`rounded-2xl border bg-[var(--surface)] overflow-hidden transition-colors ${
-                      submitted && correct === true ? 'border-green-500/40'
-                      : submitted && correct === false ? 'border-red-500/40'
-                      : 'border-[var(--border)]'
-                    }`}>
+                    <div key={i} className="rounded-2xl border overflow-hidden transition-colors"
+                      style={{
+                        background: passageStyle.bg,
+                        borderColor: submitted && correct === true ? 'rgb(34 197 94 / 0.5)'
+                          : submitted && correct === false ? 'rgb(239 68 68 / 0.5)'
+                          : `${passageStyle.color}25`,
+                      }}>
                       <div className="px-4 pt-4 pb-3">
                         <div className="flex items-start gap-3">
                           <span className="shrink-0 w-6 h-6 rounded-full text-white text-xs font-black flex items-center justify-center mt-0.5" style={{ background: 'var(--primary)' }}>
                             {i + 1}
                           </span>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm text-[var(--text)] leading-snug font-medium">{q.question}</p>
+                            <p className="text-sm leading-snug font-medium" style={{ color: passageStyle.color }}>{q.question}</p>
 
                             {mode === 'test' && !submitted && (
                               <QuestionInput q={q} value={userAnswer} onChange={v => setAnswer(i, v)} disabled={false} />
