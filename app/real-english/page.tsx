@@ -143,18 +143,24 @@ export default function RealEnglishPage() {
       </div>
 
       {/* Unlocked videos */}
-      {unlockedSets.length > 0 && (
-        <section className="mb-8">
-          <h2 className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mb-3">
-            🎬 My Unlocked Videos
-          </h2>
+      <section className="mb-8">
+        <h2 className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mb-3">
+          🎬 My Unlocked Videos
+        </h2>
+        {unlockedSets.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-[var(--border)] bg-[var(--surface)] p-6 flex flex-col items-center justify-center text-center gap-2">
+            <span className="text-3xl">🔒</span>
+            <p className="text-sm font-bold text-[var(--text)]">No unlocked videos yet</p>
+            <p className="text-xs text-[var(--text-muted)]">Learn all the words in a set and complete your SRS reviews — the YouTube link unlocks automatically.</p>
+          </div>
+        ) : (
           <div className="flex flex-col gap-3">
             {unlockedSets.map(set => (
               <UnlockedCard key={set.id} set={set} />
             ))}
           </div>
-        </section>
-      )}
+        )}
+      </section>
 
       {/* Available sets */}
       <section>
