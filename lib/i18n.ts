@@ -3,6 +3,7 @@ const en = {
   nav: {
     home: 'Home',
     learn: 'Learn',
+    real_english: 'Real English',
     reading: 'Ideas',
     review: 'Review',
     search: 'Search',
@@ -440,6 +441,7 @@ const uz: typeof en = {
   nav: {
     home: 'Bosh sahifa',
     learn: "O'rganish",
+    real_english: 'Real English',
     reading: "G'oyalar",
     review: 'Takrorlash',
     search: 'Qidirish',

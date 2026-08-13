@@ -15,7 +15,7 @@ const NAV_HREFS = [
   { href: '/srs',          icon: '🔄', key: 'review'      },
   { href: '/search',       icon: '🔍', key: 'search'      },
   { href: '/progress',     icon: '📊', key: 'progress'    },
-  { href: '/learn',        icon: '📖', key: 'learn'       },
+  { href: '/real-english',  icon: '🗣️', key: 'real_english' },
   { href: '/leaderboard',  icon: '🏆', key: 'leaderboard' },
   { href: '/classes',      icon: '👩‍🏫', key: 'classes'     },
   { href: '/library',      icon: '📚', key: 'library'     },

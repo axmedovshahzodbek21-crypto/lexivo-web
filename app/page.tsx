@@ -59,7 +59,7 @@ const DEFINED_CARD_IDS = [
   'daily_goal','level','wod',
   'learn','flashcards','srs','quiz',
   'starred','match','pomodoro','leaderboard',
-  'hard_words','lists','grammar','classes','xp_history',
+  'hard_words','lists','grammar','classes','xp_history','real_english',
 ];
 const CARD_META: Record<string, { icon: string; label: string }> = {
   collections:{ icon:'🗂️', label:'Collections' }, reading:{ icon:'📰', label:'Reading' },
@@ -72,7 +72,8 @@ const CARD_META: Record<string, { icon: string; label: string }> = {
   leaderboard:{ icon:'🏆', label:'Leaderboard'  }, starred:{ icon:'⭐', label:'Starred'      },
   hard_words: { icon:'😓', label:'Hard Words'   }, lists:{ icon:'📋', label:'My Lists'    },
   grammar:    { icon:'📚', label:'Grammar'      }, classes:{ icon:'👩‍🏫', label:'Classes'    },
-  xp_history: { icon:'📅', label:'XP History'   },
+  xp_history:  { icon:'📅', label:'XP History'   },
+  real_english:{ icon:'🗣️', label:'Real English'  },
 };
 
 const COLLECTION_META: Record<string, { icon: string; color: string; desc: string }> = {
@@ -127,6 +128,7 @@ export default function HomePage() {
   const [hideGrammar, setHideGrammar] = useState(false);
   const [hideClasses, setHideClasses] = useState(false);
   const [hideXpHistory, setHideXpHistory] = useState(false);
+  const [hideRealEnglish, setHideRealEnglish] = useState(false);
   // Slot-map: 20-element array, each entry is a card ID or null (empty slot)
   const [slotMap, setSlotMap] = useState<(string|null)[]>(Array(200).fill(null));
   const [arrangeMode, setArrangeMode] = useState(false);
@@ -212,7 +214,7 @@ export default function HomePage() {
       'daily_goal', 'level', 'wod',
       'learn', 'flashcards', 'srs', 'quiz',
       'starred', 'match', 'pomodoro', 'leaderboard',
-      'hard_words', 'lists', 'grammar', 'classes', 'xp_history',
+      'hard_words', 'lists', 'grammar', 'classes', 'xp_history', 'real_english',
     ];
     const ALL_IDS = new Set(DEFAULT_ORDER);
     const savedOrder = localStorage.getItem('home_section_order');
@@ -249,6 +251,7 @@ export default function HomePage() {
     setHideGrammar(localStorage.getItem('home_hide_grammar') === '1');
     setHideClasses(localStorage.getItem('home_hide_classes') === '1');
     setHideXpHistory(localStorage.getItem('home_hide_xp_history') === '1');
+    setHideRealEnglish(localStorage.getItem('home_hide_real_english') === '1');
 
     // Load hero toggle
     setHeroEnabled(localStorage.getItem('home_hero_enabled') !== '0');
@@ -403,6 +406,7 @@ export default function HomePage() {
       hard_words: 'home_hide_hard_words',   lists: 'home_hide_lists',
       grammar: 'home_hide_grammar',         classes: 'home_hide_classes',
       xp_history: 'home_hide_xp_history',
+      real_english: 'home_hide_real_english',
     };
     hideSelection.forEach(sId => {
       if (LS[sId]) localStorage.setItem(LS[sId], '1');
@@ -427,6 +431,7 @@ export default function HomePage() {
       else if (sId === 'grammar')      setHideGrammar(true);
       else if (sId === 'classes')      setHideClasses(true);
       else if (sId === 'xp_history')   setHideXpHistory(true);
+      else if (sId === 'real_english') setHideRealEnglish(true);
       else if (sId.startsWith('class_')) {
         const cId = sId.replace('class_', '');
         localStorage.setItem(`home_hide_class_${cId}`, '1');
@@ -456,6 +461,7 @@ export default function HomePage() {
       hard_words: 'home_hide_hard_words',   lists: 'home_hide_lists',
       grammar: 'home_hide_grammar',         classes: 'home_hide_classes',
       xp_history: 'home_hide_xp_history',
+      real_english: 'home_hide_real_english',
     };
     unhideSelection.forEach(sId => {
       if (LS[sId]) localStorage.removeItem(LS[sId]);
@@ -480,6 +486,7 @@ export default function HomePage() {
       else if (sId === 'grammar')      setHideGrammar(false);
       else if (sId === 'classes')      setHideClasses(false);
       else if (sId === 'xp_history')   setHideXpHistory(false);
+      else if (sId === 'real_english') setHideRealEnglish(false);
       else if (sId.startsWith('class_')) {
         const cId = sId.replace('class_', '');
         localStorage.removeItem(`home_hide_class_${cId}`);
@@ -683,6 +690,7 @@ export default function HomePage() {
           pomodoro: hidePomodoro, leaderboard: hideLeaderboard, starred: hideStarred,
           hard_words: hideHardWords, lists: hideLists, grammar: hideGrammar, classes: hideClasses,
           xp_history: hideXpHistory,
+          real_english: hideRealEnglish,
           ...Object.fromEntries(homeClasses.map(c => [`class_${c.classId}`, hiddenClassIds.has(c.classId)])),
         };
         const visible = sectionOrder.filter(sId => !HIDE_MAP[sId]);
@@ -707,6 +715,7 @@ export default function HomePage() {
           grammar:     { href: '/grammar-tips', icon: '📚', title: t.home.grammarTitle,    subtitle: t.home.grammarSub,     gradient: 'linear-gradient(135deg, #1a9a50, #2ECC71)', edge: '#0f6634', glow: 'rgba(46,204,113,0.4)' },
           classes:     { href: '/classes',      icon: '👩‍🏫', title: t.home.classesTitle,  subtitle: t.home.classesSub,     gradient: 'linear-gradient(135deg, #0284c7, #38bdf8)', edge: '#0369a1', glow: 'rgba(2,132,199,0.4)' },
           xp_history:  { href: '#xp-history',   icon: '📅', title: 'XP History',           subtitle: 'Your XP calendar',    gradient: 'linear-gradient(135deg, #4c1d95, #6c63ff)', edge: '#2e1065', glow: 'rgba(108,99,255,0.4)' },
+          real_english:{ href: '/real-english', icon: '🗣️', title: 'Real English',          subtitle: 'Build your listening', gradient: 'linear-gradient(135deg, #0e7490, #06b6d4)', edge: '#164e63', glow: 'rgba(14,116,144,0.4)' },
         };
 
         const renderCard = (sId: string, isLarge: boolean) => {
