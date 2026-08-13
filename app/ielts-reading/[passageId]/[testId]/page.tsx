@@ -406,33 +406,33 @@ function QuestionInput({ q, value, onChange, disabled }: {
 
 // ─── Answer reveal ───────────────────────────────────────────────────────────
 
-function AnswerReveal({ q, userAnswer, submitted }: {
-  q: IeltsQuestion; userAnswer?: string; submitted?: boolean;
+function AnswerReveal({ q, userAnswer, submitted, passageColor }: {
+  q: IeltsQuestion; userAnswer?: string; submitted?: boolean; passageColor: string;
 }) {
   const correct = submitted && userAnswer !== undefined ? isCorrect(q, userAnswer) : null;
   return (
-    <div className="border-t border-[var(--border)] px-4 py-4 space-y-3">
+    <div className="border-t px-4 py-4 space-y-3" style={{ borderColor: `${passageColor}25` }}>
       {submitted && userAnswer !== undefined && (
         <div className="flex items-center gap-2 mb-1">
           <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${correct ? 'bg-green-500/15 text-green-500' : 'bg-red-500/15 text-red-500'}`}>
             {correct ? '✓ Correct' : '✗ Incorrect'}
           </span>
           {!correct && userAnswer && (
-            <span className="text-xs text-[var(--text-muted)]">Your answer: <strong>{userAnswer}</strong></span>
+            <span className="text-xs" style={{ color: passageColor, opacity: 0.6 }}>Your answer: <strong>{userAnswer}</strong></span>
           )}
         </div>
       )}
       <div className="flex items-center gap-2">
-        <span className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider">Answer:</span>
+        <span className="text-xs font-bold uppercase tracking-wider" style={{ color: passageColor, opacity: 0.6 }}>Answer:</span>
         <span className="px-2 py-0.5 rounded-lg text-sm font-black text-white" style={{ background: 'var(--primary)' }}>{q.answer}</span>
       </div>
       <div className="rounded-xl p-3" style={{ background: 'color-mix(in srgb, var(--primary) 10%, transparent)', borderLeft: '3px solid var(--primary)' }}>
-        <p className="text-[10px] font-bold text-[var(--primary)] uppercase tracking-wider mb-1">From the passage</p>
-        <p className="text-sm text-[var(--text)] italic leading-snug">"{q.passage_excerpt}"</p>
+        <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: 'var(--primary)' }}>From the passage</p>
+        <p className="text-sm italic leading-snug" style={{ color: passageColor }}>"{q.passage_excerpt}"</p>
       </div>
       <div>
-        <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider mb-1">Why?</p>
-        <p className="text-sm text-[var(--text-muted)] leading-snug">{q.explanation}</p>
+        <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: passageColor, opacity: 0.6 }}>Why?</p>
+        <p className="text-sm leading-snug" style={{ color: passageColor, opacity: 0.75 }}>{q.explanation}</p>
       </div>
     </div>
   );
@@ -851,7 +851,7 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
                         </div>
 
                         {((mode === 'review' && isRev) || (mode === 'test' && submitted)) && (
-                          <AnswerReveal q={q} userAnswer={mode === 'test' ? userAnswer : undefined} submitted={mode === 'test' && submitted} />
+                          <AnswerReveal q={q} userAnswer={mode === 'test' ? userAnswer : undefined} submitted={mode === 'test' && submitted} passageColor={passageStyle.color} />
                         )}
                       </div>
                     );
