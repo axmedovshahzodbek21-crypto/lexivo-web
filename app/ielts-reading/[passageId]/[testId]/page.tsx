@@ -420,6 +420,54 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
     return () => { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); };
   }, []);
 
+  // Highlight toolbar
+  const HIGHLIGHT_COLORS = ['#FFEB3B', '#86EFAC', '#93C5FD', '#F9A8D4'];
+  const [floatingBar, setFloatingBar] = useState<{ x: number; y: number } | null>(null);
+
+  const handleTextMouseUp = () => {
+    const sel = window.getSelection();
+    if (!sel || sel.isCollapsed || !sel.toString().trim()) { setFloatingBar(null); return; }
+    const rect = sel.getRangeAt(0).getBoundingClientRect();
+    setFloatingBar({ x: rect.left + rect.width / 2, y: rect.top + window.scrollY });
+  };
+
+  const applyHighlight = (color: string) => {
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0) return;
+    const range = sel.getRangeAt(0);
+    if (range.collapsed) return;
+    const span = document.createElement('span');
+    span.style.backgroundColor = color;
+    span.dataset.highlight = 'true';
+    span.style.cursor = 'pointer';
+    span.title = 'Click to remove highlight';
+    span.onclick = () => {
+      const parent = span.parentNode;
+      if (!parent) return;
+      while (span.firstChild) parent.insertBefore(span.firstChild, span);
+      parent.removeChild(span);
+    };
+    try { range.surroundContents(span); }
+    catch { const frag = range.extractContents(); span.appendChild(frag); range.insertNode(span); }
+    sel.removeAllRanges();
+    setFloatingBar(null);
+  };
+
+  const removeHighlight = () => {
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0) return;
+    const range = sel.getRangeAt(0);
+    const ancestor = range.commonAncestorContainer;
+    const el = (ancestor.nodeType === 3 ? ancestor.parentElement : ancestor) as HTMLElement | null;
+    if (el?.dataset?.highlight === 'true') {
+      const parent = el.parentNode!;
+      while (el.firstChild) parent.insertBefore(el.firstChild, el);
+      parent.removeChild(el);
+    }
+    sel.removeAllRanges();
+    setFloatingBar(null);
+  };
+
   const setAnswer = useCallback((i: number, val: string) => {
     setAnswers(prev => ({ ...prev, [i]: val }));
   }, []);
@@ -521,6 +569,7 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
 
         {/* Passage */}
         <div className="overflow-y-auto p-6 transition-colors"
+          onMouseUp={handleTextMouseUp}
           style={{ width: `${passageWidthPct}%`, background: passageStyle.bg, color: passageStyle.color }}>
           <div className="space-y-4 leading-[1.85]" style={{ fontSize }}>
             {paragraphs.map((para, i) => <p key={i}>{para}</p>)}
@@ -538,6 +587,7 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
 
         {/* Questions */}
         <div className="flex flex-col gap-4 p-4 overflow-y-auto"
+          onMouseUp={handleTextMouseUp}
           style={{ width: `${100 - passageWidthPct}%`, background: passageStyle.bg }}>
           {(() => {
             const groups = buildGroups(test.questions);
@@ -643,6 +693,28 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
           )}
         </div>
       </div>
+
+      {/* Highlight floating toolbar */}
+      {floatingBar && (
+        <div
+          className="fixed z-40 flex items-center gap-1.5 px-2 py-1.5 rounded-xl shadow-xl border border-[var(--border)]"
+          style={{ left: floatingBar.x, top: floatingBar.y - 44, transform: 'translateX(-50%)', background: 'var(--surface)' }}
+          onMouseDown={e => e.preventDefault()}
+        >
+          {HIGHLIGHT_COLORS.map(color => (
+            <button key={color} onClick={() => applyHighlight(color)}
+              className="w-5 h-5 rounded-full hover:scale-125 transition-transform"
+              style={{ background: color, boxShadow: '0 1px 3px rgba(0,0,0,0.3)' }}
+            />
+          ))}
+          <div className="w-px h-4 mx-0.5" style={{ background: 'var(--border)' }} />
+          <button onClick={removeHighlight}
+            className="w-5 h-5 rounded-full flex items-center justify-center hover:scale-125 transition-transform text-[9px] font-black text-[var(--text-muted)]"
+            style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}>
+            ✕
+          </button>
+        </div>
+      )}
 
       {/* Options modal */}
       {showOptions && (
