@@ -463,9 +463,9 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
   const fontSize = TEXT_SIZES[textSize] ?? 15;
 
   return (
-    <div className="px-4 py-6 pb-6">
+    <div className="flex flex-col" style={{ height: '100dvh' }}>
       {/* Top bar */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between px-4 pt-4 pb-3 shrink-0">
         <Link href={`/ielts-reading/${passageId}`} className="inline-flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
           ← Back to Tests
         </Link>
@@ -484,7 +484,7 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
       </div>
 
       {/* Header */}
-      <div className="mb-5 flex items-start justify-between gap-4">
+      <div className="px-4 pb-3 shrink-0 flex items-start justify-between gap-4">
         <div>
           <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mb-1">
             IELTS Reading · Passage {passageId} · Test {testId}
@@ -516,8 +516,8 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
         )}
       </div>
 
-      {/* Two-column layout — fixed height, both panels scroll independently */}
-      <div ref={containerRef} className="flex" style={{ height: 'calc(100vh - 185px)', background: passageStyle.bg }}>
+      {/* Two-column layout — fills remaining height */}
+      <div ref={containerRef} className="flex flex-1 min-h-0" style={{ background: passageStyle.bg }}>
 
         {/* Passage */}
         <div className="overflow-y-auto p-6 transition-colors"
