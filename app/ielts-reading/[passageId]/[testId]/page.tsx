@@ -350,7 +350,7 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
   const score = submitted ? test.questions.filter((q, i) => isCorrect(q, answers[i] ?? '')).length : null;
   const timerColor = secondsLeft < 300 ? 'text-red-500' : secondsLeft < 600 ? 'text-orange-400' : 'text-[var(--text)]';
 
-  const passageStyle = contrast !== 'Black on white' ? CONTRAST_STYLES[contrast] : undefined;
+  const passageStyle = CONTRAST_STYLES[contrast];
   const fontSize = TEXT_SIZES[textSize] ?? 15;
 
   return (
@@ -413,7 +413,7 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
         {/* Passage */}
         <div
           className="flex-1 min-w-0 rounded-2xl border border-[var(--border)] p-6 sticky top-4 max-h-[calc(100vh-120px)] overflow-y-auto transition-colors"
-          style={passageStyle ? { background: passageStyle.bg, color: passageStyle.color } : { background: 'var(--surface)' }}
+          style={{ background: passageStyle.bg, color: passageStyle.color }}
         >
           <div className="space-y-4 leading-[1.85]" style={{ fontSize }}>
             {paragraphs.map((para, i) => <p key={i}>{para}</p>)}
