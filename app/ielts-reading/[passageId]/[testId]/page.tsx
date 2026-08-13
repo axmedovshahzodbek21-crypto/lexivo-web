@@ -211,9 +211,37 @@ function buildGroups(questions: IeltsQuestion[]) {
 
 const ANSWER_HIGHLIGHT_COLOR = 'rgba(251, 146, 60, 0.45)'; // amber — distinct from manual highlights
 
+function highlightChunk(nodes: { node: Text; start: number }[], accumulated: string, chunk: string, color: string): HTMLElement[] {
+  const matchIdx = accumulated.toLowerCase().indexOf(chunk.toLowerCase());
+  if (matchIdx === -1) return [];
+  const matchEnd = matchIdx + chunk.length;
+  const highlighted: HTMLElement[] = [];
+  for (const { node, start } of nodes) {
+    const end = start + (node.textContent?.length ?? 0);
+    if (end <= matchIdx || start >= matchEnd) continue;
+    const localStart = Math.max(0, matchIdx - start);
+    const localEnd = Math.min(node.textContent?.length ?? 0, matchEnd - start);
+    const range = document.createRange();
+    range.setStart(node, localStart);
+    range.setEnd(node, localEnd);
+    const span = document.createElement('span');
+    span.style.backgroundColor = color;
+    span.style.borderRadius = '2px';
+    span.dataset.answerHighlight = 'true';
+    try {
+      range.surroundContents(span);
+    } catch {
+      try { const frag = range.extractContents(); span.appendChild(frag); range.insertNode(span); } catch { continue; }
+    }
+    highlighted.push(span);
+  }
+  return highlighted;
+}
+
 function findAndHighlightExcerpt(container: HTMLElement, excerpt: string): HTMLElement[] {
-  const clean = excerpt.replace(/\.{3}$|…$/, '').trim();
-  if (!clean) return [];
+  // Split on mid-excerpt ellipsis to handle multi-chunk excerpts
+  const chunks = excerpt.split(/\s*[…\.]{3}\s*/).map(c => c.trim()).filter(Boolean);
+  if (chunks.length === 0) return [];
 
   const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
   let accumulated = '';
@@ -224,32 +252,13 @@ function findAndHighlightExcerpt(container: HTMLElement, excerpt: string): HTMLE
     accumulated += node.textContent ?? '';
   }
 
-  const matchIdx = accumulated.toLowerCase().indexOf(clean.toLowerCase());
-  if (matchIdx === -1) return [];
-  const matchEnd = matchIdx + clean.length;
-  const highlighted: HTMLElement[] = [];
-
-  for (const { node, start } of nodes) {
-    const end = start + (node.textContent?.length ?? 0);
-    if (end <= matchIdx || start >= matchEnd) continue;
-    const localStart = Math.max(0, matchIdx - start);
-    const localEnd = Math.min(node.textContent?.length ?? 0, matchEnd - start);
-    const range = document.createRange();
-    range.setStart(node, localStart);
-    range.setEnd(node, localEnd);
-    const span = document.createElement('span');
-    span.style.backgroundColor = ANSWER_HIGHLIGHT_COLOR;
-    span.style.borderRadius = '2px';
-    span.dataset.answerHighlight = 'true';
-    try {
-      range.surroundContents(span);
-    } catch {
-      try { const frag = range.extractContents(); span.appendChild(frag); range.insertNode(span); } catch { continue; }
-    }
-    highlighted.push(span);
+  const allHighlighted: HTMLElement[] = [];
+  for (const chunk of chunks) {
+    const spans = highlightChunk(nodes, accumulated, chunk, ANSWER_HIGHLIGHT_COLOR);
+    allHighlighted.push(...spans);
   }
-  if (highlighted.length > 0) highlighted[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
-  return highlighted;
+  if (allHighlighted.length > 0) allHighlighted[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+  return allHighlighted;
 }
 
 function removeAnswerHighlights(spans: HTMLElement[]) {
