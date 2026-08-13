@@ -6,19 +6,45 @@ import { ieltsData, IeltsQuestion } from '@/lib/ielts-data';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
-const TYPE_LABELS: Record<string, string> = {
-  true_false_not_given:      'True / False / Not Given',
-  yes_no_not_given:          'Yes / No / Not Given',
-  multiple_choice:           'Multiple Choice',
-  multiple_choice_multi:     'Multiple Choice (Multiple Answers)',
-  matching_information:      'Matching Information',
-  matching_headings:         'Matching Headings',
-  matching_features:         'Matching Features',
-  matching_sentence_endings: 'Matching Sentence Endings',
-  sentence_completion:       'Sentence Completion',
-  summary_completion:        'Summary Completion',
-  short_answer:              'Short Answer',
+
+const TYPE_INSTRUCTIONS: Record<string, string> = {
+  true_false_not_given:
+    'Do the following statements agree with the information given in the passage? Write TRUE if the statement agrees with the information, FALSE if the statement contradicts the information, or NOT GIVEN if there is no information on this.',
+  yes_no_not_given:
+    'Do the following statements agree with the views of the writer? Write YES if the statement agrees with the views of the writer, NO if the statement contradicts the views of the writer, or NOT GIVEN if it is impossible to say what the writer thinks about this.',
+  multiple_choice:
+    'Choose the correct letter, A, B, C or D.',
+  multiple_choice_multi:
+    'Choose TWO letters, A–E.',
+  matching_information:
+    'The passage has several paragraphs. Which paragraph contains the following information? Write the correct letter in boxes on your answer sheet.',
+  matching_headings:
+    'Choose the correct heading for each paragraph from the list of headings below.',
+  matching_features:
+    'Match each statement with the correct option from the list. You may use any letter more than once.',
+  matching_sentence_endings:
+    'Complete each sentence with the correct ending from the box below.',
+  sentence_completion:
+    'Complete the sentences below. Choose NO MORE THAN TWO WORDS from the passage for each answer.',
+  summary_completion:
+    'Complete the summary below. Choose NO MORE THAN TWO WORDS from the passage for each answer.',
+  short_answer:
+    'Answer the questions below. Choose NO MORE THAN THREE WORDS from the passage for each answer.',
 };
+
+// Group consecutive questions of the same type
+function buildGroups(questions: IeltsQuestion[]) {
+  const groups: { type: string; start: number; end: number }[] = [];
+  questions.forEach((q, i) => {
+    const last = groups[groups.length - 1];
+    if (last && last.type === q.type) {
+      last.end = i + 1;
+    } else {
+      groups.push({ type: q.type, start: i + 1, end: i + 1 });
+    }
+  });
+  return groups;
+}
 
 const TIMER_SECONDS = 20 * 60;
 
@@ -281,9 +307,17 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 pb-24">
-      <Link href={`/ielts-reading/${passageId}`} className="inline-flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors mb-6">
-        ← Back to Tests
-      </Link>
+      <div className="flex items-center justify-between mb-6">
+        <Link href={`/ielts-reading/${passageId}`} className="inline-flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
+          ← Back to Tests
+        </Link>
+        <a href="https://t.me/LexivoApp" target="_blank" rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all hover:opacity-80"
+          style={{ background: '#2AABEE', color: 'white' }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z"/></svg>
+          Lexivo on Telegram
+        </a>
+      </div>
 
       {/* Header */}
       <div className="mb-5 flex items-start justify-between gap-4">
@@ -336,77 +370,86 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
 
         {/* Right: questions */}
         <div className="w-[440px] shrink-0 flex flex-col gap-4">
-          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider">
-            Questions 1–{test.questions.length}
-          </p>
 
-          {test.questions.map((q, i) => {
-            const userAnswer = answers[i] ?? '';
-            const correct = submitted ? isCorrect(q, userAnswer) : null;
-            const isRev = revealed.has(i);
-
-            return (
-              <div key={i} className={`rounded-2xl border bg-[var(--surface)] overflow-hidden transition-colors ${
-                submitted && correct === true
-                  ? 'border-green-500/40'
-                  : submitted && correct === false
-                  ? 'border-red-500/40'
-                  : 'border-[var(--border)]'
-              }`}>
-                {/* Question */}
-                <div className="px-4 pt-4 pb-3">
-                  <div className="flex items-start gap-3">
-                    <span className="shrink-0 w-6 h-6 rounded-full text-white text-xs font-black flex items-center justify-center mt-0.5" style={{ background: 'var(--primary)' }}>
-                      {i + 1}
-                    </span>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[10px] font-bold text-[var(--primary)] uppercase tracking-wider mb-1">{TYPE_LABELS[q.type]}</p>
-                      <p className="text-sm text-[var(--text)] leading-snug font-medium">{q.question}</p>
-
-                      {/* Input (test mode, not yet submitted) */}
-                      {mode === 'test' && !submitted && (
-                        <QuestionInput q={q} value={userAnswer} onChange={v => setAnswer(i, v)} disabled={false} />
-                      )}
-
-                      {/* Frozen input (test mode, submitted) */}
-                      {mode === 'test' && submitted && userAnswer && (
-                        <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold"
-                          style={{
-                            background: correct ? 'rgb(34 197 94 / 0.1)' : 'rgb(239 68 68 / 0.1)',
-                            color: correct ? 'rgb(34 197 94)' : 'rgb(239 68 68)',
-                          }}>
-                          {correct ? '✓' : '✗'} {userAnswer}
-                        </div>
-                      )}
-
-                      {/* Review mode: show/hide toggle */}
-                      {mode === 'review' && (
-                        <button
-                          onClick={() => setRevealed(prev => {
-                            const next = new Set(prev);
-                            next.has(i) ? next.delete(i) : next.add(i);
-                            return next;
-                          })}
-                          className="mt-3 text-xs font-bold px-3 py-1.5 rounded-lg transition-all"
-                          style={{
-                            background: isRev ? 'var(--primary)' : 'var(--surface-2)',
-                            color: isRev ? 'white' : 'var(--text-muted)',
-                          }}
-                        >
-                          {isRev ? 'Hide Answer' : 'Show Answer'}
-                        </button>
-                      )}
-                    </div>
-                  </div>
+          {(() => {
+            const groups = buildGroups(test.questions);
+            let qIndex = 0;
+            return groups.map((group, gi) => (
+              <div key={gi} className="flex flex-col gap-3">
+                {/* Group instruction block */}
+                <div className="rounded-xl px-4 py-3 border border-[var(--border)]" style={{ background: 'var(--surface-2)' }}>
+                  <p className="text-xs font-black text-[var(--text)] mb-1">
+                    Questions {group.start}{group.end > group.start ? `–${group.end}` : ''}
+                  </p>
+                  <p className="text-xs text-[var(--text-muted)] leading-relaxed">{TYPE_INSTRUCTIONS[group.type]}</p>
                 </div>
 
-                {/* Answer reveal */}
-                {((mode === 'review' && isRev) || (mode === 'test' && submitted)) && (
-                  <AnswerReveal q={q} userAnswer={mode === 'test' ? userAnswer : undefined} submitted={mode === 'test' && submitted} />
-                )}
+                {/* Questions in this group */}
+                {test.questions.slice(group.start - 1, group.end).map((q) => {
+                  const i = qIndex++;
+                  const userAnswer = answers[i] ?? '';
+                  const correct = submitted ? isCorrect(q, userAnswer) : null;
+                  const isRev = revealed.has(i);
+
+                  return (
+                    <div key={i} className={`rounded-2xl border bg-[var(--surface)] overflow-hidden transition-colors ${
+                      submitted && correct === true
+                        ? 'border-green-500/40'
+                        : submitted && correct === false
+                        ? 'border-red-500/40'
+                        : 'border-[var(--border)]'
+                    }`}>
+                      <div className="px-4 pt-4 pb-3">
+                        <div className="flex items-start gap-3">
+                          <span className="shrink-0 w-6 h-6 rounded-full text-white text-xs font-black flex items-center justify-center mt-0.5" style={{ background: 'var(--primary)' }}>
+                            {i + 1}
+                          </span>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm text-[var(--text)] leading-snug font-medium">{q.question}</p>
+
+                            {mode === 'test' && !submitted && (
+                              <QuestionInput q={q} value={userAnswer} onChange={v => setAnswer(i, v)} disabled={false} />
+                            )}
+
+                            {mode === 'test' && submitted && userAnswer && (
+                              <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold"
+                                style={{
+                                  background: correct ? 'rgb(34 197 94 / 0.1)' : 'rgb(239 68 68 / 0.1)',
+                                  color: correct ? 'rgb(34 197 94)' : 'rgb(239 68 68)',
+                                }}>
+                                {correct ? '✓' : '✗'} {userAnswer}
+                              </div>
+                            )}
+
+                            {mode === 'review' && (
+                              <button
+                                onClick={() => setRevealed(prev => {
+                                  const next = new Set(prev);
+                                  next.has(i) ? next.delete(i) : next.add(i);
+                                  return next;
+                                })}
+                                className="mt-3 text-xs font-bold px-3 py-1.5 rounded-lg transition-all"
+                                style={{
+                                  background: isRev ? 'var(--primary)' : 'var(--surface-2)',
+                                  color: isRev ? 'white' : 'var(--text-muted)',
+                                }}
+                              >
+                                {isRev ? 'Hide Answer' : 'Show Answer'}
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {((mode === 'review' && isRev) || (mode === 'test' && submitted)) && (
+                        <AnswerReveal q={q} userAnswer={mode === 'test' ? userAnswer : undefined} submitted={mode === 'test' && submitted} />
+                      )}
+                    </div>
+                  );
+                })}
               </div>
-            );
-          })}
+            ));
+          })()}
 
           {/* Submit button */}
           {mode === 'test' && !submitted && (
