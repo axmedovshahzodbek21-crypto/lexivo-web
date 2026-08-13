@@ -525,54 +525,54 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
   return (
     <div className="flex flex-col" style={{ height: '100dvh' }}>
       {/* Top bar */}
-      <div className="flex items-center justify-between px-4 pt-4 pb-3 shrink-0">
-        <Link href={`/ielts-reading/${passageId}`} className="inline-flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
-          ← Back to Tests
-        </Link>
-        <div className="flex items-center gap-2">
-          <button onClick={() => setShowOptions(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--primary)] hover:text-[var(--primary)] transition-all">
-            ⚙ Options
-          </button>
-          <a href="https://t.me/LexivoApp" target="_blank" rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all hover:opacity-80"
-            style={{ background: '#2AABEE', color: 'white' }}>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z"/></svg>
-            Lexivo
-          </a>
-        </div>
-      </div>
+      <div className="shrink-0 px-4 py-2">
+        {/* Row 1: Back | Timer (center) | Options + Lexivo */}
+        <div className="flex items-center justify-between gap-4">
+          <Link href={`/ielts-reading/${passageId}`} className="inline-flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors shrink-0">
+            ← Back to Tests
+          </Link>
 
-      {/* Header */}
-      <div className="px-4 pb-3 shrink-0 flex items-start justify-between gap-4">
-        <div>
-          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mb-1">
-            IELTS Reading · Passage {passageId} · Test {testId}
-            <span className="ml-2 px-1.5 py-0.5 rounded-full text-[10px] font-black" style={{
-              background: mode === 'test' ? 'var(--primary)' : 'color-mix(in srgb, var(--primary) 15%, transparent)',
-              color: mode === 'test' ? 'white' : 'var(--primary)',
-            }}>
-              {mode === 'test' ? '📝 TEST MODE' : '📖 REVIEW MODE'}
-            </span>
-          </p>
-        </div>
-
-        {mode === 'test' && !submitted && (
-          <div className="shrink-0 text-right">
-            <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">Time left</p>
-            <p className={`text-2xl font-black font-mono tabular-nums ${timerColor}`}>{formatTime(secondsLeft)}</p>
+          {/* Timer centered */}
+          <div className="flex-1 flex justify-center">
+            {mode === 'test' && !submitted && (
+              <div className="text-center">
+                <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider leading-none mb-0.5">TIME LEFT</p>
+                <p className={`text-2xl font-black font-mono tabular-nums leading-none ${timerColor}`}>{formatTime(secondsLeft)}</p>
+              </div>
+            )}
+            {mode === 'test' && submitted && score !== null && (
+              <div className="flex items-center gap-3 rounded-xl border border-[var(--primary)] px-4 py-1.5" style={{ background: 'color-mix(in srgb, var(--primary) 8%, transparent)' }}>
+                <span className="text-xs font-bold text-[var(--primary)] uppercase tracking-wider">Score</span>
+                <span className="text-xl font-black text-[var(--text)]">{score}<span className="text-sm text-[var(--text-muted)]">/{test.questions.length}</span></span>
+                <span className="text-xs text-[var(--text-muted)]">{Math.round((score / test.questions.length) * 100)}%</span>
+              </div>
+            )}
           </div>
-        )}
 
-        {mode === 'test' && submitted && score !== null && (
-          <div className="shrink-0 text-right rounded-2xl border border-[var(--primary)] px-5 py-3" style={{ background: 'color-mix(in srgb, var(--primary) 8%, transparent)' }}>
-            <p className="text-[10px] text-[var(--primary)] uppercase tracking-wider font-bold">Your Score</p>
-            <p className="text-3xl font-black text-[var(--text)]">
-              {score}<span className="text-lg text-[var(--text-muted)]">/{test.questions.length}</span>
-            </p>
-            <p className="text-xs text-[var(--text-muted)] mt-0.5">{Math.round((score / test.questions.length) * 100)}%</p>
+          <div className="flex items-center gap-2 shrink-0">
+            <button onClick={() => setShowOptions(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--primary)] hover:text-[var(--primary)] transition-all">
+              ⚙ Options
+            </button>
+            <a href="https://t.me/LexivoApp" target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all hover:opacity-80"
+              style={{ background: '#2AABEE', color: 'white' }}>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z"/></svg>
+              Lexivo
+            </a>
           </div>
-        )}
+        </div>
+
+        {/* Row 2: breadcrumb */}
+        <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mt-1.5">
+          IELTS Reading · Passage {passageId} · Test {testId}
+          <span className="ml-2 px-1.5 py-0.5 rounded-full text-[10px] font-black" style={{
+            background: mode === 'test' ? 'var(--primary)' : 'color-mix(in srgb, var(--primary) 15%, transparent)',
+            color: mode === 'test' ? 'white' : 'var(--primary)',
+          }}>
+            {mode === 'test' ? '📝 TEST MODE' : '📖 REVIEW MODE'}
+          </span>
+        </p>
       </div>
 
       {/* Two-column layout — fills remaining height */}
