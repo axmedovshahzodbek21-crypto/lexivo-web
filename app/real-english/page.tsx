@@ -119,6 +119,7 @@ function SetCard({ set }: { set: RealEnglishSet }) {
 export default function RealEnglishPage() {
   const [unlockedSets, setUnlockedSets] = useState<RealEnglishSet[]>([]);
   const [lockedSets, setLockedSets] = useState<RealEnglishSet[]>([]);
+  const [unlockedOpen, setUnlockedOpen] = useState(false);
 
   useEffect(() => {
     const unlocked: RealEnglishSet[] = [];
@@ -129,6 +130,7 @@ export default function RealEnglishPage() {
     }
     setUnlockedSets(unlocked);
     setLockedSets(locked);
+    if (unlocked.length > 0) setUnlockedOpen(true);
   }, []);
 
   return (
@@ -144,10 +146,19 @@ export default function RealEnglishPage() {
 
       {/* Unlocked videos */}
       <section className="mb-8">
-        <h2 className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mb-3">
-          🎬 My Unlocked Videos
-        </h2>
-        {unlockedSets.length === 0 ? (
+        <button
+          onClick={() => setUnlockedOpen(o => !o)}
+          className="w-full flex items-center justify-between mb-3 group"
+        >
+          <h2 className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider group-hover:text-[var(--text)] transition-colors">
+            🎬 My Unlocked Videos
+            {unlockedSets.length > 0 && (
+              <span className="ml-2 text-[var(--primary)]">({unlockedSets.length})</span>
+            )}
+          </h2>
+          <span className="text-xs text-[var(--text-muted)] transition-transform duration-200" style={{ display: 'inline-block', transform: unlockedOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>▾</span>
+        </button>
+        {unlockedOpen && (unlockedSets.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-[var(--border)] bg-[var(--surface)] p-6 flex flex-col items-center justify-center text-center gap-2">
             <span className="text-3xl">🔒</span>
             <p className="text-sm font-bold text-[var(--text)]">No unlocked videos yet</p>
@@ -159,7 +170,7 @@ export default function RealEnglishPage() {
               <UnlockedCard key={set.id} set={set} />
             ))}
           </div>
-        )}
+        ))}
       </section>
 
       {/* Available sets */}
