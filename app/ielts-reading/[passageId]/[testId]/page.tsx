@@ -354,7 +354,7 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
   const fontSize = TEXT_SIZES[textSize] ?? 15;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6 pb-24">
+    <div className="px-4 py-6 pb-6">
       {/* Top bar */}
       <div className="flex items-center justify-between mb-6">
         <Link href={`/ielts-reading/${passageId}`} className="inline-flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
@@ -408,26 +408,29 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
       </div>
 
       {/* Two-column layout */}
-      <div className="flex gap-6 items-start" style={{ color: passageStyle.color }}>
+      <div className="flex items-stretch" style={{ color: passageStyle.color, minHeight: 'calc(100vh - 200px)' }}>
 
         {/* Passage */}
         <div
-          className="flex-1 min-w-0 rounded-2xl border border-[var(--border)] p-6 sticky top-4 max-h-[calc(100vh-120px)] overflow-y-auto transition-colors"
-          style={{ background: passageStyle.bg, color: passageStyle.color }}
+          className="flex-1 min-w-0 p-6 overflow-y-auto transition-colors"
+          style={{ background: passageStyle.bg, color: passageStyle.color, maxHeight: 'calc(100vh - 160px)', position: 'sticky', top: '0' }}
         >
           <div className="space-y-4 leading-[1.85]" style={{ fontSize }}>
             {paragraphs.map((para, i) => <p key={i}>{para}</p>)}
           </div>
         </div>
 
+        {/* Divider */}
+        <div className="w-px shrink-0 self-stretch" style={{ background: `${passageStyle.color}25` }} />
+
         {/* Questions */}
-        <div className="w-[440px] shrink-0 flex flex-col gap-4">
+        <div className="w-[440px] shrink-0 flex flex-col gap-4 p-4 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 160px)' }}>
           {(() => {
             const groups = buildGroups(test.questions);
             let qIndex = 0;
             return groups.map((group, gi) => (
               <div key={gi} className="flex flex-col gap-3">
-                <div className="rounded-xl px-4 py-3 border" style={{ background: passageStyle.bg, borderColor: `${passageStyle.color}25` }}>
+                <div className="px-2 py-3 border-b" style={{ borderColor: `${passageStyle.color}25` }}>
                   <p className="text-xs font-black mb-1" style={{ color: passageStyle.color }}>
                     Questions {group.start}{group.end > group.start ? `–${group.end}` : ''}
                   </p>
