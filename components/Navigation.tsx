@@ -10,12 +10,12 @@ import { LEVEL_COLORS, LEVEL_COLORS_FALLBACK } from '@/lib/colors';
 
 const NAV_HREFS = [
   { href: '/',             icon: '🏠', key: 'home'        },
-  { href: '/learn',        icon: '📖', key: 'learn'       },
+  { href: '/ielts-reading', icon: '📝', key: 'ielts_reading' },
   { href: '/reading',      icon: '💡', key: 'reading'     },
   { href: '/srs',          icon: '🔄', key: 'review'      },
   { href: '/search',       icon: '🔍', key: 'search'      },
   { href: '/progress',     icon: '📊', key: 'progress'    },
-  { href: '/ielts-reading', icon: '📝', key: 'ielts_reading' },
+  { href: '/learn',        icon: '📖', key: 'learn'       },
   { href: '/leaderboard',  icon: '🏆', key: 'leaderboard' },
   { href: '/classes',      icon: '👩‍🏫', key: 'classes'     },
   { href: '/library',      icon: '📚', key: 'library'     },
