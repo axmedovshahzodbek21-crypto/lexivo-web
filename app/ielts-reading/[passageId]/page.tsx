@@ -22,20 +22,37 @@ export default function PassagePage({ params }: { params: Promise<{ passageId: s
         <p className="text-sm text-[var(--text-muted)] mt-1">Choose a test to begin.</p>
       </div>
 
-      <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
+      <div className="flex flex-col gap-3">
         {Array.from({ length: TOTAL_TESTS }, (_, i) => i + 1).map(n => {
           const available = availableTests.has(n);
+          const test = section?.tests.find(t => t.testNumber === n);
           return available ? (
-            <Link key={n} href={`/ielts-reading/${passageId}/${n}`}>
-              <div className="rounded-2xl border border-[var(--primary)] bg-[var(--primary-bg)] hover:bg-[var(--primary)] hover:text-white transition-all duration-200 p-4 cursor-pointer group text-center">
-                <p className="text-[10px] font-bold text-[var(--primary)] group-hover:text-white uppercase tracking-wider">Test</p>
-                <p className="text-xl font-black text-[var(--primary)] group-hover:text-white">{n}</p>
+            <div key={n} className="rounded-2xl border border-[var(--primary)] bg-[var(--surface)] p-4 flex items-center justify-between gap-4">
+              <div>
+                <p className="text-[10px] font-bold text-[var(--primary)] uppercase tracking-wider">Test {n}</p>
+                <p className="text-sm font-bold text-[var(--text)] mt-0.5 line-clamp-1">{test?.title}</p>
+                <p className="text-xs text-[var(--text-muted)] mt-0.5">{test?.questions.length} questions · 20 min</p>
               </div>
-            </Link>
+              <div className="flex gap-2 shrink-0">
+                <Link href={`/ielts-reading/${passageId}/${n}?mode=review`}>
+                  <button className="px-3 py-1.5 rounded-xl text-xs font-bold border border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--primary)] hover:text-[var(--primary)] transition-all">
+                    📖 Review
+                  </button>
+                </Link>
+                <Link href={`/ielts-reading/${passageId}/${n}?mode=test`}>
+                  <button className="px-3 py-1.5 rounded-xl text-xs font-bold text-white transition-all" style={{ background: 'var(--primary)' }}>
+                    📝 Test
+                  </button>
+                </Link>
+              </div>
+            </div>
           ) : (
-            <div key={n} className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 text-center opacity-40 cursor-default">
-              <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider">Test</p>
-              <p className="text-xl font-black text-[var(--text-muted)]">{n}</p>
+            <div key={n} className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 flex items-center justify-between opacity-35 cursor-default">
+              <div>
+                <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider">Test {n}</p>
+                <p className="text-xs text-[var(--text-muted)] mt-0.5">Coming soon</p>
+              </div>
+              <span className="text-lg">🔒</span>
             </div>
           );
         })}
