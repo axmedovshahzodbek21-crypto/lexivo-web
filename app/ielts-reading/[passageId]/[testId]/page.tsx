@@ -209,6 +209,58 @@ function buildGroups(questions: IeltsQuestion[]) {
   return groups;
 }
 
+const ANSWER_HIGHLIGHT_COLOR = 'rgba(251, 146, 60, 0.45)'; // amber — distinct from manual highlights
+
+function findAndHighlightExcerpt(container: HTMLElement, excerpt: string): HTMLElement[] {
+  const clean = excerpt.replace(/\.{3}$|…$/, '').trim();
+  if (!clean) return [];
+
+  const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
+  let accumulated = '';
+  const nodes: { node: Text; start: number }[] = [];
+  let node: Text | null;
+  while ((node = walker.nextNode() as Text | null)) {
+    nodes.push({ node, start: accumulated.length });
+    accumulated += node.textContent ?? '';
+  }
+
+  const matchIdx = accumulated.toLowerCase().indexOf(clean.toLowerCase());
+  if (matchIdx === -1) return [];
+  const matchEnd = matchIdx + clean.length;
+  const highlighted: HTMLElement[] = [];
+
+  for (const { node, start } of nodes) {
+    const end = start + (node.textContent?.length ?? 0);
+    if (end <= matchIdx || start >= matchEnd) continue;
+    const localStart = Math.max(0, matchIdx - start);
+    const localEnd = Math.min(node.textContent?.length ?? 0, matchEnd - start);
+    const range = document.createRange();
+    range.setStart(node, localStart);
+    range.setEnd(node, localEnd);
+    const span = document.createElement('span');
+    span.style.backgroundColor = ANSWER_HIGHLIGHT_COLOR;
+    span.style.borderRadius = '2px';
+    span.dataset.answerHighlight = 'true';
+    try {
+      range.surroundContents(span);
+    } catch {
+      try { const frag = range.extractContents(); span.appendChild(frag); range.insertNode(span); } catch { continue; }
+    }
+    highlighted.push(span);
+  }
+  if (highlighted.length > 0) highlighted[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+  return highlighted;
+}
+
+function removeAnswerHighlights(spans: HTMLElement[]) {
+  for (const span of spans) {
+    const parent = span.parentNode;
+    if (!parent) continue;
+    while (span.firstChild) parent.insertBefore(span.firstChild, span);
+    parent.removeChild(span);
+  }
+}
+
 // ─── Options modal ───────────────────────────────────────────────────────────
 
 type OptionsScreen = 'main' | 'contrast' | 'textsize';
@@ -551,6 +603,30 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
   const [passageWidthPct, setPassageWidthPct] = useState(50);
   const containerRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
+  const passageRef = useRef<HTMLDivElement>(null);
+  const answerHighlights = useRef<Map<number, HTMLElement[]>>(new Map());
+
+  // Sync answer highlights with revealed set (review mode only)
+  useEffect(() => {
+    if (mode !== 'review' || !passageRef.current || !test) return;
+    // Remove highlights for hidden questions
+    for (const [idx, spans] of answerHighlights.current.entries()) {
+      if (!revealed.has(idx)) {
+        removeAnswerHighlights(spans);
+        answerHighlights.current.delete(idx);
+      }
+    }
+    // Add highlights for newly revealed questions
+    for (const idx of revealed) {
+      if (!answerHighlights.current.has(idx)) {
+        const excerpt = test.questions[idx]?.passage_excerpt;
+        if (excerpt && passageRef.current) {
+          const spans = findAndHighlightExcerpt(passageRef.current, excerpt);
+          if (spans.length > 0) answerHighlights.current.set(idx, spans);
+        }
+      }
+    }
+  }, [revealed, mode, test]);
 
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
@@ -705,7 +781,7 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
       <div ref={containerRef} className="flex flex-1 min-h-0" style={{ background: passageStyle.bg }}>
 
         {/* Passage */}
-        <div className="overflow-y-auto p-6 transition-colors"
+        <div ref={passageRef} className="overflow-y-auto p-6 transition-colors"
           onMouseUp={handleTextMouseUp}
           style={{ width: `${passageWidthPct}%`, background: passageStyle.bg, color: passageStyle.color }}>
           {/* Passage header */}
