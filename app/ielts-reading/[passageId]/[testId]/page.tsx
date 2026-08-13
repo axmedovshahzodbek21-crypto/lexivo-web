@@ -411,9 +411,23 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
   const section = ieltsData.find(s => s.passageSection === Number(passageId));
   const test = section?.tests.find(t => t.testNumber === Number(testId));
 
+  const timerKey = `ielts_timer_${passageId}_${testId}`;
+
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [submitted, setSubmitted] = useState(false);
-  const [secondsLeft, setSecondsLeft] = useState(TIMER_SECONDS);
+  const [secondsLeft, setSecondsLeft] = useState(() => {
+    if (mode !== 'test') return TIMER_SECONDS;
+    const stored = sessionStorage.getItem(timerKey);
+    if (stored) {
+      const { startedAt } = JSON.parse(stored);
+      const elapsed = Math.floor((Date.now() - startedAt) / 1000);
+      const remaining = TIMER_SECONDS - elapsed;
+      if (remaining > 0) return remaining;
+    }
+    const startedAt = Date.now();
+    sessionStorage.setItem(timerKey, JSON.stringify({ startedAt }));
+    return TIMER_SECONDS;
+  });
   const [timerActive, setTimerActive] = useState(mode === 'test');
   const [revealed, setRevealed] = useState<Set<number>>(new Set());
 
@@ -487,6 +501,7 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
   const handleSubmit = useCallback(() => {
     setSubmitted(true);
     setTimerActive(false);
+    sessionStorage.removeItem(timerKey);
   }, []);
 
   useEffect(() => {
