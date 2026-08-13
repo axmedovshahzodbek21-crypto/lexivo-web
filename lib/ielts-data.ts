@@ -20,8 +20,11 @@ export interface IeltsQuestion {
   answer: string;
   passage_excerpt: string;
   explanation: string;
-  paragraphLabels?: string;  // e.g. "A–G" for matching_information
-  featureListTitle?: string; // e.g. "List of People" for matching_features
+  paragraphLabels?: string;   // e.g. "A–G" for matching_information / matching_headings
+  featureListTitle?: string;  // e.g. "List of People" for matching_features
+  summaryText?: string;       // full summary paragraph with [N] placeholders for summary_completion
+  summaryTitle?: string;      // e.g. "Uses of a Popular Tree" — title of the summary box
+  summaryOptions?: string[];  // for letter-based summary completion (A–H phrases)
 }
 
 export interface IeltsPassageTest {

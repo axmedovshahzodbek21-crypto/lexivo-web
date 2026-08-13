@@ -6,18 +6,27 @@ import { ieltsData, IeltsQuestion } from '@/lib/ielts-data';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
+const ROMANS = ['i','ii','iii','iv','v','vi','vii','viii','ix','x','xi','xii','xiii','xiv','xv'];
+const LETTERS = ['A','B','C','D','E','F','G','H','I','J','K'];
+
+function letterList(n: number) {
+  const ls = LETTERS.slice(0, n);
+  if (n <= 1) return ls[0] ?? 'A';
+  return ls.slice(0, -1).join(', ') + ' or ' + ls[ls.length - 1];
+}
+
 function QuestionInstruction({ type, start, end, passageId, color, paragraphLabels, options, featureListTitle }: {
   type: string; start: number; end: number; passageId: string; color: string;
   paragraphLabels?: string; options?: string[]; featureListTitle?: string;
 }) {
   const range = end > start ? `${start}–${end}` : `${start}`;
   const it: React.CSSProperties = { fontStyle: 'italic', color, display: 'block', marginBottom: 6 };
-  const key: React.CSSProperties = { fontWeight: 900, fontStyle: 'italic', color, minWidth: 90, display: 'inline-block' };
-  const val: React.CSSProperties = { fontStyle: 'italic', color };
+  const kw: React.CSSProperties = { fontWeight: 900, fontStyle: 'italic', color, minWidth: 90, display: 'inline-block' };
+  const vl: React.CSSProperties = { fontStyle: 'italic', color };
+  const nb: React.CSSProperties = { color, display: 'block', marginBottom: 6 };
+  const box: React.CSSProperties = { border: `1px solid ${color}`, display: 'inline-block', padding: '10px 20px', marginTop: 8, marginBottom: 4, minWidth: 200 };
 
-  const head = (
-    <span style={{ ...it, fontStyle: 'italic', marginBottom: 10 }}>Questions {range}</span>
-  );
+  const head = <span style={{ ...it, marginBottom: 10 }}>Questions {range}</span>;
 
   switch (type) {
     case 'true_false_not_given':
@@ -27,7 +36,7 @@ function QuestionInstruction({ type, start, end, passageId, color, paragraphLabe
         <span style={it}>In boxes {range} on your answer sheet, write</span>
         <div style={{ paddingLeft: 16, marginTop: 4 }}>
           {[['TRUE','if the statement agrees with the information'],['FALSE','if the statement contradicts the information'],['NOT GIVEN','if there is no information on this']].map(([k,v]) => (
-            <div key={k} style={{ display: 'flex', gap: 16, marginBottom: 2 }}><span style={key}>{k}</span><span style={val}>{v}</span></div>
+            <div key={k} style={{ display: 'flex', gap: 16, marginBottom: 2 }}><span style={kw}>{k}</span><span style={vl}>{v}</span></div>
           ))}
         </div>
       </div>;
@@ -39,7 +48,7 @@ function QuestionInstruction({ type, start, end, passageId, color, paragraphLabe
         <span style={it}>In boxes {range} on your answer sheet, write</span>
         <div style={{ paddingLeft: 16, marginTop: 4 }}>
           {[['YES','if the statement agrees with the views of the writer'],['NO','if the statement contradicts the views of the writer'],['NOT GIVEN','if it is impossible to say what the writer thinks about this']].map(([k,v]) => (
-            <div key={k} style={{ display: 'flex', gap: 16, marginBottom: 2 }}><span style={key}>{k}</span><span style={val}>{v}</span></div>
+            <div key={k} style={{ display: 'flex', gap: 16, marginBottom: 2 }}><span style={kw}>{k}</span><span style={vl}>{v}</span></div>
           ))}
         </div>
       </div>;
@@ -48,12 +57,14 @@ function QuestionInstruction({ type, start, end, passageId, color, paragraphLabe
       return <div style={{ fontSize: 13, lineHeight: 1.6 }}>
         {head}
         <span style={it}>Choose the correct letter, <strong>A</strong>, <strong>B</strong>, <strong>C</strong> or <strong>D</strong>.</span>
+        <span style={it}>Write the correct letter in boxes {range} on your answer sheet.</span>
       </div>;
 
     case 'multiple_choice_multi':
       return <div style={{ fontSize: 13, lineHeight: 1.6 }}>
         {head}
         <span style={it}>Choose <strong>TWO</strong> letters, <strong>A–E</strong>.</span>
+        <span style={it}>Write the correct letters in boxes {range} on your answer sheet.</span>
       </div>;
 
     case 'matching_information': {
@@ -63,34 +74,26 @@ function QuestionInstruction({ type, start, end, passageId, color, paragraphLabe
         <span style={it}>Reading Passage {passageId} has several paragraphs, <strong>{pl}</strong>.</span>
         <span style={it}>Which section contains the following information?</span>
         <span style={it}>Write the correct letter, <strong>{pl}</strong>, in boxes {range} on your answer sheet.</span>
-        <span style={{ color, display: 'block', marginBottom: 6, marginTop: 2 }}><strong>NB</strong> You may use any letter more than once.</span>
+        <span style={nb}><strong>NB</strong> You may use any letter more than once.</span>
       </div>;
     }
 
-    case 'matching_headings':
+    case 'matching_headings': {
+      const pl = paragraphLabels ?? 'A–G';
+      const romans = options ? ROMANS.slice(0, options.length) : ROMANS.slice(0, 7);
+      const romanRange = `${romans[0]}–${romans[romans.length - 1]}`;
       return <div style={{ fontSize: 13, lineHeight: 1.6 }}>
         {head}
+        <span style={it}>Reading Passage {passageId} has several paragraphs, <strong>{pl}</strong>.</span>
         <span style={it}>Choose the correct heading for each paragraph from the list of headings below.</span>
-        <span style={it}>Write the correct number, <strong>i–x</strong>, in boxes {range} on your answer sheet.</span>
-      </div>;
-
-    case 'matching_features': {
-      const letters = ['A','B','C','D','E','F','G','H'];
-      const letterList = options && options.length >= 2
-        ? letters.slice(0, options.length).map((l, i) => `${l}, `).join('').replace(/, $/, '').replace(/,([^,]*)$/, ' or$1')
-        : 'A, B, or C';
-      const nb: React.CSSProperties = { color, display: 'block', marginBottom: 6 };
-      return <div style={{ fontSize: 13, lineHeight: 1.6 }}>
-        {head}
-        <span style={{ color, display: 'block', marginBottom: 6 }}>Look at the following statements and the list of {featureListTitle ? featureListTitle.replace('List of ', '').toLowerCase() : 'people'} below.</span>
-        <span style={{ color, display: 'block', marginBottom: 6 }}>Match each statement with the correct {featureListTitle ? featureListTitle.replace('List of ', '').toLowerCase().replace(/s$/, '') : 'person'}, <strong>{letterList}</strong>.</span>
-        <span style={nb}><strong>NB</strong> You may use any letter more than once.</span>
+        <span style={it}>Write the correct number, <strong><em>{romanRange}</em></strong>, in boxes {range} on your answer sheet.</span>
         {options && options.length > 0 && (
-          <div style={{ border: `1px solid ${color}`, display: 'inline-block', padding: '10px 20px', marginTop: 6, marginBottom: 4, minWidth: 200 }}>
-            <div style={{ fontWeight: 700, color, marginBottom: 8 }}>{featureListTitle ?? 'List of People'}</div>
+          <div style={box}>
+            <div style={{ fontWeight: 700, color, textAlign: 'center', marginBottom: 10 }}>List of Headings</div>
             {options.map((opt, i) => (
-              <div key={i} style={{ color, marginBottom: 4 }}>
-                <strong>{letters[i]}</strong>&nbsp;&nbsp;{opt}
+              <div key={i} style={{ color, marginBottom: 5, display: 'flex', gap: 12 }}>
+                <span style={{ fontStyle: 'italic', minWidth: 28 }}>{romans[i]}</span>
+                <span>{opt}</span>
               </div>
             ))}
           </div>
@@ -98,18 +101,44 @@ function QuestionInstruction({ type, start, end, passageId, color, paragraphLabe
       </div>;
     }
 
-    case 'matching_sentence_endings':
+    case 'matching_features': {
+      const n = options?.length ?? 3;
+      const ll = letterList(n);
+      const noun = featureListTitle ? featureListTitle.replace('List of ', '').toLowerCase().replace(/s$/, '') : 'person';
+      const listLabel = featureListTitle ?? 'List of People';
       return <div style={{ fontSize: 13, lineHeight: 1.6 }}>
         {head}
-        <span style={it}>Complete each sentence with the correct ending, <strong>A–</strong>…, from the box below.</span>
+        <span style={{ color, display: 'block', marginBottom: 6 }}>Look at the following statements and the list of {listLabel.replace('List of ', '').toLowerCase()} below.</span>
+        <span style={{ color, display: 'block', marginBottom: 6 }}>Match each statement with the correct {noun}, <strong>{ll}</strong>.</span>
+        <span style={nb}><strong>NB</strong> You may use any letter more than once.</span>
+        {options && options.length > 0 && (
+          <div style={box}>
+            <div style={{ fontWeight: 700, color, marginBottom: 8 }}>{listLabel}</div>
+            {options.map((opt, i) => (
+              <div key={i} style={{ color, marginBottom: 4 }}>
+                <strong>{LETTERS[i]}</strong>&nbsp;&nbsp;{opt}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>;
+    }
+
+    case 'matching_sentence_endings': {
+      const n = options?.length ?? 7;
+      const endRange = `A–${LETTERS[n - 1]}`;
+      return <div style={{ fontSize: 13, lineHeight: 1.6 }}>
+        {head}
+        <span style={it}>Complete each sentence with the correct ending, <strong>{endRange}</strong>, below.</span>
         <span style={it}>Write the correct letter in boxes {range} on your answer sheet.</span>
       </div>;
+    }
 
     case 'sentence_completion':
       return <div style={{ fontSize: 13, lineHeight: 1.6 }}>
         {head}
         <span style={it}>Complete the sentences below.</span>
-        <span style={it}>Choose <strong>NO MORE THAN TWO WORDS</strong> from the passage for each answer.</span>
+        <span style={it}>Choose <strong>ONE WORD ONLY</strong> from the passage for each answer.</span>
         <span style={it}>Write your answers in boxes {range} on your answer sheet.</span>
       </div>;
 
@@ -117,7 +146,7 @@ function QuestionInstruction({ type, start, end, passageId, color, paragraphLabe
       return <div style={{ fontSize: 13, lineHeight: 1.6 }}>
         {head}
         <span style={it}>Complete the summary below.</span>
-        <span style={it}>Choose <strong>NO MORE THAN TWO WORDS</strong> from the passage for each answer.</span>
+        <span style={it}>Choose <strong>ONE WORD ONLY</strong> from the passage for each answer.</span>
         <span style={it}>Write your answers in boxes {range} on your answer sheet.</span>
       </div>;
 
@@ -359,10 +388,17 @@ function QuestionInput({ q, value, onChange, disabled }: {
     case 'multiple_choice_multi':
       return q.options ? <MultiCheckbox options={q.options} value={value} onChange={onChange} disabled={disabled} /> : <TextInput value={value} onChange={onChange} disabled={disabled} placeholder="Comma-separated answers…" />;
     case 'matching_information':
-    case 'matching_headings':
     case 'matching_features':
-    case 'matching_sentence_endings':
-      return q.options ? <RadioGroup options={q.options} value={value} onChange={onChange} disabled={disabled} /> : <TextInput value={value} onChange={onChange} disabled={disabled} />;
+    case 'matching_sentence_endings': {
+      const n = q.options?.length ?? 7;
+      const pills = LETTERS.slice(0, n);
+      return <PillSelect options={pills} value={value} onChange={onChange} disabled={disabled} />;
+    }
+    case 'matching_headings': {
+      const n = q.options?.length ?? 7;
+      const pills = ROMANS.slice(0, n);
+      return <PillSelect options={pills} value={value} onChange={onChange} disabled={disabled} />;
+    }
     default:
       return <TextInput value={value} onChange={onChange} disabled={disabled} />;
   }
@@ -398,6 +434,80 @@ function AnswerReveal({ q, userAnswer, submitted }: {
         <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider mb-1">Why?</p>
         <p className="text-sm text-[var(--text-muted)] leading-snug">{q.explanation}</p>
       </div>
+    </div>
+  );
+}
+
+// ─── Summary block ───────────────────────────────────────────────────────────
+
+function SummaryBlock({ text, title, summaryOptions, groupQuestions, startIdx, answers, onChange, mode, submitted, passageStyle, fontSize }: {
+  text: string; title?: string; summaryOptions?: string[];
+  groupQuestions: IeltsQuestion[]; startIdx: number;
+  answers: Record<number, string>; onChange: (idx: number, val: string) => void;
+  mode: string; submitted: boolean;
+  passageStyle: { bg: string; color: string }; fontSize: number;
+}) {
+  const parts = text.split(/\[(\d+)\]/g);
+  const c = passageStyle.color;
+  const inputStyle: React.CSSProperties = {
+    width: 110, border: 'none', borderBottom: `1.5px solid ${c}`,
+    background: 'transparent', color: c, fontSize, padding: '0 2px',
+    outline: 'none', display: 'inline',
+  };
+  return (
+    <div style={{ margin: '8px 0' }}>
+      <div style={{ border: `1px solid ${c}`, padding: '14px 20px' }}>
+        {title && <p style={{ fontWeight: 700, textAlign: 'center', marginBottom: 12, color: c, fontSize }}>{title}</p>}
+        <p style={{ fontSize, lineHeight: 1.85, color: c }}>
+          {parts.map((part, pi) => {
+            if (pi % 2 === 0) return <span key={pi}>{part}</span>;
+            const qNum = parseInt(part);
+            const answerIdx = qNum - 1;
+            const localIdx = qNum - (startIdx + 1);
+            const q = groupQuestions[localIdx];
+            const val = answers[answerIdx] ?? '';
+            const correct = submitted && q ? isCorrect(q, val) : null;
+            if (mode === 'test' && !submitted) {
+              if (summaryOptions) {
+                return (
+                  <span key={pi} style={{ display: 'inline-flex', alignItems: 'baseline', gap: 3, margin: '0 2px' }}>
+                    <strong style={{ color: c }}>{qNum}</strong>
+                    <select value={val} onChange={e => onChange(answerIdx, e.target.value)}
+                      style={{ border: `1px solid ${c}`, background: passageStyle.bg, color: c, padding: '1px 4px', fontSize: fontSize - 1, borderRadius: 3 }}>
+                      <option value="">—</option>
+                      {summaryOptions.map((_, si) => <option key={si} value={LETTERS[si]}>{LETTERS[si]}</option>)}
+                    </select>
+                  </span>
+                );
+              }
+              return (
+                <span key={pi} style={{ display: 'inline-flex', alignItems: 'baseline', gap: 3, margin: '0 2px' }}>
+                  <strong style={{ color: c }}>{qNum}</strong>
+                  <input value={val} onChange={e => onChange(answerIdx, e.target.value)} style={inputStyle} />
+                </span>
+              );
+            }
+            const displayVal = val || (q?.answer ?? '…');
+            return (
+              <span key={pi} style={{ display: 'inline-flex', alignItems: 'baseline', gap: 3, margin: '0 2px' }}>
+                <strong style={{ color: c }}>{qNum}</strong>
+                <span style={{ fontWeight: 700, color: correct === false ? 'rgb(239 68 68)' : correct === true ? 'rgb(34 197 94)' : 'var(--primary)', borderBottom: `1.5px solid currentColor`, padding: '0 2px' }}>
+                  {displayVal}
+                </span>
+              </span>
+            );
+          })}
+        </p>
+      </div>
+      {summaryOptions && summaryOptions.length > 0 && (
+        <div style={{ border: `1px solid ${c}`, marginTop: 8, padding: '10px 16px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '4px 20px' }}>
+          {summaryOptions.map((opt, i) => (
+            <div key={i} style={{ color: c, fontSize: fontSize - 1 }}>
+              <strong>{LETTERS[i]}</strong>&nbsp;&nbsp;{opt}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -645,85 +755,122 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
           style={{ width: `${100 - passageWidthPct}%`, background: passageStyle.bg }}>
           {(() => {
             const groups = buildGroups(test.questions);
-            let qIndex = 0;
-            return groups.map((group, gi) => (
-              <div key={gi} className="flex flex-col gap-3">
-                <div className="px-2 py-3 border-b" style={{ borderColor: `${passageStyle.color}25` }}>
-                  <QuestionInstruction
-                    type={group.type}
-                    start={group.start}
-                    end={group.end}
-                    passageId={passageId}
-                    color={passageStyle.color}
-                    paragraphLabels={test.questions[group.start - 1]?.paragraphLabels}
-                    options={test.questions[group.start - 1]?.options}
-                    featureListTitle={test.questions[group.start - 1]?.featureListTitle}
-                  />
-                </div>
+            return groups.map((group, gi) => {
+              const firstQ = test.questions[group.start - 1];
+              const groupQuestions = test.questions.slice(group.start - 1, group.end);
+              const hasSummary = group.type === 'summary_completion' && !!firstQ?.summaryText;
 
-                {test.questions.slice(group.start - 1, group.end).map((q) => {
-                  const i = qIndex++;
-                  const userAnswer = answers[i] ?? '';
-                  const correct = submitted ? isCorrect(q, userAnswer) : null;
-                  const isRev = revealed.has(i);
+              return (
+                <div key={gi} className="flex flex-col gap-3">
+                  {/* Instruction block */}
+                  <div className="px-2 py-3 border-b" style={{ borderColor: `${passageStyle.color}25` }}>
+                    <QuestionInstruction
+                      type={group.type}
+                      start={group.start}
+                      end={group.end}
+                      passageId={passageId}
+                      color={passageStyle.color}
+                      paragraphLabels={firstQ?.paragraphLabels}
+                      options={firstQ?.options}
+                      featureListTitle={firstQ?.featureListTitle}
+                    />
+                  </div>
 
-                  return (
-                    <div key={i} className="rounded-2xl border overflow-hidden transition-colors"
-                      style={{
-                        background: passageStyle.bg,
-                        borderColor: submitted && correct === true ? 'rgb(34 197 94 / 0.5)'
-                          : submitted && correct === false ? 'rgb(239 68 68 / 0.5)'
-                          : `${passageStyle.color}25`,
-                      }}>
-                      <div className="px-4 pt-4 pb-3">
-                        <div className="flex items-start gap-3">
-                          <span className="shrink-0 w-6 h-6 rounded-full text-white text-xs font-black flex items-center justify-center mt-0.5" style={{ background: 'var(--primary)' }}>
-                            {i + 1}
-                          </span>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm leading-snug font-medium" style={{ color: passageStyle.color }}>{q.question}</p>
+                  {/* Summary block (summary_completion with summaryText) */}
+                  {hasSummary && (
+                    <SummaryBlock
+                      text={firstQ.summaryText!}
+                      title={firstQ.summaryTitle}
+                      summaryOptions={firstQ.summaryOptions}
+                      groupQuestions={groupQuestions}
+                      startIdx={group.start - 1}
+                      answers={answers}
+                      onChange={setAnswer}
+                      mode={mode}
+                      submitted={submitted}
+                      passageStyle={passageStyle}
+                      fontSize={fontSize}
+                    />
+                  )}
 
-                            {mode === 'test' && !submitted && (
-                              <QuestionInput q={q} value={userAnswer} onChange={v => setAnswer(i, v)} disabled={false} />
-                            )}
+                  {/* Individual question cards */}
+                  {groupQuestions.map((q, localIdx) => {
+                    const i = group.start - 1 + localIdx;
+                    const userAnswer = answers[i] ?? '';
+                    const correct = submitted ? isCorrect(q, userAnswer) : null;
+                    const isRev = revealed.has(i);
 
-                            {mode === 'test' && submitted && userAnswer && (
-                              <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold"
-                                style={{
-                                  background: correct ? 'rgb(34 197 94 / 0.1)' : 'rgb(239 68 68 / 0.1)',
-                                  color: correct ? 'rgb(34 197 94)' : 'rgb(239 68 68)',
-                                }}>
-                                {correct ? '✓' : '✗'} {userAnswer}
-                              </div>
-                            )}
+                    return (
+                      <div key={i} className="rounded-2xl border overflow-hidden transition-colors"
+                        style={{
+                          background: passageStyle.bg,
+                          borderColor: submitted && correct === true ? 'rgb(34 197 94 / 0.5)'
+                            : submitted && correct === false ? 'rgb(239 68 68 / 0.5)'
+                            : `${passageStyle.color}25`,
+                        }}>
+                        <div className="px-4 pt-4 pb-3">
+                          <div className="flex items-start gap-3">
+                            <span className="shrink-0 w-6 h-6 rounded-full text-white text-xs font-black flex items-center justify-center mt-0.5" style={{ background: 'var(--primary)' }}>
+                              {i + 1}
+                            </span>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm leading-snug font-medium" style={{ color: passageStyle.color }}>{q.question}</p>
 
-                            {mode === 'review' && (
-                              <button
-                                onClick={() => setRevealed(prev => {
-                                  const next = new Set(prev);
-                                  next.has(i) ? next.delete(i) : next.add(i);
-                                  return next;
-                                })}
-                                className="mt-3 text-xs font-bold px-3 py-1.5 rounded-lg transition-all"
-                                style={{
-                                  background: isRev ? 'var(--primary)' : 'var(--surface-2)',
-                                  color: isRev ? 'white' : 'var(--text-muted)',
-                                }}>
-                                {isRev ? 'Hide Answer' : 'Show Answer'}
-                              </button>
-                            )}
+                              {/* Input — hidden for summary questions (input is inline in summary block) */}
+                              {!hasSummary && mode === 'test' && !submitted && (
+                                <QuestionInput q={q} value={userAnswer} onChange={v => setAnswer(i, v)} disabled={false} />
+                              )}
+
+                              {mode === 'test' && submitted && userAnswer && (
+                                <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold"
+                                  style={{
+                                    background: correct ? 'rgb(34 197 94 / 0.1)' : 'rgb(239 68 68 / 0.1)',
+                                    color: correct ? 'rgb(34 197 94)' : 'rgb(239 68 68)',
+                                  }}>
+                                  {correct ? '✓' : '✗'} {userAnswer}
+                                </div>
+                              )}
+
+                              {mode === 'review' && (
+                                <button
+                                  onClick={() => setRevealed(prev => {
+                                    const next = new Set(prev);
+                                    next.has(i) ? next.delete(i) : next.add(i);
+                                    return next;
+                                  })}
+                                  className="mt-3 text-xs font-bold px-3 py-1.5 rounded-lg transition-all"
+                                  style={{
+                                    background: isRev ? 'var(--primary)' : 'var(--surface-2)',
+                                    color: isRev ? 'white' : 'var(--text-muted)',
+                                  }}>
+                                  {isRev ? 'Hide Answer' : 'Show Answer'}
+                                </button>
+                              )}
+                            </div>
                           </div>
                         </div>
-                      </div>
 
-                      {((mode === 'review' && isRev) || (mode === 'test' && submitted)) && (
-                        <AnswerReveal q={q} userAnswer={mode === 'test' ? userAnswer : undefined} submitted={mode === 'test' && submitted} />
-                      )}
+                        {((mode === 'review' && isRev) || (mode === 'test' && submitted)) && (
+                          <AnswerReveal q={q} userAnswer={mode === 'test' ? userAnswer : undefined} submitted={mode === 'test' && submitted} />
+                        )}
+                      </div>
+                    );
+                  })}
+
+                  {/* Endings box — rendered after questions for matching_sentence_endings */}
+                  {group.type === 'matching_sentence_endings' && firstQ?.options && firstQ.options.length > 0 && (
+                    <div style={{ border: `1px solid ${passageStyle.color}`, padding: '12px 20px', margin: '4px 0' }}>
+                      {firstQ.options.map((opt, idx) => (
+                        <div key={idx} style={{ color: passageStyle.color, marginBottom: 6, display: 'flex', gap: 12 }}>
+                          <strong style={{ minWidth: 20 }}>{LETTERS[idx]}</strong>
+                          <span>{opt}</span>
+                        </div>
+                      ))}
                     </div>
-                  );
-                })}
-              </div>
-            ));
+                  )}
+                </div>
+              );
+            });
           })()}
 
           {mode === 'test' && !submitted && (
