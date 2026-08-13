@@ -555,7 +555,6 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
               {mode === 'test' ? '📝 TEST MODE' : '📖 REVIEW MODE'}
             </span>
           </p>
-          <h1 className="text-xl font-black text-[var(--text)]">{test.title}</h1>
         </div>
 
         {mode === 'test' && !submitted && (
