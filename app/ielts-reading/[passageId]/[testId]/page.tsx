@@ -6,8 +6,9 @@ import { ieltsData, IeltsQuestion } from '@/lib/ielts-data';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
-function QuestionInstruction({ type, start, end, passageId, color }: {
+function QuestionInstruction({ type, start, end, passageId, color, paragraphLabels, options, featureListTitle }: {
   type: string; start: number; end: number; passageId: string; color: string;
+  paragraphLabels?: string; options?: string[]; featureListTitle?: string;
 }) {
   const range = end > start ? `${start}–${end}` : `${start}`;
   const it: React.CSSProperties = { fontStyle: 'italic', color, display: 'block', marginBottom: 6 };
@@ -55,13 +56,16 @@ function QuestionInstruction({ type, start, end, passageId, color }: {
         <span style={it}>Choose <strong>TWO</strong> letters, <strong>A–E</strong>.</span>
       </div>;
 
-    case 'matching_information':
+    case 'matching_information': {
+      const pl = paragraphLabels ?? 'A–G';
       return <div style={{ fontSize: 13, lineHeight: 1.6 }}>
         {head}
-        <span style={it}>Reading Passage {passageId} has several paragraphs, <strong>A–</strong>…</span>
-        <span style={it}>Which paragraph contains the following information?</span>
-        <span style={it}>Write the correct letter, <strong>A–</strong>…, in boxes {range} on your answer sheet.</span>
+        <span style={it}>Reading Passage {passageId} has several paragraphs, <strong>{pl}</strong>.</span>
+        <span style={it}>Which section contains the following information?</span>
+        <span style={it}>Write the correct letter, <strong>{pl}</strong>, in boxes {range} on your answer sheet.</span>
+        <span style={{ color, display: 'block', marginBottom: 6, marginTop: 2 }}><strong>NB</strong> You may use any letter more than once.</span>
       </div>;
+    }
 
     case 'matching_headings':
       return <div style={{ fontSize: 13, lineHeight: 1.6 }}>
@@ -70,13 +74,29 @@ function QuestionInstruction({ type, start, end, passageId, color }: {
         <span style={it}>Write the correct number, <strong>i–x</strong>, in boxes {range} on your answer sheet.</span>
       </div>;
 
-    case 'matching_features':
+    case 'matching_features': {
+      const letters = ['A','B','C','D','E','F','G','H'];
+      const letterList = options && options.length >= 2
+        ? letters.slice(0, options.length).map((l, i) => `${l}, `).join('').replace(/, $/, '').replace(/,([^,]*)$/, ' or$1')
+        : 'A, B, or C';
+      const nb: React.CSSProperties = { color, display: 'block', marginBottom: 6 };
       return <div style={{ fontSize: 13, lineHeight: 1.6 }}>
         {head}
-        <span style={it}>Match each statement with the correct person or category.</span>
-        <span style={it}>Write the correct letter in boxes {range} on your answer sheet.</span>
-        <span style={it}>You may use any letter <strong>more than once</strong>.</span>
+        <span style={{ color, display: 'block', marginBottom: 6 }}>Look at the following statements and the list of {featureListTitle ? featureListTitle.replace('List of ', '').toLowerCase() : 'people'} below.</span>
+        <span style={{ color, display: 'block', marginBottom: 6 }}>Match each statement with the correct {featureListTitle ? featureListTitle.replace('List of ', '').toLowerCase().replace(/s$/, '') : 'person'}, <strong>{letterList}</strong>.</span>
+        <span style={nb}><strong>NB</strong> You may use any letter more than once.</span>
+        {options && options.length > 0 && (
+          <div style={{ border: `1px solid ${color}`, display: 'inline-block', padding: '10px 20px', marginTop: 6, marginBottom: 4, minWidth: 200 }}>
+            <div style={{ fontWeight: 700, color, marginBottom: 8 }}>{featureListTitle ?? 'List of People'}</div>
+            {options.map((opt, i) => (
+              <div key={i} style={{ color, marginBottom: 4 }}>
+                <strong>{letters[i]}</strong>&nbsp;&nbsp;{opt}
+              </div>
+            ))}
+          </div>
+        )}
       </div>;
+    }
 
     case 'matching_sentence_endings':
       return <div style={{ fontSize: 13, lineHeight: 1.6 }}>
@@ -495,7 +515,7 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
     );
   }
 
-  const paragraphs = test.content.split('\n').map(p => p.trim()).filter(Boolean);
+  const paragraphs = test.content.split(/\n\n+/).map(p => p.trim()).filter(Boolean);
   const score = submitted ? test.questions.filter((q, i) => isCorrect(q, answers[i] ?? '')).length : null;
   const timerColor = secondsLeft < 300 ? 'text-red-500' : secondsLeft < 600 ? 'text-orange-400' : 'text-[var(--text)]';
 
@@ -563,8 +583,35 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
         <div className="overflow-y-auto p-6 transition-colors"
           onMouseUp={handleTextMouseUp}
           style={{ width: `${passageWidthPct}%`, background: passageStyle.bg, color: passageStyle.color }}>
+          {/* Passage header */}
+          <div className="mb-6">
+            <p style={{ fontSize: fontSize - 1, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 6, color: passageStyle.color }}>
+              READING PASSAGE {passageId}
+            </p>
+            {test.questionRange && (
+              <p style={{ fontSize: fontSize - 1, fontStyle: 'italic', marginBottom: 12, color: passageStyle.color }}>
+                You should spend about 20 minutes on Questions {test.questionRange}, which are based on Reading Passage {passageId}.
+              </p>
+            )}
+            <p style={{ fontSize: fontSize + 2, fontWeight: 700, textAlign: 'center', marginBottom: 6, color: passageStyle.color }}>
+              {test.title}
+            </p>
+            {test.subtitle && (
+              <p style={{ fontSize: fontSize - 1, fontStyle: 'italic', textAlign: 'center', marginBottom: 6, color: passageStyle.color }}>
+                {test.subtitle}
+              </p>
+            )}
+          </div>
+          {/* Paragraphs with A, B, C… labels */}
           <div className="space-y-4 leading-[1.85]" style={{ fontSize }}>
-            {paragraphs.map((para, i) => <p key={i}>{para}</p>)}
+            {paragraphs.map((para, i) => (
+              <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                <span style={{ fontWeight: 700, minWidth: 18, color: passageStyle.color, flexShrink: 0 }}>
+                  {String.fromCharCode(65 + i)}
+                </span>
+                <p style={{ margin: 0 }}>{para}</p>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -593,6 +640,9 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
                     end={group.end}
                     passageId={passageId}
                     color={passageStyle.color}
+                    paragraphLabels={test.questions[group.start - 1]?.paragraphLabels}
+                    options={test.questions[group.start - 1]?.options}
+                    featureListTitle={test.questions[group.start - 1]?.featureListTitle}
                   />
                 </div>
 

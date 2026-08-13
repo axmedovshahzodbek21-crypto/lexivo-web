@@ -20,11 +20,15 @@ export interface IeltsQuestion {
   answer: string;
   passage_excerpt: string;
   explanation: string;
+  paragraphLabels?: string;  // e.g. "A–G" for matching_information
+  featureListTitle?: string; // e.g. "List of People" for matching_features
 }
 
 export interface IeltsPassageTest {
   testNumber: number;
   title: string;
+  subtitle?: string;      // italic byline under the title, e.g. "Mark Rowe investigates..."
+  questionRange?: string; // e.g. "1-13" or "14-26", for the time instruction header
   content: string;
   questions: IeltsQuestion[];
 }
@@ -49,6 +53,7 @@ export const ieltsData: IeltsPassageSection[] = [
 {
   testNumber: 1,
   title: 'Wood: a valuable resource in New Zealand\'s economy',
+  questionRange: '1–13',
   content: `During the settlement of New Zealand by European immigrants, natural timbers played a major role. Wood was easily accessible and relatively cheap. A tradition of wooden houses arose, supported by the recognition that they were less likely to collapse suddenly during earthquakes, a not infrequent event in this part of the world.
 
 But in addition to demand from the domestic market, there was also a demand for forest products from overseas. Early explorers recognised the suitability of the tall, straight trunks of the kauri for constructing sailing vessels. The kauri is a species of coniferous tree found only in small areas of the southern hemisphere. So from the early 1800s, huge amounts of this type of wood were sold to Australia and the UK for that purpose.
