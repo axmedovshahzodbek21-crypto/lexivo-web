@@ -416,16 +416,17 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [submitted, setSubmitted] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(() => {
-    if (mode !== 'test') return TIMER_SECONDS;
-    const stored = sessionStorage.getItem(timerKey);
-    if (stored) {
-      const { startedAt } = JSON.parse(stored);
-      const elapsed = Math.floor((Date.now() - startedAt) / 1000);
-      const remaining = TIMER_SECONDS - elapsed;
-      if (remaining > 0) return remaining;
-    }
-    const startedAt = Date.now();
-    sessionStorage.setItem(timerKey, JSON.stringify({ startedAt }));
+    if (mode !== 'test' || typeof window === 'undefined') return TIMER_SECONDS;
+    try {
+      const stored = sessionStorage.getItem(timerKey);
+      if (stored) {
+        const { startedAt } = JSON.parse(stored);
+        const elapsed = Math.floor((Date.now() - startedAt) / 1000);
+        const remaining = TIMER_SECONDS - elapsed;
+        if (remaining > 0) return remaining;
+      }
+      sessionStorage.setItem(timerKey, JSON.stringify({ startedAt: Date.now() }));
+    } catch {}
     return TIMER_SECONDS;
   });
   const [timerActive, setTimerActive] = useState(mode === 'test');
