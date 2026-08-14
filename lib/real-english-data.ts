@@ -16,7 +16,7 @@ export const realEnglishSets: RealEnglishSet[] = [
     id: 'preview-set',
     title: 'How to Sound More Natural in English',
     videos: [
-      { id: 'preview-set-v1',  title: 'Video 1',  duration: '', collectionName: 'Natural English V1'  },
+      { id: 'preview-set-v1',  title: 'Video 1',  duration: '03:42', collectionName: 'Natural English V1'  },
       { id: 'preview-set-v2',  title: 'Video 2',  duration: '', collectionName: 'Natural English V2'  },
       { id: 'preview-set-v3',  title: 'Video 3',  duration: '', collectionName: 'Natural English V3'  },
       { id: 'preview-set-v4',  title: 'Video 4',  duration: '', collectionName: 'Natural English V4'  },
