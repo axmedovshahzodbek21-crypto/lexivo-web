@@ -615,9 +615,9 @@ function MiniCalendar({ title, color, days, year, month, lockedDays }: {
           {monthCount} {monthCount === 1 ? 'day' : 'days'}
         </span>
       </div>
-      <div className="grid grid-cols-7 gap-y-1.5">
+      <div className="grid grid-cols-7 gap-y-1">
         {['M','T','W','T','F','S','S'].map((d, i) => (
-          <div key={i} className="flex items-center justify-center text-[10px] font-bold pb-1" style={{ color: 'var(--text-muted)' }}>{d}</div>
+          <div key={i} className="flex items-center justify-center text-[8px] font-bold pb-0.5" style={{ color: 'var(--text-muted)' }}>{d}</div>
         ))}
         {cells.map((day, i) => {
           if (!day) return <div key={i} className="aspect-square" />;
@@ -633,7 +633,7 @@ function MiniCalendar({ title, color, days, year, month, lockedDays }: {
             >
               <div className="flex items-center justify-center"
                 style={{
-                  width: hasCircle ? '78%' : 'auto',
+                  width: hasCircle ? '72%' : 'auto',
                   aspectRatio: hasCircle ? '1' : undefined,
                   borderRadius: '50%',
                   background: done ? color : locked ? '#52525244' : 'transparent',
@@ -643,8 +643,8 @@ function MiniCalendar({ title, color, days, year, month, lockedDays }: {
                 }}
               >
                 {locked
-                  ? <span style={{ fontSize: 9, lineHeight: 1 }}>🔒</span>
-                  : <span style={{ fontSize: 12, fontWeight: done || isToday ? 700 : 500, lineHeight: 1, color: done ? '#fff' : isToday ? color : 'var(--text-muted)' }}>{day}</span>
+                  ? <span style={{ fontSize: 7, lineHeight: 1 }}>🔒</span>
+                  : <span style={{ fontSize: 10, fontWeight: done || isToday ? 700 : 500, lineHeight: 1, color: done ? '#fff' : isToday ? color : 'var(--text-muted)' }}>{day}</span>
                 }
               </div>
             </div>
@@ -1097,8 +1097,8 @@ function StudyCalendar({
                 ))}
               </div>
 
-              {/* Two mini-calendars — stacked full width */}
-              <div className="flex flex-col gap-3">
+              {/* Two mini-calendars — side by side */}
+              <div className="grid grid-cols-2 gap-3">
                 <MiniCalendar title="SRS"                    color={TASK_COLORS.review.bg} days={reviewDays}   year={viewYear} month={viewMonth} lockedDays={srsLockedDays} />
                 <MiniCalendar title={`Words (${dailyGoal})`} color={TASK_COLORS.words.bg}  days={wordGoalDays} year={viewYear} month={viewMonth} />
               </div>
