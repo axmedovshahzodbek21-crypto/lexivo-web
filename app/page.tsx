@@ -391,7 +391,7 @@ export default function HomePage() {
   const t = useTranslation();
   const levelInfo = getLevelInfo(xp);
   const dailyProgress = Math.min((todayCount / settings.dailyGoal) * 100, 100);
-  const mainCollections = collections.filter(c => !LEVELED_NAMES.has(c.name));
+  const mainCollections = collections.filter(c => !LEVELED_NAMES.has(c.name) && !c.youtubeUrl);
 
   const handleHideSave = () => {
     const LS: Record<string, string> = {
