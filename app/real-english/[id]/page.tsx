@@ -1,6 +1,7 @@
 'use client';
 import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import BackButton from '@/components/BackButton';
 import { type RealEnglishVideo } from '@/lib/real-english-data';
 import { realEnglishSets } from "@/lib/real-english-data";
 import { loadRealEnglishCollection } from '@/lib/data';
@@ -144,9 +145,7 @@ export default function RealEnglishSetPage({ params }: { params: Promise<{ id: s
     return (
       <div className="max-w-2xl mx-auto px-4 py-16 text-center">
         <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>Set not found.</p>
-        <button onClick={() => router.back()} style={{ marginTop: 16, fontSize: 12, color: 'var(--primary)', background: 'none', border: 'none', cursor: 'pointer' }}>
-          ← Back
-        </button>
+        <BackButton className="mt-4" />
       </div>
     );
   }

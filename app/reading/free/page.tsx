@@ -1,6 +1,7 @@
 'use client';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import BackButton from '@/components/BackButton';
 import { addImportedWords } from '@/lib/storage';
 import type { ImportedWord } from '@/lib/types';
 
@@ -301,9 +302,7 @@ export default function ReadingPage() {
   if (!reading) {
     return (
       <div className="max-w-5xl mx-auto px-6 py-10 space-y-6 pb-24">
-        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
-          ← Back
-        </Link>
+        <BackButton href="/" />
         <div>
           <h1 className="text-3xl font-bold text-[var(--text)] mb-2">Reading</h1>
           <p className="text-sm text-[var(--text-muted)] leading-relaxed">

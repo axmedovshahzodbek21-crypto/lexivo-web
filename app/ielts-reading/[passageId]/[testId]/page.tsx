@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { use, useState, useEffect, useCallback, useRef, Suspense } from 'react';
+import BackButton from '@/components/BackButton';
 import { useSearchParams } from 'next/navigation';
 import { ieltsData, IeltsQuestion } from '@/lib/ielts-data';
 
@@ -715,9 +716,7 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
   if (!test) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-8 pb-24">
-        <Link href={`/ielts-reading/${passageId}`} className="inline-flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors mb-8">
-          ← Back to Tests
-        </Link>
+        <BackButton href={`/ielts-reading/${passageId}`} label="Back to Tests" className="mb-8" />
         <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-10 flex flex-col items-center text-center gap-3">
           <span className="text-4xl">🔒</span>
           <p className="text-lg font-bold text-[var(--text)]">Coming soon</p>
@@ -740,9 +739,7 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
       <div className="shrink-0 px-4 py-2">
         {/* Row 1: Back | Timer (center) | Options + Lexivo */}
         <div className="flex items-center justify-between gap-4">
-          <Link href={`/ielts-reading/${passageId}`} className="inline-flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors shrink-0">
-            ← Back to Tests
-          </Link>
+          <BackButton href={`/ielts-reading/${passageId}`} label="Back to Tests" className="shrink-0" />
 
           {/* Timer centered */}
           <div className="flex-1 flex justify-center">

@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import BackButton from '@/components/BackButton';
 import { GRAMMAR_TIPS, TIP_CATEGORIES, type GrammarTip } from '@/lib/grammar-tips';
 
 const ALL = 'All';
@@ -30,12 +31,7 @@ export default function GrammarTipsPage() {
     <div className="flex flex-col min-h-screen animate-fade-in">
       {/* Header */}
       <div className="p-4 border-b border-[var(--border)]">
-        <button
-          onClick={() => router.back()}
-          className="flex items-center gap-2 text-sm text-[var(--text-muted)] mb-3 hover:text-[var(--text)] transition-colors"
-        >
-          ← Back
-        </button>
+        <BackButton />
         <h1 className="text-xl font-bold text-[var(--text)]">📚 Grammar Tips</h1>
         <p className="text-sm text-[var(--text-muted)] mt-0.5">
           {GRAMMAR_TIPS.length} tips across {TIP_CATEGORIES.length} categories

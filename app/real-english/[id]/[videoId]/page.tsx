@@ -1,6 +1,7 @@
 'use client';
 import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import BackButton from '@/components/BackButton';
 import Link from 'next/link';
 import { realEnglishSets } from "@/lib/real-english-data";
 import { loadRealEnglishCollection } from '@/lib/data';
@@ -118,7 +119,7 @@ export default function RealEnglishVideoPage({ params }: { params: Promise<{ id:
     return (
       <div className="max-w-2xl mx-auto px-4 py-16 text-center">
         <p className="text-[var(--text-muted)] text-sm">Video not found.</p>
-        <button onClick={() => router.back()} className="mt-4 text-xs text-[var(--primary)] hover:underline">← Back</button>
+        <BackButton className="mt-4" />
       </div>
     );
   }

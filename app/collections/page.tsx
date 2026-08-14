@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import BackButton from '@/components/BackButton';
 import { useAppStore } from '@/lib/store';
 import { useShallow } from 'zustand/react/shallow';
 import { getImportedWords } from '@/lib/storage';
@@ -81,9 +82,7 @@ export default function CollectionsPage() {
 
   return (
     <div className="px-6 py-8 pb-28">
-      <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors mb-6">
-        ← Back
-      </Link>
+      <BackButton href="/" />
       <h1 className="text-3xl font-black text-[var(--text)] mb-8">Collections</h1>
 
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">

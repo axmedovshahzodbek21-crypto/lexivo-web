@@ -3,6 +3,7 @@ import { PageLoader, SectionLoader } from '@/components/Loader';
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import BackButton from '@/components/BackButton';
 import { useAppStore } from '@/lib/store';
 import { getHardWords, removeHardWord, saveLearnedWord, addSRSWord as storeSRSWord } from '@/lib/storage';
 import { pushLists } from '@/lib/sync';
@@ -97,12 +98,7 @@ export default function HardWordsPage() {
     <div className="flex flex-col min-h-screen animate-fade-in">
       {/* Header */}
       <div className="p-4 border-b border-[var(--border)]">
-        <button
-          onClick={() => router.back()}
-          className="flex items-center gap-2 text-sm text-[var(--text-muted)] mb-3 hover:text-[var(--text)] transition-colors"
-        >
-          ← Back
-        </button>
+        <BackButton />
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-[var(--text)]">😓 Hard Words</h1>

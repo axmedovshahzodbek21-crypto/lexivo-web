@@ -1,5 +1,6 @@
 ﻿'use client';
 import { SectionLoader } from '@/components/Loader';
+import BackButton from '@/components/BackButton';
 import { Suspense } from 'react';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -296,9 +297,7 @@ function MatchingInner() {
     return (
       <div className="flex flex-col min-h-screen animate-fade-in">
         <div className="p-4 border-b border-[var(--border)]">
-          <button onClick={() => sourceClassHW && searchParams.get('hwId') ? router.push(`/classes/${searchParams.get('classId')}/homework/${searchParams.get('hwId')}?completed=match`) : router.back()} className="flex items-center gap-2 text-sm text-[var(--text-muted)] mb-3 hover:text-[var(--text)] transition-colors">
-            ← Back
-          </button>
+          <BackButton className="mb-3" />
           <h1 className="text-xl font-bold text-[var(--text)]">🎯 Complete!</h1>
         </div>
         <div className="flex-1 p-4 space-y-4">
@@ -382,12 +381,7 @@ function MatchingInner() {
     <div className="flex flex-col min-h-screen">
       {/* Header */}
       <div className="p-4 border-b border-[var(--border)] flex-shrink-0">
-        <button
-          onClick={() => { setTimerActive(false); router.back(); }}
-          className="flex items-center gap-2 text-sm text-[var(--text-muted)] mb-2 hover:text-[var(--text)] transition-colors"
-        >
-          ← Back
-        </button>
+        <BackButton className="mb-2" />
         <div className="flex items-center justify-between">
           <h1 className="text-lg font-bold text-[var(--text)]">🎯 Match the pairs</h1>
           <span className="text-sm text-[var(--text-muted)]">

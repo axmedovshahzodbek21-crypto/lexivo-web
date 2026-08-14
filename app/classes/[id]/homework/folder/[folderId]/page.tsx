@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import BackButton from '@/components/BackButton';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { AssignedUnitCard, UnassignedUnitCard, type AssignedUnit } from '../../_shared';
@@ -118,12 +119,7 @@ export default function ClassFolderHomeworkPage() {
           boxShadow: '0 8px 32px rgba(79,70,229,0.35)',
         }}
       >
-        <button
-          onClick={() => router.push(`/classes/${classId}/homework`)}
-          className="flex items-center gap-1.5 text-sm text-white/80 mb-4 hover:text-white transition-colors"
-        >
-          ← Back
-        </button>
+        <BackButton className="mb-4" />
 
         {className && (
           <p className="text-xs font-semibold text-white/60 uppercase tracking-widest mb-1">{className}</p>

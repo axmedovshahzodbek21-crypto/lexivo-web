@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { use, useState } from 'react';
+import BackButton from '@/components/BackButton';
 import { ieltsData } from '@/lib/ielts-data';
 
 const TOTAL_TESTS = 30;
@@ -13,9 +14,7 @@ export default function PassagePage({ params }: { params: Promise<{ passageId: s
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 pb-24">
-      <Link href="/ielts-reading" className="inline-flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors mb-8">
-        ← Back to Passages
-      </Link>
+      <BackButton href="/ielts-reading" label="Back to Passages" className="mb-8" />
 
       <div className="mb-10">
         <p className="text-[11px] font-black text-[var(--text-muted)] uppercase tracking-[0.15em] mb-1">IELTS Reading</p>

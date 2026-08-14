@@ -1,6 +1,7 @@
 'use client';
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import BackButton from '@/components/BackButton';
 import { readingPassages, type ReadingPassage } from '@/lib/reading-data';
 
 const CARD_COLORS = [
@@ -93,13 +94,7 @@ function PassageView({ passage, onBack }: { passage: ReadingPassage; onBack: () 
         </div>
       )}
 
-      <button
-        onClick={onBack}
-        className="flex items-center gap-1.5 text-sm mb-6"
-        style={{ color: 'var(--text-muted)' }}
-      >
-        ← Back to Library
-      </button>
+      <BackButton label="Back to Library" className="mb-6" />
 
       <span
         className="inline-block text-xs font-bold px-3 py-1 rounded-full mb-4"
