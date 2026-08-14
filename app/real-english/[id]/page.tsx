@@ -1,173 +1,186 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { use, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { realEnglishSets, type RealEnglishSet } from '@/lib/real-english-data';
-import { getSRSWords, getReviewLog } from '@/lib/storage';
-import { useAppStore } from '@/lib/store';
+import { realEnglishSets } from '@/lib/real-english-data';
+import { loadRealEnglishCollection } from '@/lib/data';
+import { getUnitProgress } from '@/lib/storage';
+import type { WordCollection, UnitProgress } from '@/lib/types';
 
-const UNLOCK_INTERVAL = 7;
-
-function getSetProgress(set: RealEnglishSet) {
-  const srsWords = getSRSWords();
-  const log = getReviewLog();
-  const setWords = srsWords.filter(w => w.collectionName === set.collectionName);
-  const done = setWords.filter(w => (log[w.id] ?? []).includes(UNLOCK_INTERVAL)).length;
-  const unlocked = setWords.length >= set.wordCount && done >= set.wordCount;
-  return { done, total: set.wordCount, unlocked };
-}
-
-const ACTIVITY_CARDS = [
-  {
-    key: 'learn',
-    icon: '📖',
-    label: 'Learn',
-    description: 'Study words one by one with translations and examples.',
-    gradient: 'linear-gradient(135deg, #6c63ff, #a78bfa)',
-    edge: '#4c1d95',
-    href: (col: string) => `/learn?collection=${encodeURIComponent(col)}`,
-  },
-  {
-    key: 'flashcards',
-    icon: '🃏',
-    label: 'Flashcards',
-    description: 'Flip through the words to test your recall.',
-    gradient: 'linear-gradient(135deg, #0e7490, #06b6d4)',
-    edge: '#164e63',
-    href: (col: string) => `/flashcards?collection=${encodeURIComponent(col)}`,
-  },
-  {
-    key: 'quiz',
-    icon: '✏️',
-    label: 'Quiz',
-    description: 'Multiple-choice questions to check your memory.',
-    gradient: 'linear-gradient(135deg, #b45309, #f59e0b)',
-    edge: '#78350f',
-    href: (col: string) => `/quiz?collection=${encodeURIComponent(col)}`,
-  },
-  {
-    key: 'match',
-    icon: '🔗',
-    label: 'Match',
-    description: 'Match words to their translations against the clock.',
-    gradient: 'linear-gradient(135deg, #047857, #10b981)',
-    edge: '#064e3b',
-    href: (col: string) => `/match?collection=${encodeURIComponent(col)}`,
-  },
+const CARD_COLORS = [
+  '#5B8AF0','#FF6B6B','#06D6A0','#FFD166',
+  '#A78BFA','#FF9F43','#F72585','#4ECDC4',
 ];
 
-export default function RealEnglishDetailPage() {
-  const params = useParams();
-  const router = useRouter();
-  const id = params.id as string;
-  const set = realEnglishSets.find(s => s.id === id);
-  const { collections } = useAppStore();
-  const youtubeUrl = collections.find(c => c.name === set?.collectionName)?.youtubeUrl;
+interface UnitRow {
+  dayNumber: number;
+  topic: string;
+  wordCount: number;
+  progress: UnitProgress;
+}
 
-  const [progress, setProgress] = useState({ done: 0, total: 0, unlocked: false });
+function ModeButton({ href, icon, label, done, locked = false }: {
+  href: string; icon: string; label: string; done: boolean; locked?: boolean;
+}) {
+  if (locked) {
+    return (
+      <div className="flex-1 flex flex-col items-center gap-0.5 py-2 rounded-xl opacity-40 cursor-not-allowed select-none"
+        style={{ background: 'var(--surface-2)' }}>
+        <span className="text-sm">🔒</span>
+        <span className="text-[10px] font-semibold text-[var(--text-muted)]">{label}</span>
+      </div>
+    );
+  }
+  return (
+    <Link href={href}
+      className="flex-1 flex flex-col items-center gap-0.5 py-2 rounded-xl transition-all hover:opacity-80 active:scale-95"
+      style={{ background: done ? 'rgba(34,197,94,0.12)' : 'var(--surface-2)' }}>
+      <span className="text-sm">{done ? '✅' : icon}</span>
+      <span className="text-[10px] font-semibold"
+        style={{ color: done ? '#16a34a' : 'var(--text-muted)' }}>{label}</span>
+    </Link>
+  );
+}
+
+function UnitCard({ unit, collectionName, accentColor }: {
+  unit: UnitRow;
+  collectionName: string;
+  accentColor: string;
+}) {
+  const enc = encodeURIComponent(collectionName);
+  const learnUrl = `/learn?collection=${enc}&day=${unit.dayNumber}`;
+  const flashUrl = `/flashcards?collection=${enc}&day=${unit.dayNumber}`;
+  const quizUrl  = `/quiz?collection=${enc}&day=${unit.dayNumber}`;
+  const matchUrl = `/matching?collection=${enc}&day=${unit.dayNumber}`;
+
+  const { learnDone, flashcardDone, quizDone } = unit.progress;
+  const allDone = learnDone && flashcardDone && quizDone;
+  const stagesComplete = [learnDone, flashcardDone, quizDone].filter(Boolean).length;
+  const pct = Math.round((stagesComplete / 3) * 100);
+
+  return (
+    <div className="rounded-2xl overflow-hidden border"
+      style={{ borderColor: allDone ? '#86efac' : 'var(--border)', background: 'var(--surface)' }}>
+      {/* Accent top strip */}
+      <div className="h-1" style={{
+        background: allDone
+          ? 'linear-gradient(90deg,#22c55e,#4ade80)'
+          : `linear-gradient(90deg,${accentColor}88,${accentColor})`,
+      }} />
+
+      <div className="p-3">
+        {/* Unit header */}
+        <div className="flex items-start justify-between gap-1 mb-2">
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] font-bold uppercase tracking-wide mb-0.5"
+              style={{ color: 'var(--text-muted)' }}>Unit {unit.dayNumber}</p>
+            <p className="text-xs font-bold leading-snug line-clamp-2"
+              style={{ color: allDone ? '#16a34a' : 'var(--text)' }}>{unit.topic}</p>
+          </div>
+          <span className="text-[10px] whitespace-nowrap shrink-0 mt-0.5"
+            style={{ color: 'var(--text-muted)' }}>{unit.wordCount} words</span>
+        </div>
+
+        {/* Progress bar */}
+        <div className="h-1 rounded-full mb-2 overflow-hidden" style={{ background: 'var(--border)' }}>
+          <div className="h-full rounded-full transition-all" style={{
+            width: `${pct}%`,
+            background: allDone ? '#22c55e' : accentColor,
+          }} />
+        </div>
+
+        {/* Action buttons */}
+        <div className="flex gap-1">
+          <ModeButton href={learnUrl} icon="📖" label="Learn"  done={learnDone} />
+          <ModeButton href={flashUrl} icon="🃏" label="Cards"  done={flashcardDone} locked={!learnDone} />
+          <ModeButton href={quizUrl}  icon="🧠" label="Quiz"   done={quizDone}     locked={!learnDone} />
+          <ModeButton href={matchUrl} icon="🔀" label="Match"  done={false}         locked={!learnDone} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function RealEnglishDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+  const router = useRouter();
+  const set = realEnglishSets.find(s => s.id === id);
+  const [collection, setCollection] = useState<WordCollection | null>(null);
+  const [units, setUnits] = useState<UnitRow[]>([]);
 
   useEffect(() => {
     if (!set) return;
-    setProgress(getSetProgress(set));
-  }, [set]);
+    loadRealEnglishCollection(id).then(col => {
+      if (!col) return;
+      setCollection(col);
+      setUnits(col.days.map(day => ({
+        dayNumber: day.dayNumber,
+        topic: day.topic || `Unit ${day.dayNumber}`,
+        wordCount: day.words.length,
+        progress: getUnitProgress(col.name, day.dayNumber),
+      })));
+    });
+  }, [id, set]);
 
   if (!set) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-16 text-center">
         <p className="text-[var(--text-muted)] text-sm">Set not found.</p>
-        <button onClick={() => router.back()} className="mt-4 text-xs text-[var(--primary)]">← Back</button>
+        <button onClick={() => router.back()} className="mt-4 text-xs text-[var(--primary)] hover:underline">← Back</button>
       </div>
     );
   }
 
-  const pct = progress.total > 0 ? Math.round((progress.done / progress.total) * 100) : 0;
+  const totalWords = collection ? collection.days.reduce((s, d) => s + d.words.length, 0) : 0;
+  const accentColor = CARD_COLORS[realEnglishSets.indexOf(set) % CARD_COLORS.length];
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 pb-24">
       {/* Back */}
       <button onClick={() => router.back()}
-        className="flex items-center gap-1.5 text-xs text-[var(--text-muted)] hover:text-[var(--text)] transition-colors mb-6">
+        className="flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors mb-5">
         ← Real English
       </button>
 
-      {/* Header */}
-      <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 mb-6">
-        <div className="flex items-start gap-4">
-          <div className="w-14 h-14 rounded-xl flex items-center justify-center text-3xl shrink-0"
-            style={{ background: 'var(--primary-bg)' }}>
-            🎬
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                style={{ background: 'var(--primary-bg)', color: 'var(--primary)' }}>
-                {set.level}
-              </span>
-              <span className="text-[10px] text-[var(--text-muted)]">{set.wordCount} words</span>
-              {progress.unlocked && (
-                <span className="text-[10px] font-bold" style={{ color: '#10b981' }}>🔓 Unlocked</span>
-              )}
-            </div>
-            <h1 className="font-black text-base text-[var(--text)] leading-tight">{set.title}</h1>
-            <p className="text-xs text-[var(--text-muted)] mt-0.5">{set.source}</p>
-            {set.description && (
-              <p className="text-xs text-[var(--text-muted)] mt-2 leading-snug">{set.description}</p>
-            )}
-          </div>
+      {/* Hero */}
+      <div className="rounded-2xl p-5 mb-6 text-white"
+        style={{ background: `linear-gradient(135deg, ${accentColor}bb, ${accentColor})` }}>
+        <div className="text-2xl mb-2">🎬</div>
+        <h1 className="text-xl font-black leading-snug mb-3" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>
+          {set.title}
+        </h1>
+        <div className="flex flex-wrap gap-2">
+          {totalWords > 0 && (
+            <span className="text-xs font-semibold bg-black/20 rounded-full px-3 py-1">{totalWords} words</span>
+          )}
+          {set.duration && (
+            <span className="text-xs font-semibold bg-black/20 rounded-full px-3 py-1">⏱ {set.duration}</span>
+          )}
+          {units.length > 0 && (
+            <span className="text-xs font-semibold bg-black/20 rounded-full px-3 py-1">{units.length} units</span>
+          )}
         </div>
-
-        {/* Progress */}
-        <div className="mt-4">
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-[10px] text-[var(--text-muted)]">
-              {progress.unlocked ? 'Completed' : `${progress.done}/${progress.total} words at +7 review`}
-            </span>
-            <span className="text-[10px] font-bold" style={{ color: 'var(--primary)' }}>{pct}%</span>
-          </div>
-          <div className="h-1.5 rounded-full bg-[var(--border)] overflow-hidden">
-            <div className="h-full rounded-full transition-all duration-500"
-              style={{ width: `${pct}%`, background: progress.unlocked ? '#10b981' : 'var(--primary)' }} />
-          </div>
-        </div>
-
-        {/* Unlock status */}
-        {!progress.unlocked && (
-          <p className="mt-3 text-[10px] text-[var(--text-muted)] text-center">
-            🔒 Complete the +7 day SRS review for all {set.wordCount} words to unlock the video
-          </p>
-        )}
-
-        {/* Watch button — only when unlocked */}
-        {progress.unlocked && youtubeUrl && (
-          <a href={youtubeUrl} target="_blank" rel="noopener noreferrer" className="block mt-4">
-            <button className="w-full py-2.5 rounded-xl text-sm font-bold text-white transition-all"
-              style={{ background: 'linear-gradient(135deg, #dc2626, #ef4444)' }}>
-              ▶ Watch on YouTube
-            </button>
-          </a>
-        )}
       </div>
 
-      {/* Activity cards */}
-      <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mb-3">Activities</p>
-      <div className="grid grid-cols-2 gap-3">
-        {ACTIVITY_CARDS.map(card => (
-          <Link key={card.key} href={card.href(set.collectionName)}>
-            <div className="rounded-2xl p-4 flex flex-col gap-2 cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98]"
-              style={{
-                background: card.gradient,
-                boxShadow: `0 4px 20px ${card.edge}55`,
-              }}>
-              <span className="text-2xl">{card.icon}</span>
-              <div>
-                <p className="font-black text-sm text-white">{card.label}</p>
-                <p className="text-[10px] text-white/70 mt-0.5 leading-snug">{card.description}</p>
-              </div>
-              <p className="text-[10px] font-bold text-white/60 mt-1">{set.wordCount} words</p>
-            </div>
-          </Link>
-        ))}
-      </div>
+      {/* Units grid */}
+      {units.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-[var(--border)] bg-[var(--surface)] p-10 text-center">
+          <span className="text-4xl">📭</span>
+          <p className="text-sm font-bold text-[var(--text)] mt-3">Words coming soon</p>
+          <p className="text-xs text-[var(--text-muted)] mt-1">This set is being prepared.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-3">
+          {units.map(unit => (
+            <UnitCard
+              key={unit.dayNumber}
+              unit={unit}
+              collectionName={collection!.name}
+              accentColor={accentColor}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

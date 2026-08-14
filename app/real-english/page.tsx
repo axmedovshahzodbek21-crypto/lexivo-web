@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { realEnglishSets, type RealEnglishSet } from '@/lib/real-english-data';
 import { getSRSWords, getReviewLog } from '@/lib/storage';
+import { loadRealEnglishCollection } from '@/lib/data';
 
 const UNLOCK_INTERVAL = 7;
 
@@ -20,22 +21,25 @@ const lighten = (hex: string, amt = 0.3) => {
   return `rgb(${Math.round(r+(255-r)*amt)},${Math.round(g+(255-g)*amt)},${Math.round(b+(255-b)*amt)})`;
 };
 
-function getSetProgress(set: RealEnglishSet): { done: number; total: number; unlocked: boolean } {
+function getSetUnlocked(set: RealEnglishSet, totalWords: number): { done: number; unlocked: boolean } {
+  if (totalWords === 0) return { done: 0, unlocked: false };
   const srsWords = getSRSWords();
   const log = getReviewLog();
   const setWords = srsWords.filter(w => w.collectionName === set.collectionName);
-  const total = set.wordCount;
   const done = setWords.filter(w => (log[w.id] ?? []).includes(UNLOCK_INTERVAL)).length;
-  const unlocked = setWords.length >= total && done >= total;
-  return { done, total, unlocked };
+  const unlocked = setWords.length >= totalWords && done >= totalWords;
+  return { done, unlocked };
 }
 
-function SetCard({ set, index, onClick }: { set: RealEnglishSet; index: number; onClick: () => void }) {
-  const [progress, setProgress] = useState({ done: 0, total: set.wordCount, unlocked: false });
-  useEffect(() => { setProgress(getSetProgress(set)); }, [set]);
-
+function SetCard({ set, index, wordCount, onClick }: {
+  set: RealEnglishSet;
+  index: number;
+  wordCount: number;
+  onClick: () => void;
+}) {
+  const { done, unlocked } = getSetUnlocked(set, wordCount);
+  const pct = wordCount > 0 ? Math.round((done / wordCount) * 100) : 0;
   const color = CARD_COLORS[index % CARD_COLORS.length];
-  const pct = progress.total > 0 ? Math.round((progress.done / progress.total) * 100) : 0;
 
   return (
     <div
@@ -48,10 +52,10 @@ function SetCard({ set, index, onClick }: { set: RealEnglishSet; index: number; 
       }}
     >
       {/* Top area */}
-      <div className="p-4 text-2xl">{progress.unlocked ? '🔓' : '🎬'}</div>
+      <div className="p-4 text-2xl">{unlocked ? '🔓' : '🎬'}</div>
 
       {/* Progress bar */}
-      {progress.done > 0 && !progress.unlocked && (
+      {done > 0 && !unlocked && wordCount > 0 && (
         <div className="absolute top-3 right-3 w-16">
           <div className="h-1 rounded-full bg-white/30 overflow-hidden">
             <div className="h-full rounded-full bg-white" style={{ width: `${pct}%` }} />
@@ -65,9 +69,15 @@ function SetCard({ set, index, onClick }: { set: RealEnglishSet; index: number; 
         style={{ background: 'rgba(0,0,0,0.22)', backdropFilter: 'blur(8px)' }}>
         <p className="text-white font-bold text-sm leading-tight line-clamp-2"
           style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>{set.title}</p>
-        {set.description && (
-          <p className="text-white/60 text-[10px] mt-0.5 line-clamp-2 leading-snug">{set.description}</p>
-        )}
+        <div className="flex items-center gap-2 mt-1">
+          {wordCount > 0 && (
+            <span className="text-white/60 text-[10px]">{wordCount} words</span>
+          )}
+          {set.duration && wordCount > 0 && <span className="text-white/40 text-[10px]">·</span>}
+          {set.duration && (
+            <span className="text-white/60 text-[10px]">{set.duration}</span>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -78,19 +88,22 @@ type Tab = 'sets' | 'unlocked';
 export default function RealEnglishPage() {
   const router = useRouter();
   const [tab, setTab] = useState<Tab>('sets');
-  const [unlockedSets, setUnlockedSets] = useState<RealEnglishSet[]>([]);
-  const [lockedSets, setLockedSets] = useState<RealEnglishSet[]>([]);
+  const [wordCounts, setWordCounts] = useState<Record<string, number>>({});
 
   useEffect(() => {
-    const unlocked: RealEnglishSet[] = [];
-    const locked: RealEnglishSet[] = [];
-    for (const set of realEnglishSets) {
-      if (getSetProgress(set).unlocked) unlocked.push(set);
-      else locked.push(set);
+    async function loadCounts() {
+      const counts: Record<string, number> = {};
+      await Promise.all(realEnglishSets.map(async set => {
+        const col = await loadRealEnglishCollection(set.id);
+        counts[set.id] = col ? col.days.reduce((s, d) => s + d.words.length, 0) : 0;
+      }));
+      setWordCounts(counts);
     }
-    setUnlockedSets(unlocked);
-    setLockedSets(locked);
+    loadCounts();
   }, []);
+
+  const unlockedSets = realEnglishSets.filter(s => getSetUnlocked(s, wordCounts[s.id] ?? 0).unlocked);
+  const lockedSets   = realEnglishSets.filter(s => !getSetUnlocked(s, wordCounts[s.id] ?? 0).unlocked);
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 pb-24">
@@ -133,14 +146,15 @@ export default function RealEnglishPage() {
             <div className="rounded-2xl border border-dashed border-[var(--border)] bg-[var(--surface)] p-10 flex flex-col items-center justify-center text-center gap-3">
               <span className="text-4xl">🎬</span>
               <p className="text-sm font-bold text-[var(--text)]">No sets yet</p>
-              <p className="text-xs text-[var(--text-muted)]">Interview vocab sets are coming soon.</p>
+              <p className="text-xs text-[var(--text-muted)]">Video sets are coming soon.</p>
             </div>
           ) : lockedSets.length === 0 ? (
             <p className="text-sm text-[var(--text-muted)] text-center py-4">All sets unlocked — you&apos;re on fire! 🔥</p>
           ) : (
             <div className="grid grid-cols-2 gap-3">
               {lockedSets.map((set, i) => (
-                <SetCard key={set.id} set={set} index={i} onClick={() => router.push(`/real-english/${set.id}`)} />
+                <SetCard key={set.id} set={set} index={i} wordCount={wordCounts[set.id] ?? 0}
+                  onClick={() => router.push(`/real-english/${set.id}`)} />
               ))}
             </div>
           )}
@@ -183,7 +197,8 @@ export default function RealEnglishPage() {
           ) : (
             <div className="grid grid-cols-2 gap-3">
               {unlockedSets.map((set, i) => (
-                <SetCard key={set.id} set={set} index={i} onClick={() => router.push(`/real-english/${set.id}`)} />
+                <SetCard key={set.id} set={set} index={i} wordCount={wordCounts[set.id] ?? 0}
+                  onClick={() => router.push(`/real-english/${set.id}`)} />
               ))}
             </div>
           )}
