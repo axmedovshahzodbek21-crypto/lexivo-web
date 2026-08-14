@@ -9,9 +9,14 @@ import { getSRSWords, getReviewLog } from '@/lib/storage';
 const UNLOCK_INTERVAL = 7;
 
 const CARD_COLORS = [
-  '#5B8AF0','#FF6B6B','#06D6A0','#FFD166',
-  '#A78BFA','#FF9F43','#F72585','#4ECDC4',
-  '#3D8BFF','#FF5E57','#00C9A7','#FFC75F',
+  { color: '#EC4899', light: '#F472B6', dark: '#BE185D' },
+  { color: '#8B5CF6', light: '#A78BFA', dark: '#6D28D9' },
+  { color: '#06B6D4', light: '#22D3EE', dark: '#0891B2' },
+  { color: '#F97316', light: '#FB923C', dark: '#C2410C' },
+  { color: '#10B981', light: '#34D399', dark: '#059669' },
+  { color: '#EF4444', light: '#F87171', dark: '#B91C1C' },
+  { color: '#6366F1', light: '#818CF8', dark: '#4338CA' },
+  { color: '#F59E0B', light: '#FCD34D', dark: '#B45309' },
 ];
 
 function getVideoUnlocked(collectionName: string, wordCount: number) {
@@ -30,37 +35,89 @@ function VideoCard({ video, index, wordCount, onClick }: {
   onClick: () => void;
 }) {
   const unlocked = getVideoUnlocked(video.collectionName, wordCount);
-  const color = CARD_COLORS[index % CARD_COLORS.length];
+  const { color, light, dark } = CARD_COLORS[index % CARD_COLORS.length];
+  const numStr = String(index + 1).padStart(2, '0');
+
+  if (wordCount === 0) {
+    return (
+      <div style={{
+        borderRadius: 18, padding: '14px 12px', minHeight: 120,
+        background: 'var(--surface)', border: '1.5px solid var(--border)',
+        opacity: 0.38, display: 'flex', flexDirection: 'column',
+        justifyContent: 'space-between', position: 'relative', overflow: 'hidden',
+      }}>
+        <div style={{
+          position: 'absolute', right: 4, bottom: -4, fontSize: 52,
+          opacity: 0.08, lineHeight: 1, userSelect: 'none', pointerEvents: 'none',
+        }}>{numStr}</div>
+        <span style={{ fontSize: 20 }}>⏳</span>
+        <div>
+          <p style={{ fontSize: 11, fontWeight: 900, color: 'var(--text)', lineHeight: 1.2 }}>{video.title}</p>
+          <p style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 3 }}>Coming soon</p>
+        </div>
+      </div>
+    );
+  }
+
+  const gradBg = unlocked
+    ? 'linear-gradient(135deg, #34D399, #10B981, #059669)'
+    : `linear-gradient(135deg, ${light}, ${color}, ${dark})`;
+  const shadow = unlocked
+    ? '0 4px 0 #059669, 0 8px 20px #10B98155'
+    : `0 4px 0 ${dark}, 0 8px 20px ${color}55`;
 
   return (
-    <div
+    <button
       onClick={onClick}
-      className="rounded-2xl border cursor-pointer hover:-translate-y-0.5 transition-all duration-200 overflow-hidden"
-      style={{ borderColor: unlocked ? '#86efac' : 'var(--border)', background: 'var(--surface)' }}
+      style={{
+        position: 'relative', overflow: 'hidden',
+        borderRadius: 18, background: gradBg, boxShadow: shadow,
+        padding: '14px 12px', minHeight: 120,
+        display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+        cursor: 'pointer', textAlign: 'left', width: '100%', border: 'none',
+        transition: 'transform 0.15s ease',
+      }}
+      onMouseEnter={e => (e.currentTarget.style.transform = 'translateY(-2px)')}
+      onMouseLeave={e => (e.currentTarget.style.transform = 'translateY(0)')}
     >
-      {/* Color accent strip */}
-      <div className="h-1.5" style={{ background: `linear-gradient(90deg, ${color}88, ${color})` }} />
+      {/* Watermark number */}
+      <div style={{
+        position: 'absolute', right: 4, bottom: -4, fontSize: 52,
+        color: 'rgba(255,255,255,0.08)', fontWeight: 900,
+        lineHeight: 1, userSelect: 'none', pointerEvents: 'none',
+      }}>{numStr}</div>
 
-      <div className="p-4">
-        <div className="flex items-start justify-between gap-2">
-          <p className="font-black text-sm text-[var(--text)]">{video.title}</p>
-          {unlocked && <span className="text-sm">🔓</span>}
-        </div>
-        <div className="flex items-center gap-2 mt-2">
-          {wordCount > 0 ? (
-            <span className="text-xs text-[var(--text-muted)]">{wordCount} words</span>
-          ) : (
-            <span className="text-xs text-[var(--text-muted)] italic">No words yet</span>
+      {/* Status icon */}
+      <span style={{ fontSize: 20, filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }}>
+        {unlocked ? '🔓' : '▶'}
+      </span>
+
+      {/* Info */}
+      <div>
+        <p style={{
+          fontSize: 12, fontWeight: 900, color: '#fff',
+          lineHeight: 1.25, marginBottom: 7,
+          display: '-webkit-box', WebkitLineClamp: 2,
+          WebkitBoxOrient: 'vertical', overflow: 'hidden',
+          textShadow: '0 1px 4px rgba(0,0,0,0.3)',
+        }}>{video.title}</p>
+        <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', alignItems: 'center' }}>
+          <span style={{
+            fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.9)',
+            background: 'rgba(0,0,0,0.22)', borderRadius: 6, padding: '2px 7px',
+          }}>{wordCount} words</span>
+          {video.duration && (
+            <span style={{
+              fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.7)',
+              background: 'rgba(0,0,0,0.15)', borderRadius: 6, padding: '2px 7px',
+            }}>{video.duration}</span>
           )}
-          {video.duration && wordCount > 0 && (
-            <>
-              <span className="text-[var(--border)] text-xs">·</span>
-              <span className="text-xs text-[var(--text-muted)]">{video.duration}</span>
-            </>
+          {unlocked && (
+            <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.95)' }}>✓ Unlocked</span>
           )}
         </div>
       </div>
-    </div>
+    </button>
   );
 }
 
@@ -86,24 +143,33 @@ export default function RealEnglishSetPage({ params }: { params: Promise<{ id: s
   if (!set) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-16 text-center">
-        <p className="text-[var(--text-muted)] text-sm">Set not found.</p>
-        <button onClick={() => router.back()} className="mt-4 text-xs text-[var(--primary)] hover:underline">← Back</button>
+        <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>Set not found.</p>
+        <button onClick={() => router.back()} style={{ marginTop: 16, fontSize: 12, color: 'var(--primary)', background: 'none', border: 'none', cursor: 'pointer' }}>
+          ← Back
+        </button>
       </div>
     );
   }
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 pb-24">
-      <button onClick={() => router.back()}
-        className="flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors mb-5">
+      {/* Back */}
+      <button
+        onClick={() => router.back()}
+        style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', marginBottom: 24 }}
+      >
         ← Real English
       </button>
 
-      <div className="mb-6">
-        <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mb-1">Video Set</p>
-        <h1 className="text-xl font-black text-[var(--text)] leading-snug">{set.title}</h1>
+      {/* Editorial header */}
+      <div style={{ marginBottom: 28 }}>
+        <p style={{ fontSize: 11, fontWeight: 900, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: 6 }}>
+          Video Set · {set.videos.length} episodes
+        </p>
+        <h1 style={{ fontSize: 32, fontWeight: 900, color: 'var(--text)', lineHeight: 1.1 }}>{set.title}</h1>
       </div>
 
+      {/* Video grid */}
       <div className="grid grid-cols-2 gap-3">
         {set.videos.map((video, i) => (
           <VideoCard
