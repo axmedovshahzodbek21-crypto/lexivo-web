@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { realEnglishSets, type RealEnglishSet } from '@/lib/real-english-data';
 import { getSRSWords, getReviewLog } from '@/lib/storage';
 
@@ -11,10 +11,7 @@ function getSetProgress(set: RealEnglishSet): { done: number; total: number; unl
   const log = getReviewLog();
   const setWords = srsWords.filter(w => w.collectionName === set.collectionName);
   const total = set.wordCount;
-  const done = setWords.filter(w => {
-    const completed = log[w.id] ?? [];
-    return completed.includes(UNLOCK_INTERVAL);
-  }).length;
+  const done = setWords.filter(w => (log[w.id] ?? []).includes(UNLOCK_INTERVAL)).length;
   const unlocked = setWords.length >= total && done >= total;
   return { done, total, unlocked };
 }
@@ -28,97 +25,56 @@ function LevelBadge({ level }: { level: string }) {
   );
 }
 
-function ProgressBar({ done, total }: { done: number; total: number }) {
-  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
-  return (
-    <div>
-      <div className="flex items-center justify-between mb-1">
-        <span className="text-[10px] text-[var(--text-muted)]">{done}/{total} words at +7</span>
-        <span className="text-[10px] font-bold" style={{ color: 'var(--primary)' }}>{pct}%</span>
-      </div>
-      <div className="h-1.5 rounded-full bg-[var(--border)] overflow-hidden">
-        <div className="h-full rounded-full transition-all duration-500"
-          style={{ width: `${pct}%`, background: 'var(--primary)' }} />
-      </div>
-    </div>
-  );
-}
-
-function UnlockedCard({ set }: { set: RealEnglishSet }) {
-  return (
-    <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 flex flex-col gap-3">
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-bold" style={{ color: '#10b981' }}>🔓 Unlocked</span>
-            <LevelBadge level={set.level} />
-          </div>
-          <p className="font-black text-sm text-[var(--text)] leading-tight">{set.title}</p>
-          <p className="text-xs text-[var(--text-muted)] mt-0.5">{set.source}</p>
-          {set.description && (
-            <p className="text-xs text-[var(--text-muted)] mt-1.5 leading-snug">{set.description}</p>
-          )}
-        </div>
-        <div className="text-3xl shrink-0">🎬</div>
-      </div>
-      <div className="flex gap-2">
-        <a href={set.youtubeUrl} target="_blank" rel="noopener noreferrer" className="flex-1">
-          <button className="w-full py-2 rounded-xl text-xs font-bold text-white transition-all"
-            style={{ background: 'linear-gradient(135deg, #dc2626, #ef4444)' }}>
-            ▶ Watch on YouTube
-          </button>
-        </a>
-        <Link href={`/flashcards?collection=${encodeURIComponent(set.collectionName)}`} className="flex-1">
-          <button className="w-full py-2 rounded-xl text-xs font-bold border border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--primary)] hover:text-[var(--primary)] transition-all">
-            🃏 Flashcards
-          </button>
-        </Link>
-      </div>
-    </div>
-  );
-}
-
-function SetCard({ set }: { set: RealEnglishSet }) {
+function SetCard({ set, onClick }: { set: RealEnglishSet; onClick: () => void }) {
   const [progress, setProgress] = useState({ done: 0, total: set.wordCount, unlocked: false });
 
   useEffect(() => {
     setProgress(getSetProgress(set));
   }, [set]);
 
+  const pct = progress.total > 0 ? Math.round((progress.done / progress.total) * 100) : 0;
   const started = progress.done > 0;
 
   return (
-    <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 flex flex-col gap-3">
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <LevelBadge level={set.level} />
-            <span className="text-[10px] text-[var(--text-muted)]">{set.wordCount} words</span>
-          </div>
-          <p className="font-black text-sm text-[var(--text)] leading-tight">{set.title}</p>
-          <p className="text-xs text-[var(--text-muted)] mt-0.5">{set.source}</p>
-          {set.description && (
-            <p className="text-xs text-[var(--text-muted)] mt-1.5 leading-snug">{set.description}</p>
-          )}
-        </div>
-        <div className="text-2xl shrink-0 opacity-40">🔒</div>
+    <button
+      onClick={onClick}
+      className="w-full text-left rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 flex items-center gap-4 hover:border-[var(--primary)] transition-all group"
+    >
+      {/* Icon */}
+      <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 text-2xl"
+        style={{ background: 'var(--primary-bg)' }}>
+        {progress.unlocked ? '🔓' : '🎬'}
       </div>
 
-      {started && <ProgressBar done={progress.done} total={progress.total} />}
+      {/* Info */}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 mb-0.5">
+          <LevelBadge level={set.level} />
+          <span className="text-[10px] text-[var(--text-muted)]">{set.wordCount} words</span>
+          {progress.unlocked && (
+            <span className="text-[10px] font-bold" style={{ color: '#10b981' }}>Unlocked</span>
+          )}
+        </div>
+        <p className="font-black text-sm text-[var(--text)] leading-tight truncate">{set.title}</p>
+        <p className="text-xs text-[var(--text-muted)] mt-0.5 truncate">{set.source}</p>
 
-      <Link href={`/learn?collection=${encodeURIComponent(set.collectionName)}`}>
-        <button className="w-full py-2 rounded-xl text-xs font-bold text-white transition-all"
-          style={{ background: 'var(--primary)' }}>
-          {started ? '→ Continue Learning' : '→ Start Learning'}
-        </button>
-      </Link>
-    </div>
+        {started && !progress.unlocked && (
+          <div className="mt-2 h-1 rounded-full bg-[var(--border)] overflow-hidden">
+            <div className="h-full rounded-full" style={{ width: `${pct}%`, background: 'var(--primary)' }} />
+          </div>
+        )}
+      </div>
+
+      {/* Arrow */}
+      <span className="text-[var(--text-muted)] group-hover:text-[var(--primary)] transition-colors shrink-0">›</span>
+    </button>
   );
 }
 
 type Tab = 'sets' | 'unlocked';
 
 export default function RealEnglishPage() {
+  const router = useRouter();
   const [tab, setTab] = useState<Tab>('sets');
   const [unlockedSets, setUnlockedSets] = useState<RealEnglishSet[]>([]);
   const [lockedSets, setLockedSets] = useState<RealEnglishSet[]>([]);
@@ -136,7 +92,6 @@ export default function RealEnglishPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 pb-24">
-      {/* Header */}
       <div className="mb-6">
         <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mb-1">Listening Skills</p>
         <h1 className="text-2xl font-black text-[var(--text)]">🗣️ Real English</h1>
@@ -147,39 +102,31 @@ export default function RealEnglishPage() {
 
       {/* Tabs */}
       <div className="flex gap-1 p-1 rounded-xl bg-[var(--surface)] border border-[var(--border)] mb-6">
-        <button
-          onClick={() => setTab('sets')}
-          className="flex-1 py-2 rounded-lg text-xs font-bold transition-all"
-          style={tab === 'sets' ? {
-            background: 'var(--primary)',
-            color: '#fff',
-            boxShadow: '0 2px 8px rgba(108,99,255,0.35)',
-          } : { color: 'var(--text-muted)' }}
-        >
-          📚 Video Sets
-        </button>
-        <button
-          onClick={() => setTab('unlocked')}
-          className="flex-1 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5"
-          style={tab === 'unlocked' ? {
-            background: 'var(--primary)',
-            color: '#fff',
-            boxShadow: '0 2px 8px rgba(108,99,255,0.35)',
-          } : { color: 'var(--text-muted)' }}
-        >
-          🎬 My Unlocked Videos
-          {unlockedSets.length > 0 && (
-            <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full"
-              style={{ background: tab === 'unlocked' ? 'rgba(255,255,255,0.25)' : 'var(--primary-bg)', color: tab === 'unlocked' ? '#fff' : 'var(--primary)' }}>
-              {unlockedSets.length}
-            </span>
-          )}
-        </button>
+        {(['sets', 'unlocked'] as Tab[]).map(t => (
+          <button
+            key={t}
+            onClick={() => setTab(t)}
+            className="flex-1 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5"
+            style={tab === t ? {
+              background: 'var(--primary)',
+              color: '#fff',
+              boxShadow: '0 2px 8px rgba(108,99,255,0.35)',
+            } : { color: 'var(--text-muted)' }}
+          >
+            {t === 'sets' ? '📚 Video Sets' : '🎬 My Unlocked Videos'}
+            {t === 'unlocked' && unlockedSets.length > 0 && (
+              <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full"
+                style={{ background: tab === 'unlocked' ? 'rgba(255,255,255,0.25)' : 'var(--primary-bg)', color: tab === 'unlocked' ? '#fff' : 'var(--primary)' }}>
+                {unlockedSets.length}
+              </span>
+            )}
+          </button>
+        ))}
       </div>
 
-      {/* Tab: Video Sets */}
+      {/* Video Sets tab */}
       {tab === 'sets' && (
-        <section>
+        <section className="flex flex-col gap-3">
           {lockedSets.length === 0 && unlockedSets.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-[var(--border)] bg-[var(--surface)] p-10 flex flex-col items-center justify-center text-center gap-3">
               <span className="text-4xl">🎬</span>
@@ -187,19 +134,14 @@ export default function RealEnglishPage() {
               <p className="text-xs text-[var(--text-muted)]">Interview vocab sets are coming soon.</p>
             </div>
           ) : lockedSets.length === 0 ? (
-            <p className="text-sm text-[var(--text-muted)] text-center py-4">
-              All sets unlocked — you&apos;re on fire! 🔥
-            </p>
+            <p className="text-sm text-[var(--text-muted)] text-center py-4">All sets unlocked — you&apos;re on fire! 🔥</p>
           ) : (
-            <div className="flex flex-col gap-3">
-              {lockedSets.map(set => (
-                <SetCard key={set.id} set={set} />
-              ))}
-            </div>
+            lockedSets.map(set => (
+              <SetCard key={set.id} set={set} onClick={() => router.push(`/real-english/${set.id}`)} />
+            ))
           )}
 
-          {/* How it works */}
-          <div className="mt-8 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5">
+          <div className="mt-6 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5">
             <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mb-3">How it works</p>
             <div className="flex flex-col gap-2.5">
               {[
@@ -218,9 +160,9 @@ export default function RealEnglishPage() {
         </section>
       )}
 
-      {/* Tab: My Unlocked Videos */}
+      {/* My Unlocked Videos tab */}
       {tab === 'unlocked' && (
-        <section>
+        <section className="flex flex-col gap-3">
           {unlockedSets.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-[var(--border)] bg-[var(--surface)] p-10 flex flex-col items-center justify-center text-center gap-3">
               <span className="text-4xl">🔒</span>
@@ -228,20 +170,16 @@ export default function RealEnglishPage() {
               <p className="text-xs text-[var(--text-muted)] max-w-xs">
                 Learn all the words in a set and complete your SRS reviews — the YouTube link unlocks automatically.
               </p>
-              <button
-                onClick={() => setTab('sets')}
-                className="mt-2 px-4 py-2 rounded-xl text-xs font-bold text-white transition-all"
-                style={{ background: 'var(--primary)' }}
-              >
+              <button onClick={() => setTab('sets')}
+                className="mt-1 px-4 py-2 rounded-xl text-xs font-bold text-white"
+                style={{ background: 'var(--primary)' }}>
                 → Browse Video Sets
               </button>
             </div>
           ) : (
-            <div className="flex flex-col gap-3">
-              {unlockedSets.map(set => (
-                <UnlockedCard key={set.id} set={set} />
-              ))}
-            </div>
+            unlockedSets.map(set => (
+              <SetCard key={set.id} set={set} onClick={() => router.push(`/real-english/${set.id}`)} />
+            ))
           )}
         </section>
       )}
