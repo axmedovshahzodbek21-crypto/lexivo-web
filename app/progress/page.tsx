@@ -129,7 +129,6 @@ function ProgressPage() {
         {/* Tabs */}
         <div className="flex gap-2 mb-4 overflow-x-auto pb-1">
           {(['overview', 'calendar', 'srs', 'achievements'] as const).map(tabKey => {
-            const icons: Record<string, string> = { overview: '📊', calendar: '📅', srs: '🔄', achievements: '🏆' };
             const labels: Record<string, string> = { overview: t.progress.tabOverview, calendar: t.progress.tabCalendar, srs: t.progress.tabSRS, achievements: t.progress.tabBadges };
             const active = tab === tabKey;
             return (
@@ -146,7 +145,7 @@ function ProgressPage() {
                   color: 'var(--text-muted)',
                 }}
               >
-                {icons[tabKey]} {labels[tabKey]}
+                {labels[tabKey]}
               </button>
             );
           })}
