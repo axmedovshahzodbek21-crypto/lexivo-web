@@ -26,7 +26,9 @@ export const realEnglishSets: RealEnglishSet[] = [
       { id: 'preview-set-v8',  title: 'Video 8',  duration: '', collectionName: 'Natural English V8'  },
       { id: 'preview-set-v9',  title: 'Video 9',  duration: '', collectionName: 'Natural English V9'  },
       { id: 'preview-set-v10', title: 'Video 10', duration: '', collectionName: 'Natural English V10' },
-      { id: 'preview-set-v11', title: 'Video 11', duration: '', collectionName: 'Natural English V11' }
+      { id: 'preview-set-v11', title: 'Video 11', duration: '', collectionName: 'Natural English V11' },
+      { id: 'preview-set-v12', title: 'Video 12', duration: '', collectionName: 'Natural English V12' },
+      { id: 'preview-set-v13', title: 'Video 13', duration: '', collectionName: 'Natural English V13' },
     ],
   },
 ];

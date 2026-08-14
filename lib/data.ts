@@ -1,5 +1,5 @@
 import type { WordCollection, WordItem } from './types';
-import { realEnglishSets } from './real-english-data';
+import { realEnglishSets } from "./realEnglishSets";
 
 const cache: Record<string, WordCollection | WordCollection[]> = {};
 

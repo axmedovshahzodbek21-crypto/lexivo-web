@@ -1,7 +1,8 @@
 'use client';
 import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { realEnglishSets, type RealEnglishVideo } from '@/lib/real-english-data';
+import { type RealEnglishVideo } from '@/lib/real-english-data';
+import { realEnglishSets } from "@/lib/realEnglishSets";
 import { loadRealEnglishCollection } from '@/lib/data';
 import { getSRSWords, getReviewLog } from '@/lib/storage';
 
