@@ -1,126 +1,86 @@
 'use client';
 import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { realEnglishSets } from '@/lib/real-english-data';
+import { realEnglishSets, type RealEnglishVideo } from '@/lib/real-english-data';
 import { loadRealEnglishCollection } from '@/lib/data';
-import { getUnitProgress } from '@/lib/storage';
-import type { WordCollection, UnitProgress } from '@/lib/types';
+import { getSRSWords, getReviewLog } from '@/lib/storage';
+
+const UNLOCK_INTERVAL = 7;
 
 const CARD_COLORS = [
   '#5B8AF0','#FF6B6B','#06D6A0','#FFD166',
   '#A78BFA','#FF9F43','#F72585','#4ECDC4',
+  '#3D8BFF','#FF5E57','#00C9A7','#FFC75F',
 ];
 
-interface UnitRow {
-  dayNumber: number;
-  topic: string;
+function getVideoUnlocked(collectionName: string, wordCount: number) {
+  if (wordCount === 0) return false;
+  const srsWords = getSRSWords();
+  const log = getReviewLog();
+  const words = srsWords.filter(w => w.collectionName === collectionName);
+  const done = words.filter(w => (log[w.id] ?? []).includes(UNLOCK_INTERVAL)).length;
+  return words.length >= wordCount && done >= wordCount;
+}
+
+function VideoCard({ video, index, wordCount, onClick }: {
+  video: RealEnglishVideo;
+  index: number;
   wordCount: number;
-  progress: UnitProgress;
-}
-
-function ModeButton({ href, icon, label, done, locked = false }: {
-  href: string; icon: string; label: string; done: boolean; locked?: boolean;
+  onClick: () => void;
 }) {
-  if (locked) {
-    return (
-      <div className="flex-1 flex flex-col items-center gap-0.5 py-2 rounded-xl opacity-40 cursor-not-allowed select-none"
-        style={{ background: 'var(--surface-2)' }}>
-        <span className="text-sm">🔒</span>
-        <span className="text-[10px] font-semibold text-[var(--text-muted)]">{label}</span>
-      </div>
-    );
-  }
-  return (
-    <Link href={href}
-      className="flex-1 flex flex-col items-center gap-0.5 py-2 rounded-xl transition-all hover:opacity-80 active:scale-95"
-      style={{ background: done ? 'rgba(34,197,94,0.12)' : 'var(--surface-2)' }}>
-      <span className="text-sm">{done ? '✅' : icon}</span>
-      <span className="text-[10px] font-semibold"
-        style={{ color: done ? '#16a34a' : 'var(--text-muted)' }}>{label}</span>
-    </Link>
-  );
-}
-
-function UnitCard({ unit, collectionName, accentColor }: {
-  unit: UnitRow;
-  collectionName: string;
-  accentColor: string;
-}) {
-  const enc = encodeURIComponent(collectionName);
-  const learnUrl = `/learn?collection=${enc}&day=${unit.dayNumber}`;
-  const flashUrl = `/flashcards?collection=${enc}&day=${unit.dayNumber}`;
-  const quizUrl  = `/quiz?collection=${enc}&day=${unit.dayNumber}`;
-  const matchUrl = `/matching?collection=${enc}&day=${unit.dayNumber}`;
-
-  const { learnDone, flashcardDone, quizDone } = unit.progress;
-  const allDone = learnDone && flashcardDone && quizDone;
-  const stagesComplete = [learnDone, flashcardDone, quizDone].filter(Boolean).length;
-  const pct = Math.round((stagesComplete / 3) * 100);
+  const unlocked = getVideoUnlocked(video.collectionName, wordCount);
+  const color = CARD_COLORS[index % CARD_COLORS.length];
 
   return (
-    <div className="rounded-2xl overflow-hidden border"
-      style={{ borderColor: allDone ? '#86efac' : 'var(--border)', background: 'var(--surface)' }}>
-      {/* Accent top strip */}
-      <div className="h-1" style={{
-        background: allDone
-          ? 'linear-gradient(90deg,#22c55e,#4ade80)'
-          : `linear-gradient(90deg,${accentColor}88,${accentColor})`,
-      }} />
+    <div
+      onClick={onClick}
+      className="rounded-2xl border cursor-pointer hover:-translate-y-0.5 transition-all duration-200 overflow-hidden"
+      style={{ borderColor: unlocked ? '#86efac' : 'var(--border)', background: 'var(--surface)' }}
+    >
+      {/* Color accent strip */}
+      <div className="h-1.5" style={{ background: `linear-gradient(90deg, ${color}88, ${color})` }} />
 
-      <div className="p-3">
-        {/* Unit header */}
-        <div className="flex items-start justify-between gap-1 mb-2">
-          <div className="flex-1 min-w-0">
-            <p className="text-[10px] font-bold uppercase tracking-wide mb-0.5"
-              style={{ color: 'var(--text-muted)' }}>Unit {unit.dayNumber}</p>
-            <p className="text-xs font-bold leading-snug line-clamp-2"
-              style={{ color: allDone ? '#16a34a' : 'var(--text)' }}>{unit.topic}</p>
-          </div>
-          <span className="text-[10px] whitespace-nowrap shrink-0 mt-0.5"
-            style={{ color: 'var(--text-muted)' }}>{unit.wordCount} words</span>
+      <div className="p-4">
+        <div className="flex items-start justify-between gap-2">
+          <p className="font-black text-sm text-[var(--text)]">{video.title}</p>
+          {unlocked && <span className="text-sm">🔓</span>}
         </div>
-
-        {/* Progress bar */}
-        <div className="h-1 rounded-full mb-2 overflow-hidden" style={{ background: 'var(--border)' }}>
-          <div className="h-full rounded-full transition-all" style={{
-            width: `${pct}%`,
-            background: allDone ? '#22c55e' : accentColor,
-          }} />
-        </div>
-
-        {/* Action buttons */}
-        <div className="flex gap-1">
-          <ModeButton href={learnUrl} icon="📖" label="Learn"  done={learnDone} />
-          <ModeButton href={flashUrl} icon="🃏" label="Cards"  done={flashcardDone} locked={!learnDone} />
-          <ModeButton href={quizUrl}  icon="🧠" label="Quiz"   done={quizDone}     locked={!learnDone} />
-          <ModeButton href={matchUrl} icon="🔀" label="Match"  done={false}         locked={!learnDone} />
+        <div className="flex items-center gap-2 mt-2">
+          {wordCount > 0 ? (
+            <span className="text-xs text-[var(--text-muted)]">{wordCount} words</span>
+          ) : (
+            <span className="text-xs text-[var(--text-muted)] italic">No words yet</span>
+          )}
+          {video.duration && wordCount > 0 && (
+            <>
+              <span className="text-[var(--border)] text-xs">·</span>
+              <span className="text-xs text-[var(--text-muted)]">{video.duration}</span>
+            </>
+          )}
         </div>
       </div>
     </div>
   );
 }
 
-export default function RealEnglishDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default function RealEnglishSetPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
   const set = realEnglishSets.find(s => s.id === id);
-  const [collection, setCollection] = useState<WordCollection | null>(null);
-  const [units, setUnits] = useState<UnitRow[]>([]);
+  const [wordCounts, setWordCounts] = useState<Record<string, number>>({});
 
   useEffect(() => {
     if (!set) return;
-    loadRealEnglishCollection(id).then(col => {
-      if (!col) return;
-      setCollection(col);
-      setUnits(col.days.map(day => ({
-        dayNumber: day.dayNumber,
-        topic: day.topic || `Unit ${day.dayNumber}`,
-        wordCount: day.words.length,
-        progress: getUnitProgress(col.name, day.dayNumber),
-      })));
-    });
-  }, [id, set]);
+    async function load() {
+      const counts: Record<string, number> = {};
+      await Promise.all(set!.videos.map(async v => {
+        const col = await loadRealEnglishCollection(v.id);
+        counts[v.id] = col ? col.days.reduce((s, d) => s + d.words.length, 0) : 0;
+      }));
+      setWordCounts(counts);
+    }
+    load();
+  }, [set]);
 
   if (!set) {
     return (
@@ -131,56 +91,29 @@ export default function RealEnglishDetailPage({ params }: { params: Promise<{ id
     );
   }
 
-  const totalWords = collection ? collection.days.reduce((s, d) => s + d.words.length, 0) : 0;
-  const accentColor = CARD_COLORS[realEnglishSets.indexOf(set) % CARD_COLORS.length];
-
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 pb-24">
-      {/* Back */}
       <button onClick={() => router.back()}
         className="flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors mb-5">
         ← Real English
       </button>
 
-      {/* Hero */}
-      <div className="rounded-2xl p-5 mb-6 text-white"
-        style={{ background: `linear-gradient(135deg, ${accentColor}bb, ${accentColor})` }}>
-        <div className="text-2xl mb-2">🎬</div>
-        <h1 className="text-xl font-black leading-snug mb-3" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>
-          {set.title}
-        </h1>
-        <div className="flex flex-wrap gap-2">
-          {totalWords > 0 && (
-            <span className="text-xs font-semibold bg-black/20 rounded-full px-3 py-1">{totalWords} words</span>
-          )}
-          {set.duration && (
-            <span className="text-xs font-semibold bg-black/20 rounded-full px-3 py-1">⏱ {set.duration}</span>
-          )}
-          {units.length > 0 && (
-            <span className="text-xs font-semibold bg-black/20 rounded-full px-3 py-1">{units.length} units</span>
-          )}
-        </div>
+      <div className="mb-6">
+        <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mb-1">Video Set</p>
+        <h1 className="text-xl font-black text-[var(--text)] leading-snug">{set.title}</h1>
       </div>
 
-      {/* Units grid */}
-      {units.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-[var(--border)] bg-[var(--surface)] p-10 text-center">
-          <span className="text-4xl">📭</span>
-          <p className="text-sm font-bold text-[var(--text)] mt-3">Words coming soon</p>
-          <p className="text-xs text-[var(--text-muted)] mt-1">This set is being prepared.</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 gap-3">
-          {units.map(unit => (
-            <UnitCard
-              key={unit.dayNumber}
-              unit={unit}
-              collectionName={collection!.name}
-              accentColor={accentColor}
-            />
-          ))}
-        </div>
-      )}
+      <div className="grid grid-cols-2 gap-3">
+        {set.videos.map((video, i) => (
+          <VideoCard
+            key={video.id}
+            video={video}
+            index={i}
+            wordCount={wordCounts[video.id] ?? 0}
+            onClick={() => router.push(`/real-english/${id}/${video.id}`)}
+          />
+        ))}
+      </div>
     </div>
   );
 }
