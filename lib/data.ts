@@ -77,7 +77,7 @@ export async function loadAllCollections(): Promise<WordCollection[]> {
     loadCEFRCollection('a2'),
     loadCEFRCollection('b1'),
     loadCEFRCollection('advanced'),
-    Promise.all(realEnglishSets.map(s => loadRealEnglishCollection(s.id))),
+    Promise.all(realEnglishSets.flatMap(s => s.videos.map(v => loadRealEnglishCollection(v.id)))),
   ]);
   return [...main, a1, a2, b1, advanced, ...realEnglish.filter((c): c is WordCollection => c !== null)];
 }
