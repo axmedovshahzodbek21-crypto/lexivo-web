@@ -4,6 +4,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { realEnglishSets, type RealEnglishSet } from '@/lib/real-english-data';
 import { getSRSWords, getReviewLog } from '@/lib/storage';
+import { useAppStore } from '@/lib/store';
 
 const UNLOCK_INTERVAL = 7;
 
@@ -60,6 +61,8 @@ export default function RealEnglishDetailPage() {
   const router = useRouter();
   const id = params.id as string;
   const set = realEnglishSets.find(s => s.id === id);
+  const { collections } = useAppStore();
+  const youtubeUrl = collections.find(c => c.name === set?.collectionName)?.youtubeUrl;
 
   const [progress, setProgress] = useState({ done: 0, total: 0, unlocked: false });
 
@@ -135,8 +138,8 @@ export default function RealEnglishDetailPage() {
         )}
 
         {/* Watch button — only when unlocked */}
-        {progress.unlocked && (
-          <a href={set.youtubeUrl} target="_blank" rel="noopener noreferrer" className="block mt-4">
+        {progress.unlocked && youtubeUrl && (
+          <a href={youtubeUrl} target="_blank" rel="noopener noreferrer" className="block mt-4">
             <button className="w-full py-2.5 rounded-xl text-sm font-bold text-white transition-all"
               style={{ background: 'linear-gradient(135deg, #dc2626, #ef4444)' }}>
               ▶ Watch on YouTube

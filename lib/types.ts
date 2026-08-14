@@ -28,6 +28,7 @@ export interface WordDay {
 export interface WordCollection {
   name: string;
   description: string;
+  youtubeUrl?: string;
   days: WordDay[];
 }
 

@@ -1,4 +1,5 @@
 import type { WordCollection, WordItem } from './types';
+import { realEnglishSets } from './real-english-data';
 
 const cache: Record<string, WordCollection | WordCollection[]> = {};
 
@@ -70,14 +71,15 @@ export async function loadRealEnglishCollection(id: string): Promise<WordCollect
 }
 
 export async function loadAllCollections(): Promise<WordCollection[]> {
-  const [main, a1, a2, b1, advanced] = await Promise.all([
+  const [main, a1, a2, b1, advanced, realEnglish] = await Promise.all([
     loadCollections(),
     loadCEFRCollection('a1'),
     loadCEFRCollection('a2'),
     loadCEFRCollection('b1'),
     loadCEFRCollection('advanced'),
+    Promise.all(realEnglishSets.map(s => loadRealEnglishCollection(s.id))),
   ]);
-  return [...main, a1, a2, b1, advanced];
+  return [...main, a1, a2, b1, advanced, ...realEnglish.filter((c): c is WordCollection => c !== null)];
 }
 
 export function getAllWords(collections: WordCollection[]): WordItem[] {
