@@ -615,9 +615,9 @@ function MiniCalendar({ title, color, days, year, month, lockedDays }: {
           {monthCount} {monthCount === 1 ? 'day' : 'days'}
         </span>
       </div>
-      <div className="grid grid-cols-7 gap-y-1">
+      <div className="grid grid-cols-7 gap-y-1.5">
         {['M','T','W','T','F','S','S'].map((d, i) => (
-          <div key={i} className="flex items-center justify-center text-[8px] font-bold pb-0.5" style={{ color: 'var(--text-muted)' }}>{d}</div>
+          <div key={i} className="flex items-center justify-center text-[10px] font-bold pb-1" style={{ color: 'var(--text-muted)' }}>{d}</div>
         ))}
         {cells.map((day, i) => {
           if (!day) return <div key={i} className="aspect-square" />;
@@ -633,18 +633,18 @@ function MiniCalendar({ title, color, days, year, month, lockedDays }: {
             >
               <div className="flex items-center justify-center"
                 style={{
-                  width: hasCircle ? '72%' : 'auto',
+                  width: hasCircle ? '78%' : 'auto',
                   aspectRatio: hasCircle ? '1' : undefined,
                   borderRadius: '50%',
                   background: done ? color : locked ? '#52525244' : 'transparent',
                   outline: isToday ? `2px solid ${color}` : 'none',
                   outlineOffset: '2px',
-                  boxShadow: done ? `0 0 5px ${color}70` : isToday ? `0 0 5px ${color}40` : 'none',
+                  boxShadow: done ? `0 0 6px ${color}80` : isToday ? `0 0 8px ${color}60` : 'none',
                 }}
               >
                 {locked
-                  ? <span style={{ fontSize: 7, lineHeight: 1 }}>🔒</span>
-                  : <span style={{ fontSize: 10, fontWeight: done || isToday ? 700 : 500, lineHeight: 1, color: done ? '#fff' : isToday ? color : 'var(--text-muted)' }}>{day}</span>
+                  ? <span style={{ fontSize: 9, lineHeight: 1 }}>🔒</span>
+                  : <span style={{ fontSize: 12, fontWeight: done || isToday ? 700 : 500, lineHeight: 1, color: done ? '#fff' : isToday ? color : 'var(--text-muted)' }}>{day}</span>
                 }
               </div>
             </div>
@@ -1014,14 +1014,14 @@ function StudyCalendar({
           style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)' }}
           onClick={() => setSelectedDay(null)}
         >
-          <div className="w-full max-w-3xl rounded-t-3xl max-h-[90vh] overflow-y-auto"
+          <div className="w-full max-w-lg rounded-t-3xl max-h-[90vh] overflow-y-auto"
             style={{ background: 'var(--bg)', borderTop: '1px solid var(--border)' }}
             onClick={e => e.stopPropagation()}>
             {/* Handle */}
             <div className="flex justify-center pt-3 pb-1">
               <div className="w-10 h-1 rounded-full" style={{ background: 'var(--border)' }} />
             </div>
-            <div className="px-6 pt-2 pb-10">
+            <div className="px-4 pt-2 pb-8">
               {/* Header — editorial with watermark day number */}
               <div className="relative flex items-start justify-between mb-6 overflow-hidden">
                 <div style={{
@@ -1058,7 +1058,7 @@ function StudyCalendar({
                   { key: 'review', label: 'SRS Review',                done: sheetTasks.review, href: '/srs',   btnLabel: 'Go to Review', color: TASK_COLORS.review.bg, shadow: TASK_COLORS.review.shadow, emoji: '🔁', nothingDue: sheetIsToday && dueCount === 0 && !sheetTasks.review },
                   { key: 'words',  label: `Words (${dailyGoal} goal)`, done: sheetTasks.words,  href: '/learn', btnLabel: 'Learn Words',  color: TASK_COLORS.words.bg,  shadow: TASK_COLORS.words.shadow,  emoji: '✏️' },
                 ] as const).map(task => (
-                  <div key={task.key} className="rounded-2xl p-5 flex flex-col gap-4 relative overflow-hidden"
+                  <div key={task.key} className="rounded-2xl p-4 flex flex-col gap-3 relative overflow-hidden"
                     style={{
                       background: task.done
                         ? `linear-gradient(135deg, ${task.color}, ${task.shadow})`
@@ -1076,14 +1076,14 @@ function StudyCalendar({
                         style={{ background: task.done ? 'rgba(255,255,255,0.25)' : 'var(--border)', boxShadow: task.done ? `0 0 8px ${task.color}80` : 'none' }}>
                         <span className="text-[11px] font-black" style={{ color: task.done ? '#fff' : 'var(--text-muted)' }}>{task.done ? '✓' : ''}</span>
                       </div>
-                      <span className="text-base font-black leading-tight" style={{ color: task.done ? '#fff' : 'var(--text)' }}>{task.label}</span>
+                      <span className="text-sm font-black leading-tight" style={{ color: task.done ? '#fff' : 'var(--text)' }}>{task.label}</span>
                     </div>
                     <div style={{ position: 'relative', zIndex: 1 }}>
                       {('nothingDue' in task && task.nothingDue) ? (
                         <span className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>Nothing due</span>
                       ) : sheetIsToday && !task.done ? (
                         <Link href={task.href} onClick={() => setSelectedDay(null)}
-                          className="block text-sm font-black px-4 py-3 rounded-xl text-white text-center transition-all"
+                          className="block text-xs font-black px-3 py-2.5 rounded-xl text-white text-center transition-all"
                           style={{ background: `linear-gradient(135deg, ${task.color}, ${task.shadow})`, boxShadow: `0 3px 0 ${task.shadow}` }}>
                           {task.btnLabel} →
                         </Link>
@@ -1097,8 +1097,8 @@ function StudyCalendar({
                 ))}
               </div>
 
-              {/* Two mini-calendars */}
-              <div className="grid grid-cols-2 gap-3">
+              {/* Two mini-calendars — stacked full width */}
+              <div className="flex flex-col gap-3">
                 <MiniCalendar title="SRS"                    color={TASK_COLORS.review.bg} days={reviewDays}   year={viewYear} month={viewMonth} lockedDays={srsLockedDays} />
                 <MiniCalendar title={`Words (${dailyGoal})`} color={TASK_COLORS.words.bg}  days={wordGoalDays} year={viewYear} month={viewMonth} />
               </div>
