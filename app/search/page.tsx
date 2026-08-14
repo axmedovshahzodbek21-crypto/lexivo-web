@@ -253,17 +253,23 @@ export default function SearchPage() {
                     overflow: 'hidden',
                     borderRadius: 16,
                     background: `linear-gradient(135deg, ${light}, ${color}, ${dark})`,
-                    boxShadow: `0 3px 0 ${dark}, 0 6px 16px ${color}44`,
+                    boxShadow: `10px 28px 50px ${color}55, 16px 48px 80px rgba(0,0,0,0.18)`,
                     padding: '14px 12px',
                     minHeight: 88,
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-between',
                     textDecoration: 'none',
-                    transition: 'transform 0.15s ease',
+                    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
                   }}
-                  onMouseEnter={e => (e.currentTarget.style.transform = 'translateY(-2px)')}
-                  onMouseLeave={e => (e.currentTarget.style.transform = 'translateY(0)')}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.transform = 'translateY(-10px)';
+                    e.currentTarget.style.boxShadow = `12px 42px 70px ${color}66, 20px 64px 100px rgba(0,0,0,0.22)`;
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = `10px 28px 50px ${color}55, 16px 48px 80px rgba(0,0,0,0.18)`;
+                  }}
                 >
                   {/* Watermark letter */}
                   <div style={{
