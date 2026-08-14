@@ -211,57 +211,79 @@ function ProgressPage() {
 
             {/* Weekly Activity */}
             <div className="card">
-              <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center justify-between mb-4">
                 <h3 className="font-semibold">📅 This Week</h3>
-                <span className="text-sm font-bold text-[var(--primary)]">{activeThisWeek} / 7 days</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--primary)' }}>{activeThisWeek} / 7 days</span>
               </div>
-              <div className="flex gap-1.5">
+              <div style={{ display: 'flex', gap: 6 }}>
                 {weeklyActivity.map((day, i) => (
-                  <div key={i} className="flex flex-col items-center gap-1 flex-1">
-                    <div
-                      className="w-full aspect-square rounded-xl flex items-center justify-center text-xs font-bold"
-                      style={{ background: day.active ? 'var(--primary)' : 'var(--surface-2)', color: day.active ? '#fff' : 'var(--text-muted)' }}
-                    >
+                  <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+                    <div style={{
+                      width: '100%', height: 44, borderRadius: 12,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 13, fontWeight: 900,
+                      background: day.active
+                        ? 'linear-gradient(135deg, #34D399, #10B981, #059669)'
+                        : 'var(--surface-2)',
+                      boxShadow: day.active ? '0 3px 0 #059669, 0 4px 12px #10B98155' : 'none',
+                      color: day.active ? '#fff' : 'var(--text-muted)',
+                      transition: 'all 0.2s',
+                    }}>
                       {day.active ? '✓' : '·'}
                     </div>
-                    <span className="text-[9px] font-medium text-[var(--text-muted)]">{day.label}</span>
+                    <span style={{ fontSize: 9, fontWeight: 600, color: 'var(--text-muted)' }}>{day.label}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Averages */}
-            <div className="card">
-              <h3 className="font-semibold mb-3">📊 Averages</h3>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-[var(--text-muted)]">Words per study day</span>
-                  <span className="font-bold text-[var(--primary)]">{wordsPerDay}</span>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              {[
+                { label: 'Words / study day', value: wordsPerDay, icon: '📚', light: '#818CF8', color: '#6366F1', dark: '#4338CA' },
+                { label: 'XP / study day',    value: xpPerDay,   icon: '⚡', light: '#FCD34D', color: '#F59E0B', dark: '#B45309' },
+              ].map(({ label, value, icon, light, color, dark }) => (
+                <div key={label} style={{
+                  borderRadius: 18, padding: '16px 14px',
+                  background: `linear-gradient(135deg, ${light}, ${color}, ${dark})`,
+                  boxShadow: `0 4px 0 ${dark}, 0 8px 20px ${color}55`,
+                  position: 'relative', overflow: 'hidden',
+                }}>
+                  <div style={{ position: 'absolute', right: 4, bottom: -4, fontSize: 52, opacity: 0.1, lineHeight: 1, userSelect: 'none', pointerEvents: 'none' }}>{icon}</div>
+                  <span style={{ fontSize: 20 }}>{icon}</span>
+                  <div style={{ fontSize: 30, fontWeight: 900, color: '#fff', lineHeight: 1, marginTop: 10, marginBottom: 4 }}>{value}</div>
+                  <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>{label}</div>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-[var(--text-muted)]">XP per study day</span>
-                  <span className="font-bold text-[var(--primary)]">{xpPerDay}</span>
-                </div>
-              </div>
+              ))}
             </div>
 
             {/* Foundation Progress */}
             {LEVEL_META.some(l => foundationDone[l.name]?.total > 0) && (
               <div className="card">
-                <h3 className="font-semibold mb-3">🌱 Foundation Progress</h3>
-                <div className="space-y-3">
+                <h3 className="font-semibold mb-4">🌱 Foundation Progress</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                   {LEVEL_META.map(({ name, color }) => {
                     const fd = foundationDone[name];
                     if (!fd || fd.total === 0) return null;
                     const pct = fd.done / fd.total;
+                    const pctLabel = `${Math.round(pct * 100)}%`;
                     return (
                       <div key={name}>
-                        <div className="flex justify-between text-sm mb-1.5">
-                          <span className="font-semibold" style={{ color }}>{name}</span>
-                          <span className="text-[var(--text-muted)] text-xs">{fd.done} / {fd.total} units</span>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
+                          <span style={{ fontSize: 14, fontWeight: 900, color }}>{name}</span>
+                          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                            <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{fd.done} / {fd.total} units</span>
+                            <span style={{ fontSize: 11, fontWeight: 800, color }}>{pctLabel}</span>
+                          </div>
                         </div>
-                        <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--surface-2)' }}>
-                          <div className="h-full rounded-full transition-all" style={{ width: `${pct * 100}%`, background: color }} />
+                        <div style={{ height: 10, borderRadius: 6, background: 'var(--surface-2)', overflow: 'hidden' }}>
+                          <div style={{
+                            height: '100%', borderRadius: 6,
+                            width: `${pct * 100}%`,
+                            background: `linear-gradient(90deg, ${color}88, ${color})`,
+                            boxShadow: `0 0 8px ${color}66`,
+                            transition: 'width 0.8s ease',
+                          }} />
                         </div>
                       </div>
                     );
