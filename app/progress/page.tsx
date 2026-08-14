@@ -19,6 +19,7 @@ import { stageLabel, stageColor } from '@/lib/srs';
 import type { SRSWord } from '@/lib/types';
 import { SRS_INTERVALS } from '@/lib/types';
 import { useTranslation } from '@/lib/useTranslation';
+import XpHistoryModal from '@/components/XpHistoryModal';
 
 export default function ProgressPageWrapper() {
   return (
@@ -293,7 +294,7 @@ function ProgressPage() {
             )}
 
             {/* XP History */}
-            <XpHistorySection entries={xpHistory} />
+            <XpHistorySection xp={xp} />
 
           </div>
         )}
@@ -561,63 +562,33 @@ function groupByDay(entries: XpEntry[]): { label: string; total: number; items: 
   return Array.from(map.values());
 }
 
-function XpHistorySection({ entries }: { entries: XpEntry[] }) {
-  const [expanded, setExpanded] = useState(false);
-  const groups = groupByDay(entries);
+function XpHistorySection({ xp }: { xp: number }) {
+  const [open, setOpen] = useState(false);
 
   return (
-    <div style={{ borderRadius: 20, overflow: 'hidden', boxShadow: '0 7px 0 #2e1065, 0 10px 24px rgba(108,99,255,0.4)' }}>
-      {/* Header — matches home card */}
+    <>
       <button
-        onClick={() => setExpanded(e => !e)}
+        onClick={() => setOpen(true)}
         style={{
-          width: '100%', padding: '20px 16px',
+          width: '100%', borderRadius: 20, overflow: 'hidden',
+          boxShadow: '0 7px 0 #2e1065, 0 10px 24px rgba(108,99,255,0.4)',
+          border: 'none', cursor: 'pointer',
+          padding: '20px 16px',
           background: 'linear-gradient(135deg, #4c1d95, #6c63ff)',
           display: 'flex', flexDirection: 'column', alignItems: 'center',
-          justifyContent: 'center', gap: 6, cursor: 'pointer', border: 'none',
+          justifyContent: 'center', gap: 6,
           textShadow: '0 1px 3px rgba(0,0,0,0.35)',
+          transition: 'transform 0.15s ease',
         }}
+        onMouseEnter={e => (e.currentTarget.style.transform = 'translateY(-2px)')}
+        onMouseLeave={e => (e.currentTarget.style.transform = 'translateY(0)')}
       >
         <span style={{ fontSize: 28 }}>📅</span>
         <span style={{ fontSize: 14, fontWeight: 700, color: '#fff', lineHeight: 1.2 }}>XP History</span>
         <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.7)' }}>Your XP calendar</span>
-        <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 4 }}>{expanded ? '▲' : '▼'}</span>
       </button>
-
-      {expanded && (
-        <div style={{ background: 'var(--surface)', padding: '12px 16px 16px' }}>
-          <div className="space-y-4">
-          {groups.length === 0 ? (
-            <p className="text-sm text-[var(--text-muted)] text-center py-2">No XP earned yet</p>
-          ) : (
-            groups.map((group, i) => (
-              <div key={i}>
-                <div className="flex justify-between text-xs text-[var(--text-muted)] font-semibold mb-2">
-                  <span>{group.label}</span>
-                  <span className="text-[var(--primary)]">+{displayXP(group.total)} XP</span>
-                </div>
-                <div className="space-y-1">
-                  {group.items.map((entry, j) => {
-                    const time = new Date(entry.timestamp).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
-                    return (
-                      <div key={j} className="flex items-center gap-3 py-2 border-b border-[var(--border)] last:border-0">
-                        <span className="text-lg">{XP_ICONS[entry.reason] ?? '⭐'}</span>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium">{entry.reason}</p>
-                          <p className="text-xs text-[var(--text-muted)]">{time}</p>
-                        </div>
-                        <span className="text-sm font-bold text-[var(--primary)] whitespace-nowrap">+{displayXP(entry.amount)} XP</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            ))
-          )}
-          </div>
-        </div>
-      )}
-    </div>
+      {open && <XpHistoryModal xp={xp} onClose={() => setOpen(false)} />}
+    </>
   );
 }
 
