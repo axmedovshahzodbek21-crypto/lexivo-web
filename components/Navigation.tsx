@@ -21,6 +21,19 @@ const NAV_HREFS = [
   { href: '/library',      icon: '📚', key: 'library'     },
 ] as const;
 
+const NAV_COLORS: Record<string, { color: string; light: string; dark: string }> = {
+  home:          { color: '#F97316', light: '#FB923C', dark: '#C2410C' },
+  ielts_reading: { color: '#6366F1', light: '#818CF8', dark: '#4338CA' },
+  reading:       { color: '#EAB308', light: '#FDE047', dark: '#A16207' },
+  review:        { color: '#06B6D4', light: '#22D3EE', dark: '#0891B2' },
+  search:        { color: '#8B5CF6', light: '#A78BFA', dark: '#6D28D9' },
+  progress:      { color: '#10B981', light: '#34D399', dark: '#059669' },
+  real_english:  { color: '#EC4899', light: '#F472B6', dark: '#BE185D' },
+  leaderboard:   { color: '#F59E0B', light: '#FCD34D', dark: '#B45309' },
+  classes:       { color: '#EF4444', light: '#F87171', dark: '#B91C1C' },
+  library:       { color: '#84CC16', light: '#A3E635', dark: '#4D7C0F' },
+};
+
 // Mobile bottom bar: 5 core items only — Matching & Leaderboard are on the home page
 const MOBILE_NAV_HREFS = NAV_HREFS.slice(0, 5);
 
@@ -32,6 +45,7 @@ export default function Navigation() {
   const t = useTranslation();
   const isActive  = (href: string) => href === '/' ? pathname === '/' : pathname.startsWith(href);
 
+  const [hoveredKey, setHoveredKey] = useState<string | null>(null);
   const [name, setName]           = useState('Learner');
   const [langLevel, setLangLevel] = useState('B1');
   const [streak, setStreak]       = useState(0);
@@ -84,16 +98,18 @@ export default function Navigation() {
       >
         {MOBILE_NAV_HREFS.map(({ href, icon, key }) => {
           const active = isActive(href);
-          const label = t.nav[key];
+          const label  = t.nav[key];
+          const nc     = NAV_COLORS[key] ?? { color: '#6366F1', light: '#818CF8', dark: '#4338CA' };
           return (
             <Link
               key={href}
               href={href}
-              className={`flex flex-col items-center gap-0.5 px-4 py-1 rounded-xl transition-all ${active ? 'text-[var(--primary)]' : 'text-[var(--text-muted)] hover:text-[var(--text)]'}`}
+              className="flex flex-col items-center gap-0.5 px-4 py-1 rounded-xl transition-all"
+              style={{ color: active ? nc.color : 'var(--text-muted)' }}
             >
               <span className={`text-xl transition-transform ${active ? 'scale-110' : ''}`}>{icon}</span>
-              <span className={`text-xs ${active ? 'font-semibold' : 'font-medium'}`}>{label}</span>
-              {active && <div className="w-1 h-1 rounded-full bg-[var(--primary)]" />}
+              <span className={`text-xs ${active ? 'font-bold' : 'font-medium'}`}>{label}</span>
+              {active && <div style={{ width: 4, height: 4, borderRadius: 2, background: nc.color }} />}
             </Link>
           );
         })}
@@ -138,28 +154,33 @@ export default function Navigation() {
         {/* Nav links */}
         <nav className="flex-1 px-3 space-y-0.5">
           {NAV_HREFS.map(({ href, icon, key }) => {
-            const active = isActive(href);
-            const label = t.nav[key];
+            const active  = isActive(href);
+            const label   = t.nav[key];
+            const nc      = NAV_COLORS[key] ?? { color: '#6366F1', light: '#818CF8', dark: '#4338CA' };
+            const hovered = hoveredKey === key && !active;
             return (
               <Link
                 key={href}
                 href={href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-semibold ${
-                  active
-                    ? 'text-white'
-                    : 'text-[var(--text-muted)] hover:text-[var(--primary)] hover:bg-[var(--primary-bg)]'
-                }`}
+                onMouseEnter={() => setHoveredKey(key)}
+                onMouseLeave={() => setHoveredKey(null)}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-semibold"
                 style={active ? {
-                  background: 'linear-gradient(135deg, var(--primary), var(--primary-light))',
-                  boxShadow: '0 4px 16px rgba(108,99,255,0.38)',
-                } : undefined}
+                  background: `linear-gradient(135deg, ${nc.light}, ${nc.color}, ${nc.dark})`,
+                  boxShadow: `0 3px 0 ${nc.dark}, 0 6px 16px ${nc.color}55`,
+                  color: '#fff',
+                } : hovered ? {
+                  background: `${nc.color}18`,
+                  color: nc.color,
+                } : {
+                  color: 'var(--text-muted)',
+                }}
               >
                 <span className={`transition-transform duration-200 ${active ? 'text-xl scale-110' : 'text-lg'}`}>{icon}</span>
                 <span>{label}</span>
               </Link>
             );
           })}
-
         </nav>
 
         {/* ── Profile block ── */}
