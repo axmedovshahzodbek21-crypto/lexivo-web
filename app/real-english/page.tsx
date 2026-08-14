@@ -6,6 +6,20 @@ import { getSRSWords, getReviewLog } from '@/lib/storage';
 
 const UNLOCK_INTERVAL = 7;
 
+const CARD_COLORS = [
+  '#5B8AF0','#FF6B6B','#06D6A0','#FFD166',
+  '#A78BFA','#FF9F43','#F72585','#4ECDC4',
+  '#3D8BFF','#FF5E57','#00C9A7','#FFC75F',
+];
+const darken = (hex: string, amt = 0.45) => {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return `rgb(${Math.round(r*(1-amt))},${Math.round(g*(1-amt))},${Math.round(b*(1-amt))})`;
+};
+const lighten = (hex: string, amt = 0.3) => {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return `rgb(${Math.round(r+(255-r)*amt)},${Math.round(g+(255-g)*amt)},${Math.round(b+(255-b)*amt)})`;
+};
+
 function getSetProgress(set: RealEnglishSet): { done: number; total: number; unlocked: boolean } {
   const srsWords = getSRSWords();
   const log = getReviewLog();
@@ -16,58 +30,44 @@ function getSetProgress(set: RealEnglishSet): { done: number; total: number; unl
   return { done, total, unlocked };
 }
 
-function LevelBadge({ level }: { level: string }) {
-  return (
-    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full"
-      style={{ background: 'var(--primary-bg)', color: 'var(--primary)' }}>
-      {level}
-    </span>
-  );
-}
-
-function SetCard({ set, onClick }: { set: RealEnglishSet; onClick: () => void }) {
+function SetCard({ set, index, onClick }: { set: RealEnglishSet; index: number; onClick: () => void }) {
   const [progress, setProgress] = useState({ done: 0, total: set.wordCount, unlocked: false });
+  useEffect(() => { setProgress(getSetProgress(set)); }, [set]);
 
-  useEffect(() => {
-    setProgress(getSetProgress(set));
-  }, [set]);
-
+  const color = CARD_COLORS[index % CARD_COLORS.length];
   const pct = progress.total > 0 ? Math.round((progress.done / progress.total) * 100) : 0;
-  const started = progress.done > 0;
 
   return (
-    <button
+    <div
       onClick={onClick}
-      className="w-full text-left rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 flex items-center gap-4 hover:border-[var(--primary)] transition-all group"
+      className="rounded-2xl cursor-pointer hover:-translate-y-1 transition-all duration-200 relative overflow-hidden"
+      style={{
+        background: `linear-gradient(135deg, ${lighten(color)}, ${color})`,
+        boxShadow: `0 12px 0 ${darken(color)}, 0 16px 32px ${color}99`,
+        minHeight: '140px',
+      }}
     >
-      {/* Icon */}
-      <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 text-2xl"
-        style={{ background: 'var(--primary-bg)' }}>
-        {progress.unlocked ? '🔓' : '🎬'}
-      </div>
+      {/* Top area */}
+      <div className="p-4 text-2xl">{progress.unlocked ? '🔓' : '🎬'}</div>
 
-      {/* Info */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-0.5">
-          <LevelBadge level={set.level} />
-          <span className="text-[10px] text-[var(--text-muted)]">{set.wordCount} words</span>
-          {progress.unlocked && (
-            <span className="text-[10px] font-bold" style={{ color: '#10b981' }}>Unlocked</span>
-          )}
-        </div>
-        <p className="font-black text-sm text-[var(--text)] leading-tight truncate">{set.title}</p>
-        <p className="text-xs text-[var(--text-muted)] mt-0.5 truncate">{set.source}</p>
-
-        {started && !progress.unlocked && (
-          <div className="mt-2 h-1 rounded-full bg-[var(--border)] overflow-hidden">
-            <div className="h-full rounded-full" style={{ width: `${pct}%`, background: 'var(--primary)' }} />
+      {/* Progress bar */}
+      {progress.done > 0 && !progress.unlocked && (
+        <div className="absolute top-3 right-3 w-16">
+          <div className="h-1 rounded-full bg-white/30 overflow-hidden">
+            <div className="h-full rounded-full bg-white" style={{ width: `${pct}%` }} />
           </div>
-        )}
-      </div>
+          <p className="text-white/70 text-[9px] text-right mt-0.5">{pct}%</p>
+        </div>
+      )}
 
-      {/* Arrow */}
-      <span className="text-[var(--text-muted)] group-hover:text-[var(--primary)] transition-colors shrink-0">›</span>
-    </button>
+      {/* Label */}
+      <div className="absolute bottom-0 left-0 right-0 px-4 py-3"
+        style={{ background: 'rgba(0,0,0,0.22)', backdropFilter: 'blur(8px)' }}>
+        <p className="text-white font-bold text-sm leading-tight line-clamp-2"
+          style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>{set.title}</p>
+        <p className="text-white/70 text-xs mt-0.5">{set.wordCount} words · {set.level}</p>
+      </div>
+    </div>
   );
 }
 
@@ -126,7 +126,7 @@ export default function RealEnglishPage() {
 
       {/* Video Sets tab */}
       {tab === 'sets' && (
-        <section className="flex flex-col gap-3">
+        <section>
           {lockedSets.length === 0 && unlockedSets.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-[var(--border)] bg-[var(--surface)] p-10 flex flex-col items-center justify-center text-center gap-3">
               <span className="text-4xl">🎬</span>
@@ -136,9 +136,11 @@ export default function RealEnglishPage() {
           ) : lockedSets.length === 0 ? (
             <p className="text-sm text-[var(--text-muted)] text-center py-4">All sets unlocked — you&apos;re on fire! 🔥</p>
           ) : (
-            lockedSets.map(set => (
-              <SetCard key={set.id} set={set} onClick={() => router.push(`/real-english/${set.id}`)} />
-            ))
+            <div className="grid grid-cols-2 gap-3">
+              {lockedSets.map((set, i) => (
+                <SetCard key={set.id} set={set} index={i} onClick={() => router.push(`/real-english/${set.id}`)} />
+              ))}
+            </div>
           )}
 
           <div className="mt-6 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5">
@@ -162,7 +164,7 @@ export default function RealEnglishPage() {
 
       {/* My Unlocked Videos tab */}
       {tab === 'unlocked' && (
-        <section className="flex flex-col gap-3">
+        <section>
           {unlockedSets.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-[var(--border)] bg-[var(--surface)] p-10 flex flex-col items-center justify-center text-center gap-3">
               <span className="text-4xl">🔒</span>
@@ -177,9 +179,11 @@ export default function RealEnglishPage() {
               </button>
             </div>
           ) : (
-            unlockedSets.map(set => (
-              <SetCard key={set.id} set={set} onClick={() => router.push(`/real-english/${set.id}`)} />
-            ))
+            <div className="grid grid-cols-2 gap-3">
+              {unlockedSets.map((set, i) => (
+                <SetCard key={set.id} set={set} index={i} onClick={() => router.push(`/real-english/${set.id}`)} />
+              ))}
+            </div>
           )}
         </section>
       )}
