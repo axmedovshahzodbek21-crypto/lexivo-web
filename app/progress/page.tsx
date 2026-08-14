@@ -1009,59 +1009,90 @@ function StudyCalendar({
       )}
 
       {selectedDay && sheetTasks && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center" style={{ background: 'rgba(0,0,0,0.8)' }}
-          onClick={() => setSelectedDay(null)}>
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center"
+          style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)' }}
+          onClick={() => setSelectedDay(null)}
+        >
           <div className="w-full max-w-lg rounded-t-3xl max-h-[90vh] overflow-y-auto"
-            style={{ background: 'var(--bg)' }}
+            style={{ background: 'var(--bg)', borderTop: '1px solid var(--border)' }}
             onClick={e => e.stopPropagation()}>
             {/* Handle */}
             <div className="flex justify-center pt-3 pb-1">
               <div className="w-10 h-1 rounded-full" style={{ background: 'var(--border)' }} />
             </div>
             <div className="px-4 pt-2 pb-8">
-              {/* Header */}
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <p className="text-xs font-semibold" style={{ color: 'var(--text-muted)' }}>
+              {/* Header — editorial with watermark day number */}
+              <div className="relative flex items-start justify-between mb-6 overflow-hidden">
+                <div style={{
+                  position: 'absolute', right: 32, top: -16,
+                  fontSize: 110, fontWeight: 900, lineHeight: 1,
+                  color: 'var(--text)', opacity: 0.04,
+                  pointerEvents: 'none', userSelect: 'none',
+                }}>
+                  {new Date(selectedDay + 'T12:00:00').getDate()}
+                </div>
+                <div style={{ position: 'relative', zIndex: 1 }}>
+                  <p style={{ fontSize: 10, fontWeight: 900, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.14em', marginBottom: 6 }}>
                     {new Date(selectedDay + 'T12:00:00').toLocaleDateString('default', { weekday: 'long' })}
                   </p>
-                  <p className="text-xl font-black" style={{ color: 'var(--text)' }}>
+                  <p style={{ fontSize: 28, fontWeight: 900, color: 'var(--text)', lineHeight: 1.1 }}>
                     {new Date(selectedDay + 'T12:00:00').toLocaleDateString('default', { month: 'long', day: 'numeric', year: 'numeric' })}
                   </p>
                 </div>
-                <button onClick={() => setSelectedDay(null)}
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold"
-                  style={{ background: 'var(--surface-2)', color: 'var(--text-muted)' }}>✕</button>
+                <button
+                  onClick={() => setSelectedDay(null)}
+                  style={{
+                    width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 13, fontWeight: 700, position: 'relative', zIndex: 1,
+                    background: 'var(--surface-2)', color: 'var(--text-muted)',
+                    border: '1.5px solid var(--border)',
+                  }}
+                >✕</button>
               </div>
 
-              {/* Task cards */}
+              {/* Task cards — 3D gradient */}
               <div className="grid grid-cols-2 gap-3 mb-3">
                 {([
-                  { key: 'review', label: 'SRS Review',                done: sheetTasks.review, href: '/srs',   btnLabel: 'Go to Review', color: TASK_COLORS.review.bg, nothingDue: sheetIsToday && dueCount === 0 && !sheetTasks.review },
-                  { key: 'words',  label: `Words (${dailyGoal} goal)`, done: sheetTasks.words,  href: '/learn', btnLabel: 'Learn Words',  color: TASK_COLORS.words.bg },
+                  { key: 'review', label: 'SRS Review',                done: sheetTasks.review, href: '/srs',   btnLabel: 'Go to Review', color: TASK_COLORS.review.bg, shadow: TASK_COLORS.review.shadow, emoji: '🔁', nothingDue: sheetIsToday && dueCount === 0 && !sheetTasks.review },
+                  { key: 'words',  label: `Words (${dailyGoal} goal)`, done: sheetTasks.words,  href: '/learn', btnLabel: 'Learn Words',  color: TASK_COLORS.words.bg,  shadow: TASK_COLORS.words.shadow,  emoji: '✏️' },
                 ] as const).map(task => (
-                  <div key={task.key} className="rounded-2xl p-4 flex flex-col gap-3"
-                    style={{ background: 'var(--surface-2)', border: `1px solid ${task.color}33` }}>
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0"
-                        style={{ background: task.done ? task.color : 'var(--border)', boxShadow: task.done ? `0 0 8px ${task.color}80` : 'none' }}>
-                        <span className="text-[11px] font-black text-white">{task.done ? '✓' : ''}</span>
+                  <div key={task.key} className="rounded-2xl p-4 flex flex-col gap-3 relative overflow-hidden"
+                    style={{
+                      background: task.done
+                        ? `linear-gradient(135deg, ${task.color}, ${task.shadow})`
+                        : 'var(--surface-2)',
+                      border: `2px solid ${task.done ? task.color : task.color + '44'}`,
+                      boxShadow: task.done ? `0 4px 0 ${task.shadow}, 0 8px 20px ${task.color}55` : 'none',
+                    }}>
+                    {task.done && (
+                      <div style={{ position: 'absolute', right: -8, bottom: -8, fontSize: 58, opacity: 0.12, lineHeight: 1, pointerEvents: 'none', userSelect: 'none' }}>
+                        {task.emoji}
                       </div>
-                      <span className="text-sm font-bold leading-tight" style={{ color: 'var(--text)' }}>{task.label}</span>
-                    </div>
-                    {('nothingDue' in task && task.nothingDue) ? (
-                      <span className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>Nothing due</span>
-                    ) : sheetIsToday && !task.done ? (
-                      <Link href={task.href} onClick={() => setSelectedDay(null)}
-                        className="text-xs font-bold px-3 py-2 rounded-xl text-white text-center"
-                        style={{ background: task.color }}>
-                        {task.btnLabel} →
-                      </Link>
-                    ) : task.done ? (
-                      <span className="text-xs font-bold" style={{ color: task.color }}>Done ✓</span>
-                    ) : (
-                      <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Not done</span>
                     )}
+                    <div className="flex items-center gap-2" style={{ position: 'relative', zIndex: 1 }}>
+                      <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0"
+                        style={{ background: task.done ? 'rgba(255,255,255,0.25)' : 'var(--border)', boxShadow: task.done ? `0 0 8px ${task.color}80` : 'none' }}>
+                        <span className="text-[11px] font-black" style={{ color: task.done ? '#fff' : 'var(--text-muted)' }}>{task.done ? '✓' : ''}</span>
+                      </div>
+                      <span className="text-sm font-black leading-tight" style={{ color: task.done ? '#fff' : 'var(--text)' }}>{task.label}</span>
+                    </div>
+                    <div style={{ position: 'relative', zIndex: 1 }}>
+                      {('nothingDue' in task && task.nothingDue) ? (
+                        <span className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>Nothing due</span>
+                      ) : sheetIsToday && !task.done ? (
+                        <Link href={task.href} onClick={() => setSelectedDay(null)}
+                          className="block text-xs font-black px-3 py-2.5 rounded-xl text-white text-center transition-all"
+                          style={{ background: `linear-gradient(135deg, ${task.color}, ${task.shadow})`, boxShadow: `0 3px 0 ${task.shadow}` }}>
+                          {task.btnLabel} →
+                        </Link>
+                      ) : task.done ? (
+                        <span className="text-xs font-bold" style={{ color: 'rgba(255,255,255,0.8)' }}>Done ✓</span>
+                      ) : (
+                        <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Not done</span>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
