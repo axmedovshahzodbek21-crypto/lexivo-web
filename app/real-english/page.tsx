@@ -69,15 +69,6 @@ function SetCard({ set, index, wordCount, onClick }: {
         style={{ background: 'rgba(0,0,0,0.22)', backdropFilter: 'blur(8px)' }}>
         <p className="text-white font-bold text-sm leading-tight line-clamp-2"
           style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>{set.title}</p>
-        <div className="flex items-center gap-2 mt-1">
-          {wordCount > 0 && (
-            <span className="text-white/60 text-[10px]">{wordCount} words</span>
-          )}
-          {set.duration && wordCount > 0 && <span className="text-white/40 text-[10px]">·</span>}
-          {set.duration && (
-            <span className="text-white/60 text-[10px]">{set.duration}</span>
-          )}
-        </div>
       </div>
     </div>
   );
