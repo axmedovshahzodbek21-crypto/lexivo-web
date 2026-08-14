@@ -566,20 +566,27 @@ function XpHistorySection({ entries }: { entries: XpEntry[] }) {
   const groups = groupByDay(entries);
 
   return (
-    <div className="card">
+    <div style={{ borderRadius: 20, overflow: 'hidden', boxShadow: '0 7px 0 #2e1065, 0 10px 24px rgba(108,99,255,0.4)' }}>
+      {/* Header — matches home card */}
       <button
-        className="w-full flex items-center justify-between"
         onClick={() => setExpanded(e => !e)}
+        style={{
+          width: '100%', padding: '20px 16px',
+          background: 'linear-gradient(135deg, #4c1d95, #6c63ff)',
+          display: 'flex', flexDirection: 'column', alignItems: 'center',
+          justifyContent: 'center', gap: 6, cursor: 'pointer', border: 'none',
+          textShadow: '0 1px 3px rgba(0,0,0,0.35)',
+        }}
       >
-        <div className="flex items-center gap-2">
-          <span className="text-xl">⭐</span>
-          <span className="font-semibold">XP History</span>
-        </div>
-        <span className="text-[var(--text-muted)] text-sm">{expanded ? '▲' : '▼'}</span>
+        <span style={{ fontSize: 28 }}>📅</span>
+        <span style={{ fontSize: 14, fontWeight: 700, color: '#fff', lineHeight: 1.2 }}>XP History</span>
+        <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.7)' }}>Your XP calendar</span>
+        <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 4 }}>{expanded ? '▲' : '▼'}</span>
       </button>
 
       {expanded && (
-        <div className="mt-3 space-y-4">
+        <div style={{ background: 'var(--surface)', padding: '12px 16px 16px' }}>
+          <div className="space-y-4">
           {groups.length === 0 ? (
             <p className="text-sm text-[var(--text-muted)] text-center py-2">No XP earned yet</p>
           ) : (
@@ -607,6 +614,7 @@ function XpHistorySection({ entries }: { entries: XpEntry[] }) {
               </div>
             ))
           )}
+          </div>
         </div>
       )}
     </div>
