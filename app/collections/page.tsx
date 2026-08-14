@@ -72,7 +72,7 @@ export default function CollectionsPage() {
 
   const CURATED_ORDER = ['30 Days of Powerful Words', '24 Vocabulary Challenge', 'Word Mastery'];
   const mainCollections = collections
-    .filter(c => !LEVELED_NAMES.has(c.name))
+    .filter(c => !LEVELED_NAMES.has(c.name) && !c.youtubeUrl)
     .sort((a, b) => {
       const ai = CURATED_ORDER.indexOf(a.name);
       const bi = CURATED_ORDER.indexOf(b.name);
