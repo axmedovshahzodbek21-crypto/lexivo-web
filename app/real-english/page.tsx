@@ -138,7 +138,7 @@ export default function RealEnglishPage() {
           ) : (
             <div className="grid grid-cols-2 gap-3">
               {lockedSets.map((set, i) => (
-                <SetCard key={set.id} set={set} index={i} onClick={() => router.push(`/real-english/${set.id}`)} />
+                <SetCard key={set.id} set={set} index={i} onClick={() => router.push(`/collections/${encodeURIComponent(set.collectionName)}`)} />
               ))}
             </div>
           )}
@@ -181,7 +181,7 @@ export default function RealEnglishPage() {
           ) : (
             <div className="grid grid-cols-2 gap-3">
               {unlockedSets.map((set, i) => (
-                <SetCard key={set.id} set={set} index={i} onClick={() => router.push(`/real-english/${set.id}`)} />
+                <SetCard key={set.id} set={set} index={i} onClick={() => router.push(`/collections/${encodeURIComponent(set.collectionName)}`)} />
               ))}
             </div>
           )}
