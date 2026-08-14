@@ -756,7 +756,7 @@ export default function HomePage() {
           if (sId === 'total_xp') return (
             <button onClick={() => setShowXpModal(true)} className="block h-full w-full">
               <StatCard icon="⚡" value={displayXP(xp)} label={t.home.totalXp}
-                gradient="linear-gradient(135deg, #d97706, #fbbf24)" edge="#92400e" glowColor="rgba(217,119,6,0.4)" />
+                gradient="linear-gradient(135deg, #a78bfa, #6C63FF, #4C1D95)" edge="#3D1F9E" glowColor="rgba(108,99,255,0.4)" />
             </button>
           );
           if (sId === 'words') return (

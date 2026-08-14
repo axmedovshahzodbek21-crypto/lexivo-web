@@ -20,10 +20,10 @@
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 4px 14px rgba(120,100,60,0.10);
   --sidebar-bg: rgba(255, 253, 249, 0.82);
   --sidebar-border: rgba(180, 160, 140, 0.28);
-  /* light: amethyst photo with light veil */
+  /* light: clean subtle gradient, no photo */
   --bg-mesh:
-    linear-gradient(rgba(245, 240, 255, 0.42), rgba(245, 240, 255, 0.42)),
-    url('/XV3PB.jpg');
+    radial-gradient(ellipse at 15% 30%, rgba(108, 99, 255, 0.06) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 70%, rgba(168, 85, 247, 0.04) 0%, transparent 50%);
 }
 
 [data-theme="dark"] {
