@@ -156,13 +156,6 @@ export default function LeaderboardPage() {
     }
   };
 
-  const rankChipStyle = (rank: number, isMe: boolean) => {
-    if (isMe) return { background: 'var(--primary)', color: 'white' };
-    if (rank <= 3) return { background: 'rgba(255,215,0,0.18)', color: '#b45309' };
-    if (rank <= 10) return { background: 'var(--primary-bg)', color: 'var(--primary)' };
-    return { background: 'var(--surface-2)', color: 'var(--text-muted)' };
-  };
-
   return (
     <div className="flex flex-col min-h-screen animate-fade-in pb-24">
       {/* Profile modal */}
@@ -361,66 +354,106 @@ export default function LeaderboardPage() {
             )}
             {/* Top 3 podium */}
             {visible.length >= 3 && (
-              <div className="flex items-end gap-2 mb-3">
+              <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end', marginBottom: 16 }}>
                 {([
-                  { entry: visible[1], rank: 2, medal: '🥈', avatarSize: 40, pt: 'pt-4', borderColor: 'rgba(192,192,192,0.5)', bg: 'linear-gradient(160deg,rgba(192,192,192,0.14) 0%,rgba(192,192,192,0.04) 100%)' },
-                  { entry: visible[0], rank: 1, medal: '🥇', avatarSize: 52, pt: 'pt-8', borderColor: 'rgba(255,200,0,0.6)',   bg: 'linear-gradient(160deg,rgba(255,215,0,0.18) 0%,rgba(245,158,11,0.06) 100%)' },
-                  { entry: visible[2], rank: 3, medal: '🥉', avatarSize: 40, pt: 'pt-4', borderColor: 'rgba(205,127,50,0.5)',   bg: 'linear-gradient(160deg,rgba(205,127,50,0.14) 0%,rgba(205,127,50,0.04) 100%)' },
-                ].map(({ entry: e, rank, medal, avatarSize, pt, borderColor, bg }) => {
-                  const isMe = user && e.user_id === user.id;
+                  { entry: visible[1], rank: 2, medal: '🥈', avatarSize: 40, minH: 160,
+                    light: '#E2E8F0', color: '#94A3B8', dark: '#334155' },
+                  { entry: visible[0], rank: 1, medal: '🥇', avatarSize: 52, minH: 200,
+                    light: '#FDE047', color: '#F59E0B', dark: '#B45309' },
+                  { entry: visible[2], rank: 3, medal: '🥉', avatarSize: 36, minH: 140,
+                    light: '#FED7AA', color: '#F97316', dark: '#9A3412' },
+                ] as const).map(({ entry: e, rank, medal, avatarSize, minH, light, color, dark }) => {
+                  const isMe = !!(user && e.user_id === user.id);
+                  const numStr = String(rank).padStart(2, '0');
                   return (
-                    <div key={e.user_id} onClick={() => setSelected(e)}
-                      className={`flex-1 flex flex-col items-center rounded-2xl pb-4 px-2 border-2 cursor-pointer transition-all hover:opacity-90 active:scale-95 ${pt}`}
-                      style={{ background: bg, borderColor: isMe ? 'var(--primary)' : borderColor, boxShadow: isMe ? '0 0 0 2px var(--primary)' : undefined }}>
-                      <div className={`text-${rank === 1 ? '3xl' : '2xl'} mb-2`}>{medal}</div>
-                      <Avatar name={e.name} url={e.avatar_url} size={avatarSize} userId={e.user_id} />
-                      <p className="text-xs font-bold mt-2 text-center truncate w-full px-1" style={{ color: 'var(--text)' }}>
-                        {savedIds.has(e.user_id) ? '⭐ ' : ''}{e.name}
-                      </p>
-                      <p className="text-xs font-black mt-0.5" style={{ color: rank === 1 ? '#b45309' : 'var(--primary)' }}>
-                        {displayXP(e.xp)} XP
-                      </p>
-                      {e.streak > 0 && <p className="text-[10px] text-[var(--text-muted)] mt-0.5">🔥 {e.streak}</p>}
-                      {e.last_study_date === today && (
-                        <span className="mt-1.5 text-[9px] font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(16,185,129,0.18)', color: 'var(--success)' }}>TODAY</span>
-                      )}
+                    <div key={e.user_id} onClick={() => setSelected(e)} style={{ flex: 1, cursor: 'pointer' }}>
+                      <div
+                        style={{
+                          borderRadius: 20, minHeight: minH,
+                          background: `linear-gradient(135deg, ${light}, ${color}, ${dark})`,
+                          boxShadow: isMe
+                            ? `0 4px 0 ${dark}, 0 8px 20px ${color}88, 0 0 0 3px #fff`
+                            : `0 4px 0 ${dark}, 0 8px 20px ${color}55`,
+                          position: 'relative', overflow: 'hidden',
+                          display: 'flex', flexDirection: 'column',
+                          alignItems: 'center', justifyContent: 'center',
+                          padding: '14px 8px', gap: 5,
+                          textShadow: '0 1px 4px rgba(0,0,0,0.3)',
+                          transition: 'transform 0.15s ease',
+                        }}
+                        onMouseEnter={ev => (ev.currentTarget.style.transform = 'translateY(-3px)')}
+                        onMouseLeave={ev => (ev.currentTarget.style.transform = 'translateY(0)')}
+                      >
+                        {/* Watermark rank */}
+                        <div style={{
+                          position: 'absolute', right: 4, bottom: -6, fontSize: 56,
+                          fontWeight: 900, color: 'rgba(255,255,255,0.1)',
+                          lineHeight: 1, userSelect: 'none', pointerEvents: 'none',
+                        }}>{numStr}</div>
+
+                        <span style={{ fontSize: rank === 1 ? 30 : 22 }}>{medal}</span>
+                        <div style={{ borderRadius: '50%', border: '2.5px solid rgba(255,255,255,0.55)', overflow: 'hidden', flexShrink: 0 }}>
+                          <Avatar name={e.name} url={e.avatar_url} size={avatarSize} userId={e.user_id} />
+                        </div>
+                        <p style={{ fontSize: 11, fontWeight: 900, color: '#fff', textAlign: 'center', lineHeight: 1.2, width: '100%', paddingInline: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {savedIds.has(e.user_id) ? '⭐ ' : ''}{e.name}
+                        </p>
+                        <p style={{ fontSize: rank === 1 ? 13 : 11, fontWeight: 900, color: 'rgba(255,255,255,0.95)' }}>
+                          {displayXP(e.xp)} XP
+                        </p>
+                        {e.streak > 0 && (
+                          <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.75)' }}>🔥 {e.streak}</p>
+                        )}
+                        {e.last_study_date === today && (
+                          <span style={{ fontSize: 9, fontWeight: 800, background: 'rgba(255,255,255,0.25)', color: '#fff', borderRadius: 20, padding: '2px 8px' }}>TODAY</span>
+                        )}
+                      </div>
                     </div>
                   );
-                }))}
+                })}
               </div>
             )}
 
             {/* Ranked list (4 onwards, or all if < 3) */}
-            <div className="space-y-2">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {visible.slice(visible.length >= 3 ? 3 : 0).map((e, i) => {
                 const rank = (visible.length >= 3 ? 3 : 0) + i + 1;
                 const isMe = !!(user && e.user_id === user.id);
+                const rankColor = rank <= 10 ? '#6366F1' : 'var(--text-muted)';
                 return (
                   <div key={e.user_id} onClick={() => setSelected(e)}
-                    className="flex items-center gap-3 rounded-2xl p-3 border transition-all cursor-pointer hover:opacity-80 active:scale-[0.99]"
                     style={{
-                      background: isMe ? 'var(--primary-bg)' : 'var(--surface)',
-                      borderColor: isMe ? 'var(--primary)' : 'var(--border)',
-                      boxShadow: isMe ? '0 0 0 1.5px var(--primary)' : undefined,
-                    }}>
-                    <div className="w-8 h-8 rounded-xl flex items-center justify-center text-sm font-black flex-shrink-0"
-                      style={rankChipStyle(rank, isMe)}>
-                      {rank}
-                    </div>
+                      display: 'flex', alignItems: 'center', gap: 12,
+                      borderRadius: 18, padding: '10px 14px',
+                      background: isMe ? 'linear-gradient(135deg, #6366F118, #8B5CF618)' : 'var(--surface)',
+                      border: isMe ? '1.5px solid #6366F1' : '1.5px solid var(--border)',
+                      boxShadow: isMe ? '0 0 0 1px #6366F144' : undefined,
+                      cursor: 'pointer', transition: 'transform 0.1s ease',
+                    }}
+                    onMouseEnter={ev => (ev.currentTarget.style.transform = 'translateY(-1px)')}
+                    onMouseLeave={ev => (ev.currentTarget.style.transform = 'translateY(0)')}
+                  >
+                    <div style={{
+                      width: 32, height: 32, borderRadius: 10, flexShrink: 0,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 13, fontWeight: 900,
+                      background: isMe ? '#6366F1' : rank <= 10 ? '#6366F118' : 'var(--surface-2)',
+                      color: isMe ? '#fff' : rankColor,
+                    }}>{rank}</div>
                     <Avatar name={e.name} url={e.avatar_url} size={38} userId={e.user_id} />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        {savedIds.has(e.user_id) && <span className="text-sm leading-none">⭐</span>}
-                        <p className="font-bold text-sm truncate">{e.name}</p>
-                        {isMe && <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0" style={{ background: 'var(--primary)', color: 'white' }}>YOU</span>}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                        {savedIds.has(e.user_id) && <span style={{ fontSize: 13, lineHeight: 1 }}>⭐</span>}
+                        <p style={{ fontWeight: 700, fontSize: 14, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.name}</p>
+                        {isMe && <span style={{ fontSize: 10, fontWeight: 800, background: '#6366F1', color: '#fff', borderRadius: 20, padding: '2px 7px', flexShrink: 0 }}>YOU</span>}
                       </div>
                       {e.last_study_date === today && (
-                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(16,185,129,0.15)', color: 'var(--success)' }}>TODAY</span>
+                        <span style={{ fontSize: 9, fontWeight: 700, background: 'rgba(16,185,129,0.15)', color: 'var(--success)', borderRadius: 20, padding: '1px 7px' }}>TODAY</span>
                       )}
                     </div>
-                    <div className="text-right flex-shrink-0">
-                      <p className="text-sm font-black" style={{ color: 'var(--primary)' }}>{displayXP(e.xp)} XP</p>
-                      {e.streak > 0 && <p className="text-xs text-[var(--text-muted)]">🔥 {e.streak}</p>}
+                    <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                      <p style={{ fontSize: 14, fontWeight: 900, color: isMe ? '#6366F1' : 'var(--primary)' }}>{displayXP(e.xp)} XP</p>
+                      {e.streak > 0 && <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>🔥 {e.streak}</p>}
                     </div>
                   </div>
                 );
