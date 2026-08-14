@@ -1,5 +1,30 @@
 [
   {
+    "name": "Real English: Natural English",
+    "description": "Key phrases and vocabulary from a real interview coaching session.",
+    "days": [
+      {
+        "dayNumber": 1,
+        "topic": "Natural English",
+        "words": [
+          {
+            "word": "articulate",
+            "partOfSpeech": "adjective / verb",
+            "pronunciation": "/ɑːˈtɪk.jə.lət/",
+            "translation": "aniq ifodalangan / aniq gapirmoq",
+            "definition": "Able to express ideas clearly and effectively in speech or writing.",
+            "example1": "She gave an articulate answer during the job interview.",
+            "example1Translation": "U ish intervyusi davomida aniq javob berdi.",
+            "example2": "He struggled to articulate his feelings about the situation.",
+            "example2Translation": "U vaziyat haqidagi his-tuyg'ularini ifodalashga qiynaldi.",
+            "example3": "An articulate speaker can win over an audience quickly.",
+            "example3Translation": "Aniq gapiradigan notiq tinglovchilarni tezda o'z tomoniga jalb qila oladi."
+          }
+        ]
+      }
+    ]
+  },
+  {
     "name": "30 Days of Powerful Words",
     "description": "Master essential IELTS vocabulary organized by topic",
     "days": [

@@ -10,15 +10,14 @@ export interface RealEnglishSet {
 }
 
 export const realEnglishSets: RealEnglishSet[] = [
-  // ── Add sets below ──────────────────────────────────────────────────────────
-  // {
-  //   id: 'example-set',
-  //   title: 'Example Interview Title',
-  //   source: 'Channel Name',
-  //   level: 'B2',
-  //   youtubeUrl: 'https://youtu.be/xxx',
-  //   collectionName: 'Real English: Example Set',
-  //   wordCount: 30,
-  //   description: 'Optional short description of the video.',
-  // },
+  {
+    id: 'preview-set',
+    title: 'How to Sound More Natural in English',
+    source: 'English with Lucy',
+    level: 'B2',
+    youtubeUrl: 'https://youtu.be/placeholder',
+    collectionName: 'Real English: Natural English',
+    wordCount: 42,
+    description: 'Key phrases and vocabulary from a real interview coaching session.',
+  },
 ];
