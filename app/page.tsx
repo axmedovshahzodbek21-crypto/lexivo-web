@@ -600,25 +600,37 @@ export default function HomePage() {
 
       {/* ── Review reminder banner ── */}
       {dueCount > 0 && showReviewBanner && (
-        <div className="flex items-center gap-4 p-4 rounded-2xl border-2"
-          style={{ background: 'rgba(239,68,68,0.08)', borderColor: 'rgba(239,68,68,0.35)' }}>
-          <Link href="/srs" className="flex items-center gap-4 flex-1 min-w-0 hover:opacity-90 transition-opacity">
-            <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
-              style={{ background: 'rgba(239,68,68,0.15)' }}>🔔</div>
-            <div className="flex-1 min-w-0">
-              <div className="font-bold text-sm" style={{ color: 'var(--danger)' }}>
-                {dueCount} {dueCount === 1 ? 'word' : 'words'} due for review!
-              </div>
-              <div className="text-xs mt-0.5 text-[var(--text-muted)]">Complete your reviews for best results.</div>
-            </div>
-            <span className="text-sm font-bold flex-shrink-0 mr-1" style={{ color: 'var(--danger)' }}>→</span>
+        <div className="relative overflow-hidden rounded-2xl p-[18px]"
+          style={{
+            background: 'linear-gradient(135deg, #FCD34D, #F59E0B, #B45309)',
+            boxShadow: '0 4px 0 #78350F, 0 8px 18px rgba(245,158,11,0.35)',
+          }}>
+          {/* watermark */}
+          <div className="absolute -right-2 -bottom-4 text-[80px] leading-none pointer-events-none select-none"
+            style={{ opacity: 0.1 }}>🔔</div>
+          {/* eyebrow + skip */}
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-[10px] font-black tracking-[1.2px] text-white">REVIEW DUE</span>
+            <button onClick={() => setShowReviewBanner(false)}
+              className="text-xs font-semibold transition-opacity hover:opacity-70"
+              style={{ color: 'rgba(255,255,255,0.75)' }}>
+              Skip →
+            </button>
+          </div>
+          {/* title */}
+          <div className="text-[18px] font-black text-white leading-tight">
+            {dueCount} {dueCount === 1 ? 'word' : 'words'} due for review!
+          </div>
+          {/* subtitle */}
+          <div className="text-xs mt-1 leading-[1.4]" style={{ color: 'rgba(255,255,255,0.85)' }}>
+            Complete your reviews before learning new words for best results.
+          </div>
+          {/* CTA */}
+          <Link href="/srs"
+            className="mt-3.5 flex items-center justify-center w-full py-3 rounded-xl font-black text-[15px] text-white transition-opacity hover:opacity-90"
+            style={{ background: 'rgba(255,255,255,0.25)', border: '1px solid rgba(255,255,255,0.4)' }}>
+            Start Reviews 🧠
           </Link>
-          <button
-            onClick={() => setShowReviewBanner(false)}
-            className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs text-[var(--text-muted)] hover:text-[var(--danger)] hover:bg-[var(--surface-2)] transition-colors"
-          >
-            ✕
-          </button>
         </div>
       )}
 
