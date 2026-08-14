@@ -4,14 +4,14 @@ import Link from 'next/link';
 import { readingPassages, type ReadingPassage } from '@/lib/reading-data';
 
 const CARD_COLORS = [
-  ['#6C63FF', '#8B5CF6'],
-  ['#0E7490', '#22D3EE'],
-  ['#1A9A50', '#2ECC71'],
-  ['#B45309', '#FBBF24'],
-  ['#BE123C', '#FB7185'],
-  ['#EC4899', '#F472B6'],
-  ['#0284C7', '#38BDF8'],
-  ['#D97706', '#FCD34D'],
+  { color: '#6366F1', light: '#818CF8', dark: '#4338CA' },
+  { color: '#06B6D4', light: '#22D3EE', dark: '#0891B2' },
+  { color: '#10B981', light: '#34D399', dark: '#059669' },
+  { color: '#F59E0B', light: '#FCD34D', dark: '#B45309' },
+  { color: '#EF4444', light: '#F87171', dark: '#B91C1C' },
+  { color: '#EC4899', light: '#F472B6', dark: '#BE185D' },
+  { color: '#3B82F6', light: '#60A5FA', dark: '#1D4ED8' },
+  { color: '#F97316', light: '#FB923C', dark: '#C2410C' },
 ];
 
 const allTopics = ['All', ...Array.from(new Set(readingPassages.map(p => p.topic))).sort()];
@@ -241,19 +241,28 @@ export default function ReadingPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6 pb-24">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-5">
+    <div className="max-w-5xl mx-auto px-4 py-8 pb-24">
+      {/* Editorial header */}
+      <div className="flex items-end justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-black" style={{ color: 'var(--text)' }}>💡 Ideas</h1>
-          <p className="text-sm mt-0.5" style={{ color: 'var(--text-muted)' }}>
-            {filtered.length} of {readingPassages.length} {readingPassages.length === 1 ? 'passage' : 'passages'}
+          <p style={{ fontSize: 11, fontWeight: 900, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: 6 }}>
+            Explore · {readingPassages.length} passages
+          </p>
+          <h1 style={{ fontSize: 40, fontWeight: 900, color: 'var(--text)', lineHeight: 1 }}>Ideas</h1>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 8 }}>
+            Read, collect vocabulary, and answer comprehension questions.
           </p>
         </div>
         <Link
           href="/reading/free"
-          className="text-xs font-bold px-3 py-2 rounded-xl border transition-colors"
-          style={{ color: 'var(--text-muted)', borderColor: 'var(--border)' }}
+          style={{
+            fontSize: 12, fontWeight: 700,
+            padding: '8px 16px', borderRadius: 12,
+            border: '1.5px solid var(--border)',
+            color: 'var(--text-muted)',
+            textDecoration: 'none',
+            whiteSpace: 'nowrap',
+          }}
         >
           Free Read →
         </Link>
@@ -265,76 +274,114 @@ export default function ReadingPage() {
         value={search}
         onChange={e => setSearch(e.target.value)}
         placeholder="Search passages…"
-        className="w-full px-4 py-2.5 rounded-xl text-sm border outline-none transition-colors mb-3"
+        className="w-full px-4 py-3 rounded-2xl text-sm outline-none transition-all mb-4"
         style={{
           background: 'var(--surface)',
-          border: '1px solid var(--border)',
+          border: '1.5px solid var(--border)',
           color: 'var(--text)',
+          fontSize: 14,
         }}
         onFocus={e => (e.target.style.borderColor = 'var(--primary)')}
         onBlur={e => (e.target.style.borderColor = 'var(--border)')}
       />
 
-      {/* Topic filter — single scrollable row */}
-      <div className="flex gap-2 overflow-x-auto pb-2 mb-5" style={{ scrollbarWidth: 'none' }}>
-        {allTopics.map(t => (
-          <button
-            key={t}
-            onClick={() => setTopic(t)}
-            className="shrink-0 text-xs font-bold px-3 py-2 rounded-xl transition-all"
-            style={{
-              background: topic === t ? 'var(--primary)' : 'var(--surface)',
-              color: topic === t ? 'white' : 'var(--text-muted)',
-              border: `1px solid ${topic === t ? 'var(--primary)' : 'var(--border)'}`,
-            }}
-          >
-            {t}
-          </button>
-        ))}
+      {/* Topic filter — scrollable row with gradient active pill */}
+      <div className="flex gap-2 overflow-x-auto pb-3 mb-6" style={{ scrollbarWidth: 'none' }}>
+        {allTopics.map(t => {
+          const active = topic === t;
+          return (
+            <button
+              key={t}
+              onClick={() => setTopic(t)}
+              className="shrink-0 text-xs font-bold px-3 py-2 rounded-xl transition-all duration-200"
+              style={active ? {
+                background: 'linear-gradient(135deg, #FDE047, #EAB308, #A16207)',
+                boxShadow: '0 3px 0 #A16207, 0 6px 14px #EAB30860',
+                color: '#fff',
+                border: '1px solid transparent',
+              } : {
+                background: 'var(--surface)',
+                color: 'var(--text-muted)',
+                border: '1px solid var(--border)',
+              }}
+            >
+              {t}
+            </button>
+          );
+        })}
       </div>
 
-      {/* 2-column grid */}
+      {/* Grid */}
       {filtered.length === 0 ? (
         <div className="text-center py-20" style={{ color: 'var(--text-muted)' }}>
           <p className="text-3xl mb-3">🔍</p>
           <p className="text-sm font-semibold">No passages match your search.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
           {filtered.map((passage) => {
-            const colorIndex = (passage.id - 1) % CARD_COLORS.length;
-            const [c1, c2] = CARD_COLORS[colorIndex];
+            const { color, light, dark } = CARD_COLORS[(passage.id - 1) % CARD_COLORS.length];
+            const numStr = String(passage.id).padStart(2, '0');
             return (
               <button
                 key={passage.id}
                 onClick={() => { setSelected(passage); window.scrollTo(0, 0); }}
-                className="w-full text-left rounded-2xl px-4 py-3.5 flex items-center gap-3 transition-transform hover:-translate-y-0.5 active:scale-[0.99] animate-heartbeat"
+                className="w-full text-left transition-transform hover:-translate-y-0.5 active:scale-[0.98]"
                 style={{
-                  background: `linear-gradient(135deg, ${c1}, ${c2})`,
-                  boxShadow: `0 5px 0 ${c1}99, 0 8px 20px ${c1}44`,
+                  position: 'relative',
+                  overflow: 'hidden',
+                  borderRadius: 20,
+                  background: `linear-gradient(135deg, ${light}, ${color}, ${dark})`,
+                  boxShadow: `0 4px 0 ${dark}, 0 8px 20px ${color}55`,
+                  padding: '16px 14px',
+                  minHeight: 130,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
                 }}
               >
-                <span
-                  className="shrink-0 w-9 h-9 rounded-xl flex items-center justify-center text-xs font-black text-white"
-                  style={{ background: 'rgba(255,255,255,0.2)' }}
-                >
-                  {passage.id}
-                </span>
-                <div className="flex-1 min-w-0">
-                  <p className="font-black text-white text-sm leading-tight truncate">{passage.title}</p>
-                  <p className="text-xs mt-0.5 font-semibold truncate" style={{ color: 'rgba(255,255,255,0.75)' }}>
-                    {passage.topic}
+                {/* Watermark number */}
+                <div style={{
+                  position: 'absolute', right: 6, top: '50%',
+                  transform: 'translateY(-50%)',
+                  fontSize: 72, fontWeight: 900,
+                  color: 'rgba(255,255,255,0.07)',
+                  lineHeight: 1,
+                  userSelect: 'none', pointerEvents: 'none',
+                }}>{numStr}</div>
+
+                {/* Topic label */}
+                <p style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.65)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                  {passage.topic}
+                </p>
+
+                {/* Title + badge row */}
+                <div>
+                  <p style={{
+                    fontSize: 13, fontWeight: 900, color: '#fff',
+                    lineHeight: 1.3, marginBottom: 8,
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                    textShadow: '0 1px 4px rgba(0,0,0,0.3)',
+                  }}>
+                    {passage.title}
                   </p>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    {passage.questions.length > 0 ? (
+                      <span style={{
+                        fontSize: 10, fontWeight: 700,
+                        color: 'rgba(255,255,255,0.9)',
+                        background: 'rgba(0,0,0,0.22)',
+                        borderRadius: 6, padding: '2px 8px',
+                      }}>
+                        {passage.questions.length} Q
+                      </span>
+                    ) : <span />}
+                    <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: 14 }}>›</span>
+                  </div>
                 </div>
-                {passage.questions.length > 0 && (
-                  <span
-                    className="shrink-0 text-xs font-bold px-2 py-1 rounded-lg"
-                    style={{ background: 'rgba(255,255,255,0.2)', color: 'white' }}
-                  >
-                    {passage.questions.length} Q
-                  </span>
-                )}
-                <span className="text-white/50 text-sm">›</span>
               </button>
             );
           })}
