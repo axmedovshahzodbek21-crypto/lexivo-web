@@ -152,11 +152,10 @@ export default function RealEnglishVideoPage({ params }: { params: Promise<{ id:
       </div>
 
       {/* Units */}
-      {units.length === 0 || units.every(u => u.wordCount === 0) ? (
+      {units.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-[var(--border)] bg-[var(--surface)] p-10 text-center">
           <span className="text-4xl">📭</span>
-          <p className="text-sm font-bold text-[var(--text)] mt-3">Words coming soon</p>
-          <p className="text-xs text-[var(--text-muted)] mt-1">This video&apos;s words are being prepared.</p>
+          <p className="text-sm font-bold text-[var(--text)] mt-3">Units coming soon</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-3">
