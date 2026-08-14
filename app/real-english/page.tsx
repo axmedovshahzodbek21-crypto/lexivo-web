@@ -1,7 +1,7 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { type RealEnglishSet } from '@/lib/real-english-data';
-import { realEnglishSets } from "@/lib/realEnglishSets";
+import { realEnglishSets } from "@/lib/real-english-data";
 
 const CARD_COLORS = [
   '#5B8AF0','#FF6B6B','#06D6A0','#FFD166',

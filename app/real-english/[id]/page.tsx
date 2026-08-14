@@ -2,7 +2,7 @@
 import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { type RealEnglishVideo } from '@/lib/real-english-data';
-import { realEnglishSets } from "@/lib/realEnglishSets";
+import { realEnglishSets } from "@/lib/real-english-data";
 import { loadRealEnglishCollection } from '@/lib/data';
 import { getSRSWords, getReviewLog } from '@/lib/storage';
 

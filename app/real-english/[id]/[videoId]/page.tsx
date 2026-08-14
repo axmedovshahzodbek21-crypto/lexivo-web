@@ -2,7 +2,7 @@
 import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { realEnglishSets } from "@/lib/realEnglishSets";
+import { realEnglishSets } from "@/lib/real-english-data";
 import { loadRealEnglishCollection } from '@/lib/data';
 import { getUnitProgress } from '@/lib/storage';
 import type { WordCollection, UnitProgress } from '@/lib/types';
