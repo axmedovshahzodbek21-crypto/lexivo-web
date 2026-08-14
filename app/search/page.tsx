@@ -253,7 +253,7 @@ export default function SearchPage() {
                     overflow: 'hidden',
                     borderRadius: 16,
                     background: `linear-gradient(135deg, ${light}, ${color}, ${dark})`,
-                    boxShadow: `10px 28px 50px ${color}55, 16px 48px 80px rgba(0,0,0,0.18)`,
+                    boxShadow: `8px 36px 40px rgba(0,0,0,0.28), 14px 56px 70px rgba(0,0,0,0.16)`,
                     padding: '14px 12px',
                     minHeight: 88,
                     display: 'flex',
@@ -264,11 +264,11 @@ export default function SearchPage() {
                   }}
                   onMouseEnter={e => {
                     e.currentTarget.style.transform = 'translateY(-10px)';
-                    e.currentTarget.style.boxShadow = `12px 42px 70px ${color}66, 20px 64px 100px rgba(0,0,0,0.22)`;
+                    e.currentTarget.style.boxShadow = `10px 50px 55px rgba(0,0,0,0.34), 18px 72px 90px rgba(0,0,0,0.20)`;
                   }}
                   onMouseLeave={e => {
                     e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = `10px 28px 50px ${color}55, 16px 48px 80px rgba(0,0,0,0.18)`;
+                    e.currentTarget.style.boxShadow = `8px 36px 40px rgba(0,0,0,0.28), 14px 56px 70px rgba(0,0,0,0.16)`;
                   }}
                 >
                   {/* Watermark letter */}
