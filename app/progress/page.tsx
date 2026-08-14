@@ -128,15 +128,28 @@ function ProgressPage() {
 
         {/* Tabs */}
         <div className="flex gap-2 mb-4 overflow-x-auto pb-1">
-          {(['overview', 'calendar', 'srs', 'achievements'] as const).map(tabKey => (
-            <button
-              key={tabKey}
-              onClick={() => setTab(tabKey)}
-              className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors whitespace-nowrap ${tab === tabKey ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface-2)] text-[var(--text-muted)]'}`}
-            >
-              {tabKey === 'overview' ? t.progress.tabOverview : tabKey === 'calendar' ? t.progress.tabCalendar : tabKey === 'srs' ? t.progress.tabSRS : t.progress.tabBadges}
-            </button>
-          ))}
+          {(['overview', 'calendar', 'srs', 'achievements'] as const).map(tabKey => {
+            const icons: Record<string, string> = { overview: '📊', calendar: '📅', srs: '🔄', achievements: '🏆' };
+            const labels: Record<string, string> = { overview: t.progress.tabOverview, calendar: t.progress.tabCalendar, srs: t.progress.tabSRS, achievements: t.progress.tabBadges };
+            const active = tab === tabKey;
+            return (
+              <button
+                key={tabKey}
+                onClick={() => setTab(tabKey)}
+                className="px-4 py-2 rounded-xl text-sm font-bold transition-all whitespace-nowrap"
+                style={active ? {
+                  background: 'linear-gradient(135deg, var(--primary), #818CF8)',
+                  color: '#fff',
+                  boxShadow: '0 3px 0 #4338CA, 0 6px 16px color-mix(in srgb, var(--primary) 40%, transparent)',
+                } : {
+                  background: 'var(--surface-2)',
+                  color: 'var(--text-muted)',
+                }}
+              >
+                {icons[tabKey]} {labels[tabKey]}
+              </button>
+            );
+          })}
         </div>
 
         {tab === 'overview' && (
@@ -734,26 +747,40 @@ function StudyCalendar({
         return (
           <div className="grid grid-cols-2 gap-3 mb-1">
             {/* Review card */}
-            <div className="rounded-2xl py-3 px-4 flex flex-col items-center gap-1.5 border"
-              style={{ background: reviewToday ? TASK_COLORS.review.bg : 'var(--surface)', borderColor: reviewToday ? TASK_COLORS.review.bg : 'var(--border)' }}>
-              <span style={{ fontSize: 22, color: reviewToday ? '#fff' : 'var(--text-muted)' }}>{reviewToday ? '✅' : '○'}</span>
-              <span className="flex items-center gap-1">
-                <span className="text-xs font-bold" style={{ color: reviewToday ? '#fff' : 'var(--text-muted)' }}>Review</span>
+            <div className="rounded-2xl py-4 px-4 flex flex-col items-center gap-2 relative overflow-hidden"
+              style={{
+                background: reviewToday
+                  ? `linear-gradient(135deg, ${TASK_COLORS.review.bg}, ${TASK_COLORS.review.shadow})`
+                  : 'var(--surface)',
+                border: `2px solid ${reviewToday ? TASK_COLORS.review.bg : 'var(--border)'}`,
+                boxShadow: reviewToday ? `0 4px 0 ${TASK_COLORS.review.shadow}, 0 8px 20px ${TASK_COLORS.review.bg}55` : 'none',
+              }}>
+              {reviewToday && <div style={{ position: 'absolute', right: -8, bottom: -10, fontSize: 60, opacity: 0.1, pointerEvents: 'none', userSelect: 'none', lineHeight: 1 }}>🔁</div>}
+              <span style={{ fontSize: 26, position: 'relative', zIndex: 1 }}>{reviewToday ? '✅' : '○'}</span>
+              <span className="flex items-center gap-1" style={{ position: 'relative', zIndex: 1 }}>
+                <span className="text-xs font-black" style={{ color: reviewToday ? '#fff' : 'var(--text-muted)' }}>Review</span>
                 <InfoBtn k="review" light={reviewToday} />
               </span>
-              <span className="text-[9px] font-semibold" style={{ color: reviewToday ? 'rgba(255,255,255,0.7)' : 'var(--text-muted)' }}>
+              <span className="text-[10px] font-bold" style={{ color: reviewToday ? 'rgba(255,255,255,0.75)' : 'var(--text-muted)', position: 'relative', zIndex: 1 }}>
                 {reviewToday ? 'All done!' : dueCount > 0 ? `${dueCount} due` : 'Nothing due'}
               </span>
             </div>
             {/* Words card */}
-            <div className="rounded-2xl py-3 px-4 flex flex-col items-center gap-1.5 border"
-              style={{ background: wordsToday ? TASK_COLORS.words.bg : 'var(--surface)', borderColor: wordsToday ? TASK_COLORS.words.bg : 'var(--border)' }}>
-              <span style={{ fontSize: 22, color: wordsToday ? '#fff' : 'var(--text-muted)' }}>{wordsToday ? '✅' : '✏️'}</span>
-              <span className="flex items-center gap-1">
-                <span className="text-xs font-bold" style={{ color: wordsToday ? '#fff' : 'var(--text-muted)' }}>Words</span>
+            <div className="rounded-2xl py-4 px-4 flex flex-col items-center gap-2 relative overflow-hidden"
+              style={{
+                background: wordsToday
+                  ? `linear-gradient(135deg, ${TASK_COLORS.words.bg}, ${TASK_COLORS.words.shadow})`
+                  : 'var(--surface)',
+                border: `2px solid ${wordsToday ? TASK_COLORS.words.bg : 'var(--border)'}`,
+                boxShadow: wordsToday ? `0 4px 0 ${TASK_COLORS.words.shadow}, 0 8px 20px ${TASK_COLORS.words.bg}55` : 'none',
+              }}>
+              {wordsToday && <div style={{ position: 'absolute', right: -8, bottom: -10, fontSize: 60, opacity: 0.1, pointerEvents: 'none', userSelect: 'none', lineHeight: 1 }}>✏️</div>}
+              <span style={{ fontSize: 26, position: 'relative', zIndex: 1 }}>{wordsToday ? '✅' : '✏️'}</span>
+              <span className="flex items-center gap-1" style={{ position: 'relative', zIndex: 1 }}>
+                <span className="text-xs font-black" style={{ color: wordsToday ? '#fff' : 'var(--text-muted)' }}>Words</span>
                 <InfoBtn k="words" light={wordsToday} />
               </span>
-              <span className="text-[9px] font-semibold" style={{ color: wordsToday ? 'rgba(255,255,255,0.7)' : 'var(--text-muted)' }}>{goalLabel}</span>
+              <span className="text-[10px] font-bold" style={{ color: wordsToday ? 'rgba(255,255,255,0.75)' : 'var(--text-muted)', position: 'relative', zIndex: 1 }}>{goalLabel}</span>
             </div>
           </div>
         );
@@ -761,27 +788,36 @@ function StudyCalendar({
 
       {/* Stat tiles */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="rounded-2xl p-3 flex flex-col gap-1" style={{ background: '#be123c', boxShadow: '0 3px 0 #881337' }}>
-          <span className="text-xl">🔥</span>
-          <div className="text-2xl font-black text-white leading-tight">{streak}</div>
-          <div className="flex items-center gap-1">
-            <div className="text-[10px] text-white/70 font-semibold leading-tight">{t.progress.currentStreak}</div>
+        {/* Current Streak */}
+        <div className="rounded-2xl p-3 flex flex-col gap-1 relative overflow-hidden"
+          style={{ background: 'linear-gradient(135deg, #F43F5E, #BE123C, #881337)', boxShadow: '0 4px 0 #881337, 0 8px 20px #BE123C55' }}>
+          <div style={{ position: 'absolute', right: -6, bottom: -10, fontSize: 52, opacity: 0.12, lineHeight: 1, pointerEvents: 'none', userSelect: 'none' }}>🔥</div>
+          <span className="text-xl relative z-10">🔥</span>
+          <div className="text-3xl font-black text-white leading-tight relative z-10">{streak}</div>
+          <div className="flex items-center gap-1 relative z-10">
+            <div className="text-[10px] text-white/70 font-bold leading-tight">{t.progress.currentStreak}</div>
             <InfoBtn k="streak" light />
           </div>
         </div>
-        <div className="rounded-2xl p-3 flex flex-col gap-1" style={{ background: '#0369a1', boxShadow: '0 3px 0 #0c4a6e' }}>
-          <span className="text-xl">⚡</span>
-          <div className="text-2xl font-black text-white leading-tight">{longestStreak}</div>
-          <div className="flex items-center gap-1">
-            <div className="text-[10px] text-white/70 font-semibold leading-tight">{t.progress.longestStreak}</div>
+        {/* Longest Streak */}
+        <div className="rounded-2xl p-3 flex flex-col gap-1 relative overflow-hidden"
+          style={{ background: 'linear-gradient(135deg, #38BDF8, #0369A1, #0C4A6E)', boxShadow: '0 4px 0 #0C4A6E, 0 8px 20px #0369A155' }}>
+          <div style={{ position: 'absolute', right: -6, bottom: -10, fontSize: 52, opacity: 0.12, lineHeight: 1, pointerEvents: 'none', userSelect: 'none' }}>⚡</div>
+          <span className="text-xl relative z-10">⚡</span>
+          <div className="text-3xl font-black text-white leading-tight relative z-10">{longestStreak}</div>
+          <div className="flex items-center gap-1 relative z-10">
+            <div className="text-[10px] text-white/70 font-bold leading-tight">{t.progress.longestStreak}</div>
             <InfoBtn k="longest" light />
           </div>
         </div>
-        <div className="rounded-2xl p-3 flex flex-col gap-1" style={{ background: '#b45309', boxShadow: '0 3px 0 #78350f' }}>
-          <span className="text-xl">🏆</span>
-          <div className="text-2xl font-black text-white leading-tight">{activeDays}</div>
-          <div className="flex items-center gap-1">
-            <div className="text-[10px] text-white/70 font-semibold leading-tight">Full days</div>
+        {/* Full Days */}
+        <div className="rounded-2xl p-3 flex flex-col gap-1 relative overflow-hidden"
+          style={{ background: 'linear-gradient(135deg, #FBBF24, #B45309, #78350F)', boxShadow: '0 4px 0 #78350F, 0 8px 20px #B4530955' }}>
+          <div style={{ position: 'absolute', right: -6, bottom: -10, fontSize: 52, opacity: 0.12, lineHeight: 1, pointerEvents: 'none', userSelect: 'none' }}>🏆</div>
+          <span className="text-xl relative z-10">🏆</span>
+          <div className="text-3xl font-black text-white leading-tight relative z-10">{activeDays}</div>
+          <div className="flex items-center gap-1 relative z-10">
+            <div className="text-[10px] text-white/70 font-bold leading-tight">Full days</div>
             <InfoBtn k="fulldays" light />
           </div>
         </div>
@@ -868,6 +904,7 @@ function StudyCalendar({
                     outline: (isToday || isSelected) ? '2.5px solid #6366f1' : 'none',
                     outlineOffset: '2px',
                     transform: isSelected ? 'scale(1.12)' : 'scale(1)',
+                    boxShadow: isToday ? '0 0 14px #6366f180' : isSelected ? '0 0 8px #6366f150' : 'none',
                   }}
                 >
                   {/* Bottom half: SRS review (indigo) or locked (gray) */}
