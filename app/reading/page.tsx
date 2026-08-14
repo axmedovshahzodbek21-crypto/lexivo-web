@@ -220,16 +220,44 @@ function PassageView({ passage, onBack }: { passage: ReadingPassage; onBack: () 
   );
 }
 
+const VISITED_KEY = 'lexivo_reading_visited';
+
 export default function ReadingPage() {
   const [selected, setSelected] = useState<ReadingPassage | null>(null);
   const [search, setSearch] = useState('');
   const [topic, setTopic] = useState('All');
+  const [visited, setVisited] = useState<Set<number>>(() => {
+    try { return new Set(JSON.parse(localStorage.getItem(VISITED_KEY) ?? '[]')); }
+    catch { return new Set(); }
+  });
+
+  const openPassage = (passage: ReadingPassage) => {
+    const next = new Set(visited);
+    next.add(passage.id);
+    setVisited(next);
+    localStorage.setItem(VISITED_KEY, JSON.stringify([...next]));
+    setSelected(passage);
+    window.scrollTo(0, 0);
+  };
+
+  const surpriseMe = () => {
+    const unvisited = readingPassages.filter(p => !visited.has(p.id));
+    const pool = unvisited.length > 0 ? unvisited : readingPassages;
+    openPassage(pool[Math.floor(Math.random() * pool.length)]);
+  };
+
+  const resetVisited = () => {
+    setVisited(new Set());
+    localStorage.removeItem(VISITED_KEY);
+  };
 
   const filtered = useMemo(() => readingPassages.filter(p => {
     const matchesTopic = topic === 'All' || p.topic === topic;
     const matchesSearch = !search.trim() || p.title.toLowerCase().includes(search.toLowerCase()) || p.topic.toLowerCase().includes(search.toLowerCase());
     return matchesTopic && matchesSearch;
   }), [search, topic]);
+
+  const unvisitedCount = readingPassages.length - visited.size;
 
   if (selected) {
     return <PassageView passage={selected} onBack={() => { setSelected(null); window.scrollTo(0, 0); }} />;
@@ -248,19 +276,49 @@ export default function ReadingPage() {
             Read, collect vocabulary, and answer comprehension questions.
           </p>
         </div>
-        <Link
-          href="/reading/free"
-          style={{
-            fontSize: 12, fontWeight: 700,
-            padding: '8px 16px', borderRadius: 12,
-            border: '1.5px solid var(--border)',
-            color: 'var(--text-muted)',
-            textDecoration: 'none',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          Free Read →
-        </Link>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button
+              onClick={surpriseMe}
+              style={{
+                fontSize: 12, fontWeight: 700,
+                padding: '8px 14px', borderRadius: 12,
+                background: 'linear-gradient(135deg, #a78bfa, #6C63FF, #4C1D95)',
+                boxShadow: '0 3px 0 #3D1F9E, 0 6px 14px rgba(108,99,255,0.35)',
+                color: '#fff', border: 'none', cursor: 'pointer',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              🎲 Surprise Me
+            </button>
+            <Link
+              href="/reading/free"
+              style={{
+                fontSize: 12, fontWeight: 700,
+                padding: '8px 16px', borderRadius: 12,
+                border: '1.5px solid var(--border)',
+                color: 'var(--text-muted)',
+                textDecoration: 'none',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              Free Read →
+            </Link>
+          </div>
+          {visited.size > 0 && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                {unvisitedCount > 0 ? `${unvisitedCount} unread` : '🎉 All read!'}
+              </span>
+              <button
+                onClick={resetVisited}
+                style={{ fontSize: 11, color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+              >
+                Reset
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Search */}
@@ -320,7 +378,7 @@ export default function ReadingPage() {
             return (
               <button
                 key={passage.id}
-                onClick={() => { setSelected(passage); window.scrollTo(0, 0); }}
+                onClick={() => openPassage(passage)}
                 className="w-full text-left transition-transform hover:-translate-y-0.5 active:scale-[0.98]"
                 style={{
                   position: 'relative',
@@ -333,6 +391,7 @@ export default function ReadingPage() {
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'space-between',
+                  opacity: visited.has(passage.id) ? 0.72 : 1,
                 }}
               >
                 {/* Watermark number */}
@@ -344,6 +403,18 @@ export default function ReadingPage() {
                   lineHeight: 1,
                   userSelect: 'none', pointerEvents: 'none',
                 }}>{numStr}</div>
+
+                {/* Visited ✓ badge */}
+                {visited.has(passage.id) && (
+                  <div style={{
+                    position: 'absolute', top: 10, right: 10,
+                    width: 22, height: 22, borderRadius: '50%',
+                    background: 'rgba(255,255,255,0.3)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 12, color: '#fff', fontWeight: 900,
+                    backdropFilter: 'blur(4px)',
+                  }}>✓</div>
+                )}
 
                 {/* Topic label */}
                 <p style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.65)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
