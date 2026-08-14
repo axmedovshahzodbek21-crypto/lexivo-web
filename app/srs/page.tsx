@@ -386,7 +386,17 @@ export default function SRSReviewPage() {
         </div>
 
         {/* Word card */}
-        <div className="card animate-slide-up flex flex-col gap-3" style={{ minHeight: choices !== null ? 'auto' : 280 }}>
+        <div className="card animate-slide-up flex flex-col gap-3 relative overflow-hidden" style={{ minHeight: choices !== null ? 'auto' : 280, borderLeft: '3px solid var(--primary)' }}>
+          {/* Watermark letter */}
+          <div style={{
+            position: 'absolute', right: -12, bottom: -20,
+            fontSize: 180, fontWeight: 900, lineHeight: 1,
+            color: 'var(--text)', opacity: 0.04,
+            pointerEvents: 'none', userSelect: 'none', textTransform: 'uppercase',
+          }}>
+            {current.word[0]}
+          </div>
+
           <div className="flex items-center justify-between">
             <span className="badge text-xs">{current.topic}</span>
             <button
@@ -396,7 +406,7 @@ export default function SRSReviewPage() {
             >🔊</button>
           </div>
 
-          <h2 className="text-3xl font-bold text-[var(--text)]">{current.word}</h2>
+          <h2 className="text-5xl font-black text-[var(--text)] leading-none">{current.word}</h2>
           <p className="text-sm text-[var(--text-muted)]">{current.partOfSpeech} · {current.pronunciation}</p>
 
           {revealed ? (
@@ -428,7 +438,15 @@ export default function SRSReviewPage() {
               </div>
             </div>
           ) : choices === null ? (
-            <button onClick={() => setRevealed(true)} className="mt-4 btn-secondary w-full">
+            <button
+              onClick={() => setRevealed(true)}
+              className="mt-4 w-full py-4 rounded-xl font-bold text-white transition-all"
+              style={{
+                background: 'linear-gradient(135deg, var(--primary), #818CF8)',
+                boxShadow: '0 4px 0 #4338CA, 0 8px 24px color-mix(in srgb, var(--primary) 45%, transparent)',
+                letterSpacing: '0.04em',
+              }}
+            >
               {t.srs.reveal}
             </button>
           ) : null}
@@ -469,24 +487,58 @@ export default function SRSReviewPage() {
               })}
             </div>
             {tappedChoice && (
-              <div className="flex gap-2 animate-slide-up">
-                <button onClick={() => grade('notYet')} className="flex-1 py-3 rounded-xl border-2 border-[var(--danger)] text-[var(--danger)] font-bold text-sm hover:bg-red-50 transition-colors">
-                  {t.srs.notYet}
+              <div className="flex gap-3 animate-slide-up">
+                <button
+                  onClick={() => grade('notYet')}
+                  className="flex-1 py-4 rounded-2xl text-white font-black text-sm transition-all active:scale-95"
+                  style={{
+                    background: 'linear-gradient(135deg, #EF4444, #DC2626)',
+                    boxShadow: '0 4px 0 #991B1B, 0 8px 24px #EF444455',
+                  }}
+                >
+                  ✗ {t.srs.notYet}
                 </button>
-                <button onClick={() => grade('knew')} className="flex-1 py-3 rounded-xl border-2 border-[var(--success)] text-[var(--success)] font-bold text-sm hover:bg-green-50 transition-colors">
-                  {t.srs.knewIt}
+                <button
+                  onClick={() => grade('knew')}
+                  className="flex-1 py-4 rounded-2xl text-white font-black text-sm transition-all active:scale-95"
+                  style={{
+                    background: 'linear-gradient(135deg, #22C55E, #16A34A)',
+                    boxShadow: '0 4px 0 #15803D, 0 8px 24px #22C55E55',
+                  }}
+                >
+                  ✓ {t.srs.knewIt}
                 </button>
               </div>
             )}
           </div>
         ) : (
           revealed && (
-            <div className="flex gap-2 animate-slide-up">
-              <button onClick={() => grade('notYet')} className="flex-1 py-4 rounded-xl border-2 border-[var(--danger)] text-[var(--danger)] font-bold text-sm hover:bg-red-50 transition-colors flex flex-col items-center gap-1">
-                <span>✗</span><span className="text-xs font-normal">{t.srs.notYet}</span>
+            <div className="flex gap-3 animate-slide-up">
+              <button
+                onClick={() => grade('notYet')}
+                className="flex-1 rounded-2xl text-white font-bold transition-all active:scale-95 flex flex-col items-center justify-center gap-1"
+                style={{
+                  padding: '20px 16px',
+                  background: 'linear-gradient(135deg, #EF4444, #DC2626)',
+                  boxShadow: '0 4px 0 #991B1B, 0 8px 24px #EF444455',
+                }}
+              >
+                <span className="text-2xl leading-none">✗</span>
+                <span className="text-sm font-black">{t.srs.notYet}</span>
+                <span className="text-xs opacity-60">← J</span>
               </button>
-              <button onClick={() => grade('knew')} className="flex-1 py-4 rounded-xl border-2 border-[var(--success)] text-[var(--success)] font-bold text-sm hover:bg-green-50 transition-colors flex flex-col items-center gap-1">
-                <span>✓</span><span className="text-xs font-normal">{t.srs.knewIt}</span>
+              <button
+                onClick={() => grade('knew')}
+                className="flex-1 rounded-2xl text-white font-bold transition-all active:scale-95 flex flex-col items-center justify-center gap-1"
+                style={{
+                  padding: '20px 16px',
+                  background: 'linear-gradient(135deg, #22C55E, #16A34A)',
+                  boxShadow: '0 4px 0 #15803D, 0 8px 24px #22C55E55',
+                }}
+              >
+                <span className="text-2xl leading-none">✓</span>
+                <span className="text-sm font-black">{t.srs.knewIt}</span>
+                <span className="text-xs opacity-60">K →</span>
               </button>
             </div>
           )
