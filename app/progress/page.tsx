@@ -175,12 +175,12 @@ function ProgressPage() {
 
             {/* Stats grid */}
             <div className="grid grid-cols-2 gap-3">
-              <StatBlock icon="🔥" label={t.progress.currentStreak} value={`${streak} ${t.progress.days}`} bg="#c2410c" shadow="#7c2d12" />
-              <StatBlock icon="📅" label={t.progress.studyDays} value={`${totalDays} ${t.progress.days}`} bg="#4338ca" shadow="#312e81" />
-              <StatBlock icon="📚" label={t.progress.wordsLearned} value={learnedCount} bg="#059669" shadow="#064e3b" />
-              <StatBlock icon="🧠" label={t.progress.srsMastered} value={masteredCount} bg="#7c3aed" shadow="#4c1d95" />
-              <StatBlock icon="⚡" label={t.progress.todayXp} value={`+${displayXP(todayXp)}`} bg="#b45309" shadow="#78350f" />
-              <StatBlock icon="🎯" label={t.progress.todayWords} value={todayCount} bg="#be185d" shadow="#831843" />
+              <StatBlock icon="🔥" label={t.progress.currentStreak} rawNumber={streak}       suffix={` ${t.progress.days}`} light="#fb923c" bg="#c2410c" shadow="#7c2d12" />
+              <StatBlock icon="📅" label={t.progress.studyDays}     rawNumber={totalDays}     suffix={` ${t.progress.days}`} light="#818cf8" bg="#4338ca" shadow="#312e81" />
+              <StatBlock icon="📚" label={t.progress.wordsLearned}  rawNumber={learnedCount}                                 light="#34d399" bg="#059669" shadow="#064e3b" />
+              <StatBlock icon="🧠" label={t.progress.srsMastered}   rawNumber={masteredCount}                                light="#a78bfa" bg="#7c3aed" shadow="#4c1d95" />
+              <StatBlock icon="⚡" label={t.progress.todayXp}       rawNumber={todayXp}       prefix="+" displayFn={displayXP} light="#fcd34d" bg="#b45309" shadow="#78350f" />
+              <StatBlock icon="🎯" label={t.progress.todayWords}    rawNumber={todayCount}                                   light="#f472b6" bg="#be185d" shadow="#831843" />
             </div>
 
             {/* Due reviews */}
@@ -442,16 +442,66 @@ function ProgressPage() {
   );
 }
 
-function StatBlock({ icon, label, value, bg, shadow }: { icon: string; label: string; value: string | number; bg: string; shadow: string }) {
+function useCountUp(target: number, duration = 900): number {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    if (target === 0) { setCount(0); return; }
+    const start = performance.now();
+    let id: number;
+    const tick = (now: number) => {
+      const progress = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.round(eased * target));
+      if (progress < 1) id = requestAnimationFrame(tick);
+    };
+    id = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(id);
+  }, [target, duration]);
+  return count;
+}
+
+function StatBlock({
+  icon, label, rawNumber, prefix = '', suffix = '', displayFn,
+  light, bg, shadow,
+}: {
+  icon: string; label: string;
+  rawNumber: number; prefix?: string; suffix?: string;
+  displayFn?: (n: number) => string;
+  light: string; bg: string; shadow: string;
+}) {
+  const animated = useCountUp(rawNumber);
+  const displayed = displayFn ? displayFn(animated) : String(animated);
+
   return (
-    <div
-      className="rounded-2xl p-4 flex flex-col justify-between min-h-[110px]"
-      style={{ background: bg, boxShadow: `0 4px 0 ${shadow}` }}
-    >
-      <span className="text-2xl">{icon}</span>
+    <div style={{
+      borderRadius: 20, padding: '16px 14px', minHeight: 140,
+      display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+      position: 'relative', overflow: 'hidden',
+      background: `linear-gradient(135deg, ${light}, ${bg}, ${shadow})`,
+      boxShadow: `0 4px 0 ${shadow}, 0 8px 20px ${bg}55`,
+    }}>
+      {/* Watermark emoji */}
+      <div style={{
+        position: 'absolute', right: 4, bottom: -6, fontSize: 68,
+        lineHeight: 1, opacity: 0.1, userSelect: 'none', pointerEvents: 'none',
+      }}>{icon}</div>
+
+      <span style={{ fontSize: 22 }}>{icon}</span>
+
       <div>
-        <div className="text-2xl font-black text-white leading-tight">{value}</div>
-        <div className="text-xs text-white/70 font-medium mt-0.5">{label}</div>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
+          <span style={{ fontSize: 48, fontWeight: 900, color: '#fff', lineHeight: 1 }}>
+            {prefix}{displayed}
+          </span>
+          {suffix && (
+            <span style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.75)' }}>
+              {suffix.trim()}
+            </span>
+          )}
+        </div>
+        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.65)', fontWeight: 600, marginTop: 4 }}>
+          {label}
+        </div>
       </div>
     </div>
   );
