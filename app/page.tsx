@@ -602,8 +602,8 @@ export default function HomePage() {
       {dueCount > 0 && showReviewBanner && (
         <div className="relative overflow-hidden rounded-2xl p-[18px]"
           style={{
-            background: 'linear-gradient(135deg, #FCD34D, #F59E0B, #B45309)',
-            boxShadow: '0 4px 0 #78350F, 0 8px 18px rgba(245,158,11,0.35)',
+            background: 'linear-gradient(135deg, #FB923C, #F97316, #C2410C)',
+            boxShadow: '0 4px 0 #7C2D12, 0 8px 18px rgba(249,115,22,0.35)',
           }}>
           {/* watermark */}
           <div className="absolute -right-2 -bottom-4 text-[80px] leading-none pointer-events-none select-none"
