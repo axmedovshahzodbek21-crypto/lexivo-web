@@ -1,0 +1,28 @@
+{
+  "name": "Real English: Natural English",
+  "description": "Key phrases and vocabulary from a real interview coaching session.",
+  "days": [
+    {
+      "dayNumber": 1,
+      "topic": "PASTE_TOPIC_1_HERE",
+      "words": [
+        {
+          "word": "PASTE_AI_WORDS_HERE",
+          "partOfSpeech": "",
+          "pronunciation": "",
+          "definition": "",
+          "definitionUz": "",
+          "translation": "",
+          "example1": "",
+          "example1Translation": "",
+          "example2": "",
+          "example2Translation": "",
+          "example3": "",
+          "example3Translation": "",
+          "extraExamples": [],
+          "extraExampleTranslations": []
+        }
+      ]
+    }
+  ]
+}

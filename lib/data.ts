@@ -55,6 +55,20 @@ export async function loadCEFRCollection(level: 'a1' | 'a2' | 'b1' | 'advanced')
   return data;
 }
 
+export async function loadRealEnglishCollection(id: string): Promise<WordCollection | null> {
+  if (cache[`re_${id}`]) return cache[`re_${id}`] as WordCollection;
+  try {
+    const res = await fetch(`/data/real_english/${id}.json`);
+    if (!res.ok) return null;
+    const raw: WordCollection = await res.json();
+    const data = sanitizeCollection(raw);
+    cache[`re_${id}`] = data;
+    return data;
+  } catch {
+    return null;
+  }
+}
+
 export async function loadAllCollections(): Promise<WordCollection[]> {
   const [main, a1, a2, b1, advanced] = await Promise.all([
     loadCollections(),

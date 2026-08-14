@@ -1,30 +1,5 @@
 [
   {
-    "name": "Real English: Natural English",
-    "description": "Key phrases and vocabulary from a real interview coaching session.",
-    "days": [
-      {
-        "dayNumber": 1,
-        "topic": "Natural English",
-        "words": [
-          {
-            "word": "articulate",
-            "partOfSpeech": "adjective / verb",
-            "pronunciation": "/ɑːˈtɪk.jə.lət/",
-            "translation": "aniq ifodalangan / aniq gapirmoq",
-            "definition": "Able to express ideas clearly and effectively in speech or writing.",
-            "example1": "She gave an articulate answer during the job interview.",
-            "example1Translation": "U ish intervyusi davomida aniq javob berdi.",
-            "example2": "He struggled to articulate his feelings about the situation.",
-            "example2Translation": "U vaziyat haqidagi his-tuyg'ularini ifodalashga qiynaldi.",
-            "example3": "An articulate speaker can win over an audience quickly.",
-            "example3Translation": "Aniq gapiradigan notiq tinglovchilarni tezda o'z tomoniga jalb qila oladi."
-          }
-        ]
-      }
-    ]
-  },
-  {
     "name": "30 Days of Powerful Words",
     "description": "Master essential IELTS vocabulary organized by topic",
     "days": [
@@ -5152,15 +5127,15 @@
             "word": "Legacy",
             "partOfSpeech": "noun",
             "pronunciation": "/ˈleɡəsi/",
-            "translation": "Merov",
+            "translation": "Meros",
             "definition": "Something handed down from previous generations, such as traditions, values, buildings, or achievements.",
-            "definitionUz": "Merov – o‘tmish avlodlardan qolgan an’analar, qadriyatlar, binolar yoki yutuqlar kabi narsalar.",
+            "definitionUz": "Meros – o‘tmish avlodlardan qolgan an’analar, qadriyatlar, binolar yoki yutuqlar kabi narsalar.",
             "example1": "The ancient library is part of the city’s cultural legacy.",
-            "example1Translation": "Qadimiy kutubxona shaharning madaniy merovining bir qismidir.",
+            "example1Translation": "Qadimiy kutubxona shaharning madaniy Merosining bir qismidir.",
             "example2": "She wants to leave a positive legacy through her charity work.",
-            "example2Translation": "U xayriya ishlari orqali ijobiy merov qoldirmoqchi.",
+            "example2Translation": "U xayriya ishlari orqali ijobiy Meros qoldirmoqchi.",
             "example3": "Preserving our legacy is important for future generations.",
-            "example3Translation": "Merovimizni saqlash kelajak avlodlar uchun muhim.",
+            "example3Translation": "Merosimizni saqlash kelajak avlodlar uchun muhim.",
             "extraExamples": [
               "Family legacies often include stories and values passed down.",
               "The scientist’s legacy continues to influence modern research.",
@@ -5171,13 +5146,13 @@
               "Understanding our legacy helps us appreciate history."
             ],
             "extraExampleTranslations": [
-              "Oilaviy merov ko‘pincha hikoyalar va qadriyatlar shaklida o‘tadi.",
-              "Olimga qoldirgan merovi zamonaviy tadqiqotlarga ta’sirini davom ettirmoqda.",
-              "Madaniy merov milliy o‘zlikni shakllantiradi.",
-              "Ko‘plab tarixiy binolar o‘tmish tsivilizatsiyalarining merovidir.",
-              "Merov ham ijobiy, ham salbiy bo‘lishi mumkin.",
-              "U o‘z merovi sifatida stipendiya tashkil etdi.",
-              "Merovimizni tushunish tarixni qadrlashga yordam beradi."
+              "Oilaviy meros ko‘pincha hikoyalar va qadriyatlar shaklida o‘tadi.",
+              "Olimga qoldirgan merosi zamonaviy tadqiqotlarga ta’sirini davom ettirmoqda.",
+              "Madaniy meros milliy o‘zlikni shakllantiradi.",
+              "Ko‘plab tarixiy binolar o‘tmish tsivilizatsiyalarining merosidir.",
+              "Meros ham ijobiy, ham salbiy bo‘lishi mumkin.",
+              "U o‘z meros sifatida stipendiya tashkil etdi.",
+              "Merosimizni tushunish tarixni qadrlashga yordam beradi."
             ]
           },
           {
