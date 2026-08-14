@@ -65,7 +65,10 @@ function SetCard({ set, index, onClick }: { set: RealEnglishSet; index: number; 
         style={{ background: 'rgba(0,0,0,0.22)', backdropFilter: 'blur(8px)' }}>
         <p className="text-white font-bold text-sm leading-tight line-clamp-2"
           style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>{set.title}</p>
-        <p className="text-white/70 text-xs mt-0.5">{set.wordCount} words · {set.level}</p>
+        <p className="text-white/70 text-xs mt-0.5 truncate">{set.source}</p>
+        {set.description && (
+          <p className="text-white/60 text-[10px] mt-0.5 line-clamp-2 leading-snug">{set.description}</p>
+        )}
       </div>
     </div>
   );
