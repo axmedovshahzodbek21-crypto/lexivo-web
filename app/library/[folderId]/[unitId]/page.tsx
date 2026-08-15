@@ -99,6 +99,10 @@ ${exampleBlock(wordLang, transLang)}
 Output only the formatted blocks. No commentary.`;
 }
 
+// Module-level cache keyed by unitId — avoids re-showing the loading
+// spinner every time this page is revisited (e.g. switching tabs away and back).
+const _cache: Record<string, { unitName: string; folderName: string; words: UnitWord[] }> = {};
+
 export default function UnitPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
@@ -106,10 +110,11 @@ export default function UnitPage() {
   const folderId = params.folderId as string;
   const unitId = params.unitId as string;
 
-  const [unitName, setUnitName] = useState('');
-  const [folderName, setFolderName] = useState('');
-  const [words, setWords] = useState<UnitWord[]>([]);
-  const [loading, setLoading] = useState(true);
+  const cached = _cache[unitId] ?? null;
+  const [unitName, setUnitName] = useState(cached?.unitName ?? '');
+  const [folderName, setFolderName] = useState(cached?.folderName ?? '');
+  const [words, setWords] = useState<UnitWord[]>(cached?.words ?? []);
+  const [loading, setLoading] = useState(cached === null);
   const [tab, setTab] = useState<'words' | 'add'>('words');
 
   // AI import state
@@ -136,15 +141,14 @@ export default function UnitPage() {
 
   async function load() {
     if (!user) return;
-    setLoading(true);
     const [unitRes, folderRes, wordsRes] = await Promise.all([
       supabase.from('teacher_units').select('name').eq('id', unitId).single(),
       supabase.from('teacher_folders').select('name').eq('id', folderId).single(),
       supabase.from('teacher_unit_words').select('id, word, translation, definition, part_of_speech, pronunciation, definition_uz, examples').eq('unit_id', unitId).order('position').order('created_at'),
     ]);
-    setUnitName(unitRes.data?.name ?? '');
-    setFolderName(folderRes.data?.name ?? '');
-    setWords((wordsRes.data ?? []).map((w: any) => ({
+    const unit = unitRes.data?.name ?? '';
+    const folder = folderRes.data?.name ?? '';
+    const mapped = (wordsRes.data ?? []).map((w: any) => ({
       id: w.id,
       word: w.word,
       translation: w.translation,
@@ -153,7 +157,11 @@ export default function UnitPage() {
       pronunciation: w.pronunciation ?? null,
       definitionUz: w.definition_uz ?? null,
       examples: (w.examples ?? []) as WordExample[],
-    })));
+    }));
+    _cache[unitId] = { unitName: unit, folderName: folder, words: mapped };
+    setUnitName(unit);
+    setFolderName(folder);
+    setWords(mapped);
     setLoading(false);
   }
 
