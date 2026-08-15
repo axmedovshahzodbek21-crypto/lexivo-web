@@ -190,8 +190,8 @@ export default function SpeakingPage() {
       // Pitch rises slightly as the spin slows, like a wheel settling down
       playTick(1 + progress * 0.5);
 
-      // Decelerate: ticks start fast (70ms) and slow down toward the end
-      const delay = 60 + progress * progress * 260;
+      // Decelerate: ticks start moderate (90ms) and slow down toward the end (~2.9s total)
+      const delay = 90 + progress * progress * 420;
       window.setTimeout(runTick, delay);
     };
     runTick();
