@@ -189,7 +189,12 @@ export default function UnitPage() {
   async function deleteWord(id: string) {
     if (!confirm('Delete this word?')) return;
     await supabase.from('teacher_unit_words').delete().eq('id', id);
-    setWords(prev => prev.filter(w => w.id !== id));
+    setWords(prev => {
+      const next = prev.filter(w => w.id !== id);
+      const c = _cache[unitId];
+      if (c) _cache[unitId] = { ...c, words: next };
+      return next;
+    });
   }
 
   function copyPrompt(hasTranslations: boolean) {
