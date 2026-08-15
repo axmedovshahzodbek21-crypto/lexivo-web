@@ -91,6 +91,8 @@ function playReveal() {
   } catch {}
 }
 
+const SESSION_KEY = 'lexivo_speaking_session';
+
 export default function SpeakingPage() {
   const router = useRouter();
   const [part, setPart] = useState<Part | null>(null);
@@ -102,6 +104,7 @@ export default function SpeakingPage() {
   const [question, setQuestion] = useState<SpeakingQuestion | null>(null);
   const [card, setCard] = useState<SpeakingCueCard | null>(null);
   const lastIndexRef = useRef<number | undefined>(undefined);
+  const skipNextPersistRef = useRef(true);
 
   // Part 2 timer state
   const [phase, setPhase] = useState<'idle' | 'prep' | 'speak' | 'done'>('idle');
@@ -116,6 +119,35 @@ export default function SpeakingPage() {
   };
 
   useEffect(() => clearTimer, []);
+
+  // Restore where the student left off after a hard refresh (state otherwise resets to nothing).
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(SESSION_KEY);
+      if (raw) {
+        const saved = JSON.parse(raw) as { part?: Part; question?: SpeakingQuestion; card?: SpeakingCueCard };
+        if (saved.part) setPart(saved.part);
+        if (saved.question) setQuestion(saved.question);
+        if (saved.card) setCard(saved.card);
+      }
+    } catch {}
+  }, []);
+
+  // Persist current spot (part + whichever question/card is showing) as it changes.
+  // Skip the very first run so a just-restored session isn't wiped by a stale closure.
+  useEffect(() => {
+    if (skipNextPersistRef.current) {
+      skipNextPersistRef.current = false;
+      return;
+    }
+    try {
+      if (part) {
+        sessionStorage.setItem(SESSION_KEY, JSON.stringify({ part, question, card }));
+      } else {
+        sessionStorage.removeItem(SESSION_KEY);
+      }
+    } catch {}
+  }, [part, question, card]);
 
   const pool: (SpeakingQuestion | SpeakingCueCard)[] | null =
     part === 1 ? part1Pool : part === 3 ? part3Pool : part === 2 ? part2Cards : null;
@@ -286,16 +318,17 @@ export default function SpeakingPage() {
 
             {/* Spinning / flicker state */}
             {spinning && (
-              <div className="flex-1 flex flex-col items-center justify-center gap-4 py-10">
-                <p className="text-[11px] font-bold uppercase tracking-wider" style={{ color: info.color }}>
+              <div className="flex-1 flex flex-col items-center justify-center gap-5 py-10">
+                <p className="text-sm font-bold uppercase tracking-wider flex items-center gap-2" style={{ color: info.color }}>
+                  <span className="inline-block animate-spin" style={{ animationDuration: '0.9s' }}>🎲</span>
                   Shuffling through questions…
                 </p>
                 <div
-                  className="rounded-2xl p-5 w-full text-center"
-                  style={{ background: 'var(--surface-2)', border: `1px dashed ${info.color}88` }}
+                  className="rounded-3xl p-8 md:p-10 w-full min-h-[220px] flex flex-col items-center justify-center text-center"
+                  style={{ background: 'var(--surface-2)', border: `2px dashed ${info.color}88` }}
                 >
-                  <p className="text-[10px] font-bold text-[var(--text-muted)] mb-1 uppercase tracking-wide">{flickerTopic}</p>
-                  <p className="text-base font-semibold text-[var(--text)] opacity-70">{flickerText}</p>
+                  <p className="text-xs md:text-sm font-bold text-[var(--text-muted)] mb-3 uppercase tracking-wide">{flickerTopic}</p>
+                  <p className="text-2xl md:text-3xl font-bold text-[var(--text)] opacity-70 leading-snug">{flickerText}</p>
                 </div>
               </div>
             )}
