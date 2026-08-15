@@ -196,13 +196,17 @@ export default function JoinedClassesPage() {
           const { gradient, glow } = classGradient(cls.id);
 
           return (
-            <div key={cls.id} className="rounded-2xl overflow-hidden border border-[var(--border)]"
-              style={{ boxShadow: `0 6px 0 ${glow}55, 0 12px 30px ${glow}33` }}>
+            <div key={cls.id} className="rounded-2xl overflow-hidden"
+              style={{ boxShadow: `0 6px 0 ${glow}cc, 0 16px 40px ${glow}55`, position: 'relative' }}>
               <div className={`bg-gradient-to-br ${gradient} px-4 pt-4 pb-5`}>
+                {/* Watermark */}
+                <div style={{ position: 'absolute', right: 12, top: 8, fontSize: 64, lineHeight: 1, color: 'rgba(255,255,255,0.07)', userSelect: 'none', pointerEvents: 'none' }}>
+                  {cls.name.charAt(0).toUpperCase()}
+                </div>
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="font-black text-white text-lg leading-tight">{cls.name}</p>
+                      <p className="font-black text-white text-xl leading-tight" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>{cls.name}</p>
                       {unreadNotes > 0 && <span className="bg-white/25 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">{unreadNotes} new</span>}
                     </div>
                     <p className="text-sm text-white/70 mt-0.5">👩‍🏫 {teacherProfiles[cls.teacher_id]?.name ?? 'Teacher'} · {cls.join_code}</p>
@@ -213,7 +217,11 @@ export default function JoinedClassesPage() {
                     )}
                   </div>
                   <div className="flex flex-col gap-1.5 shrink-0 items-end">
-                    <button onClick={() => router.push(`/classes/${cls.id}/home`)} className="bg-white text-gray-900 font-black text-xs px-3.5 py-1.5 rounded-xl hover:opacity-90 transition-opacity">Enter →</button>
+                    <button
+                      onClick={() => router.push(`/classes/${cls.id}/home`)}
+                      className="font-black text-white text-xs px-4 py-2 rounded-xl transition-opacity hover:opacity-90"
+                      style={{ background: 'rgba(255,255,255,0.25)', boxShadow: '0 3px 0 rgba(0,0,0,0.2), 0 6px 14px rgba(0,0,0,0.15)', border: '1px solid rgba(255,255,255,0.35)', backdropFilter: 'blur(8px)' }}
+                    >Enter →</button>
                     <div className="flex gap-1">
                       <button onClick={() => toggleLeaderboard(cls.id)} className={`text-xs px-2 py-1 rounded-lg font-medium transition-all ${expandedLeaderboard === cls.id ? 'bg-white/30 text-white' : 'bg-black/20 text-white/80 hover:bg-black/30'}`}>🏆</button>
                       <button onClick={() => setLeaveTarget(cls.id)} className="text-xs px-2 py-1 rounded-lg bg-black/20 text-white/80 hover:bg-red-500/40 transition-colors font-medium">Leave</button>

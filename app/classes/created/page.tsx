@@ -161,7 +161,7 @@ export default function CreatedClassesPage() {
               const { gradient, glow } = classGradient(cls.id);
               return (
                 <div key={cls.id} className={`rounded-2xl overflow-hidden bg-gradient-to-br ${gradient} flex flex-col transition-all hover:-translate-y-1 duration-200`}
-                  style={{ boxShadow: `0 6px 0 ${glow}88, 0 14px 32px ${glow}44` }}>
+                  style={{ boxShadow: `0 6px 0 ${glow}cc, 0 16px 40px ${glow}55`, position: 'relative' }}>
                   <div className="p-4 flex-1 cursor-pointer" onClick={() => router.push(`/classes/${cls.id}/home`)}>
                     {renamingId === cls.id ? (
                       <div className="flex items-center gap-2 mb-3">
