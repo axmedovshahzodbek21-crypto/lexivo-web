@@ -183,7 +183,10 @@ body.focus-mode .focus-container {
   0%, 100% { scale: 1; }
   50%       { scale: 1.015; }
 }
-.animate-heartbeat { animation: heartbeat 1.5s ease-in-out infinite; }
+.animate-heartbeat        { animation: heartbeat 1.5s ease-in-out infinite; }
+.animate-heartbeat-slow   { animation: heartbeat 2.8s ease-in-out infinite; }
+.animate-heartbeat-normal { animation: heartbeat 1.5s ease-in-out infinite; }
+.animate-heartbeat-fast   { animation: heartbeat 0.8s ease-in-out infinite; }
 
 .animate-slide-up { animation: slideUp 0.3s ease; }
 .animate-fade-in { animation: fadeIn 0.3s ease; }

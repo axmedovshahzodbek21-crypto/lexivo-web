@@ -97,7 +97,7 @@ export default function HomePage() {
   const [todayCount, setTodayCount] = useState(0);
   const [dueCount, setDueCount] = useState(0);
   const [learnedCount, setLearnedCount] = useState(0);
-  const [settings, setSettings] = useState<UserSettings>({ name: 'Learner', dailyGoal: 10, languageLevel: 'B1', defaultAccent: 'us', autoPlayOnReveal: true, sessionSize: 20, fontSize: 'normal', studyOrder: 'random', quizDirection: 'word-to-uz', reduceMotion: false, uiLanguage: 'en', showOnLeaderboard: true });
+  const [settings, setSettings] = useState<UserSettings>({ name: 'Learner', dailyGoal: 10, languageLevel: 'B1', defaultAccent: 'us', autoPlayOnReveal: true, sessionSize: 20, fontSize: 'normal', studyOrder: 'random', quizDirection: 'word-to-uz', reduceMotion: false, uiLanguage: 'en', showOnLeaderboard: true, pulseEnabled: true, pulseSpeed: 'normal' });
   const [freezes, setFreezes] = useState(0);
   const [streakRisk, setStreakRisk] = useState<'safe' | 'at-risk' | 'freeze-saves'>('safe');
   const [importedCount, setImportedCount] = useState(0);
@@ -391,6 +391,7 @@ export default function HomePage() {
   const t = useTranslation();
   const levelInfo = getLevelInfo(xp);
   const dailyProgress = Math.min((todayCount / settings.dailyGoal) * 100, 100);
+  const pulseClass = (settings.pulseEnabled ?? true) ? `animate-heartbeat-${settings.pulseSpeed ?? 'normal'}` : '';
   const mainCollections = collections.filter(c => !LEVELED_NAMES.has(c.name) && !c.youtubeUrl);
 
   const handleHideSave = () => {
@@ -734,18 +735,18 @@ export default function HomePage() {
           if (sId === 'collections') return (
             <Link href="/collections" className="block h-full">
               <StatCard icon="🗂️" value={mainCollections.length + 2} label={t.home.collections}
-                gradient="linear-gradient(135deg, #1d4ed8, #60a5fa)" edge="#1e3a8a" glowColor="rgba(29,78,216,0.4)" />
+                gradient="linear-gradient(135deg, #1d4ed8, #60a5fa)" edge="#1e3a8a" glowColor="rgba(29,78,216,0.4)" pulseClass={pulseClass} />
             </Link>
           );
           if (sId === 'reading') return (
             <Link href="/reading" className="block h-full">
               <StatCard icon="📰" value="→" label="Reading"
-                gradient="linear-gradient(135deg, #047857, #34d399)" edge="#064e3b" glowColor="rgba(4,120,87,0.4)" />
+                gradient="linear-gradient(135deg, #047857, #34d399)" edge="#064e3b" glowColor="rgba(4,120,87,0.4)" pulseClass={pulseClass} />
             </Link>
           );
           if (sId === 'day_streak') return (
             <Link href="/progress?tab=calendar" className="block h-full">
-              <div className="rounded-2xl h-full flex flex-col items-center justify-center text-center gap-3 hover:-translate-y-1 transition-all duration-200 animate-heartbeat"
+              <div className={`rounded-2xl h-full flex flex-col items-center justify-center text-center gap-3 hover:-translate-y-1 transition-all duration-200 ${pulseClass}`}
                 style={{ background: 'linear-gradient(135deg, #FF6B35, #ff9f7f)', boxShadow: '0 12px 0 #b84a1a, 0 22px 50px rgba(255,107,53,0.55)', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>
                 <div className={isLarge ? 'text-7xl' : 'text-4xl'}>🔥</div>
                 <div className={isLarge ? 'text-6xl font-black text-white' : 'text-3xl font-black text-white'}>{streak}</div>
@@ -756,17 +757,17 @@ export default function HomePage() {
           if (sId === 'total_xp') return (
             <button onClick={() => setShowXpModal(true)} className="block h-full w-full">
               <StatCard icon="⚡" value={displayXP(xp)} label={t.home.totalXp}
-                gradient="linear-gradient(135deg, #a78bfa, #6C63FF, #4C1D95)" edge="#3D1F9E" glowColor="rgba(108,99,255,0.4)" />
+                gradient="linear-gradient(135deg, #a78bfa, #6C63FF, #4C1D95)" edge="#3D1F9E" glowColor="rgba(108,99,255,0.4)" pulseClass={pulseClass} />
             </button>
           );
           if (sId === 'words') return (
             <Link href="/progress" className="block h-full">
               <StatCard icon="📚" value={learnedCount} label={t.home.words}
-                gradient="linear-gradient(135deg, #0284c7, #38bdf8)" edge="#0369a1" glowColor="rgba(2,132,199,0.4)" />
+                gradient="linear-gradient(135deg, #0284c7, #38bdf8)" edge="#0369a1" glowColor="rgba(2,132,199,0.4)" pulseClass={pulseClass} />
             </Link>
           );
           if (sId === 'daily_goal') return (
-            <div className="rounded-2xl h-full p-4 flex flex-col justify-between animate-heartbeat"
+            <div className={`rounded-2xl h-full p-4 flex flex-col justify-between ${pulseClass}`}
               style={{ background: 'linear-gradient(135deg, #5b21b6, #8b5cf6)', boxShadow: '0 10px 0 #3b0764, 0 18px 40px rgba(91,33,182,0.5)' }}>
               <div className="flex items-center gap-3">
                 <div className="relative shrink-0" style={{ width: 50, height: 50 }}>
@@ -797,7 +798,7 @@ export default function HomePage() {
           );
           if (sId === 'level') return (
             <button onClick={() => setShowXpModal(true)} className="block h-full w-full text-left">
-              <div className="rounded-2xl h-full p-4 flex flex-col justify-between animate-heartbeat"
+              <div className={`rounded-2xl h-full p-4 flex flex-col justify-between ${pulseClass}`}
                 style={{ background: 'linear-gradient(135deg, #be123c, #fb7185)', boxShadow: '0 10px 0 #881337, 0 18px 40px rgba(190,18,60,0.5)', textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
                 <div>
                   <div className="text-2xl mb-1">⭐</div>
@@ -814,7 +815,7 @@ export default function HomePage() {
             </button>
           );
           if (sId === 'wod') return wod ? (
-            <div className="rounded-2xl h-full p-4 flex flex-col justify-between animate-heartbeat"
+            <div className={`rounded-2xl h-full p-4 flex flex-col justify-between ${pulseClass}`}
               style={{ background: 'linear-gradient(135deg, #a21caf, #e879f9)', boxShadow: '0 10px 0 #701a75, 0 18px 40px rgba(162,28,175,0.5)', textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
               <div className="flex items-start justify-between gap-1">
                 <div className="flex-1 min-w-0">
@@ -851,7 +852,7 @@ export default function HomePage() {
                   </div>
                 )}
                 <Link href={`/classes/${card.classId}/home`} className="block h-full">
-                  <div className="rounded-2xl h-full p-3 flex flex-col justify-between hover:-translate-y-1 transition-all duration-200 animate-heartbeat"
+                  <div className={`rounded-2xl h-full p-3 flex flex-col justify-between hover:-translate-y-1 transition-all duration-200 ${pulseClass}`}
                     style={{ background: bg, boxShadow: `0 10px 0 ${edge}, 0 18px 40px ${glow}`, textShadow: '0 1px 3px rgba(0,0,0,0.35)' }}>
                     <div className="flex items-start justify-between gap-1">
                       <div className="flex-1 min-w-0">
@@ -879,7 +880,7 @@ export default function HomePage() {
             const a = ACTION_MAP['xp_history'];
             return (
               <button onClick={() => setShowXpHistoryModal(true)} className="block h-full w-full">
-                <div className="rounded-2xl h-full p-4 flex flex-col items-center justify-center text-center gap-2 hover:-translate-y-1 transition-all duration-200 animate-heartbeat"
+                <div className={`rounded-2xl h-full p-4 flex flex-col items-center justify-center text-center gap-2 hover:-translate-y-1 transition-all duration-200 ${pulseClass}`}
                   style={{ background: a.gradient, boxShadow: `0 10px 0 ${a.edge}, 0 18px 40px ${a.glow}`, textShadow: '0 1px 3px rgba(0,0,0,0.35)' }}>
                   <div className="text-3xl">{a.icon}</div>
                   <div className="font-bold text-sm text-white leading-tight">{a.title}</div>
@@ -898,7 +899,7 @@ export default function HomePage() {
                   </div>
                 )}
                 <Link href={a.href} className="block h-full">
-                  <div className="rounded-2xl h-full p-4 flex flex-col items-center justify-center text-center gap-2 hover:-translate-y-1 transition-all duration-200 animate-heartbeat"
+                  <div className={`rounded-2xl h-full p-4 flex flex-col items-center justify-center text-center gap-2 hover:-translate-y-1 transition-all duration-200 ${pulseClass}`}
                     style={{ background: a.gradient, boxShadow: `0 10px 0 ${a.edge}, 0 18px 40px ${a.glow}`, textShadow: '0 1px 3px rgba(0,0,0,0.35)' }}>
                     <div className="text-3xl">{a.icon}</div>
                     <div className="font-bold text-sm text-white leading-tight">{a.title}</div>
@@ -1314,13 +1315,13 @@ export default function HomePage() {
   );
 }
 
-function StatCard({ icon, value, label, gradient, edge, glowColor }: {
+function StatCard({ icon, value, label, gradient, edge, glowColor, pulseClass = '' }: {
   icon: string; value: number | string; label: string;
-  gradient: string; edge: string; glowColor: string;
+  gradient: string; edge: string; glowColor: string; pulseClass?: string;
 }) {
   return (
     <div
-      className="rounded-2xl p-4 flex flex-col items-center text-center gap-1 transition-all duration-200 hover:-translate-y-1 w-full h-full animate-heartbeat"
+      className={`rounded-2xl p-4 flex flex-col items-center text-center gap-1 transition-all duration-200 hover:-translate-y-1 w-full h-full ${pulseClass}`}
       style={{
         background: gradient,
         boxShadow: `0 10px 0 ${edge}, 0 18px 40px ${glowColor}`,

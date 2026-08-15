@@ -26,7 +26,7 @@ export default function SettingsPage() {
   const router = useRouter();
   const [settings, setSettings] = useState<UserSettings>(() =>
     typeof window === 'undefined'
-      ? { name: '', dailyGoal: 10, languageLevel: 'B1', defaultAccent: 'us', autoPlayOnReveal: true, sessionSize: 20, fontSize: 'normal', studyOrder: 'random', quizDirection: 'word-to-uz', reduceMotion: false, uiLanguage: 'en' as const, showOnLeaderboard: true }
+      ? { name: '', dailyGoal: 10, languageLevel: 'B1', defaultAccent: 'us', autoPlayOnReveal: true, sessionSize: 20, fontSize: 'normal', studyOrder: 'random', quizDirection: 'word-to-uz', reduceMotion: false, uiLanguage: 'en' as const, showOnLeaderboard: true, pulseEnabled: true, pulseSpeed: 'normal' as const }
       : getSettings()
   );
   const [saved, setSaved] = useState(false);
@@ -541,6 +541,46 @@ export default function SettingsPage() {
             </button>
           </div>
         </div>
+      </div>
+
+      {/* Card Pulse */}
+      <div className="card space-y-4" style={{ borderTop: '3px solid #ec4899', boxShadow: '0 4px 20px rgba(0,0,0,0.07)' }}>
+        <div className="flex items-center gap-3">
+          <div className="w-11 h-11 rounded-2xl flex items-center justify-center text-xl shrink-0"
+            style={{ background: 'linear-gradient(135deg, #ec4899, #f472b6)', boxShadow: '0 4px 0 #be185d, 0 8px 16px rgba(236,72,153,0.35)' }}>💓</div>
+          <h2 className="font-black text-base">Card Pulse</h2>
+        </div>
+
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <p className="text-sm font-semibold">Animate cards</p>
+            <p className="text-xs text-[var(--text-muted)]">Cards gently pulse on the home screen</p>
+          </div>
+          <button
+            onClick={() => { const s = { ...settings, pulseEnabled: !(settings.pulseEnabled ?? true) }; saveSettings(s); setSettings(s); }}
+            className={`relative w-14 h-7 rounded-full transition-colors duration-300 shrink-0 ${(settings.pulseEnabled ?? true) ? 'bg-[var(--primary)]' : 'bg-[var(--border)]'}`}
+            aria-label="Toggle card pulse"
+          >
+            <span className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-300 ${(settings.pulseEnabled ?? true) ? 'translate-x-7' : 'translate-x-0'}`} />
+          </button>
+        </div>
+
+        {(settings.pulseEnabled ?? true) && (
+          <div>
+            <p className="text-sm font-semibold mb-3">Speed</p>
+            <div className="flex gap-2">
+              {(['slow', 'normal', 'fast'] as const).map(sp => (
+                <button
+                  key={sp}
+                  onClick={() => { const s = { ...settings, pulseSpeed: sp }; saveSettings(s); setSettings(s); }}
+                  className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all ${(settings.pulseSpeed ?? 'normal') === sp ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface-2)] text-[var(--text-muted)]'}`}
+                >
+                  {sp.charAt(0).toUpperCase() + sp.slice(1)}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Voice */}

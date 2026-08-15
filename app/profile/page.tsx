@@ -62,7 +62,7 @@ export default function ProfilePage() {
   const [settings, setSettings] = useState<UserSettings>({
     name: 'Learner', dailyGoal: 10, languageLevel: 'B1', defaultAccent: 'us',
     autoPlayOnReveal: true, sessionSize: 20, fontSize: 'normal',
-    studyOrder: 'random', quizDirection: 'word-to-uz', reduceMotion: false, uiLanguage: 'en', showOnLeaderboard: true,
+    studyOrder: 'random', quizDirection: 'word-to-uz', reduceMotion: false, uiLanguage: 'en', showOnLeaderboard: true, pulseEnabled: true, pulseSpeed: 'normal' as const,
   });
   const [streak, setStreak]           = useState(0);
   const [xp, setXp]                   = useState(0);

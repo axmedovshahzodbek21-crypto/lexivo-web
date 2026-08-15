@@ -84,6 +84,8 @@ export interface UserSettings {
   reduceMotion: boolean;
   uiLanguage: 'en' | 'uz';
   showOnLeaderboard: boolean;
+  pulseEnabled: boolean;
+  pulseSpeed: 'slow' | 'normal' | 'fast';
 }
 
 export interface CustomList {

@@ -53,7 +53,7 @@ export default function OnboardingPage() {
   const finish = () => {
     setFinishing(true);
     const now = new Date().toISOString();
-    saveSettings({ name: name.trim() || 'Learner', dailyGoal: goal, languageLevel: level, defaultAccent: 'us', autoPlayOnReveal: true, sessionSize: 20, fontSize: 'normal', studyOrder: 'random', quizDirection: 'word-to-uz', reduceMotion: false, uiLanguage: getSettings().uiLanguage, showOnLeaderboard: true });
+    saveSettings({ name: name.trim() || 'Learner', dailyGoal: goal, languageLevel: level, defaultAccent: 'us', autoPlayOnReveal: true, sessionSize: 20, fontSize: 'normal', studyOrder: 'random', quizDirection: 'word-to-uz', reduceMotion: false, uiLanguage: getSettings().uiLanguage, showOnLeaderboard: true, pulseEnabled: true, pulseSpeed: 'normal' });
     saveLevelUpdatedAt(now);
     saveNameUpdatedAt(now);
     saveSettingsUpdatedAt(now);

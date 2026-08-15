@@ -87,6 +87,8 @@ const SETTINGS_DEFAULTS: UserSettings = {
   reduceMotion: false,
   uiLanguage: 'en',
   showOnLeaderboard: true,
+  pulseEnabled: true,
+  pulseSpeed: 'normal',
 };
 
 // uiLanguage lives in its own key so pullAll's saveSettings call never overwrites it
