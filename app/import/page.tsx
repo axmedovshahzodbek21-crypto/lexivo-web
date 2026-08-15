@@ -207,12 +207,8 @@ function ImportPageInner() {
   const [wordLangCode, setWordLangCode] = useState('en-US');
   const [wordsInput, setWordsInput] = useState('');
   const [pasted, setPasted] = useState('');
-  const [copied1, setCopied1] = useState(false);
-  const [copied2, setCopied2] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [added, setAdded] = useState(false);
-  const [open1, setOpen1] = useState(false);
-  const [open2, setOpen2] = useState(false);
-  const [openFmt, setOpenFmt] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [tutorialLang, setTutorialLang] = useState<'en' | 'uz' | 'ru'>('en');
 
@@ -226,12 +222,12 @@ function ImportPageInner() {
   const parseResult = useMemo(() => parseOutput(pasted, wordLangCode), [pasted, wordLangCode]);
   const parsed = parseResult.words;
 
-  function copyPrompt(which: 1 | 2) {
-    const words = wordsInput.trim() || (which === 2 ? 'apple - olma\nbook - kitob' : 'apple, book, water');
-    const text = which === 1 ? buildPrompt1(wordLang, transLang, words) : buildPrompt2(wordLang, transLang, words);
+  function copyPrompt(hasTranslations: boolean) {
+    const words = wordsInput.trim() || (hasTranslations ? 'apple - olma\nbook - kitob' : 'apple, book, water');
+    const text = hasTranslations ? buildPrompt2(wordLang, transLang, words) : buildPrompt1(wordLang, transLang, words);
     navigator.clipboard.writeText(text);
-    if (which === 1) { setCopied1(true); setTimeout(() => setCopied1(false), 2000); }
-    else { setCopied2(true); setTimeout(() => setCopied2(false), 2000); }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
   }
 
   function handleAdd() {
@@ -319,37 +315,33 @@ function ImportPageInner() {
 
         {/* Language selectors */}
         <div className="card space-y-3">
-          <div className="flex gap-3">
-            <div className="flex-1">
-              <label className="text-xs font-medium text-[var(--text-muted)] mb-1 block">{t.import.langWord}</label>
-              <select
-                value={wordLang}
-                onChange={e => {
-                  const lang = LANGUAGES.find(l => l.label === e.target.value);
-                  setWordLang(e.target.value);
-                  if (lang) setWordLangCode(lang.code);
-                }}
-                className="w-full px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
-              >
-                {LANGUAGES.map(l => <option key={l.code}>{l.label}</option>)}
-              </select>
-            </div>
-            <div className="flex-1">
-              <label className="text-xs font-medium text-[var(--text-muted)] mb-1 block">{t.import.langTranslation}</label>
-              <select
-                value={transLang}
-                onChange={e => setTransLang(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
-              >
-                {LANGUAGES.map(l => <option key={l.code}>{l.label}</option>)}
-              </select>
-            </div>
+          <p className="text-xs font-bold text-[var(--text-muted)]">Word Language / Translation Language</p>
+          <div className="flex items-center gap-3">
+            <select
+              value={wordLang}
+              onChange={e => {
+                const lang = LANGUAGES.find(l => l.label === e.target.value);
+                setWordLang(e.target.value);
+                if (lang) setWordLangCode(lang.code);
+              }}
+              className="flex-1 px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+            >
+              {LANGUAGES.map(l => <option key={l.code}>{l.label}</option>)}
+            </select>
+            <span className="text-[var(--text-muted)] font-bold">→</span>
+            <select
+              value={transLang}
+              onChange={e => setTransLang(e.target.value)}
+              className="flex-1 px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+            >
+              {LANGUAGES.map(l => <option key={l.code}>{l.label}</option>)}
+            </select>
           </div>
         </div>
 
-        {/* Words input — embedded directly into whichever prompt you copy below */}
+        {/* Step 1: words input + copy prompt */}
         <div className="card space-y-3">
-          <p className="font-semibold text-sm text-[var(--text)]">1. Enter words to import</p>
+          <p className="text-sm font-bold text-[var(--text)]">1. Enter words to import</p>
           <textarea
             value={wordsInput}
             onChange={e => setWordsInput(e.target.value)}
@@ -357,93 +349,25 @@ function ImportPageInner() {
             rows={4}
             className="w-full px-3 py-2.5 rounded-xl bg-[var(--surface-2)] text-[var(--text)] text-sm border border-[var(--border)] outline-none focus:border-[var(--primary)] resize-none"
           />
-        </div>
-
-        {/* Prompt 1 */}
-        <div className="card space-y-3">
-          <button onClick={() => setOpen1(p => !p)} className="w-full flex items-center justify-between">
-            <div className="text-left">
-              <p className="font-semibold text-sm text-[var(--text)]">{t.import.prompt1Title}</p>
-              <p className="text-xs text-[var(--text-muted)] mt-0.5">{t.import.prompt1Desc}</p>
-            </div>
-            <span className="text-[var(--text-muted)] ml-2">{open1 ? '▲' : '▼'}</span>
-          </button>
-          {open1 && (
-            <div className="space-y-2">
-              <pre className="text-xs bg-[var(--surface-2)] rounded-xl p-3 whitespace-pre-wrap text-[var(--text)] leading-relaxed overflow-x-auto">
-                {buildPrompt1(wordLang, transLang, wordsInput.trim() || 'apple, book, water')}
-              </pre>
-              <button onClick={() => copyPrompt(1)} className="btn-primary w-full py-2 text-sm">
-                {copied1 ? t.import.copied : t.import.copyPrompt}
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* Prompt 2 */}
-        <div className="card space-y-3">
-          <button onClick={() => setOpen2(p => !p)} className="w-full flex items-center justify-between">
-            <div className="text-left">
-              <p className="font-semibold text-sm text-[var(--text)]">{t.import.prompt2Title}</p>
-              <p className="text-xs text-[var(--text-muted)] mt-0.5">{t.import.prompt2Desc}</p>
-            </div>
-            <span className="text-[var(--text-muted)] ml-2">{open2 ? '▲' : '▼'}</span>
-          </button>
-          {open2 && (
-            <div className="space-y-2">
-              <pre className="text-xs bg-[var(--surface-2)] rounded-xl p-3 whitespace-pre-wrap text-[var(--text)] leading-relaxed overflow-x-auto">
-                {buildPrompt2(wordLang, transLang, wordsInput.trim() || 'apple - olma\nbook - kitob')}
-              </pre>
-              <button onClick={() => copyPrompt(2)} className="btn-primary w-full py-2 text-sm">
-                {copied2 ? t.import.copied : t.import.copyPrompt}
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* Format reference */}
-        <div className="card space-y-3">
-          <button onClick={() => setOpenFmt(p => !p)} className="w-full flex items-center justify-between">
-            <div className="text-left">
-              <p className="font-semibold text-sm text-[var(--text)]">Format reference</p>
-              <p className="text-xs text-[var(--text-muted)] mt-0.5">Exact structure expected — open if pasting manually or fixing errors</p>
-            </div>
-            <span className="text-[var(--text-muted)] ml-2">{openFmt ? '▲' : '▼'}</span>
-          </button>
-          {openFmt && (
-            <div className="space-y-3">
-              <p className="text-xs text-[var(--text-muted)]">Each word is one block. Blocks are separated by <code className="bg-[var(--surface-2)] px-1 py-0.5 rounded font-mono">---</code> on its own line.</p>
-              <div className="rounded-xl bg-[var(--surface-2)] p-3 space-y-1 font-mono text-xs leading-relaxed">
-                <div><span className="text-[var(--primary)] font-bold">word:</span><span className="text-[var(--text)]"> enormous</span><span className="ml-2 text-green-500 font-sans font-semibold text-[10px]">required</span></div>
-                <div><span className="text-[var(--primary)] font-bold">translation:</span><span className="text-[var(--text)]"> ulkan</span><span className="ml-2 text-green-500 font-sans font-semibold text-[10px]">required</span></div>
-                <div><span className="text-[var(--text-muted)]">definition:</span><span className="text-[var(--text)]"> extremely large in size</span><span className="ml-2 text-[var(--text-muted)] font-sans text-[10px]">optional</span></div>
-                <div><span className="text-[var(--text-muted)]">example1:</span><span className="text-[var(--text)]"> The enormous building towered above the city.</span><span className="ml-2 text-[var(--text-muted)] font-sans text-[10px]">optional</span></div>
-                <div><span className="text-[var(--text-muted)]">example1Translation:</span><span className="text-[var(--text)]"> Ulkan bino shahar ustida baland turardi.</span><span className="ml-2 text-[var(--text-muted)] font-sans text-[10px]">optional</span></div>
-                <div><span className="text-[var(--text-muted)]">example2:</span><span className="text-[var(--text)]"> She faced an enormous challenge at work.</span><span className="ml-2 text-[var(--text-muted)] font-sans text-[10px]">optional</span></div>
-                <div><span className="text-[var(--text-muted)]">example2Translation:</span><span className="text-[var(--text)]"> U ishda ulkan muammoga duch keldi.</span><span className="ml-2 text-[var(--text-muted)] font-sans text-[10px]">optional</span></div>
-                <div><span className="text-[var(--text-muted)]">example3 … example5:</span><span className="text-[var(--text-muted)] italic"> (same pattern)</span><span className="ml-2 text-[var(--text-muted)] font-sans text-[10px]">optional</span></div>
-                <div className="pt-1 text-[var(--text-muted)]">---</div>
-                <div className="pt-1 text-[var(--text-muted)] italic">next word block goes here...</div>
-              </div>
-              <div className="rounded-xl border border-amber-200 bg-amber-50 dark:bg-amber-900/10 dark:border-amber-800 p-3 space-y-1">
-                <p className="text-xs font-semibold text-amber-700 dark:text-amber-400">Common mistakes</p>
-                <ul className="text-xs text-amber-600 dark:text-amber-400 space-y-0.5 list-disc list-inside">
-                  <li>Missing <code className="bg-amber-100 dark:bg-amber-900/30 px-1 rounded">---</code> separator between words</li>
-                  <li>Using <code className="bg-amber-100 dark:bg-amber-900/30 px-1 rounded">**bold**</code> or markdown formatting in values</li>
-                  <li><code className="bg-amber-100 dark:bg-amber-900/30 px-1 rounded">word</code> or <code className="bg-amber-100 dark:bg-amber-900/30 px-1 rounded">translation</code> field missing entirely</li>
-                </ul>
-              </div>
-            </div>
-          )}
+          <div className="space-y-2">
+            <button
+              onClick={() => copyPrompt(false)}
+              className="w-full py-2.5 rounded-xl text-sm font-semibold border border-[var(--primary)] text-[var(--primary)] hover:bg-[var(--primary-bg)] transition-colors"
+            >📋 Copy Prompt — just words, AI translates</button>
+            <button
+              onClick={() => copyPrompt(true)}
+              className="w-full py-2.5 rounded-xl text-sm font-semibold border border-[var(--border)] text-[var(--text-muted)] hover:bg-[var(--surface-2)] transition-colors"
+            >📋 Copy Prompt — I already have translations</button>
+          </div>
         </div>
 
         {/* Paste area */}
         <div className="card space-y-2">
-          <p className="font-semibold text-sm text-[var(--text)]">{t.import.pasteTitle}</p>
+          <p className="font-semibold text-sm text-[var(--text)]">2. Paste AI output</p>
           <textarea
             value={pasted}
             onChange={e => setPasted(e.target.value)}
-            placeholder={t.import.pastePlaceholder}
+            placeholder="Paste the AI response here..."
             rows={8}
             className="w-full px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] resize-none font-mono"
           />
@@ -523,6 +447,13 @@ function ImportPageInner() {
         )}
 
       </div>
+
+      {/* Copy toast */}
+      {copied && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl text-sm font-semibold text-white shadow-xl pointer-events-none" style={{ background: 'var(--primary)' }}>
+          📋 Prompt copied — paste into an AI chatbot
+        </div>
+      )}
     </div>
   );
 }
