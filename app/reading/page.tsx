@@ -94,7 +94,7 @@ function PassageView({ passage, onBack }: { passage: ReadingPassage; onBack: () 
         </div>
       )}
 
-      <BackButton label="Back to Library" className="mb-6" />
+      <BackButton label="Back to Library" className="mb-6" onClick={onBack} />
 
       <span
         className="inline-block text-xs font-bold px-3 py-1 rounded-full mb-4"

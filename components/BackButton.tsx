@@ -6,9 +6,10 @@ interface BackButtonProps {
   href?: string;
   label?: string;
   className?: string;
+  onClick?: () => void;
 }
 
-export default function BackButton({ href, label = 'Back', className = 'mb-6' }: BackButtonProps) {
+export default function BackButton({ href, label = 'Back', className = 'mb-6', onClick }: BackButtonProps) {
   const router = useRouter();
 
   const inner = (
@@ -31,7 +32,7 @@ export default function BackButton({ href, label = 'Back', className = 'mb-6' }:
   }
 
   return (
-    <button onClick={() => router.back()} className={`inline-block ${className}`}>
+    <button onClick={onClick ?? (() => router.back())} className={`inline-block ${className}`}>
       {inner}
     </button>
   );

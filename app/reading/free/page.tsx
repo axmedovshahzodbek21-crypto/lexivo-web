@@ -302,7 +302,7 @@ export default function ReadingPage() {
   if (!reading) {
     return (
       <div className="max-w-5xl mx-auto px-6 py-10 space-y-6 pb-24">
-        <BackButton href="/" />
+        <BackButton href="/reading" />
         <div>
           <h1 className="text-3xl font-bold text-[var(--text)] mb-2">Reading</h1>
           <p className="text-sm text-[var(--text-muted)] leading-relaxed">
