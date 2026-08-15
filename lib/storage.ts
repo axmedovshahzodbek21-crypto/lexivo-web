@@ -966,7 +966,12 @@ export function updateFolderMap(collectionName: string, folderName: string) {
   localStorage.setItem(FOLDER_MAP_KEY, JSON.stringify(map));
 }
 
-export function getImportedWords(): ImportedWord[] {
+// Includes soft-deleted (tombstoned) words. Only sync push/merge logic should
+// use this — everything else should use getImportedWords() below, which hides
+// tombstones. Deletions are kept as tombstones (rather than removed outright)
+// so they can propagate to other devices instead of the deleted word silently
+// reappearing on next sync pull.
+export function getImportedWordsRaw(): ImportedWord[] {
   const folderMap = getFolderMap();
   return get<ImportedWord[]>(IMPORTED_KEY, []).map(w => {
     const col = w.collectionName ?? DEFAULT_COLLECTION;
@@ -976,6 +981,10 @@ export function getImportedWords(): ImportedWord[] {
       folderName: w.folderName ?? folderMap[col],
     };
   });
+}
+
+export function getImportedWords(): ImportedWord[] {
+  return getImportedWordsRaw().filter(w => !w.deletedAt);
 }
 
 export function getImportedWordsByCollection(collectionName: string, folderName?: string): ImportedWord[] {
@@ -1055,34 +1064,46 @@ function sanitizeImportedWord(w: ImportedWord): ImportedWord {
 }
 
 export function addImportedWords(words: ImportedWord[], collectionName: string, folderName?: string) {
-  const existing = getImportedWords();
-  const slots = Math.max(0, MAX_IMPORTED_WORDS - existing.length);
+  const raw = getImportedWordsRaw();
+  const live = raw.filter(w => !w.deletedAt);
+  const slots = Math.max(0, MAX_IMPORTED_WORDS - live.length);
   if (slots === 0) return;
-  const existingSet = new Set(existing.map(w => w.word.toLowerCase().trim()));
+  // Dedupe against live words only — re-importing a word that was previously
+  // deleted (a tombstone) is allowed, so it comes back as a fresh entry.
+  const existingSet = new Set(live.map(w => w.word.toLowerCase().trim()));
   const fresh = words
     .filter(w => w.word?.trim() && !existingSet.has(w.word.toLowerCase().trim()))
     .slice(0, slots)
     .map(w => sanitizeImportedWord({ ...w, collectionName, ...(folderName ? { folderName } : {}) }));
-  set(IMPORTED_KEY, [...existing, ...fresh]);
+  set(IMPORTED_KEY, [...raw, ...fresh]);
   if (folderName) updateFolderMap(collectionName, folderName);
 }
 
+// Soft-delete: mark with a tombstone timestamp instead of removing outright,
+// so the deletion syncs to (and takes effect on) other devices too.
 export function deleteImportedWord(word: string, collectionName: string, folderName?: string) {
-  set(IMPORTED_KEY, getImportedWords().filter(w =>
-    !(w.word === word && w.collectionName === collectionName &&
+  const now = Date.now();
+  set(IMPORTED_KEY, getImportedWordsRaw().map(w =>
+    (w.word === word && w.collectionName === collectionName &&
       (folderName === undefined ? !w.folderName : w.folderName === folderName))
+      ? { ...w, deletedAt: now }
+      : w
   ));
 }
 
 export function deleteImportedCollection(collectionName: string, folderName?: string) {
-  set(IMPORTED_KEY, getImportedWords().filter(w =>
-    !(w.collectionName === collectionName &&
+  const now = Date.now();
+  set(IMPORTED_KEY, getImportedWordsRaw().map(w =>
+    (w.collectionName === collectionName &&
       (folderName === undefined ? !w.folderName : w.folderName === folderName))
+      ? { ...w, deletedAt: now }
+      : w
   ));
 }
 
 export function deleteImportedFolder(folderName: string) {
-  set(IMPORTED_KEY, getImportedWords().filter(w => w.folderName !== folderName));
+  const now = Date.now();
+  set(IMPORTED_KEY, getImportedWordsRaw().map(w => w.folderName === folderName ? { ...w, deletedAt: now } : w));
 }
 
 export function saveImportedWords(words: ImportedWord[]) {

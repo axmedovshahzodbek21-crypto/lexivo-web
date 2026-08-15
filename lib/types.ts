@@ -116,6 +116,7 @@ export interface ImportedWord {
   addedAt: number;
   collectionName?: string; // optional for backward compat; defaults to 'My Words'
   folderName?: string;     // optional; if set, collection lives inside this folder
+  deletedAt?: number;      // tombstone: set instead of removing, so deletion syncs across devices
 }
 
 export interface ImportedCollection {

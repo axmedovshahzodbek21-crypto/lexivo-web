@@ -1,6 +1,6 @@
 import { supabase } from './supabase';
 import type { UserSettings, LearnedWord, SRSWord, UnitProgress } from './types';
-import { getSettings, saveSettings, getLearnedWords, saveLearnedWord, getSRSWords, getImportedWords, localDateStr, getProfilePicUrl, saveProfilePicUrl } from './storage';
+import { getSettings, saveSettings, getLearnedWords, saveLearnedWord, getSRSWords, getImportedWordsRaw, localDateStr, getProfilePicUrl, saveProfilePicUrl } from './storage';
 import type { HardWordEntry } from './storage';
 import { getNotifSettings, saveNotifSettings } from './notifications';
 
@@ -162,7 +162,7 @@ export async function pushLists(): Promise<void> {
         xp_history:       lsJSON<unknown[]>('lexivo_xp_history', []),
         unit_progress:    getAllUnitProgress(),
         review_log:       lsJSON<Record<string, number[]>>('lexivo_review_log', {}),
-        imported_words:   getImportedWords(),
+        imported_words:   getImportedWordsRaw(), // includes tombstones so deletions propagate
         achievements:     Object.entries(lsJSON<Record<string, string>>('lexivo_achievement_dates', {})).map(([id, date]) => ({ id, date })),
         lists_updated_at: ts,
       }),
@@ -422,16 +422,25 @@ export async function pullAll(): Promise<void> {
       }
     }
 
-    // imported_words
-    if (Array.isArray(row.imported_words) && row.imported_words.length > 0) {
+    // imported_words — per-record last-write-wins merge (keyed by word+collection+folder).
+    // Cloud rows include tombstones (deletedAt), so a deletion made on another
+    // device correctly overwrites a stale local copy instead of being ignored.
+    if (Array.isArray(row.imported_words)) {
       const local = lsJSON<Record<string, unknown>[]>('lexivo_imported_words', []);
-      const localKeys = new Set(local.map(w => `${w['word']}__${w['collectionName'] ?? ''}__${w['folderName'] ?? ''}`));
+      const keyOf = (w: Record<string, unknown>) => `${w['word']}__${w['collectionName'] ?? ''}__${w['folderName'] ?? ''}`;
+      const tsOf = (w: Record<string, unknown>) => (w['deletedAt'] as number | undefined) ?? (w['addedAt'] as number | undefined) ?? 0;
+      const byKey = new Map<string, Record<string, unknown>>();
+      for (const w of local) byKey.set(keyOf(w), w);
       let changed = false;
       for (const w of row.imported_words as Record<string, unknown>[]) {
-        const key = `${w['word']}__${w['collectionName'] ?? ''}__${w['folderName'] ?? ''}`;
-        if (!localKeys.has(key)) { local.push(w); localKeys.add(key); changed = true; }
+        const key = keyOf(w);
+        const existing = byKey.get(key);
+        if (!existing || tsOf(w) > tsOf(existing)) {
+          byKey.set(key, w);
+          changed = true;
+        }
       }
-      if (changed) lsSet('lexivo_imported_words', JSON.stringify(local));
+      if (changed) lsSet('lexivo_imported_words', JSON.stringify(Array.from(byKey.values())));
     }
   } catch {}
 }
