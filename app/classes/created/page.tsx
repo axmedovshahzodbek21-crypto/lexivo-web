@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
+import BackButton from '@/components/BackButton';
 
 function generateCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -111,19 +112,38 @@ export default function CreatedClassesPage() {
 
   return (
     <div className="flex flex-col min-h-screen pb-24 animate-fade-in">
-      <div className="flex items-center gap-3 p-4 border-b border-[var(--border)]">
-        <button onClick={() => router.push('/classes')} className="btn-icon text-lg" aria-label="Go back">←</button>
-        <div className="flex-1">
-          <h1 className="font-bold text-[var(--text)]">🏫 My Classes</h1>
-          <p className="text-xs text-[var(--text-muted)]">Classes you created</p>
+      {/* Gradient hero header */}
+      <div
+        className="relative px-5 pt-5 pb-7"
+        style={{
+          background: 'linear-gradient(135deg, #A78BFA 0%, #6C63FF 50%, #4C1D95 100%)',
+          boxShadow: '0 8px 32px rgba(108,99,255,0.35)',
+        }}
+      >
+        <div style={{ position: 'absolute', right: 16, top: 8, fontSize: 96, fontWeight: 900, color: 'rgba(255,255,255,0.05)', lineHeight: 1, userSelect: 'none', pointerEvents: 'none' }}>🏫</div>
+        <div className="flex items-start justify-between gap-4">
+          <BackButton href="/classes" className="mb-4" />
+          <button
+            onClick={() => setShowCreate(true)}
+            className="shrink-0 px-4 py-2 rounded-full text-sm font-black transition-opacity hover:opacity-90 active:opacity-70"
+            style={{ background: 'rgba(255,255,255,0.22)', color: '#fff', boxShadow: '0 3px 0 rgba(0,0,0,0.2), 0 6px 14px rgba(0,0,0,0.15)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.3)' }}
+          >
+            + Create
+          </button>
         </div>
-        <button
-          onClick={() => setShowCreate(true)}
-          className="px-4 py-2 rounded-xl font-bold text-sm text-white"
-          style={{ background: 'var(--primary)' }}
-        >
-          + Create
-        </button>
+        <div className="flex items-center gap-4">
+          <div
+            className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shrink-0"
+            style={{ background: 'rgba(255,255,255,0.18)', boxShadow: '0 4px 0 rgba(0,0,0,0.15)' }}
+          >🏫</div>
+          <div>
+            <p className="text-xs font-black text-white/50 uppercase tracking-widest mb-0.5">My Classes</p>
+            <h1 className="text-2xl font-black text-white leading-tight" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.25)' }}>
+              {myClasses.length > 0 ? `${myClasses.length} Class${myClasses.length !== 1 ? 'es' : ''}` : 'My Classes'}
+            </h1>
+          </div>
+        </div>
+        <p className="text-sm text-white/65 mt-2 ml-0.5">Classes you created as a teacher.</p>
       </div>
 
       <div className="p-4 max-w-5xl mx-auto w-full">
