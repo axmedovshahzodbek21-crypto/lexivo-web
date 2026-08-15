@@ -265,13 +265,24 @@ export default function ClassHomeworkPage() {
     );
   }
 
+  const _n = (id as string).split('').reduce((a: number, c: string) => a + c.charCodeAt(0), 0);
+  const _grad = ['from-indigo-500 to-purple-500','from-pink-500 to-rose-400','from-emerald-500 to-teal-400','from-blue-500 to-cyan-400','from-amber-500 to-orange-400','from-violet-500 to-purple-400','from-red-500 to-pink-400','from-cyan-500 to-blue-400'][_n % 8];
+  const _glow = ['#818cf8','#ec4899','#22c55e','#3b82f6','#f59e0b','#8b5cf6','#ef4444','#06b6d4'][_n % 8];
+
   return (
     <div className="flex flex-col min-h-screen animate-fade-in pb-24">
-      <div className="flex items-center gap-3 px-4 pt-4 pb-2">
-        <button onClick={() => router.push(`/classes/${id}/home`)} className="btn-icon">←</button>
-        <div className="min-w-0">
-          {className && <p className="text-xs text-[var(--text-muted)] font-medium truncate">{className}</p>}
-          <p className="font-bold text-[var(--text)] text-sm">Homework</p>
+      <div className={`bg-gradient-to-br ${_grad} px-5 pt-5 pb-7 relative`}
+        style={{ boxShadow: `0 8px 32px ${_glow}cc` }}>
+        <div style={{ position: 'absolute', right: 16, top: 8, fontSize: 80, fontWeight: 900, color: 'rgba(255,255,255,0.06)', lineHeight: 1, userSelect: 'none', pointerEvents: 'none' }}>📋</div>
+        <button onClick={() => router.push(`/classes/${id}/home`)} className="inline-flex items-center gap-1.5 text-white/70 hover:text-white text-sm font-medium mb-4 transition-colors">← Back</button>
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shrink-0"
+            style={{ background: 'rgba(255,255,255,0.18)', boxShadow: '0 4px 0 rgba(0,0,0,0.15)' }}>📋</div>
+          <div>
+            <p className="text-xs font-black text-white/50 uppercase tracking-widest mb-0.5">{className || '...'}</p>
+            <h1 className="text-2xl font-black text-white leading-tight" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.25)' }}>Homework</h1>
+            <p className="text-sm text-white/60 mt-1">Assigned folders to review</p>
+          </div>
         </div>
       </div>
       <div className="p-4 space-y-1">

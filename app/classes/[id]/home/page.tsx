@@ -706,7 +706,7 @@ const [memberCount, setMemberCount] = useState(0);
       {/* Hero */}
       <div
         className={`bg-gradient-to-br ${gradient} px-5 pt-6 pb-8 relative`}
-        style={{ boxShadow: `0 8px 32px ${glow}55` }}
+        style={{ boxShadow: `0 8px 32px ${glow}cc` }}
       >
         <div className="flex items-start gap-3 mb-4">
           {isTeacher ? (
