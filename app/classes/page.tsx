@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
+import BackButton from '@/components/BackButton';
 
 function generateCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -112,12 +113,36 @@ export default function ClassesPage() {
 
   return (
     <div className="flex flex-col min-h-screen animate-fade-in">
-      <div className="flex items-center gap-3 p-4 border-b border-[var(--border)]">
-        <button onClick={() => router.back()} className="btn-icon text-lg" aria-label="Go back">←</button>
-        <div className="flex-1">
-          <h1 className="font-bold text-[var(--text)]">🏫 Classes</h1>
-          <p className="text-xs text-[var(--text-muted)]">Create or join a class</p>
+      {/* Gradient hero header */}
+      <div
+        className="relative px-5 pt-5 pb-7"
+        style={{
+          background: 'linear-gradient(135deg, #A78BFA 0%, #6C63FF 50%, #4C1D95 100%)',
+          boxShadow: '0 8px 32px rgba(108,99,255,0.35)',
+        }}
+      >
+        {/* Watermark */}
+        <div style={{
+          position: 'absolute', right: 16, top: 8,
+          fontSize: 96, fontWeight: 900,
+          color: 'rgba(255,255,255,0.05)',
+          lineHeight: 1, userSelect: 'none', pointerEvents: 'none',
+        }}>🏫</div>
+
+        <BackButton className="mb-4" />
+        <div className="flex items-center gap-4">
+          <div
+            className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shrink-0"
+            style={{ background: 'rgba(255,255,255,0.18)', boxShadow: '0 4px 0 rgba(0,0,0,0.15)' }}
+          >🏫</div>
+          <div>
+            <p className="text-xs font-black text-white/50 uppercase tracking-widest mb-0.5">Lexivo</p>
+            <h1 className="text-2xl font-black text-white leading-tight" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.25)' }}>
+              Classes
+            </h1>
+          </div>
         </div>
+        <p className="text-sm text-white/65 mt-2 ml-0.5">Create or join a class with your teacher or students.</p>
       </div>
 
       {/* Tab bar */}
@@ -191,7 +216,8 @@ export default function ClassesPage() {
               </button>
               <button
                 onClick={() => setShowJoin(true)}
-                className="flex-1 py-4 rounded-2xl font-black text-sm transition-all hover:-translate-y-0.5 active:translate-y-0 border border-[var(--border)] bg-[var(--surface)] text-[var(--text)]"
+                className="flex-1 py-4 rounded-2xl font-black text-sm text-white transition-all hover:-translate-y-0.5 active:translate-y-0"
+                style={{ background: 'linear-gradient(135deg, #10b981, #0891b2)', boxShadow: '0 5px 0 rgba(7,120,100,0.55), 0 8px 20px rgba(16,185,129,0.25)' }}
               >
                 Join a Class
               </button>
