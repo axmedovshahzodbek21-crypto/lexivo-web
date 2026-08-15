@@ -31,6 +31,66 @@ function formatTime(s: number) {
   return `${m}:${sec.toString().padStart(2, '0')}`;
 }
 
+// ── Sound (Web Audio, no files) ───────────────────────────────────────────────
+
+let audioCtx: AudioContext | null = null;
+
+function getAudioCtx(): AudioContext | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    if (!audioCtx) {
+      const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      audioCtx = new Ctx();
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+  } catch {
+    return null;
+  }
+}
+
+// Soft slot-machine "tick" — pitch rises slightly as the spin decelerates.
+function playTick(pitch: number) {
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  try {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(420 * pitch, ctx.currentTime);
+    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.09, ctx.currentTime + 0.004);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.06);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.07);
+  } catch {}
+}
+
+// Bright ascending chime for when the spin lands on the final question.
+function playReveal() {
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  try {
+    const freqs = [523.25, 659.25, 783.99]; // C5, E5, G5
+    freqs.forEach((freq, i) => {
+      const start = ctx.currentTime + i * 0.09;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, start);
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.linearRampToValueAtTime(0.2, start + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.4);
+      osc.start(start);
+      osc.stop(start + 0.42);
+    });
+  } catch {}
+}
+
 export default function SpeakingPage() {
   const router = useRouter();
   const [part, setPart] = useState<Part | null>(null);
@@ -76,6 +136,7 @@ export default function SpeakingPage() {
     const runTick = () => {
       tick += 1;
       const isLast = tick >= SPIN_TICKS;
+      const progress = tick / SPIN_TICKS;
       const shown = isLast ? finalItem : randomFrom(pool).item;
 
       if ('question' in shown) {
@@ -87,14 +148,17 @@ export default function SpeakingPage() {
       }
 
       if (isLast) {
+        playReveal();
         setSpinning(false);
         if ('question' in finalItem) setQuestion(finalItem);
         else setCard(finalItem as SpeakingCueCard);
         return;
       }
 
+      // Pitch rises slightly as the spin slows, like a wheel settling down
+      playTick(1 + progress * 0.5);
+
       // Decelerate: ticks start fast (70ms) and slow down toward the end
-      const progress = tick / SPIN_TICKS;
       const delay = 60 + progress * progress * 260;
       window.setTimeout(runTick, delay);
     };
