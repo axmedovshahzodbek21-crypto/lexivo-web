@@ -2157,38 +2157,45 @@ export default function ClassDashboardPage() {
     { key: 'inactive', label: '😴 Inactive' },
   ];
 
+  const _n = (id as string).split('').reduce((a: number, c: string) => a + c.charCodeAt(0), 0);
+  const _grad = ['from-indigo-500 to-purple-500','from-pink-500 to-rose-400','from-emerald-500 to-teal-400','from-blue-500 to-cyan-400','from-amber-500 to-orange-400','from-violet-500 to-purple-400','from-red-500 to-pink-400','from-cyan-500 to-blue-400'][_n % 8];
+  const _glow = ['#818cf8','#ec4899','#22c55e','#3b82f6','#f59e0b','#8b5cf6','#ef4444','#06b6d4'][_n % 8];
+
   return (
     <div className="flex flex-col min-h-screen pb-24 animate-fade-in">
-      {/* Header */}
-      <div className="flex items-center gap-3 p-4 border-b border-[var(--border)]">
-        <button onClick={() => router.push(`/classes/${id}/home`)} className="btn-icon text-lg" aria-label="Go back">←</button>
-        <div className="flex-1 min-w-0">
-          <h1 className="font-bold text-[var(--text)] truncate">{classInfo?.name ?? 'Class Dashboard'}</h1>
-          <div className="flex items-center gap-2 mt-0.5">
-            <span className="text-xs text-[var(--text-muted)]">Join code:</span>
-            <code className="text-xs font-bold text-[var(--primary)]">{classInfo?.join_code}</code>
-            <button onClick={copyCode} className="text-sm hover:scale-110 transition-transform" aria-label="Copy join code">{copied ? '✅' : '📋'}</button>
+      {/* Gradient hero header */}
+      <div className={`bg-gradient-to-br ${_grad} px-5 pt-5 pb-6 relative`}
+        style={{ boxShadow: `0 8px 32px ${_glow}cc` }}>
+        <div style={{ position: 'absolute', right: 16, top: 8, fontSize: 80, fontWeight: 900, color: 'rgba(255,255,255,0.06)', lineHeight: 1, userSelect: 'none', pointerEvents: 'none' }}>🏫</div>
+        <button onClick={() => router.push(`/classes/${id}/home`)} className="inline-flex items-center gap-1.5 text-white/70 hover:text-white text-sm font-medium mb-4 transition-colors">← Back</button>
+        <div className="flex items-center gap-4 mb-4">
+          <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shrink-0"
+            style={{ background: 'rgba(255,255,255,0.18)', boxShadow: '0 4px 0 rgba(0,0,0,0.15)' }}>🏫</div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-black text-white/50 uppercase tracking-widest mb-0.5">Teacher Dashboard</p>
+            <h1 className="text-2xl font-black text-white leading-tight truncate" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.25)' }}>{classInfo?.name ?? '…'}</h1>
+            <div className="flex items-center gap-2 mt-1">
+              <p className="text-xs text-white/60">Join code:</p>
+              <code className="text-xs font-black text-white/90">{classInfo?.join_code}</code>
+              <button onClick={copyCode} className="text-sm hover:scale-110 transition-transform" aria-label="Copy join code">{copied ? '✅' : '📋'}</button>
+            </div>
+          </div>
+          <div className="shrink-0 text-right">
+            <p className="text-2xl font-black text-white leading-tight">{students.length}</p>
+            <p className="text-xs text-white/60">students</p>
           </div>
         </div>
-        <div className="shrink-0 flex flex-col items-end gap-1">
-          <p className="text-xl font-black text-[var(--primary)] leading-tight">{visibleStudents.length}<span className="text-sm text-[var(--text-muted)] font-normal">/{students.length}</span></p>
-          <p className="text-[10px] text-[var(--text-muted)]">students</p>
-          <div className="flex gap-1.5">
-            <button onClick={() => router.push(`/classes/${id}/words`)} className="text-[10px] font-semibold px-2 py-1 rounded-lg bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--primary)] hover:bg-[var(--primary-bg)] transition-colors">
-              📝 Words
-            </button>
-            <button onClick={() => { setShowAnnounce(true); setAnnounceText(''); }} className="text-[10px] font-semibold px-2 py-1 rounded-lg bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--primary)] hover:bg-[var(--primary-bg)] transition-colors">
-              📢 Announce
-            </button>
-            <button onClick={load} className="text-[10px] font-semibold px-2 py-1 rounded-lg bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--primary)] hover:bg-[var(--primary-bg)] transition-colors">
-              🔄 Refresh
-            </button>
-            {students.length > 0 && (
-              <button onClick={exportCSV} className="text-[10px] font-semibold px-2 py-1 rounded-lg bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--primary)] hover:bg-[var(--primary-bg)] transition-colors">
-                📥 CSV
-              </button>
-            )}
-          </div>
+        <div className="flex gap-2 flex-wrap">
+          <button onClick={() => router.push(`/classes/${id}/words`)} className="text-xs font-bold px-3 py-1.5 rounded-xl text-white transition-opacity hover:opacity-80"
+            style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.25)', backdropFilter: 'blur(8px)' }}>📝 Words</button>
+          <button onClick={() => { setShowAnnounce(true); setAnnounceText(''); }} className="text-xs font-bold px-3 py-1.5 rounded-xl text-white transition-opacity hover:opacity-80"
+            style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.25)', backdropFilter: 'blur(8px)' }}>📢 Announce</button>
+          <button onClick={load} className="text-xs font-bold px-3 py-1.5 rounded-xl text-white transition-opacity hover:opacity-80"
+            style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.25)', backdropFilter: 'blur(8px)' }}>🔄 Refresh</button>
+          {students.length > 0 && (
+            <button onClick={exportCSV} className="text-xs font-bold px-3 py-1.5 rounded-xl text-white transition-opacity hover:opacity-80"
+              style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.25)', backdropFilter: 'blur(8px)' }}>📥 CSV</button>
+          )}
         </div>
       </div>
 
