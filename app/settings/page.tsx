@@ -270,17 +270,20 @@ export default function SettingsPage() {
       </div>
 
       {/* Profile hero */}
-      <div className="rounded-2xl p-5" style={{ background: 'linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%)' }}>
+      <div className="rounded-2xl p-5 relative overflow-hidden"
+        style={{ background: 'linear-gradient(135deg, #6366f1 0%, #7c3aed 100%)', boxShadow: '0 10px 0 #3730a3, 0 18px 40px rgba(99,102,241,0.5)' }}>
+        <div style={{ position: 'absolute', right: 12, top: 4, fontSize: 80, color: 'rgba(255,255,255,0.06)', lineHeight: 1, userSelect: 'none', pointerEvents: 'none' }}>⚙️</div>
+        <p className="text-[10px] font-black text-white/50 uppercase tracking-widest mb-3">Your Profile</p>
         <div className="flex items-center gap-4">
           <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl font-bold flex-shrink-0"
-            style={{ background: 'rgba(255,255,255,0.18)', color: 'white' }}>
+            style={{ background: 'rgba(255,255,255,0.18)', color: 'white', boxShadow: '0 4px 0 rgba(0,0,0,0.15)' }}>
             {settings.name ? settings.name[0].toUpperCase() : '?'}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xl font-bold text-white truncate">{settings.name || 'Your name'}</p>
+            <p className="text-xl font-black text-white truncate" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.25)' }}>{settings.name || 'Your name'}</p>
             <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold text-white"
-                style={{ background: 'rgba(255,255,255,0.22)' }}>
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-black text-white"
+                style={{ background: 'rgba(255,255,255,0.22)', backdropFilter: 'blur(8px)' }}>
                 {settings.languageLevel}
               </span>
               <span className="text-xs" style={{ color: 'rgba(255,255,255,0.75)' }}>🎯 {settings.dailyGoal} words/day</span>
@@ -291,7 +294,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Profile edit */}
-      <div className="card space-y-4" style={{ borderTop: '3px solid var(--primary)' }}>
+      <div className="card space-y-4" style={{ borderTop: '3px solid #6366f1', boxShadow: '0 4px 20px rgba(0,0,0,0.07)' }}>
         <div>
           <label className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide block mb-1.5">{t.settings.yourName}</label>
           <input
@@ -372,10 +375,11 @@ export default function SettingsPage() {
       </div>
 
       {/* Learning preferences */}
-      <div className="card space-y-4" style={{ borderTop: '3px solid #10b981' }}>
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center text-sm" style={{ background: 'rgba(16,185,129,0.12)' }}>📖</div>
-          <h2 className="font-bold">{t.settings.learning}</h2>
+      <div className="card space-y-4" style={{ borderTop: '3px solid #10b981', boxShadow: '0 4px 20px rgba(0,0,0,0.07)' }}>
+        <div className="flex items-center gap-3">
+          <div className="w-11 h-11 rounded-2xl flex items-center justify-center text-xl shrink-0"
+            style={{ background: 'linear-gradient(135deg, #10b981, #34d399)', boxShadow: '0 4px 0 #047857, 0 8px 16px rgba(16,185,129,0.35)' }}>📖</div>
+          <h2 className="font-black text-base">{t.settings.learning}</h2>
         </div>
 
         <div>
@@ -425,10 +429,11 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      <div className="card space-y-4" style={{ borderTop: '3px solid #f59e0b' }}>
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center text-sm" style={{ background: 'rgba(245,158,11,0.12)' }}>🎨</div>
-          <h2 className="font-bold">{t.settings.appearance}</h2>
+      <div className="card space-y-4" style={{ borderTop: '3px solid #f59e0b', boxShadow: '0 4px 20px rgba(0,0,0,0.07)' }}>
+        <div className="flex items-center gap-3">
+          <div className="w-11 h-11 rounded-2xl flex items-center justify-center text-xl shrink-0"
+            style={{ background: 'linear-gradient(135deg, #f59e0b, #fbbf24)', boxShadow: '0 4px 0 #b45309, 0 8px 16px rgba(245,158,11,0.35)' }}>🎨</div>
+          <h2 className="font-black text-base">{t.settings.appearance}</h2>
         </div>
 
         <div>
@@ -539,10 +544,11 @@ export default function SettingsPage() {
       </div>
 
       {/* Voice */}
-      <div className="card space-y-4" style={{ borderTop: '3px solid #3b82f6' }}>
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center text-sm" style={{ background: 'rgba(59,130,246,0.12)' }}>🔊</div>
-          <h2 className="font-bold">{t.settings.voice}</h2>
+      <div className="card space-y-4" style={{ borderTop: '3px solid #3b82f6', boxShadow: '0 4px 20px rgba(0,0,0,0.07)' }}>
+        <div className="flex items-center gap-3">
+          <div className="w-11 h-11 rounded-2xl flex items-center justify-center text-xl shrink-0"
+            style={{ background: 'linear-gradient(135deg, #3b82f6, #60a5fa)', boxShadow: '0 4px 0 #1d4ed8, 0 8px 16px rgba(59,130,246,0.35)' }}>🔊</div>
+          <h2 className="font-black text-base">{t.settings.voice}</h2>
         </div>
 
         <div className="flex items-center justify-between gap-4">
@@ -586,10 +592,11 @@ export default function SettingsPage() {
       {notifSupported ? (
         <div className="space-y-3">
           {/* Toggle card */}
-          <div className="card" style={{ borderTop: '3px solid #ef4444' }}>
-            <div className="flex items-center gap-2.5 mb-3">
-              <div className="w-8 h-8 rounded-xl flex items-center justify-center text-sm" style={{ background: 'rgba(239,68,68,0.1)' }}>🔔</div>
-              <h2 className="font-bold">{t.settings.dailyReminder}</h2>
+          <div className="card" style={{ borderTop: '3px solid #ef4444', boxShadow: '0 4px 20px rgba(0,0,0,0.07)' }}>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-11 h-11 rounded-2xl flex items-center justify-center text-xl shrink-0"
+                style={{ background: 'linear-gradient(135deg, #ef4444, #f87171)', boxShadow: '0 4px 0 #b91c1c, 0 8px 16px rgba(239,68,68,0.35)' }}>🔔</div>
+              <h2 className="font-black text-base">{t.settings.dailyReminder}</h2>
             </div>
 
             {permission === 'denied' && (
@@ -669,21 +676,23 @@ export default function SettingsPage() {
           )}
         </div>
       ) : (
-        <div className="card" style={{ borderTop: '3px solid #ef4444' }}>
-          <div className="flex items-center gap-2.5 mb-2">
-            <div className="w-8 h-8 rounded-xl flex items-center justify-center text-sm" style={{ background: 'rgba(239,68,68,0.1)' }}>🔔</div>
-            <h2 className="font-bold">{t.settings.dailyReminder}</h2>
+        <div className="card" style={{ borderTop: '3px solid #ef4444', boxShadow: '0 4px 20px rgba(0,0,0,0.07)' }}>
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-11 h-11 rounded-2xl flex items-center justify-center text-xl shrink-0"
+              style={{ background: 'linear-gradient(135deg, #ef4444, #f87171)', boxShadow: '0 4px 0 #b91c1c, 0 8px 16px rgba(239,68,68,0.35)' }}>🔔</div>
+            <h2 className="font-black text-base">{t.settings.dailyReminder}</h2>
           </div>
           <p className="text-sm text-[var(--text-muted)]">{t.settings.notifNotSupported}</p>
         </div>
       )}
 
       {/* Data backup */}
-      <div className="card space-y-4" style={{ borderTop: '3px solid #10b981' }}>
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center text-sm" style={{ background: 'rgba(16,185,129,0.12)' }}>💾</div>
+      <div className="card space-y-4" style={{ borderTop: '3px solid #10b981', boxShadow: '0 4px 20px rgba(0,0,0,0.07)' }}>
+        <div className="flex items-center gap-3">
+          <div className="w-11 h-11 rounded-2xl flex items-center justify-center text-xl shrink-0"
+            style={{ background: 'linear-gradient(135deg, #10b981, #34d399)', boxShadow: '0 4px 0 #047857, 0 8px 16px rgba(16,185,129,0.35)' }}>💾</div>
           <div>
-            <h2 className="font-bold">{t.settings.dataBackup}</h2>
+            <h2 className="font-black text-base">{t.settings.dataBackup}</h2>
             <p className="text-xs text-[var(--text-muted)]">{t.settings.dataBackupHelper}</p>
           </div>
         </div>
@@ -743,10 +752,11 @@ export default function SettingsPage() {
       </div>
 
       {/* Support */}
-      <div className="card" style={{ borderTop: '3px solid #3b82f6' }}>
-        <div className="flex items-center gap-2.5 mb-3">
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center text-sm" style={{ background: 'rgba(59,130,246,0.12)' }}>💬</div>
-          <h2 className="font-bold">Support</h2>
+      <div className="card" style={{ borderTop: '3px solid #0284c7', boxShadow: '0 4px 20px rgba(0,0,0,0.07)' }}>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-11 h-11 rounded-2xl flex items-center justify-center text-xl shrink-0"
+            style={{ background: 'linear-gradient(135deg, #0284c7, #38bdf8)', boxShadow: '0 4px 0 #0369a1, 0 8px 16px rgba(2,132,199,0.35)' }}>💬</div>
+          <h2 className="font-black text-base">Support</h2>
         </div>
         <a
           href="https://t.me/lexivo_support_bot"
@@ -763,10 +773,11 @@ export default function SettingsPage() {
         </a>
       </div>
 
-      <div className="card space-y-3" style={{ borderTop: '3px solid #6366f1' }}>
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center text-sm" style={{ background: 'rgba(99,102,241,0.12)' }}>ℹ️</div>
-          <h2 className="font-bold">{t.settings.about}</h2>
+      <div className="card space-y-3" style={{ borderTop: '3px solid #6366f1', boxShadow: '0 4px 20px rgba(0,0,0,0.07)' }}>
+        <div className="flex items-center gap-3">
+          <div className="w-11 h-11 rounded-2xl flex items-center justify-center text-xl shrink-0"
+            style={{ background: 'linear-gradient(135deg, #6366f1, #818cf8)', boxShadow: '0 4px 0 #4338ca, 0 8px 16px rgba(99,102,241,0.35)' }}>ℹ️</div>
+          <h2 className="font-black text-base">{t.settings.about}</h2>
         </div>
         <p className="text-sm text-[var(--text-muted)]">
           {t.settings.aboutText}
@@ -788,10 +799,11 @@ export default function SettingsPage() {
       </div>
 
       {/* Account */}
-      <div className="card space-y-3" style={{ borderTop: '3px solid #6366f1' }}>
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center text-sm" style={{ background: 'rgba(99,102,241,0.12)' }}>🔑</div>
-          <h2 className="font-bold">{t.profile.account}</h2>
+      <div className="card space-y-3" style={{ borderTop: '3px solid #6366f1', boxShadow: '0 4px 20px rgba(0,0,0,0.07)' }}>
+        <div className="flex items-center gap-3">
+          <div className="w-11 h-11 rounded-2xl flex items-center justify-center text-xl shrink-0"
+            style={{ background: 'linear-gradient(135deg, #6366f1, #818cf8)', boxShadow: '0 4px 0 #4338ca, 0 8px 16px rgba(99,102,241,0.35)' }}>🔑</div>
+          <h2 className="font-black text-base">{t.profile.account}</h2>
         </div>
         {userEmail ? (
           <>
@@ -825,10 +837,11 @@ export default function SettingsPage() {
       </div>
 
       {/* Danger Zone */}
-      <div className="card space-y-3" style={{ borderColor: 'rgba(239,68,68,0.35)', borderWidth: 2 }}>
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center text-sm" style={{ background: 'rgba(239,68,68,0.1)' }}>⚠️</div>
-          <h2 className="font-bold text-[var(--danger)]">{t.settings.dangerZone}</h2>
+      <div className="card space-y-3" style={{ borderColor: 'rgba(239,68,68,0.5)', borderWidth: 2, boxShadow: '0 4px 20px rgba(239,68,68,0.1)' }}>
+        <div className="flex items-center gap-3">
+          <div className="w-11 h-11 rounded-2xl flex items-center justify-center text-xl shrink-0"
+            style={{ background: 'linear-gradient(135deg, #dc2626, #ef4444)', boxShadow: '0 4px 0 #991b1b, 0 8px 16px rgba(220,38,38,0.35)' }}>⚠️</div>
+          <h2 className="font-black text-base text-[var(--danger)]">{t.settings.dangerZone}</h2>
         </div>
 
         {/* Reset Progress */}
