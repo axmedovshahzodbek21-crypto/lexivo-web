@@ -858,6 +858,7 @@ function CurriculumTab({
   const [detailProgress, setDetailProgress] = useState<{ studentId: string; name: string; modes: Set<string> }[]>([]);
   const [detailLoading, setDetailLoading] = useState(false);
   const [hwDeleting, setHwDeleting] = useState(false);
+  const [hwDeleteConfirm, setHwDeleteConfirm] = useState(false);
 
   const loadCurriculum = async () => {
     setLoading(true);
@@ -1052,6 +1053,7 @@ function CurriculumTab({
 
   const openHwDetail = async (hw: CurrHW) => {
     setHwDetail(hw);
+    setHwDeleteConfirm(false);
     setDetailLoading(true);
     const { data } = await supabase.from('class_homework_progress').select('student_id, mode').eq('homework_id', hw.id);
     const byStudent: Record<string, Set<string>> = {};
@@ -1065,10 +1067,11 @@ function CurriculumTab({
   };
 
   const deleteHomework = async () => {
-    if (!hwDetail || !confirm('Delete this homework assignment?')) return;
+    if (!hwDetail) return;
     setHwDeleting(true);
     await supabase.from('class_homework').delete().eq('id', hwDetail.id);
     setHwDetail(null);
+    setHwDeleteConfirm(false);
     setHwDeleting(false);
     await loadCurriculum();
   };
@@ -1599,7 +1602,7 @@ function CurriculumTab({
 
       {/* ── Homework detail modal ── */}
       {hwDetail && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60" onClick={() => setHwDetail(null)}>
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60" onClick={() => { setHwDetail(null); setHwDeleteConfirm(false); }}>
           <div
             className="w-full max-w-md flex flex-col max-h-[82vh]"
             style={{
@@ -1635,7 +1638,7 @@ function CurriculumTab({
                   </div>
                 </div>
                 <button
-                  onClick={deleteHomework}
+                  onClick={() => setHwDeleteConfirm(true)}
                   disabled={hwDeleting}
                   className="shrink-0 active:scale-95 transition-transform disabled:opacity-50"
                   style={{
@@ -1646,6 +1649,34 @@ function CurriculumTab({
                   }}
                 >{hwDeleting ? 'Deleting…' : '🗑 Delete'}</button>
               </div>
+
+              {hwDeleteConfirm && (
+                <div
+                  className="mt-3 flex items-center justify-between gap-3 px-3.5 py-3 rounded-xl"
+                  style={{
+                    background: 'color-mix(in srgb, var(--danger) 10%, transparent)',
+                    border: '1px solid color-mix(in srgb, var(--danger) 30%, transparent)',
+                  }}
+                >
+                  <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)', lineHeight: 1.35 }}>
+                    Delete this homework? Progress for all assigned students will be lost.
+                  </p>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      onClick={() => setHwDeleteConfirm(false)}
+                      disabled={hwDeleting}
+                      className="active:scale-95 transition-transform disabled:opacity-50"
+                      style={{ fontSize: 11, fontWeight: 700, padding: '7px 12px', borderRadius: 10, background: 'var(--surface-2)', color: 'var(--text)' }}
+                    >Cancel</button>
+                    <button
+                      onClick={deleteHomework}
+                      disabled={hwDeleting}
+                      className="active:scale-95 transition-transform disabled:opacity-50"
+                      style={{ fontSize: 11, fontWeight: 700, padding: '7px 12px', borderRadius: 10, background: 'var(--danger)', color: 'white' }}
+                    >{hwDeleting ? 'Deleting…' : 'Yes, delete'}</button>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Student list */}
@@ -1709,7 +1740,7 @@ function CurriculumTab({
             {/* Close */}
             <div className="shrink-0 px-5 pb-6 pt-3" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
               <button
-                onClick={() => setHwDetail(null)}
+                onClick={() => { setHwDetail(null); setHwDeleteConfirm(false); }}
                 className="w-full active:scale-[0.98] transition-transform"
                 style={{
                   padding: '14px', borderRadius: 14, fontWeight: 700, fontSize: 14,
