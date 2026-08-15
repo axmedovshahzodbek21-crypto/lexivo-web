@@ -154,10 +154,38 @@ export default function LibraryPage() {
 
       {/* Empty state */}
       {folders.length === 0 ? (
-        <div className="text-center py-20">
+        <div className="text-center py-12">
           <div className="text-6xl mb-4">📚</div>
           <h2 className="text-xl font-bold text-[var(--text)] mb-2">No folders yet</h2>
-          <p className="text-sm text-[var(--text-muted)] mb-6">Create a folder to organise your teaching units.</p>
+          <p className="text-sm text-[var(--text-muted)] mb-8">Create a folder to organise your teaching units.</p>
+
+          {/* Illustrative example — not real data, just shows the Folder → Unit → Words shape */}
+          <div className="max-w-sm mx-auto mb-8">
+            <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider mb-3">How it works</p>
+            <div className="flex items-center justify-center gap-2 flex-wrap opacity-70 pointer-events-none select-none">
+              <div
+                className="rounded-xl px-3 py-2 text-left"
+                style={{ background: `linear-gradient(135deg, ${lighten(CARD_COLORS[0])}, ${CARD_COLORS[0]}, ${darken(CARD_COLORS[0])})`, border: `1.5px dashed ${darken(CARD_COLORS[0])}` }}
+              >
+                <p className="text-[9px] font-bold text-white/70 uppercase tracking-wide">Folder</p>
+                <p className="text-xs font-bold text-white">📁 Vocabulary 101</p>
+              </div>
+              <span className="text-[var(--text-muted)]">→</span>
+              <div
+                className="rounded-xl px-3 py-2 text-left"
+                style={{ background: `linear-gradient(135deg, ${lighten(CARD_COLORS[1])}, ${CARD_COLORS[1]}, ${darken(CARD_COLORS[1])})`, border: `1.5px dashed ${darken(CARD_COLORS[1])}` }}
+              >
+                <p className="text-[9px] font-bold text-white/70 uppercase tracking-wide">Unit</p>
+                <p className="text-xs font-bold text-white">📖 Unit 1</p>
+              </div>
+              <span className="text-[var(--text-muted)]">→</span>
+              <div className="rounded-xl px-3 py-2 text-left border border-[var(--border)]" style={{ background: 'var(--surface-2)' }}>
+                <p className="text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-wide">Words</p>
+                <p className="text-xs font-bold text-[var(--text)]">apple · book · water</p>
+              </div>
+            </div>
+          </div>
+
           <button
             onClick={() => setShowCreate(true)}
             className="px-6 py-3 rounded-xl text-sm font-bold text-white"
