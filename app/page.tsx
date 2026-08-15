@@ -746,7 +746,7 @@ export default function HomePage() {
           if (sId === 'day_streak') return (
             <Link href="/progress?tab=calendar" className="block h-full">
               <div className="rounded-2xl h-full flex flex-col items-center justify-center text-center gap-3 hover:-translate-y-1 transition-all duration-200 animate-heartbeat"
-                style={{ background: 'linear-gradient(135deg, #FF6B35, #ff9f7f)', boxShadow: '0 10px 0 #b84a1a, 0 16px 36px rgba(255,107,53,0.45)', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>
+                style={{ background: 'linear-gradient(135deg, #FF6B35, #ff9f7f)', boxShadow: '0 12px 0 #b84a1a, 0 22px 50px rgba(255,107,53,0.55)', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>
                 <div className={isLarge ? 'text-7xl' : 'text-4xl'}>🔥</div>
                 <div className={isLarge ? 'text-6xl font-black text-white' : 'text-3xl font-black text-white'}>{streak}</div>
                 <div className={isLarge ? 'text-base text-white/85 font-semibold' : 'text-xs text-white/85 font-semibold'}>{t.home.dayStreak}</div>
@@ -767,7 +767,7 @@ export default function HomePage() {
           );
           if (sId === 'daily_goal') return (
             <div className="rounded-2xl h-full p-4 flex flex-col justify-between animate-heartbeat"
-              style={{ background: 'linear-gradient(135deg, #5b21b6, #8b5cf6)', boxShadow: '0 8px 0 #3b0764, 0 12px 28px rgba(91,33,182,0.4)' }}>
+              style={{ background: 'linear-gradient(135deg, #5b21b6, #8b5cf6)', boxShadow: '0 10px 0 #3b0764, 0 18px 40px rgba(91,33,182,0.5)' }}>
               <div className="flex items-center gap-3">
                 <div className="relative shrink-0" style={{ width: 50, height: 50 }}>
                   <svg width="50" height="50" style={{ transform: 'rotate(-90deg)' }}>
@@ -798,7 +798,7 @@ export default function HomePage() {
           if (sId === 'level') return (
             <button onClick={() => setShowXpModal(true)} className="block h-full w-full text-left">
               <div className="rounded-2xl h-full p-4 flex flex-col justify-between animate-heartbeat"
-                style={{ background: 'linear-gradient(135deg, #be123c, #fb7185)', boxShadow: '0 8px 0 #881337, 0 12px 28px rgba(190,18,60,0.4)', textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
+                style={{ background: 'linear-gradient(135deg, #be123c, #fb7185)', boxShadow: '0 10px 0 #881337, 0 18px 40px rgba(190,18,60,0.5)', textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
                 <div>
                   <div className="text-2xl mb-1">⭐</div>
                   <div className="text-sm font-black text-white leading-tight">{levelInfo.level}</div>
@@ -815,7 +815,7 @@ export default function HomePage() {
           );
           if (sId === 'wod') return wod ? (
             <div className="rounded-2xl h-full p-4 flex flex-col justify-between animate-heartbeat"
-              style={{ background: 'linear-gradient(135deg, #a21caf, #e879f9)', boxShadow: '0 8px 0 #701a75, 0 12px 28px rgba(162,28,175,0.4)', textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
+              style={{ background: 'linear-gradient(135deg, #a21caf, #e879f9)', boxShadow: '0 10px 0 #701a75, 0 18px 40px rgba(162,28,175,0.5)', textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
               <div className="flex items-start justify-between gap-1">
                 <div className="flex-1 min-w-0">
                   <div className="text-[9px] font-bold text-white/60 uppercase tracking-wider mb-1">{t.home.wordOfDay}</div>
@@ -852,7 +852,7 @@ export default function HomePage() {
                 )}
                 <Link href={`/classes/${card.classId}/home`} className="block h-full">
                   <div className="rounded-2xl h-full p-3 flex flex-col justify-between hover:-translate-y-1 transition-all duration-200 animate-heartbeat"
-                    style={{ background: bg, boxShadow: `0 7px 0 ${edge}, 0 10px 24px ${glow}`, textShadow: '0 1px 3px rgba(0,0,0,0.35)' }}>
+                    style={{ background: bg, boxShadow: `0 10px 0 ${edge}, 0 18px 40px ${glow}`, textShadow: '0 1px 3px rgba(0,0,0,0.35)' }}>
                     <div className="flex items-start justify-between gap-1">
                       <div className="flex-1 min-w-0">
                         <div className="text-base font-black text-white leading-tight truncate">{card.className}</div>
@@ -880,7 +880,7 @@ export default function HomePage() {
             return (
               <button onClick={() => setShowXpHistoryModal(true)} className="block h-full w-full">
                 <div className="rounded-2xl h-full p-4 flex flex-col items-center justify-center text-center gap-2 hover:-translate-y-1 transition-all duration-200 animate-heartbeat"
-                  style={{ background: a.gradient, boxShadow: `0 7px 0 ${a.edge}, 0 10px 24px ${a.glow}`, textShadow: '0 1px 3px rgba(0,0,0,0.35)' }}>
+                  style={{ background: a.gradient, boxShadow: `0 10px 0 ${a.edge}, 0 18px 40px ${a.glow}`, textShadow: '0 1px 3px rgba(0,0,0,0.35)' }}>
                   <div className="text-3xl">{a.icon}</div>
                   <div className="font-bold text-sm text-white leading-tight">{a.title}</div>
                   <div className="text-[10px] text-white/70">{a.subtitle}</div>
@@ -899,7 +899,7 @@ export default function HomePage() {
                 )}
                 <Link href={a.href} className="block h-full">
                   <div className="rounded-2xl h-full p-4 flex flex-col items-center justify-center text-center gap-2 hover:-translate-y-1 transition-all duration-200 animate-heartbeat"
-                    style={{ background: a.gradient, boxShadow: `0 7px 0 ${a.edge}, 0 10px 24px ${a.glow}`, textShadow: '0 1px 3px rgba(0,0,0,0.35)' }}>
+                    style={{ background: a.gradient, boxShadow: `0 10px 0 ${a.edge}, 0 18px 40px ${a.glow}`, textShadow: '0 1px 3px rgba(0,0,0,0.35)' }}>
                     <div className="text-3xl">{a.icon}</div>
                     <div className="font-bold text-sm text-white leading-tight">{a.title}</div>
                     <div className="text-[10px] text-white/70">{a.subtitle}</div>
@@ -1323,7 +1323,7 @@ function StatCard({ icon, value, label, gradient, edge, glowColor }: {
       className="rounded-2xl p-4 flex flex-col items-center text-center gap-1 transition-all duration-200 hover:-translate-y-1 w-full h-full animate-heartbeat"
       style={{
         background: gradient,
-        boxShadow: `0 7px 0 ${edge}, 0 10px 24px ${glowColor}`,
+        boxShadow: `0 10px 0 ${edge}, 0 18px 40px ${glowColor}`,
         textShadow: '0 1px 3px rgba(0,0,0,0.35)',
       }}
     >
