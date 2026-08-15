@@ -3,6 +3,7 @@ import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import BackButton from '@/components/BackButton';
 import { readingPassages, type ReadingPassage } from '@/lib/reading-data';
+import { pickRandom, playShuffleTick, playShuffleReveal } from '@/lib/shuffle';
 
 const CARD_COLORS = [
   { color: '#6366F1', light: '#818CF8', dark: '#4338CA' },
@@ -16,6 +17,86 @@ const CARD_COLORS = [
 ];
 
 const allTopics = ['All', ...Array.from(new Set(readingPassages.map(p => p.topic))).sort()];
+
+function PassageCardTile({ passage, visited, onClick, large }: { passage: ReadingPassage; visited?: boolean; onClick?: () => void; large?: boolean }) {
+  const { color, light, dark } = CARD_COLORS[(passage.id - 1) % CARD_COLORS.length];
+  const numStr = String(passage.id).padStart(2, '0');
+  return (
+    <button
+      onClick={onClick}
+      disabled={!onClick}
+      className={`w-full text-left transition-transform ${onClick ? 'hover:-translate-y-0.5 active:scale-[0.98]' : 'cursor-default'}`}
+      style={{
+        position: 'relative',
+        overflow: 'hidden',
+        borderRadius: 20,
+        background: `linear-gradient(135deg, ${light}, ${color}, ${dark})`,
+        boxShadow: `0 4px 0 ${dark}, 0 8px 20px ${color}55`,
+        padding: large ? '22px 20px' : '16px 14px',
+        minHeight: large ? 180 : 130,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        opacity: visited ? 0.72 : 1,
+      }}
+    >
+      {/* Watermark number */}
+      <div style={{
+        position: 'absolute', right: large ? 10 : 6, top: '50%',
+        transform: 'translateY(-50%)',
+        fontSize: large ? 100 : 72, fontWeight: 900,
+        color: 'rgba(255,255,255,0.07)',
+        lineHeight: 1,
+        userSelect: 'none', pointerEvents: 'none',
+      }}>{numStr}</div>
+
+      {/* Visited ✓ badge */}
+      {visited && (
+        <div style={{
+          position: 'absolute', top: 10, right: 10,
+          width: 22, height: 22, borderRadius: '50%',
+          background: 'rgba(255,255,255,0.3)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: 12, color: '#fff', fontWeight: 900,
+          backdropFilter: 'blur(4px)',
+        }}>✓</div>
+      )}
+
+      {/* Topic label */}
+      <p style={{ fontSize: large ? 11 : 10, fontWeight: 700, color: 'rgba(255,255,255,0.65)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+        {passage.topic}
+      </p>
+
+      {/* Title + badge row */}
+      <div>
+        <p style={{
+          fontSize: large ? 18 : 13, fontWeight: 900, color: '#fff',
+          lineHeight: 1.3, marginBottom: 8,
+          display: '-webkit-box',
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: 'vertical',
+          overflow: 'hidden',
+          textShadow: '0 1px 4px rgba(0,0,0,0.3)',
+        }}>
+          {passage.title}
+        </p>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          {passage.questions.length > 0 ? (
+            <span style={{
+              fontSize: 10, fontWeight: 700,
+              color: 'rgba(255,255,255,0.9)',
+              background: 'rgba(0,0,0,0.22)',
+              borderRadius: 6, padding: '2px 8px',
+            }}>
+              {passage.questions.length} Q
+            </span>
+          ) : <span />}
+          {onClick && <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: 14 }}>›</span>}
+        </div>
+      </div>
+    </button>
+  );
+}
 
 type Tooltip = { text: string; x: number; y: number };
 
@@ -221,6 +302,7 @@ function PassageView({ passage, onBack }: { passage: ReadingPassage; onBack: () 
 }
 
 const VISITED_KEY = 'lexivo_reading_visited';
+const SURPRISE_TICKS = 9;
 
 export default function ReadingPage() {
   const [selected, setSelected] = useState<ReadingPassage | null>(null);
@@ -230,6 +312,9 @@ export default function ReadingPage() {
     try { return new Set(JSON.parse(localStorage.getItem(VISITED_KEY) ?? '[]')); }
     catch { return new Set(); }
   });
+  const [surpriseShuffling, setSurpriseShuffling] = useState(false);
+  const [surpriseShown, setSurpriseShown] = useState<ReadingPassage | null>(null);
+  const surpriseLastIndexRef = useRef<number | undefined>(undefined);
 
   const openPassage = (passage: ReadingPassage) => {
     const next = new Set(visited);
@@ -241,9 +326,38 @@ export default function ReadingPage() {
   };
 
   const surpriseMe = () => {
+    if (surpriseShuffling) return;
     const unvisited = readingPassages.filter(p => !visited.has(p.id));
     const pool = unvisited.length > 0 ? unvisited : readingPassages;
-    openPassage(pool[Math.floor(Math.random() * pool.length)]);
+    if (pool.length === 0) return;
+
+    setSurpriseShuffling(true);
+    const { item: finalPassage, index: finalIndex } = pickRandom(pool, surpriseLastIndexRef.current);
+    surpriseLastIndexRef.current = finalIndex;
+
+    let tick = 0;
+    const runTick = () => {
+      tick += 1;
+      const isLast = tick >= SURPRISE_TICKS;
+      const progress = tick / SURPRISE_TICKS;
+      const shown = isLast ? finalPassage : pickRandom(pool).item;
+      setSurpriseShown(shown);
+
+      if (isLast) {
+        playShuffleReveal();
+        window.setTimeout(() => {
+          setSurpriseShuffling(false);
+          setSurpriseShown(null);
+          openPassage(finalPassage);
+        }, 260);
+        return;
+      }
+
+      playShuffleTick(1 + progress * 0.5);
+      const delay = 70 + progress * progress * 260;
+      window.setTimeout(runTick, delay);
+    };
+    runTick();
   };
 
   const resetVisited = () => {
@@ -264,6 +378,23 @@ export default function ReadingPage() {
   }
 
   return (
+    <>
+      {surpriseShuffling && surpriseShown && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-6"
+          style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(2px)' }}
+        >
+          <div className="w-full max-w-xs flex flex-col items-center gap-4">
+            <p className="text-sm font-bold uppercase tracking-wider text-white flex items-center gap-2">
+              <span className="inline-block animate-spin" style={{ animationDuration: '0.9s' }}>🎲</span>
+              Finding something for you…
+            </p>
+            <div className="w-full">
+              <PassageCardTile passage={surpriseShown} large />
+            </div>
+          </div>
+        </div>
+      )}
     <div className="max-w-5xl mx-auto px-4 py-8 pb-24">
       {/* Editorial header */}
       <div className="flex items-end justify-between mb-8">
@@ -280,12 +411,14 @@ export default function ReadingPage() {
           <div style={{ display: 'flex', gap: 8 }}>
             <button
               onClick={surpriseMe}
+              disabled={surpriseShuffling}
               style={{
                 fontSize: 12, fontWeight: 700,
                 padding: '8px 14px', borderRadius: 12,
                 background: 'linear-gradient(135deg, #a78bfa, #6C63FF, #4C1D95)',
                 boxShadow: '0 3px 0 #3D1F9E, 0 6px 14px rgba(108,99,255,0.35)',
-                color: '#fff', border: 'none', cursor: 'pointer',
+                color: '#fff', border: 'none', cursor: surpriseShuffling ? 'default' : 'pointer',
+                opacity: surpriseShuffling ? 0.7 : 1,
                 whiteSpace: 'nowrap',
               }}
             >
@@ -372,87 +505,17 @@ export default function ReadingPage() {
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-          {filtered.map((passage) => {
-            const { color, light, dark } = CARD_COLORS[(passage.id - 1) % CARD_COLORS.length];
-            const numStr = String(passage.id).padStart(2, '0');
-            return (
-              <button
-                key={passage.id}
-                onClick={() => openPassage(passage)}
-                className="w-full text-left transition-transform hover:-translate-y-0.5 active:scale-[0.98]"
-                style={{
-                  position: 'relative',
-                  overflow: 'hidden',
-                  borderRadius: 20,
-                  background: `linear-gradient(135deg, ${light}, ${color}, ${dark})`,
-                  boxShadow: `0 4px 0 ${dark}, 0 8px 20px ${color}55`,
-                  padding: '16px 14px',
-                  minHeight: 130,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  opacity: visited.has(passage.id) ? 0.72 : 1,
-                }}
-              >
-                {/* Watermark number */}
-                <div style={{
-                  position: 'absolute', right: 6, top: '50%',
-                  transform: 'translateY(-50%)',
-                  fontSize: 72, fontWeight: 900,
-                  color: 'rgba(255,255,255,0.07)',
-                  lineHeight: 1,
-                  userSelect: 'none', pointerEvents: 'none',
-                }}>{numStr}</div>
-
-                {/* Visited ✓ badge */}
-                {visited.has(passage.id) && (
-                  <div style={{
-                    position: 'absolute', top: 10, right: 10,
-                    width: 22, height: 22, borderRadius: '50%',
-                    background: 'rgba(255,255,255,0.3)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 12, color: '#fff', fontWeight: 900,
-                    backdropFilter: 'blur(4px)',
-                  }}>✓</div>
-                )}
-
-                {/* Topic label */}
-                <p style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.65)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                  {passage.topic}
-                </p>
-
-                {/* Title + badge row */}
-                <div>
-                  <p style={{
-                    fontSize: 13, fontWeight: 900, color: '#fff',
-                    lineHeight: 1.3, marginBottom: 8,
-                    display: '-webkit-box',
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical',
-                    overflow: 'hidden',
-                    textShadow: '0 1px 4px rgba(0,0,0,0.3)',
-                  }}>
-                    {passage.title}
-                  </p>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    {passage.questions.length > 0 ? (
-                      <span style={{
-                        fontSize: 10, fontWeight: 700,
-                        color: 'rgba(255,255,255,0.9)',
-                        background: 'rgba(0,0,0,0.22)',
-                        borderRadius: 6, padding: '2px 8px',
-                      }}>
-                        {passage.questions.length} Q
-                      </span>
-                    ) : <span />}
-                    <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: 14 }}>›</span>
-                  </div>
-                </div>
-              </button>
-            );
-          })}
+          {filtered.map((passage) => (
+            <PassageCardTile
+              key={passage.id}
+              passage={passage}
+              visited={visited.has(passage.id)}
+              onClick={() => openPassage(passage)}
+            />
+          ))}
         </div>
       )}
     </div>
+    </>
   );
 }
