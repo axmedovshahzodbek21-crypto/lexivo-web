@@ -73,7 +73,7 @@ example9Translation: Ishini yo'qotish u uchun ulkan qiyinchilik bo'ldi.
 example10: The enormous mountain range stretched across the horizon.
 example10Translation: Ulkan tog' tizmasi ufq bo'ylab cho'zilgan edi.`;
 
-function buildPrompt1(wordLang: string, transLang: string): string {
+function buildPrompt1(wordLang: string, transLang: string, words: string): string {
   return `I have a list of ${wordLang} words I want to learn. For each word, provide the translation in ${transLang}, a short definition in ${wordLang}, and up to 10 example sentences in ${wordLang} with their ${transLang} translations.
 
 Format EXACTLY like this for every word. Use plain text only — no markdown, no bold, no asterisks, no extra formatting:
@@ -90,10 +90,10 @@ ${EXAMPLE_FORMAT_BLOCK}
 Important: the example above uses English/Uzbek only to show the format. In your actual response, write the definition and examples in ${wordLang}, the translations and definitionUz in ${transLang}.
 
 Here are my words:
-[PASTE YOUR WORDS HERE, one per line]`;
+${words}`;
 }
 
-function buildPrompt2(wordLang: string, transLang: string): string {
+function buildPrompt2(wordLang: string, transLang: string, words: string): string {
   return `I have ${wordLang}-${transLang} word pairs. For each pair, keep my translation exactly as written. Add a short definition in ${wordLang}, a short explanation in ${transLang} (definitionUz), and up to 10 example sentences in ${wordLang} with their ${transLang} translations.
 
 Format EXACTLY like this for every word. Use plain text only — no markdown, no bold, no asterisks, no extra formatting:
@@ -110,7 +110,7 @@ ${EXAMPLE_FORMAT_BLOCK}
 Important: the example above uses English/Uzbek only to show the format. In your actual response, write the definition and examples in ${wordLang}, the translations and definitionUz in ${transLang}.
 
 Here are my pairs (word - translation):
-[PASTE YOUR PAIRS HERE, one per line]`;
+${words}`;
 }
 
 interface ParseResult {
@@ -205,6 +205,7 @@ function ImportPageInner() {
   const [wordLang, setWordLang] = useState('English');
   const [transLang, setTransLang] = useState('Uzbek');
   const [wordLangCode, setWordLangCode] = useState('en-US');
+  const [wordsInput, setWordsInput] = useState('');
   const [pasted, setPasted] = useState('');
   const [copied1, setCopied1] = useState(false);
   const [copied2, setCopied2] = useState(false);
@@ -225,7 +226,9 @@ function ImportPageInner() {
   const parseResult = useMemo(() => parseOutput(pasted, wordLangCode), [pasted, wordLangCode]);
   const parsed = parseResult.words;
 
-  function copy(text: string, which: 1 | 2) {
+  function copyPrompt(which: 1 | 2) {
+    const words = wordsInput.trim() || (which === 2 ? 'apple - olma\nbook - kitob' : 'apple, book, water');
+    const text = which === 1 ? buildPrompt1(wordLang, transLang, words) : buildPrompt2(wordLang, transLang, words);
     navigator.clipboard.writeText(text);
     if (which === 1) { setCopied1(true); setTimeout(() => setCopied1(false), 2000); }
     else { setCopied2(true); setTimeout(() => setCopied2(false), 2000); }
@@ -344,6 +347,18 @@ function ImportPageInner() {
           </div>
         </div>
 
+        {/* Words input — embedded directly into whichever prompt you copy below */}
+        <div className="card space-y-3">
+          <p className="font-semibold text-sm text-[var(--text)]">1. Enter words to import</p>
+          <textarea
+            value={wordsInput}
+            onChange={e => setWordsInput(e.target.value)}
+            placeholder={`apple, book, water\nor one per line\nor already-translated pairs like: apple - olma`}
+            rows={4}
+            className="w-full px-3 py-2.5 rounded-xl bg-[var(--surface-2)] text-[var(--text)] text-sm border border-[var(--border)] outline-none focus:border-[var(--primary)] resize-none"
+          />
+        </div>
+
         {/* Prompt 1 */}
         <div className="card space-y-3">
           <button onClick={() => setOpen1(p => !p)} className="w-full flex items-center justify-between">
@@ -356,9 +371,9 @@ function ImportPageInner() {
           {open1 && (
             <div className="space-y-2">
               <pre className="text-xs bg-[var(--surface-2)] rounded-xl p-3 whitespace-pre-wrap text-[var(--text)] leading-relaxed overflow-x-auto">
-                {buildPrompt1(wordLang, transLang)}
+                {buildPrompt1(wordLang, transLang, wordsInput.trim() || 'apple, book, water')}
               </pre>
-              <button onClick={() => copy(buildPrompt1(wordLang, transLang), 1)} className="btn-primary w-full py-2 text-sm">
+              <button onClick={() => copyPrompt(1)} className="btn-primary w-full py-2 text-sm">
                 {copied1 ? t.import.copied : t.import.copyPrompt}
               </button>
             </div>
@@ -377,9 +392,9 @@ function ImportPageInner() {
           {open2 && (
             <div className="space-y-2">
               <pre className="text-xs bg-[var(--surface-2)] rounded-xl p-3 whitespace-pre-wrap text-[var(--text)] leading-relaxed overflow-x-auto">
-                {buildPrompt2(wordLang, transLang)}
+                {buildPrompt2(wordLang, transLang, wordsInput.trim() || 'apple - olma\nbook - kitob')}
               </pre>
-              <button onClick={() => copy(buildPrompt2(wordLang, transLang), 2)} className="btn-primary w-full py-2 text-sm">
+              <button onClick={() => copyPrompt(2)} className="btn-primary w-full py-2 text-sm">
                 {copied2 ? t.import.copied : t.import.copyPrompt}
               </button>
             </div>
