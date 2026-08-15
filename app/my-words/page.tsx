@@ -200,6 +200,14 @@ export default function MyWordsPage() {
                 </div>
               </div>
             )}
+
+            <button
+              onClick={() => setCreating(true)}
+              className="mt-5 flex items-center justify-center gap-2 w-full py-3 rounded-2xl border-2 border-dashed border-[var(--border)] text-sm font-medium text-[var(--text-muted)] hover:border-[var(--primary)] hover:text-[var(--primary)] transition-colors"
+            >
+              <span>+</span>
+              <span>New Folder</span>
+            </button>
           </>
         )}
       </div>

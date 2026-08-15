@@ -74,24 +74,34 @@ export default function FolderPage({ params }: Props) {
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-3 gap-3">
-            {collections.map((col, i) => (
-              <Link
-                key={col.name}
-                href={`/my-words/${encodeURIComponent(folder)}/${encodeURIComponent(col.name)}`}
-                className="flex flex-col rounded-2xl p-3 min-h-[100px] justify-between active:scale-95 transition-transform"
-                style={{ background: cardColor(i) }}
-              >
-                <span className="text-2xl">📖</span>
-                <div>
-                  <p className="font-bold text-white text-sm leading-tight line-clamp-2">{col.name}</p>
-                  <p className="text-[11px] mt-0.5" style={{ color: 'rgba(255,255,255,0.75)' }}>
-                    {t.myWords.wordCount(col.count)}
-                  </p>
-                </div>
-              </Link>
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-3 gap-3">
+              {collections.map((col, i) => (
+                <Link
+                  key={col.name}
+                  href={`/my-words/${encodeURIComponent(folder)}/${encodeURIComponent(col.name)}`}
+                  className="flex flex-col rounded-2xl p-3 min-h-[100px] justify-between active:scale-95 transition-transform"
+                  style={{ background: cardColor(i) }}
+                >
+                  <span className="text-2xl">📖</span>
+                  <div>
+                    <p className="font-bold text-white text-sm leading-tight line-clamp-2">{col.name}</p>
+                    <p className="text-[11px] mt-0.5" style={{ color: 'rgba(255,255,255,0.75)' }}>
+                      {t.myWords.wordCount(col.count)}
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            <Link
+              href={`/import?folder=${encodeURIComponent(folder)}`}
+              className="mt-5 flex items-center justify-center gap-2 w-full py-3 rounded-2xl border-2 border-dashed border-[var(--border)] text-sm font-medium text-[var(--text-muted)] hover:border-[var(--primary)] hover:text-[var(--primary)] transition-colors"
+            >
+              <span>+</span>
+              <span>New Unit</span>
+            </Link>
+          </>
         )}
       </div>
     </div>
