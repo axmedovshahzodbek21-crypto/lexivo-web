@@ -95,6 +95,11 @@ export interface CustomList {
   words: string[];   // word.word values
 }
 
+export interface ImportedWordExample {
+  sentence: string;
+  translation?: string;
+}
+
 export interface ImportedWord {
   word: string;
   partOfSpeech?: string;
@@ -102,16 +107,7 @@ export interface ImportedWord {
   translation: string;
   definition: string;
   definitionUz?: string;
-  example1: string;
-  example1Translation?: string;
-  example2: string;
-  example2Translation?: string;
-  example3?: string;
-  example3Translation?: string;
-  example4?: string;
-  example4Translation?: string;
-  example5?: string;
-  example5Translation?: string;
+  examples: ImportedWordExample[]; // unlimited, unlike the built-in WordItem's fixed example1-3
   language: string; // BCP-47 e.g. 'en-US', 'ru-RU'
   addedAt: number;
   collectionName?: string; // optional for backward compat; defaults to 'My Words'

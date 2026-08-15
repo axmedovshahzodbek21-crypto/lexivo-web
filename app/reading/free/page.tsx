@@ -89,20 +89,14 @@ function parseAIResponse(text: string): ImportedWord[] {
     };
     const word = get('word');
     if (!word) return [];
+    const examples = [1, 2, 3, 4, 5]
+      .map(n => ({ sentence: get(`example${n}`), translation: get(`example${n}Translation`) || undefined }))
+      .filter(ex => ex.sentence);
     return [{
       word,
       translation: get('translation') || '',
       definition: get('definition') || '',
-      example1: get('example1') || '',
-      example1Translation: get('example1Translation') || undefined,
-      example2: get('example2') || '',
-      example2Translation: get('example2Translation') || undefined,
-      example3: get('example3') || undefined,
-      example3Translation: get('example3Translation') || undefined,
-      example4: get('example4') || undefined,
-      example4Translation: get('example4Translation') || undefined,
-      example5: get('example5') || undefined,
-      example5Translation: get('example5Translation') || undefined,
+      examples,
       language: 'en-US',
       addedAt: Date.now(),
     } satisfies ImportedWord];

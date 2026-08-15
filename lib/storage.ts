@@ -1,4 +1,4 @@
-import type { SRSWord, DueSRSWord, LearnedWord, UnitProgress, UserSettings, Achievement, CustomList, WordItem, WordCollection, ImportedWord, ImportedCollection, ImportedFolder } from './types';
+import type { SRSWord, DueSRSWord, LearnedWord, UnitProgress, UserSettings, Achievement, CustomList, WordItem, WordCollection, ImportedWord, ImportedWordExample, ImportedCollection, ImportedFolder } from './types';
 import { SRS_INTERVALS, LEVEL_THRESHOLDS, LEARN_XP_TIERS, STREAK_BONUS_7, STREAK_BONUS_30 } from './types';
 import { supabase } from './supabase';
 
@@ -959,6 +959,36 @@ function getFolderMap(): Record<string, string> {
   try { return JSON.parse(localStorage.getItem(FOLDER_MAP_KEY) ?? '{}'); } catch { return {}; }
 }
 
+// Migrates old-shape records (fixed example1..5 fields) into the current
+// `examples[]` array shape, for words stored/synced before that change.
+function normalizeImportedWord(raw: Record<string, unknown>): ImportedWord {
+  let examples: ImportedWordExample[];
+  if (Array.isArray(raw.examples)) {
+    examples = raw.examples as ImportedWordExample[];
+  } else {
+    examples = [];
+    for (let i = 1; i <= 5; i++) {
+      const sentence = raw[`example${i}`] as string | undefined;
+      const translation = raw[`example${i}Translation`] as string | undefined;
+      if (sentence) examples.push({ sentence, translation: translation || undefined });
+    }
+  }
+  return {
+    word: (raw.word as string) ?? '',
+    partOfSpeech: raw.partOfSpeech as string | undefined,
+    pronunciation: raw.pronunciation as string | undefined,
+    translation: (raw.translation as string) ?? '',
+    definition: (raw.definition as string) ?? '',
+    definitionUz: raw.definitionUz as string | undefined,
+    examples,
+    language: (raw.language as string) ?? 'en-US',
+    addedAt: (raw.addedAt as number) ?? 0,
+    collectionName: raw.collectionName as string | undefined,
+    folderName: raw.folderName as string | undefined,
+    deletedAt: raw.deletedAt as number | undefined,
+  };
+}
+
 export function updateFolderMap(collectionName: string, folderName: string) {
   if (typeof window === 'undefined') return;
   const map = getFolderMap();
@@ -973,7 +1003,8 @@ export function updateFolderMap(collectionName: string, folderName: string) {
 // reappearing on next sync pull.
 export function getImportedWordsRaw(): ImportedWord[] {
   const folderMap = getFolderMap();
-  return get<ImportedWord[]>(IMPORTED_KEY, []).map(w => {
+  return get<Record<string, unknown>[]>(IMPORTED_KEY, []).map(raw => {
+    const w = normalizeImportedWord(raw);
     const col = w.collectionName ?? DEFAULT_COLLECTION;
     return {
       ...(w.collectionName ? w : { ...w, collectionName: DEFAULT_COLLECTION }),
@@ -992,6 +1023,26 @@ export function getImportedWordsByCollection(collectionName: string, folderName?
     w.collectionName === collectionName &&
     (folderName === undefined ? !w.folderName : w.folderName === folderName)
   );
+}
+
+// Folds an ImportedWord's unlimited examples[] into the app-wide WordItem/
+// StudyWord shape (fixed example1-3 + extraExamples/extraExampleTranslations),
+// used everywhere words are studied (Learn, Flashcards, Quiz, Matching).
+export function importedWordExampleFields(w: ImportedWord) {
+  const ex = w.examples ?? [];
+  return {
+    example1: ex[0]?.sentence ?? '',
+    example1Situation: '',
+    example1Translation: ex[0]?.translation ?? '',
+    example2: ex[1]?.sentence ?? '',
+    example2Situation: '',
+    example2Translation: ex[1]?.translation ?? '',
+    example3: ex[2]?.sentence ?? '',
+    example3Situation: '',
+    example3Translation: ex[2]?.translation ?? '',
+    extraExamples: ex.slice(3).map(e => e.sentence),
+    extraExampleTranslations: ex.slice(3).map(e => e.translation ?? ''),
+  };
 }
 
 // ─── Class Homework Temp ──────────────────────────────────────────────────────
@@ -1047,6 +1098,8 @@ export function getCollectionsByFolder(folderName: string): ImportedCollection[]
 
 const MAX_IMPORTED_WORDS = 10_000;
 
+const MAX_EXAMPLES_PER_WORD = 10;
+
 function sanitizeImportedWord(w: ImportedWord): ImportedWord {
   const trunc = (s: string | undefined, max: number) => (s ?? '').slice(0, max);
   return {
@@ -1054,10 +1107,10 @@ function sanitizeImportedWord(w: ImportedWord): ImportedWord {
     word:               trunc(w.word, 100),
     translation:        trunc(w.translation, 200),
     definition:         trunc(w.definition, 500),
-    example1:           trunc(w.example1, 300),
-    example1Translation:trunc(w.example1Translation, 300),
-    example2:           trunc(w.example2, 300),
-    example2Translation:trunc(w.example2Translation, 300),
+    examples: (w.examples ?? []).slice(0, MAX_EXAMPLES_PER_WORD).map(ex => ({
+      sentence:    trunc(ex.sentence, 300),
+      translation: ex.translation ? trunc(ex.translation, 300) : undefined,
+    })),
     collectionName:     trunc(w.collectionName, 100),
     folderName:         w.folderName ? trunc(w.folderName, 100) : undefined,
   };

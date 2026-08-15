@@ -59,40 +59,42 @@ function parseOutput(text: string): ParsedWord[] {
   return results;
 }
 
-function buildPrompt(wordLang: string, transLang: string, words: string): string {
-  return `You are a vocabulary flashcard generator. Create detailed flashcard data for these ${wordLang.toLowerCase()} words, with translations in ${transLang.toLowerCase()}.
+function exampleBlock(wordLang: string, transLang: string): string {
+  return Array.from({ length: 10 }, (_, i) => {
+    const n = i + 1;
+    const desc = n === 1 ? 'natural sentence using the word' : 'another natural sentence';
+    return `Example ${n}: [${desc} in ${wordLang.toLowerCase()}]\nExample ${n} Translation: [${transLang.toLowerCase()} translation of example ${n}]`;
+  }).join('\n');
+}
 
-Words to process:
+// hasTranslations: true when the pasted input is already word-translation pairs
+// (their translation is kept verbatim) rather than a bare word list to translate.
+function buildPrompt(wordLang: string, transLang: string, words: string, hasTranslations: boolean): string {
+  const intro = hasTranslations
+    ? `I have ${wordLang.toLowerCase()}-${transLang.toLowerCase()} word pairs. For each pair, keep my translation exactly as written. Add a short definition in ${wordLang.toLowerCase()}, a short definition in Uzbek, and 10 example sentences in ${wordLang.toLowerCase()} with their ${transLang.toLowerCase()} translations.`
+    : `You are a vocabulary flashcard generator. Create detailed flashcard data for these ${wordLang.toLowerCase()} words, with translations in ${transLang.toLowerCase()}.`;
+  const label = hasTranslations ? 'Word pairs to process (word - translation)' : 'Words to process';
+  const wordLine = hasTranslations
+    ? `Word: [the ${wordLang.toLowerCase()} word — keep exactly as given]`
+    : `Word: [the ${wordLang.toLowerCase()} word]`;
+  const transLine = hasTranslations
+    ? `Translation: [keep exactly as given in my pairs]`
+    : `Translation: [${transLang.toLowerCase()} translation]`;
+
+  return `${intro}
+
+${label}:
 ${words}
 
 For each word output exactly this format, separated by ---:
 
-Word: [the ${wordLang.toLowerCase()} word]
+${wordLine}
 Part of speech: [noun / verb / adjective / adverb / phrase / etc.]
 Pronunciation: [IPA pronunciation, e.g. /wɜːrd/]
-Translation: [${transLang.toLowerCase()} translation]
+${transLine}
 Definition: [short definition in ${wordLang.toLowerCase()}, max 20 words]
 Uzbek definition: [short definition in Uzbek, max 20 words]
-Example 1: [natural sentence using the word in ${wordLang.toLowerCase()}]
-Example 1 Translation: [${transLang.toLowerCase()} translation of example 1]
-Example 2: [another natural sentence in ${wordLang.toLowerCase()}]
-Example 2 Translation: [${transLang.toLowerCase()} translation of example 2]
-Example 3: [another natural sentence in ${wordLang.toLowerCase()}]
-Example 3 Translation: [${transLang.toLowerCase()} translation of example 3]
-Example 4: [another natural sentence in ${wordLang.toLowerCase()}]
-Example 4 Translation: [${transLang.toLowerCase()} translation of example 4]
-Example 5: [another natural sentence in ${wordLang.toLowerCase()}]
-Example 5 Translation: [${transLang.toLowerCase()} translation of example 5]
-Example 6: [another natural sentence in ${wordLang.toLowerCase()}]
-Example 6 Translation: [${transLang.toLowerCase()} translation of example 6]
-Example 7: [another natural sentence in ${wordLang.toLowerCase()}]
-Example 7 Translation: [${transLang.toLowerCase()} translation of example 7]
-Example 8: [another natural sentence in ${wordLang.toLowerCase()}]
-Example 8 Translation: [${transLang.toLowerCase()} translation of example 8]
-Example 9: [another natural sentence in ${wordLang.toLowerCase()}]
-Example 9 Translation: [${transLang.toLowerCase()} translation of example 9]
-Example 10: [another natural sentence in ${wordLang.toLowerCase()}]
-Example 10 Translation: [${transLang.toLowerCase()} translation of example 10]
+${exampleBlock(wordLang, transLang)}
 
 Output only the formatted blocks. No commentary.`;
 }
@@ -182,8 +184,9 @@ export default function UnitPage() {
     setWords(prev => prev.filter(w => w.id !== id));
   }
 
-  function copyPrompt() {
-    const prompt = buildPrompt(wordLang, transLang, wordsInput.trim() || 'apple, book, water');
+  function copyPrompt(hasTranslations: boolean) {
+    const words = wordsInput.trim() || (hasTranslations ? 'apple - olma\nbook - kitob' : 'apple, book, water');
+    const prompt = buildPrompt(wordLang, transLang, words, hasTranslations);
     navigator.clipboard.writeText(prompt);
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
@@ -289,14 +292,20 @@ export default function UnitPage() {
             <textarea
               value={wordsInput}
               onChange={e => setWordsInput(e.target.value)}
-              placeholder={`apple, book, water\nor one per line`}
+              placeholder={`apple, book, water\nor one per line\nor already-translated pairs like: apple - olma`}
               rows={4}
               className="w-full px-3 py-2.5 rounded-xl bg-[var(--surface-2)] text-[var(--text)] text-sm border border-[var(--border)] outline-none focus:border-[var(--primary)] resize-none mb-3"
             />
-            <button
-              onClick={copyPrompt}
-              className="w-full py-2.5 rounded-xl text-sm font-semibold border border-[var(--primary)] text-[var(--primary)] hover:bg-[var(--primary-bg)] transition-colors"
-            >📋 Copy AI Prompt</button>
+            <div className="space-y-2">
+              <button
+                onClick={() => copyPrompt(false)}
+                className="w-full py-2.5 rounded-xl text-sm font-semibold border border-[var(--primary)] text-[var(--primary)] hover:bg-[var(--primary-bg)] transition-colors"
+              >📋 Copy Prompt — just words, AI translates</button>
+              <button
+                onClick={() => copyPrompt(true)}
+                className="w-full py-2.5 rounded-xl text-sm font-semibold border border-[var(--border)] text-[var(--text-muted)] hover:bg-[var(--surface-2)] transition-colors"
+              >📋 Copy Prompt — I already have translations</button>
+            </div>
           </div>
 
           {/* Step 2 */}

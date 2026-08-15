@@ -51,18 +51,8 @@ const LANGUAGES = [
   { label: 'Uzbek', code: 'uz-UZ' },
 ];
 
-function buildPrompt1(wordLang: string, transLang: string): string {
-  return `I have a list of ${wordLang} words I want to learn. For each word, provide the translation in ${transLang}, a short definition in ${wordLang}, and 5 example sentences in ${wordLang} with their ${transLang} translations.
-
-Format EXACTLY like this for every word. Use plain text only — no markdown, no bold, no asterisks, no extra formatting:
-
-word: enormous
-partOfSpeech: adjective
-pronunciation: /ɪˈnɔːrməs/
-translation: ulkan
-definition: extremely large in size or extent
-definitionUz: Ulkan — juda katta yoki keng hajmga ega bo'lgan narsa yoki hodisa.
-example1: The enormous building towered above the city.
+// Shared illustrative "enormous" example block shown to the AI, up to 10 examples.
+const EXAMPLE_FORMAT_BLOCK = `example1: The enormous building towered above the city.
 example1Translation: Ulkan bino shahar ustida baland turardi.
 example2: She faced an enormous challenge at work.
 example2Translation: U ishda ulkan muammoga duch keldi.
@@ -72,6 +62,29 @@ example4: He made an enormous effort to finish the project on time.
 example4Translation: U loyihani o'z vaqtida tugatish uchun ulkan harakat qildi.
 example5: The discovery had an enormous impact on modern science.
 example5Translation: Bu kashfiyot zamonaviy fanga ulkan ta'sir ko'rsatdi.
+example6: The company invested an enormous amount of money in research.
+example6Translation: Kompaniya tadqiqotlarga ulkan miqdorda mablag' sarfladi.
+example7: Cleaning up after the enormous storm took several weeks.
+example7Translation: Ulkan bo'rondan keyin tozalash bir necha hafta davom etdi.
+example8: The enormous crowd gathered to watch the festival.
+example8Translation: Festivalni tomosha qilish uchun ulkan olomon to'plandi.
+example9: Losing his job was an enormous setback for him.
+example9Translation: Ishini yo'qotish u uchun ulkan qiyinchilik bo'ldi.
+example10: The enormous mountain range stretched across the horizon.
+example10Translation: Ulkan tog' tizmasi ufq bo'ylab cho'zilgan edi.`;
+
+function buildPrompt1(wordLang: string, transLang: string): string {
+  return `I have a list of ${wordLang} words I want to learn. For each word, provide the translation in ${transLang}, a short definition in ${wordLang}, and up to 10 example sentences in ${wordLang} with their ${transLang} translations.
+
+Format EXACTLY like this for every word. Use plain text only — no markdown, no bold, no asterisks, no extra formatting:
+
+word: enormous
+partOfSpeech: adjective
+pronunciation: /ɪˈnɔːrməs/
+translation: ulkan
+definition: extremely large in size or extent
+definitionUz: Ulkan — juda katta yoki keng hajmga ega bo'lgan narsa yoki hodisa.
+${EXAMPLE_FORMAT_BLOCK}
 ---
 
 Important: the example above uses English/Uzbek only to show the format. In your actual response, write the definition and examples in ${wordLang}, the translations and definitionUz in ${transLang}.
@@ -81,7 +94,7 @@ Here are my words:
 }
 
 function buildPrompt2(wordLang: string, transLang: string): string {
-  return `I have ${wordLang}-${transLang} word pairs. For each pair, keep my translation exactly as written. Add a short definition in ${wordLang}, a short explanation in ${transLang} (definitionUz), and 5 example sentences in ${wordLang} with their ${transLang} translations.
+  return `I have ${wordLang}-${transLang} word pairs. For each pair, keep my translation exactly as written. Add a short definition in ${wordLang}, a short explanation in ${transLang} (definitionUz), and up to 10 example sentences in ${wordLang} with their ${transLang} translations.
 
 Format EXACTLY like this for every word. Use plain text only — no markdown, no bold, no asterisks, no extra formatting:
 
@@ -91,16 +104,7 @@ pronunciation: /ɪˈnɔːrməs/
 translation: ulkan
 definition: extremely large in size or extent
 definitionUz: Ulkan — juda katta yoki keng hajmga ega bo'lgan narsa yoki hodisa.
-example1: The enormous building towered above the city.
-example1Translation: Ulkan bino shahar ustida baland turardi.
-example2: She faced an enormous challenge at work.
-example2Translation: U ishda ulkan muammoga duch keldi.
-example3: The storm caused enormous damage to the coastline.
-example3Translation: Bo'ron qirg'oqqa ulkan zarar yetkazdi.
-example4: He made an enormous effort to finish the project on time.
-example4Translation: U loyihani o'z vaqtida tugatish uchun ulkan harakat qildi.
-example5: The discovery had an enormous impact on modern science.
-example5Translation: Bu kashfiyot zamonaviy fanga ulkan ta'sir ko'rsatdi.
+${EXAMPLE_FORMAT_BLOCK}
 ---
 
 Important: the example above uses English/Uzbek only to show the format. In your actual response, write the definition and examples in ${wordLang}, the translations and definitionUz in ${transLang}.
@@ -165,6 +169,13 @@ function parseOutput(text: string, langCode: string): ParseResult {
       errors.push({ index: i + 1, preview, reason: 'Missing "translation:" field' });
       continue;
     }
+    // Unlimited examples — collect "exampleN" / "exampleNtranslation" for any N.
+    const examples: ImportedWord['examples'] = [];
+    for (let n = 1; n <= 20; n++) {
+      const sentence = fields[`example${n}`];
+      if (!sentence) continue;
+      examples.push({ sentence, translation: fields[`example${n}translation`] || undefined });
+    }
     words.push({
       word: fields.word,
       partOfSpeech: fields.partofspeech || undefined,
@@ -172,16 +183,7 @@ function parseOutput(text: string, langCode: string): ParseResult {
       translation: fields.translation,
       definition: fields.definition ?? '',
       definitionUz: fields.definitionuz || undefined,
-      example1: fields.example1 ?? '',
-      example1Translation: fields.example1translation ?? '',
-      example2: fields.example2 ?? '',
-      example2Translation: fields.example2translation ?? '',
-      example3: fields.example3 || undefined,
-      example3Translation: fields.example3translation || undefined,
-      example4: fields.example4 || undefined,
-      example4Translation: fields.example4translation || undefined,
-      example5: fields.example5 || undefined,
-      example5Translation: fields.example5translation || undefined,
+      examples,
       language: langCode,
       addedAt: Date.now(),
     });
@@ -482,16 +484,12 @@ function ImportPageInner() {
                       <span className="text-[var(--primary)] font-medium">{w.translation}</span>
                     </div>
                     {w.definition && <p className="text-xs text-[var(--text-muted)]">{w.definition}</p>}
-                    {w.example1 && <p className="text-xs italic text-[var(--text)]">"{w.example1}"</p>}
-                    {w.example1Translation && <p className="text-xs text-[var(--text-muted)] pl-2">↳ {w.example1Translation}</p>}
-                    {w.example2 && <p className="text-xs italic text-[var(--text)]">"{w.example2}"</p>}
-                    {w.example2Translation && <p className="text-xs text-[var(--text-muted)] pl-2">↳ {w.example2Translation}</p>}
-                    {w.example3 && <p className="text-xs italic text-[var(--text)]">"{w.example3}"</p>}
-                    {w.example3Translation && <p className="text-xs text-[var(--text-muted)] pl-2">↳ {w.example3Translation}</p>}
-                    {w.example4 && <p className="text-xs italic text-[var(--text)]">"{w.example4}"</p>}
-                    {w.example4Translation && <p className="text-xs text-[var(--text-muted)] pl-2">↳ {w.example4Translation}</p>}
-                    {w.example5 && <p className="text-xs italic text-[var(--text)]">"{w.example5}"</p>}
-                    {w.example5Translation && <p className="text-xs text-[var(--text-muted)] pl-2">↳ {w.example5Translation}</p>}
+                    {w.examples.map((ex, exIdx) => (
+                      <div key={exIdx}>
+                        <p className="text-xs italic text-[var(--text)]">&quot;{ex.sentence}&quot;</p>
+                        {ex.translation && <p className="text-xs text-[var(--text-muted)] pl-2">↳ {ex.translation}</p>}
+                      </div>
+                    ))}
                   </div>
                 ))}
               </div>

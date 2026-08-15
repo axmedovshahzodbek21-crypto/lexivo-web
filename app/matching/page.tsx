@@ -6,7 +6,7 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
-import { getHardWords, getStarredWords, getCustomListWords, getImportedWords, getImportedWordsByCollection, getClassHWTemp, addXP, hasMatchXPAwarded, markMatchXPAwarded, markMatchComplete } from '@/lib/storage';
+import { getHardWords, getStarredWords, getCustomListWords, getImportedWords, getImportedWordsByCollection, importedWordExampleFields, getClassHWTemp, addXP, hasMatchXPAwarded, markMatchXPAwarded, markMatchComplete } from '@/lib/storage';
 import { getClassWordsFull, addClassHardWord } from '@/lib/class-srs';
 import { recordClassStudyDay } from '@/lib/class-xp';
 import { supabase } from '@/lib/supabase';
@@ -156,15 +156,7 @@ function MatchingInner() {
         pronunciation: '',
         translation: w.translation,
         definition: w.definition ?? '',
-        example1: w.example1 ?? '',
-        example1Situation: '',
-        example1Translation: w.example1Translation ?? '',
-        example2: w.example2 ?? '',
-        example2Situation: '',
-        example2Translation: w.example2Translation ?? '',
-        example3: '',
-        example3Translation: '',
-        example3Situation: '',
+        ...importedWordExampleFields(w),
         language: w.language ?? 'en-US',
         collectionName: 'my-words',
         topic: myCollection ?? 'My Words',

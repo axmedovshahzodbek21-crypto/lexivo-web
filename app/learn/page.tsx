@@ -22,7 +22,7 @@ import { recordClassStudyDay } from '@/lib/class-xp';
 import type { Accent } from '@/lib/speech';
 import { checkAchievements } from '@/lib/gamification';
 import type { WordItem, WordCollection } from '@/lib/types';
-import { getImportedWords, getImportedWordsByCollection } from '@/lib/storage';
+import { getImportedWords, getImportedWordsByCollection, importedWordExampleFields } from '@/lib/storage';
 import Link from 'next/link';
 import UnitPicker from '@/components/UnitPicker';
 import TiltCard from '@/components/TiltCard';
@@ -203,17 +203,7 @@ function LearnInner() {
         translation: w.translation,
         definition: w.definition,
         definitionUz: w.definitionUz,
-        example1: w.example1,
-        example1Situation: '',
-        example1Translation: w.example1Translation ?? '',
-        example2: w.example2,
-        example2Situation: '',
-        example2Translation: w.example2Translation ?? '',
-        example3: w.example3 ?? '',
-        example3Translation: w.example3Translation ?? '',
-        example3Situation: '',
-        extraExamples: [w.example4, w.example5].filter(Boolean) as string[],
-        extraExampleTranslations: [w.example4Translation, w.example5Translation].filter(Boolean) as string[],
+        ...importedWordExampleFields(w),
         language: w.language,
         collectionName: 'my-words',
         topic: myCollection ?? 'My Words',
