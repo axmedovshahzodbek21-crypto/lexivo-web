@@ -29,6 +29,37 @@ const lighten = (hex: string, amt = 0.3) => {
 // Module-level cache — survives navigation within the same tab session
 const _cache: Record<string, Folder[]> = {};
 
+const EXAMPLE_SEEDED_KEY = 'lexivo_library_example_seeded';
+
+// One-time real example (folder → unit → word) so a first-time teacher sees
+// the actual structure, not an empty page. Guarded by a local flag so it
+// never reappears even if they delete it — this is a courtesy seed, not a
+// permanent fixture.
+async function seedExampleFolder(teacherId: string): Promise<boolean> {
+  try {
+    const { data: folder } = await supabase
+      .from('teacher_folders').insert({ teacher_id: teacherId, name: 'Vocabulary 101' }).select('id').single();
+    if (!folder) return false;
+    const { data: unit } = await supabase
+      .from('teacher_units').insert({ folder_id: folder.id, teacher_id: teacherId, name: 'Unit 1' }).select('id').single();
+    if (!unit) return false;
+    await supabase.from('teacher_unit_words').insert({
+      unit_id: unit.id,
+      teacher_id: teacherId,
+      word: 'apple',
+      translation: 'olma',
+      definition: 'a round fruit with red, yellow, or green skin and a whitish inside',
+      part_of_speech: 'noun',
+      pronunciation: '/ˈæp.əl/',
+      definition_uz: "qizil, sariq yoki yashil po'stli, ichi oq mevali dumaloq meva",
+      examples: [{ sentence: 'She ate a fresh apple for breakfast.', translation: 'U nonushta uchun yangi olma yedi.' }],
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export default function LibraryPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
@@ -60,6 +91,10 @@ export default function LibraryPage() {
       name: f.name,
       unit_count: f.teacher_units?.[0]?.count ?? 0,
     }));
+    if (result.length === 0 && !localStorage.getItem(EXAMPLE_SEEDED_KEY)) {
+      localStorage.setItem(EXAMPLE_SEEDED_KEY, '1');
+      if (await seedExampleFolder(user.id)) { await load(); return; }
+    }
     _cache[user.id] = result;
     setFolders(result);
     setLoading(false);

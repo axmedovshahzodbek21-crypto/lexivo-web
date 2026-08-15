@@ -3,9 +3,33 @@ import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/lib/useTranslation';
-import { getImportedFolders, getImportedCollections } from '@/lib/storage';
+import { getImportedFolders, getImportedCollections, addImportedWords } from '@/lib/storage';
 import { pushLists, pullAll } from '@/lib/sync';
 import type { ImportedFolder, ImportedCollection } from '@/lib/types';
+
+const EXAMPLE_SEEDED_KEY = 'lexivo_mywords_example_seeded';
+
+// One-time real example (folder → collection → word) so a first-time user
+// sees the actual structure, not an empty page. Guarded by a local flag so
+// it never reappears even if they delete it — this is a courtesy seed, not
+// a permanent fixture.
+function seedExampleFolderIfNeeded(): boolean {
+  if (typeof window === 'undefined') return false;
+  if (localStorage.getItem(EXAMPLE_SEEDED_KEY)) return false;
+  localStorage.setItem(EXAMPLE_SEEDED_KEY, '1');
+  addImportedWords([{
+    word: 'apple',
+    translation: 'olma',
+    definition: 'a round fruit with red, yellow, or green skin and a whitish inside',
+    partOfSpeech: 'noun',
+    pronunciation: '/ˈæp.əl/',
+    definitionUz: "qizil, sariq yoki yashil po'stli, ichi oq mevali dumaloq meva",
+    examples: [{ sentence: 'She ate a fresh apple for breakfast.', translation: 'U nonushta uchun yangi olma yedi.' }],
+    language: 'en-US',
+    addedAt: Date.now(),
+  }], 'Unit 1', 'Vocabulary 101');
+  return true;
+}
 
 const COLORS = [
   '#5B8AF0', '#FF6B6B', '#06D6A0', '#FFD166',
@@ -32,8 +56,15 @@ export default function MyWordsPage() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    setFolders(getImportedFolders());
-    setOrphaned(getImportedCollections());
+    let initialFolders = getImportedFolders();
+    let initialOrphaned = getImportedCollections();
+    if (initialFolders.length === 0 && initialOrphaned.length === 0 && seedExampleFolderIfNeeded()) {
+      initialFolders = getImportedFolders();
+      initialOrphaned = getImportedCollections();
+    }
+    setFolders(initialFolders);
+    setOrphaned(initialOrphaned);
+    pushLists();
     pullAll().then(() => {
       setFolders(getImportedFolders());
       setOrphaned(getImportedCollections());
