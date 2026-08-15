@@ -19,6 +19,7 @@ const NAV_HREFS = [
   { href: '/leaderboard',  icon: '🏆', key: 'leaderboard' },
   { href: '/classes',      icon: '👩‍🏫', key: 'classes'     },
   { href: '/library',      icon: '📚', key: 'library'     },
+  { href: '/speaking',     icon: '🎤', key: 'speaking'    },
 ] as const;
 
 const NAV_COLORS: Record<string, { color: string; light: string; dark: string }> = {
@@ -32,6 +33,7 @@ const NAV_COLORS: Record<string, { color: string; light: string; dark: string }>
   leaderboard:   { color: '#F59E0B', light: '#FCD34D', dark: '#B45309' },
   classes:       { color: '#EF4444', light: '#F87171', dark: '#B91C1C' },
   library:       { color: '#84CC16', light: '#A3E635', dark: '#4D7C0F' },
+  speaking:      { color: '#FF6584', light: '#FF8FA3', dark: '#C2410C' },
 };
 
 // Mobile bottom bar: 5 core items only — Matching & Leaderboard are on the home page

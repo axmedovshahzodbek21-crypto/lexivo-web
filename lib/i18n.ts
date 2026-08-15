@@ -13,6 +13,7 @@ const en = {
     leaderboard: 'Leaderboard',
     classes: 'Classes',
     library: 'Library',
+    speaking: 'Speaking',
   },
   sidebar: {
     tagline: 'Vocabulary Learning',
@@ -451,6 +452,7 @@ const uz: typeof en = {
     leaderboard: 'Reyting',
     classes: 'Sinflar',
     library: 'Kutubxona',
+    speaking: "Gapirish",
   },
   sidebar: {
     tagline: "Lug'at o'rganish",
