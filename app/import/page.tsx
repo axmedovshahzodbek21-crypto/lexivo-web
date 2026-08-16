@@ -152,7 +152,10 @@ function parseOutput(text: string, langCode: string): ParseResult {
     for (const line of lines) {
       const colon = line.indexOf(':');
       if (colon === -1) continue;
-      const key = line.slice(0, colon).trim().toLowerCase().replace(/[*_`#]/g, '');
+      // Strip whitespace too so "Example 1:" / "Part of speech:" (Library-prompt
+      // style) and "example1:" / "partOfSpeech:" (My Words-prompt style) both parse.
+      let key = line.slice(0, colon).trim().toLowerCase().replace(/[*_`#\s]/g, '');
+      if (key === 'uzbekdefinition') key = 'definitionuz';
       const val = line.slice(colon + 1).trim().replace(/[*_`]/g, '');
       fields[key] = val;
     }

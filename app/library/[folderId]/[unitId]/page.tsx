@@ -37,17 +37,19 @@ function parseOutput(text: string): ParsedWord[] {
     for (const line of block.split('\n')) {
       const colon = line.indexOf(':');
       if (colon < 0) continue;
-      const key = line.slice(0, colon).trim().toLowerCase().replace(/\s+/g, ' ');
+      // Strip whitespace so "Example 1:" / "Part of speech:" (this prompt's own
+      // style) and "example1:" / "partOfSpeech:" (My Words-prompt style) both parse.
+      const key = line.slice(0, colon).trim().toLowerCase().replace(/\s+/g, '');
       const val = line.slice(colon + 1).trim();
       if (key === 'word') w.word = val;
       else if (key === 'translation') w.translation = val;
       else if (key === 'definition') w.definition = val;
-      else if (key === 'part of speech') w.partOfSpeech = val;
+      else if (key === 'partofspeech') w.partOfSpeech = val;
       else if (key === 'pronunciation') w.pronunciation = val;
-      else if (key === 'uzbek definition') w.definitionUz = val;
+      else if (key === 'uzbekdefinition' || key === 'definitionuz') w.definitionUz = val;
       else {
-        const sm = key.match(/^example (\d+)$/);
-        const tm = key.match(/^example (\d+) translation$/);
+        const sm = key.match(/^example(\d+)$/);
+        const tm = key.match(/^example(\d+)translation$/);
         if (sm) sentences[+sm[1]] = val;
         if (tm) translations[+tm[1]] = val;
       }
