@@ -4,11 +4,15 @@ let currentUtterance: SpeechSynthesisUtterance | null = null;
 
 function pickVoice(langCode: string): SpeechSynthesisVoice | null {
   const voices = window.speechSynthesis.getVoices();
-  // Prefer local (on-device) voice for the exact lang, then any voice for that lang
+  const baseLang = langCode.split('-')[0];
+  // Prefer local (on-device) voice for the exact lang, then any voice for that lang.
+  // No English fallback here — an English voice reading non-English text (e.g. Russian)
+  // mispronounces it badly. Leave voice unset instead so the browser picks its own
+  // default for u.lang rather than forcing a mismatched English one.
   return (
     voices.find(v => v.lang === langCode && v.localService) ??
     voices.find(v => v.lang.startsWith(langCode)) ??
-    voices.find(v => v.lang.startsWith('en')) ??
+    voices.find(v => v.lang.startsWith(baseLang)) ??
     null
   );
 }
