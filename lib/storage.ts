@@ -1,4 +1,4 @@
-import type { SRSWord, DueSRSWord, LearnedWord, UnitProgress, UserSettings, Achievement, CustomList, WordItem, WordCollection, ImportedWord, ImportedWordExample, ImportedCollection, ImportedFolder } from './types';
+import type { SRSWord, DueSRSWord, LearnedWord, UnitProgress, MyUnitProgress, UserSettings, Achievement, CustomList, WordItem, WordCollection, ImportedWord, ImportedWordExample, ImportedCollection, ImportedFolder } from './types';
 import { SRS_INTERVALS, LEVEL_THRESHOLDS, LEARN_XP_TIERS, STREAK_BONUS_7, STREAK_BONUS_30 } from './types';
 import { supabase } from './supabase';
 
@@ -55,6 +55,7 @@ const KEYS = {
   quizXpUnits:       'lexivo_quiz_xp_units',
   matchXpUnits:      'lexivo_match_xp_units',
   srsLockedDays:     'lexivo_srs_locked_days',
+  myUnitProgress:    'lexivo_my_unit_progress',
 };
 
 function get<T>(key: string, fallback: T): T {
@@ -782,6 +783,59 @@ export function markMatchComplete(collectionName: string, dayNumber: number) {
   set(key, { ...p, matchDone: true });
 }
 
+// ─── My Words Unit Progress ───────────────────────────────────────────────────
+// Unlike the curated collections above, a My Words unit can grow after it's
+// been completed. Completion (all four activities done) stamps completedAt
+// and snapshots the word list at that moment. If new words are added later,
+// addImportedWords() resets the four flags (see below) but keeps completedAt
+// and completedWords intact, so the unit shows "Completed · N new words to
+// learn" instead of losing its badge.
+
+function myUnitProgressKey(folderName: string | undefined, collectionName: string): string {
+  return `${KEYS.myUnitProgress}_${folderName ?? ''}_${collectionName}`;
+}
+
+export function getMyUnitProgress(folderName: string | undefined, collectionName: string): MyUnitProgress {
+  return get<MyUnitProgress>(myUnitProgressKey(folderName, collectionName), {
+    learnDone: false, flashcardDone: false, quizDone: false, matchDone: false, completedWords: [],
+  });
+}
+
+// Returns true when this call is what just brought the unit to full
+// completion (all four activities done), so callers can fire a one-time
+// celebration — not true on every call, and not true again on redos.
+function markMyUnitActivityComplete(
+  folderName: string | undefined,
+  collectionName: string,
+  activity: 'learnDone' | 'flashcardDone' | 'quizDone' | 'matchDone',
+): boolean {
+  const key = myUnitProgressKey(folderName, collectionName);
+  const p = getMyUnitProgress(folderName, collectionName);
+  const wasComplete = p.learnDone && p.flashcardDone && p.quizDone && p.matchDone;
+  const updated: MyUnitProgress = { ...p, [activity]: true };
+  const nowComplete = updated.learnDone && updated.flashcardDone && updated.quizDone && updated.matchDone;
+  if (nowComplete) {
+    updated.completedWords = getImportedWordsByCollection(collectionName, folderName).map(w => w.word);
+    updated.completedAt = new Date().toISOString();
+  }
+  set(key, updated);
+  return nowComplete && !wasComplete;
+}
+
+export const markMyLearnComplete      = (folderName: string | undefined, collectionName: string) => markMyUnitActivityComplete(folderName, collectionName, 'learnDone');
+export const markMyFlashcardComplete  = (folderName: string | undefined, collectionName: string) => markMyUnitActivityComplete(folderName, collectionName, 'flashcardDone');
+export const markMyQuizComplete       = (folderName: string | undefined, collectionName: string) => markMyUnitActivityComplete(folderName, collectionName, 'quizDone');
+export const markMyMatchComplete      = (folderName: string | undefined, collectionName: string) => markMyUnitActivityComplete(folderName, collectionName, 'matchDone');
+
+// Words in this unit not yet covered by the last full completion. Empty
+// (nothing pending) whenever the unit has never been completed at all.
+export function getMyUnitPendingNewWords(folderName: string | undefined, collectionName: string, currentWords: string[]): string[] {
+  const p = getMyUnitProgress(folderName, collectionName);
+  if (!p.completedAt) return [];
+  const completedSet = new Set(p.completedWords);
+  return currentWords.filter(w => !completedSet.has(w));
+}
+
 // ─── Starred words ───────────────────────────────────────────────────────────
 
 export function getStarredWords(): string[] {
@@ -1130,6 +1184,13 @@ export function addImportedWords(words: ImportedWord[], collectionName: string, 
     .map(w => sanitizeImportedWord({ ...w, collectionName, ...(folderName ? { folderName } : {}) }));
   set(IMPORTED_KEY, [...raw, ...fresh]);
   if (folderName) updateFolderMap(collectionName, folderName);
+  if (fresh.length > 0) {
+    const key = myUnitProgressKey(folderName, collectionName);
+    const p = getMyUnitProgress(folderName, collectionName);
+    if (p.completedAt) {
+      set(key, { ...p, learnDone: false, flashcardDone: false, quizDone: false, matchDone: false });
+    }
+  }
 }
 
 // Soft-delete: mark with a tombstone timestamp instead of removing outright,

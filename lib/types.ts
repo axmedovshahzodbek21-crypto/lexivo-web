@@ -61,6 +61,20 @@ export interface UnitProgress {
   completedAt?: string;
 }
 
+// Progress for a user-created My Words unit (folder + collection).
+// Unlike UnitProgress, completion requires all four activities (My Words
+// treats Learn/Flashcards/Quiz/Match as equal, parallel steps), and adding
+// new words after completion resets the four flags without erasing
+// completedAt/completedWords — see markMyUnitActivityComplete in storage.ts.
+export interface MyUnitProgress {
+  learnDone: boolean;
+  flashcardDone: boolean;
+  quizDone: boolean;
+  matchDone: boolean;
+  completedAt?: string;
+  completedWords: string[]; // snapshot of words covered as of the last full completion
+}
+
 export interface Achievement {
   id: string;
   title: string;

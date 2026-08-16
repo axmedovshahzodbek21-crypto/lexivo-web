@@ -3,7 +3,7 @@ import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/lib/useTranslation';
-import { getImportedFolders, getImportedCollections, addImportedWords } from '@/lib/storage';
+import { getImportedFolders, getImportedCollections, addImportedWords, getCollectionsByFolder, getMyUnitProgress } from '@/lib/storage';
 import { pushLists, pullAll } from '@/lib/sync';
 import type { ImportedFolder, ImportedCollection } from '@/lib/types';
 
@@ -39,6 +39,10 @@ const COLORS = [
 
 function cardColor(index: number) {
   return COLORS[index % COLORS.length];
+}
+
+function completedUnitsInFolder(folderName: string): number {
+  return getCollectionsByFolder(folderName).filter(c => !!getMyUnitProgress(folderName, c.name).completedAt).length;
 }
 
 const darken = (hex: string, amt = 0.45) => {
@@ -168,6 +172,10 @@ export default function MyWordsPage() {
                     <p className="font-bold text-white text-sm leading-tight line-clamp-2">{folder.name}</p>
                     <p className="text-[11px] mt-0.5" style={{ color: 'rgba(255,255,255,0.75)' }}>
                       {folder.wordCount} words
+                      {(() => {
+                        const done = completedUnitsInFolder(folder.name);
+                        return done > 0 ? ` · ✅ ${done}/${folder.collectionCount}` : '';
+                      })()}
                     </p>
                   </div>
                 </Link>

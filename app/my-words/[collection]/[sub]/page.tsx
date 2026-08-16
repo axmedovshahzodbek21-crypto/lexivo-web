@@ -3,7 +3,7 @@ import { useEffect, useState, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/lib/useTranslation';
-import { getImportedWordsByCollection, deleteImportedWord, deleteImportedCollection } from '@/lib/storage';
+import { getImportedWordsByCollection, deleteImportedWord, deleteImportedCollection, getMyUnitProgress, getMyUnitPendingNewWords } from '@/lib/storage';
 import { pushLists } from '@/lib/sync';
 import { speakText } from '@/lib/speech';
 import type { ImportedWord } from '@/lib/types';
@@ -20,6 +20,8 @@ export default function FolderCollectionPage({ params }: Props) {
   const router = useRouter();
   const t = useTranslation();
   const [words, setWords] = useState<ImportedWord[]>([]);
+  const [completedAt, setCompletedAt] = useState<string | undefined>(undefined);
+  const [pendingNewWords, setPendingNewWords] = useState<string[]>([]);
   const [selectMode, setSelectMode] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [confirmModal, setConfirmModal] = useState<
@@ -29,8 +31,18 @@ export default function FolderCollectionPage({ params }: Props) {
     | null
   >(null);
 
+  const loadProgress = (currentWords: ImportedWord[]) => {
+    const p = getMyUnitProgress(folder, collectionName);
+    setCompletedAt(p.completedAt);
+    setPendingNewWords(getMyUnitPendingNewWords(folder, collectionName, currentWords.map(w => w.word)));
+  };
+
   useEffect(() => {
-    const load = () => setWords(getImportedWordsByCollection(collectionName, folder));
+    const load = () => {
+      const w = getImportedWordsByCollection(collectionName, folder);
+      setWords(w);
+      loadProgress(w);
+    };
     load();
   }, [folder, collectionName]);
 
@@ -65,7 +77,9 @@ export default function FolderCollectionPage({ params }: Props) {
     if (confirmModal.type === 'word') {
       deleteImportedWord(confirmModal.word, collectionName, folder);
       pushLists();
-      setWords(getImportedWordsByCollection(collectionName, folder));
+      const w = getImportedWordsByCollection(collectionName, folder);
+      setWords(w);
+      loadProgress(w);
     } else if (confirmModal.type === 'collection') {
       deleteImportedCollection(collectionName, folder);
       pushLists();
@@ -75,7 +89,9 @@ export default function FolderCollectionPage({ params }: Props) {
     } else if (confirmModal.type === 'bulk') {
       selected.forEach(word => deleteImportedWord(word, collectionName, folder));
       pushLists();
-      setWords(getImportedWordsByCollection(collectionName, folder));
+      const w = getImportedWordsByCollection(collectionName, folder);
+      setWords(w);
+      loadProgress(w);
       setSelected(new Set());
       setSelectMode(false);
     }
@@ -93,6 +109,14 @@ export default function FolderCollectionPage({ params }: Props) {
           <p className="text-xs text-[var(--text-muted)] truncate">
             <span className="text-[var(--primary)]">📁 {folder}</span> · {t.myWords.wordCount(words.length)}
           </p>
+          {completedAt && (
+            <p className="text-xs font-semibold mt-0.5" style={{ color: 'var(--success)' }}>
+              {t.myWords.completedBadge}
+              {pendingNewWords.length > 0 && (
+                <span className="text-[var(--text-muted)] font-normal"> · {t.myWords.newWordsToLearn(pendingNewWords.length)}</span>
+              )}
+            </p>
+          )}
         </div>
         {words.length > 0 && (
           <button
@@ -128,6 +152,37 @@ export default function FolderCollectionPage({ params }: Props) {
           </div>
         ) : (
           <>
+            {pendingNewWords.length > 0 && (() => {
+              const newParam = `${studyParam}&onlyNew=1`;
+              return (
+                <div className="space-y-1.5">
+                  <p className="text-xs font-semibold" style={{ color: 'var(--success)' }}>
+                    {t.myWords.studyNewWords(pendingNewWords.length)}
+                  </p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Link href={`/learn?${newParam}`} className="flex flex-col items-center gap-1.5 py-3 rounded-2xl text-center transition-colors" style={{ background: 'rgba(34,197,94,0.12)', border: '1.5px solid var(--success)' }}>
+                      <span className="text-2xl">📖</span>
+                      <span className="text-xs font-semibold" style={{ color: 'var(--success)' }}>Learn</span>
+                    </Link>
+                    <Link href={`/flashcards?${newParam}`} className="flex flex-col items-center gap-1.5 py-3 rounded-2xl text-center transition-colors" style={{ background: 'rgba(34,197,94,0.12)', border: '1.5px solid var(--success)' }}>
+                      <span className="text-2xl">🃏</span>
+                      <span className="text-xs font-semibold" style={{ color: 'var(--success)' }}>Flashcards</span>
+                    </Link>
+                    <Link href={`/quiz?${newParam}`} className="flex flex-col items-center gap-1.5 py-3 rounded-2xl text-center transition-colors" style={{ background: 'rgba(34,197,94,0.12)', border: '1.5px solid var(--success)' }}>
+                      <span className="text-2xl">❓</span>
+                      <span className="text-xs font-semibold" style={{ color: 'var(--success)' }}>Quiz</span>
+                    </Link>
+                    <Link href={`/matching?${newParam}`} className="flex flex-col items-center gap-1.5 py-3 rounded-2xl text-center transition-colors" style={{ background: 'rgba(34,197,94,0.12)', border: '1.5px solid var(--success)' }}>
+                      <span className="text-2xl">🔗</span>
+                      <span className="text-xs font-semibold" style={{ color: 'var(--success)' }}>Match</span>
+                    </Link>
+                  </div>
+                </div>
+              );
+            })()}
+            {pendingNewWords.length > 0 && (
+              <p className="text-xs font-semibold text-[var(--text-muted)]">{t.myWords.studyAllWords}</p>
+            )}
             <div className="grid grid-cols-2 gap-2">
               <Link href={`/learn?${studyParam}`} className="flex flex-col items-center gap-1.5 py-3 rounded-2xl text-center transition-colors" style={{ background: 'rgba(108,99,255,0.1)', border: '1.5px solid rgba(108,99,255,0.3)' }}>
                 <span className="text-2xl">📖</span>

@@ -21,8 +21,9 @@ import { initClassSRSWord } from '@/lib/class-srs';
 import { recordClassStudyDay } from '@/lib/class-xp';
 import type { Accent } from '@/lib/speech';
 import { checkAchievements } from '@/lib/gamification';
+import { fireConfetti } from '@/lib/confetti';
 import type { WordItem, WordCollection } from '@/lib/types';
-import { getImportedWords, getImportedWordsByCollection, importedWordExampleFields } from '@/lib/storage';
+import { getImportedWords, getImportedWordsByCollection, importedWordExampleFields, getMyUnitPendingNewWords, markMyLearnComplete } from '@/lib/storage';
 import Link from 'next/link';
 import UnitPicker from '@/components/UnitPicker';
 import TiltCard from '@/components/TiltCard';
@@ -74,6 +75,7 @@ function LearnInner() {
   const starredUnitIndex = parseInt(sp.get('unit') ?? '1') - 1; // 0-based
   const myCollection = sp.get('myCollection') ?? undefined;
   const myFolder     = sp.get('myFolder') ?? undefined;
+  const onlyNew = sp.get('onlyNew') === '1';
   const rawCollectionName = sp.get('collection') ?? undefined;
   const dayParam = sp.get('day');
   const dayNumber = dayParam ? parseInt(dayParam) : undefined;
@@ -114,6 +116,7 @@ function LearnInner() {
   const [marks, setMarks] = useState<('learned' | 'skipped' | 'too-hard' | null)[]>([]);
   const [maxReached, setMaxReached] = useState(0);
   const [done, setDone] = useState(false);
+  const [myUnitCompleted, setMyUnitCompleted] = useState(false);
   const [sessionCount, setSessionCount] = useState(0);
   const [sessionXP, setSessionXP] = useState(0);
   const [starred, setStarredState] = useState(false);
@@ -195,7 +198,11 @@ function LearnInner() {
       return;
     }
     if (sourceMyWords) {
-      const imported = myCollection ? getImportedWordsByCollection(myCollection, myFolder) : getImportedWords();
+      let imported = myCollection ? getImportedWordsByCollection(myCollection, myFolder) : getImportedWords();
+      if (onlyNew && myCollection) {
+        const pending = new Set(getMyUnitPendingNewWords(myFolder, myCollection, imported.map(w => w.word)));
+        imported = imported.filter(w => pending.has(w.word));
+      }
       const list: StudyWord[] = imported.map(w => ({
         word: w.word,
         partOfSpeech: w.partOfSpeech ?? '',
@@ -240,7 +247,7 @@ function LearnInner() {
         }
       }
     }
-  }, [collectionsLoaded, collections, collectionName, dayNumber, hardOnly, sourceMyWords, sourceStarred, starredUnitIndex, myCollection, myFolder]);
+  }, [collectionsLoaded, collections, collectionName, dayNumber, hardOnly, sourceMyWords, sourceStarred, starredUnitIndex, myCollection, myFolder, onlyNew]);
 
   useEffect(() => {
     if (!sourceClass || !classIdParam) return;
@@ -462,6 +469,8 @@ function LearnInner() {
       if (collectionName && words.length > 0) {
         markLearningComplete(collectionName, words[0].dayNumber);
         clearLearnProgress(collectionName, words[0].dayNumber);
+      } else if (sourceMyWords && myCollection) {
+        if (markMyLearnComplete(myFolder, myCollection)) { setMyUnitCompleted(true); fireConfetti(); }
       }
       pushLists();
       pushStats();
@@ -475,7 +484,7 @@ function LearnInner() {
       setIndex(i => i + 1);
       setMaxReached(m => Math.max(m, index + 1));
     }
-  }, [current, index, words, collectionName, pushAchievement, setPendingLevelUp, hardOnly]);
+  }, [current, index, words, collectionName, pushAchievement, setPendingLevelUp, hardOnly, sourceMyWords, myCollection, myFolder]);
 
   const tryAdvanceCard = useCallback(() => {
     if (!current || !revealed || revealCountdown > 0 || inQuizGate || inSpotCheck) return;
@@ -636,6 +645,7 @@ function LearnInner() {
         sessionCount={sessionCount}
         skipped={skipped}
         pureSkipped={pureSkipped}
+        myUnitCompleted={myUnitCompleted}
         backUrl={backUrl}
         collectionName={sourceClassHW || sourceClass ? classNameParam : collectionName}
         dayNumber={sourceClass ? undefined : dayNumber}
@@ -1165,11 +1175,12 @@ function LoadingState() {
 }
 
 function SessionDone({
-  sessionCount, skipped, pureSkipped, backUrl, collectionName, dayNumber, xpEarned, streak, todayCount, onRestart, classHWNextUrl,
+  sessionCount, skipped, pureSkipped, myUnitCompleted, backUrl, collectionName, dayNumber, xpEarned, streak, todayCount, onRestart, classHWNextUrl,
 }: {
   sessionCount: number;
   skipped: StudyWord[];
   pureSkipped: StudyWord[];
+  myUnitCompleted?: boolean;
   backUrl: string;
   collectionName?: string;
   dayNumber?: number;
@@ -1186,6 +1197,11 @@ function SessionDone({
 
   return (
     <div className="p-6 animate-fade-in flex flex-col items-center min-h-screen">
+      {myUnitCompleted && (
+        <div className="w-full rounded-2xl px-4 py-3 mb-4 text-center font-bold animate-pop" style={{ background: 'rgba(34,197,94,0.12)', color: 'var(--success)', border: '1.5px solid var(--success)' }}>
+          🏆 Unit Complete!
+        </div>
+      )}
       {/* Hero */}
       <div className="flex flex-col items-center text-center pt-10 pb-6">
         <div className="text-6xl mb-3 animate-pop">🎉</div>

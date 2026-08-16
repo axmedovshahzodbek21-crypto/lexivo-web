@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { speak, speakText } from '@/lib/speech';
-import { recordStudySession, markQuizComplete, unlockAchievement, getStarredWords, getCustomListWords, getSettings, getUnitProgress, getImportedWords, getImportedWordsByCollection, importedWordExampleFields, getClassHWTemp, recordQuizSession, addXP, hasQuizXPAwarded, markQuizXPAwarded } from '@/lib/storage';
+import { recordStudySession, markQuizComplete, unlockAchievement, getStarredWords, getCustomListWords, getSettings, getUnitProgress, getImportedWords, getImportedWordsByCollection, importedWordExampleFields, getClassHWTemp, recordQuizSession, addXP, hasQuizXPAwarded, markQuizXPAwarded, getMyUnitPendingNewWords, markMyQuizComplete } from '@/lib/storage';
 import { pushLists, pushStats } from '@/lib/sync';
 import { fireConfetti } from '@/lib/confetti';
 import { checkAchievements } from '@/lib/gamification';
@@ -116,6 +116,7 @@ export default function QuizPage() {
   const classNameParam = sp.get('className') ?? 'Class';
   const myCollection = sp.get('myCollection') ?? undefined;
   const myFolder     = sp.get('myFolder') ?? undefined;
+  const onlyNew = sp.get('onlyNew') === '1';
   const { collections, collectionsLoaded, pushAchievement, setPendingLevelUp } = useAppStore();
 
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
@@ -124,6 +125,7 @@ export default function QuizPage() {
   const [state, setState] = useState<QuizState>('idle');
   const [correct, setCorrect] = useState(0);
   const [done, setDone] = useState(false);
+  const [myUnitCompleted, setMyUnitCompleted] = useState(false);
   const [wrongQuestions, setWrongQuestions] = useState<QuizQuestion[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
   const selecting = useRef(false);
@@ -215,7 +217,11 @@ export default function QuizPage() {
       return;
     }
     if (sourceMyWords) {
-      const imported = myCollection ? getImportedWordsByCollection(myCollection, myFolder) : getImportedWords();
+      let imported = myCollection ? getImportedWordsByCollection(myCollection, myFolder) : getImportedWords();
+      if (onlyNew && myCollection) {
+        const pending = new Set(getMyUnitPendingNewWords(myFolder, myCollection, imported.map(w => w.word)));
+        imported = imported.filter(w => pending.has(w.word));
+      }
       const allWords: QuizWord[] = imported.map(w => ({
         word: w.word, partOfSpeech: '', pronunciation: '',
         translation: w.translation, definition: w.definition,
@@ -243,7 +249,7 @@ export default function QuizPage() {
     if (collectionsLoaded && collections.length > 0) {
       setQuestions(buildQuiz(collections, collectionName, dayNumber, starredOnly, listId, quizDirection));
     }
-  }, [collectionsLoaded, collections, collectionName, dayNumber, starredOnly, listId, quizDirection, sourceMyWords, sourceClassHW, myCollection, myFolder]);
+  }, [collectionsLoaded, collections, collectionName, dayNumber, starredOnly, listId, quizDirection, sourceMyWords, sourceClassHW, myCollection, myFolder, onlyNew]);
 
   const current = questions[index];
 
@@ -303,6 +309,8 @@ export default function QuizPage() {
           markQuizComplete(collectionName, qDayNumber);
           const p = getUnitProgress(collectionName, qDayNumber);
           if (p.learnDone && p.flashcardDone && p.quizDone) fireConfetti();
+        } else if (sourceMyWords && myCollection) {
+          if (markMyQuizComplete(myFolder, myCollection)) { setMyUnitCompleted(true); fireConfetti(); }
         }
         recordQuizSession();
         const newAchievements = checkAchievements();
@@ -321,7 +329,7 @@ export default function QuizPage() {
       setSelected(null);
       setState('idle');
     }
-  }, [index, questions, correct, selected, current, collectionName, sourceClassHW, pushAchievement, setPendingLevelUp]);
+  }, [index, questions, correct, selected, current, collectionName, sourceClassHW, sourceClass, pushAchievement, setPendingLevelUp, sourceMyWords, myCollection, myFolder]);
 
   if (!collectionName && !starredOnly && !listId && !sourceMyWords && !sourceClassHW && !sourceClass) return <UnitPicker mode="quiz" />;
 
@@ -357,6 +365,11 @@ export default function QuizPage() {
     const backUrl = starredOnly ? '/starred' : sourceClass ? `/classes/${classId}/words` : sourceClassHW ? (sp.get('hwId') ? `/classes/${sp.get('classId')}/homework/${sp.get('hwId')}?completed=quiz` : '/classes') : sourceMyWords ? (myCollection ? (myFolder ? `/my-words/${encodeURIComponent(myFolder)}/${encodeURIComponent(myCollection)}` : `/my-words/${encodeURIComponent(myCollection)}`) : '/my-words') : collectionName ? `/collections/${encodeURIComponent(collectionName)}` : '/';
     return (
       <div className="p-6 text-center flex flex-col items-center justify-center min-h-screen animate-fade-in">
+        {myUnitCompleted && (
+          <div className="w-full rounded-2xl px-4 py-3 mb-4 text-center font-bold animate-pop" style={{ background: 'rgba(34,197,94,0.12)', color: 'var(--success)', border: '1.5px solid var(--success)' }}>
+            🏆 Unit Complete!
+          </div>
+        )}
         <div className="text-6xl mb-4">{score === 100 ? '🏆' : score >= 80 ? '🎉' : score >= 50 ? '👍' : '💪'}</div>
         <h2 className="text-2xl font-bold mb-2">{t.quiz.done}</h2>
         <p className="text-[var(--text-muted)] mb-6">{correct} / {questions.length} correct · {score}%</p>

@@ -6,11 +6,12 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
-import { getHardWords, getStarredWords, getCustomListWords, getImportedWords, getImportedWordsByCollection, importedWordExampleFields, getClassHWTemp, addXP, hasMatchXPAwarded, markMatchXPAwarded, markMatchComplete } from '@/lib/storage';
+import { getHardWords, getStarredWords, getCustomListWords, getImportedWords, getImportedWordsByCollection, importedWordExampleFields, getClassHWTemp, addXP, hasMatchXPAwarded, markMatchXPAwarded, markMatchComplete, getMyUnitPendingNewWords, markMyMatchComplete } from '@/lib/storage';
 import { getClassWordsFull, addClassHardWord } from '@/lib/class-srs';
 import { recordClassStudyDay } from '@/lib/class-xp';
 import { supabase } from '@/lib/supabase';
 import { checkAchievements } from '@/lib/gamification';
+import { fireConfetti } from '@/lib/confetti';
 import type { WordItem, WordCollection } from '@/lib/types';
 
 interface MatchWord extends WordItem {
@@ -83,6 +84,7 @@ function MatchingInner() {
   const classNameParam   = searchParams.get('className') ?? 'Class';
   const myCollection     = searchParams.get('myCollection') ?? undefined;
   const myFolder         = searchParams.get('myFolder') ?? undefined;
+  const onlyNew          = searchParams.get('onlyNew') === '1';
 
   const [words,       setWords]       = useState<MatchWord[]>([]);
   const [roundIndex,  setRoundIndex]  = useState(0);
@@ -108,6 +110,7 @@ function MatchingInner() {
   // Session totals
   const [totalMistakes, setTotalMistakes] = useState(0);
   const [totalTime,     setTotalTime]     = useState(0);
+  const [myUnitCompleted, setMyUnitCompleted] = useState(false);
 
   const wrongTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const timerInterval = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -147,9 +150,13 @@ function MatchingInner() {
       return;
     }
     if (sourceMyWords) {
-      const imported = myCollection
+      let imported = myCollection
         ? getImportedWordsByCollection(myCollection, myFolder)
         : getImportedWords();
+      if (onlyNew && myCollection) {
+        const pending = new Set(getMyUnitPendingNewWords(myFolder, myCollection, imported.map(w => w.word)));
+        imported = imported.filter(w => pending.has(w.word));
+      }
       const list: MatchWord[] = imported.map(w => ({
         word: w.word,
         partOfSpeech: '',
@@ -167,7 +174,7 @@ function MatchingInner() {
     }
     if (!collectionsLoaded) return;
     setWords(buildList(collections, collectionParam, dayParam, starredParam, hardParam, listId));
-  }, [collectionsLoaded, collections, collectionParam, dayParam, starredParam, hardParam, listId, sourceMyWords, sourceClassHW, sourceClass, classId, classNameParam, myCollection, myFolder]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [collectionsLoaded, collections, collectionParam, dayParam, starredParam, hardParam, listId, sourceMyWords, sourceClassHW, sourceClass, classId, classNameParam, myCollection, myFolder, onlyNew]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const initRound = useCallback((idx: number, wordList: MatchWord[]) => {
     const batch = wordList.slice(idx * BATCH_SIZE, (idx + 1) * BATCH_SIZE);
@@ -244,6 +251,8 @@ function MatchingInner() {
             markMatchXPAwarded(collectionParam, dayParam);
             if (result.leveledUp) setPendingLevelUp({ level: result.newLevel, xp: result.newXp });
           }
+        } else if (isLast && sourceMyWords && myCollection) {
+          if (markMyMatchComplete(myFolder, myCollection)) { setMyUnitCompleted(true); fireConfetti(); }
         }
         if (isLast && sourceClass && classId) {
           supabase.auth.getUser().then(({ data: { user } }) => {
@@ -262,7 +271,7 @@ function MatchingInner() {
         addClassHardWord(userId, classId, leftId);
       }
     }
-  }, [matched, wrongPair, selected, timerActive, roundWords, mistakes, elapsed, roundIndex, words.length, sourceClass, classId, userId]);
+  }, [matched, wrongPair, selected, timerActive, roundWords, mistakes, elapsed, roundIndex, words.length, sourceClass, classId, userId, sourceMyWords, myCollection, myFolder, collectionParam, dayParam, sourceClassHW]);
 
   // ── Not supported / loading ──
   if (!collectionsLoaded && !sourceMyWords && !sourceClass) {
@@ -293,6 +302,11 @@ function MatchingInner() {
           <h1 className="text-xl font-bold text-[var(--text)]">🎯 Complete!</h1>
         </div>
         <div className="flex-1 p-4 space-y-4">
+          {myUnitCompleted && (
+            <div className="w-full rounded-2xl px-4 py-3 text-center font-bold animate-pop" style={{ background: 'rgba(34,197,94,0.12)', color: 'var(--success)', border: '1.5px solid var(--success)' }}>
+              🏆 Unit Complete!
+            </div>
+          )}
           <div className="card text-center space-y-3">
             <div className="text-5xl">
               {totalMistakes === 0 ? '🏆' : totalMistakes <= 3 ? '🌟' : '💪'}

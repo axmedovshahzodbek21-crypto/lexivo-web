@@ -3,7 +3,7 @@ import { useEffect, useState, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/lib/useTranslation';
-import { deleteImportedFolder, getCollectionsByFolder } from '@/lib/storage';
+import { deleteImportedFolder, getCollectionsByFolder, getMyUnitProgress } from '@/lib/storage';
 import { pushLists } from '@/lib/sync';
 import type { ImportedCollection } from '@/lib/types';
 
@@ -32,6 +32,8 @@ export default function FolderPage({ params }: Props) {
     setCollections(getCollectionsByFolder(folder));
   }, [folder]);
 
+  const completedUnits = collections.filter(c => !!getMyUnitProgress(folder, c.name).completedAt).length;
+
   function handleDeleteFolder() {
     if (!confirm(`Delete the entire "${folder}" folder and all its words?`)) return;
     deleteImportedFolder(folder);
@@ -47,6 +49,7 @@ export default function FolderPage({ params }: Props) {
           <h1 className="font-bold text-[var(--text)] truncate">{folder}</h1>
           <p className="text-xs text-[var(--text-muted)]">
             {collections.length} unit{collections.length !== 1 ? 's' : ''}
+            {collections.length > 0 && <> · {t.collections.completed(completedUnits, collections.length)}</>}
           </p>
         </div>
         <Link
@@ -80,9 +83,12 @@ export default function FolderPage({ params }: Props) {
                 <Link
                   key={col.name}
                   href={`/my-words/${encodeURIComponent(folder)}/${encodeURIComponent(col.name)}`}
-                  className="flex flex-col rounded-2xl p-3 min-h-[100px] justify-between active:scale-95 transition-transform"
+                  className="relative flex flex-col rounded-2xl p-3 min-h-[100px] justify-between active:scale-95 transition-transform"
                   style={{ background: cardColor(i) }}
                 >
+                  {getMyUnitProgress(folder, col.name).completedAt && (
+                    <span className="absolute top-2 right-2 text-sm" title={t.myWords.completedBadge}>✅</span>
+                  )}
                   <span className="text-2xl">📖</span>
                   <div>
                     <p className="font-bold text-white text-sm leading-tight line-clamp-2">{col.name}</p>

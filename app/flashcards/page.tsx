@@ -5,12 +5,13 @@ import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { useShallow } from 'zustand/react/shallow';
 import { speak, speakText } from '@/lib/speech';
-import { recordStudySession, markFlashcardComplete, getStarredWords, getHardWords, getCustomListWords, getUnitProgress, saveFlashcardProgress, getFlashcardProgress, clearFlashcardProgress, getImportedWords, getImportedWordsByCollection, importedWordExampleFields, getClassHWTemp, recordFlashcardSession, addXP, hasFlashcardXPAwarded, markFlashcardXPAwarded } from '@/lib/storage';
+import { recordStudySession, markFlashcardComplete, getStarredWords, getHardWords, getCustomListWords, getUnitProgress, saveFlashcardProgress, getFlashcardProgress, clearFlashcardProgress, getImportedWords, getImportedWordsByCollection, importedWordExampleFields, getClassHWTemp, recordFlashcardSession, addXP, hasFlashcardXPAwarded, markFlashcardXPAwarded, getMyUnitPendingNewWords, markMyFlashcardComplete } from '@/lib/storage';
 import { supabase } from '@/lib/supabase';
 import { getClassWordsFull } from '@/lib/class-srs';
 import { recordClassStudyDay } from '@/lib/class-xp';
 import { pushLists, pushStats } from '@/lib/sync';
 import { checkAchievements } from '@/lib/gamification';
+import { fireConfetti } from '@/lib/confetti';
 import type { WordItem, WordCollection } from '@/lib/types';
 import Link from 'next/link';
 import UnitPicker from '@/components/UnitPicker';
@@ -84,6 +85,7 @@ export default function FlashcardsPage() {
   const classNameParam = sp.get('className') ?? 'Class';
   const myCollection = sp.get('myCollection') ?? undefined;
   const myFolder     = sp.get('myFolder') ?? undefined;
+  const onlyNew = sp.get('onlyNew') === '1';
   const { collections, collectionsLoaded, pushAchievement, setPendingLevelUp, focusMode, setFocusMode } = useAppStore(
     useShallow(s => ({
       collections: s.collections, collectionsLoaded: s.collectionsLoaded,
@@ -99,6 +101,7 @@ export default function FlashcardsPage() {
   const [known, setKnown] = useState(0);
   const [unknown, setUnknown] = useState(0);
   const [done, setDone] = useState(false);
+  const [myUnitCompleted, setMyUnitCompleted] = useState(false);
   const [unknownWords, setUnknownWords] = useState<StudyWord[]>([]);
   const cardsSinceLastPush = useRef(0);
   const advancing = useRef(false);
@@ -158,7 +161,11 @@ export default function FlashcardsPage() {
       return;
     }
     if (sourceMyWords) {
-      const imported = myCollection ? getImportedWordsByCollection(myCollection, myFolder) : getImportedWords();
+      let imported = myCollection ? getImportedWordsByCollection(myCollection, myFolder) : getImportedWords();
+      if (onlyNew && myCollection) {
+        const pending = new Set(getMyUnitPendingNewWords(myFolder, myCollection, imported.map(w => w.word)));
+        imported = imported.filter(w => pending.has(w.word));
+      }
       const list: StudyWord[] = imported.map(w => ({
         word: w.word, partOfSpeech: '', pronunciation: '',
         translation: w.translation, definition: w.definition,
@@ -191,7 +198,7 @@ export default function FlashcardsPage() {
         setDeck(fullDeck);
       }
     }
-  }, [collectionsLoaded, collections, collectionName, dayNumber, starredOnly, hardOnly, listId, fresh, sourceMyWords, sourceClassHW, myCollection, myFolder]);
+  }, [collectionsLoaded, collections, collectionName, dayNumber, starredOnly, hardOnly, listId, fresh, sourceMyWords, sourceClassHW, myCollection, myFolder, onlyNew]);
 
   const current = deck[index];
 
@@ -251,6 +258,8 @@ export default function FlashcardsPage() {
         const qDay = dayNumber ?? deck[0]?.dayNumber ?? 1;
         markFlashcardComplete(collectionName, qDay);
         clearFlashcardProgress(collectionName, qDay);
+      } else if (sourceMyWords && myCollection) {
+        if (markMyFlashcardComplete(myFolder, myCollection)) { setMyUnitCompleted(true); fireConfetti(); }
       }
       pushLists();
       pushStats();
@@ -267,7 +276,7 @@ export default function FlashcardsPage() {
       setIndex(i => i + 1);
       setSide('front');
     }
-  }, [index, deck, collectionName, dayNumber, sourceClassHW, pushAchievement, setPendingLevelUp]);
+  }, [index, deck, collectionName, dayNumber, sourceClassHW, pushAchievement, setPendingLevelUp, sourceMyWords, myCollection, myFolder]);
 
   const markKnown = () => advance(true);
   const markUnknown = () => advance(false);
@@ -305,6 +314,11 @@ export default function FlashcardsPage() {
     const score = Math.round((known / deck.length) * 100);
     return (
       <div className="p-6 text-center flex flex-col items-center justify-center min-h-screen animate-fade-in">
+        {myUnitCompleted && (
+          <div className="w-full rounded-2xl px-4 py-3 mb-4 text-center font-bold animate-pop" style={{ background: 'rgba(34,197,94,0.12)', color: 'var(--success)', border: '1.5px solid var(--success)' }}>
+            🏆 Unit Complete!
+          </div>
+        )}
         <div className="text-6xl mb-4">{score >= 80 ? '🎉' : score >= 50 ? '👍' : '💪'}</div>
         <h2 className="text-2xl font-bold mb-2">{t.flashcards.done}</h2>
         <p className="text-[var(--text-muted)] mb-6">{known} {t.flashcards.known} · {unknown} {t.flashcards.review} · {score}% {t.flashcards.score}</p>

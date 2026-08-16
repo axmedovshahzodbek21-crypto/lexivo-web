@@ -334,6 +334,10 @@ const en = {
     addWords: '+ Add Items',
     wordCount: (n: number) => `${n} item${n !== 1 ? 's' : ''}`,
     deleteConfirm: 'Remove this word?',
+    completedBadge: '✅ Completed',
+    newWordsToLearn: (n: number) => `${n} new word${n !== 1 ? 's' : ''} to learn`,
+    studyNewWords: (n: number) => `Study ${n} new word${n !== 1 ? 's' : ''}`,
+    studyAllWords: 'Study all words',
   },
   import: {
     title: 'Import Words',
@@ -763,6 +767,10 @@ const uz: typeof en = {
     addWords: "+ Element qo'shish",
     wordCount: (n: number) => `${n} ta element`,
     deleteConfirm: "Bu so'zni olib tashlaysizmi?",
+    completedBadge: '✅ Tugallandi',
+    newWordsToLearn: (n: number) => `${n} ta yangi so'z o'rganish kerak`,
+    studyNewWords: (n: number) => `${n} ta yangi so'zni o'rganish`,
+    studyAllWords: "Barcha so'zlarni o'rganish",
   },
   import: {
     title: "So'z import qilish",
