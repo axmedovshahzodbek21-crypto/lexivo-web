@@ -91,7 +91,7 @@ ${words}
 For each word output exactly this format, separated by ---:
 
 ${wordLine}
-Part of speech: [noun / verb / adjective / adverb / phrase / etc.]
+Part of speech: [noun / verb / adjective / adverb / phrase / etc., written in ${wordLang.toLowerCase()}]
 Pronunciation: [IPA pronunciation, e.g. /wɜːrd/]
 ${transLine}
 Definition: [short definition in ${wordLang.toLowerCase()}, max 20 words]

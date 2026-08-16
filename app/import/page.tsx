@@ -87,7 +87,7 @@ definitionUz: Ulkan — juda katta yoki keng hajmga ega bo'lgan narsa yoki hodis
 ${EXAMPLE_FORMAT_BLOCK}
 ---
 
-Important: the example above uses English/Uzbek only to show the format. In your actual response, write the definition and examples in ${wordLang}, the translations and definitionUz in ${transLang}.
+Important: the example above uses English/Uzbek only to show the format. In your actual response, write the definition, part of speech, and examples in ${wordLang}, the translations and definitionUz in ${transLang}.
 
 Here are my words:
 ${words}`;
@@ -107,7 +107,7 @@ definitionUz: Ulkan — juda katta yoki keng hajmga ega bo'lgan narsa yoki hodis
 ${EXAMPLE_FORMAT_BLOCK}
 ---
 
-Important: the example above uses English/Uzbek only to show the format. In your actual response, write the definition and examples in ${wordLang}, the translations and definitionUz in ${transLang}.
+Important: the example above uses English/Uzbek only to show the format. In your actual response, write the definition, part of speech, and examples in ${wordLang}, the translations and definitionUz in ${transLang}.
 
 Here are my pairs (word - translation):
 ${words}`;
