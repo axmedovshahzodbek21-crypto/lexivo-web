@@ -131,6 +131,15 @@ export default function UnitPage() {
   // Word detail modal
   const [detailWord, setDetailWord] = useState<UnitWord | null>(null);
 
+  // Selection + delete confirmation
+  const [selectMode, setSelectMode] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [confirmModal, setConfirmModal] = useState<
+    | { type: 'word'; id: string; message: string }
+    | { type: 'bulk'; ids: string[]; message: string }
+    | null
+  >(null);
+
   useEffect(() => {
     if (authLoading) return;
     if (!user) { router.replace('/login'); return; }
@@ -188,15 +197,49 @@ export default function UnitPage() {
     setImporting(false);
   }
 
-  async function deleteWord(id: string) {
-    if (!confirm('Delete this word?')) return;
-    await supabase.from('teacher_unit_words').delete().eq('id', id);
+  async function deleteWordIds(ids: string[]) {
+    await supabase.from('teacher_unit_words').delete().in('id', ids);
     setWords(prev => {
-      const next = prev.filter(w => w.id !== id);
+      const next = prev.filter(w => !ids.includes(w.id));
       const c = _cache[unitId];
       if (c) _cache[unitId] = { ...c, words: next };
       return next;
     });
+  }
+
+  function toggleSelectMode() {
+    setSelectMode(v => !v);
+    setSelected(new Set());
+  }
+
+  function toggleSelected(id: string) {
+    setSelected(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }
+
+  function requestDeleteWord(id: string) {
+    setConfirmModal({ type: 'word', id, message: 'Delete this word?' });
+  }
+
+  function requestDeleteSelected() {
+    if (selected.size === 0) return;
+    const ids = [...selected];
+    setConfirmModal({ type: 'bulk', ids, message: `Delete ${ids.length} selected word${ids.length !== 1 ? 's' : ''}?` });
+  }
+
+  async function confirmDelete() {
+    if (!confirmModal) return;
+    if (confirmModal.type === 'word') {
+      await deleteWordIds([confirmModal.id]);
+    } else {
+      await deleteWordIds(confirmModal.ids);
+      setSelected(new Set());
+      setSelectMode(false);
+    }
+    setConfirmModal(null);
   }
 
   function copyPrompt(hasTranslations: boolean) {
@@ -228,6 +271,14 @@ export default function UnitPage() {
           <h1 className="text-2xl font-black text-[var(--text)]">{unitName}</h1>
           <p className="text-sm text-[var(--text-muted)] mt-0.5">{words.length} {words.length === 1 ? 'word' : 'words'}</p>
         </div>
+        {tab === 'words' && words.length > 0 && (
+          <button
+            onClick={toggleSelectMode}
+            className={`text-xs font-semibold px-3 py-1.5 rounded-full transition-colors ${selectMode ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface-2)] text-[var(--text-muted)]'}`}
+          >
+            {selectMode ? 'Cancel' : 'Select'}
+          </button>
+        )}
       </div>
 
       {/* Tabs */}
@@ -256,30 +307,40 @@ export default function UnitPage() {
           <div className="space-y-2">
             <div className="flex items-center justify-between mb-3">
               <span className="text-sm text-[var(--text-muted)] font-medium">{words.length} words</span>
-              <button onClick={() => setTab('add')} className="text-xs font-semibold text-[var(--primary)] hover:underline">+ Add more</button>
+              {!selectMode && <button onClick={() => setTab('add')} className="text-xs font-semibold text-[var(--primary)] hover:underline">+ Add more</button>}
             </div>
-            {words.map(word => (
-              <div
-                key={word.id}
-                onClick={() => setDetailWord(word)}
-                className="flex items-center gap-3 p-4 bg-[var(--surface)] rounded-2xl cursor-pointer hover:bg-[var(--surface-2)] transition-colors group"
-              >
-                <div className="flex-1 min-w-0">
-                  <p className="font-bold text-[var(--text)] text-sm">{word.word}</p>
-                  <p className="text-[var(--primary)] text-xs font-semibold mt-0.5">{word.translation}</p>
-                  {word.definition && <p className="text-[var(--text-muted)] text-xs mt-0.5 truncate">{word.definition}</p>}
+            {words.map(word => {
+              const isSelected = selected.has(word.id);
+              return (
+                <div
+                  key={word.id}
+                  onClick={() => selectMode ? toggleSelected(word.id) : setDetailWord(word)}
+                  className={`flex items-center gap-3 p-4 bg-[var(--surface)] rounded-2xl cursor-pointer hover:bg-[var(--surface-2)] transition-colors group ${isSelected ? 'ring-2 ring-[var(--primary)]' : ''}`}
+                >
+                  {selectMode && (
+                    <div className={`w-5 h-5 rounded-md border-2 shrink-0 flex items-center justify-center ${isSelected ? 'bg-[var(--primary)] border-[var(--primary)]' : 'border-[var(--border)]'}`}>
+                      {isSelected && <span className="text-white text-xs leading-none">✓</span>}
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-[var(--text)] text-sm">{word.word}</p>
+                    <p className="text-[var(--primary)] text-xs font-semibold mt-0.5">{word.translation}</p>
+                    {word.definition && <p className="text-[var(--text-muted)] text-xs mt-0.5 truncate">{word.definition}</p>}
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="text-[10px] font-bold px-2 py-1 rounded-lg bg-[var(--primary-bg)] text-[var(--primary)]">
+                      {word.examples.length}ex
+                    </span>
+                    {!selectMode && (
+                      <button
+                        onClick={e => { e.stopPropagation(); requestDeleteWord(word.id); }}
+                        className="opacity-0 group-hover:opacity-100 text-[var(--text-muted)] hover:text-red-500 transition-all text-sm"
+                      >🗑</button>
+                    )}
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <span className="text-[10px] font-bold px-2 py-1 rounded-lg bg-[var(--primary-bg)] text-[var(--primary)]">
-                    {word.examples.length}ex
-                  </span>
-                  <button
-                    onClick={e => { e.stopPropagation(); deleteWord(word.id); }}
-                    className="opacity-0 group-hover:opacity-100 text-[var(--text-muted)] hover:text-red-500 transition-all text-sm"
-                  >🗑</button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )
       )}
@@ -395,6 +456,42 @@ export default function UnitPage() {
                 </div>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {selectMode && selected.size > 0 && (
+        <div className="fixed bottom-20 sm:bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-3 px-5 py-3 rounded-2xl shadow-xl bg-[var(--surface)] border border-[var(--border)]">
+          <span className="text-sm font-semibold text-[var(--text)]">{selected.size} selected</span>
+          <button
+            onClick={requestDeleteSelected}
+            className="px-4 py-2 rounded-xl text-sm font-bold text-white"
+            style={{ background: 'var(--danger)' }}
+          >
+            🗑️ Delete
+          </button>
+        </div>
+      )}
+
+      {confirmModal && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 px-4 pb-4 sm:pb-0" onClick={() => setConfirmModal(null)}>
+          <div className="bg-[var(--surface)] rounded-2xl w-full max-w-sm p-6 shadow-2xl" onClick={e => e.stopPropagation()}>
+            <p className="text-[var(--text)] font-semibold mb-6">{confirmModal.message}</p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setConfirmModal(null)}
+                className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-[var(--text-muted)] bg-[var(--surface-2)]"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="flex-1 py-2.5 rounded-xl text-sm font-bold text-white"
+                style={{ background: 'var(--danger)' }}
+              >
+                Delete
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -20,24 +20,66 @@ export default function FolderCollectionPage({ params }: Props) {
   const router = useRouter();
   const t = useTranslation();
   const [words, setWords] = useState<ImportedWord[]>([]);
+  const [selectMode, setSelectMode] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [confirmModal, setConfirmModal] = useState<
+    | { type: 'word'; word: string; message: string }
+    | { type: 'collection'; message: string }
+    | { type: 'bulk'; count: number; message: string }
+    | null
+  >(null);
 
   useEffect(() => {
     const load = () => setWords(getImportedWordsByCollection(collectionName, folder));
     load();
   }, [folder, collectionName]);
 
-  function handleDelete(word: string) {
-    if (!confirm(t.myWords.deleteConfirm)) return;
-    deleteImportedWord(word, collectionName, folder);
-    pushLists();
-    setWords(getImportedWordsByCollection(collectionName, folder));
+  function toggleSelectMode() {
+    setSelectMode(v => !v);
+    setSelected(new Set());
   }
 
-  function handleDeleteCollection() {
-    if (!confirm(`Delete the "${collectionName}" collection and all its words?`)) return;
-    deleteImportedCollection(collectionName, folder);
-    pushLists();
-    router.push(`/my-words/${encodeURIComponent(folder)}`);
+  function toggleSelected(word: string) {
+    setSelected(prev => {
+      const next = new Set(prev);
+      if (next.has(word)) next.delete(word); else next.add(word);
+      return next;
+    });
+  }
+
+  function requestDelete(word: string) {
+    setConfirmModal({ type: 'word', word, message: t.myWords.deleteConfirm });
+  }
+
+  function requestDeleteCollection() {
+    setConfirmModal({ type: 'collection', message: `Delete the "${collectionName}" collection and all its words?` });
+  }
+
+  function requestDeleteSelected() {
+    if (selected.size === 0) return;
+    setConfirmModal({ type: 'bulk', count: selected.size, message: `Delete ${selected.size} selected word${selected.size !== 1 ? 's' : ''}?` });
+  }
+
+  function confirmDelete() {
+    if (!confirmModal) return;
+    if (confirmModal.type === 'word') {
+      deleteImportedWord(confirmModal.word, collectionName, folder);
+      pushLists();
+      setWords(getImportedWordsByCollection(collectionName, folder));
+    } else if (confirmModal.type === 'collection') {
+      deleteImportedCollection(collectionName, folder);
+      pushLists();
+      setConfirmModal(null);
+      router.push(`/my-words/${encodeURIComponent(folder)}`);
+      return;
+    } else if (confirmModal.type === 'bulk') {
+      selected.forEach(word => deleteImportedWord(word, collectionName, folder));
+      pushLists();
+      setWords(getImportedWordsByCollection(collectionName, folder));
+      setSelected(new Set());
+      setSelectMode(false);
+    }
+    setConfirmModal(null);
   }
 
   const studyParam = `source=my-words&myCollection=${encodeURIComponent(collectionName)}&myFolder=${encodeURIComponent(folder)}`;
@@ -52,8 +94,16 @@ export default function FolderCollectionPage({ params }: Props) {
             <span className="text-[var(--primary)]">📁 {folder}</span> · {t.myWords.wordCount(words.length)}
           </p>
         </div>
+        {words.length > 0 && (
+          <button
+            onClick={toggleSelectMode}
+            className={`text-xs font-semibold px-3 py-1.5 rounded-full transition-colors ${selectMode ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface-2)] text-[var(--text-muted)]'}`}
+          >
+            {selectMode ? 'Cancel' : 'Select'}
+          </button>
+        )}
         <button
-          onClick={handleDeleteCollection}
+          onClick={requestDeleteCollection}
           className="btn-icon text-base text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors"
           aria-label="Delete collection"
         >🗑️</button>
@@ -98,29 +148,48 @@ export default function FolderCollectionPage({ params }: Props) {
             </div>
 
             <div className="space-y-2">
-              {words.map((w, i) => (
-                <div key={i} className="card space-y-2">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-[var(--text)]">{w.word}</span>
-                        <button onClick={() => speakText(w.word, w.language)} className="w-6 h-6 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-xs hover:bg-[var(--primary)] hover:text-white transition-colors shrink-0" aria-label="Listen">🔊</button>
-                      </div>
-                      <p className="text-sm font-medium text-[var(--primary)] mt-0.5">{w.translation}</p>
-                      {w.definition && <p className="text-xs text-[var(--text-muted)] mt-1">{w.definition}</p>}
-                      {w.examples.map((ex, exIdx) => (
-                        <div key={exIdx}>
-                          <p className="text-xs italic text-[var(--text)] mt-0.5">&quot;{ex.sentence}&quot;</p>
-                          {ex.translation && <p className="text-xs text-[var(--text-muted)] pl-2">↳ {ex.translation}</p>}
+              {words.map((w, i) => {
+                const isSelected = selected.has(w.word);
+                return (
+                  <div
+                    key={i}
+                    className={`card space-y-2 transition-colors ${selectMode ? 'cursor-pointer' : ''} ${isSelected ? 'ring-2 ring-[var(--primary)]' : ''}`}
+                    onClick={selectMode ? () => toggleSelected(w.word) : undefined}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      {selectMode && (
+                        <div
+                          className={`w-5 h-5 rounded-md border-2 shrink-0 mt-0.5 flex items-center justify-center ${isSelected ? 'bg-[var(--primary)] border-[var(--primary)]' : 'border-[var(--border)]'}`}
+                        >
+                          {isSelected && <span className="text-white text-xs leading-none">✓</span>}
                         </div>
-                      ))}
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-[var(--text)]">{w.word}</span>
+                          {!selectMode && (
+                            <button onClick={e => { e.stopPropagation(); speakText(w.word, w.language); }} className="w-6 h-6 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-xs hover:bg-[var(--primary)] hover:text-white transition-colors shrink-0" aria-label="Listen">🔊</button>
+                          )}
+                        </div>
+                        <p className="text-sm font-medium text-[var(--primary)] mt-0.5">{w.translation}</p>
+                        {w.definition && <p className="text-xs text-[var(--text-muted)] mt-1">{w.definition}</p>}
+                        {w.examples.map((ex, exIdx) => (
+                          <div key={exIdx}>
+                            <p className="text-xs italic text-[var(--text)] mt-0.5">&quot;{ex.sentence}&quot;</p>
+                            {ex.translation && <p className="text-xs text-[var(--text-muted)] pl-2">↳ {ex.translation}</p>}
+                          </div>
+                        ))}
+                      </div>
+                      {!selectMode && (
+                        <button onClick={() => requestDelete(w.word)} className="text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors text-sm shrink-0 mt-0.5" aria-label="Delete word">🗑️</button>
+                      )}
                     </div>
-                    <button onClick={() => handleDelete(w.word)} className="text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors text-sm shrink-0 mt-0.5" aria-label="Delete word">🗑️</button>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
+            {!selectMode && (
             <Link
               href={`/import?folder=${encodeURIComponent(folder)}&collection=${encodeURIComponent(collectionName)}`}
               className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl border-2 border-dashed border-[var(--border)] text-sm font-medium text-[var(--text-muted)] hover:border-[var(--primary)] hover:text-[var(--primary)] transition-colors"
@@ -128,9 +197,46 @@ export default function FolderCollectionPage({ params }: Props) {
               <span>+</span>
               <span>{t.myWords.addWords}</span>
             </Link>
+            )}
           </>
         )}
       </div>
+
+      {selectMode && selected.size > 0 && (
+        <div className="fixed bottom-20 sm:bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-3 px-5 py-3 rounded-2xl shadow-xl bg-[var(--surface)] border border-[var(--border)]">
+          <span className="text-sm font-semibold text-[var(--text)]">{selected.size} selected</span>
+          <button
+            onClick={requestDeleteSelected}
+            className="px-4 py-2 rounded-xl text-sm font-bold text-white"
+            style={{ background: 'var(--danger)' }}
+          >
+            🗑️ Delete
+          </button>
+        </div>
+      )}
+
+      {confirmModal && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 px-4 pb-4 sm:pb-0" onClick={() => setConfirmModal(null)}>
+          <div className="bg-[var(--surface)] rounded-2xl w-full max-w-sm p-6 shadow-2xl" onClick={e => e.stopPropagation()}>
+            <p className="text-[var(--text)] font-semibold mb-6">{confirmModal.message}</p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setConfirmModal(null)}
+                className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-[var(--text-muted)] bg-[var(--surface-2)]"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="flex-1 py-2.5 rounded-xl text-sm font-bold text-white"
+                style={{ background: 'var(--danger)' }}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
