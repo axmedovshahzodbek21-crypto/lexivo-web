@@ -400,17 +400,22 @@ function mergeListsFromCloudRow(row: Record<string, unknown>): void {
       if (changed) lsSet('lexivo_starred', JSON.stringify(local));
     }
 
-    // hard_words (HardWordEntry[])
+    // hard_words (HardWordEntry[]) — per-word last-write-wins by the entry's
+    // effective timestamp (removedAt if present, else addedAt). The previous
+    // comparison only looked at addedAt, so a tombstone (removedAt set, same
+    // addedAt as the local live entry) never actually won the comparison —
+    // an unmark on another device could never propagate.
     if (Array.isArray(row.hard_words) && row.hard_words.length > 0) {
       const local = lsJSON<HardWordEntry[]>('lexivo_hard_words', []);
       const localMap = new Map(local.map((e: HardWordEntry) => [e.word, e]));
+      const tsOf = (e: HardWordEntry) => e.removedAt && e.removedAt > e.addedAt ? e.removedAt : e.addedAt;
       let changed = false;
       for (const raw of row.hard_words as (HardWordEntry | string)[]) {
         const ce: HardWordEntry = typeof raw === 'string'
           ? { word: raw, addedAt: '1970-01-01T00:00:00.000Z' }
           : raw;
         const le = localMap.get(ce.word);
-        if (!le || (ce.addedAt ?? '') > (le.addedAt ?? '')) {
+        if (!le || tsOf(ce) > tsOf(le)) {
           localMap.set(ce.word, ce);
           changed = true;
         }
