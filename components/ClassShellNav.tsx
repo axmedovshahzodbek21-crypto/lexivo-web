@@ -5,6 +5,11 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { getClassDueWords } from '@/lib/class-srs';
+import { useAppStore } from '@/lib/store';
+
+// Not a route — clicking it just opens the Focus Mode setup widget in place,
+// so it works no matter which class tab the student/teacher is currently on.
+const POMODORO_SEG = '__pomodoro__';
 
 const STUDENT_ITEMS = [
   { seg: 'home',        icon: '🏠', label: 'Home'     },
@@ -13,6 +18,7 @@ const STUDENT_ITEMS = [
   { seg: 'leaderboard', icon: '🏆', label: 'Ranks'    },
   { seg: 'homework',    icon: '📋', label: 'Homework' },
   { seg: 'progress',   icon: '📊', label: 'Progress' },
+  { seg: POMODORO_SEG,  icon: '🍅', label: 'Pomodoro' },
 ];
 
 const TEACHER_ITEMS = [
@@ -21,6 +27,7 @@ const TEACHER_ITEMS = [
   { seg: 'leaderboard', icon: '🏆', label: 'Ranks'       },
   { seg: '',            icon: '📊', label: 'Dashboard'   },
   { seg: '__curriculum__', icon: '📋', label: 'Curriculum' },
+  { seg: POMODORO_SEG,  icon: '🍅', label: 'Pomodoro' },
 ];
 
 export default function ClassShellNav({ classId }: { classId: string }) {
@@ -28,6 +35,7 @@ export default function ClassShellNav({ classId }: { classId: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user } = useAuth();
+  const showPomodoroSetup = useAppStore(s => s.showPomodoroSetup);
   const [isTeacher, setIsTeacher] = useState(false);
   const [className, setClassName] = useState('');
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
@@ -91,6 +99,18 @@ export default function ClassShellNav({ classId }: { classId: string }) {
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
         {items.map(({ seg, icon, label }) => {
+          if (seg === POMODORO_SEG) {
+            return (
+              <button
+                key={seg}
+                onClick={() => showPomodoroSetup()}
+                className="flex flex-col items-center gap-0.5 px-3 py-1 min-w-[48px] text-[var(--text-muted)]"
+              >
+                <span className="text-xl leading-none">{icon}</span>
+                <span className="text-[10px] font-semibold">{label}</span>
+              </button>
+            );
+          }
           const active = isActive(seg);
           return (
             <Link
@@ -149,6 +169,18 @@ export default function ClassShellNav({ classId }: { classId: string }) {
           {/* Nav links with icon + label */}
           <nav className="flex-1 px-3 space-y-0.5">
             {items.map(({ seg, icon, label }) => {
+              if (seg === POMODORO_SEG) {
+                return (
+                  <button
+                    key={seg}
+                    onClick={() => showPomodoroSetup()}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-semibold text-[var(--text-muted)] hover:text-[var(--primary)] hover:bg-[var(--primary-bg)]"
+                  >
+                    <span className="text-lg">{icon}</span>
+                    <span className="flex-1 text-left">{label}</span>
+                  </button>
+                );
+              }
               const active = isActive(seg);
               return (
                 <Link
