@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/lib/useTranslation';
 import { deleteImportedFolder, getCollectionsByFolder, getMyUnitProgress } from '@/lib/storage';
-import { pushLists } from '@/lib/sync';
+import { pushLists, pullAll } from '@/lib/sync';
 import type { ImportedCollection } from '@/lib/types';
 
 const COLORS = [
@@ -30,6 +30,9 @@ export default function FolderPage({ params }: Props) {
 
   useEffect(() => {
     setCollections(getCollectionsByFolder(folder));
+    pullAll().then(() => {
+      setCollections(getCollectionsByFolder(folder));
+    });
   }, [folder]);
 
   const completedUnits = collections.filter(c => !!getMyUnitProgress(folder, c.name).completedAt).length;

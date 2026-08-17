@@ -247,7 +247,7 @@ function ImportPageInner() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen animate-fade-in pb-24">
+    <div className={`flex flex-col min-h-screen animate-fade-in ${parsed.length > 0 ? 'pb-36' : 'pb-24'}`}>
       {/* Tutorial modal */}
       {showHelp && (
         <div className="fixed inset-0 z-50 flex items-end justify-center p-4 pb-8" style={{ background: 'rgba(0,0,0,0.5)' }} onClick={() => setShowHelp(false)}>
@@ -437,19 +437,24 @@ function ImportPageInner() {
               </div>
             )}
 
-            {parsed.length > 0 && (
-              <button
-                onClick={handleAdd}
-                disabled={added}
-                className="w-full py-3 rounded-xl bg-[var(--primary)] text-white font-bold text-sm disabled:opacity-60 transition-opacity hover:opacity-90"
-              >
-                {added ? t.import.added(parsed.length) : t.import.addBtn(parsed.length, collectionName.trim() || 'My Words')}
-              </button>
-            )}
           </div>
         )}
 
       </div>
+
+      {/* Add button — pinned to the bottom of the screen so it's reachable
+          without scrolling past the preview list, however long it gets. */}
+      {parsed.length > 0 && (
+        <div className="fixed bottom-20 sm:bottom-6 left-4 right-4 z-40 max-w-lg mx-auto">
+          <button
+            onClick={handleAdd}
+            disabled={added}
+            className="w-full py-3.5 rounded-2xl bg-[var(--primary)] text-white font-bold text-sm shadow-xl disabled:opacity-60 transition-opacity hover:opacity-90"
+          >
+            {added ? t.import.added(parsed.length) : t.import.addBtn(parsed.length, collectionName.trim() || 'My Words')}
+          </button>
+        </div>
+      )}
 
       {/* Copy toast */}
       {copied && (

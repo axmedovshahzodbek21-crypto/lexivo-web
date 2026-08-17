@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/lib/useTranslation';
 import { getImportedWordsByCollection, deleteImportedWord, deleteImportedCollection, getMyUnitProgress, getMyUnitPendingNewWords, getMyActivityPendingNewWords } from '@/lib/storage';
-import { pushLists } from '@/lib/sync';
+import { pushLists, pullAll } from '@/lib/sync';
 import { speakText } from '@/lib/speech';
 import type { ImportedWord } from '@/lib/types';
 
@@ -54,6 +54,7 @@ export default function FolderCollectionPage({ params }: Props) {
       loadProgress(w);
     };
     load();
+    pullAll().then(load);
     // Re-check progress when the user returns from a Learn/Flashcards/Quiz/Match
     // session (e.g. via the back button), so the just-finished activity's
     // checkmark shows up without requiring a manual refresh.
