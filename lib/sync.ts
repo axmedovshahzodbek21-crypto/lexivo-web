@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import type { UserSettings, LearnedWord, SRSWord, UnitProgress } from './types';
+import type { UserSettings, LearnedWord, SRSWord, UnitProgress, MyUnitProgress } from './types';
 import { getSettings, saveSettings, getLearnedWords, saveLearnedWord, getSRSWords, getImportedWordsRaw, localDateStr, getProfilePicUrl, saveProfilePicUrl } from './storage';
 import type { HardWordEntry } from './storage';
 import { getNotifSettings, saveNotifSettings } from './notifications';
@@ -30,6 +30,20 @@ function getAllUnitProgress(): Record<string, UnitProgress> {
   if (typeof window === 'undefined') return {};
   const result: Record<string, UnitProgress> = {};
   const prefix = 'lexivo_unit_progress_';
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k?.startsWith(prefix)) {
+      try { const v = localStorage.getItem(k); if (v) result[k.slice(prefix.length)] = JSON.parse(v); }
+      catch {}
+    }
+  }
+  return result;
+}
+
+function getAllMyUnitProgress(): Record<string, MyUnitProgress> {
+  if (typeof window === 'undefined') return {};
+  const result: Record<string, MyUnitProgress> = {};
+  const prefix = 'lexivo_my_unit_progress_';
   for (let i = 0; i < localStorage.length; i++) {
     const k = localStorage.key(i);
     if (k?.startsWith(prefix)) {
@@ -161,6 +175,7 @@ export async function pushLists(): Promise<void> {
         unit_done_days:   lsJSON<string[]>('lexivo_unit_done_days', []),
         xp_history:       lsJSON<unknown[]>('lexivo_xp_history', []),
         unit_progress:    getAllUnitProgress(),
+        my_unit_progress: getAllMyUnitProgress(),
         review_log:       lsJSON<Record<string, number[]>>('lexivo_review_log', {}),
         imported_words:   getImportedWordsRaw(), // includes tombstones so deletions propagate
         achievements:     Object.entries(lsJSON<Record<string, string>>('lexivo_achievement_dates', {})).map(([id, date]) => ({ id, date })),
@@ -385,6 +400,42 @@ export async function pullAll(): Promise<void> {
             quizDone:      lp.quizDone      || cp.quizDone,
             matchDone:     (lp.matchDone    || cp.matchDone) ?? false,
             completedAt:   lp.completedAt   ?? cp.completedAt,
+          };
+          lsSet(lsKey, JSON.stringify(merged));
+        }
+      }
+    }
+
+    // my_unit_progress: per-key (folder+collection), OR flags + per-activity word snapshots
+    if (row.my_unit_progress && typeof row.my_unit_progress === 'object') {
+      const prefix = 'lexivo_my_unit_progress_';
+      for (const [unitKey, cp] of Object.entries(row.my_unit_progress as Record<string, MyUnitProgress>)) {
+        const lsKey = prefix + unitKey;
+        const existing = localStorage.getItem(lsKey);
+        if (!existing) {
+          lsSet(lsKey, JSON.stringify(cp));
+        } else {
+          const lp: MyUnitProgress = JSON.parse(existing);
+          const pick = (activity: 'learn' | 'flashcard' | 'quiz' | 'match') => {
+            const doneKey = `${activity}Done` as const;
+            const wordsKey = `${activity}Words` as const;
+            const done = lp[doneKey] || cp[doneKey];
+            // Local's own snapshot wins once local has run the activity; only
+            // take cloud's snapshot when local hasn't done it yet itself.
+            const words = lp[doneKey] ? lp[wordsKey] : (cp[doneKey] ? cp[wordsKey] : lp[wordsKey]);
+            return { done, words };
+          };
+          const learn = pick('learn');
+          const flashcard = pick('flashcard');
+          const quiz = pick('quiz');
+          const match = pick('match');
+          const merged: MyUnitProgress = {
+            learnDone: learn.done, learnWords: learn.words,
+            flashcardDone: flashcard.done, flashcardWords: flashcard.words,
+            quizDone: quiz.done, quizWords: quiz.words,
+            matchDone: match.done, matchWords: match.words,
+            completedAt: lp.completedAt ?? cp.completedAt,
+            completedWords: lp.completedWords.length > 0 ? lp.completedWords : cp.completedWords,
           };
           lsSet(lsKey, JSON.stringify(merged));
         }

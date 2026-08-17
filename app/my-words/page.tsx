@@ -95,6 +95,7 @@ export default function MyWordsPage() {
     setResetConfirm(false);
     setFolders(getImportedFolders());
     setOrphaned(getImportedCollections());
+    pushLists();
   }
 
   const isEmpty = folders.length === 0 && orphaned.length === 0;
