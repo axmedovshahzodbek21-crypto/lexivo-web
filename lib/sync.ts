@@ -72,8 +72,17 @@ export async function pushStats(): Promise<void> {
     const todayXpDate = lsGet('lexivo_today_xp_date');
     const todayCountDate = lsGet('lexivo_today_count_date');
     const s = getSettings();
-    const xp = lsJSON<number>('lexivo_xp', 0);
-    const streak = lsJSON<number>('lexivo_streak', 0);
+
+    // Accumulators must never regress the shared cloud row: fetch its current
+    // values and take max(local, cloud) before writing, mirroring the max()
+    // merge already applied on pull. Without this, a device pushing a lower
+    // (stale) locally-computed total after another device already pushed a
+    // higher one would silently erase the other device's earned XP/streak.
+    const { data: cloudRow } = await supabase.from('user_data').select('total_xp, streak, streak_freezes').eq('id', uid).maybeSingle();
+    const xp = Math.max(lsJSON<number>('lexivo_xp', 0), cloudRow?.total_xp ?? 0);
+    const streak = Math.max(lsJSON<number>('lexivo_streak', 0), cloudRow?.streak ?? 0);
+    const freezes = Math.max(lsJSON<number>('lexivo_freezes', 0), cloudRow?.streak_freezes ?? 0);
+
     const studyDays = lsJSON<string[]>('lexivo_study_days', []);
     const reviewDays = lsJSON<string[]>('lexivo_review_days', []);
     const wordGoalDays = lsJSON<string[]>('lexivo_word_goal_days', []);
@@ -82,7 +91,7 @@ export async function pushStats(): Promise<void> {
         id: uid,
         total_xp:            xp,
         streak:              streak,
-        streak_freezes:      lsJSON<number>('lexivo_freezes', 0),
+        streak_freezes:      freezes,
         last_study_date:     lsGet('lexivo_last_study') || null,
         last_freeze_week:    lsGet('lexivo_last_freeze_week') || null,
         show_on_leaderboard: s.showOnLeaderboard ?? true,
@@ -100,7 +109,7 @@ export async function pushStats(): Promise<void> {
         id:               uid,
         xp:               xp,
         streak:           streak,
-        freezes:          lsJSON<number>('lexivo_freezes', 0),
+        freezes:          freezes,
         last_study_date:  lsGet('lexivo_last_study') || null,
         last_freeze_week: lsGet('lexivo_last_freeze_week') || null,
         total_days:       studyDays.length,
@@ -118,6 +127,9 @@ export async function pushStats(): Promise<void> {
         xp_updated_at:    ts,
       }),
     ]);
+    lsSet('lexivo_xp', JSON.stringify(xp));
+    lsSet('lexivo_streak', JSON.stringify(streak));
+    lsSet('lexivo_freezes', JSON.stringify(freezes));
     lsSet(S.statTs, ts);
   } catch {}
 }
