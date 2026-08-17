@@ -54,6 +54,7 @@ const KEYS = {
   flashcardXpUnits:  'lexivo_flash_xp_units',
   quizXpUnits:       'lexivo_quiz_xp_units',
   matchXpUnits:      'lexivo_match_xp_units',
+  myWordsXpUnits:    'lexivo_my_words_xp_units',
   srsLockedDays:     'lexivo_srs_locked_days',
   myUnitProgress:    'lexivo_my_unit_progress',
 };
@@ -930,6 +931,21 @@ export function markMatchXPAwarded(collectionName: string, dayNumber: number): v
   const list = get<string[]>(KEYS.matchXpUnits, []);
   const k = _unitKey(collectionName, dayNumber);
   if (!list.includes(k)) { list.push(k); set(KEYS.matchXpUnits, list); }
+}
+
+// One-time XP per My Words unit per activity (learn is awarded per-word elsewhere,
+// so this only covers flashcard/quiz/match — same "once per unit" rule as the
+// curated-collection XP above, keyed by folder+collection instead of day number).
+function _myWordsUnitKey(activity: string, folderName: string | undefined, collectionName: string) {
+  return `${activity}_${folderName ?? ''}_${collectionName}`;
+}
+export function hasMyWordsXPAwarded(activity: 'flashcard' | 'quiz' | 'match', folderName: string | undefined, collectionName: string): boolean {
+  return get<string[]>(KEYS.myWordsXpUnits, []).includes(_myWordsUnitKey(activity, folderName, collectionName));
+}
+export function markMyWordsXPAwarded(activity: 'flashcard' | 'quiz' | 'match', folderName: string | undefined, collectionName: string): void {
+  const list = get<string[]>(KEYS.myWordsXpUnits, []);
+  const k = _myWordsUnitKey(activity, folderName, collectionName);
+  if (!list.includes(k)) { list.push(k); set(KEYS.myWordsXpUnits, list); }
 }
 
 // ─── Hard words (too hard) ───────────────────────────────────────────────────

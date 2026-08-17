@@ -654,6 +654,7 @@ function LearnInner() {
         todayCount={getTodayLearnedCount()}
         onRestart={() => { setIndex(0); setMaxReached(0); setDone(false); setSessionCount(0); setSkipped([]); setPureSkipped([]); setMarks(new Array(words.length).fill(null)); }}
         classHWNextUrl={sourceClassHW && sp.get('hwId') ? `/flashcards?source=class-hw&className=${encodeURIComponent(classNameParam)}&classId=${classIdParam}&hwId=${sp.get('hwId')}&prevCompleted=learn` : undefined}
+        myWordsNextUrl={sourceMyWords && myCollection ? `/flashcards?source=my-words&myCollection=${encodeURIComponent(myCollection)}${myFolder ? `&myFolder=${encodeURIComponent(myFolder)}` : ''}` : undefined}
       />
     );
   }
@@ -1175,7 +1176,7 @@ function LoadingState() {
 }
 
 function SessionDone({
-  sessionCount, skipped, pureSkipped, myUnitCompleted, backUrl, collectionName, dayNumber, xpEarned, streak, todayCount, onRestart, classHWNextUrl,
+  sessionCount, skipped, pureSkipped, myUnitCompleted, backUrl, collectionName, dayNumber, xpEarned, streak, todayCount, onRestart, classHWNextUrl, myWordsNextUrl,
 }: {
   sessionCount: number;
   skipped: StudyWord[];
@@ -1189,6 +1190,7 @@ function SessionDone({
   todayCount: number;
   onRestart: () => void;
   classHWNextUrl?: string;
+  myWordsNextUrl?: string;
 }) {
   const t = useTranslation();
   const hardStudyUrl = collectionName
@@ -1241,6 +1243,21 @@ function SessionDone({
       {collectionName && dayNumber !== undefined && (
         <Link
           href={`/flashcards?collection=${encodeURIComponent(collectionName)}&day=${dayNumber}`}
+          className="w-full flex items-center justify-between px-5 py-4 rounded-2xl text-white mb-1"
+          style={{ background: 'linear-gradient(135deg, #FF6B35, #FF8C42)' }}
+        >
+          <div>
+            <div className="font-bold text-sm">{t.learn.practiceFlashcards}</div>
+            <div className="text-xs opacity-80 mt-0.5">{t.learn.reinforceSub}</div>
+          </div>
+          <span className="text-lg">→</span>
+        </Link>
+      )}
+
+      {/* Next step: Flashcards (My Words) */}
+      {myWordsNextUrl && (
+        <Link
+          href={myWordsNextUrl}
           className="w-full flex items-center justify-between px-5 py-4 rounded-2xl text-white mb-1"
           style={{ background: 'linear-gradient(135deg, #FF6B35, #FF8C42)' }}
         >

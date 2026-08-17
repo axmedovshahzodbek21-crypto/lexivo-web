@@ -21,6 +21,7 @@ export default function FolderCollectionPage({ params }: Props) {
   const t = useTranslation();
   const [words, setWords] = useState<ImportedWord[]>([]);
   const [completedAt, setCompletedAt] = useState<string | undefined>(undefined);
+  const [progress, setProgress] = useState<{ learnDone: boolean; flashcardDone: boolean; quizDone: boolean; matchDone: boolean }>({ learnDone: false, flashcardDone: false, quizDone: false, matchDone: false });
   const [pendingNewWords, setPendingNewWords] = useState<string[]>([]);
   const [selectMode, setSelectMode] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -34,6 +35,7 @@ export default function FolderCollectionPage({ params }: Props) {
   const loadProgress = (currentWords: ImportedWord[]) => {
     const p = getMyUnitProgress(folder, collectionName);
     setCompletedAt(p.completedAt);
+    setProgress({ learnDone: p.learnDone, flashcardDone: p.flashcardDone, quizDone: p.quizDone, matchDone: p.matchDone });
     setPendingNewWords(getMyUnitPendingNewWords(folder, collectionName, currentWords.map(w => w.word)));
   };
 
@@ -44,6 +46,16 @@ export default function FolderCollectionPage({ params }: Props) {
       loadProgress(w);
     };
     load();
+    // Re-check progress when the user returns from a Learn/Flashcards/Quiz/Match
+    // session (e.g. via the back button), so the just-finished activity's
+    // checkmark shows up without requiring a manual refresh.
+    const onFocus = () => load();
+    window.addEventListener('focus', onFocus);
+    document.addEventListener('visibilitychange', onFocus);
+    return () => {
+      window.removeEventListener('focus', onFocus);
+      document.removeEventListener('visibilitychange', onFocus);
+    };
   }, [folder, collectionName]);
 
   function toggleSelectMode() {
@@ -109,14 +121,6 @@ export default function FolderCollectionPage({ params }: Props) {
           <p className="text-xs text-[var(--text-muted)] truncate">
             <span className="text-[var(--primary)]">📁 {folder}</span> · {t.myWords.wordCount(words.length)}
           </p>
-          {completedAt && (
-            <p className="text-xs font-semibold mt-0.5" style={{ color: 'var(--success)' }}>
-              {t.myWords.completedBadge}
-              {pendingNewWords.length > 0 && (
-                <span className="text-[var(--text-muted)] font-normal"> · {t.myWords.newWordsToLearn(pendingNewWords.length)}</span>
-              )}
-            </p>
-          )}
         </div>
         {words.length > 0 && (
           <button
@@ -137,6 +141,18 @@ export default function FolderCollectionPage({ params }: Props) {
           aria-label={t.myWords.addWords}
         >+</Link>
       </div>
+
+      {completedAt && (
+        <div className="mx-4 mt-4 rounded-2xl px-4 py-3 flex items-center gap-2 font-bold animate-pop" style={{ background: 'rgba(34,197,94,0.12)', color: 'var(--success)', border: '1.5px solid var(--success)' }}>
+          <span className="text-xl">🏆</span>
+          <span>
+            {t.myWords.completedBadge}
+            {pendingNewWords.length > 0 && (
+              <span className="text-[var(--text-muted)] font-normal"> · {t.myWords.newWordsToLearn(pendingNewWords.length)}</span>
+            )}
+          </span>
+        </div>
+      )}
 
       <div className="p-4 space-y-4">
         {words.length === 0 ? (
@@ -184,19 +200,23 @@ export default function FolderCollectionPage({ params }: Props) {
               <p className="text-xs font-semibold text-[var(--text-muted)]">{t.myWords.studyAllWords}</p>
             )}
             <div className="grid grid-cols-2 gap-2">
-              <Link href={`/learn?${studyParam}`} className="flex flex-col items-center gap-1.5 py-3 rounded-2xl text-center transition-colors" style={{ background: 'rgba(108,99,255,0.1)', border: '1.5px solid rgba(108,99,255,0.3)' }}>
+              <Link href={`/learn?${studyParam}`} className="relative flex flex-col items-center gap-1.5 py-3 rounded-2xl text-center transition-colors" style={{ background: 'rgba(108,99,255,0.1)', border: '1.5px solid rgba(108,99,255,0.3)' }}>
+                {progress.learnDone && <span className="absolute top-1.5 right-1.5 text-sm">✅</span>}
                 <span className="text-2xl">📖</span>
                 <span className="text-xs font-semibold" style={{ color: 'var(--primary)' }}>Learn</span>
               </Link>
-              <Link href={`/flashcards?${studyParam}`} className="flex flex-col items-center gap-1.5 py-3 rounded-2xl text-center transition-colors" style={{ background: 'rgba(255,107,53,0.1)', border: '1.5px solid rgba(255,107,53,0.3)' }}>
+              <Link href={`/flashcards?${studyParam}`} className="relative flex flex-col items-center gap-1.5 py-3 rounded-2xl text-center transition-colors" style={{ background: 'rgba(255,107,53,0.1)', border: '1.5px solid rgba(255,107,53,0.3)' }}>
+                {progress.flashcardDone && <span className="absolute top-1.5 right-1.5 text-sm">✅</span>}
                 <span className="text-2xl">🃏</span>
                 <span className="text-xs font-semibold" style={{ color: '#FF6B35' }}>Flashcards</span>
               </Link>
-              <Link href={`/quiz?${studyParam}`} className="flex flex-col items-center gap-1.5 py-3 rounded-2xl text-center transition-colors" style={{ background: 'rgba(245,158,11,0.1)', border: '1.5px solid rgba(245,158,11,0.3)' }}>
+              <Link href={`/quiz?${studyParam}`} className="relative flex flex-col items-center gap-1.5 py-3 rounded-2xl text-center transition-colors" style={{ background: 'rgba(245,158,11,0.1)', border: '1.5px solid rgba(245,158,11,0.3)' }}>
+                {progress.quizDone && <span className="absolute top-1.5 right-1.5 text-sm">✅</span>}
                 <span className="text-2xl">❓</span>
                 <span className="text-xs font-semibold" style={{ color: 'var(--warning)' }}>Quiz</span>
               </Link>
-              <Link href={`/matching?${studyParam}`} className="flex flex-col items-center gap-1.5 py-3 rounded-2xl text-center transition-colors" style={{ background: 'rgba(16,185,129,0.1)', border: '1.5px solid rgba(16,185,129,0.3)' }}>
+              <Link href={`/matching?${studyParam}`} className="relative flex flex-col items-center gap-1.5 py-3 rounded-2xl text-center transition-colors" style={{ background: 'rgba(16,185,129,0.1)', border: '1.5px solid rgba(16,185,129,0.3)' }}>
+                {progress.matchDone && <span className="absolute top-1.5 right-1.5 text-sm">✅</span>}
                 <span className="text-2xl">🔗</span>
                 <span className="text-xs font-semibold" style={{ color: 'var(--success)' }}>Match</span>
               </Link>

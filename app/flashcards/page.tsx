@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { useShallow } from 'zustand/react/shallow';
 import { speak, speakText } from '@/lib/speech';
-import { recordStudySession, markFlashcardComplete, getStarredWords, getHardWords, getCustomListWords, getUnitProgress, saveFlashcardProgress, getFlashcardProgress, clearFlashcardProgress, getImportedWords, getImportedWordsByCollection, importedWordExampleFields, getClassHWTemp, recordFlashcardSession, addXP, hasFlashcardXPAwarded, markFlashcardXPAwarded, getMyUnitPendingNewWords, markMyFlashcardComplete } from '@/lib/storage';
+import { recordStudySession, markFlashcardComplete, getStarredWords, getHardWords, getCustomListWords, getUnitProgress, saveFlashcardProgress, getFlashcardProgress, clearFlashcardProgress, getImportedWords, getImportedWordsByCollection, importedWordExampleFields, getClassHWTemp, recordFlashcardSession, addXP, hasFlashcardXPAwarded, markFlashcardXPAwarded, hasMyWordsXPAwarded, markMyWordsXPAwarded, getMyUnitPendingNewWords, markMyFlashcardComplete, displayXP } from '@/lib/storage';
 import { supabase } from '@/lib/supabase';
 import { getClassWordsFull } from '@/lib/class-srs';
 import { recordClassStudyDay } from '@/lib/class-xp';
@@ -102,6 +102,7 @@ export default function FlashcardsPage() {
   const [unknown, setUnknown] = useState(0);
   const [done, setDone] = useState(false);
   const [myUnitCompleted, setMyUnitCompleted] = useState(false);
+  const [sessionXP, setSessionXP] = useState(0);
   const [unknownWords, setUnknownWords] = useState<StudyWord[]>([]);
   const cardsSinceLastPush = useRef(0);
   const advancing = useRef(false);
@@ -174,6 +175,7 @@ export default function FlashcardsPage() {
         collectionName: 'my-words', topic: myCollection ?? 'My Words', dayNumber: 0,
       }));
       for (let i = list.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [list[i], list[j]] = [list[j], list[i]]; }
+      originalWordCount.current = list.length;
       setDeck(list);
       return;
     }
@@ -249,8 +251,18 @@ export default function FlashcardsPage() {
       const finalUnknown = wasKnown ? unknownWords.length : unknownWords.length + 1;
       if (!sourceClassHW && !sourceClass && collectionName && dayNumber !== undefined && finalUnknown === 0) {
         if (!hasFlashcardXPAwarded(collectionName, dayNumber)) {
-          const result = addXP(Math.round(originalWordCount.current * 3), 'Flashcard', `Unit ${dayNumber} · ${collectionName}`);
+          const xpAmount = Math.round(originalWordCount.current * 3);
+          const result = addXP(xpAmount, 'Flashcard', `Unit ${dayNumber} · ${collectionName}`);
           markFlashcardXPAwarded(collectionName, dayNumber);
+          setSessionXP(xpAmount);
+          if (result.leveledUp) setPendingLevelUp({ level: result.newLevel, xp: result.newXp });
+        }
+      } else if (!sourceClassHW && !sourceClass && sourceMyWords && myCollection && finalUnknown === 0) {
+        if (!hasMyWordsXPAwarded('flashcard', myFolder, myCollection)) {
+          const xpAmount = Math.round(originalWordCount.current * 3);
+          const result = addXP(xpAmount, 'Flashcard', `${myCollection}`);
+          markMyWordsXPAwarded('flashcard', myFolder, myCollection);
+          setSessionXP(xpAmount);
           if (result.leveledUp) setPendingLevelUp({ level: result.newLevel, xp: result.newXp });
         }
       }
@@ -327,10 +339,30 @@ export default function FlashcardsPage() {
           <div className="card text-center"><div className="text-2xl font-bold text-[var(--danger)]">{unknown}</div><div className="text-xs text-[var(--text-muted)]">{t.flashcards.review}</div></div>
           <div className="card text-center"><div className="text-2xl font-bold text-[var(--primary)]">{score}%</div><div className="text-xs text-[var(--text-muted)]">{t.flashcards.score}</div></div>
         </div>
+        <div className="w-full card mb-6 flex items-center justify-center gap-2">
+          <span className="text-xl">⚡</span>
+          <span className="font-bold" style={{ color: 'var(--warning)' }}>+{displayXP(sessionXP)} XP</span>
+          {sessionXP === 0 && unknown > 0 && (
+            <span className="text-xs text-[var(--text-muted)]">— mark all known to earn XP</span>
+          )}
+        </div>
         <div className="flex flex-col gap-3 w-full">
           {collectionName && dayNumber !== undefined && (
             <Link
               href={`/quiz?collection=${encodeURIComponent(collectionName)}&day=${dayNumber}`}
+              className="w-full flex items-center justify-between px-5 py-4 rounded-2xl text-white"
+              style={{ background: 'linear-gradient(135deg, var(--warning), #FBBF24)' }}
+            >
+              <div>
+                <div className="font-bold text-sm">{t.flashcards.takeQuiz}</div>
+                <div className="text-xs opacity-80 mt-0.5">{t.flashcards.testMemory}</div>
+              </div>
+              <span className="text-lg">→</span>
+            </Link>
+          )}
+          {sourceMyWords && myCollection && (
+            <Link
+              href={`/quiz?source=my-words&myCollection=${encodeURIComponent(myCollection)}${myFolder ? `&myFolder=${encodeURIComponent(myFolder)}` : ''}`}
               className="w-full flex items-center justify-between px-5 py-4 rounded-2xl text-white"
               style={{ background: 'linear-gradient(135deg, var(--warning), #FBBF24)' }}
             >

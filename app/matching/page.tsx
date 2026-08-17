@@ -6,7 +6,7 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
-import { getHardWords, getStarredWords, getCustomListWords, getImportedWords, getImportedWordsByCollection, importedWordExampleFields, getClassHWTemp, addXP, hasMatchXPAwarded, markMatchXPAwarded, markMatchComplete, getMyUnitPendingNewWords, markMyMatchComplete } from '@/lib/storage';
+import { getHardWords, getStarredWords, getCustomListWords, getImportedWords, getImportedWordsByCollection, importedWordExampleFields, getClassHWTemp, addXP, hasMatchXPAwarded, markMatchXPAwarded, hasMyWordsXPAwarded, markMyWordsXPAwarded, markMatchComplete, getMyUnitPendingNewWords, markMyMatchComplete, displayXP } from '@/lib/storage';
 import { getClassWordsFull, addClassHardWord } from '@/lib/class-srs';
 import { recordClassStudyDay } from '@/lib/class-xp';
 import { supabase } from '@/lib/supabase';
@@ -111,6 +111,7 @@ function MatchingInner() {
   const [totalMistakes, setTotalMistakes] = useState(0);
   const [totalTime,     setTotalTime]     = useState(0);
   const [myUnitCompleted, setMyUnitCompleted] = useState(false);
+  const [sessionXP, setSessionXP] = useState(0);
 
   const wrongTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const timerInterval = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -247,11 +248,20 @@ function MatchingInner() {
         if (isLast && !sourceClassHW && !sourceClass && collectionParam && dayParam !== undefined) {
           markMatchComplete(collectionParam, dayParam);
           if (!hasMatchXPAwarded(collectionParam, dayParam)) {
-            const result = addXP(words.length * 4, 'Match', `Unit ${dayParam} · ${collectionParam}`);
+            const xpAmount = words.length * 4;
+            const result = addXP(xpAmount, 'Match', `Unit ${dayParam} · ${collectionParam}`);
             markMatchXPAwarded(collectionParam, dayParam);
+            setSessionXP(xpAmount);
             if (result.leveledUp) setPendingLevelUp({ level: result.newLevel, xp: result.newXp });
           }
         } else if (isLast && sourceMyWords && myCollection) {
+          if (!hasMyWordsXPAwarded('match', myFolder, myCollection)) {
+            const xpAmount = words.length * 4;
+            const result = addXP(xpAmount, 'Match', `${myCollection}`);
+            markMyWordsXPAwarded('match', myFolder, myCollection);
+            setSessionXP(xpAmount);
+            if (result.leveledUp) setPendingLevelUp({ level: result.newLevel, xp: result.newXp });
+          }
           if (markMyMatchComplete(myFolder, myCollection)) { setMyUnitCompleted(true); fireConfetti(); }
         }
         if (isLast && sourceClass && classId) {
@@ -329,6 +339,12 @@ function MatchingInner() {
               <p className="text-sm font-semibold text-[var(--success)]">🎉 Perfect — no mistakes!</p>
             )}
           </div>
+          {sessionXP > 0 && (
+            <div className="card flex items-center justify-center gap-2">
+              <span className="text-xl">⚡</span>
+              <span className="font-bold" style={{ color: 'var(--warning)' }}>+{displayXP(sessionXP)} XP</span>
+            </div>
+          )}
           <div className="flex gap-3">
             <button
               onClick={() => {

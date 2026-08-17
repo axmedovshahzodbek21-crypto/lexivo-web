@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { speak, speakText } from '@/lib/speech';
-import { recordStudySession, markQuizComplete, unlockAchievement, getStarredWords, getCustomListWords, getSettings, getUnitProgress, getImportedWords, getImportedWordsByCollection, importedWordExampleFields, getClassHWTemp, recordQuizSession, addXP, hasQuizXPAwarded, markQuizXPAwarded, getMyUnitPendingNewWords, markMyQuizComplete } from '@/lib/storage';
+import { recordStudySession, markQuizComplete, unlockAchievement, getStarredWords, getCustomListWords, getSettings, getUnitProgress, getImportedWords, getImportedWordsByCollection, importedWordExampleFields, getClassHWTemp, recordQuizSession, addXP, hasQuizXPAwarded, markQuizXPAwarded, hasMyWordsXPAwarded, markMyWordsXPAwarded, getMyUnitPendingNewWords, markMyQuizComplete, displayXP } from '@/lib/storage';
 import { pushLists, pushStats } from '@/lib/sync';
 import { fireConfetti } from '@/lib/confetti';
 import { checkAchievements } from '@/lib/gamification';
@@ -126,6 +126,7 @@ export default function QuizPage() {
   const [correct, setCorrect] = useState(0);
   const [done, setDone] = useState(false);
   const [myUnitCompleted, setMyUnitCompleted] = useState(false);
+  const [sessionXP, setSessionXP] = useState(0);
   const [wrongQuestions, setWrongQuestions] = useState<QuizQuestion[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
   const selecting = useRef(false);
@@ -302,14 +303,23 @@ export default function QuizPage() {
         if (collectionName) {
           const qDayNumber = dayNumber ?? questions[0]?.word.dayNumber ?? 1;
           if (!hasQuizXPAwarded(collectionName, qDayNumber)) {
-            const result = addXP(questions.length * 5, 'Quiz', `Unit ${qDayNumber} · ${collectionName}`);
+            const xpAmount = questions.length * 5;
+            const result = addXP(xpAmount, 'Quiz', `Unit ${qDayNumber} · ${collectionName}`);
             markQuizXPAwarded(collectionName, qDayNumber);
+            setSessionXP(xpAmount);
             if (result.leveledUp) setPendingLevelUp({ level: result.newLevel, xp: result.newXp });
           }
           markQuizComplete(collectionName, qDayNumber);
           const p = getUnitProgress(collectionName, qDayNumber);
           if (p.learnDone && p.flashcardDone && p.quizDone) fireConfetti();
         } else if (sourceMyWords && myCollection) {
+          if (!hasMyWordsXPAwarded('quiz', myFolder, myCollection)) {
+            const xpAmount = questions.length * 5;
+            const result = addXP(xpAmount, 'Quiz', `${myCollection}`);
+            markMyWordsXPAwarded('quiz', myFolder, myCollection);
+            setSessionXP(xpAmount);
+            if (result.leveledUp) setPendingLevelUp({ level: result.newLevel, xp: result.newXp });
+          }
           if (markMyQuizComplete(myFolder, myCollection)) { setMyUnitCompleted(true); fireConfetti(); }
         }
         recordQuizSession();
@@ -379,7 +389,38 @@ export default function QuizPage() {
           </div>
           <p className="text-center text-sm mt-2 font-medium text-[var(--primary)]">{score}% accuracy</p>
         </div>
+        {sessionXP > 0 && (
+          <div className="w-full card mb-6 flex items-center justify-center gap-2">
+            <span className="text-xl">⚡</span>
+            <span className="font-bold" style={{ color: 'var(--warning)' }}>+{displayXP(sessionXP)} XP</span>
+          </div>
+        )}
         <div className="flex flex-col gap-3 w-full">
+          {sourceMyWords && myCollection ? (
+            <Link
+              href={`/matching?source=my-words&myCollection=${encodeURIComponent(myCollection)}${myFolder ? `&myFolder=${encodeURIComponent(myFolder)}` : ''}`}
+              className="w-full flex items-center justify-between px-5 py-4 rounded-2xl text-white"
+              style={{ background: 'linear-gradient(135deg, #6366F1, #818CF8)' }}
+            >
+              <div>
+                <div className="font-bold text-sm">Play Matching</div>
+                <div className="text-xs opacity-80 mt-0.5">Lock it in with a quick game</div>
+              </div>
+              <span className="text-lg">→</span>
+            </Link>
+          ) : collectionName && dayNumber !== undefined && (
+            <Link
+              href={`/matching?collection=${encodeURIComponent(collectionName)}&day=${dayNumber}`}
+              className="w-full flex items-center justify-between px-5 py-4 rounded-2xl text-white"
+              style={{ background: 'linear-gradient(135deg, #6366F1, #818CF8)' }}
+            >
+              <div>
+                <div className="font-bold text-sm">Play Matching</div>
+                <div className="text-xs opacity-80 mt-0.5">Lock it in with a quick game</div>
+              </div>
+              <span className="text-lg">→</span>
+            </Link>
+          )}
           {wrongQuestions.length > 0 && (
             <button
               onClick={() => { setQuestions(wrongQuestions); setIndex(0); setSelected(null); setState('idle'); setCorrect(0); setWrongQuestions([]); setDone(false); }}
