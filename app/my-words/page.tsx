@@ -3,7 +3,7 @@ import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/lib/useTranslation';
-import { getImportedFolders, getImportedCollections, addImportedWords, getCollectionsByFolder, getMyUnitProgress } from '@/lib/storage';
+import { getImportedFolders, getImportedCollections, addImportedWords, getCollectionsByFolder, getMyUnitProgress, resetMyWordsProgress } from '@/lib/storage';
 import { pushLists, pullAll } from '@/lib/sync';
 import type { ImportedFolder, ImportedCollection } from '@/lib/types';
 
@@ -57,6 +57,7 @@ export default function MyWordsPage() {
   const [orphaned, setOrphaned] = useState<ImportedCollection[]>([]);
   const [creating, setCreating] = useState(false);
   const [folderName, setFolderName] = useState('');
+  const [resetConfirm, setResetConfirm] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -89,6 +90,13 @@ export default function MyWordsPage() {
     router.push(`/my-words/${encodeURIComponent(name)}`);
   }
 
+  function handleResetProgress() {
+    resetMyWordsProgress();
+    setResetConfirm(false);
+    setFolders(getImportedFolders());
+    setOrphaned(getImportedCollections());
+  }
+
   const isEmpty = folders.length === 0 && orphaned.length === 0;
 
   return (
@@ -96,11 +104,21 @@ export default function MyWordsPage() {
       <div className="flex items-center justify-between p-4 border-b border-[var(--border)]">
         <button onClick={() => router.back()} className="btn-icon text-lg" aria-label="Go back">←</button>
         <h1 className="font-bold text-[var(--text)]">{t.myWords.title}</h1>
-        <button
-          onClick={() => setCreating(true)}
-          className="w-9 h-9 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-lg font-bold text-[var(--primary)]"
-          aria-label="Create folder"
-        >+</button>
+        <div className="flex items-center gap-1.5">
+          {!isEmpty && (
+            <button
+              onClick={() => setResetConfirm(true)}
+              className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-base text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors"
+              aria-label="Reset My Words progress"
+              title="Reset My Words progress"
+            >↺</button>
+          )}
+          <button
+            onClick={() => setCreating(true)}
+            className="w-9 h-9 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-lg font-bold text-[var(--primary)]"
+            aria-label="Create folder"
+          >+</button>
+        </div>
       </div>
 
       {creating && (
@@ -219,6 +237,33 @@ export default function MyWordsPage() {
           </>
         )}
       </div>
+
+      {resetConfirm && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 px-4 pb-4 sm:pb-0" onClick={() => setResetConfirm(false)}>
+          <div className="bg-[var(--surface)] rounded-2xl w-full max-w-sm p-6 shadow-2xl" onClick={e => e.stopPropagation()}>
+            <p className="text-[var(--text)] font-bold mb-2">Reset My Words progress?</p>
+            <p className="text-sm text-[var(--text-muted)] mb-6">
+              This clears the Learn/Flashcards/Quiz/Match checkmarks and completion badges on every folder and unit,
+              so you can study them again from scratch. Your words and folders are not deleted.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setResetConfirm(false)}
+                className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-[var(--text-muted)] bg-[var(--surface-2)]"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleResetProgress}
+                className="flex-1 py-2.5 rounded-xl text-sm font-bold text-white"
+                style={{ background: 'var(--danger)' }}
+              >
+                Reset
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

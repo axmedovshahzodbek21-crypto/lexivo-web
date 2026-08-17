@@ -876,6 +876,22 @@ export function getMyUnitPendingNewWords(folderName: string | undefined, collect
   return currentWords.filter(w => pending.has(w));
 }
 
+// Clears all My Words unit progress (per-activity done-flags, word snapshots,
+// completion badges) and their XP-awarded markers, for every folder/unit —
+// but leaves the imported words/folders themselves untouched. Distinct from
+// the Settings "Reset Progress" action, which resets curated-collection
+// progress; this is scoped to My Words only, triggerable from within My Words.
+export function resetMyWordsProgress(): void {
+  if (typeof window === 'undefined') return;
+  const toRemove: string[] = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k?.startsWith(`${KEYS.myUnitProgress}_`)) toRemove.push(k);
+  }
+  toRemove.forEach(k => localStorage.removeItem(k));
+  localStorage.removeItem(KEYS.myWordsXpUnits);
+}
+
 // ─── Starred words ───────────────────────────────────────────────────────────
 
 export function getStarredWords(): string[] {
