@@ -1,6 +1,7 @@
 ﻿import type { Metadata, Viewport } from 'next';
+import { Suspense } from 'react';
 import './globals.css';
-import Navigation from '@/components/Navigation';
+import AppNav from '@/components/AppNav';
 import AchievementToast from '@/components/AchievementToast';
 import LevelUpOverlay from '@/components/LevelUpOverlay';
 import KeyboardHelp from '@/components/KeyboardHelp';
@@ -36,14 +37,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <NotificationScheduler />
         <DataLoader />
         <GlobalKeyboardHandler />
-        <div className="sm:flex sm:min-h-screen">
-          <Navigation />
-          <div className="flex-1 min-w-0">
+        <Suspense fallback={
+          <div className="sm:flex sm:min-h-screen">
+            <div className="hidden sm:block w-[224px] shrink-0" />
+            <div className="flex-1 min-w-0">
+              <main className="min-h-screen pb-20 sm:pb-8">
+                {children}
+              </main>
+            </div>
+          </div>
+        }>
+          <AppNav>
             <main className="min-h-screen pb-20 sm:pb-8">
               {children}
             </main>
-          </div>
-        </div>
+          </AppNav>
+        </Suspense>
         <PomodoroWidget />
         <OneSignalProvider />
         <HomeworkNotify />
