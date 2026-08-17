@@ -4,10 +4,12 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
+import { getClassDueWords } from '@/lib/class-srs';
 
 const STUDENT_ITEMS = [
   { seg: 'home',        icon: '🏠', label: 'Home'     },
   { seg: 'words',       icon: '📖', label: 'Words'    },
+  { seg: 'review',      icon: '🔄', label: 'Review'   },
   { seg: 'leaderboard', icon: '🏆', label: 'Ranks'    },
   { seg: 'homework',    icon: '📋', label: 'Homework' },
   { seg: 'progress',   icon: '📊', label: 'Progress' },
@@ -29,6 +31,7 @@ export default function ClassShellNav({ classId }: { classId: string }) {
   const [isTeacher, setIsTeacher] = useState(false);
   const [className, setClassName] = useState('');
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
+  const [dueCount, setDueCount] = useState(0);
 
   useEffect(() => {
     if (!user) return;
@@ -44,6 +47,13 @@ export default function ClassShellNav({ classId }: { classId: string }) {
         }
       });
   }, [classId, user]);
+
+  // Refresh the due-review count whenever the student navigates within the class
+  // (so it updates right after finishing a review session).
+  useEffect(() => {
+    if (!user || isTeacher) return;
+    getClassDueWords(user.id, classId).then(due => setDueCount(due.length)).catch(() => {});
+  }, [user, classId, isTeacher, pathname]);
 
   const items = isTeacher ? TEACHER_ITEMS : STUDENT_ITEMS;
 
@@ -88,7 +98,14 @@ export default function ClassShellNav({ classId }: { classId: string }) {
               href={hrefFor(seg)}
               className={`flex flex-col items-center gap-0.5 px-3 py-1 min-w-[48px] ${active ? 'text-[var(--primary)]' : 'text-[var(--text-muted)]'}`}
             >
-              <span className="text-xl leading-none">{icon}</span>
+              <span className="relative text-xl leading-none">
+                {icon}
+                {seg === 'review' && dueCount > 0 && (
+                  <span className="absolute -top-1.5 -right-2.5 min-w-[15px] h-[15px] px-1 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center leading-none">
+                    {dueCount > 99 ? '99+' : dueCount}
+                  </span>
+                )}
+              </span>
               <span className="text-[10px] font-semibold">{label}</span>
               {active && <span className="w-1 h-1 rounded-full bg-[var(--primary)] mt-0.5" />}
             </Link>
@@ -147,10 +164,17 @@ export default function ClassShellNav({ classId }: { classId: string }) {
                     boxShadow: '0 4px 16px rgba(108,99,255,0.38)',
                   } : undefined}
                 >
-                  <span className={`transition-transform duration-200 ${active ? 'text-xl scale-110' : 'text-lg'}`}>
+                  <span className={`relative transition-transform duration-200 ${active ? 'text-xl scale-110' : 'text-lg'}`}>
                     {icon}
                   </span>
-                  <span>{label}</span>
+                  <span className="flex-1">{label}</span>
+                  {seg === 'review' && dueCount > 0 && (
+                    <span className={`min-w-[20px] h-5 px-1.5 rounded-full text-[11px] font-bold flex items-center justify-center leading-none ${
+                      active ? 'bg-white/25 text-white' : 'bg-red-500 text-white'
+                    }`}>
+                      {dueCount > 99 ? '99+' : dueCount}
+                    </span>
+                  )}
                 </Link>
               );
             })}
