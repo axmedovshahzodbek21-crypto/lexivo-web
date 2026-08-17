@@ -38,6 +38,7 @@ export interface SRSWord extends WordItem {
   dayNumber: number;
   topic: string;
   learnedAt: string; // "YYYY-MM-DD" — date added to SRS
+  deletedAt?: number; // tombstone: set instead of removing, so unlearning syncs across devices
 }
 
 export interface DueSRSWord extends SRSWord {
@@ -51,6 +52,7 @@ export interface LearnedWord {
   topic: string;
   dayNumber: number;
   learnedAt: string;
+  deletedAt?: number; // tombstone: set instead of removing, so unlearning syncs across devices
 }
 
 export interface UnitProgress {

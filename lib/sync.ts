@@ -1,6 +1,6 @@
 import { supabase } from './supabase';
 import type { UserSettings, LearnedWord, SRSWord, UnitProgress, MyUnitProgress } from './types';
-import { getSettings, saveSettings, getLearnedWords, saveLearnedWord, getSRSWords, getImportedWordsRaw, localDateStr, getProfilePicUrl, saveProfilePicUrl } from './storage';
+import { getSettings, saveSettings, getLearnedWords, getLearnedWordsRaw, getSRSWordsRaw, getImportedWordsRaw, localDateStr, getProfilePicUrl, saveProfilePicUrl } from './storage';
 import type { HardWordEntry } from './storage';
 import { getNotifSettings, saveNotifSettings } from './notifications';
 
@@ -182,12 +182,12 @@ export async function pushLists(): Promise<void> {
     if (cloudRow) mergeListsFromCloudRow(cloudRow);
 
     const ts = new Date().toISOString();
-    const learnedWords = getLearnedWords();
+    const learnedWords = getLearnedWords(); // live-only, for the per-record learned_words table below
     const promises = [
       supabase.from('user_data').upsert({
         id: uid,
-        learned_words:    learnedWords,
-        srs_words:        getSRSWords(),
+        learned_words:    getLearnedWordsRaw(), // includes tombstones so unlearning propagates
+        srs_words:        getSRSWordsRaw(),     // includes tombstones so unlearning propagates
         starred_words:    lsJSON<string[]>('lexivo_starred', []),
         hard_words:       lsJSON<HardWordEntry[]>('lexivo_hard_words', []),
         study_days:       lsJSON<string[]>('lexivo_study_days', []),
@@ -335,23 +335,52 @@ export async function pullAll(): Promise<void> {
 // without this, pushLists() overwrote the whole row with only-local state.
 function mergeListsFromCloudRow(row: Record<string, unknown>): void {
   try {
-    // learned_words
+    // learned_words — per-record last-write-wins merge (keyed by
+    // word+collection). Cloud rows may include tombstones (deletedAt), so an
+    // unlearn made on another device correctly overwrites a stale local copy
+    // instead of a naive add-only merge silently resurrecting it.
     if (Array.isArray(row.learned_words) && row.learned_words.length > 0) {
-      const local = getLearnedWords();
-      const localKeys = new Set(local.map((w: LearnedWord) => `${w.word}_${w.collectionName}`));
-      for (const w of row.learned_words as LearnedWord[]) {
-        if (!localKeys.has(`${w.word}_${w.collectionName}`)) saveLearnedWord(w);
+      const local = lsJSON<LearnedWord[]>('lexivo_learned_words', []);
+      const keyOf = (w: LearnedWord) => `${w.word}::${w.collectionName}`;
+      const tsOf = (w: LearnedWord) => w.deletedAt ?? Date.parse(w.learnedAt) ?? 0;
+      const byKey = new Map<string, LearnedWord>(local.map(w => [keyOf(w), w]));
+      let learnedChanged = false;
+      for (const cw of row.learned_words as LearnedWord[]) {
+        const key = keyOf(cw);
+        const existing = byKey.get(key);
+        if (!existing || tsOf(cw) > tsOf(existing)) {
+          byKey.set(key, cw);
+          learnedChanged = true;
+        }
       }
+      if (learnedChanged) lsSet('lexivo_learned_words', JSON.stringify([...byKey.values()]));
     }
 
-    // srs_words: add new, take higher reviewStage for existing
+    // srs_words: union by key; when both sides are live, take the higher
+    // reviewStage (preserves real review progress, matching Flutter's local
+    // model); when either side is a tombstone (deletedAt), last-write-wins by
+    // timestamp instead, so an unlearn on another device isn't undone.
     if (Array.isArray(row.srs_words) && row.srs_words.length > 0) {
-      const local = getSRSWords();
+      const local = lsJSON<SRSWord[]>('lexivo_srs_words', []);
       const localMap = new Map(local.map((w: SRSWord) => [`${w.collectionName}::${w.word}`, w]));
+      const tsOf = (w: SRSWord) => w.deletedAt ?? Date.parse(w.learnedAt) ?? 0;
       let changed = false;
       for (const cw of row.srs_words as Record<string, unknown>[]) {
         const key = `${cw['collectionName']}::${cw['word']}`;
-        if (!localMap.has(key)) {
+        const lw = localMap.get(key);
+        if (lw && (cw['deletedAt'] != null || lw.deletedAt != null)) {
+          if (tsOf(cw as unknown as SRSWord) > tsOf(lw)) {
+            localMap.set(key, cw as unknown as SRSWord);
+            changed = true;
+          }
+        } else if (lw) {
+          const cloudStage = (cw['reviewStage'] as number) ?? 0;
+          const localStage = (lw as unknown as Record<string, unknown>)['reviewStage'] as number ?? 0;
+          if (cloudStage > localStage) {
+            localMap.set(key, cw as unknown as SRSWord);
+            changed = true;
+          }
+        } else {
           // Add new word from cloud; reviewLog tracks its progress independently
           localMap.set(key, { ...cw, id: cw['id'] ?? key } as unknown as SRSWord);
           changed = true;

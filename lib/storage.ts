@@ -194,13 +194,20 @@ export function saveSettingsUpdatedAt(ts: string) {
 
 // ─── Learned words ───────────────────────────────────────────────────────────
 
-export function getLearnedWords(): LearnedWord[] {
+// Includes tombstoned (deletedAt set) entries — internal use only, so
+// read-modify-write callers don't silently erase tombstones on their next
+// save. Use getLearnedWords() for anything user-facing.
+export function getLearnedWordsRaw(): LearnedWord[] {
   return get<LearnedWord[]>(KEYS.learned, []);
 }
 
+export function getLearnedWords(): LearnedWord[] {
+  return getLearnedWordsRaw().filter(w => !w.deletedAt);
+}
+
 export function saveLearnedWord(word: LearnedWord): boolean {
-  const words = getLearnedWords();
-  if (!words.find(w => w.word === word.word && w.collectionName === word.collectionName)) {
+  const words = getLearnedWordsRaw();
+  if (!words.find(w => !w.deletedAt && w.word === word.word && w.collectionName === word.collectionName)) {
     words.push(word);
     set(KEYS.learned, words);
     return true;
@@ -248,7 +255,10 @@ function daysBetweenDateStrs(fromStr: string, toStr: string): number {
   return Math.round((to.getTime() - from.getTime()) / 86400000);
 }
 
-export function getSRSWords(): SRSWord[] {
+// Includes tombstoned (deletedAt set) entries — internal use only, so
+// read-modify-write callers don't silently erase tombstones on their next
+// save. Use getSRSWords() for anything user-facing.
+export function getSRSWordsRaw(): SRSWord[] {
   const raw = get<any[]>(KEYS.srs, []); // eslint-disable-line @typescript-eslint/no-explicit-any
   let needsSave = false;
   const words: SRSWord[] = raw.map(w => {
@@ -264,16 +274,20 @@ export function getSRSWords(): SRSWord[] {
   return words;
 }
 
+export function getSRSWords(): SRSWord[] {
+  return getSRSWordsRaw().filter(w => !w.deletedAt);
+}
+
 export function addSRSWord(word: SRSWord) {
-  const words = getSRSWords();
-  if (!words.find(w => w.id === word.id)) {
+  const words = getSRSWordsRaw();
+  if (!words.find(w => !w.deletedAt && w.id === word.id)) {
     words.push(word);
     set(KEYS.srs, words);
   }
 }
 
 export function removeSRSWord(id: string) {
-  set(KEYS.srs, getSRSWords().filter(w => w.id !== id));
+  set(KEYS.srs, getSRSWordsRaw().filter(w => w.id !== id));
 }
 
 // ─── Review log ──────────────────────────────────────────────────────────────
@@ -334,12 +348,18 @@ function unlearnDate(learnedDate: string) {
     set(`${KEYS.unitProgress}_${col}_${day}`, { learnDone: false, flashcardDone: false, quizDone: false });
   }
 
-  // Remove from SRS store
-  set(KEYS.srs, allWords.filter(w => w.learnedAt !== learnedDate));
+  // Tombstone (not remove) so the unlearn propagates across devices instead
+  // of being silently undone by the next pull's additive-only merge, which
+  // would otherwise just see the word missing locally and re-add it back
+  // from a cloud copy that doesn't know it was unlearned.
+  const now = Date.now();
+  const affectedIds = new Set(affected.map(w => w.id));
+  const rawSRS = getSRSWordsRaw();
+  set(KEYS.srs, rawSRS.map(w => affectedIds.has(w.id) ? { ...w, deletedAt: now } : w));
 
-  // Remove from learned words so the user can re-learn them fresh
   const affectedWords = new Set(affected.map(w => w.word));
-  set(KEYS.learned, getLearnedWords().filter(w => !affectedWords.has(w.word)));
+  const rawLearned = getLearnedWordsRaw();
+  set(KEYS.learned, rawLearned.map(w => affectedWords.has(w.word) ? { ...w, deletedAt: now } : w));
 }
 
 // One-time migration: pre-populate reviewLog from old reviewStage data so
@@ -412,6 +432,13 @@ export function checkAndUnlearn(today: string = localDateStr()): void {
 
   for (const date of datesToUnlearn) {
     unlearnDate(date);
+  }
+
+  // Push immediately so the tombstones (and unit-progress reset) reach the
+  // server right away instead of waiting for some unrelated future write.
+  // Dynamic import avoids a circular dependency (sync.ts imports storage.ts).
+  if (datesToUnlearn.size > 0) {
+    import('./sync').then(m => m.pushLists()).catch(() => {});
   }
 }
 
