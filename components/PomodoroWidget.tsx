@@ -67,6 +67,49 @@ const BREAK_TIPS = [
 
 const STORAGE_KEY = 'pom-widget-pos';
 
+// ── Document Picture-in-Picture ────────────────────────────────────────────────
+// Pops the timer into a small always-on-top OS window so it stays visible while
+// the user works in another tab or app. Chrome/Edge desktop only (116+); the
+// popped-out window shares the same JS realm as the page, so the tick interval
+// that already lives in this component keeps driving it with no extra plumbing.
+
+interface PiPWindow extends Window {
+  document: Document;
+}
+
+interface DocumentPictureInPicture {
+  requestWindow(options?: { width?: number; height?: number }): Promise<PiPWindow>;
+  window: PiPWindow | null;
+}
+
+function getPipApi(): DocumentPictureInPicture | null {
+  if (typeof window === 'undefined') return null;
+  return (window as unknown as { documentPictureInPicture?: DocumentPictureInPicture }).documentPictureInPicture ?? null;
+}
+
+function copyStylesInto(pipDoc: Document) {
+  pipDoc.documentElement.setAttribute('data-theme', document.documentElement.getAttribute('data-theme') ?? '');
+  if (document.documentElement.dataset.fontSize) pipDoc.documentElement.dataset.fontSize = document.documentElement.dataset.fontSize;
+  if (document.documentElement.dataset.reduceMotion) pipDoc.documentElement.dataset.reduceMotion = document.documentElement.dataset.reduceMotion;
+
+  [...document.styleSheets].forEach(sheet => {
+    try {
+      const css = [...sheet.cssRules].map(r => r.cssText).join('\n');
+      const style = pipDoc.createElement('style');
+      style.textContent = css;
+      pipDoc.head.appendChild(style);
+    } catch {
+      // Cross-origin sheet — link it instead (browser will fetch it directly).
+      if (sheet.href) {
+        const link = pipDoc.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = sheet.href;
+        pipDoc.head.appendChild(link);
+      }
+    }
+  });
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function PomodoroWidget() {
@@ -100,8 +143,46 @@ export default function PomodoroWidget() {
   const [mounted, setMounted] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
   const [customMode, setCustomMode] = useState(false);
+  const [pipSupported, setPipSupported] = useState(false);
+  const [pipWin, setPipWin] = useState<PiPWindow | null>(null);
+  const [pipBody, setPipBody] = useState<HTMLElement | null>(null);
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => { setMounted(true); setPipSupported(!!getPipApi()); }, []);
+
+  const closePip = useRef<() => void>(() => {});
+  closePip.current = () => {
+    pipWin?.close();
+    setPipWin(null);
+    setPipBody(null);
+  };
+
+  // Close the PiP window if the user leaves the timer running past the whole
+  // point of a floating widget (i.e. resets the session entirely).
+  useEffect(() => {
+    if (pomPhase === 'idle' && pipWin) closePip.current();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pomPhase]);
+
+  useEffect(() => {
+    return () => { pipWin?.close(); };
+  }, [pipWin]);
+
+  async function togglePip() {
+    if (pipWin) { closePip.current(); return; }
+    const api = getPipApi();
+    if (!api) return;
+    try {
+      const win = await api.requestWindow({ width: 260, height: 200 });
+      copyStylesInto(win.document);
+      win.document.title = 'Focus Timer — Lexivo';
+      win.document.body.style.margin = '0';
+      win.document.body.style.background = 'var(--bg, #0a0a18)';
+      win.addEventListener('pagehide', () => { setPipWin(null); setPipBody(null); });
+      setPipWin(win);
+      setPipBody(win.document.body);
+      setPanelOpen(false);
+    } catch {}
+  }
 
   // Initialise widget position
   useEffect(() => {
@@ -162,7 +243,18 @@ export default function PomodoroWidget() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [panelOpen]);
 
-  if (!pomVisible || !pos || !mounted) return null;
+  const pipPortal = pipBody ? createPortal(
+    <PipTimerContent
+      phase={pomPhase} secondsLeft={pomSecondsLeft} running={pomRunning} sessions={pomSessions}
+      breakMins={pomBreakMins}
+      onPauseResume={() => (pomRunning ? pausePomodoro() : resumePomodoro())}
+      onSkip={skipPomodoro}
+      onStop={() => { resetPomodoro(); closePip.current(); }}
+    />,
+    pipBody,
+  ) : null;
+
+  if (!pomVisible || !pos || !mounted) return pipPortal;
 
   const isSetup = pomPhase === 'idle';
   const isBreak = pomPhase === 'break';
@@ -239,7 +331,7 @@ export default function PomodoroWidget() {
     const tip = BREAK_TIPS[tipIndex % BREAK_TIPS.length];
     const breakProgress = 1 - pomSecondsLeft / (pomBreakMins * 60);
 
-    return createPortal(
+    return <>{createPortal(
       <div className="fixed inset-0 z-[9999] flex items-center justify-center">
         {/* Blurred backdrop */}
         <div
@@ -252,6 +344,15 @@ export default function PomodoroWidget() {
           className="relative z-10 mx-5 w-full max-w-sm rounded-3xl shadow-2xl overflow-hidden"
           style={{ background: 'rgba(16,185,129,0.95)', backdropFilter: 'blur(20px)' }}
         >
+          {/* Top-right controls */}
+          {pipSupported && (
+            <button
+              onClick={togglePip}
+              className="absolute top-3 right-14 w-8 h-8 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-white text-sm transition-colors z-10"
+              aria-label={pipWin ? 'Return timer to page' : 'Pop out timer'}
+              title={pipWin ? 'Return timer to page' : 'Pop out timer so it stays visible over other windows'}
+            >⧉</button>
+          )}
           {/* Stop session button */}
           <button
             onClick={resetPomodoro}
@@ -315,7 +416,7 @@ export default function PomodoroWidget() {
         </div>
       </div>,
       document.body,
-    );
+    )}{pipPortal}</>;
   }
 
   const SETUP_PRESETS = [
@@ -328,7 +429,7 @@ export default function PomodoroWidget() {
   if (isSetup) {
     const isCustom = customMode;
 
-    return (
+    return <>
       <div
         ref={elemRef}
         onPointerDown={onPointerDown}
@@ -431,7 +532,8 @@ export default function PomodoroWidget() {
           </button>
         </div>
       </div>
-    );
+      {pipPortal}
+    </>;
   }
 
   // ── Running work timer (compact draggable widget) ─────────────────────────
@@ -462,12 +564,23 @@ export default function PomodoroWidget() {
             <span style={{ color: accentColor, fontWeight: 800, fontSize: 13, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
               {isWork ? '🎯 Focus' : '☕ Break'}
             </span>
-            <button
-              onPointerDown={e => e.stopPropagation()}
-              onClick={() => setPanelOpen(false)}
-              style={{ width: 24, height: 24, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', border: 'none', color: 'rgba(255,255,255,0.6)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-              aria-label="Close"
-            >✕</button>
+            <div style={{ display: 'flex', gap: 6 }}>
+              {pipSupported && (
+                <button
+                  onPointerDown={e => e.stopPropagation()}
+                  onClick={() => { togglePip(); }}
+                  style={{ width: 24, height: 24, borderRadius: '50%', background: pipWin ? accentColor : 'rgba(255,255,255,0.1)', border: 'none', color: pipWin ? '#fff' : 'rgba(255,255,255,0.6)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  aria-label={pipWin ? 'Return timer to page' : 'Pop out timer'}
+                  title={pipWin ? 'Return timer to page' : 'Pop out timer so it stays visible over other windows'}
+                >⧉</button>
+              )}
+              <button
+                onPointerDown={e => e.stopPropagation()}
+                onClick={() => setPanelOpen(false)}
+                style={{ width: 24, height: 24, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', border: 'none', color: 'rgba(255,255,255,0.6)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                aria-label="Close"
+              >✕</button>
+            </div>
           </div>
 
           {/* Big countdown */}
@@ -576,7 +689,66 @@ export default function PomodoroWidget() {
 
       </div>
     </div>
+    {pipPortal}
     </>
+  );
+}
+
+// ── Pip window content ──────────────────────────────────────────────────────
+
+function PipTimerContent({ phase, secondsLeft, running, sessions, breakMins, onPauseResume, onSkip, onStop }: {
+  phase: PomPhase; secondsLeft: number; running: boolean; sessions: number; breakMins: number;
+  onPauseResume: () => void; onSkip: () => void; onStop: () => void;
+}) {
+  const isBreak = phase === 'break';
+  const accentColor = isBreak ? 'var(--success)' : 'var(--primary)';
+  return (
+    <div style={{
+      minHeight: '100vh', boxSizing: 'border-box', padding: 16,
+      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+      fontFamily: 'inherit', background: isBreak ? 'rgba(16,185,129,0.95)' : 'var(--bg, #0a0a18)',
+    }}>
+      <span style={{
+        fontSize: 11, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase',
+        color: isBreak ? '#fff' : accentColor, marginBottom: 8,
+      }}>
+        {isBreak ? `☕ Break · ${breakMins}m` : '🎯 Focus'}
+      </span>
+      <div style={{
+        fontFamily: '"Courier New", monospace', fontSize: 48, fontWeight: 900, lineHeight: 1,
+        color: '#fff', letterSpacing: '-1px',
+        textShadow: isBreak ? 'none' : `0 0 24px ${accentColor}80`,
+      }}>
+        {fmt(secondsLeft)}
+      </div>
+      {sessions > 0 && (
+        <span style={{ fontSize: 11, color: isBreak ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.4)', marginTop: 6 }}>
+          {sessions} session{sessions === 1 ? '' : 's'} done
+        </span>
+      )}
+      <div style={{ display: 'flex', gap: 8, marginTop: 16, width: '100%' }}>
+        <button
+          onClick={onPauseResume}
+          style={{ flex: 1, padding: '10px 0', borderRadius: 12, border: 'none', background: isBreak ? 'rgba(255,255,255,0.25)' : accentColor, color: '#fff', fontWeight: 800, fontSize: 16, cursor: 'pointer' }}
+          aria-label={running ? 'Pause' : 'Resume'}
+        >
+          {running ? '⏸' : '▶'}
+        </button>
+        <button
+          onClick={onSkip}
+          style={{ flex: 1, padding: '10px 0', borderRadius: 12, border: '1px solid rgba(255,255,255,0.25)', background: 'rgba(255,255,255,0.08)', color: '#fff', fontWeight: 800, fontSize: 16, cursor: 'pointer' }}
+          aria-label="Skip to next"
+        >
+          ⏭
+        </button>
+        <button
+          onClick={onStop}
+          style={{ padding: '10px 12px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.7)', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}
+        >
+          Stop
+        </button>
+      </div>
+    </div>
   );
 }
 
