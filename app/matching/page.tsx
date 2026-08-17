@@ -6,7 +6,7 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
-import { getHardWords, getStarredWords, getCustomListWords, getImportedWords, getImportedWordsByCollection, importedWordExampleFields, getClassHWTemp, addXP, hasMatchXPAwarded, markMatchXPAwarded, hasMyWordsXPAwarded, markMyWordsXPAwarded, markMatchComplete, getMyUnitPendingNewWords, markMyMatchComplete, displayXP } from '@/lib/storage';
+import { getHardWords, getStarredWords, getCustomListWords, getImportedWords, getImportedWordsByCollection, importedWordExampleFields, getClassHWTemp, addXP, hasMatchXPAwarded, markMatchXPAwarded, hasMyWordsXPAwarded, markMyWordsXPAwarded, markMatchComplete, getMyActivityPendingNewWords, markMyMatchComplete, displayXP } from '@/lib/storage';
 import { getClassWordsFull, addClassHardWord } from '@/lib/class-srs';
 import { recordClassStudyDay } from '@/lib/class-xp';
 import { supabase } from '@/lib/supabase';
@@ -155,7 +155,7 @@ function MatchingInner() {
         ? getImportedWordsByCollection(myCollection, myFolder)
         : getImportedWords();
       if (onlyNew && myCollection) {
-        const pending = new Set(getMyUnitPendingNewWords(myFolder, myCollection, imported.map(w => w.word)));
+        const pending = new Set(getMyActivityPendingNewWords(myFolder, myCollection, 'match', imported.map(w => w.word)));
         imported = imported.filter(w => pending.has(w.word));
       }
       const list: MatchWord[] = imported.map(w => ({

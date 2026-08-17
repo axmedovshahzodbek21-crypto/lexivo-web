@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { speak, speakText } from '@/lib/speech';
-import { recordStudySession, markQuizComplete, unlockAchievement, getStarredWords, getCustomListWords, getSettings, getUnitProgress, getImportedWords, getImportedWordsByCollection, importedWordExampleFields, getClassHWTemp, recordQuizSession, addXP, hasQuizXPAwarded, markQuizXPAwarded, hasMyWordsXPAwarded, markMyWordsXPAwarded, getMyUnitPendingNewWords, markMyQuizComplete, displayXP } from '@/lib/storage';
+import { recordStudySession, markQuizComplete, unlockAchievement, getStarredWords, getCustomListWords, getSettings, getUnitProgress, getImportedWords, getImportedWordsByCollection, importedWordExampleFields, getClassHWTemp, recordQuizSession, addXP, hasQuizXPAwarded, markQuizXPAwarded, hasMyWordsXPAwarded, markMyWordsXPAwarded, getMyActivityPendingNewWords, markMyQuizComplete, displayXP } from '@/lib/storage';
 import { pushLists, pushStats } from '@/lib/sync';
 import { fireConfetti } from '@/lib/confetti';
 import { checkAchievements } from '@/lib/gamification';
@@ -220,7 +220,7 @@ export default function QuizPage() {
     if (sourceMyWords) {
       let imported = myCollection ? getImportedWordsByCollection(myCollection, myFolder) : getImportedWords();
       if (onlyNew && myCollection) {
-        const pending = new Set(getMyUnitPendingNewWords(myFolder, myCollection, imported.map(w => w.word)));
+        const pending = new Set(getMyActivityPendingNewWords(myFolder, myCollection, 'quiz', imported.map(w => w.word)));
         imported = imported.filter(w => pending.has(w.word));
       }
       const allWords: QuizWord[] = imported.map(w => ({

@@ -785,21 +785,32 @@ export function markMatchComplete(collectionName: string, dayNumber: number) {
 }
 
 // ─── My Words Unit Progress ───────────────────────────────────────────────────
-// Unlike the curated collections above, a My Words unit can grow after it's
-// been completed. Completion (all four activities done) stamps completedAt
-// and snapshots the word list at that moment. If new words are added later,
-// addImportedWords() resets the four flags (see below) but keeps completedAt
-// and completedWords intact, so the unit shows "Completed · N new words to
-// learn" instead of losing its badge.
+// Unlike the curated collections above, a My Words unit can grow at any time.
+// Each activity keeps its own word-list snapshot (learnWords etc.), taken the
+// moment that activity is marked done — independent of whether the other
+// three activities have ever run. So "new word" detection works per activity:
+// if only Learn was done and the unit grows, Learn alone can offer just the
+// new words, without needing Flashcards/Quiz/Match to have been done first.
+// completedAt/completedWords separately track the whole-unit "all four done"
+// milestone, used for the "🏆 Completed" badge.
+
+type MyActivity = 'learn' | 'flashcard' | 'quiz' | 'match';
+const MY_ACTIVITIES: MyActivity[] = ['learn', 'flashcard', 'quiz', 'match'];
 
 function myUnitProgressKey(folderName: string | undefined, collectionName: string): string {
   return `${KEYS.myUnitProgress}_${folderName ?? ''}_${collectionName}`;
 }
 
 export function getMyUnitProgress(folderName: string | undefined, collectionName: string): MyUnitProgress {
-  return get<MyUnitProgress>(myUnitProgressKey(folderName, collectionName), {
-    learnDone: false, flashcardDone: false, quizDone: false, matchDone: false, completedWords: [],
-  });
+  const defaults: MyUnitProgress = {
+    learnDone: false, flashcardDone: false, quizDone: false, matchDone: false,
+    learnWords: [], flashcardWords: [], quizWords: [], matchWords: [],
+    completedWords: [],
+  };
+  // Merge over defaults, not just substitute on a missing key — records
+  // stored before the per-activity word-list fields existed would otherwise
+  // deserialize with those fields `undefined` instead of `[]`.
+  return { ...defaults, ...get<Partial<MyUnitProgress>>(myUnitProgressKey(folderName, collectionName), {}) };
 }
 
 // Returns true when this call is what just brought the unit to full
@@ -808,33 +819,61 @@ export function getMyUnitProgress(folderName: string | undefined, collectionName
 function markMyUnitActivityComplete(
   folderName: string | undefined,
   collectionName: string,
-  activity: 'learnDone' | 'flashcardDone' | 'quizDone' | 'matchDone',
+  activity: MyActivity,
 ): boolean {
   const key = myUnitProgressKey(folderName, collectionName);
   const p = getMyUnitProgress(folderName, collectionName);
   const wasComplete = p.learnDone && p.flashcardDone && p.quizDone && p.matchDone;
-  const updated: MyUnitProgress = { ...p, [activity]: true };
+  const currentWords = getImportedWordsByCollection(collectionName, folderName).map(w => w.word);
+  const updated: MyUnitProgress = { ...p, [`${activity}Done`]: true, [`${activity}Words`]: currentWords };
   const nowComplete = updated.learnDone && updated.flashcardDone && updated.quizDone && updated.matchDone;
   if (nowComplete) {
-    updated.completedWords = getImportedWordsByCollection(collectionName, folderName).map(w => w.word);
+    updated.completedWords = currentWords;
     updated.completedAt = new Date().toISOString();
   }
   set(key, updated);
   return nowComplete && !wasComplete;
 }
 
-export const markMyLearnComplete      = (folderName: string | undefined, collectionName: string) => markMyUnitActivityComplete(folderName, collectionName, 'learnDone');
-export const markMyFlashcardComplete  = (folderName: string | undefined, collectionName: string) => markMyUnitActivityComplete(folderName, collectionName, 'flashcardDone');
-export const markMyQuizComplete       = (folderName: string | undefined, collectionName: string) => markMyUnitActivityComplete(folderName, collectionName, 'quizDone');
-export const markMyMatchComplete      = (folderName: string | undefined, collectionName: string) => markMyUnitActivityComplete(folderName, collectionName, 'matchDone');
+export const markMyLearnComplete      = (folderName: string | undefined, collectionName: string) => markMyUnitActivityComplete(folderName, collectionName, 'learn');
+export const markMyFlashcardComplete  = (folderName: string | undefined, collectionName: string) => markMyUnitActivityComplete(folderName, collectionName, 'flashcard');
+export const markMyQuizComplete       = (folderName: string | undefined, collectionName: string) => markMyUnitActivityComplete(folderName, collectionName, 'quiz');
+export const markMyMatchComplete      = (folderName: string | undefined, collectionName: string) => markMyUnitActivityComplete(folderName, collectionName, 'match');
 
-// Words in this unit not yet covered by the last full completion. Empty
-// (nothing pending) whenever the unit has never been completed at all.
-export function getMyUnitPendingNewWords(folderName: string | undefined, collectionName: string, currentWords: string[]): string[] {
+// Words not yet covered by this specific activity's last snapshot. Empty
+// whenever the activity has never been done — its next run naturally
+// includes everything, so there's nothing to flag as "new" ahead of time.
+//
+// Migration note: units completed before per-activity snapshots existed have
+// an empty e.g. learnWords even though learnDone is true. In that case we
+// fall back to completedWords (the old whole-unit snapshot) as a best-effort
+// stand-in, so pre-existing completed units don't suddenly show every word
+// as "new". Units that had only *some* activities done (never fully
+// completed) predate this feature entirely and have no snapshot to fall back
+// on — they'll start tracking correctly from the next time that activity runs.
+export function getMyActivityPendingNewWords(
+  folderName: string | undefined,
+  collectionName: string,
+  activity: MyActivity,
+  currentWords: string[],
+): string[] {
   const p = getMyUnitProgress(folderName, collectionName);
-  if (!p.completedAt) return [];
-  const completedSet = new Set(p.completedWords);
-  return currentWords.filter(w => !completedSet.has(w));
+  const done = { learn: p.learnDone, flashcard: p.flashcardDone, quiz: p.quizDone, match: p.matchDone }[activity];
+  if (!done) return [];
+  let snapshot = { learn: p.learnWords, flashcard: p.flashcardWords, quiz: p.quizWords, match: p.matchWords }[activity];
+  if (snapshot.length === 0 && p.completedWords.length > 0) snapshot = p.completedWords;
+  const snapshotSet = new Set(snapshot);
+  return currentWords.filter(w => !snapshotSet.has(w));
+}
+
+// Union of words pending for any activity that's actually done — used for
+// the unit-level "Completed · N new words to learn" banner text.
+export function getMyUnitPendingNewWords(folderName: string | undefined, collectionName: string, currentWords: string[]): string[] {
+  const pending = new Set<string>();
+  for (const activity of MY_ACTIVITIES) {
+    for (const w of getMyActivityPendingNewWords(folderName, collectionName, activity, currentWords)) pending.add(w);
+  }
+  return currentWords.filter(w => pending.has(w));
 }
 
 // ─── Starred words ───────────────────────────────────────────────────────────
@@ -1200,13 +1239,10 @@ export function addImportedWords(words: ImportedWord[], collectionName: string, 
     .map(w => sanitizeImportedWord({ ...w, collectionName, ...(folderName ? { folderName } : {}) }));
   set(IMPORTED_KEY, [...raw, ...fresh]);
   if (folderName) updateFolderMap(collectionName, folderName);
-  if (fresh.length > 0) {
-    const key = myUnitProgressKey(folderName, collectionName);
-    const p = getMyUnitProgress(folderName, collectionName);
-    if (p.completedAt) {
-      set(key, { ...p, learnDone: false, flashcardDone: false, quizDone: false, matchDone: false });
-    }
-  }
+  // No longer resetting the four done-flags here: per-activity word
+  // snapshots (see getMyActivityPendingNewWords) now detect exactly which
+  // words are new for each activity, so there's no need to force a full
+  // redo — the existing ✅ badges stay, with a "N new" indicator alongside.
 }
 
 // Soft-delete: mark with a tombstone timestamp instead of removing outright,

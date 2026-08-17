@@ -3,7 +3,7 @@ import { useEffect, useState, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/lib/useTranslation';
-import { getImportedWordsByCollection, deleteImportedWord, deleteImportedCollection, getMyUnitProgress, getMyUnitPendingNewWords } from '@/lib/storage';
+import { getImportedWordsByCollection, deleteImportedWord, deleteImportedCollection, getMyUnitProgress, getMyUnitPendingNewWords, getMyActivityPendingNewWords } from '@/lib/storage';
 import { pushLists } from '@/lib/sync';
 import { speakText } from '@/lib/speech';
 import type { ImportedWord } from '@/lib/types';
@@ -23,6 +23,7 @@ export default function FolderCollectionPage({ params }: Props) {
   const [completedAt, setCompletedAt] = useState<string | undefined>(undefined);
   const [progress, setProgress] = useState<{ learnDone: boolean; flashcardDone: boolean; quizDone: boolean; matchDone: boolean }>({ learnDone: false, flashcardDone: false, quizDone: false, matchDone: false });
   const [pendingNewWords, setPendingNewWords] = useState<string[]>([]);
+  const [pendingByActivity, setPendingByActivity] = useState({ learn: 0, flashcard: 0, quiz: 0, match: 0 });
   const [selectMode, setSelectMode] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [confirmModal, setConfirmModal] = useState<
@@ -34,9 +35,16 @@ export default function FolderCollectionPage({ params }: Props) {
 
   const loadProgress = (currentWords: ImportedWord[]) => {
     const p = getMyUnitProgress(folder, collectionName);
+    const wordList = currentWords.map(w => w.word);
     setCompletedAt(p.completedAt);
     setProgress({ learnDone: p.learnDone, flashcardDone: p.flashcardDone, quizDone: p.quizDone, matchDone: p.matchDone });
-    setPendingNewWords(getMyUnitPendingNewWords(folder, collectionName, currentWords.map(w => w.word)));
+    setPendingNewWords(getMyUnitPendingNewWords(folder, collectionName, wordList));
+    setPendingByActivity({
+      learn: getMyActivityPendingNewWords(folder, collectionName, 'learn', wordList).length,
+      flashcard: getMyActivityPendingNewWords(folder, collectionName, 'flashcard', wordList).length,
+      quiz: getMyActivityPendingNewWords(folder, collectionName, 'quiz', wordList).length,
+      match: getMyActivityPendingNewWords(folder, collectionName, 'match', wordList).length,
+    });
   };
 
   useEffect(() => {
@@ -168,58 +176,35 @@ export default function FolderCollectionPage({ params }: Props) {
           </div>
         ) : (
           <>
-            {pendingNewWords.length > 0 && (() => {
-              const newParam = `${studyParam}&onlyNew=1`;
-              return (
-                <div className="space-y-1.5">
-                  <p className="text-xs font-semibold" style={{ color: 'var(--success)' }}>
-                    {t.myWords.studyNewWords(pendingNewWords.length)}
-                  </p>
-                  <div className="grid grid-cols-2 gap-2">
-                    <Link href={`/learn?${newParam}`} className="flex flex-col items-center gap-1.5 py-3 rounded-2xl text-center transition-colors" style={{ background: 'rgba(34,197,94,0.12)', border: '1.5px solid var(--success)' }}>
-                      <span className="text-2xl">📖</span>
-                      <span className="text-xs font-semibold" style={{ color: 'var(--success)' }}>Learn</span>
-                    </Link>
-                    <Link href={`/flashcards?${newParam}`} className="flex flex-col items-center gap-1.5 py-3 rounded-2xl text-center transition-colors" style={{ background: 'rgba(34,197,94,0.12)', border: '1.5px solid var(--success)' }}>
-                      <span className="text-2xl">🃏</span>
-                      <span className="text-xs font-semibold" style={{ color: 'var(--success)' }}>Flashcards</span>
-                    </Link>
-                    <Link href={`/quiz?${newParam}`} className="flex flex-col items-center gap-1.5 py-3 rounded-2xl text-center transition-colors" style={{ background: 'rgba(34,197,94,0.12)', border: '1.5px solid var(--success)' }}>
-                      <span className="text-2xl">❓</span>
-                      <span className="text-xs font-semibold" style={{ color: 'var(--success)' }}>Quiz</span>
-                    </Link>
-                    <Link href={`/matching?${newParam}`} className="flex flex-col items-center gap-1.5 py-3 rounded-2xl text-center transition-colors" style={{ background: 'rgba(34,197,94,0.12)', border: '1.5px solid var(--success)' }}>
-                      <span className="text-2xl">🔗</span>
-                      <span className="text-xs font-semibold" style={{ color: 'var(--success)' }}>Match</span>
-                    </Link>
-                  </div>
-                </div>
-              );
-            })()}
-            {pendingNewWords.length > 0 && (
-              <p className="text-xs font-semibold text-[var(--text-muted)]">{t.myWords.studyAllWords}</p>
-            )}
             <div className="grid grid-cols-2 gap-2">
-              <Link href={`/learn?${studyParam}`} className="relative flex flex-col items-center gap-1.5 py-3 rounded-2xl text-center transition-colors" style={{ background: 'rgba(108,99,255,0.1)', border: '1.5px solid rgba(108,99,255,0.3)' }}>
-                {progress.learnDone && <span className="absolute top-1.5 right-1.5 text-sm">✅</span>}
-                <span className="text-2xl">📖</span>
-                <span className="text-xs font-semibold" style={{ color: 'var(--primary)' }}>Learn</span>
-              </Link>
-              <Link href={`/flashcards?${studyParam}`} className="relative flex flex-col items-center gap-1.5 py-3 rounded-2xl text-center transition-colors" style={{ background: 'rgba(255,107,53,0.1)', border: '1.5px solid rgba(255,107,53,0.3)' }}>
-                {progress.flashcardDone && <span className="absolute top-1.5 right-1.5 text-sm">✅</span>}
-                <span className="text-2xl">🃏</span>
-                <span className="text-xs font-semibold" style={{ color: '#FF6B35' }}>Flashcards</span>
-              </Link>
-              <Link href={`/quiz?${studyParam}`} className="relative flex flex-col items-center gap-1.5 py-3 rounded-2xl text-center transition-colors" style={{ background: 'rgba(245,158,11,0.1)', border: '1.5px solid rgba(245,158,11,0.3)' }}>
-                {progress.quizDone && <span className="absolute top-1.5 right-1.5 text-sm">✅</span>}
-                <span className="text-2xl">❓</span>
-                <span className="text-xs font-semibold" style={{ color: 'var(--warning)' }}>Quiz</span>
-              </Link>
-              <Link href={`/matching?${studyParam}`} className="relative flex flex-col items-center gap-1.5 py-3 rounded-2xl text-center transition-colors" style={{ background: 'rgba(16,185,129,0.1)', border: '1.5px solid rgba(16,185,129,0.3)' }}>
-                {progress.matchDone && <span className="absolute top-1.5 right-1.5 text-sm">✅</span>}
-                <span className="text-2xl">🔗</span>
-                <span className="text-xs font-semibold" style={{ color: 'var(--success)' }}>Match</span>
-              </Link>
+              <StudyButton
+                href={`/learn?${studyParam}`}
+                onlyNewHref={`/learn?${studyParam}&onlyNew=1`}
+                icon="📖" label="Learn" color="var(--primary)"
+                bg="rgba(108,99,255,0.1)" border="rgba(108,99,255,0.3)"
+                done={progress.learnDone} pendingNew={pendingByActivity.learn}
+              />
+              <StudyButton
+                href={`/flashcards?${studyParam}`}
+                onlyNewHref={`/flashcards?${studyParam}&onlyNew=1`}
+                icon="🃏" label="Flashcards" color="#FF6B35"
+                bg="rgba(255,107,53,0.1)" border="rgba(255,107,53,0.3)"
+                done={progress.flashcardDone} pendingNew={pendingByActivity.flashcard}
+              />
+              <StudyButton
+                href={`/quiz?${studyParam}`}
+                onlyNewHref={`/quiz?${studyParam}&onlyNew=1`}
+                icon="❓" label="Quiz" color="var(--warning)"
+                bg="rgba(245,158,11,0.1)" border="rgba(245,158,11,0.3)"
+                done={progress.quizDone} pendingNew={pendingByActivity.quiz}
+              />
+              <StudyButton
+                href={`/matching?${studyParam}`}
+                onlyNewHref={`/matching?${studyParam}&onlyNew=1`}
+                icon="🔗" label="Match" color="var(--success)"
+                bg="rgba(16,185,129,0.1)" border="rgba(16,185,129,0.3)"
+                done={progress.matchDone} pendingNew={pendingByActivity.match}
+              />
             </div>
 
             <div className="space-y-2">
@@ -313,5 +298,37 @@ export default function FolderCollectionPage({ params }: Props) {
         </div>
       )}
     </div>
+  );
+}
+
+// An activity button that's aware of its own "new words since I was last
+// done" count — independent of the other three activities. When done and
+// there are pending new words, tapping jumps straight into a session with
+// just those words instead of the full set.
+function StudyButton({
+  href, onlyNewHref, icon, label, color, bg, border, done, pendingNew,
+}: {
+  href: string; onlyNewHref: string; icon: string; label: string;
+  color: string; bg: string; border: string; done: boolean; pendingNew: number;
+}) {
+  const target = done && pendingNew > 0 ? onlyNewHref : href;
+  return (
+    <Link
+      href={target}
+      className="relative flex flex-col items-center gap-1.5 py-3 rounded-2xl text-center transition-colors"
+      style={{ background: bg, border: `1.5px solid ${border}` }}
+    >
+      {done && <span className="absolute top-1.5 right-1.5 text-sm">✅</span>}
+      <span className="text-2xl">{icon}</span>
+      <span className="text-xs font-semibold" style={{ color }}>{label}</span>
+      {done && pendingNew > 0 && (
+        <span
+          className="absolute -top-1.5 -left-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full text-white"
+          style={{ background: 'var(--success)' }}
+        >
+          {pendingNew} new
+        </span>
+      )}
+    </Link>
   );
 }

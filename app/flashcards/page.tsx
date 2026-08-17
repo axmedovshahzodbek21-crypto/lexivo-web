@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { useShallow } from 'zustand/react/shallow';
 import { speak, speakText } from '@/lib/speech';
-import { recordStudySession, markFlashcardComplete, getStarredWords, getHardWords, getCustomListWords, getUnitProgress, saveFlashcardProgress, getFlashcardProgress, clearFlashcardProgress, getImportedWords, getImportedWordsByCollection, importedWordExampleFields, getClassHWTemp, recordFlashcardSession, addXP, hasFlashcardXPAwarded, markFlashcardXPAwarded, hasMyWordsXPAwarded, markMyWordsXPAwarded, getMyUnitPendingNewWords, markMyFlashcardComplete, displayXP } from '@/lib/storage';
+import { recordStudySession, markFlashcardComplete, getStarredWords, getHardWords, getCustomListWords, getUnitProgress, saveFlashcardProgress, getFlashcardProgress, clearFlashcardProgress, getImportedWords, getImportedWordsByCollection, importedWordExampleFields, getClassHWTemp, recordFlashcardSession, addXP, hasFlashcardXPAwarded, markFlashcardXPAwarded, hasMyWordsXPAwarded, markMyWordsXPAwarded, getMyActivityPendingNewWords, markMyFlashcardComplete, displayXP } from '@/lib/storage';
 import { supabase } from '@/lib/supabase';
 import { getClassWordsFull } from '@/lib/class-srs';
 import { recordClassStudyDay } from '@/lib/class-xp';
@@ -164,7 +164,7 @@ export default function FlashcardsPage() {
     if (sourceMyWords) {
       let imported = myCollection ? getImportedWordsByCollection(myCollection, myFolder) : getImportedWords();
       if (onlyNew && myCollection) {
-        const pending = new Set(getMyUnitPendingNewWords(myFolder, myCollection, imported.map(w => w.word)));
+        const pending = new Set(getMyActivityPendingNewWords(myFolder, myCollection, 'flashcard', imported.map(w => w.word)));
         imported = imported.filter(w => pending.has(w.word));
       }
       const list: StudyWord[] = imported.map(w => ({

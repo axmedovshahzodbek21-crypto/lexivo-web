@@ -23,7 +23,7 @@ import type { Accent } from '@/lib/speech';
 import { checkAchievements } from '@/lib/gamification';
 import { fireConfetti } from '@/lib/confetti';
 import type { WordItem, WordCollection } from '@/lib/types';
-import { getImportedWords, getImportedWordsByCollection, importedWordExampleFields, getMyUnitPendingNewWords, markMyLearnComplete } from '@/lib/storage';
+import { getImportedWords, getImportedWordsByCollection, importedWordExampleFields, getMyActivityPendingNewWords, markMyLearnComplete } from '@/lib/storage';
 import Link from 'next/link';
 import UnitPicker from '@/components/UnitPicker';
 import TiltCard from '@/components/TiltCard';
@@ -200,7 +200,7 @@ function LearnInner() {
     if (sourceMyWords) {
       let imported = myCollection ? getImportedWordsByCollection(myCollection, myFolder) : getImportedWords();
       if (onlyNew && myCollection) {
-        const pending = new Set(getMyUnitPendingNewWords(myFolder, myCollection, imported.map(w => w.word)));
+        const pending = new Set(getMyActivityPendingNewWords(myFolder, myCollection, 'learn', imported.map(w => w.word)));
         imported = imported.filter(w => pending.has(w.word));
       }
       const list: StudyWord[] = imported.map(w => ({
