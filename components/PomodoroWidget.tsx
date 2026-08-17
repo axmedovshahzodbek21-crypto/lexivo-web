@@ -172,7 +172,7 @@ export default function PomodoroWidget() {
     const api = getPipApi();
     if (!api) return;
     try {
-      const win = await api.requestWindow({ width: 260, height: 200 });
+      const win = await api.requestWindow({ width: 180, height: 96 });
       copyStylesInto(win.document);
       win.document.title = 'Focus Timer — Lexivo';
       win.document.body.style.margin = '0';
@@ -704,48 +704,49 @@ function PipTimerContent({ phase, secondsLeft, running, sessions, breakMins, onP
   const accentColor = isBreak ? 'var(--success)' : 'var(--primary)';
   return (
     <div style={{
-      minHeight: '100vh', boxSizing: 'border-box', padding: 16,
-      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+      minHeight: '100vh', boxSizing: 'border-box', padding: '8px 10px',
+      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4,
       fontFamily: 'inherit', background: isBreak ? 'rgba(16,185,129,0.95)' : 'var(--bg, #0a0a18)',
     }}>
-      <span style={{
-        fontSize: 11, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase',
-        color: isBreak ? '#fff' : accentColor, marginBottom: 8,
-      }}>
-        {isBreak ? `☕ Break · ${breakMins}m` : '🎯 Focus'}
-      </span>
-      <div style={{
-        fontFamily: '"Courier New", monospace', fontSize: 48, fontWeight: 900, lineHeight: 1,
-        color: '#fff', letterSpacing: '-1px',
-        textShadow: isBreak ? 'none' : `0 0 24px ${accentColor}80`,
-      }}>
-        {fmt(secondsLeft)}
-      </div>
-      {sessions > 0 && (
-        <span style={{ fontSize: 11, color: isBreak ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.4)', marginTop: 6 }}>
-          {sessions} session{sessions === 1 ? '' : 's'} done
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+        <span style={{
+          fontSize: 9, fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase',
+          color: isBreak ? '#fff' : accentColor,
+        }}>
+          {isBreak ? '☕' : '🎯'}
         </span>
-      )}
-      <div style={{ display: 'flex', gap: 8, marginTop: 16, width: '100%' }}>
+        <span style={{
+          fontFamily: '"Courier New", monospace', fontSize: 26, fontWeight: 900, lineHeight: 1,
+          color: '#fff', letterSpacing: '-1px',
+        }}>
+          {fmt(secondsLeft)}
+        </span>
+        {sessions > 0 && (
+          <span style={{ fontSize: 9, color: isBreak ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.4)' }}>
+            ×{sessions}
+          </span>
+        )}
+      </div>
+      <div style={{ display: 'flex', gap: 4, width: '100%' }}>
         <button
           onClick={onPauseResume}
-          style={{ flex: 1, padding: '10px 0', borderRadius: 12, border: 'none', background: isBreak ? 'rgba(255,255,255,0.25)' : accentColor, color: '#fff', fontWeight: 800, fontSize: 16, cursor: 'pointer' }}
+          style={{ flex: 1, padding: '4px 0', borderRadius: 8, border: 'none', background: isBreak ? 'rgba(255,255,255,0.25)' : accentColor, color: '#fff', fontWeight: 800, fontSize: 12, cursor: 'pointer' }}
           aria-label={running ? 'Pause' : 'Resume'}
         >
           {running ? '⏸' : '▶'}
         </button>
         <button
           onClick={onSkip}
-          style={{ flex: 1, padding: '10px 0', borderRadius: 12, border: '1px solid rgba(255,255,255,0.25)', background: 'rgba(255,255,255,0.08)', color: '#fff', fontWeight: 800, fontSize: 16, cursor: 'pointer' }}
+          style={{ flex: 1, padding: '4px 0', borderRadius: 8, border: '1px solid rgba(255,255,255,0.25)', background: 'rgba(255,255,255,0.08)', color: '#fff', fontWeight: 800, fontSize: 12, cursor: 'pointer' }}
           aria-label="Skip to next"
         >
           ⏭
         </button>
         <button
           onClick={onStop}
-          style={{ padding: '10px 12px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.7)', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}
+          style={{ padding: '4px 6px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.7)', fontWeight: 700, fontSize: 9, cursor: 'pointer' }}
         >
-          Stop
+          ✕
         </button>
       </div>
     </div>
