@@ -3,6 +3,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import BackButton from '@/components/BackButton';
 import { addImportedWords } from '@/lib/storage';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/lib/auth-context';
 import type { ImportedWord } from '@/lib/types';
 
 function highlightParagraph(text: string, collected: string[]): React.ReactNode {
@@ -104,6 +106,7 @@ function parseAIResponse(text: string): ImportedWord[] {
 }
 
 export default function ReadingPage() {
+  const { user } = useAuth();
   const [passage, setPassage] = useState('');
   const [reading, setReading] = useState(false);
   const [wordList, setWordList] = useState<string[]>([]);
@@ -257,11 +260,17 @@ export default function ReadingPage() {
 
   const fetchArticle = async () => {
     if (!urlInput.trim()) return;
+    if (!user) { setFetchError('Log in to fetch articles by URL.'); return; }
     setFetching(true); setFetchError('');
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) { setFetchError('Log in to fetch articles by URL.'); return; }
       const res = await fetch('/api/fetch-article', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
         body: JSON.stringify({ url: urlInput.trim() }),
       });
       const data = await res.json();
