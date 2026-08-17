@@ -198,8 +198,13 @@ export default function SettingsPage() {
           // Deliberately NOT clearing imported_words — Reset Progress undoes
           // learning progress, not vocabulary the user typed in themselves.
           achievements: [], lists_updated_at: ts,
+          // Lets other devices detect this reset on their next pull (mirrors
+          // Flutter's reset flow) — without this, a device that hasn't
+          // reset locally would just push its old data back on top.
+          reset_at: ts,
         });
         if (upsertErr) throw new Error(upsertErr.message);
+        localStorage.setItem('lexivo_last_reset_at', ts);
         const dels = await Promise.all([
           supabase.from('learned_words').delete().eq('user_id', user.id),
           supabase.from('xp_history').delete().eq('user_id', user.id),
