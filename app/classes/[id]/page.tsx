@@ -2363,9 +2363,13 @@ export default function ClassDashboardPage() {
                     speedFlagSessions: r.speed_flag_sessions,
                   };
                 });
+                const { data: { session } } = await supabase.auth.getSession();
                 const res = await fetch('/api/digest', {
                   method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
+                  headers: {
+                    'Content-Type': 'application/json',
+                    ...(session ? { Authorization: `Bearer ${session.access_token}` } : {}),
+                  },
                   body: JSON.stringify({ classId: id, analytics: payload }),
                 });
                 const json = await res.json();

@@ -1,13 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
+import { createClient } from '@supabase/supabase-js';
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
 
-// Max one digest request per class per minute (in-process guard)
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+);
+
+// Max one digest request per teacher per minute. Keyed by authenticated user
+// id (not the caller-supplied classId), so it can't be bypassed by varying
+// classId — same in-memory-per-user pattern used by /api/transcribe.
 const rateLimitMap = new Map<string, number>();
 
 export async function POST(req: NextRequest) {
   try {
+    // Auth check — must be a logged-in user
+    const authHeader = req.headers.get('Authorization');
+    const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
+    if (!token) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await req.json();
     const { classId, analytics } = body as {
       classId: string;
@@ -25,11 +44,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing classId or analytics' }, { status: 400 });
     }
 
-    const last = rateLimitMap.get(classId) ?? 0;
+    // Authorization — caller must actually teach this class
+    const { data: cls, error: clsError } = await supabase
+      .from('classes').select('teacher_id').eq('id', classId).maybeSingle();
+    if (clsError || !cls || cls.teacher_id !== user.id) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    const last = rateLimitMap.get(user.id) ?? 0;
     if (Date.now() - last < 60_000) {
       return NextResponse.json({ error: 'Rate limit: one digest per minute' }, { status: 429 });
     }
-    rateLimitMap.set(classId, Date.now());
+    rateLimitMap.set(user.id, Date.now());
 
     const rows = analytics
       .map(s =>
