@@ -172,6 +172,15 @@ export async function pushLists(): Promise<void> {
   const uid = await getUid();
   if (!uid) return;
   try {
+    // Merge in whatever's currently in the cloud row before overwriting it —
+    // otherwise a device pushing after being offline (or racing another
+    // device's own push) would silently discard the other side's data
+    // instead of just adding to it.
+    const { data: cloudRow } = await supabase.from('user_data')
+      .select('learned_words, srs_words, starred_words, hard_words, study_days, review_days, word_goal_days, unit_done_days, xp_history, unit_progress, my_unit_progress, review_log, achievements, imported_words')
+      .eq('id', uid).maybeSingle();
+    if (cloudRow) mergeListsFromCloudRow(cloudRow);
+
     const ts = new Date().toISOString();
     const learnedWords = getLearnedWords();
     const promises = [
@@ -314,8 +323,18 @@ export async function pullAll(): Promise<void> {
       saveProfilePicUrl(row.avatar_url as string);
     }
 
-    // ── Lists (union-merge) ──────────────────────────────────────────────────
+    mergeListsFromCloudRow(row);
+  } catch {}
+}
 
+// Merges every list-type field from a cloud `user_data` row into local
+// storage (additive union-merge / tombstone-aware last-write-wins, depending
+// on the field — see comments per field below). Shared by pullAll() and by
+// pushLists(), which calls this immediately before building its push payload
+// so a push can never silently discard data another device already synced —
+// without this, pushLists() overwrote the whole row with only-local state.
+function mergeListsFromCloudRow(row: Record<string, unknown>): void {
+  try {
     // learned_words
     if (Array.isArray(row.learned_words) && row.learned_words.length > 0) {
       const local = getLearnedWords();
