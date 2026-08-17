@@ -194,7 +194,9 @@ export default function SettingsPage() {
           learned_words: [], srs_words: [], starred_words: [],
           hard_words: [], study_days: [], review_days: [],
           word_goal_days: [], unit_done_days: [], xp_history: [],
-          unit_progress: {}, review_log: {}, imported_words: [],
+          unit_progress: {}, review_log: {},
+          // Deliberately NOT clearing imported_words — Reset Progress undoes
+          // learning progress, not vocabulary the user typed in themselves.
           achievements: [], lists_updated_at: ts,
         });
         if (upsertErr) throw new Error(upsertErr.message);
