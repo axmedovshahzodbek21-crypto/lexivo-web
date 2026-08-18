@@ -5,7 +5,6 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { saveClassHWTemp } from '@/lib/storage';
 import type { ClassHWWord } from '@/lib/storage';
-import { recordClassXP } from '@/lib/class-xp';
 import { loadCollections, loadCEFRCollection } from '@/lib/data';
 import type { WordCollection } from '@/lib/types';
 import { readingPassages, type ReadingPassage } from '@/lib/reading-data';
@@ -44,7 +43,6 @@ function dueLabel(due: string | null): { text: string; overdue: boolean } | null
 
 type HWMeta = { unitName: string; modes: string[]; dueDate: string | null; words: UnitWord[]; passage: ReadingPassage | null };
 const _hwCache = new Map<string, HWMeta>();
-const PASSAGE_XP = 15;
 
 export default function UnitStudyHubPage() {
   const { id: classId, hwId } = useParams<{ id: string; hwId: string }>();
@@ -85,25 +83,21 @@ export default function UnitStudyHubPage() {
 
   // Handle ?completed=mode (and ?alsoCompleted=mode) set by study pages when a session finishes.
   // This is how we record progress without marking it prematurely in startMode().
+  // The URL param only tells us WHICH mode to check — the record_class_homework_progress
+  // RPC re-validates assignment/membership and computes XP server-side before writing,
+  // so navigating here with an arbitrary ?completed= value can't fabricate progress or XP.
   useEffect(() => {
     const completed = searchParams.get('completed');
     if (!completed || !user) return;
     const alsoCompleted = searchParams.get('alsoCompleted');
     const modesToRecord = [completed, ...(alsoCompleted ? [alsoCompleted] : [])];
-    const MODE_XP: Record<string, number> = { learn: 10, flashcard: 3, quiz: 5, match: 4 };
-    const MODE_REASON: Record<string, string> = { learn: 'Learn', flashcard: 'Cards', quiz: 'Quiz', match: 'Match' };
     router.replace(`/classes/${classId}/homework/${hwId}`);
     void (async () => {
       const wordCount = _hwCache.get(hwId)?.words.length ?? words.length;
       for (const mode of modesToRecord) {
-        const { data: existing } = await supabase.from('class_homework_progress').select('mode')
-          .eq('homework_id', hwId).eq('student_id', user.id).eq('mode', mode).maybeSingle();
-        if (!existing) {
-          const { error } = await supabase.from('class_homework_progress').insert({
-            homework_id: hwId, student_id: user.id, mode,
-          });
-          if (!error) void recordClassXP(user.id, classId, wordCount * (MODE_XP[mode] ?? 3), MODE_REASON[mode] ?? mode);
-        }
+        await supabase.rpc('record_class_homework_progress', {
+          p_homework_id: hwId, p_mode: mode, p_client_word_count: wordCount,
+        });
       }
       setCompletedModes(prev => new Set([...prev, ...modesToRecord]));
     })();
@@ -265,15 +259,10 @@ export default function UnitStudyHubPage() {
     if (!user || markingRead || completedModes.has('read')) return;
     setMarkingRead(true);
     try {
-      const { data: existing } = await supabase.from('class_homework_progress').select('mode')
-        .eq('homework_id', hwId).eq('student_id', user.id).eq('mode', 'read').maybeSingle();
-      if (!existing) {
-        const { error } = await supabase.from('class_homework_progress').insert({
-          homework_id: hwId, student_id: user.id, mode: 'read',
-        });
-        if (error) { setProgressError(error.message); setMarkingRead(false); return; }
-        void recordClassXP(user.id, classId, PASSAGE_XP, 'Reading');
-      }
+      const { error } = await supabase.rpc('record_class_homework_progress', {
+        p_homework_id: hwId, p_mode: 'read', p_client_word_count: null,
+      });
+      if (error) { setProgressError(error.message); setMarkingRead(false); return; }
       setCompletedModes(prev => new Set([...prev, 'read']));
     } finally {
       setMarkingRead(false);
