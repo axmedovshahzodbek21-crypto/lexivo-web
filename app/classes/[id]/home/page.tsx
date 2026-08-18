@@ -655,10 +655,12 @@ const [memberCount, setMemberCount] = useState(0);
                           const entries = teacherXpByDate[dStr] ?? [];
                           const hasXp = entries.length > 0;
                           const dayXp = entries.reduce((s, e) => s + e.amount, 0);
+                          const hasReview = entries.some(e => e.reason === 'SRS Review');
                           return (
                             <button key={dStr} disabled={isFuture || !hasXp}
                               onClick={() => hasXp && setTeacherXpCalSelectedDay(dStr)}
-                              className="w-10 h-10 rounded-full relative overflow-hidden flex flex-col items-center justify-center transition-all disabled:opacity-20"
+                              title={hasReview ? 'Did SRS Review this day' : undefined}
+                              className="w-10 h-10 rounded-full relative flex flex-col items-center justify-center transition-all disabled:opacity-20"
                               style={{
                                 background: hasXp ? classAccent : 'transparent',
                                 outline: isToday || isSelected ? '2.5px solid #6366f1' : 'none',
@@ -667,15 +669,25 @@ const [memberCount, setMemberCount] = useState(0);
                               }}>
                               <span className="text-xs font-bold leading-none" style={{ color: hasXp ? '#fff' : isToday ? 'var(--text)' : 'var(--text-muted)' }}>{day}</span>
                               {hasXp && <span className="text-[7px] text-white/70 font-semibold leading-none">+{(dayXp / 10).toFixed(1)}</span>}
+                              {hasReview && (
+                                <span
+                                  className="absolute top-0 right-0 w-3.5 h-3.5 rounded-full flex items-center justify-center"
+                                  style={{ background: '#06b6d4', boxShadow: '0 0 0 1.5px var(--surface)', fontSize: 7 }}
+                                >🔄</span>
+                              )}
                             </button>
                           );
                         })}
                       </div>
                     </div>
-                    <div className="flex items-center gap-3 mt-4 pt-3 border-t border-[var(--border)]">
+                    <div className="flex items-center gap-3 mt-4 pt-3 border-t border-[var(--border)] flex-wrap">
                       <div className="flex items-center gap-1.5">
                         <div className="w-3.5 h-3.5 rounded-full" style={{ background: classAccent }} />
                         <span className="text-[10px] text-[var(--text-muted)]">XP earned</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span style={{ fontSize: 11 }}>🔄</span>
+                        <span className="text-[10px] text-[var(--text-muted)]">Did Review</span>
                       </div>
                       <span className="text-[10px] text-[var(--text-muted)] ml-auto">Tap a day for details</span>
                     </div>
