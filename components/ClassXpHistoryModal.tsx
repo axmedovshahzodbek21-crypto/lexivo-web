@@ -160,10 +160,6 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
     last30Days.push(d.toISOString().slice(0, 10));
   }
 
-  const openCount = (selectedDay ? 1 : 0) + (showReviewDetail ? 1 : 0);
-  const hasDetail = openCount > 0;
-  const bothOpen = openCount === 2;
-
   return (
     <div className="fixed inset-0 z-[70] flex items-end justify-center" onClick={onClose}>
       <div className="absolute inset-0 bg-black/50" />
@@ -173,8 +169,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
           maxHeight: '90vh',
           background: 'var(--surface)',
           width: '100%',
-          maxWidth: bothOpen ? '980px' : hasDetail ? '680px' : '384px',
-          transition: 'max-width 0.2s ease-out',
+          maxWidth: '980px',
         }}
         onClick={e => e.stopPropagation()}
       >
@@ -182,9 +177,9 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
           <div className="w-10 h-1 rounded-full" style={{ background: 'var(--border)' }} />
         </div>
 
-        <div className="flex flex-1 min-h-0">
+        <div className="flex flex-1 min-h-0 justify-center">
           {/* Calendar (right column once a day is selected) */}
-          <div className="flex flex-col overflow-y-auto px-6 pb-6 space-y-4" style={{ width: hasDetail ? (bothOpen ? '300px' : '360px') : '100%', flexShrink: 0, order: 2 }}>
+          <div className="flex flex-col overflow-y-auto px-6 pb-6 space-y-4" style={{ width: '300px', flexShrink: 0, order: 2 }}>
             <div className="flex items-center justify-between">
               <h3 className="text-xl font-black" style={{ color: 'var(--text)' }}>📅 XP History</h3>
               <div className="text-right min-w-0">
