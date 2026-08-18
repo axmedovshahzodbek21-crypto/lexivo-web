@@ -94,6 +94,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
   const { user } = useAuth();
   const [history, setHistory] = useState<XpEntry[]>([]);
   const [overdueCount, setOverdueCount] = useState(0);
+  const [dueCount, setDueCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [calMonth, setCalMonth] = useState(() => { const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), 1); });
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
@@ -109,11 +110,13 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
         isSelf
           ? supabase.from('class_xp_history').select('id, amount, reason, created_at').eq('user_id', userId).eq('class_id', classId).order('created_at', { ascending: false })
           : supabase.rpc('get_student_xp_history', { p_class_id: classId, p_student_id: userId }),
-        supabase.from('class_srs_states').select('stage, next_due').eq('user_id', userId).eq('class_id', classId).lt('next_due', today),
+        supabase.from('class_srs_states').select('stage, next_due').eq('user_id', userId).eq('class_id', classId).lte('next_due', today),
       ]);
       if (!cancelled) {
         setHistory((data ?? []) as XpEntry[]);
-        setOverdueCount(((srs ?? []) as { stage: number }[]).filter(r => r.stage < 5).length);
+        const pending = ((srs ?? []) as { stage: number; next_due: string }[]).filter(r => r.stage < 5);
+        setDueCount(pending.length);
+        setOverdueCount(pending.filter(r => r.next_due < today).length);
         setLoading(false);
       }
     })();
@@ -199,7 +202,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
                   <p className="text-xs font-bold truncate" style={{ color: reviewMeta.color }}>Review: {reviewMeta.text}</p>
                   <p className="text-[10px] text-[var(--text-muted)] truncate">
                     {reviewPattern.daysReviewed}/30 days · {reviewPattern.streak}d streak
-                    {overdueCount > 0 ? ` · ${overdueCount} overdue` : ''}
+                    {overdueCount > 0 ? ` · ${overdueCount} overdue` : dueCount > 0 ? ` · ${dueCount} due` : ''}
                   </p>
                 </div>
                 <span className="text-xs shrink-0" style={{ color: reviewMeta.color }}>ⓘ</span>
@@ -348,6 +351,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
                     { label: 'Longest gap', value: `${reviewPattern.longestGap} day${reviewPattern.longestGap === 1 ? '' : 's'}` },
                     { label: 'Avg words / active day', value: reviewPattern.totalReviews > 0 ? reviewPattern.avgPerActiveDay.toFixed(1) : '—' },
                     { label: 'Total reviews (30d)', value: `${reviewPattern.totalReviews}` },
+                    { label: 'Currently due for review', value: `${dueCount}` },
                     { label: 'Currently overdue', value: `${overdueCount}` },
                   ].map(row => (
                     <div key={row.label} className="flex items-center justify-between px-4 py-2.5 text-xs">

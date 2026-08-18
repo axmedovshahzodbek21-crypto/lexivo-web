@@ -817,14 +817,18 @@ function ReviewPatternTab({
     entriesByStudent.get(e.user_id)!.push(e);
   }
   const overdueByStudent = new Map<string, number>();
+  const dueByStudent = new Map<string, number>();
   for (const r of srsRows) {
-    if (r.next_due < today && r.stage < 5) overdueByStudent.set(r.user_id, (overdueByStudent.get(r.user_id) ?? 0) + 1);
+    if (r.stage >= 5) continue;
+    if (r.next_due <= today) dueByStudent.set(r.user_id, (dueByStudent.get(r.user_id) ?? 0) + 1);
+    if (r.next_due < today) overdueByStudent.set(r.user_id, (overdueByStudent.get(r.user_id) ?? 0) + 1);
   }
 
   const rows = students.map(s => {
     const entries = entriesByStudent.get(s.student_id) ?? [];
     const overdue = overdueByStudent.get(s.student_id) ?? 0;
-    return { student: s, overdue, ...classifyReview(entries, overdue) };
+    const due = dueByStudent.get(s.student_id) ?? 0;
+    return { student: s, overdue, due, ...classifyReview(entries, overdue) };
   });
 
   const order: ReviewLabel[] = ['inactive', 'bursty', 'never', 'mostly', 'daily'];
@@ -847,11 +851,15 @@ function ReviewPatternTab({
                   <p className="text-[11px]" style={{ color: meta.color }}>{meta.emoji} {meta.text}</p>
                 </div>
               </div>
-              {r.overdue > 0 && (
+              {r.overdue > 0 ? (
                 <span className="text-[10px] font-bold shrink-0 px-2 py-1 rounded-full" style={{ background: 'color-mix(in srgb, var(--danger) 12%, transparent)', color: 'var(--danger)' }}>
                   {r.overdue} overdue
                 </span>
-              )}
+              ) : r.due > 0 ? (
+                <span className="text-[10px] font-bold shrink-0 px-2 py-1 rounded-full" style={{ background: 'color-mix(in srgb, var(--warning) 12%, transparent)', color: 'var(--warning)' }}>
+                  {r.due} due
+                </span>
+              ) : null}
             </div>
             <p className="text-[11px] text-[var(--text-muted)]">{meta.blurb}</p>
             <div className="flex flex-wrap gap-x-4 gap-y-1 text-[10px] text-[var(--text-muted)]">
