@@ -153,8 +153,8 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
         </div>
 
         <div className="flex flex-1 min-h-0">
-          {/* Left column: calendar */}
-          <div className="flex flex-col overflow-y-auto px-6 pb-6 space-y-4" style={{ width: selectedDay ? '360px' : '100%', flexShrink: 0 }}>
+          {/* Calendar (right column once a day is selected) */}
+          <div className="flex flex-col overflow-y-auto px-6 pb-6 space-y-4" style={{ width: selectedDay ? '360px' : '100%', flexShrink: 0, order: selectedDay ? 2 : 1 }}>
             <div className="flex items-center justify-between">
               <h3 className="text-xl font-black" style={{ color: 'var(--text)' }}>📅 XP History</h3>
               <div className="text-right min-w-0">
@@ -252,9 +252,9 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
             </button>
           </div>
 
-          {/* Right column: day detail */}
+          {/* Day detail (left column) */}
           {selectedDay && (
-            <div className="flex-1 flex flex-col min-w-0 border-l overflow-y-auto animate-slide-in-right" style={{ borderColor: 'var(--border)' }}>
+            <div className="flex-1 flex flex-col min-w-0 border-r overflow-y-auto animate-slide-in-left" style={{ borderColor: 'var(--border)', order: 1 }}>
               <div className="flex items-center justify-between px-5 py-4 shrink-0 border-b" style={{ borderColor: 'var(--border)' }}>
                 <div>
                   <p className="text-xs font-bold" style={{ color: 'var(--text-muted)' }}>{selectedDay}</p>
