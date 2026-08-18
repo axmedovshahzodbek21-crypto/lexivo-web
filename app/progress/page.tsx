@@ -9,7 +9,8 @@ import {
   getTodayXP, getTodayLearnedCount, getDueWords, getStarredWords, getHardWords,
   getStudyHistory, getStudyDays, getReviewDays, getWordGoalDays,
   getSettings, getXPHistory, localDateStr, getReviewLog, getGraduatedCount, displayXP,
-  getUnitProgress, getSRSLockedDays,
+  getUnitProgress, getSRSLockedDays, getFlashcardTotalDays, getFlashcardStreak,
+  getQuizTotalDays, getQuizStreak,
 } from '@/lib/storage';
 import type { XpEntry } from '@/lib/storage';
 import { useAppStore } from '@/lib/store';
@@ -355,8 +356,9 @@ function ProgressPage() {
         )}
 
         {tab === 'achievements' && (() => {
-          const stats = { learnedCount, streak, xp, masteredCount: 0, totalDays,
-            flashDays: 0, flashStreak: 0, quizDays: 0, quizStreak: 0 };
+          const stats = { learnedCount, streak, xp, masteredCount, totalDays,
+            flashDays: getFlashcardTotalDays(), flashStreak: getFlashcardStreak(),
+            quizDays: getQuizTotalDays(), quizStreak: getQuizStreak() };
           const xpEarned = ALL_ACHIEVEMENTS.filter(a => unlockedIds.includes(a.id)).reduce((s, a) => s + a.xp, 0);
           const xpTotal  = ALL_ACHIEVEMENTS.reduce((s, a) => s + a.xp, 0);
           const byCategory: Record<string, typeof ALL_ACHIEVEMENTS> = {};
