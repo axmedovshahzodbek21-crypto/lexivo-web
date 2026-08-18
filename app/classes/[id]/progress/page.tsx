@@ -5,21 +5,19 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { getClassSRSAll, getClassStarredWordIds, getClassHardWordIds } from '@/lib/class-srs';
 import type { ClassSRSEntry } from '@/lib/class-srs';
+import { localDateStr, addDaysToDateStr } from '@/lib/storage';
 
 const STAGE_COLORS = ['#9CA3AF', '#F59E0B', '#3B82F6', '#8B5CF6', '#EC4899', '#10B981'];
 const STAGE_LABELS = ['New', '+1 day', '+3 days', '+7 days', '+14 days', 'Graduated'];
 
 function todayStr() {
-  return new Date().toISOString().slice(0, 10);
+  return localDateStr();
 }
 
 function last30Days(): string[] {
+  const today = todayStr();
   const days: string[] = [];
-  for (let i = 29; i >= 0; i--) {
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    days.push(d.toISOString().slice(0, 10));
-  }
+  for (let i = 29; i >= 0; i--) days.push(addDaysToDateStr(today, -i));
   return days;
 }
 

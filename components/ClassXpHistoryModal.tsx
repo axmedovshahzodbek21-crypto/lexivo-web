@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { classifyReview, REVIEW_LABEL_META } from '@/lib/reviewPattern';
+import { localDateStr, addDaysToDateStr } from '@/lib/storage';
 
 const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const DAY_LABELS = ['M','T','W','T','F','S','S'];
@@ -103,7 +104,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
     (async () => {
       setLoading(true);
       const isSelf = user?.id === userId;
-      const today = new Date().toISOString().slice(0, 10);
+      const today = localDateStr();
       const [{ data }, { data: srs }] = await Promise.all([
         isSelf
           ? supabase.from('class_xp_history').select('id, amount, reason, created_at').eq('user_id', userId).eq('class_id', classId).order('created_at', { ascending: false })
@@ -130,11 +131,11 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
 
   const byDate: Record<string, XpEntry[]> = {};
   for (const e of history) {
-    const key = e.created_at.slice(0, 10);
+    const key = localDateStr(new Date(e.created_at));
     (byDate[key] ??= []).push(e);
   }
   const now = new Date();
-  const todayStr = now.toISOString().slice(0, 10);
+  const todayStr = localDateStr(now);
   const isCurrentMonth = calMonth.getFullYear() === now.getFullYear() && calMonth.getMonth() === now.getMonth();
   const daysInMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() + 1, 0).getDate();
   const firstWeekday = (new Date(calMonth.getFullYear(), calMonth.getMonth(), 1).getDay() + 6) % 7;
@@ -150,14 +151,12 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
 
   const reviewCountByDay = new Map<string, number>();
   for (const e of reviewOnly) {
-    const d = e.created_at.slice(0, 10);
+    const d = localDateStr(new Date(e.created_at));
     reviewCountByDay.set(d, (reviewCountByDay.get(d) ?? 0) + 1);
   }
   const last30Days: string[] = [];
   for (let i = 29; i >= 0; i--) {
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    last30Days.push(d.toISOString().slice(0, 10));
+    last30Days.push(addDaysToDateStr(todayStr, -i));
   }
 
   return (

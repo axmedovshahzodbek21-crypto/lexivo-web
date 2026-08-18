@@ -6,7 +6,7 @@ import { useTranslation } from '@/lib/useTranslation';
 import { useAppStore } from '@/lib/store';
 import { useShallow } from 'zustand/react/shallow';
 import { getWordOfDay } from '@/lib/data';
-import { getStreak, getXP, getTodayXP, getTodayLearnedCount, getDueWords, getLearnedWords, getSettings, isOnboarded, setOnboarded, getFreezes, checkAndGrantWeeklyFreeze, getImportedWords, getLastStudyDate, localDateStr, displayXP } from '@/lib/storage';
+import { getStreak, getXP, getTodayXP, getTodayLearnedCount, getDueWords, getLearnedWords, getSettings, isOnboarded, setOnboarded, getFreezes, checkAndGrantWeeklyFreeze, getImportedWords, getLastStudyDate, localDateStr, addDaysToDateStr, displayXP } from '@/lib/storage';
 import { pullAll } from '@/lib/sync';
 import { useAuth } from '@/lib/auth-context';
 import { getLevelInfo } from '@/lib/gamification';
@@ -42,15 +42,12 @@ function classGradient(classId: string) {
 function computeClassStreak(datesDesc: string[]): number {
   if (!datesDesc.length) return 0;
   const set = new Set(datesDesc);
-  const today = new Date().toISOString().slice(0, 10);
-  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  const today = localDateStr();
+  const yesterday = addDaysToDateStr(today, -1);
   if (!set.has(today) && !set.has(yesterday)) return 0;
   let streak = 0;
-  let cur = set.has(today) ? Date.now() : Date.now() - 86400000;
-  while (true) {
-    const key = new Date(cur).toISOString().slice(0, 10);
-    if (set.has(key)) { streak++; cur -= 86400000; } else break;
-  }
+  let cur = set.has(today) ? today : yesterday;
+  while (set.has(cur)) { streak++; cur = addDaysToDateStr(cur, -1); }
   return streak;
 }
 
@@ -324,7 +321,7 @@ export default function HomePage() {
 
       if (taught && taught.length > 0) {
         const taughtList = taught.map((c: { id: string }) => c.id);
-        const today = new Date().toISOString().slice(0, 10);
+        const today = localDateStr();
         const [{ data: memberRows }, { data: activeTodayRows }] = await Promise.all([
           supabase.from('class_members').select('class_id').in('class_id', taughtList),
           supabase.from('class_study_days').select('class_id').in('class_id', taughtList).eq('study_date', today),

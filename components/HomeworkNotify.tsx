@@ -2,13 +2,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
+import { localDateStr, addDaysToDateStr } from '@/lib/storage';
 
 interface HWToast { id: string; title: string; dueDate: string | null; className: string; }
 
 function dueText(due: string | null): { label: string; urgent: boolean } {
   if (!due) return { label: 'No deadline set', urgent: false };
-  const today = new Date().toISOString().slice(0, 10);
-  const tomorrow = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+  const today = localDateStr();
+  const tomorrow = addDaysToDateStr(today, 1);
   if (due < today) return { label: `Overdue · ${due}`, urgent: true };
   if (due === today) return { label: 'Due today', urgent: true };
   if (due === tomorrow) return { label: 'Due tomorrow', urgent: false };

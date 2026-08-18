@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
-import { saveClassHWTemp } from '@/lib/storage';
+import { saveClassHWTemp, localDateStr, addDaysToDateStr } from '@/lib/storage';
 import type { ClassHWWord } from '@/lib/storage';
 import { loadCollections, loadCEFRCollection } from '@/lib/data';
 import type { WordCollection } from '@/lib/types';
@@ -33,8 +33,8 @@ const MODE_COLOR: Record<string, string> = { learn: '#4f46e5', flashcard: '#ea58
 
 function dueLabel(due: string | null): { text: string; overdue: boolean } | null {
   if (!due) return null;
-  const today = new Date().toISOString().slice(0, 10);
-  const tomorrow = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+  const today = localDateStr();
+  const tomorrow = addDaysToDateStr(today, 1);
   if (due < today) return { text: `Overdue · ${due}`, overdue: true };
   if (due === today) return { text: 'Due today', overdue: false };
   if (due === tomorrow) return { text: 'Due tomorrow', overdue: false };

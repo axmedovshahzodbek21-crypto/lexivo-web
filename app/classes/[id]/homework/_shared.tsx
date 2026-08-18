@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import { localDateStr, addDaysToDateStr } from '@/lib/storage';
 
 export const MODE_ICON: Record<string, string> = { learn: '📖', flashcard: '🃏', quiz: '❓', match: '🎯' };
 export const MODE_LABEL: Record<string, string> = { learn: 'Learn', flashcard: 'Cards', quiz: 'Quiz', match: 'Match' };
@@ -7,8 +8,8 @@ export const MODE_COLOR: Record<string, string> = { learn: '#4f46e5', flashcard:
 
 export function dueLabel(due: string | null): { text: string; overdue: boolean } | null {
   if (!due) return null;
-  const today = new Date().toISOString().slice(0, 10);
-  const tomorrow = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+  const today = localDateStr();
+  const tomorrow = addDaysToDateStr(today, 1);
   if (due < today) return { text: `Overdue · ${due}`, overdue: true };
   if (due === today) return { text: 'Due today', overdue: false };
   if (due === tomorrow) return { text: 'Due tomorrow', overdue: false };

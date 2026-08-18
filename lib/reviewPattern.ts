@@ -19,10 +19,10 @@ export const REVIEW_WINDOW_DAYS = 30;
 
 export function classifyReview(entries: { created_at: string }[], overdueCount: number) {
   const today = new Date();
-  const dateKey = (d: Date) => d.toISOString().slice(0, 10);
+  const dateKey = (d: Date) => d.toLocaleDateString('en-CA'); // local date, matches class-srs.ts's due-date convention
   const byDay = new Map<string, number>();
   for (const e of entries) {
-    const day = e.created_at.slice(0, 10);
+    const day = dateKey(new Date(e.created_at));
     byDay.set(day, (byDay.get(day) ?? 0) + 1);
   }
   const days: string[] = [];

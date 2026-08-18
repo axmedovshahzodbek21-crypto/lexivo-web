@@ -8,6 +8,7 @@ import { loadCollections, loadCEFRCollection } from '@/lib/data';
 import type { WordCollection } from '@/lib/types';
 import { readingPassages } from '@/lib/reading-data';
 import { classifyReview, REVIEW_LABEL_META, REVIEW_WINDOW_DAYS, type ReviewEntry, type ReviewLabel } from '@/lib/reviewPattern';
+import { localDateStr, addDaysToDateStr } from '@/lib/storage';
 
 interface CollectionMeta {
   collection_name: string;
@@ -139,8 +140,8 @@ function Avatar({ name, url, size = 38 }: { name: string; url: string | null; si
 
 function lastActiveLabel(date: string | null): string {
   if (!date) return 'Never';
-  const today = new Date().toISOString().slice(0, 10);
-  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  const today = localDateStr();
+  const yesterday = addDaysToDateStr(today, -1);
   if (date >= today) return 'Today ✅';
   if (date >= yesterday) return 'Yesterday';
   const days = Math.floor((Date.now() - new Date(date).getTime()) / 86400000);
@@ -163,8 +164,8 @@ function timeAgo(iso: string): string {
 
 function dueDateLabel(due: string | null): { text: string; overdue: boolean } | null {
   if (!due) return null;
-  const today = new Date().toISOString().slice(0, 10);
-  const tomorrow = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+  const today = localDateStr();
+  const tomorrow = addDaysToDateStr(today, 1);
   if (due < today) return { text: `Overdue · ${new Date(due + 'T00:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`, overdue: true };
   if (due === today) return { text: 'Due today', overdue: false };
   if (due === tomorrow) return { text: 'Due tomorrow', overdue: false };
@@ -173,14 +174,14 @@ function dueDateLabel(due: string | null): { text: string; overdue: boolean } | 
 
 function isInactive(date: string | null): boolean {
   if (!date) return true;
-  const threeDaysAgo = new Date(Date.now() - 3 * 86400000).toISOString().slice(0, 10);
+  const threeDaysAgo = addDaysToDateStr(localDateStr(), -3);
   return date < threeDaysAgo;
 }
 
 function dayLabel(iso: string): string {
-  const date = iso.slice(0, 10);
-  const today = new Date().toISOString().slice(0, 10);
-  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  const date = localDateStr(new Date(iso));
+  const today = localDateStr();
+  const yesterday = addDaysToDateStr(today, -1);
   if (date === today) return 'Today';
   if (date === yesterday) return 'Yesterday';
   return new Date(date).toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' });
@@ -630,7 +631,7 @@ function SRSTab({
 }) {
   if (loading) return <div className="flex justify-center py-12"><div className="text-4xl animate-bounce">📚</div></div>;
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localDateStr();
   const studentIds = [...new Set(srsRows.map(r => r.user_id))];
 
   const wordStageMap = new Map<string, Map<string, number>>();
@@ -809,7 +810,7 @@ function ReviewPatternTab({
     );
   }
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localDateStr();
   const entriesByStudent = new Map<string, ReviewEntry[]>();
   for (const e of reviewEntries) {
     if (!entriesByStudent.has(e.user_id)) entriesByStudent.set(e.user_id, []);
@@ -1714,7 +1715,7 @@ function CurriculumTab({
 
             <div className="shrink-0">
               <label className="text-xs font-semibold text-[var(--text-muted)] mb-1.5 block">Due Date (optional)</label>
-              <input type="date" value={hwDueDate} onChange={e => setHwDueDate(e.target.value)} min={new Date().toISOString().slice(0, 10)} className="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]" />
+              <input type="date" value={hwDueDate} onChange={e => setHwDueDate(e.target.value)} min={localDateStr()} className="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]" />
             </div>
 
             <div className="shrink-0">
@@ -2029,7 +2030,7 @@ export default function ClassDashboardPage() {
   const [streakLoading, setStreakLoading] = useState(false);
   const [calendarMonth, setCalendarMonth] = useState({ year: new Date().getFullYear(), month: new Date().getMonth() });
 
-  const sevenDaysAgo = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
+  const sevenDaysAgo = addDaysToDateStr(localDateStr(), -7);
 
   const visibleStudents = useMemo(() => {
     let list = [...students];
@@ -2286,7 +2287,7 @@ export default function ClassDashboardPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${(classInfo?.name ?? 'class').replace(/[^a-z0-9]/gi, '-')}-progress-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `${(classInfo?.name ?? 'class').replace(/[^a-z0-9]/gi, '-')}-progress-${localDateStr()}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -2829,7 +2830,7 @@ export default function ClassDashboardPage() {
               <input type="text" placeholder='e.g. "Complete A1 Unit 5 by Friday"' value={targetTitle} onChange={e => setTargetTitle(e.target.value)} autoFocus className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]" />
               <div>
                 <label className="text-xs text-[var(--text-muted)] mb-1 block">Due date (optional)</label>
-                <input type="date" value={targetDate} onChange={e => setTargetDate(e.target.value)} min={new Date().toISOString().slice(0, 10)} className="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]" />
+                <input type="date" value={targetDate} onChange={e => setTargetDate(e.target.value)} min={localDateStr()} className="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]" />
               </div>
               <div className="flex gap-3">
                 <button onClick={() => setTargetStudent(null)} className="flex-1 btn-ghost py-3 text-sm">Cancel</button>
@@ -2843,7 +2844,7 @@ export default function ClassDashboardPage() {
       {/* Streak calendar modal */}
       {streakModal && (() => {
         const today = new Date(); today.setHours(0, 0, 0, 0);
-        const todayStr = today.toISOString().slice(0, 10);
+        const todayStr = localDateStr(today);
         const { year, month } = calendarMonth;
         const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
         const daysInMonth = new Date(year, month + 1, 0).getDate();

@@ -4,6 +4,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import ClassXpHistoryModal from '@/components/ClassXpHistoryModal';
+import { localDateStr, addDaysToDateStr } from '@/lib/storage';
 
 interface Announcement { id: string; message: string; created_at: string; }
 interface Target { id: string; title: string; due_date: string | null; completed_at: string | null; }
@@ -38,8 +39,8 @@ function timeAgo(iso: string) {
 
 function dueLabel(due: string | null): { text: string; overdue: boolean } | null {
   if (!due) return null;
-  const today = new Date().toISOString().slice(0, 10);
-  const tomorrow = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+  const today = localDateStr();
+  const tomorrow = addDaysToDateStr(today, 1);
   if (due < today) return { text: `Overdue · ${due}`, overdue: true };
   if (due === today) return { text: 'Due today', overdue: false };
   if (due === tomorrow) return { text: 'Due tomorrow', overdue: false };
@@ -157,8 +158,8 @@ const [memberCount, setMemberCount] = useState(0);
           : Promise.resolve({ data: null as { name?: string; bio?: string } | null }),
       ]);
 
-      const today = new Date().toISOString().slice(0, 10);
-      const threeDaysAgo = new Date(Date.now() - 3 * 86400000).toISOString().slice(0, 10);
+      const today = localDateStr();
+      const threeDaysAgo = addDaysToDateStr(today, -3);
       const activeToday = (profiles ?? []).filter(p => p.last_study_date === today).length;
       const needsAttention = (profiles ?? []).filter(p => !p.last_study_date || p.last_study_date < threeDaysAgo).length;
 
@@ -388,7 +389,7 @@ const [memberCount, setMemberCount] = useState(0);
               ) : students.length === 0 ? (
                 <p className="text-center text-sm text-[var(--text-muted)] py-10">No students yet</p>
               ) : students.map((s, i) => {
-                const today = new Date().toISOString().slice(0, 10);
+                const today = localDateStr();
                 const isActive = s.last_study_date === today;
                 return (
                   <div key={s.id} className="flex items-center gap-3 p-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)]">

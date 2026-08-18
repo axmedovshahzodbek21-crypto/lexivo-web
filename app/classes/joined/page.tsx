@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import BackButton from '@/components/BackButton';
+import { localDateStr, addDaysToDateStr } from '@/lib/storage';
 interface ClassRow {
   id: string;
   name: string;
@@ -31,8 +32,8 @@ function timeAgo(iso: string): string {
 
 function dueDateLabel(due: string | null): { text: string; overdue: boolean } | null {
   if (!due) return null;
-  const today = new Date().toISOString().slice(0, 10);
-  const tomorrow = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+  const today = localDateStr();
+  const tomorrow = addDaysToDateStr(today, 1);
   if (due < today) return { text: `Overdue · ${new Date(due + 'T00:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`, overdue: true };
   if (due === today) return { text: 'Due today', overdue: false };
   if (due === tomorrow) return { text: 'Due tomorrow', overdue: false };
