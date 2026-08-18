@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, after } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
 const BOT_TOKEN      = process.env.TELEGRAM_BOT_TOKEN;
@@ -117,25 +117,28 @@ export async function POST(req: NextRequest) {
       const targets = (users ?? []).filter(u => String(u.chat_id) !== OWNER_ID);
       await supabase.from('bot_users').update({ last_broadcast_at: new Date().toISOString() }).eq('chat_id', fromId);
 
-      // Queue the send loop as a background job so we can return 200 immediately.
-      // Telegram stops retrying once it receives 200, so this must happen before
-      // the long loop. The function stays alive until the Promise settles.
-      const broadcastJob = (async () => {
+      // Queue the send loop via after() so it keeps running on the serverless
+      // instance after the response is sent — a bare fire-and-forget IIFE has
+      // no such guarantee and can be torn down mid-loop on some hosts.
+      after(async () => {
         let sent = 0;
-        for (const u of targets) {
-          const r = await sendMessage(u.chat_id, broadcastText);
-          if (r.ok) sent++;
-          await new Promise(resolve => setTimeout(resolve, 34)); // ≈29 msgs/sec
+        try {
+          for (const u of targets) {
+            const r = await sendMessage(u.chat_id, broadcastText);
+            if (r.ok) sent++;
+            await new Promise(resolve => setTimeout(resolve, 34)); // ≈29 msgs/sec
+          }
+          await supabase.from('bot_broadcasts').insert({
+            sent_by: fromId,
+            message: broadcastText,
+            recipient_count: sent,
+            sent_at: new Date().toISOString(),
+          });
+          await sendMessage(OWNER_ID, `✅ Broadcast sent to ${sent} user${sent !== 1 ? 's' : ''}.`);
+        } catch (err) {
+          console.error('[broadcast]', err);
         }
-        await supabase.from('bot_broadcasts').insert({
-          sent_by: fromId,
-          message: broadcastText,
-          recipient_count: sent,
-          sent_at: new Date().toISOString(),
-        }).throwOnError().catch(() => {});
-        await sendMessage(OWNER_ID, `✅ Broadcast sent to ${sent} user${sent !== 1 ? 's' : ''}.`);
-      })();
-      broadcastJob.catch(err => console.error('[broadcast]', err));
+      });
 
       // Acknowledge immediately so the owner knows the job started
       await sendMessage(OWNER_ID, `📤 Broadcasting to ${targets.length} user${targets.length !== 1 ? 's' : ''}…`);
