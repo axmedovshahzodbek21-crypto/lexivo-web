@@ -1311,6 +1311,15 @@ function CurriculumTab({
         );
       })()}
 
+      {/* ── Reading Passages ── */}
+      <div className="card p-4 space-y-2">
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">📚 Reading Passages</p>
+          <button onClick={() => setShowPassagePicker(true)} className="shrink-0 text-xs font-bold px-3 py-1.5 rounded-lg bg-[var(--primary-bg)] text-[var(--primary)] hover:opacity-80 transition-opacity">+ Assign</button>
+        </div>
+        <p className="text-xs text-[var(--text-muted)]">Assign one of the {readingPassages.length} curated Ideas passages as reading homework — students read it and mark it done.</p>
+      </div>
+
       {/* ── Homework ── */}
       <div>
         <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide mb-3">📋 Homework</p>
@@ -1550,13 +1559,53 @@ function CurriculumTab({
         </div>
       )}
 
+      {/* ── Reading passage picker ── */}
+      {showPassagePicker && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setShowPassagePicker(false)}>
+          <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-5 space-y-3 max-h-[75vh] flex flex-col" onClick={e => e.stopPropagation()}>
+            <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto shrink-0" />
+            <p className="font-bold text-[var(--text)] shrink-0">Assign a Reading Passage</p>
+            <input
+              autoFocus value={passageSearch} onChange={e => setPassageSearch(e.target.value)}
+              placeholder="Search by title or topic…"
+              className="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)] shrink-0"
+            />
+            <div className="flex-1 overflow-y-auto space-y-2 min-h-0">
+              {readingPassages
+                .filter(p => {
+                  const q = passageSearch.trim().toLowerCase();
+                  if (!q) return true;
+                  return p.title.toLowerCase().includes(q) || p.topic.toLowerCase().includes(q);
+                })
+                .map(p => {
+                  const alreadyAssigned = homework.some(h => h.passageId === p.id);
+                  return (
+                    <button key={p.id} onClick={() => !alreadyAssigned && openPassageHwModal(p)}
+                      disabled={alreadyAssigned}
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-colors ${alreadyAssigned ? 'opacity-50 cursor-default' : 'hover:bg-[var(--primary-bg)]'}`}
+                      style={{ background: 'var(--surface-2)' }}>
+                      <span className="text-xl shrink-0">📚</span>
+                      <div className="min-w-0">
+                        <p className="font-semibold text-sm text-[var(--text)] truncate">{p.title}</p>
+                        <p className="text-[10px] text-[var(--text-muted)] truncate">{p.topic}{alreadyAssigned ? ' · Assigned ✓' : ''}</p>
+                      </div>
+                    </button>
+                  );
+                })}
+            </div>
+            <button onClick={() => setShowPassagePicker(false)} className="w-full btn-ghost py-3 shrink-0">Cancel</button>
+          </div>
+        </div>
+      )}
+
       {/* ── Assign homework modal ── */}
-      {hwUnit && (
+      {(hwUnit || hwPassage) && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={closeHwModal}>
           <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-5 space-y-4 max-h-[85vh] flex flex-col" onClick={e => e.stopPropagation()}>
             <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto shrink-0" />
-            <p className="font-bold text-[var(--text)] shrink-0">Assign: {hwUnit.name}</p>
+            <p className="font-bold text-[var(--text)] shrink-0">Assign: {hwPassage ? hwPassage.title : hwUnit!.name}</p>
 
+            {!hwPassage && (
             <div className="shrink-0">
               <p className="text-xs font-semibold text-[var(--text-muted)] mb-2">Modes</p>
               <div className="flex flex-wrap gap-2">
@@ -1578,6 +1627,7 @@ function CurriculumTab({
               </div>
               <p className="text-[10px] text-[var(--text-muted)] mt-1">* Required</p>
             </div>
+            )}
 
             <div className="shrink-0">
               <label className="text-xs font-semibold text-[var(--text-muted)] mb-1.5 block">Due Date (optional)</label>
