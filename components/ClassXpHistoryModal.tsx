@@ -30,24 +30,41 @@ function exactTime(iso: string) {
   return new Date(iso).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 }
 
-// Soft rising tone for when the day-detail panel slides open — no audio file,
-// same Web Audio approach as lib/shuffle.ts's reveal sounds.
+// Whoosh-then-land two-parter for when the day-detail panel slides open and
+// overshoot-settles — no audio file, same Web Audio approach as
+// lib/shuffle.ts's reveal sounds. Timed to roughly match the CSS bounce.
 function playPanelOpenSound() {
   try {
     const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
     const ctx = new Ctx();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(320, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(620, ctx.currentTime + 0.14);
-    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-    gain.gain.linearRampToValueAtTime(0.11, ctx.currentTime + 0.02);
-    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.2);
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 0.22);
+
+    // Whoosh: rising sweep as the panel slides in.
+    const sweep = ctx.createOscillator();
+    const sweepGain = ctx.createGain();
+    sweep.connect(sweepGain);
+    sweepGain.connect(ctx.destination);
+    sweep.type = 'sine';
+    sweep.frequency.setValueAtTime(260, ctx.currentTime);
+    sweep.frequency.exponentialRampToValueAtTime(720, ctx.currentTime + 0.26);
+    sweepGain.gain.setValueAtTime(0.0001, ctx.currentTime);
+    sweepGain.gain.linearRampToValueAtTime(0.13, ctx.currentTime + 0.04);
+    sweepGain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.3);
+    sweep.start(ctx.currentTime);
+    sweep.stop(ctx.currentTime + 0.32);
+
+    // Landing chime: brief bright ping as the overshoot settles.
+    const land = ctx.createOscillator();
+    const landGain = ctx.createGain();
+    land.connect(landGain);
+    landGain.connect(ctx.destination);
+    land.type = 'sine';
+    const landStart = ctx.currentTime + 0.28;
+    land.frequency.setValueAtTime(880, landStart);
+    landGain.gain.setValueAtTime(0.0001, landStart);
+    landGain.gain.linearRampToValueAtTime(0.1, landStart + 0.02);
+    landGain.gain.exponentialRampToValueAtTime(0.0001, landStart + 0.22);
+    land.start(landStart);
+    land.stop(landStart + 0.24);
   } catch {}
 }
 
@@ -107,7 +124,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
           background: 'var(--surface)',
           width: '100%',
           maxWidth: selectedDay ? '680px' : '384px',
-          transition: 'max-width 0.45s cubic-bezier(0.22, 1, 0.36, 1)',
+          transition: 'max-width 0.65s cubic-bezier(0.34, 1.56, 0.64, 1)',
         }}
         onClick={e => e.stopPropagation()}
       >
