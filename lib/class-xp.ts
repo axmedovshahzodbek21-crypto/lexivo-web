@@ -4,7 +4,7 @@ import { supabase } from './supabase';
 // user_data.total_xp / user_stats.xp) — it only reflects activity done
 // inside a specific class, stored per (student, class) on class_members.
 export async function recordClassStudyDay(studentId: string, classId: string): Promise<void> {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localDateStr(new Date()); // local time, not UTC — matches when the user actually studied
   try {
     await supabase
       .from('class_study_days')
@@ -15,25 +15,21 @@ export async function recordClassStudyDay(studentId: string, classId: string): P
   }
 }
 
+function localDateStr(d: Date): string {
+  return d.toLocaleDateString('en-CA'); // YYYY-MM-DD in the user's local timezone
+}
+
+// Increments class_members.class_xp via the record_class_xp RPC rather than
+// a client-side read-then-write — two near-simultaneous awards for the same
+// student could otherwise both read the same "current" value and silently
+// lose one increment. The RPC does a single atomic UPDATE instead.
 export async function recordClassXP(studentId: string, classId: string, xp: number, reason: string): Promise<void> {
   if (xp <= 0) return;
   try {
-    const { data: row } = await supabase
-      .from('class_members')
-      .select('class_xp')
-      .eq('student_id', studentId)
-      .eq('class_id', classId)
-      .maybeSingle();
-    const current = (row?.class_xp as number | null) ?? 0;
     await Promise.all([
-      supabase
-        .from('class_members')
-        .update({ class_xp: current + xp })
-        .eq('student_id', studentId)
-        .eq('class_id', classId),
-      supabase
-        .from('class_xp_history')
-        .insert({ user_id: studentId, class_id: classId, amount: xp, reason }),
+      supabase.rpc('record_class_xp', {
+        p_student_id: studentId, p_class_id: classId, p_xp: xp, p_reason: reason,
+      }),
       recordClassStudyDay(studentId, classId),
     ]);
   } catch {
