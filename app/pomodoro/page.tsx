@@ -65,7 +65,14 @@ export default function PomodoroPage() {
           ←
         </button>
         <h1 className="font-bold text-[var(--text)]">Focus Mode</h1>
-        <div className="w-9 h-9" />
+        <button
+          onClick={() => router.push('/pomodoro/stats')}
+          className="btn-icon text-lg"
+          aria-label="Focus time stats"
+          title="Focus time stats"
+        >
+          📊
+        </button>
       </div>
 
       <div className="p-5 flex flex-col items-center gap-5 flex-1">

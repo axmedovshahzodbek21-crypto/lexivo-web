@@ -1,6 +1,7 @@
 'use client';
 import { create } from 'zustand';
 import type { WordCollection, Achievement } from './types';
+import { addFocusSeconds } from './storage';
 
 type PomPhase = 'idle' | 'work' | 'break';
 
@@ -113,6 +114,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   tickPomodoro: () => {
     const s = get();
     if (!s.pomRunning || s.pomPhase === 'idle') return;
+    if (s.pomPhase === 'work') addFocusSeconds(1);
     if (s.pomSecondsLeft <= 1) {
       if (s.pomPhase === 'work') {
         set({ pomSecondsLeft: s.pomBreakMins * 60, pomPhase: 'break', pomRunning: true, pomSessions: s.pomSessions + 1 });

@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
+import { pushLists } from '@/lib/sync';
 
 type PomPhase = 'idle' | 'work' | 'break';
 
@@ -117,9 +118,17 @@ export default function PomodoroWidget() {
   const {
     pomPhase, pomSecondsLeft, pomRunning, pomSessions, pomVisible,
     pomWorkMins, pomBreakMins,
-    pausePomodoro, resumePomodoro, skipPomodoro, tickPomodoro, resetPomodoro,
+    pausePomodoro: storePause, resumePomodoro, skipPomodoro: storeSkip, tickPomodoro, resetPomodoro: storeReset,
     startPomodoro, hidePomodoroSetup, setPomSettings,
   } = useAppStore();
+
+  // Flush accumulated focus seconds to Supabase whenever a session pauses,
+  // ends, or moves to a new phase — not just on the 30s running-tick cadence
+  // below — so a quick start/stop never gets lost before the next flush.
+  const flushFocusSync = () => { pushLists().catch(() => {}); };
+  const pausePomodoro = () => { storePause(); flushFocusSync(); };
+  const skipPomodoro = () => { storeSkip(); flushFocusSync(); };
+  const resetPomodoro = () => { storeReset(); flushFocusSync(); };
 
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
   const posRef = useRef<{ x: number; y: number } | null>(null);
@@ -197,6 +206,15 @@ export default function PomodoroWidget() {
     const id = setInterval(tickPomodoro, 1000);
     return () => clearInterval(id);
   }, [pomRunning, tickPomodoro]);
+
+  // Sync accumulated focus seconds to Supabase every 30s while a work session
+  // is actually running, plus once more when it stops running (covers
+  // pausing via keyboard, tab close, etc. — button clicks above flush too).
+  useEffect(() => {
+    if (!pomRunning || pomPhase !== 'work') return;
+    const id = setInterval(() => { pushLists().catch(() => {}); }, 30_000);
+    return () => { clearInterval(id); pushLists().catch(() => {}); };
+  }, [pomRunning, pomPhase]);
 
   // Detect phase transitions → sound + notification
   useEffect(() => {

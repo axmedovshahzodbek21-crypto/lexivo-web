@@ -165,7 +165,7 @@ export async function pushLists(): Promise<void> {
     // device's own push) would silently discard the other side's data
     // instead of just adding to it.
     const { data: cloudRow } = await supabase.from('user_data')
-      .select('learned_words, srs_words, starred_words, hard_words, study_days, review_days, word_goal_days, unit_done_days, xp_history, unit_progress, my_unit_progress, review_log, achievements, imported_words')
+      .select('learned_words, srs_words, starred_words, hard_words, study_days, review_days, word_goal_days, unit_done_days, xp_history, unit_progress, my_unit_progress, review_log, achievements, imported_words, focus_days')
       .eq('id', uid).maybeSingle();
     if (cloudRow) mergeListsFromCloudRow(cloudRow);
 
@@ -186,6 +186,7 @@ export async function pushLists(): Promise<void> {
         unit_progress:    getAllUnitProgress(),
         my_unit_progress: getAllMyUnitProgress(),
         review_log:       lsJSON<Record<string, number[]>>('lexivo_review_log', {}),
+        focus_days:       lsJSON<Record<string, number>>('lexivo_focus_days', {}),
         imported_words:   getImportedWordsRaw(), // includes tombstones so deletions propagate
         achievements:     Object.entries(lsJSON<Record<string, string>>('lexivo_achievement_dates', {})).map(([id, date]) => ({ id, date })),
         lists_updated_at: ts,
@@ -508,6 +509,18 @@ function mergeListsFromCloudRow(row: Record<string, unknown>): void {
         if (merged.length > localIntervals.length) { local[wordKey] = merged; changed = true; }
       }
       if (changed) lsSet('lexivo_review_log', JSON.stringify(local));
+    }
+
+    // focus_days: per-day accumulator, take max(local, cloud) for each date so
+    // a push from a device that hasn't logged today's session yet can never
+    // erase time already recorded elsewhere.
+    if (row.focus_days && typeof row.focus_days === 'object') {
+      const local = lsJSON<Record<string, number>>('lexivo_focus_days', {});
+      let changed = false;
+      for (const [date, seconds] of Object.entries(row.focus_days as Record<string, number>)) {
+        if ((local[date] ?? 0) < seconds) { local[date] = seconds; changed = true; }
+      }
+      if (changed) lsSet('lexivo_focus_days', JSON.stringify(local));
     }
 
     // achievements: union by id, write to both lexivo_achievements and lexivo_achievement_dates

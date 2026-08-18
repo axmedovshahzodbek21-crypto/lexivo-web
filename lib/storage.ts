@@ -57,6 +57,8 @@ const KEYS = {
   myWordsXpUnits:    'lexivo_my_words_xp_units',
   srsLockedDays:     'lexivo_srs_locked_days',
   myUnitProgress:    'lexivo_my_unit_progress',
+  focusDays:         'lexivo_focus_days',
+  focusUpdatedAt:    'lexivo_focus_updated_at',
 };
 
 function get<T>(key: string, fallback: T): T {
@@ -649,6 +651,40 @@ export function recordSRSLockedDay() {
   const today = localDateStr();
   const days = getSRSLockedDays();
   if (!days.includes(today)) { days.push(today); set(KEYS.srsLockedDays, days); }
+}
+
+// ─── Focus time (Pomodoro) ────────────────────────────────────────────────────
+// Seconds of actual work-phase time per day, including partial (paused/reset)
+// sessions — a session only ever adds what was truly spent focusing.
+
+export function getFocusDays(): Record<string, number> {
+  return get<Record<string, number>>(KEYS.focusDays, {});
+}
+
+export function addFocusSeconds(seconds: number): void {
+  if (seconds <= 0) return;
+  const today = localDateStr();
+  const days = getFocusDays();
+  days[today] = (days[today] ?? 0) + seconds;
+  set(KEYS.focusDays, days);
+  set(KEYS.focusUpdatedAt, new Date().toISOString());
+}
+
+export function getTodayFocusSeconds(): number {
+  return getFocusDays()[localDateStr()] ?? 0;
+}
+
+export function getWeekFocusSeconds(): number {
+  const days = getFocusDays();
+  let total = 0;
+  for (let i = 0; i < 7; i++) {
+    total += days[localDateStr(new Date(Date.now() - i * 86400000))] ?? 0;
+  }
+  return total;
+}
+
+export function getTotalFocusSeconds(): number {
+  return Object.values(getFocusDays()).reduce((sum, s) => sum + s, 0);
 }
 
 export function getDayTasks(dateStr: string): { unit: boolean; review: boolean; words: boolean } {
