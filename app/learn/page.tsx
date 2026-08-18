@@ -35,6 +35,44 @@ interface StudyWord extends WordItem {
   dayNumber: number;
 }
 
+// Shared by both "Got it" and "Too Hard" — a word marked Too Hard earns the
+// same XP and goes into SRS exactly like a word marked Learned. This is
+// deliberate: if Too Hard didn't reward like Learned, students under peer
+// pressure (leaderboards, streaks) would just mark everything Learned to
+// avoid losing out, making the app's difficulty signal to teachers useless.
+// Too Hard's only difference is it *also* lands in the separate Hard Words
+// list (addHardWord, called by the caller) so the student and their teacher
+// can still see which words were a genuine struggle.
+async function grantLearnReward(
+  word: StudyWord,
+  opts: { sourceClass: boolean; sourceClassHW: boolean; classIdParam: string },
+): Promise<boolean> {
+  let isNew: boolean;
+  if (opts.sourceClass || opts.sourceClassHW) {
+    // Class mode: SRS lives in Supabase, not personal localStorage. Always
+    // counts toward the daily goal since XP is unified across activities.
+    isNew = true;
+    incrementTodayCount();
+    if (opts.classIdParam) {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) await initClassSRSWord(user.id, opts.classIdParam, word.word, word.translation);
+    }
+  } else {
+    isNew = saveLearnedWord({
+      word: word.word,
+      translation: word.translation,
+      collectionName: word.collectionName,
+      topic: word.topic,
+      dayNumber: word.dayNumber,
+      learnedAt: new Date().toISOString(),
+    });
+    const srsWord = createSRSWord(word, word.collectionName, word.dayNumber, word.topic);
+    storeSRSWord(srsWord);
+    if (isNew) incrementTodayCount();
+  }
+  return isNew;
+}
+
 function buildStudyList(
   collections: WordCollection[],
   collectionName?: string,
@@ -410,41 +448,12 @@ function LearnInner() {
     emit();
   }, [done, marks, words, collectionName, dayNumber]);
 
-  const advanceCard = useCallback(async () => {
+  // Shared tail end of both "Got it" and "Too Hard" — XP, streak bookkeeping,
+  // achievements, and unit-completion detection are identical for both
+  // outcomes; only the analytics tag and the Hard Words side-effect differ
+  // (handled by the caller before this runs).
+  const finishWordMark = useCallback((outcome: 'learned' | 'too-hard', isNew: boolean, gateAttempts: number, gateCorrectFirst: boolean) => {
     if (!current) return;
-    if (hardOnly) removeHardWord(current.word);
-
-    let isNew: boolean;
-    if (sourceClass) {
-      // Class mode: SRS lives in Supabase, not personal localStorage
-      isNew = true; // always count toward daily goal (XP is unified)
-      incrementTodayCount();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        await initClassSRSWord(user.id, classIdParam, current.word, current.translation);
-      }
-    } else if (sourceClassHW) {
-      // Class homework: teacher-assigned words, always award XP per word
-      isNew = true;
-      incrementTodayCount();
-      if (classIdParam) {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) await initClassSRSWord(user.id, classIdParam, current.word, current.translation);
-      }
-    } else {
-      isNew = saveLearnedWord({
-        word: current.word,
-        translation: current.translation,
-        collectionName: current.collectionName,
-        topic: current.topic,
-        dayNumber: current.dayNumber,
-        learnedAt: new Date().toISOString(),
-      });
-      const srsWord = createSRSWord(current, current.collectionName, current.dayNumber, current.topic);
-      storeSRSWord(srsWord);
-      if (isNew) incrementTodayCount();
-    }
-
     if (isNew && !sourceClassHW && !sourceClass) {
       const learnXP = getLearnXPAmount();
       const { leveledUp, newLevel, newXp } = addXP(learnXP, 'Learn', `Unit ${current.dayNumber} · ${current.collectionName}`);
@@ -455,12 +464,12 @@ function LearnInner() {
     setSessionCount(c => c + 1);
     perWordDataRef.current.push({
       word: current.word,
-      outcome: 'learned',
+      outcome,
       seconds_to_mark: Math.round((Date.now() - wordStartRef.current) / 1000),
-      gate_attempts: wordGateAttemptsRef.current,
-      gate_correct_first: wordGateCorrectFirstRef.current,
+      gate_attempts: gateAttempts,
+      gate_correct_first: gateCorrectFirst,
     });
-    setMarks(m => { const n = [...m]; n[index] = 'learned'; return n; });
+    setMarks(m => { const n = [...m]; n[index] = outcome; return n; });
     if (!sourceClassHW && !sourceClass) {
       const newAch = checkAchievements();
       newAch.forEach(pushAchievement);
@@ -484,7 +493,14 @@ function LearnInner() {
       setIndex(i => i + 1);
       setMaxReached(m => Math.max(m, index + 1));
     }
-  }, [current, index, words, collectionName, pushAchievement, setPendingLevelUp, hardOnly, sourceMyWords, myCollection, myFolder]);
+  }, [current, index, words, collectionName, pushAchievement, setPendingLevelUp, sourceClass, sourceClassHW, classIdParam, sourceMyWords, myCollection, myFolder]);
+
+  const advanceCard = useCallback(async () => {
+    if (!current) return;
+    if (hardOnly) removeHardWord(current.word);
+    const isNew = await grantLearnReward(current, { sourceClass, sourceClassHW, classIdParam });
+    finishWordMark('learned', isNew, wordGateAttemptsRef.current, wordGateCorrectFirstRef.current);
+  }, [current, hardOnly, sourceClass, sourceClassHW, classIdParam, finishWordMark]);
 
   const tryAdvanceCard = useCallback(() => {
     if (!current || !revealed || revealCountdown > 0 || inQuizGate || inSpotCheck) return;
@@ -550,21 +566,17 @@ function LearnInner() {
     }, 700);
   }, [spotCheckSelected, index, advanceCard]);
 
-  const markTooHard = useCallback(() => {
+  const markTooHard = useCallback(async () => {
     if (!current) return;
+    // Too Hard earns the same XP/SRS reward as Learned (see grantLearnReward)
+    // — only difference is it also lands in the Hard Words list below, so
+    // students can't game the leaderboard by mis-marking hard words as
+    // Learned just to avoid losing the reward.
     addHardWord(current.word);
     setSkipped(s => [...s, current]);
-    perWordDataRef.current.push({
-      word: current.word,
-      outcome: 'too-hard',
-      seconds_to_mark: Math.round((Date.now() - wordStartRef.current) / 1000),
-      gate_attempts: 0,
-      gate_correct_first: true,
-    });
-    setMarks(m => { const n = [...m]; n[index] = 'too-hard'; return n; });
-    if (index + 1 >= words.length) setDone(true);
-    else { setIndex(i => i + 1); setMaxReached(m => Math.max(m, index + 1)); }
-  }, [current, index, words]);
+    const isNew = await grantLearnReward(current, { sourceClass, sourceClassHW, classIdParam });
+    finishWordMark('too-hard', isNew, 0, true);
+  }, [current, sourceClass, sourceClassHW, classIdParam, finishWordMark]);
 
   const dismissSkipTip = useCallback(() => {
     setShowSkipTip(false);
