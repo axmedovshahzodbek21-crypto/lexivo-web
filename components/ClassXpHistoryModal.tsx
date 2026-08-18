@@ -96,6 +96,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
   const [loading, setLoading] = useState(true);
   const [calMonth, setCalMonth] = useState(() => { const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), 1); });
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
+  const [showReviewDetail, setShowReviewDetail] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -124,8 +125,8 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
   }, []);
 
   useEffect(() => {
-    if (selectedDay) playPanelOpenSound();
-  }, [selectedDay]);
+    if (selectedDay || showReviewDetail) playPanelOpenSound();
+  }, [selectedDay, showReviewDetail]);
 
   const byDate: Record<string, XpEntry[]> = {};
   for (const e of history) {
@@ -143,8 +144,23 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
     ? (byDate[selectedDay] ?? []).slice().sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
     : [];
   const dayTotal = dayEntries.reduce((s, e) => s + e.amount, 0);
-  const reviewPattern = classifyReview(history.filter(e => e.reason === 'SRS Review'), overdueCount);
+  const reviewOnly = history.filter(e => e.reason === 'SRS Review');
+  const reviewPattern = classifyReview(reviewOnly, overdueCount);
   const reviewMeta = REVIEW_LABEL_META[reviewPattern.label];
+
+  const reviewCountByDay = new Map<string, number>();
+  for (const e of reviewOnly) {
+    const d = e.created_at.slice(0, 10);
+    reviewCountByDay.set(d, (reviewCountByDay.get(d) ?? 0) + 1);
+  }
+  const last30Days: string[] = [];
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    last30Days.push(d.toISOString().slice(0, 10));
+  }
+
+  const hasDetail = !!selectedDay || showReviewDetail;
 
   return (
     <div className="fixed inset-0 z-[70] flex items-end justify-center" onClick={onClose}>
@@ -155,7 +171,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
           maxHeight: '90vh',
           background: 'var(--surface)',
           width: '100%',
-          maxWidth: selectedDay ? '680px' : '384px',
+          maxWidth: hasDetail ? '680px' : '384px',
           transition: 'max-width 0.2s ease-out',
         }}
         onClick={e => e.stopPropagation()}
@@ -166,7 +182,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
 
         <div className="flex flex-1 min-h-0">
           {/* Calendar (right column once a day is selected) */}
-          <div className="flex flex-col overflow-y-auto px-6 pb-6 space-y-4" style={{ width: selectedDay ? '360px' : '100%', flexShrink: 0, order: selectedDay ? 2 : 1 }}>
+          <div className="flex flex-col overflow-y-auto px-6 pb-6 space-y-4" style={{ width: hasDetail ? '360px' : '100%', flexShrink: 0, order: showReviewDetail ? 1 : selectedDay ? 2 : 1 }}>
             <div className="flex items-center justify-between">
               <h3 className="text-xl font-black" style={{ color: 'var(--text)' }}>📅 XP History</h3>
               <div className="text-right min-w-0">
@@ -176,20 +192,22 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
             </div>
 
             {!loading && (
-              <div
-                className="flex items-center gap-2 px-3 py-2 rounded-xl"
+              <button
+                onClick={() => { setSelectedDay(null); setShowReviewDetail(true); }}
+                className="flex items-center gap-2 px-3 py-2 rounded-xl text-left hover:opacity-85 transition-opacity"
                 style={{ background: `color-mix(in srgb, ${reviewMeta.color} 12%, transparent)`, border: `1px solid color-mix(in srgb, ${reviewMeta.color} 30%, transparent)` }}
                 title={reviewMeta.blurb}
               >
                 <span>{reviewMeta.emoji}</span>
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <p className="text-xs font-bold truncate" style={{ color: reviewMeta.color }}>Review: {reviewMeta.text}</p>
                   <p className="text-[10px] text-[var(--text-muted)] truncate">
                     {reviewPattern.daysReviewed}/30 days · {reviewPattern.streak}d streak
                     {overdueCount > 0 ? ` · ${overdueCount} overdue` : ''}
                   </p>
                 </div>
-              </div>
+                <span className="text-xs shrink-0" style={{ color: reviewMeta.color }}>ⓘ</span>
+              </button>
             )}
 
             {loading ? (
@@ -237,7 +255,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
                     const isSelected = selectedDay === dateStr;
                     return (
                       <button key={day}
-                        onClick={() => hasXp && setSelectedDay(isSelected ? null : dateStr)}
+                        onClick={() => { if (!hasXp) return; setShowReviewDetail(false); setSelectedDay(isSelected ? null : dateStr); }}
                         title={hasReview ? 'Did SRS Review this day' : undefined}
                         className="relative flex flex-col items-center justify-center rounded-full aspect-square transition-all"
                         style={{
@@ -305,6 +323,72 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
                     </div>
                   </div>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* Review Pattern detail (right column) */}
+          {showReviewDetail && (
+            <div className="flex-1 flex flex-col min-w-0 border-l overflow-y-auto animate-slide-in-right" style={{ borderColor: 'var(--border)', order: 2 }}>
+              <div className="flex items-center justify-between px-5 py-4 shrink-0 border-b" style={{ borderColor: 'var(--border)' }}>
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">{reviewMeta.emoji}</span>
+                  <div>
+                    <p className="text-xs font-bold" style={{ color: 'var(--text-muted)' }}>Review Pattern</p>
+                    <p className="text-sm font-black" style={{ color: reviewMeta.color }}>{reviewMeta.text}</p>
+                  </div>
+                </div>
+                <button onClick={() => setShowReviewDetail(false)} className="text-lg" style={{ color: 'var(--text-muted)' }}>✕</button>
+              </div>
+
+              <div className="overflow-y-auto overscroll-contain px-5 py-4 space-y-5">
+                <p className="text-sm" style={{ color: 'var(--text)' }}>{reviewMeta.blurb}</p>
+
+                {/* Stat breakdown */}
+                <div className="rounded-xl divide-y" style={{ background: 'var(--surface-2)', borderColor: 'var(--border)' }}>
+                  {[
+                    { label: 'Days reviewed (last 30)', value: `${reviewPattern.daysReviewed}/30 (${Math.round(reviewPattern.coverage * 100)}%)` },
+                    { label: 'Current streak', value: `${reviewPattern.streak} day${reviewPattern.streak === 1 ? '' : 's'}` },
+                    { label: 'Longest gap', value: `${reviewPattern.longestGap} day${reviewPattern.longestGap === 1 ? '' : 's'}` },
+                    { label: 'Avg words / active day', value: reviewPattern.totalReviews > 0 ? reviewPattern.avgPerActiveDay.toFixed(1) : '—' },
+                    { label: 'Total reviews (30d)', value: `${reviewPattern.totalReviews}` },
+                    { label: 'Currently overdue', value: `${overdueCount}` },
+                  ].map(row => (
+                    <div key={row.label} className="flex items-center justify-between px-4 py-2.5 text-xs">
+                      <span style={{ color: 'var(--text-muted)' }}>{row.label}</span>
+                      <span className="font-bold" style={{ color: 'var(--text)' }}>{row.value}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* 30-day review strip */}
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--text-muted)' }}>Last 30 days</p>
+                  <div className="grid grid-cols-10 gap-1">
+                    {last30Days.map(d => {
+                      const count = reviewCountByDay.get(d) ?? 0;
+                      const isToday = d === todayStr;
+                      return (
+                        <div
+                          key={d}
+                          title={`${d}${count > 0 ? ` · reviewed ${count} word${count === 1 ? '' : 's'}` : ' · no review'}`}
+                          className="aspect-square rounded"
+                          style={{
+                            background: count > 0 ? reviewMeta.color : 'var(--surface-2)',
+                            border: count > 0 ? 'none' : '1px solid var(--border)',
+                            outline: isToday ? `1.5px solid ${accentColor}` : 'none',
+                            outlineOffset: 1,
+                            opacity: count > 0 ? Math.min(1, 0.45 + count * 0.15) : 1,
+                          }}
+                        />
+                      );
+                    })}
+                  </div>
+                  <div className="flex items-center gap-3 mt-2 text-[10px]" style={{ color: 'var(--text-muted)' }}>
+                    <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm inline-block" style={{ background: reviewMeta.color }} />reviewed</span>
+                    <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm inline-block" style={{ border: '1px solid var(--border)' }} />no review</span>
+                  </div>
+                </div>
               </div>
             </div>
           )}
