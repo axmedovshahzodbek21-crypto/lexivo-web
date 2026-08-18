@@ -30,6 +30,27 @@ function exactTime(iso: string) {
   return new Date(iso).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 }
 
+// Soft rising tone for when the day-detail panel slides open — no audio file,
+// same Web Audio approach as lib/shuffle.ts's reveal sounds.
+function playPanelOpenSound() {
+  try {
+    const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    const ctx = new Ctx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(320, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(620, ctx.currentTime + 0.14);
+    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.11, ctx.currentTime + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.2);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.22);
+  } catch {}
+}
+
 export default function ClassXpHistoryModal({ classId, userId, xp, studentName, accentColor = 'var(--primary)', onClose }: Props) {
   const { user } = useAuth();
   const [history, setHistory] = useState<XpEntry[]>([]);
@@ -54,6 +75,10 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
     document.body.style.overflow = 'hidden';
     return () => { document.body.style.overflow = ''; };
   }, []);
+
+  useEffect(() => {
+    if (selectedDay) playPanelOpenSound();
+  }, [selectedDay]);
 
   const byDate: Record<string, XpEntry[]> = {};
   for (const e of history) {
@@ -82,7 +107,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
           background: 'var(--surface)',
           width: '100%',
           maxWidth: selectedDay ? '680px' : '384px',
-          transition: 'max-width 0.25s ease',
+          transition: 'max-width 0.45s cubic-bezier(0.22, 1, 0.36, 1)',
         }}
         onClick={e => e.stopPropagation()}
       >
@@ -192,7 +217,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
 
           {/* Right column: day detail */}
           {selectedDay && (
-            <div className="flex-1 flex flex-col min-w-0 border-l overflow-y-auto" style={{ borderColor: 'var(--border)' }}>
+            <div className="flex-1 flex flex-col min-w-0 border-l overflow-y-auto animate-slide-in-right" style={{ borderColor: 'var(--border)' }}>
               <div className="flex items-center justify-between px-5 py-4 shrink-0 border-b" style={{ borderColor: 'var(--border)' }}>
                 <div>
                   <p className="text-xs font-bold" style={{ color: 'var(--text-muted)' }}>{selectedDay}</p>
