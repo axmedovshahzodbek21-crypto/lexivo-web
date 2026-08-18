@@ -30,41 +30,61 @@ function exactTime(iso: string) {
   return new Date(iso).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 }
 
-// Whoosh-then-land two-parter for when the day-detail panel slides open and
-// overshoot-settles — no audio file, same Web Audio approach as
-// lib/shuffle.ts's reveal sounds. Timed to roughly match the CSS bounce.
+// Whoosh, overshoot-thud, then a two-note landing chime — timed to the
+// 1.1s slideInRight keyframe (whoosh through the fly-in, thud at the 60%
+// overshoot peak, chime as it settles). No audio file, same Web Audio
+// approach as lib/shuffle.ts's reveal sounds.
 function playPanelOpenSound() {
   try {
     const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
     const ctx = new Ctx();
+    const t0 = ctx.currentTime;
 
-    // Whoosh: rising sweep as the panel slides in.
+    // Whoosh: long rising sweep as the panel flies in.
     const sweep = ctx.createOscillator();
     const sweepGain = ctx.createGain();
     sweep.connect(sweepGain);
     sweepGain.connect(ctx.destination);
-    sweep.type = 'sine';
-    sweep.frequency.setValueAtTime(260, ctx.currentTime);
-    sweep.frequency.exponentialRampToValueAtTime(720, ctx.currentTime + 0.26);
-    sweepGain.gain.setValueAtTime(0.0001, ctx.currentTime);
-    sweepGain.gain.linearRampToValueAtTime(0.13, ctx.currentTime + 0.04);
-    sweepGain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.3);
-    sweep.start(ctx.currentTime);
-    sweep.stop(ctx.currentTime + 0.32);
+    sweep.type = 'sawtooth';
+    sweep.frequency.setValueAtTime(120, t0);
+    sweep.frequency.exponentialRampToValueAtTime(680, t0 + 0.62);
+    sweepGain.gain.setValueAtTime(0.0001, t0);
+    sweepGain.gain.linearRampToValueAtTime(0.05, t0 + 0.08);
+    sweepGain.gain.linearRampToValueAtTime(0.09, t0 + 0.55);
+    sweepGain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.68);
+    sweep.start(t0);
+    sweep.stop(t0 + 0.7);
 
-    // Landing chime: brief bright ping as the overshoot settles.
-    const land = ctx.createOscillator();
-    const landGain = ctx.createGain();
-    land.connect(landGain);
-    landGain.connect(ctx.destination);
-    land.type = 'sine';
-    const landStart = ctx.currentTime + 0.28;
-    land.frequency.setValueAtTime(880, landStart);
-    landGain.gain.setValueAtTime(0.0001, landStart);
-    landGain.gain.linearRampToValueAtTime(0.1, landStart + 0.02);
-    landGain.gain.exponentialRampToValueAtTime(0.0001, landStart + 0.22);
-    land.start(landStart);
-    land.stop(landStart + 0.24);
+    // Thud: soft low impact right at the overshoot peak (~60% of 1.1s).
+    const thud = ctx.createOscillator();
+    const thudGain = ctx.createGain();
+    thud.connect(thudGain);
+    thudGain.connect(ctx.destination);
+    thud.type = 'sine';
+    const thudStart = t0 + 0.62;
+    thud.frequency.setValueAtTime(180, thudStart);
+    thud.frequency.exponentialRampToValueAtTime(70, thudStart + 0.16);
+    thudGain.gain.setValueAtTime(0.0001, thudStart);
+    thudGain.gain.linearRampToValueAtTime(0.16, thudStart + 0.015);
+    thudGain.gain.exponentialRampToValueAtTime(0.0001, thudStart + 0.18);
+    thud.start(thudStart);
+    thud.stop(thudStart + 0.2);
+
+    // Landing chime: two bright notes as it settles into place (~80%–100%).
+    [880, 1174.66].forEach((freq, i) => {
+      const start = t0 + 0.78 + i * 0.1;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, start);
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.linearRampToValueAtTime(0.11, start + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.26);
+      osc.start(start);
+      osc.stop(start + 0.28);
+    });
   } catch {}
 }
 
@@ -124,7 +144,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
           background: 'var(--surface)',
           width: '100%',
           maxWidth: selectedDay ? '680px' : '384px',
-          transition: 'max-width 0.65s cubic-bezier(0.34, 1.56, 0.64, 1)',
+          transition: 'max-width 0.2s ease-out',
         }}
         onClick={e => e.stopPropagation()}
       >
