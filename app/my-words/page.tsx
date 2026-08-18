@@ -69,7 +69,9 @@ export default function MyWordsPage() {
     }
     setFolders(initialFolders);
     setOrphaned(initialOrphaned);
-    pushLists();
+    // Pull first so any locally-seeded example folder (or other pending
+    // local state) merges with the cloud before pushing — pushing first
+    // raced the pull that was about to supersede it anyway.
     pullAll().then(() => {
       setFolders(getImportedFolders());
       setOrphaned(getImportedCollections());
