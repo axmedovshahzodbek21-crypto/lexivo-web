@@ -53,6 +53,10 @@ function timeAgo(iso: string) {
   return d < 7 ? `${d}d ago` : `${Math.floor(d / 7)}w ago`;
 }
 
+function exactTime(iso: string) {
+  return new Date(iso).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+}
+
 function dueLabel(due: string | null): { text: string; overdue: boolean } | null {
   if (!due) return null;
   const today = new Date().toISOString().slice(0, 10);
@@ -684,7 +688,10 @@ const [memberCount, setMemberCount] = useState(0);
                         <div key={e.id} className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <span className="text-lg">{XP_REASON_ICON2[e.reason] ?? '⚡'}</span>
-                            <span className="text-sm text-[var(--text)]">{e.reason}</span>
+                            <div>
+                              <p className="text-sm text-[var(--text)] leading-tight">{e.reason}</p>
+                              <p className="text-[11px] text-[var(--text-muted)] leading-tight">{exactTime(e.created_at)}</p>
+                            </div>
                           </div>
                           <span className="text-sm font-bold" style={{ color: classAccent }}>+{(e.amount / 10).toFixed(1)}</span>
                         </div>
