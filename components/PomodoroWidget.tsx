@@ -489,14 +489,6 @@ export default function PomodoroWidget() {
   const accentColor = isWork ? 'var(--primary)' : 'var(--success)';
   const timeStr = fmt(pomSecondsLeft);
 
-  const cardStyle = {
-    borderRadius: 20,
-    background: 'rgba(10, 10, 24, 0.96)',
-    backdropFilter: 'blur(20px)',
-    border: `1px solid ${accentColor}55`,
-    boxShadow: `0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px ${accentColor}18`,
-  };
-
   // Same layout as the pop-out PiP window's content (icon+time+sessions row,
   // then pause/skip/pip/stop buttons in a row) so the two look and behave
   // the same, just draggable and slightly larger for in-page use.
