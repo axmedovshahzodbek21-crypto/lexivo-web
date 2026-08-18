@@ -138,7 +138,7 @@ export default function ClassLeaderboardPage() {
       {/* Podium */}
       {top3.length >= 2 && (
         <div className="px-4 pt-6 pb-4">
-          <div className="flex items-end justify-center gap-1.5" style={{ height: 230 }}>
+          <div className="flex items-end justify-center gap-1.5" style={{ height: 290 }}>
             {PODIUM_ORDER.map(rankIdx => {
               const row = top3[rankIdx];
               if (!row) return <div key={rankIdx} className="flex-1" />;
