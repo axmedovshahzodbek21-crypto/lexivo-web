@@ -431,7 +431,7 @@ export default function QuizPage() {
           )}
           <div className="flex gap-3">
             <button
-              onClick={() => { setIndex(0); setSelected(null); setState('idle'); setCorrect(0); setWrongQuestions([]); setDone(false); if (!sourceMyWords && !sourceClassHW) setQuestions(buildQuiz(collections, collectionName, dayNumber, starredOnly, listId)); }}
+              onClick={() => { setIndex(0); setSelected(null); setState('idle'); setCorrect(0); setWrongQuestions([]); setDone(false); if (!sourceMyWords && !sourceClassHW && !sourceClass) setQuestions(buildQuiz(collections, collectionName, dayNumber, starredOnly, listId)); }}
               className="btn-secondary flex-1"
             >{t.common.retry}</button>
             <Link href={backUrl} className="btn-primary flex-1 text-center">{t.common.back}</Link>
