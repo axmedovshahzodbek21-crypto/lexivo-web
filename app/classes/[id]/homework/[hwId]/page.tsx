@@ -94,12 +94,15 @@ export default function UnitStudyHubPage() {
     router.replace(`/classes/${classId}/homework/${hwId}`);
     void (async () => {
       const wordCount = _hwCache.get(hwId)?.words.length ?? words.length;
+      const succeeded: string[] = [];
       for (const mode of modesToRecord) {
-        await supabase.rpc('record_class_homework_progress', {
+        const { error } = await supabase.rpc('record_class_homework_progress', {
           p_homework_id: hwId, p_mode: mode, p_client_word_count: wordCount,
         });
+        if (error) { setProgressError(error.message); continue; }
+        succeeded.push(mode);
       }
-      setCompletedModes(prev => new Set([...prev, ...modesToRecord]));
+      if (succeeded.length > 0) setCompletedModes(prev => new Set([...prev, ...succeeded]));
     })();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, user]);
