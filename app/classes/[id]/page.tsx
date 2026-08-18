@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { loadCollections, loadCEFRCollection } from '@/lib/data';
 import type { WordCollection } from '@/lib/types';
+import { readingPassages } from '@/lib/reading-data';
 
 interface CollectionMeta {
   collection_name: string;
@@ -124,7 +125,7 @@ interface HardWordRaw { user_id: string; word: string; }
 interface CurrFolder { id: string; assignmentId: string; name: string; units: CurrUnit[]; }
 interface CurrUnit { id: string; name: string; wordCount: number; }
 interface CurrWordUnit { id: string; name: string; wordCount: number; }
-interface CurrHW { id: string; unitId: string | null; classUnitId: string | null; collectionName: string | null; dayNumber: number | null; source: 'library' | 'class' | 'collection'; unitName: string; modes: string[]; dueDate: string | null; studentIds: string[] | null; progressByMode: Record<string, number>; }
+interface CurrHW { id: string; unitId: string | null; classUnitId: string | null; collectionName: string | null; dayNumber: number | null; passageId: number | null; source: 'library' | 'class' | 'collection' | 'passage'; unitName: string; modes: string[]; dueDate: string | null; studentIds: string[] | null; progressByMode: Record<string, number>; }
 
 function Avatar({ name, url, size = 38 }: { name: string; url: string | null; size?: number }) {
   if (url) return <img src={url} alt={name} style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />;
@@ -782,9 +783,9 @@ function SRSTab({
   );
 }
 
-const HW_MODE_ICON: Record<string, string> = { learn: '📖', flashcard: '🃏', quiz: '🧠', match: '🎯' };
-const HW_MODE_LABEL: Record<string, string> = { learn: 'Learn', flashcard: 'Cards', quiz: 'Quiz', match: 'Match' };
-const HW_MODE_COLOR: Record<string, string> = { learn: '#3B82F6', flashcard: '#8B5CF6', quiz: '#EC4899', match: '#10B981' };
+const HW_MODE_ICON: Record<string, string> = { learn: '📖', flashcard: '🃏', quiz: '🧠', match: '🎯', read: '📚' };
+const HW_MODE_LABEL: Record<string, string> = { learn: 'Learn', flashcard: 'Cards', quiz: 'Quiz', match: 'Match', read: 'Read' };
+const HW_MODE_COLOR: Record<string, string> = { learn: '#3B82F6', flashcard: '#8B5CF6', quiz: '#EC4899', match: '#10B981', read: '#F59E0B' };
 const REQUIRED_MODES = ['learn', 'flashcard', 'quiz'];
 const OPTIONAL_MODES = ['match'];
 
@@ -844,6 +845,11 @@ function CurriculumTab({
   const [hwSaving, setHwSaving] = useState(false);
   const [hwCollectionName, setHwCollectionName] = useState<string | null>(null);
   const [hwDayNumber, setHwDayNumber] = useState<number | null>(null);
+  const [hwPassage, setHwPassage] = useState<{ id: number; title: string } | null>(null);
+
+  // Reading passage picker
+  const [showPassagePicker, setShowPassagePicker] = useState(false);
+  const [passageSearch, setPassageSearch] = useState('');
 
   // Collection picker
   const [collOpenStates, setCollOpenStates] = useState<Record<string, boolean>>({});
@@ -892,7 +898,7 @@ function CurriculumTab({
     // Homework
     const { data: hwData } = await supabase
       .from('class_homework')
-      .select('id, unit_id, class_unit_id, collection_name, day_number, modes, due_date, student_ids, teacher_units(name), class_word_units(name)')
+      .select('id, unit_id, class_unit_id, collection_name, day_number, passage_id, modes, due_date, student_ids, teacher_units(name), class_word_units(name)')
       .eq('class_id', classId).order('created_at', { ascending: false });
 
     let parsedHw: CurrHW[] = [];
@@ -908,15 +914,18 @@ function CurriculumTab({
         }
         const collName = h.collection_name as string | null;
         const dayNum = h.day_number as number | null;
+        const passageId = h.passage_id as number | null;
+        const isPassage = passageId != null;
         const isCollection = collName != null;
         const isClass = h.class_unit_id != null;
-        const source: CurrHW['source'] = isCollection ? 'collection' : isClass ? 'class' : 'library';
-        const unitName = isCollection
-          ? `${collName} · Day ${dayNum}`
+        const source: CurrHW['source'] = isPassage ? 'passage' : isCollection ? 'collection' : isClass ? 'class' : 'library';
+        const unitName = isPassage
+          ? (readingPassages.find(p => p.id === passageId)?.title ?? 'Reading Passage')
+          : isCollection ? `${collName} · Day ${dayNum}`
           : isClass ? (h.class_word_units?.name ?? 'Unit') : (h.teacher_units?.name ?? 'Unit');
         return {
           id: h.id, unitId: h.unit_id ?? null, classUnitId: h.class_unit_id ?? null,
-          collectionName: collName, dayNumber: dayNum,
+          collectionName: collName, dayNumber: dayNum, passageId,
           source, unitName,
           modes: h.modes ?? [], dueDate: h.due_date, studentIds: h.student_ids, progressByMode,
         };
@@ -965,21 +974,31 @@ function CurriculumTab({
     setHwStudentIds(new Set());
   };
 
+  const openPassageHwModal = (passage: { id: number; title: string }) => {
+    setHwPassage(passage);
+    setHwDueDate('');
+    setHwWho('class');
+    setHwStudentIds(new Set());
+    setShowPassagePicker(false);
+  };
+
   const closeHwModal = () => {
     setHwUnit(null);
     setHwCollectionName(null);
     setHwDayNumber(null);
+    setHwPassage(null);
   };
 
   const saveHomework = async () => {
-    if (!user || (!hwUnit && !hwCollectionName)) return;
+    if (!user || (!hwUnit && !hwCollectionName && !hwPassage)) return;
     setHwSaving(true);
     const { error } = await supabase.from('class_homework').insert({
       class_id: classId,
-      ...(hwCollectionName
-        ? { collection_name: hwCollectionName, day_number: hwDayNumber }
-        : hwUnit!.isClassWords ? { class_unit_id: hwUnit!.id } : { unit_id: hwUnit!.id }),
-      modes: [...hwModes],
+      ...(hwPassage
+        ? { passage_id: hwPassage.id, modes: ['read'] }
+        : hwCollectionName
+          ? { collection_name: hwCollectionName, day_number: hwDayNumber, modes: [...hwModes] }
+          : hwUnit!.isClassWords ? { class_unit_id: hwUnit!.id, modes: [...hwModes] } : { unit_id: hwUnit!.id, modes: [...hwModes] }),
       due_date: hwDueDate || null,
       student_ids: hwWho === 'class' ? null : [...hwStudentIds],
     });
@@ -1325,6 +1344,7 @@ function CurriculumTab({
                         <p className="font-bold text-sm text-[var(--text)] truncate">{hw.unitName}</p>
                         {hw.source === 'class' && <span style={{ fontSize: 9, fontWeight: 800, padding: '2px 6px', borderRadius: 6, background: 'rgba(245,158,11,0.18)', color: '#F59E0B' }}>Class</span>}
                         {hw.source === 'collection' && <span style={{ fontSize: 9, fontWeight: 800, padding: '2px 6px', borderRadius: 6, background: 'rgba(34,197,94,0.15)', color: '#16a34a' }}>📗</span>}
+                        {hw.source === 'passage' && <span style={{ fontSize: 9, fontWeight: 800, padding: '2px 6px', borderRadius: 6, background: 'rgba(245,158,11,0.15)', color: '#F59E0B' }}>📚 Reading</span>}
                         {due && (
                           <span style={{
                             fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 20,
