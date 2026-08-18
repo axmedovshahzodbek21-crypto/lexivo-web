@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
+import { classifyReview, REVIEW_LABEL_META } from '@/lib/reviewPattern';
 
 const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const DAY_LABELS = ['M','T','W','T','F','S','S'];
@@ -91,6 +92,7 @@ function playPanelOpenSound() {
 export default function ClassXpHistoryModal({ classId, userId, xp, studentName, accentColor = 'var(--primary)', onClose }: Props) {
   const { user } = useAuth();
   const [history, setHistory] = useState<XpEntry[]>([]);
+  const [overdueCount, setOverdueCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [calMonth, setCalMonth] = useState(() => { const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), 1); });
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
@@ -100,10 +102,18 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
     (async () => {
       setLoading(true);
       const isSelf = user?.id === userId;
-      const { data } = isSelf
-        ? await supabase.from('class_xp_history').select('id, amount, reason, created_at').eq('user_id', userId).eq('class_id', classId).order('created_at', { ascending: false })
-        : await supabase.rpc('get_student_xp_history', { p_class_id: classId, p_student_id: userId });
-      if (!cancelled) { setHistory((data ?? []) as XpEntry[]); setLoading(false); }
+      const today = new Date().toISOString().slice(0, 10);
+      const [{ data }, { data: srs }] = await Promise.all([
+        isSelf
+          ? supabase.from('class_xp_history').select('id, amount, reason, created_at').eq('user_id', userId).eq('class_id', classId).order('created_at', { ascending: false })
+          : supabase.rpc('get_student_xp_history', { p_class_id: classId, p_student_id: userId }),
+        supabase.from('class_srs_states').select('stage, next_due').eq('user_id', userId).eq('class_id', classId).lt('next_due', today),
+      ]);
+      if (!cancelled) {
+        setHistory((data ?? []) as XpEntry[]);
+        setOverdueCount(((srs ?? []) as { stage: number }[]).filter(r => r.stage < 5).length);
+        setLoading(false);
+      }
     })();
     return () => { cancelled = true; };
   }, [classId, userId, user?.id]);
@@ -133,6 +143,8 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
     ? (byDate[selectedDay] ?? []).slice().sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
     : [];
   const dayTotal = dayEntries.reduce((s, e) => s + e.amount, 0);
+  const reviewPattern = classifyReview(history.filter(e => e.reason === 'SRS Review'), overdueCount);
+  const reviewMeta = REVIEW_LABEL_META[reviewPattern.label];
 
   return (
     <div className="fixed inset-0 z-[70] flex items-end justify-center" onClick={onClose}>
@@ -162,6 +174,23 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
                 <p className="text-2xl font-black" style={{ color: accentColor }}>{(xp / 10).toFixed(1)}</p>
               </div>
             </div>
+
+            {!loading && (
+              <div
+                className="flex items-center gap-2 px-3 py-2 rounded-xl"
+                style={{ background: `color-mix(in srgb, ${reviewMeta.color} 12%, transparent)`, border: `1px solid color-mix(in srgb, ${reviewMeta.color} 30%, transparent)` }}
+                title={reviewMeta.blurb}
+              >
+                <span>{reviewMeta.emoji}</span>
+                <div className="min-w-0">
+                  <p className="text-xs font-bold truncate" style={{ color: reviewMeta.color }}>Review: {reviewMeta.text}</p>
+                  <p className="text-[10px] text-[var(--text-muted)] truncate">
+                    {reviewPattern.daysReviewed}/30 days · {reviewPattern.streak}d streak
+                    {overdueCount > 0 ? ` · ${overdueCount} overdue` : ''}
+                  </p>
+                </div>
+              </div>
+            )}
 
             {loading ? (
               <div className="flex justify-center py-10">
