@@ -160,7 +160,9 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
     last30Days.push(d.toISOString().slice(0, 10));
   }
 
-  const hasDetail = !!selectedDay || showReviewDetail;
+  const openCount = (selectedDay ? 1 : 0) + (showReviewDetail ? 1 : 0);
+  const hasDetail = openCount > 0;
+  const bothOpen = openCount === 2;
 
   return (
     <div className="fixed inset-0 z-[70] flex items-end justify-center" onClick={onClose}>
@@ -171,7 +173,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
           maxHeight: '90vh',
           background: 'var(--surface)',
           width: '100%',
-          maxWidth: hasDetail ? '680px' : '384px',
+          maxWidth: bothOpen ? '980px' : hasDetail ? '680px' : '384px',
           transition: 'max-width 0.2s ease-out',
         }}
         onClick={e => e.stopPropagation()}
@@ -182,7 +184,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
 
         <div className="flex flex-1 min-h-0">
           {/* Calendar (right column once a day is selected) */}
-          <div className="flex flex-col overflow-y-auto px-6 pb-6 space-y-4" style={{ width: hasDetail ? '360px' : '100%', flexShrink: 0, order: showReviewDetail ? 1 : selectedDay ? 2 : 1 }}>
+          <div className="flex flex-col overflow-y-auto px-6 pb-6 space-y-4" style={{ width: hasDetail ? (bothOpen ? '300px' : '360px') : '100%', flexShrink: 0, order: 2 }}>
             <div className="flex items-center justify-between">
               <h3 className="text-xl font-black" style={{ color: 'var(--text)' }}>📅 XP History</h3>
               <div className="text-right min-w-0">
@@ -193,7 +195,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
 
             {!loading && (
               <button
-                onClick={() => { setSelectedDay(null); setShowReviewDetail(true); }}
+                onClick={() => setShowReviewDetail(true)}
                 className="flex items-center gap-2 px-3 py-2 rounded-xl text-left hover:opacity-85 transition-opacity"
                 style={{ background: `color-mix(in srgb, ${reviewMeta.color} 12%, transparent)`, border: `1px solid color-mix(in srgb, ${reviewMeta.color} 30%, transparent)` }}
                 title={reviewMeta.blurb}
@@ -255,7 +257,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
                     const isSelected = selectedDay === dateStr;
                     return (
                       <button key={day}
-                        onClick={() => { if (!hasXp) return; setShowReviewDetail(false); setSelectedDay(isSelected ? null : dateStr); }}
+                        onClick={() => { if (!hasXp) return; setSelectedDay(isSelected ? null : dateStr); }}
                         title={hasReview ? 'Did SRS Review this day' : undefined}
                         className="relative flex flex-col items-center justify-center rounded-full aspect-square transition-all"
                         style={{
@@ -329,7 +331,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
 
           {/* Review Pattern detail (right column) */}
           {showReviewDetail && (
-            <div className="flex-1 flex flex-col min-w-0 border-l overflow-y-auto animate-slide-in-right" style={{ borderColor: 'var(--border)', order: 2 }}>
+            <div className="flex-1 flex flex-col min-w-0 border-l overflow-y-auto animate-slide-in-right" style={{ borderColor: 'var(--border)', order: 3 }}>
               <div className="flex items-center justify-between px-5 py-4 shrink-0 border-b" style={{ borderColor: 'var(--border)' }}>
                 <div className="flex items-center gap-2">
                   <span className="text-xl">{reviewMeta.emoji}</span>
