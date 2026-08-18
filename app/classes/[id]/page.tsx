@@ -2095,7 +2095,8 @@ export default function ClassDashboardPage() {
 
   const load = async () => {
     if (!user || !id) return;
-    const cached = _classCache.get(id);
+    const cacheKey = `${user.id}:${id}`;
+    const cached = _classCache.get(cacheKey);
     if (cached) {
       setClassInfo(cached.classInfo);
       setStudents(cached.students);
@@ -2116,7 +2117,7 @@ export default function ClassDashboardPage() {
     setCollections((colData as CollectionMeta[]) ?? []);
     const { data: hwData } = await supabase.rpc('get_hard_words', { p_class_id: id });
     setHardWords((hwData as HardWord[]) ?? []);
-    _classCache.set(id, {
+    _classCache.set(cacheKey, {
       classInfo: cls as ClassInfo,
       students: (data as StudentRow[]) ?? [],
       collections: (colData as CollectionMeta[]) ?? [],
@@ -2126,7 +2127,7 @@ export default function ClassDashboardPage() {
     setLoading(false);
   };
 
-  useEffect(() => { if (user) load(); else setLoading(false); }, [user, id]);
+  useEffect(() => { if (user) load(); else { _classCache.clear(); setLoading(false); } }, [user, id]);
   useEffect(() => { if (tab === 'activity' && activityFeed.length === 0) loadActivity(); }, [tab]);
   useEffect(() => {
     if (tab !== 'analytics') return;
