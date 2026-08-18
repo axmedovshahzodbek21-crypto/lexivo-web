@@ -2,28 +2,22 @@ import { localDateStr } from './storage';
 
 const BACKUP_VERSION = 1;
 
-// All keys that belong to Lexivo's localStorage data
-const LEXIVO_KEYS = [
-  'lexivo_learned_words',
-  'lexivo_srs_words',
-  'lexivo_streak',
-  'lexivo_last_study',
-  'lexivo_total_study_days',
-  'lexivo_xp',
-  'lexivo_today_xp',
-  'lexivo_today_xp_date',
-  'lexivo_today_count',
-  'lexivo_today_count_date',
-  'lexivo_unit_progress',
-  'lexivo_starred',
-  'lexivo_achievements',
-  'lexivo_settings',
-  'lexivo_hard_words',
-  'lexivo_notif_settings',
-  'lexivo_theme',
-  'lexivo_last_notif',
-  'lexivo_onboarded',
-];
+// Every Lexivo localStorage key, discovered dynamically rather than hand-
+// maintained — the previous fixed list omitted most real keys (imported
+// words, review log, streak-validity day-sets, XP history, achievement
+// dates, custom lists, per-unit progress, ...), so exporting then restoring
+// a backup silently lost the majority of a user's data despite the export
+// reporting success. Per-unit progress in particular is stored under
+// dynamically-suffixed keys (lexivo_unit_progress_<collection>_<day>) that
+// could never have matched a fixed list at all.
+function getLexivoKeys(): string[] {
+  const keys: string[] = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k?.startsWith('lexivo_')) keys.push(k);
+  }
+  return keys;
+}
 
 export interface BackupFile {
   version: number;
@@ -34,7 +28,7 @@ export interface BackupFile {
 
 export function exportData(): void {
   const data: Record<string, unknown> = {};
-  for (const key of LEXIVO_KEYS) {
+  for (const key of getLexivoKeys()) {
     const raw = localStorage.getItem(key);
     if (raw !== null) {
       try { data[key] = JSON.parse(raw); } catch { data[key] = raw; }
@@ -91,11 +85,14 @@ export function importData(jsonStr: string): ImportResult {
   const data = backup.data as Record<string, unknown>;
   let keysRestored = 0;
 
-  for (const key of LEXIVO_KEYS) {
-    if (key in data) {
-      localStorage.setItem(key, JSON.stringify(data[key]));
-      keysRestored++;
-    }
+  // Restore whatever keys the backup file actually contains — not a fixed
+  // list — so older backups (fewer keys) and newer ones (more keys, as this
+  // app adds features) both restore correctly rather than silently dropping
+  // anything outside a hardcoded set.
+  for (const key of Object.keys(data)) {
+    if (!key.startsWith('lexivo_')) continue;
+    localStorage.setItem(key, JSON.stringify(data[key]));
+    keysRestored++;
   }
 
   const learnedWords = Array.isArray(data['lexivo_learned_words'])
