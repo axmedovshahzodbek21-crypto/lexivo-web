@@ -131,17 +131,9 @@ export default function PomodoroWidget() {
   const wasDrag = useRef(false);
   const elemRef = useRef<HTMLDivElement>(null);
 
-  const [panelPos, setPanelPos] = useState<{ x: number; y: number } | null>(null);
-  const panelPosRef = useRef<{ x: number; y: number } | null>(null);
-  const panelDrag = useRef<{
-    startCX: number; startCY: number;
-    startEX: number; startEY: number;
-    moved: boolean;
-  } | null>(null);
   const prevPhaseRef = useRef<PomPhase>('idle');
   const [tipIndex, setTipIndex] = useState(0);
   const [mounted, setMounted] = useState(false);
-  const [panelOpen, setPanelOpen] = useState(false);
   const [customMode, setCustomMode] = useState(false);
   const [pipSupported, setPipSupported] = useState(false);
   const [pipWin, setPipWin] = useState<PiPWindow | null>(null);
@@ -180,7 +172,6 @@ export default function PomodoroWidget() {
       win.addEventListener('pagehide', () => { setPipWin(null); setPipBody(null); });
       setPipWin(win);
       setPipBody(win.document.body);
-      setPanelOpen(false);
     } catch {}
   }
 
@@ -229,19 +220,6 @@ export default function PomodoroWidget() {
     const id = setInterval(() => setTipIndex(i => (i + 1) % BREAK_TIPS.length), 8000);
     return () => clearInterval(id);
   }, [pomPhase]);
-
-  // Initialise panel position when it opens, clear when it closes
-  useEffect(() => {
-    if (panelOpen && pos) {
-      const p = { x: pos.x, y: pos.y + 60 };
-      panelPosRef.current = p;
-      setPanelPos(p);
-    } else if (!panelOpen) {
-      panelPosRef.current = null;
-      setPanelPos(null);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [panelOpen]);
 
   const pipPortal = pipBody ? createPortal(
     <PipTimerContent
@@ -295,35 +273,6 @@ export default function PomodoroWidget() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(posRef.current));
     }
     drag.current = null;
-  }
-
-  function onPanelPointerDown(e: React.PointerEvent<HTMLDivElement>) {
-    if (!panelPosRef.current) return;
-    panelDrag.current = {
-      startCX: e.clientX, startCY: e.clientY,
-      startEX: panelPosRef.current.x, startEY: panelPosRef.current.y,
-      moved: false,
-    };
-    e.currentTarget.setPointerCapture(e.pointerId);
-  }
-
-  function onPanelPointerMove(e: React.PointerEvent<HTMLDivElement>) {
-    if (!panelDrag.current) return;
-    const dx = e.clientX - panelDrag.current.startCX;
-    const dy = e.clientY - panelDrag.current.startCY;
-    if (!panelDrag.current.moved && Math.hypot(dx, dy) <= 4) return;
-    panelDrag.current.moved = true;
-    const w = e.currentTarget.offsetWidth;
-    const h = e.currentTarget.offsetHeight;
-    const nx = Math.max(8, Math.min(window.innerWidth - w - 8, panelDrag.current.startEX + dx));
-    const ny = Math.max(8, Math.min(window.innerHeight - h - 8, panelDrag.current.startEY + dy));
-    const p = { x: nx, y: ny };
-    panelPosRef.current = p;
-    setPanelPos(p);
-  }
-
-  function onPanelPointerUp() {
-    panelDrag.current = null;
   }
 
   // ── Break overlay (portal, full-screen) ───────────────────────────────────
@@ -548,145 +497,81 @@ export default function PomodoroWidget() {
     boxShadow: `0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px ${accentColor}18`,
   };
 
+  // Same layout as the pop-out PiP window's content (icon+time+sessions row,
+  // then pause/skip/pip/stop buttons in a row) so the two look and behave
+  // the same, just draggable and slightly larger for in-page use.
   return (
     <>
-      {/* Expanded panel — shown when widget is tapped */}
-      {panelOpen && createPortal(
-        <div
-          onPointerDown={onPanelPointerDown}
-          onPointerMove={onPanelPointerMove}
-          onPointerUp={onPanelPointerUp}
-          className="fixed z-50 cursor-move select-none"
-          style={{ left: panelPos?.x ?? pos?.x ?? 0, top: panelPos?.y ?? (pos?.y ?? 0) + 60, width: 260, touchAction: 'none', ...cardStyle }}
-        >
-          {/* Header */}
-          <div style={{ padding: '14px 14px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span style={{ color: accentColor, fontWeight: 800, fontSize: 13, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-              {isWork ? '🎯 Focus' : '☕ Break'}
-            </span>
-            <div style={{ display: 'flex', gap: 6 }}>
-              {pipSupported && (
-                <button
-                  onPointerDown={e => e.stopPropagation()}
-                  onClick={() => { togglePip(); }}
-                  style={{ width: 24, height: 24, borderRadius: '50%', background: pipWin ? accentColor : 'rgba(255,255,255,0.1)', border: 'none', color: pipWin ? '#fff' : 'rgba(255,255,255,0.6)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                  aria-label={pipWin ? 'Return timer to page' : 'Pop out timer'}
-                  title={pipWin ? 'Return timer to page' : 'Pop out timer so it stays visible over other windows'}
-                >⧉</button>
-              )}
-              <button
-                onPointerDown={e => e.stopPropagation()}
-                onClick={() => setPanelOpen(false)}
-                style={{ width: 24, height: 24, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', border: 'none', color: 'rgba(255,255,255,0.6)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                aria-label="Close"
-              >✕</button>
-            </div>
-          </div>
-
-          {/* Big countdown */}
-          <div style={{ padding: '10px 14px 4px', textAlign: 'center' }}>
-            <div style={{ fontSize: 52, fontWeight: 900, color: '#fff', lineHeight: 1, fontFamily: '"Courier New", monospace', letterSpacing: '-2px', textShadow: `0 0 24px ${accentColor}80` }}>
-              {timeStr}
-            </div>
-            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginTop: 4 }}>
-              {pomRunning ? 'running' : 'paused'}
-            </div>
-          </div>
-
-          {/* Session dots */}
-          {pomSessions > 0 && (
-            <div style={{ display: 'flex', justifyContent: 'center', gap: 6, padding: '6px 0 0' }}>
-              {Array.from({ length: pomSessions }).map((_, i) => (
-                <div key={i} style={{ width: 8, height: 8, borderRadius: '50%', background: accentColor }} />
-              ))}
-              <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', marginLeft: 2 }}>{pomSessions} done</span>
-            </div>
-          )}
-
-          {/* Controls */}
-          <div style={{ padding: '12px 14px 14px', display: 'flex', gap: 8 }}>
-            <button
-              onPointerDown={e => e.stopPropagation()}
-              onClick={() => { pomRunning ? pausePomodoro() : resumePomodoro(); }}
-              style={{ flex: 1, padding: '10px 0', borderRadius: 12, border: 'none', background: accentColor, color: '#fff', fontWeight: 800, fontSize: 16, cursor: 'pointer' }}
-              aria-label={pomRunning ? 'Pause' : 'Resume'}
-            >
-              {pomRunning ? '⏸' : '▶'}
-            </button>
-            <button
-              onPointerDown={e => e.stopPropagation()}
-              onClick={skipPomodoro}
-              style={{ flex: 1, padding: '10px 0', borderRadius: 12, border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.6)', fontWeight: 800, fontSize: 16, cursor: 'pointer' }}
-              aria-label="Skip to next"
-            >
-              ⏭
-            </button>
-            <button
-              onPointerDown={e => e.stopPropagation()}
-              onClick={() => { resetPomodoro(); setPanelOpen(false); }}
-              style={{ padding: '10px 12px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.35)', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}
-            >
-              Stop
-            </button>
-          </div>
-        </div>,
-        document.body,
-      )}
-
     <div
       ref={elemRef}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
-      onClick={() => { if (wasDrag.current) { wasDrag.current = false; return; } setPanelOpen(p => !p); }}
-      className="fixed z-50 cursor-move select-none overflow-hidden"
+      className="fixed z-50 select-none"
       style={{
         left: pos.x, top: pos.y,
-        width: 158,
+        width: 220,
         borderRadius: 16,
         background: 'rgba(8, 8, 18, 0.97)',
         border: `1px solid ${accentColor}44`,
         boxShadow: `0 8px 28px rgba(0,0,0,0.5), 0 0 0 1px ${accentColor}18`,
         touchAction: 'none',
+        cursor: 'move',
       }}
     >
-      <div style={{ padding: '8px 12px 10px' }}>
-        {/* Phase + session count */}
-        <div className="flex items-center justify-between" style={{ marginBottom: 6 }}>
+      <div style={{ padding: '10px 12px 12px' }}>
+        {/* Icon + time + sessions */}
+        <div className="flex items-center justify-center" style={{ gap: 8, marginBottom: 8 }}>
+          <span style={{ fontSize: 14 }}>{isWork ? '🎯' : '☕'}</span>
           <span style={{
-            fontSize: 9, fontWeight: 700, letterSpacing: '0.08em',
-            color: accentColor, textTransform: 'uppercase',
+            fontFamily: '"Courier New", monospace', fontSize: 28, fontWeight: 900, lineHeight: 1,
+            color: '#fff', letterSpacing: '-1px', textShadow: `0 0 14px ${accentColor}80`,
           }}>
-            {isWork ? '🎯 Focus' : '☕ Break'}
+            {timeStr}
           </span>
           {pomSessions > 0 && (
-            <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.3)' }}>×{pomSessions}</span>
+            <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)' }}>×{pomSessions}</span>
           )}
         </div>
 
-        {/* Flip countdown digits */}
-        <div className="flex items-center justify-center" style={{ marginBottom: 8, gap: 0 }}>
-          {timeStr.split('').map((char, i) => (
-            <span
-              key={`${i}-${char}`}
-              style={{
-                display: 'inline-block',
-                fontFamily: '"Courier New", "Lucida Console", monospace',
-                fontSize: char === ':' ? 28 : 36,
-                fontWeight: 900,
-                lineHeight: 1,
-                color: char === ':' ? 'rgba(255,255,255,0.35)' : '#ffffff',
-                letterSpacing: '-0.03em',
-                padding: char === ':' ? '0 2px' : '0 1px',
-                textShadow: char !== ':' ? `0 0 14px ${accentColor}80` : 'none',
-                animation: char !== ':' ? 'digit-flip-in 0.28s ease-out' : 'none',
-              }}
+        {/* Controls */}
+        <div style={{ display: 'flex', gap: 6 }}>
+          <button
+            onPointerDown={e => e.stopPropagation()}
+            onClick={() => { pomRunning ? pausePomodoro() : resumePomodoro(); }}
+            style={{ flex: 1, padding: '8px 0', borderRadius: 10, border: 'none', background: accentColor, color: '#fff', fontWeight: 800, fontSize: 14, cursor: 'pointer' }}
+            aria-label={pomRunning ? 'Pause' : 'Resume'}
+          >
+            {pomRunning ? '⏸' : '▶'}
+          </button>
+          <button
+            onPointerDown={e => e.stopPropagation()}
+            onClick={skipPomodoro}
+            style={{ flex: 1, padding: '8px 0', borderRadius: 10, border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.7)', fontWeight: 800, fontSize: 14, cursor: 'pointer' }}
+            aria-label="Skip to next"
+          >
+            ⏭
+          </button>
+          {pipSupported && (
+            <button
+              onPointerDown={e => e.stopPropagation()}
+              onClick={togglePip}
+              style={{ padding: '8px 10px', borderRadius: 10, border: 'none', background: pipWin ? accentColor : 'rgba(255,255,255,0.06)', color: pipWin ? '#fff' : 'rgba(255,255,255,0.6)', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}
+              aria-label={pipWin ? 'Return timer to page' : 'Pop out timer'}
+              title={pipWin ? 'Return timer to page' : 'Pop out timer so it stays visible over other windows'}
             >
-              {char}
-            </span>
-          ))}
+              ⧉
+            </button>
+          )}
+          <button
+            onPointerDown={e => e.stopPropagation()}
+            onClick={resetPomodoro}
+            style={{ padding: '8px 10px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.35)', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}
+            aria-label="Stop"
+          >
+            ✕
+          </button>
         </div>
-
       </div>
     </div>
     {pipPortal}
