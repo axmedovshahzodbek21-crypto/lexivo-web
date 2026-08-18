@@ -8,6 +8,7 @@ import type { ClassHWWord } from '@/lib/storage';
 import { recordClassXP } from '@/lib/class-xp';
 import { loadCollections, loadCEFRCollection } from '@/lib/data';
 import type { WordCollection } from '@/lib/types';
+import { readingPassages, type ReadingPassage } from '@/lib/reading-data';
 
 async function fetchCollectionByName(name: string): Promise<WordCollection | null> {
   if (name === '30 Days of Powerful Words') { const c = await loadCollections(); return c[0] ?? null; }
@@ -41,8 +42,9 @@ function dueLabel(due: string | null): { text: string; overdue: boolean } | null
   return { text: `Due ${due}`, overdue: false };
 }
 
-type HWMeta = { unitName: string; modes: string[]; dueDate: string | null; words: UnitWord[] };
+type HWMeta = { unitName: string; modes: string[]; dueDate: string | null; words: UnitWord[]; passage: ReadingPassage | null };
 const _hwCache = new Map<string, HWMeta>();
+const PASSAGE_XP = 15;
 
 export default function UnitStudyHubPage() {
   const { id: classId, hwId } = useParams<{ id: string; hwId: string }>();
@@ -56,6 +58,8 @@ export default function UnitStudyHubPage() {
   const [modes, setModes] = useState<string[]>([]);
   const [dueDate, setDueDate] = useState<string | null>(null);
   const [words, setWords] = useState<UnitWord[]>([]);
+  const [passage, setPassage] = useState<ReadingPassage | null>(null);
+  const [markingRead, setMarkingRead] = useState(false);
   const [completedModes, setCompletedModes] = useState<Set<string>>(new Set());
   const [navigating, setNavigating] = useState<string | null>(null);
   const [progressError, setProgressError] = useState<string | null>(null);
@@ -113,6 +117,7 @@ export default function UnitStudyHubPage() {
       setModes(cached.modes);
       setDueDate(cached.dueDate);
       setWords(cached.words);
+      setPassage(cached.passage);
       setLoading(false);
     } else {
       setLoading(true);
@@ -124,7 +129,7 @@ export default function UnitStudyHubPage() {
         ? Promise.resolve({ data: null })
         : supabase
             .from('class_homework')
-            .select('unit_id, class_unit_id, collection_name, day_number, modes, due_date, student_ids, teacher_units(name), class_word_units(name)')
+            .select('unit_id, class_unit_id, collection_name, day_number, passage_id, modes, due_date, student_ids, teacher_units(name), class_word_units(name)')
             .eq('id', hwId)
             .single(),
       supabase
@@ -143,6 +148,19 @@ export default function UnitStudyHubPage() {
 
     const hw = hwRes.data;
     if (!hw) { setLoading(false); return; }
+
+    const passageId = hw.passage_id as number | null;
+    if (passageId != null) {
+      const found = readingPassages.find(p => p.id === passageId) ?? null;
+      _hwCache.set(hwId, { unitName: found?.title ?? 'Reading Passage', modes: (hw.modes as string[]) ?? ['read'], dueDate: hw.due_date as string | null, words: [], passage: found });
+      setUnitName(found?.title ?? 'Reading Passage');
+      setModes((hw.modes as string[]) ?? ['read']);
+      setDueDate(hw.due_date as string | null);
+      setWords([]);
+      setPassage(found);
+      setLoading(false);
+      return;
+    }
 
     const unitId = hw.unit_id as string | null;
     const classUnitId = hw.class_unit_id as string | null;
@@ -200,11 +218,12 @@ export default function UnitStudyHubPage() {
       }));
     }
 
-    _hwCache.set(hwId, { unitName: name, modes: hwModes, dueDate: due, words: unitWords });
+    _hwCache.set(hwId, { unitName: name, modes: hwModes, dueDate: due, words: unitWords, passage: null });
     setUnitName(name);
     setModes(hwModes);
     setDueDate(due);
     setWords(unitWords);
+    setPassage(null);
     setLoading(false);
   }
 
@@ -242,10 +261,103 @@ export default function UnitStudyHubPage() {
     router.push(paths[mode] ?? hwBack);
   }
 
+  async function markPassageRead() {
+    if (!user || markingRead || completedModes.has('read')) return;
+    setMarkingRead(true);
+    try {
+      const { data: existing } = await supabase.from('class_homework_progress').select('mode')
+        .eq('homework_id', hwId).eq('student_id', user.id).eq('mode', 'read').maybeSingle();
+      if (!existing) {
+        const { error } = await supabase.from('class_homework_progress').insert({
+          homework_id: hwId, student_id: user.id, mode: 'read',
+        });
+        if (error) { setProgressError(error.message); setMarkingRead(false); return; }
+        void recordClassXP(user.id, classId, PASSAGE_XP, 'Reading');
+      }
+      setCompletedModes(prev => new Set([...prev, 'read']));
+    } finally {
+      setMarkingRead(false);
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="w-8 h-8 border-2 border-[var(--primary)] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (passage) {
+    const passageDone = completedModes.has('read');
+    const passageDue = dueLabel(dueDate);
+    return (
+      <div className="flex flex-col min-h-screen animate-fade-in pb-24">
+        <div className="flex items-center gap-3 px-4 pt-4 pb-2">
+          <button onClick={() => router.push(`/classes/${classId}/homework`)} className="btn-icon">←</button>
+          <div className="min-w-0">
+            {className && <p className="text-xs text-[var(--text-muted)] font-medium truncate">{className}</p>}
+            <p className="font-bold text-[var(--text)] text-sm truncate">{passage.title}</p>
+          </div>
+        </div>
+        <div className="p-3 space-y-3">
+          {progressError && (
+            <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-xl p-3 flex items-start gap-2.5">
+              <span className="text-lg shrink-0">⚠️</span>
+              <div>
+                <p className="font-bold text-red-700 dark:text-red-400 text-xs">Couldn&apos;t save progress</p>
+                <p className="text-red-600 dark:text-red-500 text-[11px] mt-0.5 break-all">{progressError}</p>
+              </div>
+            </div>
+          )}
+
+          <div
+            className="rounded-xl overflow-hidden"
+            style={{
+              background: 'var(--surface)',
+              border: passageDone ? '1.5px solid #22c55e' : '1.5px solid var(--border)',
+            }}
+          >
+            <div className="h-1" style={{ background: passageDone ? '#22c55e' : 'linear-gradient(135deg, #F59E0B, #ea580c)' }} />
+            <div className="p-4 space-y-3">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full text-white" style={{ background: passageDone ? '#22c55e' : '#F59E0B' }}>
+                  📚 Reading
+                </span>
+                <span className="text-[9px] text-[var(--text-muted)]">{passage.topic}</span>
+                {passageDone && <span className="text-[9px] font-bold text-green-500">✓ Done</span>}
+                {passageDue && (
+                  <span className={`text-[9px] font-semibold ${passageDue.overdue ? 'text-red-500' : 'text-[var(--text-muted)]'}`}>
+                    {passageDue.overdue ? '⚠️ ' : '📅 '}{passageDue.text}
+                  </span>
+                )}
+              </div>
+              <div className="text-sm text-[var(--text)] leading-relaxed whitespace-pre-line" style={{ maxHeight: '55vh', overflowY: 'auto' }}>
+                {passage.content}
+              </div>
+              <button
+                onClick={markPassageRead}
+                disabled={markingRead || passageDone}
+                className="w-full py-3 rounded-xl font-bold text-sm transition-all active:scale-[0.98] disabled:active:scale-100"
+                style={passageDone
+                  ? { background: 'rgba(34,197,94,0.12)', border: '1.5px solid rgba(34,197,94,0.35)', color: '#16a34a' }
+                  : { background: 'linear-gradient(135deg, #F59E0B, #ea580c)', color: 'white' }}
+              >
+                {passageDone ? '✓ Marked as read' : markingRead ? 'Saving…' : 'Mark as Read ✓'}
+              </button>
+            </div>
+          </div>
+
+          {passageDone && (
+            <div className="bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-xl p-2.5 flex items-center gap-2">
+              <span className="text-lg">🎉</span>
+              <div>
+                <p className="font-bold text-green-700 dark:text-green-400 text-xs">Nice work!</p>
+                <p className="text-green-600 dark:text-green-500 text-[10px] mt-0.5">You&apos;ve completed this reading assignment.</p>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     );
   }

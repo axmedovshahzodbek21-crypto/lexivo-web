@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { loadCollections, loadCEFRCollection } from '@/lib/data';
 import type { WordCollection } from '@/lib/types';
+import { readingPassages } from '@/lib/reading-data';
 
 interface FolderUnit {
   id: string;
@@ -40,6 +41,14 @@ interface CollHW {
   hwDue: string | null;
 }
 
+interface PassageHW {
+  homeworkId: string;
+  title: string;
+  topic: string;
+  hwModes: string[];
+  hwDue: string | null;
+}
+
 async function fetchCollectionByName(name: string): Promise<WordCollection | null> {
   if (name === '30 Days of Powerful Words') { const c = await loadCollections(); return c[0] ?? null; }
   if (name === '24 Vocabulary Challenge')   { const c = await loadCollections(); return c[1] ?? null; }
@@ -58,13 +67,14 @@ function dueLabel(due: string | null): { text: string; overdue: boolean } | null
   return { text: `Due ${due}`, overdue: false };
 }
 
-const MODE_ICON: Record<string, string> = { learn: '📖', flashcard: '🃏', quiz: '🧠', match: '🎯' };
+const MODE_ICON: Record<string, string> = { learn: '📖', flashcard: '🃏', quiz: '🧠', match: '🎯', read: '📚' };
 
 type CachedHW = {
   isTeacher: boolean;
   folders: AssignedFolder[];
   cwUnits: CWUnit[];
   collHwItems: CollHW[];
+  passageItems: PassageHW[];
   completedModes: Record<string, string[]>;
   totalAssigned: number;
   totalDone: number;
@@ -85,6 +95,7 @@ export default function ClassHomeworkPage() {
   const [folders, setFolders] = useState<AssignedFolder[]>(cached?.folders ?? []);
   const [cwUnits, setCwUnits] = useState<CWUnit[]>(cached?.cwUnits ?? []);
   const [collHwItems, setCollHwItems] = useState<CollHW[]>(cached?.collHwItems ?? []);
+  const [passageItems, setPassageItems] = useState<PassageHW[]>(cached?.passageItems ?? []);
   const [completedModes, setCompletedModes] = useState<Record<string, Set<string>>>(
     cached ? Object.fromEntries(Object.entries(cached.completedModes).map(([k, v]) => [k, new Set(v)])) : {}
   );
@@ -112,7 +123,7 @@ export default function ClassHomeworkPage() {
     const [assignsRes, cwUnitRes, hwRes] = await Promise.all([
       supabase.from('class_library_assignments').select('id, folder_id, teacher_folders(id, name)').eq('class_id', id),
       supabase.from('class_word_units').select('id, name, class_words(count)').eq('class_id', id).order('created_at'),
-      supabase.from('class_homework').select('id, unit_id, class_unit_id, collection_name, day_number, modes, due_date, student_ids').eq('class_id', id),
+      supabase.from('class_homework').select('id, unit_id, class_unit_id, collection_name, day_number, passage_id, modes, due_date, student_ids').eq('class_id', id),
     ]);
 
     const assigns = (assignsRes.data ?? []) as any[];
@@ -127,10 +138,12 @@ export default function ClassHomeworkPage() {
     const hwByLibUnit: Record<string, any> = {};
     const hwByCWUnit: Record<string, any> = {};
     const collHwRows: any[] = [];
+    const passageHwRows: any[] = [];
     for (const h of applicableHw) {
       if (h.unit_id) hwByLibUnit[h.unit_id] = h;
       else if (h.class_unit_id) hwByCWUnit[h.class_unit_id] = h;
       else if (h.collection_name) collHwRows.push(h);
+      else if (h.passage_id != null) passageHwRows.push(h);
     }
 
     const hwIds = applicableHw.map(h => h.id);
@@ -208,6 +221,18 @@ export default function ClassHomeworkPage() {
       }
     }
 
+    // Reading passages
+    const passageBuilt: PassageHW[] = passageHwRows.map((h: any) => {
+      const found = readingPassages.find(p => p.id === (h.passage_id as number));
+      return {
+        homeworkId: h.id,
+        title: found?.title ?? 'Reading Passage',
+        topic: found?.topic ?? '',
+        hwModes: (h.modes as string[]) ?? ['read'],
+        hwDue: (h.due_date as string | null) ?? null,
+      };
+    });
+
     // Totals
     let assigned = 0, done = 0;
     for (const f of built) {
@@ -226,12 +251,17 @@ export default function ClassHomeworkPage() {
       assigned++;
       if (h.hwModes.every(m => (modeMap[h.id] ?? new Set()).has(m))) done++;
     }
+    for (const p of passageBuilt) {
+      assigned++;
+      if (p.hwModes.every(m => (modeMap[p.homeworkId] ?? new Set()).has(m))) done++;
+    }
 
     if (cacheKey) _cache[cacheKey] = {
       isTeacher: false,
       folders: built,
       cwUnits: builtCW,
       collHwItems: collItems,
+      passageItems: passageBuilt,
       completedModes: Object.fromEntries(Object.entries(modeMap).map(([k, v]) => [k, [...v]])),
       totalAssigned: assigned,
       totalDone: done,
@@ -240,6 +270,7 @@ export default function ClassHomeworkPage() {
     setFolders(built);
     setCwUnits(builtCW);
     setCollHwItems(collItems);
+    setPassageItems(passageBuilt);
     setCompletedModes(modeMap);
     setTotalAssigned(assigned);
     setTotalDone(done);
@@ -307,7 +338,7 @@ export default function ClassHomeworkPage() {
         )}
 
         {/* Empty */}
-        {folders.length === 0 && cwUnits.length === 0 && collFolders.length === 0 && (
+        {folders.length === 0 && cwUnits.length === 0 && collFolders.length === 0 && passageItems.length === 0 && (
           <div className="flex flex-col items-center justify-center py-20 gap-3 text-center">
             <span className="text-5xl">📚</span>
             <p className="text-base font-bold text-[var(--text)]">No homework yet</p>
@@ -413,6 +444,61 @@ export default function ClassHomeworkPage() {
                         </div>
                         {due && (
                           <span className={`text-[10px] font-semibold ${due.overdue ? 'text-red-500' : 'text-[var(--text-muted)]'}`}>
+                            {due.text}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <svg className="w-4 h-4 text-[var(--text-muted)] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Reading passages section */}
+        {passageItems.length > 0 && (
+          <div className="mt-2">
+            <div className="flex items-center gap-2 mb-2 px-1">
+              <span className="text-xs">📚</span>
+              <p className="flex-1 text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">Reading</p>
+            </div>
+            <div className="space-y-2">
+              {passageItems.map(item => {
+                const modes = item.hwModes;
+                const completed = completedModes[item.homeworkId] ?? new Set();
+                const allDone = modes.length > 0 && modes.every(m => completed.has(m));
+                const due = dueLabel(item.hwDue);
+                return (
+                  <button
+                    key={item.homeworkId}
+                    onClick={() => router.push(`/classes/${id}/homework/${item.homeworkId}`)}
+                    className={`w-full flex items-center gap-3 p-4 rounded-2xl border text-left transition-all active:scale-[0.98] ${
+                      allDone
+                        ? 'bg-green-50 border-green-200 dark:bg-green-950/30 dark:border-green-800'
+                        : 'bg-[var(--surface)] border-[var(--border)] shadow-sm'
+                    }`}
+                  >
+                    <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 text-lg ${
+                      allDone ? 'bg-green-100 dark:bg-green-900/50' : 'bg-amber-50 dark:bg-amber-950/30'
+                    }`}>
+                      {allDone ? (
+                        <svg className="w-6 h-6 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                      ) : <span>📚</span>}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-sm font-bold truncate ${allDone ? 'text-green-700 dark:text-green-400' : 'text-[var(--text)]'}`}>
+                        {item.title}
+                      </p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-[11px] text-[var(--text-muted)] truncate">{item.topic}</span>
+                        {due && (
+                          <span className={`text-[10px] font-semibold shrink-0 ${due.overdue ? 'text-red-500' : 'text-[var(--text-muted)]'}`}>
                             {due.text}
                           </span>
                         )}
