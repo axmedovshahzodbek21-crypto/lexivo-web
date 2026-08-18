@@ -78,10 +78,14 @@ export async function pushStats(): Promise<void> {
     // merge already applied on pull. Without this, a device pushing a lower
     // (stale) locally-computed total after another device already pushed a
     // higher one would silently erase the other device's earned XP/streak.
-    const { data: cloudRow } = await supabase.from('user_data').select('total_xp, streak, streak_freezes').eq('id', uid).maybeSingle();
+    //
+    // Freezes are NOT included in this max() — they're spendable, so a
+    // device pushing right after spending one needs its lower local value to
+    // win outright, not lose to max() against a stale higher cloud value.
+    const { data: cloudRow } = await supabase.from('user_data').select('total_xp, streak').eq('id', uid).maybeSingle();
     const xp = Math.max(lsJSON<number>('lexivo_xp', 0), cloudRow?.total_xp ?? 0);
     const streak = Math.max(lsJSON<number>('lexivo_streak', 0), cloudRow?.streak ?? 0);
-    const freezes = Math.max(lsJSON<number>('lexivo_freezes', 0), cloudRow?.streak_freezes ?? 0);
+    const freezes = lsJSON<number>('lexivo_freezes', 0);
 
     const studyDays = lsJSON<string[]>('lexivo_study_days', []);
     const reviewDays = lsJSON<string[]>('lexivo_review_days', []);
@@ -267,10 +271,12 @@ export async function pullAll(): Promise<void> {
     const localStatsTs = lsGet(S.statTs);
     const cloudStatsNewer = cloudStatsTs > localStatsTs;
 
-    // Accumulators: always take max
+    // Accumulators: always take max. Freezes are NOT one of these — they're
+    // spendable (can legitimately decrease), so max() would resurrect a
+    // freeze that was already spent on another device the moment a stale
+    // higher cloud/local value gets pulled. Merged by timestamp below instead.
     lsSet('lexivo_xp', JSON.stringify(Math.max(lsJSON<number>('lexivo_xp', 0), row.total_xp ?? 0)));
     lsSet('lexivo_streak', JSON.stringify(Math.max(lsJSON<number>('lexivo_streak', 0), row.streak ?? 0)));
-    lsSet('lexivo_freezes', JSON.stringify(Math.max(lsJSON<number>('lexivo_freezes', 0), row.streak_freezes ?? 0)));
 
     // Daily accumulators: always take max regardless of which side has newer timestamp
     const today = localDateStr();
@@ -290,6 +296,7 @@ export async function pullAll(): Promise<void> {
         lsSet('lexivo_last_study', row.last_study_date);
       }
       if (row.last_freeze_week) lsSet('lexivo_last_freeze_week', row.last_freeze_week);
+      if (row.streak_freezes != null) lsSet('lexivo_freezes', JSON.stringify(row.streak_freezes));
       lsSet(S.statTs, cloudStatsTs);
     }
 
