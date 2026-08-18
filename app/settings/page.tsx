@@ -167,7 +167,7 @@ export default function SettingsPage() {
         'lexivo_unit_done_days', 'lexivo_review_log', 'lexivo_srs_last_review',
         'lexivo_freezes', 'lexivo_last_freeze_week', 'lexivo_streak_bonus_date',
         'lexivo_hard_words', 'lexivo_flash_xp_units', 'lexivo_quiz_xp_units',
-        'lexivo_match_xp_units',
+        'lexivo_match_xp_units', 'lexivo_focus_days', 'lexivo_focus_updated_at',
         'lexivo_sync_stat_ts', 'lexivo_sync_settings_ts', 'lexivo_sync_lists_ts',
         'lexivo_achievements', 'lexivo_achievement_dates',
       ];
@@ -195,6 +195,7 @@ export default function SettingsPage() {
           hard_words: [], study_days: [], review_days: [],
           word_goal_days: [], unit_done_days: [], xp_history: [],
           unit_progress: {}, my_unit_progress: {}, review_log: {},
+          focus_days: {},
           // Deliberately NOT clearing imported_words — Reset Progress undoes
           // learning progress, not vocabulary the user typed in themselves.
           achievements: [], lists_updated_at: ts,
