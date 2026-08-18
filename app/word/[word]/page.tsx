@@ -8,7 +8,7 @@ import { speak } from '@/lib/speech';
 import {
   toggleStarred, isStarred, addHardWord, removeHardWord, getHardWords,
   getLearnedWords, getSRSWords, getCustomLists, addWordToList, removeWordFromList, isWordInList,
-  saveCustomList, getReviewLog, addDaysToDateStr,
+  saveCustomList, getReviewLog, addDaysToDateStr, getSRSLastReview,
 } from '@/lib/storage';
 import { pushLists } from '@/lib/sync';
 import { SRS_INTERVALS } from '@/lib/types';
@@ -71,9 +71,10 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
       setLearnedAt(learned?.learnedAt ?? null);
       const srs = getSRSWords().find(s => s.word === found.word);
       if (srs) {
-        const completed = getReviewLog()[srs.learnedAt] ?? [];
+        const completed = getReviewLog()[srs.id] ?? [];
         const nextInterval = SRS_INTERVALS.find(i => !completed.includes(i));
-        const nextReview = nextInterval ? addDaysToDateStr(srs.learnedAt, nextInterval) : 'Graduated';
+        const baseDate = getSRSLastReview()[srs.id] ?? srs.learnedAt;
+        const nextReview = nextInterval ? addDaysToDateStr(baseDate, nextInterval) : 'Graduated';
         setSrsInfo({ completedCount: completed.length, nextReview });
       }
     }
