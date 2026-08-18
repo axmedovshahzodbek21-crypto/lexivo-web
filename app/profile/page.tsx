@@ -172,7 +172,7 @@ export default function ProfilePage() {
   async function handleDeleteAccount() {
     setDeleting(true);
     setDeleteError(null);
-    const { error } = await supabase.rpc('delete_user');
+    const { error } = await supabase.rpc('delete_own_account');
     if (error) {
       setDeleteError(error.message);
       setDeleting(false);
