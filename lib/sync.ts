@@ -90,47 +90,31 @@ export async function pushStats(): Promise<void> {
     const studyDays = lsJSON<string[]>('lexivo_study_days', []);
     const reviewDays = lsJSON<string[]>('lexivo_review_days', []);
     const wordGoalDays = lsJSON<string[]>('lexivo_word_goal_days', []);
-    await Promise.all([
-      supabase.from('user_data').upsert({
-        id: uid,
-        total_xp:            xp,
-        streak:              streak,
-        streak_freezes:      freezes,
-        last_study_date:     lsGet('lexivo_last_study') || null,
-        last_freeze_week:    lsGet('lexivo_last_freeze_week') || null,
-        show_on_leaderboard: s.showOnLeaderboard ?? true,
-        ...(todayXpDate === today ? {
-          today_xp:      lsJSON<number>('lexivo_today_xp', 0),
-          today_xp_date: today,
-        } : {}),
-        ...(todayCountDate === today ? {
-          daily_words_learned: lsJSON<number>('lexivo_today_count', 0),
-          daily_words_date:    today,
-        } : {}),
-        stats_updated_at:    ts,
-      }),
-      supabase.from('user_stats').upsert({
-        id:               uid,
-        xp:               xp,
-        streak:           streak,
-        freezes:          freezes,
-        last_study_date:  lsGet('lexivo_last_study') || null,
-        last_freeze_week: lsGet('lexivo_last_freeze_week') || null,
-        total_days:       studyDays.length,
-        study_days:       studyDays,
-        review_days:      reviewDays,
-        word_goal_days:   wordGoalDays,
-        ...(todayXpDate === today ? {
-          today_xp:      lsJSON<number>('lexivo_today_xp', 0),
-          today_xp_date: today,
-        } : {}),
-        ...(todayCountDate === today ? {
-          today_count:      lsJSON<number>('lexivo_today_count', 0),
-          today_count_date: today,
-        } : {}),
-        xp_updated_at:    ts,
-      }),
-    ]);
+    // user_stats (the leaderboard's read source) is no longer written
+    // directly — a trigger on user_data derives it in the same transaction,
+    // so the two can't diverge on a partial failure the way two separate
+    // client upserts could.
+    await supabase.from('user_data').upsert({
+      id: uid,
+      total_xp:            xp,
+      streak:              streak,
+      streak_freezes:      freezes,
+      last_study_date:     lsGet('lexivo_last_study') || null,
+      last_freeze_week:    lsGet('lexivo_last_freeze_week') || null,
+      show_on_leaderboard: s.showOnLeaderboard ?? true,
+      study_days:          studyDays,
+      review_days:         reviewDays,
+      word_goal_days:      wordGoalDays,
+      ...(todayXpDate === today ? {
+        today_xp:      lsJSON<number>('lexivo_today_xp', 0),
+        today_xp_date: today,
+      } : {}),
+      ...(todayCountDate === today ? {
+        daily_words_learned: lsJSON<number>('lexivo_today_count', 0),
+        daily_words_date:    today,
+      } : {}),
+      stats_updated_at:    ts,
+    });
     lsSet('lexivo_xp', JSON.stringify(xp));
     lsSet('lexivo_streak', JSON.stringify(streak));
     lsSet('lexivo_freezes', JSON.stringify(freezes));
