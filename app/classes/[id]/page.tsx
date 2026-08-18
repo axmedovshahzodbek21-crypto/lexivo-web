@@ -22,7 +22,7 @@ const ACTIVITY_LABEL: Record<string, string> = { learn: 'Learn', flashcard: 'Fla
 
 type SortKey = 'lastActive' | 'xp' | 'progress' | 'name';
 type FilterKey = 'all' | 'active' | 'inactive';
-type Tab = 'students' | 'activity' | 'radar' | 'analytics' | 'srs' | 'curriculum';
+type Tab = 'students' | 'activity' | 'radar' | 'analytics' | 'srs' | 'review' | 'curriculum';
 
 interface AnalyticsRow {
   student_id: string;
@@ -779,6 +779,140 @@ function SRSTab({
           </div>
         </section>
       )}
+    </div>
+  );
+}
+
+// ── Review Pattern tab ──────────────────────────────────────────────────────
+// Classifies each student's SRS Review behavior from their timestamped
+// class_xp_history entries — no new tracking needed, purely derived from
+// data already being recorded on every review action.
+
+interface ReviewEntry { user_id: string; created_at: string; }
+
+type ReviewLabel = 'never' | 'daily' | 'mostly' | 'bursty' | 'inactive';
+
+const REVIEW_LABEL_META: Record<ReviewLabel, { emoji: string; text: string; color: string; blurb: string }> = {
+  daily:    { emoji: '🟢', text: 'Daily',                  color: '#22C55E', blurb: 'Reviews on nearly every day — small, steady sessions.' },
+  mostly:   { emoji: '🟡', text: 'Mostly daily',            color: '#EAB308', blurb: 'Reviews most days, with the occasional gap.' },
+  bursty:   { emoji: '🟠', text: 'Bursty catch-up',         color: '#F97316', blurb: 'Reviews rarely, but does a lot at once when they do.' },
+  inactive: { emoji: '🔴', text: 'Inactive',                color: '#EF4444', blurb: 'Little to no review activity, and words are piling up.' },
+  never:    { emoji: '⚪', text: 'Never reviewed',          color: '#94A3B8', blurb: "Hasn't done a single SRS review yet." },
+};
+
+const REVIEW_WINDOW_DAYS = 30;
+
+function classifyReview(entries: ReviewEntry[], overdueCount: number) {
+  const today = new Date();
+  const dateKey = (d: Date) => d.toISOString().slice(0, 10);
+  const byDay = new Map<string, number>();
+  for (const e of entries) {
+    const day = e.created_at.slice(0, 10);
+    byDay.set(day, (byDay.get(day) ?? 0) + 1);
+  }
+  const days: string[] = [];
+  for (let i = REVIEW_WINDOW_DAYS - 1; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    days.push(dateKey(d));
+  }
+  const daysReviewed = days.filter(d => byDay.has(d)).length;
+  const coverage = daysReviewed / REVIEW_WINDOW_DAYS;
+
+  let streak = 0;
+  for (let i = days.length - 1; i >= 0; i--) {
+    if (byDay.has(days[i])) streak++; else break;
+  }
+  let longestGap = 0, curGap = 0;
+  for (const d of days) {
+    if (byDay.has(d)) curGap = 0;
+    else { curGap++; longestGap = Math.max(longestGap, curGap); }
+  }
+  const totalReviews = entries.length;
+  const avgPerActiveDay = daysReviewed > 0 ? totalReviews / daysReviewed : 0;
+
+  let label: ReviewLabel;
+  if (totalReviews === 0) label = 'never';
+  else if (coverage >= 0.8) label = 'daily';
+  else if (coverage >= 0.4) label = 'mostly';
+  else if (daysReviewed <= 2 && overdueCount > 0) label = 'inactive';
+  else label = 'bursty';
+
+  return { daysReviewed, coverage, streak, longestGap, totalReviews, avgPerActiveDay, label };
+}
+
+function ReviewPatternTab({
+  students, reviewEntries, srsRows, loading,
+}: {
+  students: StudentRow[];
+  reviewEntries: ReviewEntry[];
+  srsRows: SRSRow[];
+  loading: boolean;
+}) {
+  if (loading) return <div className="flex justify-center py-12"><div className="text-4xl animate-bounce">🔄</div></div>;
+
+  if (students.length === 0) {
+    return (
+      <div className="card text-center py-10 space-y-2">
+        <p className="text-4xl">🔄</p>
+        <p className="text-sm text-[var(--text-muted)]">No students yet.</p>
+      </div>
+    );
+  }
+
+  const today = new Date().toISOString().slice(0, 10);
+  const entriesByStudent = new Map<string, ReviewEntry[]>();
+  for (const e of reviewEntries) {
+    if (!entriesByStudent.has(e.user_id)) entriesByStudent.set(e.user_id, []);
+    entriesByStudent.get(e.user_id)!.push(e);
+  }
+  const overdueByStudent = new Map<string, number>();
+  for (const r of srsRows) {
+    if (r.next_due < today && r.stage < 5) overdueByStudent.set(r.user_id, (overdueByStudent.get(r.user_id) ?? 0) + 1);
+  }
+
+  const rows = students.map(s => {
+    const entries = entriesByStudent.get(s.student_id) ?? [];
+    const overdue = overdueByStudent.get(s.student_id) ?? 0;
+    return { student: s, overdue, ...classifyReview(entries, overdue) };
+  });
+
+  const order: ReviewLabel[] = ['inactive', 'bursty', 'never', 'mostly', 'daily'];
+  rows.sort((a, b) => order.indexOf(a.label) - order.indexOf(b.label) || b.coverage - a.coverage);
+
+  return (
+    <div className="space-y-3">
+      <p className="text-xs text-[var(--text-muted)]">
+        Classified from each student&apos;s SRS Review activity over the last {REVIEW_WINDOW_DAYS} days. Sorted with students needing attention first.
+      </p>
+      {rows.map(r => {
+        const meta = REVIEW_LABEL_META[r.label];
+        return (
+          <div key={r.student.student_id} className="card space-y-2" style={{ borderLeft: `3px solid ${meta.color}` }}>
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <Avatar name={r.student.name} url={r.student.avatar_url} size={32} />
+                <div className="min-w-0">
+                  <p className="font-bold text-sm text-[var(--text)] truncate">{r.student.name}</p>
+                  <p className="text-[11px]" style={{ color: meta.color }}>{meta.emoji} {meta.text}</p>
+                </div>
+              </div>
+              {r.overdue > 0 && (
+                <span className="text-[10px] font-bold shrink-0 px-2 py-1 rounded-full" style={{ background: 'color-mix(in srgb, var(--danger) 12%, transparent)', color: 'var(--danger)' }}>
+                  {r.overdue} overdue
+                </span>
+              )}
+            </div>
+            <p className="text-[11px] text-[var(--text-muted)]">{meta.blurb}</p>
+            <div className="flex flex-wrap gap-x-4 gap-y-1 text-[10px] text-[var(--text-muted)]">
+              <span><b className="text-[var(--text)]">{r.daysReviewed}</b>/{REVIEW_WINDOW_DAYS} days reviewed</span>
+              <span><b className="text-[var(--text)]">{r.streak}</b> day streak</span>
+              <span>longest gap: <b className="text-[var(--text)]">{r.longestGap}</b>d</span>
+              {r.totalReviews > 0 && <span>avg <b className="text-[var(--text)]">{r.avgPerActiveDay.toFixed(1)}</b> words/active day</span>}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -1879,7 +2013,7 @@ export default function ClassDashboardPage() {
   const [notTeacher, setNotTeacher] = useState(false);
   const [tab, setTab] = useState<Tab>(() => {
     const t = searchParams.get('tab') as Tab | null;
-    return t && ['students','activity','radar','analytics','srs','curriculum'].includes(t) ? t : 'students';
+    return t && ['students','activity','radar','analytics','srs','review','curriculum'].includes(t) ? t : 'students';
   });
 
   // Sort & filter
@@ -1933,6 +2067,12 @@ export default function ClassDashboardPage() {
   const [srsNames, setSrsNames] = useState<Record<string, string>>({});
   const [srsLoading, setSrsLoading] = useState(false);
   const [srsLoaded, setSrsLoaded] = useState(false);
+
+  // Review Pattern tab
+  const [reviewEntries, setReviewEntries] = useState<ReviewEntry[]>([]);
+  const [reviewSrsRows, setReviewSrsRows] = useState<SRSRow[]>([]);
+  const [reviewLoading, setReviewLoading] = useState(false);
+  const [reviewLoaded, setReviewLoaded] = useState(false);
 
   // Streak calendar
   const [streakModal, setStreakModal] = useState<StudentRow | null>(null);
@@ -2093,6 +2233,19 @@ export default function ClassDashboardPage() {
     setSrsLoaded(true);
   };
 
+  const loadReviewPattern = async () => {
+    if (!id) return;
+    setReviewLoading(true);
+    const [{ data: xp }, { data: srs }] = await Promise.all([
+      supabase.from('class_xp_history').select('user_id, created_at').eq('class_id', id).eq('reason', 'SRS Review'),
+      supabase.from('class_srs_states').select('user_id, word, translation, stage, next_due').eq('class_id', id),
+    ]);
+    setReviewEntries((xp as ReviewEntry[]) ?? []);
+    setReviewSrsRows((srs as SRSRow[]) ?? []);
+    setReviewLoading(false);
+    setReviewLoaded(true);
+  };
+
   const load = async () => {
     if (!user || !id) return;
     const cacheKey = `${user.id}:${id}`;
@@ -2137,6 +2290,7 @@ export default function ClassDashboardPage() {
     return () => clearInterval(id30s);
   }, [tab]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (tab === 'srs' && !srsLoaded) loadSRS(); }, [tab]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (tab === 'review' && !reviewLoaded) loadReviewPattern(); }, [tab]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!streakModal || !id) return;
     setStreakLoading(true);
@@ -2304,7 +2458,7 @@ export default function ClassDashboardPage() {
       {/* Tab switcher */}
       {!loading && (
         <div className="flex overflow-x-auto border-b border-[var(--border)]">
-          {(['students', 'activity', 'radar', 'analytics', 'srs', 'curriculum'] as Tab[]).map(t => (
+          {(['students', 'activity', 'radar', 'analytics', 'srs', 'review', 'curriculum'] as Tab[]).map(t => (
             <button
               key={t}
               onClick={() => setTab(t)}
@@ -2314,8 +2468,8 @@ export default function ClassDashboardPage() {
                   : 'text-[var(--text-muted)] hover:text-[var(--text)]'
               }`}
             >
-              {t === 'students' ? '👥' : t === 'activity' ? '📡' : t === 'radar' ? '🎯' : t === 'analytics' ? '📊' : t === 'srs' ? '📚' : '📋'}
-              {' '}{t === 'students' ? 'Students' : t === 'activity' ? 'Activity' : t === 'radar' ? 'Radar' : t === 'analytics' ? 'Analytics' : t === 'srs' ? 'SRS' : 'Curriculum'}
+              {t === 'students' ? '👥' : t === 'activity' ? '📡' : t === 'radar' ? '🎯' : t === 'analytics' ? '📊' : t === 'srs' ? '📚' : t === 'review' ? '🔄' : '📋'}
+              {' '}{t === 'students' ? 'Students' : t === 'activity' ? 'Activity' : t === 'radar' ? 'Radar' : t === 'analytics' ? 'Analytics' : t === 'srs' ? 'SRS' : t === 'review' ? 'Review' : 'Curriculum'}
             </button>
           ))}
         </div>
@@ -2497,6 +2651,15 @@ export default function ClassDashboardPage() {
             hardWordsRaw={hardWordsRaw}
             srsNames={srsNames}
             loading={srsLoading}
+          />
+
+        ) : tab === 'review' ? (
+          /* ── Review Pattern tab ── */
+          <ReviewPatternTab
+            students={students}
+            reviewEntries={reviewEntries}
+            srsRows={reviewSrsRows}
+            loading={reviewLoading}
           />
 
         ) : tab === 'curriculum' ? (
