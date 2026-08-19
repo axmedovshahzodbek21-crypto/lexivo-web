@@ -461,7 +461,11 @@ export default function ClassWordsPage() {
 
   const deleteWord = async (wordId: string) => {
     if (!confirm('Delete this word?')) return;
-    await supabase.from('class_words').delete().eq('id', wordId);
+    // class_id scopes the delete to this class as defense-in-depth — RLS is
+    // the real backstop, but a bare .eq('id', wordId) here would let a
+    // misconfigured policy delete any class_words row by id regardless of
+    // which class it belongs to.
+    await supabase.from('class_words').delete().eq('id', wordId).eq('class_id', id);
     setWords(prev => {
       const next = prev.filter(w => w.id !== wordId);
       const c = _wordsCache.get(id); if (c) _wordsCache.set(id, { ...c, words: next });

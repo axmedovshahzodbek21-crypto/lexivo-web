@@ -1054,7 +1054,7 @@ function CurriculumTab({
 
   const unassignFolder = async (assignmentId: string) => {
     if (!confirm('Remove this folder from the class? Students will lose access to its units.')) return;
-    await supabase.from('class_library_assignments').delete().eq('id', assignmentId);
+    await supabase.from('class_library_assignments').delete().eq('id', assignmentId).eq('class_id', classId);
     await loadCurriculum();
   };
 
@@ -1134,7 +1134,7 @@ function CurriculumTab({
 
   const deleteCWUnit = async (unit: CurrWordUnit) => {
     if (!confirm(`Delete unit "${unit.name}"? Words will remain but lose their unit assignment.`)) return;
-    await supabase.from('class_word_units').delete().eq('id', unit.id);
+    await supabase.from('class_word_units').delete().eq('id', unit.id).eq('class_id', classId);
     await loadCurriculum();
   };
 
@@ -1180,7 +1180,7 @@ function CurriculumTab({
   const deleteHomework = async () => {
     if (!hwDetail) return;
     setHwDeleting(true);
-    await supabase.from('class_homework').delete().eq('id', hwDetail.id);
+    await supabase.from('class_homework').delete().eq('id', hwDetail.id).eq('class_id', classId);
     setHwDetail(null);
     setHwDeleteConfirm(false);
     setHwDeleting(false);
@@ -2139,7 +2139,7 @@ export default function ClassDashboardPage() {
 
   const deleteAnnouncement = async (announcementId: string) => {
     if (!confirm('Delete this announcement?')) return;
-    await supabase.from('class_announcements').delete().eq('id', announcementId);
+    await supabase.from('class_announcements').delete().eq('id', announcementId).eq('class_id', id);
     setAnnouncements(prev => prev.filter(a => a.id !== announcementId));
   };
 
@@ -2337,7 +2337,7 @@ export default function ClassDashboardPage() {
 
   const deleteTarget = async (targetId: string) => {
     if (!confirm('Delete this target?')) return;
-    await supabase.from('class_targets').delete().eq('id', targetId);
+    await supabase.from('class_targets').delete().eq('id', targetId).eq('class_id', id);
     await loadTargets();
   };
 
