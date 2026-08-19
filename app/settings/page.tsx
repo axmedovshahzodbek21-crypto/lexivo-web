@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { getSettings, saveSettings, setUILanguage, resetOnboarded, saveNameUpdatedAt, saveLevelUpdatedAt, saveSettingsUpdatedAt, clearUserData, resetMyWordsProgress } from '@/lib/storage';
+import { getSettings, saveSettings, setUILanguage, resetOnboarded, saveNameUpdatedAt, saveLevelUpdatedAt, saveSettingsUpdatedAt, clearUserData, resetMyWordsProgress, PROGRESS_RESET_KEYS, PROGRESS_RESET_PREFIXES } from '@/lib/storage';
 import { pushSettings } from '@/lib/sync';
 import { getTheme, setTheme, type Theme } from '@/lib/theme';
 import { supabase } from '@/lib/supabase';
@@ -181,25 +181,11 @@ export default function SettingsPage() {
     setResetLoading(true);
     setResetError('');
     try {
-      const progressKeys = [
-        'lexivo_learned_words', 'lexivo_srs_words', 'lexivo_starred',
-        'lexivo_xp', 'lexivo_xp_updated_at', 'lexivo_xp_history',
-        'lexivo_today_xp', 'lexivo_today_xp_date',
-        'lexivo_today_count', 'lexivo_today_count_date',
-        'lexivo_streak', 'lexivo_last_study', 'lexivo_total_study_days',
-        'lexivo_study_days', 'lexivo_review_days', 'lexivo_word_goal_days',
-        'lexivo_unit_done_days', 'lexivo_review_log', 'lexivo_srs_last_review',
-        'lexivo_freezes', 'lexivo_last_freeze_week', 'lexivo_streak_bonus_date',
-        'lexivo_hard_words', 'lexivo_flash_xp_units', 'lexivo_quiz_xp_units',
-        'lexivo_match_xp_units', 'lexivo_focus_days', 'lexivo_focus_updated_at',
-        'lexivo_sync_stat_ts', 'lexivo_sync_settings_ts', 'lexivo_sync_lists_ts',
-        'lexivo_achievements', 'lexivo_achievement_dates',
-      ];
-      progressKeys.forEach(k => localStorage.removeItem(k));
+      PROGRESS_RESET_KEYS.forEach(k => localStorage.removeItem(k));
       const toRemove: string[] = [];
       for (let i = 0; i < localStorage.length; i++) {
         const k = localStorage.key(i);
-        if (k?.startsWith('lexivo_unit_progress_')) toRemove.push(k);
+        if (k && PROGRESS_RESET_PREFIXES.some(p => k.startsWith(p))) toRemove.push(k);
       }
       toRemove.forEach(k => localStorage.removeItem(k));
       resetMyWordsProgress(); // also clears lexivo_my_unit_progress_* and lexivo_my_words_xp_units

@@ -61,6 +61,31 @@ const KEYS = {
   focusUpdatedAt:    'lexivo_focus_updated_at',
 };
 
+// The exact set of localStorage keys Reset Progress clears — shared between
+// this device's own reset (app/settings/page.tsx) and the cross-device
+// reset-propagation path (lib/sync.ts's pullAll) so the two can't drift
+// apart. The propagation path previously deleted every lexivo_ key except a
+// 3-key allowlist, which included lexivo_imported_words — wiping a synced
+// device's My Words vocabulary even though Reset Progress is deliberately
+// supposed to preserve it (see the "Deliberately NOT clearing
+// imported_words" comment in handleResetProgress).
+export const PROGRESS_RESET_KEYS = [
+  'lexivo_learned_words', 'lexivo_srs_words', 'lexivo_starred',
+  'lexivo_xp', 'lexivo_xp_updated_at', 'lexivo_xp_history',
+  'lexivo_today_xp', 'lexivo_today_xp_date',
+  'lexivo_today_count', 'lexivo_today_count_date',
+  'lexivo_streak', 'lexivo_last_study', 'lexivo_total_study_days',
+  'lexivo_study_days', 'lexivo_review_days', 'lexivo_word_goal_days',
+  'lexivo_unit_done_days', 'lexivo_review_log', 'lexivo_srs_last_review',
+  'lexivo_freezes', 'lexivo_last_freeze_week', 'lexivo_streak_bonus_date',
+  'lexivo_hard_words', 'lexivo_flash_xp_units', 'lexivo_quiz_xp_units',
+  'lexivo_match_xp_units', 'lexivo_focus_days', 'lexivo_focus_updated_at',
+  'lexivo_sync_stat_ts', 'lexivo_sync_settings_ts', 'lexivo_sync_lists_ts',
+  'lexivo_achievements', 'lexivo_achievement_dates',
+];
+
+export const PROGRESS_RESET_PREFIXES = ['lexivo_unit_progress_'];
+
 function get<T>(key: string, fallback: T): T {
   if (typeof window === 'undefined') return fallback;
   try {

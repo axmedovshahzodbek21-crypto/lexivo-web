@@ -1,6 +1,6 @@
 import { supabase } from './supabase';
 import type { UserSettings, LearnedWord, SRSWord, UnitProgress, MyUnitProgress } from './types';
-import { getSettings, saveSettings, getLearnedWords, getLearnedWordsRaw, getSRSWordsRaw, getImportedWordsRaw, localDateStr, getProfilePicUrl, saveProfilePicUrl } from './storage';
+import { getSettings, saveSettings, getLearnedWords, getLearnedWordsRaw, getSRSWordsRaw, getImportedWordsRaw, localDateStr, getProfilePicUrl, saveProfilePicUrl, resetMyWordsProgress, PROGRESS_RESET_KEYS, PROGRESS_RESET_PREFIXES } from './storage';
 import type { HardWordEntry } from './storage';
 import { getNotifSettings, saveNotifSettings } from './notifications';
 
@@ -236,18 +236,22 @@ export async function pullAll(): Promise<void> {
     }
 
     // Cross-device reset: cloud carries a newer reset_at — clear local data
-    // instead of pushing old data back overtop the reset.
+    // instead of pushing old data back overtop the reset. Uses the exact
+    // same key set as this device's own Reset Progress (PROGRESS_RESET_KEYS,
+    // shared with app/settings/page.tsx) instead of deleting every lexivo_
+    // key — that previously wiped settings and imported_words too, even
+    // though Reset Progress is supposed to preserve both.
     const cloudResetAt = (row.reset_at as string) ?? '';
     const localResetAt = lsGet('lexivo_last_reset_at');
     if (cloudResetAt && cloudResetAt > localResetAt) {
+      PROGRESS_RESET_KEYS.forEach(k => localStorage.removeItem(k));
       const toRemove: string[] = [];
       for (let i = 0; i < localStorage.length; i++) {
-        const k = localStorage.key(i)!;
-        if (k.startsWith('lexivo_') && k !== 'lexivo_ui_lang' && k !== 'lexivo_last_reset_at' && k !== 'lexivo_onboarded') {
-          toRemove.push(k);
-        }
+        const k = localStorage.key(i);
+        if (k && PROGRESS_RESET_PREFIXES.some(p => k.startsWith(p))) toRemove.push(k);
       }
       toRemove.forEach(k => localStorage.removeItem(k));
+      resetMyWordsProgress();
       lsSet('lexivo_last_reset_at', cloudResetAt);
       return;
     }
