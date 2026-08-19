@@ -1155,12 +1155,19 @@ function CurriculumTab({
   const saveManageWords = async () => {
     if (!cwWordsMgr) return;
     setCwWordsSaving(true);
+    const toAdd: string[] = [];
+    const toRemove: string[] = [];
     for (const w of cwWordsAll) {
       const shouldBe = cwWordsPending[w.id] ?? false;
       const isMember = w.unitId === cwWordsMgr.id;
-      if (shouldBe && !isMember) await supabase.from('class_words').update({ unit_id: cwWordsMgr.id }).eq('id', w.id);
-      else if (!shouldBe && isMember) await supabase.from('class_words').update({ unit_id: null }).eq('id', w.id);
+      if (shouldBe && !isMember) toAdd.push(w.id);
+      else if (!shouldBe && isMember) toRemove.push(w.id);
     }
+    // Batched into at most 2 queries instead of one update per changed word.
+    await Promise.all([
+      toAdd.length > 0 ? supabase.from('class_words').update({ unit_id: cwWordsMgr.id }).in('id', toAdd) : null,
+      toRemove.length > 0 ? supabase.from('class_words').update({ unit_id: null }).in('id', toRemove) : null,
+    ]);
     setCwWordsSaving(false);
     setCwWordsMgr(null);
     await loadCurriculum();
