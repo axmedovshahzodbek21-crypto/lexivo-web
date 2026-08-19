@@ -358,18 +358,34 @@ export default function ReadingPage() {
     window.scrollTo(0, 0);
   };
 
+  const surpriseTimeoutRef = useRef<number | null>(null);
+  const surpriseCancelledRef = useRef(false);
+
+  // Navigating away mid-shuffle otherwise let the recursive setTimeout chain
+  // keep running and eventually call openPassage() — an unexpected
+  // navigation on a page the user already left, plus setState on an
+  // unmounted component.
+  useEffect(() => {
+    return () => {
+      surpriseCancelledRef.current = true;
+      if (surpriseTimeoutRef.current !== null) window.clearTimeout(surpriseTimeoutRef.current);
+    };
+  }, []);
+
   const surpriseMe = () => {
     if (surpriseShuffling) return;
     const unvisited = readingPassages.filter(p => !visited.has(p.id));
     const pool = unvisited.length > 0 ? unvisited : readingPassages;
     if (pool.length === 0) return;
 
+    surpriseCancelledRef.current = false;
     setSurpriseShuffling(true);
     const { item: finalPassage, index: finalIndex } = pickRandom(pool, surpriseLastIndexRef.current);
     surpriseLastIndexRef.current = finalIndex;
 
     let tick = 0;
     const runTick = () => {
+      if (surpriseCancelledRef.current) return;
       tick += 1;
       const isLast = tick >= SURPRISE_TICKS;
       const progress = tick / SURPRISE_TICKS;
@@ -378,7 +394,8 @@ export default function ReadingPage() {
 
       if (isLast) {
         playShuffleReveal();
-        window.setTimeout(() => {
+        surpriseTimeoutRef.current = window.setTimeout(() => {
+          if (surpriseCancelledRef.current) return;
           setSurpriseShuffling(false);
           setSurpriseShown(null);
           openPassage(finalPassage);
@@ -388,7 +405,7 @@ export default function ReadingPage() {
 
       playShuffleTick(1 + progress * 0.5);
       const delay = 70 + progress * progress * 260;
-      window.setTimeout(runTick, delay);
+      surpriseTimeoutRef.current = window.setTimeout(runTick, delay);
     };
     runTick();
   };

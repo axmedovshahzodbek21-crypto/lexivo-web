@@ -43,6 +43,8 @@ export default function SpeakingPage() {
   const [phase, setPhase] = useState<'idle' | 'prep' | 'speak' | 'done'>('idle');
   const [secondsLeft, setSecondsLeft] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const spinTimeoutRef = useRef<number | null>(null);
+  const spinCancelledRef = useRef(false);
 
   const clearTimer = () => {
     if (timerRef.current) {
@@ -52,6 +54,15 @@ export default function SpeakingPage() {
   };
 
   useEffect(() => clearTimer, []);
+
+  // Navigating away mid-spin otherwise let the recursive setTimeout chain
+  // keep running and call setState on this unmounted page.
+  useEffect(() => {
+    return () => {
+      spinCancelledRef.current = true;
+      if (spinTimeoutRef.current !== null) window.clearTimeout(spinTimeoutRef.current);
+    };
+  }, []);
 
   // Restore where the student left off after a hard refresh (state otherwise resets to nothing).
   useEffect(() => {
@@ -88,6 +99,7 @@ export default function SpeakingPage() {
   function runSpin() {
     if (!pool || pool.length === 0) return;
     clearTimer();
+    spinCancelledRef.current = false;
     setPhase('idle');
     setSecondsLeft(0);
     setSpinning(true);
@@ -99,6 +111,7 @@ export default function SpeakingPage() {
 
     let tick = 0;
     const runTick = () => {
+      if (spinCancelledRef.current) return;
       tick += 1;
       const isLast = tick >= SPIN_TICKS;
       const progress = tick / SPIN_TICKS;
@@ -125,7 +138,7 @@ export default function SpeakingPage() {
 
       // Decelerate: ticks start moderate (90ms) and slow down toward the end (~2.9s total)
       const delay = 90 + progress * progress * 420;
-      window.setTimeout(runTick, delay);
+      spinTimeoutRef.current = window.setTimeout(runTick, delay);
     };
     runTick();
   }
