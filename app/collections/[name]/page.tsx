@@ -87,7 +87,7 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
       ? allRows.filter(r => r.progress.learnDone && r.progress.flashcardDone && r.progress.quizDone)
       : allRows;
     setUnits(rows);
-  }, [collectionsLoaded, collections, collectionName]);
+  }, [collectionsLoaded, collections, collectionName, doneOnly]);
 
   useEffect(() => {
     if (!collection) return;
