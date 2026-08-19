@@ -119,7 +119,9 @@ export async function pushStats(): Promise<void> {
     lsSet('lexivo_streak', JSON.stringify(streak));
     lsSet('lexivo_freezes', JSON.stringify(freezes));
     lsSet(S.statTs, ts);
-  } catch {}
+  } catch (e) {
+    console.error('[sync] pushStats failed:', e);
+  }
 }
 
 export async function pushSettings(): Promise<void> {
@@ -153,7 +155,9 @@ export async function pushSettings(): Promise<void> {
       }),
     ]);
     lsSet(S.settingsTs, ts);
-  } catch {}
+  } catch (e) {
+    console.error('[sync] pushSettings failed:', e);
+  }
 }
 
 export async function pushLists(): Promise<void> {
@@ -207,7 +211,9 @@ export async function pushLists(): Promise<void> {
     }
     await Promise.all(promises);
     lsSet(S.listsTs, ts);
-  } catch {}
+  } catch (e) {
+    console.error('[sync] pushLists failed:', e);
+  }
 }
 
 export async function pushAll(): Promise<void> {
@@ -316,7 +322,9 @@ export async function pullAll(): Promise<void> {
     }
 
     mergeListsFromCloudRow(row);
-  } catch {}
+  } catch (e) {
+    console.error('[sync] pullAll failed:', e);
+  }
 }
 
 // Merges every list-type field from a cloud `user_data` row into local
@@ -562,5 +570,7 @@ function mergeListsFromCloudRow(row: Record<string, unknown>): void {
       }
       if (changed) lsSet('lexivo_imported_words', JSON.stringify(Array.from(byKey.values())));
     }
-  } catch {}
+  } catch (e) {
+    console.error('[sync] mergeListsFromCloudRow failed:', e);
+  }
 }
