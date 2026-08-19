@@ -1320,9 +1320,18 @@ export function addImportedWords(words: ImportedWord[], collectionName: string, 
   const live = raw.filter(w => !w.deletedAt);
   const slots = Math.max(0, MAX_IMPORTED_WORDS - live.length);
   if (slots === 0) return;
-  // Dedupe against live words only — re-importing a word that was previously
-  // deleted (a tombstone) is allowed, so it comes back as a fresh entry.
-  const existingSet = new Set(live.map(w => w.word.toLowerCase().trim()));
+  // Dedupe against live words in this same collection/folder only — matching
+  // how deleteImportedWord identifies a word by (word, collectionName,
+  // folderName). Checking the word alone across every collection/folder
+  // meant importing "apple" into Folder B silently dropped it if "apple"
+  // already existed anywhere else in My Words, with no indication to the
+  // user that it was skipped. Re-importing a word that was previously
+  // deleted (a tombstone) is still allowed, so it comes back as a fresh entry.
+  const existingSet = new Set(
+    live
+      .filter(w => w.collectionName === collectionName && w.folderName === folderName)
+      .map(w => w.word.toLowerCase().trim())
+  );
   const fresh = words
     .filter(w => w.word?.trim() && !existingSet.has(w.word.toLowerCase().trim()))
     .slice(0, slots)
