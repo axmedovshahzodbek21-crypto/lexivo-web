@@ -58,12 +58,17 @@ async function grantLearnReward(
     if (opts.classIdParam) {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        // Inserts the SRS row and awards XP atomically server-side, so a
-        // tampered client can't replay this call against an already-learned
-        // word for repeat XP — see record_class_word_learned in
-        // supabase/migrations. isNew reflects Postgres's own dedup check,
-        // not a client assertion.
-        isNew = await recordClassWordLearned(user.id, opts.classIdParam, word.word, word.translation, getLearnXPAmount());
+        try {
+          // Inserts the SRS row and awards XP atomically server-side, so a
+          // tampered client can't replay this call against an already-learned
+          // word for repeat XP — see record_class_word_learned in
+          // supabase/migrations. isNew reflects Postgres's own dedup check,
+          // not a client assertion.
+          isNew = await recordClassWordLearned(user.id, opts.classIdParam, word.word, word.translation, getLearnXPAmount());
+        } catch {
+          // Sync failed (network/RPC) — don't strand the student on this
+          // card; the lesson still advances, just without server credit.
+        }
       }
     }
   } else {
