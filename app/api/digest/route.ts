@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-);
+if (!process.env.ANTHROPIC_API_KEY) {
+  throw new Error('Missing ANTHROPIC_API_KEY env var — check .env.local (or the deployment\'s environment variables) and redeploy.');
+}
+const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 // Max one digest request per teacher per minute. Keyed by authenticated user
 // id (not the caller-supplied classId), so it can't be bypassed by varying

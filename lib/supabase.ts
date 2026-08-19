@@ -1,6 +1,14 @@
 import { createClient } from '@supabase/supabase-js';
 
-const url  = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const key  = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+if (!url || !key) {
+  throw new Error(
+    'Missing Supabase env vars: NEXT_PUBLIC_SUPABASE_URL and/or ' +
+    'NEXT_PUBLIC_SUPABASE_ANON_KEY are not set. Check .env.local ' +
+    '(or the deployment\'s environment variables) and redeploy.'
+  );
+}
 
 export const supabase = createClient(url, key);

@@ -1,14 +1,9 @@
 import { NextRequest, NextResponse, after } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 
 const BOT_TOKEN      = process.env.TELEGRAM_BOT_TOKEN;
 const OWNER_ID       = process.env.TELEGRAM_OWNER_ID ?? '8639830756';
 const WEBHOOK_SECRET = process.env.TELEGRAM_WEBHOOK_SECRET;
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-);
 
 // In-memory dedup: ignore retried updates from Telegram within the same instance lifetime.
 // Cross-instance retries are harmless because we always return 200 — Telegram's 48-hour
