@@ -60,25 +60,33 @@ function daysBetween(fromDateStr: string, toDateStr: string): number {
   return Math.round((b.getTime() - a.getTime()) / 86400000);
 }
 
-// Called when a student marks a class word as learned.
-// Uses ignoreDuplicates so re-learning doesn't reset an existing SRS stage.
-export async function initClassSRSWord(
+// Called when a student marks a class word as learned. Inserts the SRS row
+// and awards XP atomically server-side via the record_class_word_learned
+// RPC (see supabase/migrations), so a tampered client can't split "insert
+// the SRS row" and "award XP" into two requests and replay just the XP one
+// against an already-learned word. Returns true if the word was newly
+// learned (not already in class_srs_states) — same semantics as the old
+// ignoreDuplicates upsert's "did this insert happen" check, but decided by
+// Postgres instead of asserted by the client. Mirrors Flutter's
+// recordClassWordLearned in class_srs_service.dart — keep both in sync.
+export async function recordClassWordLearned(
   userId: string,
   classId: string,
   word: string,
   translation: string,
-): Promise<void> {
-  await supabase.from('class_srs_states').upsert(
-    {
-      user_id: userId,
-      class_id: classId,
-      word,
-      translation,
-      stage: 0,
-      next_due: addDays(INTERVALS[0]),
-    },
-    { onConflict: 'user_id,class_id,word', ignoreDuplicates: true },
-  );
+  xp: number,
+): Promise<boolean> {
+  const { data, error } = await supabase.rpc('record_class_word_learned', {
+    p_student_id: userId,
+    p_class_id: classId,
+    p_word: word,
+    p_translation: translation,
+    p_next_due: addDays(INTERVALS[0]),
+    p_xp: xp,
+    p_reason: 'Learn',
+  });
+  if (error) throw error;
+  return data as boolean;
 }
 
 // Cascades every overdue, non-graduated word for this student down through

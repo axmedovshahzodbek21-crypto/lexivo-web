@@ -17,8 +17,8 @@ import { pushLists, pushStats } from '@/lib/sync';
 import { supabase } from '@/lib/supabase';
 import { createSRSWord } from '@/lib/srs';
 import { addSRSWord as storeSRSWord } from '@/lib/storage';
-import { initClassSRSWord } from '@/lib/class-srs';
-import { recordClassStudyDay, recordClassXP } from '@/lib/class-xp';
+import { recordClassWordLearned } from '@/lib/class-srs';
+import { recordClassStudyDay } from '@/lib/class-xp';
 import type { Accent } from '@/lib/speech';
 import { checkAchievements } from '@/lib/gamification';
 import { fireConfetti } from '@/lib/confetti';
@@ -50,12 +50,21 @@ async function grantLearnReward(
   let isNew: boolean;
   if (opts.sourceClass || opts.sourceClassHW) {
     // Class mode: SRS lives in Supabase, not personal localStorage. Always
-    // counts toward the daily goal since XP is unified across activities.
-    isNew = true;
+    // counts toward the daily goal since XP is unified across activities —
+    // that's independent of whether the word itself was already learned,
+    // which is what isNew (used below for XP) actually tracks.
     incrementTodayCount();
+    isNew = false;
     if (opts.classIdParam) {
       const { data: { user } } = await supabase.auth.getUser();
-      if (user) await initClassSRSWord(user.id, opts.classIdParam, word.word, word.translation);
+      if (user) {
+        // Inserts the SRS row and awards XP atomically server-side, so a
+        // tampered client can't replay this call against an already-learned
+        // word for repeat XP — see record_class_word_learned in
+        // supabase/migrations. isNew reflects Postgres's own dedup check,
+        // not a client assertion.
+        isNew = await recordClassWordLearned(user.id, opts.classIdParam, word.word, word.translation, getLearnXPAmount());
+      }
     }
   } else {
     isNew = saveLearnedWord({
@@ -462,14 +471,13 @@ function LearnInner() {
     } else if (isNew && (sourceClassHW || sourceClass) && classIdParam) {
       // Class-earned XP counts toward the class leaderboard AND the
       // account's global total, so it isn't lost if the student later
-      // leaves the class.
+      // leaves the class. The class-side award already happened atomically
+      // inside grantLearnReward's recordClassWordLearned call — this only
+      // updates the local/account-wide total and session display.
       const learnXP = getLearnXPAmount();
       const { leveledUp, newLevel, newXp } = addXP(learnXP, 'Learn', `Class · ${classNameParam}`);
       if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
       setSessionXP(prev => prev + learnXP);
-      supabase.auth.getUser().then(({ data: { user } }) => {
-        if (user) void recordClassXP(user.id, classIdParam, learnXP, 'Learn');
-      });
     }
     recordStudySession();
     setSessionCount(c => c + 1);
