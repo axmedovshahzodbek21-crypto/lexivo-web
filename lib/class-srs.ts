@@ -2,6 +2,19 @@ import { supabase } from './supabase';
 
 const INTERVALS = [1, 3, 7, 14, 30]; // days, same as personal SRS
 
+// Grace period (days overdue) a word gets at each stage before it demotes one
+// stage — indexed by stage 0-4. A fresh Stage 0 word is fragile and gets a
+// generous buffer; a Stage 4 word already survived a 30-day gap once, so it
+// gets proportionally less patience if that happens again. Stage 5
+// (graduated) is never scheduled again, so it's exempt entirely.
+const UNLEARN_GRACE_DAYS = [3, 5, 7, 10, 15];
+
+// Consecutive "Not Yet" answers allowed at Stage 0 (the floor advanceClassSRSWord's
+// Math.max already prevents demoting past) before the word unlearns outright.
+// Active, repeated failure is stronger evidence than a skipped day, so this is
+// checked independently of — and resolves faster than — the day-based cascade.
+const FAIL_STREAK_LIMIT = 3;
+
 export interface ClassSRSEntry {
   id: string;
   user_id: string;
@@ -12,6 +25,7 @@ export interface ClassSRSEntry {
   next_due: string; // YYYY-MM-DD
   last_reviewed: string | null;
   created_at: string;
+  fail_streak: number;
 }
 
 // Local date (not UTC) — matches the personal SRS system's localDateStr()
@@ -32,6 +46,18 @@ function addDays(n: number): string {
 
 function todayStr(): string {
   return localDateStr(new Date());
+}
+
+function addDaysToDateStr(dateStr: string, days: number): string {
+  const d = new Date(dateStr + 'T00:00:00');
+  d.setDate(d.getDate() + days);
+  return localDateStr(d);
+}
+
+function daysBetween(fromDateStr: string, toDateStr: string): number {
+  const a = new Date(fromDateStr + 'T00:00:00');
+  const b = new Date(toDateStr + 'T00:00:00');
+  return Math.round((b.getTime() - a.getTime()) / 86400000);
 }
 
 // Called when a student marks a class word as learned.
@@ -55,11 +81,58 @@ export async function initClassSRSWord(
   );
 }
 
+// Cascades every overdue, non-graduated word for this student down through
+// UNLEARN_GRACE_DAYS one stage at a time, resolving a long absence in a single
+// pass rather than needing a check every day the gap grows. A word that falls
+// through Stage 0's own grace window is unlearned (deleted) outright — same
+// hard-reset behavior as the fail-streak path in advanceClassSRSWord, and as
+// personal SRS's existing checkAndUnlearn.
+export async function checkAndDemoteClassSRS(
+  userId: string,
+  classId: string,
+): Promise<void> {
+  const { data } = await supabase
+    .from('class_srs_states')
+    .select('id, stage, next_due')
+    .eq('user_id', userId)
+    .eq('class_id', classId)
+    .lt('stage', 5);
+  const rows = (data ?? []) as { id: string; stage: number; next_due: string }[];
+  if (rows.length === 0) return;
+
+  const today = todayStr();
+  const toDelete: string[] = [];
+  const toUpdate: { id: string; stage: number; next_due: string }[] = [];
+
+  for (const row of rows) {
+    let stage = row.stage;
+    let nextDue = row.next_due;
+    let changed = false;
+
+    while (stage > 0 && daysBetween(nextDue, today) >= UNLEARN_GRACE_DAYS[stage]) {
+      nextDue = addDaysToDateStr(nextDue, UNLEARN_GRACE_DAYS[stage]);
+      stage -= 1;
+      changed = true;
+    }
+    if (stage === 0 && daysBetween(nextDue, today) >= UNLEARN_GRACE_DAYS[0]) {
+      toDelete.push(row.id);
+      continue;
+    }
+    if (changed) toUpdate.push({ id: row.id, stage, next_due: nextDue });
+  }
+
+  await Promise.all([
+    ...toUpdate.map(u => supabase.from('class_srs_states').update({ stage: u.stage, next_due: u.next_due, fail_streak: 0 }).eq('id', u.id)),
+    toDelete.length > 0 ? supabase.from('class_srs_states').delete().in('id', toDelete) : Promise.resolve(),
+  ]);
+}
+
 // Returns all words due for review today (or overdue) for this student in this class.
 export async function getClassDueWords(
   userId: string,
   classId: string,
 ): Promise<ClassSRSEntry[]> {
+  await checkAndDemoteClassSRS(userId, classId);
   const { data } = await supabase
     .from('class_srs_states')
     .select('*')
@@ -94,16 +167,26 @@ export async function advanceClassSRSWord(
 ): Promise<void> {
   const { data } = await supabase
     .from('class_srs_states')
-    .select('stage')
+    .select('id, stage, fail_streak')
     .eq('user_id', userId)
     .eq('class_id', classId)
     .eq('word', word)
     .single();
 
   if (!data) return;
-  const current = (data as { stage: number }).stage;
+  const { id, stage: current, fail_streak: currentStreak } = data as { id: string; stage: number; fail_streak: number };
+
+  // Repeated failure at the Stage 0 floor is stronger evidence the word isn't
+  // known than a skipped day is — resolve it immediately rather than looping
+  // the same 1-day reset forever.
+  if (!knew && current === 0 && currentStreak + 1 >= FAIL_STREAK_LIMIT) {
+    await supabase.from('class_srs_states').delete().eq('id', id);
+    return;
+  }
+
   const next = knew ? Math.min(current + 1, 5) : Math.max(current - 1, 0);
   const interval = next >= 5 ? 36500 : INTERVALS[next]; // graduated → far future
+  const nextStreak = knew ? 0 : (next === 0 ? currentStreak + 1 : 0);
 
   await supabase
     .from('class_srs_states')
@@ -111,10 +194,9 @@ export async function advanceClassSRSWord(
       stage: next,
       next_due: addDays(interval),
       last_reviewed: new Date().toISOString(),
+      fail_streak: nextStreak,
     })
-    .eq('user_id', userId)
-    .eq('class_id', classId)
-    .eq('word', word);
+    .eq('id', id);
 }
 
 // Teacher view: all students' SRS states for a class.
