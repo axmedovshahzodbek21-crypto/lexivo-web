@@ -408,8 +408,8 @@ function MultiCheckbox({ options, value, onChange, disabled }: {
   );
 }
 
-function RadioGroup({ options, value, onChange, disabled }: {
-  options: string[]; value: string; onChange: (v: string) => void; disabled: boolean;
+function RadioGroup({ name, options, value, onChange, disabled }: {
+  name: string; options: string[]; value: string; onChange: (v: string) => void; disabled: boolean;
 }) {
   return (
     <div className="flex flex-col gap-1.5 mt-2">
@@ -418,7 +418,7 @@ function RadioGroup({ options, value, onChange, disabled }: {
         const checked = value === letter || value === opt;
         return (
           <label key={opt} className="flex items-center gap-2 cursor-pointer select-none">
-            <input type="radio" name={opt} checked={checked} disabled={disabled} onChange={() => onChange(letter)}
+            <input type="radio" name={name} checked={checked} disabled={disabled} onChange={() => onChange(letter)}
               className="accent-[var(--primary)] w-4 h-4" />
             <span className="text-sm text-[var(--text)]"><span className="font-bold">{letter}.</span> {opt}</span>
           </label>
@@ -438,8 +438,8 @@ function TextInput({ value, onChange, disabled, placeholder }: {
   );
 }
 
-function QuestionInput({ q, value, onChange, disabled }: {
-  q: IeltsQuestion; value: string; onChange: (v: string) => void; disabled: boolean;
+function QuestionInput({ q, name, value, onChange, disabled }: {
+  q: IeltsQuestion; name: string; value: string; onChange: (v: string) => void; disabled: boolean;
 }) {
   switch (q.type) {
     case 'true_false_not_given':
@@ -447,7 +447,7 @@ function QuestionInput({ q, value, onChange, disabled }: {
     case 'yes_no_not_given':
       return <PillSelect options={['YES', 'NO', 'NOT GIVEN']} value={value} onChange={onChange} disabled={disabled} />;
     case 'multiple_choice':
-      return q.options ? <RadioGroup options={q.options} value={value} onChange={onChange} disabled={disabled} /> : <TextInput value={value} onChange={onChange} disabled={disabled} />;
+      return q.options ? <RadioGroup name={name} options={q.options} value={value} onChange={onChange} disabled={disabled} /> : <TextInput value={value} onChange={onChange} disabled={disabled} />;
     case 'multiple_choice_multi':
       return q.options ? <MultiCheckbox options={q.options} value={value} onChange={onChange} disabled={disabled} /> : <TextInput value={value} onChange={onChange} disabled={disabled} placeholder="Comma-separated answers…" />;
     case 'matching_information':
@@ -901,7 +901,7 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
 
                               {/* Input — hidden for summary questions (input is inline in summary block) */}
                               {!hasSummary && mode === 'test' && !submitted && (
-                                <QuestionInput q={q} value={userAnswer} onChange={v => setAnswer(i, v)} disabled={false} />
+                                <QuestionInput q={q} name={`question-${i}`} value={userAnswer} onChange={v => setAnswer(i, v)} disabled={false} />
                               )}
 
                               {mode === 'test' && submitted && userAnswer && (
