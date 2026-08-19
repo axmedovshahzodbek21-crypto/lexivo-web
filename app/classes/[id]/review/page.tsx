@@ -32,6 +32,7 @@ export default function ClassReviewPage() {
   const [tappedChoice, setTappedChoice] = useState<string | null>(null);
   const [choices,    setChoices]    = useState<string[] | null>(null);
   const [userId,     setUserId]     = useState<string | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
   const [className,  setClassName]  = useState('');
   const [loading,    setLoading]    = useState(true);
 
@@ -41,29 +42,41 @@ export default function ClassReviewPage() {
   // Resolve user + class name
   useEffect(() => {
     (async () => {
-      const [{ data: { user } }, { data: cls }] = await Promise.all([
-        supabase.auth.getUser(),
-        supabase.from('classes').select('name').eq('id', id).single(),
-      ]);
-      setUserId(user?.id ?? null);
-      setClassName((cls as { name: string } | null)?.name ?? 'Class');
+      try {
+        const [{ data: { user } }, { data: cls }] = await Promise.all([
+          supabase.auth.getUser(),
+          supabase.from('classes').select('name').eq('id', id).single(),
+        ]);
+        setUserId(user?.id ?? null);
+        setClassName((cls as { name: string } | null)?.name ?? 'Class');
+      } finally {
+        // Distinguishes "no session" from "still resolving" — without this,
+        // an expired/missing session (userId stays null either way) left
+        // the next effect's `if (!userId) return` guard never firing, so
+        // loading never cleared and the page spun forever.
+        setAuthChecked(true);
+      }
     })();
   }, [id]);
 
   // Load due words + full pool once userId is known
   useEffect(() => {
-    if (!userId || !id) return;
+    if (!authChecked || !id) return;
     (async () => {
-      const [due, all] = await Promise.all([
-        getClassDueWords(userId, id),
-        getClassSRSAll(userId, id),
-      ]);
-      setQueue(due);
-      setAllPool(all);
-      setLoading(false);
-      if (due.length === 0) setDone(true);
+      if (!userId) { setLoading(false); return; }
+      try {
+        const [due, all] = await Promise.all([
+          getClassDueWords(userId, id),
+          getClassSRSAll(userId, id),
+        ]);
+        setQueue(due);
+        setAllPool(all);
+        if (due.length === 0) setDone(true);
+      } finally {
+        setLoading(false);
+      }
     })();
-  }, [userId, id]);
+  }, [authChecked, userId, id]);
 
   const current = queue[index];
 
