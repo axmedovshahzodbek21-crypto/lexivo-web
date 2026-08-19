@@ -16,20 +16,32 @@ export default function JoinPage() {
   const { user } = useAuth();
   const [cls, setCls] = useState<ClassInfo | null>(null);
   const [notFound, setNotFound] = useState(false);
+  const [fetchError, setFetchError] = useState(false);
+  const [retryKey, setRetryKey] = useState(0);
   const [status, setStatus] = useState<'idle' | 'joining' | 'joined' | 'already' | 'ownClass'>('idle');
 
   useEffect(() => {
     if (!code) return;
-    supabase
-      .from('classes')
-      .select('id, name, teacher_id')
-      .eq('join_code', code.toUpperCase())
-      .single()
-      .then(({ data }) => {
-        if (!data) setNotFound(true);
-        else setCls(data);
-      });
-  }, [code]);
+    setNotFound(false);
+    setFetchError(false);
+    (async () => {
+      try {
+        const { data, error } = await supabase
+          .from('classes')
+          .select('id, name, teacher_id')
+          .eq('join_code', code.toUpperCase())
+          .single();
+        if (data) { setCls(data); return; }
+        // PGRST116 = "no rows" from .single() — a genuinely bad code.
+        // Anything else (network failure, outage) is not the same as
+        // "invalid link" and shouldn't be shown as one.
+        if (error && error.code !== 'PGRST116') { setFetchError(true); return; }
+        setNotFound(true);
+      } catch {
+        setFetchError(true);
+      }
+    })();
+  }, [code, retryKey]);
 
   useEffect(() => {
     if (!user || !cls || status !== 'idle') return;
@@ -56,6 +68,15 @@ export default function JoinPage() {
       return () => clearTimeout(t);
     }
   }, [status]);
+
+  if (fetchError) return (
+    <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8 animate-fade-in">
+      <div className="text-6xl">⚠️</div>
+      <p className="text-xl font-bold text-[var(--text)]">Couldn&#39;t load this invite</p>
+      <p className="text-sm text-[var(--text-muted)]">Something went wrong checking this link. Check your connection and try again.</p>
+      <button onClick={() => setRetryKey(k => k + 1)} className="btn-primary">Try again</button>
+    </div>
+  );
 
   if (notFound) return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8 animate-fade-in">
