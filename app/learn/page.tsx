@@ -18,7 +18,7 @@ import { supabase } from '@/lib/supabase';
 import { createSRSWord } from '@/lib/srs';
 import { addSRSWord as storeSRSWord } from '@/lib/storage';
 import { initClassSRSWord } from '@/lib/class-srs';
-import { recordClassStudyDay } from '@/lib/class-xp';
+import { recordClassStudyDay, recordClassXP } from '@/lib/class-xp';
 import type { Accent } from '@/lib/speech';
 import { checkAchievements } from '@/lib/gamification';
 import { fireConfetti } from '@/lib/confetti';
@@ -459,6 +459,17 @@ function LearnInner() {
       const { leveledUp, newLevel, newXp } = addXP(learnXP, 'Learn', `Unit ${current.dayNumber} · ${current.collectionName}`);
       if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
       setSessionXP(prev => prev + learnXP);
+    } else if (isNew && (sourceClassHW || sourceClass) && classIdParam) {
+      // Class-earned XP counts toward the class leaderboard AND the
+      // account's global total, so it isn't lost if the student later
+      // leaves the class.
+      const learnXP = getLearnXPAmount();
+      const { leveledUp, newLevel, newXp } = addXP(learnXP, 'Learn', `Class · ${classNameParam}`);
+      if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
+      setSessionXP(prev => prev + learnXP);
+      supabase.auth.getUser().then(({ data: { user } }) => {
+        if (user) void recordClassXP(user.id, classIdParam, learnXP, 'Learn');
+      });
     }
     recordStudySession();
     setSessionCount(c => c + 1);
@@ -493,7 +504,7 @@ function LearnInner() {
       setIndex(i => i + 1);
       setMaxReached(m => Math.max(m, index + 1));
     }
-  }, [current, index, words, collectionName, pushAchievement, setPendingLevelUp, sourceClass, sourceClassHW, classIdParam, sourceMyWords, myCollection, myFolder]);
+  }, [current, index, words, collectionName, pushAchievement, setPendingLevelUp, sourceClass, sourceClassHW, classIdParam, classNameParam, sourceMyWords, myCollection, myFolder]);
 
   const advanceCard = useCallback(async () => {
     if (!current) return;
