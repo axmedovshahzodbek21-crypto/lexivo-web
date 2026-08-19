@@ -4,6 +4,9 @@ import Link from 'next/link';
 import BackButton from '@/components/BackButton';
 import { readingPassages, type ReadingPassage } from '@/lib/reading-data';
 import { pickRandom, playShuffleTick, playShuffleReveal } from '@/lib/shuffle';
+import { supabase } from '@/lib/supabase';
+import { addXP } from '@/lib/storage';
+import { recordClassXP, recordClassStudyDay } from '@/lib/class-xp';
 
 const CARD_COLORS = [
   { color: '#6366F1', light: '#818CF8', dark: '#4338CA' },
@@ -315,12 +318,42 @@ export default function ReadingPage() {
   const [surpriseShuffling, setSurpriseShuffling] = useState(false);
   const [surpriseShown, setSurpriseShown] = useState<ReadingPassage | null>(null);
   const surpriseLastIndexRef = useRef<number | undefined>(undefined);
+  const classIdsRef = useRef<string[]>([]);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
+      if (!user) return;
+      const { data } = await supabase.from('class_members').select('class_id').eq('student_id', user.id);
+      classIdsRef.current = (data ?? []).map(r => r.class_id as string);
+    });
+  }, []);
+
+  // Free-browse reads aren't tied to a homework assignment, so they can't
+  // show up in the teacher's per-passage checklist — that needs a real
+  // class_homework row. This just credits the student's classes with
+  // activity/XP (mirrored to the account's global total) so reading here
+  // isn't invisible and doesn't look like inactivity.
+  const recordClassReadActivity = (passage: ReadingPassage) => {
+    const classIds = classIdsRef.current;
+    if (classIds.length === 0) return;
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return;
+      const xp = 3;
+      for (const classId of classIds) {
+        void recordClassXP(user.id, classId, xp, `Reading: ${passage.title}`);
+        void recordClassStudyDay(user.id, classId);
+      }
+      addXP(xp, 'Reading', passage.title);
+    });
+  };
 
   const openPassage = (passage: ReadingPassage) => {
+    const isNew = !visited.has(passage.id);
     const next = new Set(visited);
     next.add(passage.id);
     setVisited(next);
     localStorage.setItem(VISITED_KEY, JSON.stringify([...next]));
+    if (isNew) recordClassReadActivity(passage);
     setSelected(passage);
     window.scrollTo(0, 0);
   };
