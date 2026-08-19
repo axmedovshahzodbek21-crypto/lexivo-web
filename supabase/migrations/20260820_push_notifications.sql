@@ -59,7 +59,7 @@ begin
   end if;
 
   perform net.http_post(
-    url := 'https://<PROJECT_REF>.supabase.co/functions/v1/send-push',
+    url := 'https://jzozrqbzhagezlwncktf.supabase.co/functions/v1/send-push',
     headers := jsonb_build_object(
       'Content-Type', 'application/json',
       'Authorization', 'Bearer ' || trigger_secret
