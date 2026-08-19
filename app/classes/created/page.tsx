@@ -5,11 +5,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import BackButton from '@/components/BackButton';
-
-function generateCode(): string {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  return 'LEXI-' + Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
-}
+import { createClass as createClassRow } from '@/lib/class-create';
 
 interface ClassRow {
   id: string;
@@ -77,9 +73,7 @@ export default function CreatedClassesPage() {
   const createClass = async () => {
     if (!user || !className.trim()) return;
     setCreating(true); setCreateError('');
-    const { error: err } = await supabase.from('classes').insert({
-      name: className.trim(), join_code: generateCode(), teacher_id: user.id,
-    });
+    const { error: err } = await createClassRow(className.trim(), user.id);
     if (err) { setCreateError('Failed to create class.'); setCreating(false); return; }
     setClassName(''); setShowCreate(false); setCreating(false);
     _cache.delete(user.id); load();
