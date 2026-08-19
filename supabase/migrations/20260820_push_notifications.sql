@@ -27,45 +27,54 @@ declare
   payload jsonb;
   trigger_secret text;
 begin
-  select decrypted_secret into trigger_secret
-    from vault.decrypted_secrets where name = 'push_trigger_secret';
+  -- Push notification is a side effect of saving an announcement/homework/
+  -- target, not the point of the action — a misconfigured push pipeline
+  -- (vault secret not set, edge function not deployed, pg_net down, bad
+  -- URL) must never roll back the actual insert the teacher is waiting on.
+  -- Everything below is best-effort: log and continue on any failure.
+  begin
+    select decrypted_secret into trigger_secret
+      from vault.decrypted_secrets where name = 'push_trigger_secret';
 
-  -- IF/ELSIF instead of a single CASE expression: a CASE is one SQL
-  -- expression, so Postgres has to type-check every branch against NEW's
-  -- actual row shape before picking one — and new.student_id doesn't exist
-  -- on class_homework, so inserting there failed even though that branch
-  -- was never reached ("record 'new' has no field 'student_id'"). IF/ELSIF
-  -- are separate PL/pgSQL statements, only compiled once actually entered.
-  if tg_table_name = 'class_homework' then
-    payload := jsonb_build_object(
-      'kind', 'homework',
-      'class_id', new.class_id,
-      'student_ids', new.student_ids,
-      'title', coalesce(new.collection_name, 'New homework')
-    );
-  elsif tg_table_name = 'class_targets' then
-    payload := jsonb_build_object(
-      'kind', 'target',
-      'class_id', new.class_id,
-      'student_ids', jsonb_build_array(new.student_id),
-      'title', new.title
-    );
-  elsif tg_table_name = 'class_announcements' then
-    payload := jsonb_build_object(
-      'kind', 'announcement',
-      'class_id', new.class_id,
-      'message', new.message
-    );
-  end if;
+    -- IF/ELSIF instead of a single CASE expression: a CASE is one SQL
+    -- expression, so Postgres has to type-check every branch against NEW's
+    -- actual row shape before picking one — and new.student_id doesn't exist
+    -- on class_homework, so inserting there failed even though that branch
+    -- was never reached ("record 'new' has no field 'student_id'"). IF/ELSIF
+    -- are separate PL/pgSQL statements, only compiled once actually entered.
+    if tg_table_name = 'class_homework' then
+      payload := jsonb_build_object(
+        'kind', 'homework',
+        'class_id', new.class_id,
+        'student_ids', new.student_ids,
+        'title', coalesce(new.collection_name, 'New homework')
+      );
+    elsif tg_table_name = 'class_targets' then
+      payload := jsonb_build_object(
+        'kind', 'target',
+        'class_id', new.class_id,
+        'student_ids', jsonb_build_array(new.student_id),
+        'title', new.title
+      );
+    elsif tg_table_name = 'class_announcements' then
+      payload := jsonb_build_object(
+        'kind', 'announcement',
+        'class_id', new.class_id,
+        'message', new.message
+      );
+    end if;
 
-  perform net.http_post(
-    url := 'https://jzozrqbzhagezlwncktf.supabase.co/functions/v1/send-push',
-    headers := jsonb_build_object(
-      'Content-Type', 'application/json',
-      'Authorization', 'Bearer ' || trigger_secret
-    ),
-    body := payload
-  );
+    perform net.http_post(
+      url := 'https://jzozrqbzhagezlwncktf.supabase.co/functions/v1/send-push',
+      headers := jsonb_build_object(
+        'Content-Type', 'application/json',
+        'Authorization', 'Bearer ' || trigger_secret
+      ),
+      body := payload
+    );
+  exception when others then
+    raise warning 'notify_push failed for %: %', tg_table_name, sqlerrm;
+  end;
 
   return new;
 end;
