@@ -54,10 +54,16 @@ export default function FolderPage() {
   async function load() {
     if (!user) return;
     const [folderRes, unitsRes] = await Promise.all([
-      supabase.from('teacher_folders').select('name').eq('id', folderId).single(),
+      supabase.from('teacher_folders').select('name, teacher_id').eq('id', folderId).maybeSingle(),
       supabase.from('teacher_units').select('id, name, teacher_unit_words(count)').eq('folder_id', folderId).order('position').order('created_at'),
     ]);
-    const name = folderRes.data?.name ?? '';
+    // Defense-in-depth: RLS is the real backstop, but confirm this folder
+    // is actually the caller's before trusting an arbitrary folderId's data.
+    if (!folderRes.data || folderRes.data.teacher_id !== user.id) {
+      router.replace('/library');
+      return;
+    }
+    const name = folderRes.data.name;
     const result = (unitsRes.data ?? []).map((u: any) => ({
       id: u.id,
       name: u.name,

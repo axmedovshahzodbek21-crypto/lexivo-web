@@ -153,11 +153,17 @@ export default function UnitPage() {
   async function load() {
     if (!user) return;
     const [unitRes, folderRes, wordsRes] = await Promise.all([
-      supabase.from('teacher_units').select('name').eq('id', unitId).single(),
-      supabase.from('teacher_folders').select('name').eq('id', folderId).single(),
+      supabase.from('teacher_units').select('name, teacher_id').eq('id', unitId).maybeSingle(),
+      supabase.from('teacher_folders').select('name').eq('id', folderId).maybeSingle(),
       supabase.from('teacher_unit_words').select('id, word, translation, definition, part_of_speech, pronunciation, definition_uz, examples').eq('unit_id', unitId).order('position').order('created_at'),
     ]);
-    const unit = unitRes.data?.name ?? '';
+    // Defense-in-depth: RLS is the real backstop, but confirm this unit is
+    // actually the caller's before trusting an arbitrary unitId's data.
+    if (!unitRes.data || unitRes.data.teacher_id !== user.id) {
+      router.replace(`/library/${folderId}`);
+      return;
+    }
+    const unit = unitRes.data.name;
     const folder = folderRes.data?.name ?? '';
     const mapped = (wordsRes.data ?? []).map((w: any) => ({
       id: w.id,
