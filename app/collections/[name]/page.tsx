@@ -73,12 +73,16 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
     const found = collections.find(c => c.name === collectionName);
     if (!found) return;
     setCollection(found);
-    const allRows: UnitRow[] = found.days.map(day => ({
-      dayNumber: day.dayNumber,
-      topic: day.topic || `Unit ${day.dayNumber}`,
-      wordCount: day.words.length,
-      progress: getUnitProgress(collectionName, day.dayNumber),
-    }));
+    // Units with no words yet are unfinished content, not real units —
+    // showing them lets a click crash Flashcards/Quiz on an empty word list.
+    const allRows: UnitRow[] = found.days
+      .filter(day => day.words.length > 0)
+      .map(day => ({
+        dayNumber: day.dayNumber,
+        topic: day.topic || `Unit ${day.dayNumber}`,
+        wordCount: day.words.length,
+        progress: getUnitProgress(collectionName, day.dayNumber),
+      }));
     const rows = doneOnly
       ? allRows.filter(r => r.progress.learnDone && r.progress.flashcardDone && r.progress.quizDone)
       : allRows;
