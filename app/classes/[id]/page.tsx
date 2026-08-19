@@ -2313,7 +2313,11 @@ export default function ClassDashboardPage() {
 
   const removeStudent = async (studentId: string) => {
     if (!confirm('Remove this student from the class?')) return;
-    await supabase.from('class_members').delete().eq('class_id', id).eq('student_id', studentId);
+    const { data, error } = await supabase.from('class_members').delete().eq('class_id', id).eq('student_id', studentId).select();
+    if (error || !data || data.length === 0) {
+      alert('Failed to remove student.');
+      return;
+    }
     load();
   };
 
