@@ -109,6 +109,22 @@ export default function ClassHomeworkPage() {
   }, [user, id]);
 
   async function load() {
+    try {
+      await loadInner();
+    } catch (err) {
+      // folders/cwUnits/etc. are only ever updated below on a full success,
+      // so on error they still hold whatever was showing before this call
+      // (cached data for a background refresh, or the initial empty state
+      // for a true first load) — just stop the spinner rather than clearing
+      // anything, and don't let one bad row (e.g. a stale
+      // class_library_assignments row whose teacher_folders was deleted)
+      // take down the whole tab.
+      console.error('homework load error', err);
+    }
+    setLoading(false);
+  }
+
+  async function loadInner() {
     const { data: cls } = await supabase.from('classes').select('name, teacher_id').eq('id', id).maybeSingle();
     const teacher = (cls as any)?.teacher_id === user!.id;
     setIsTeacher(teacher);
@@ -127,7 +143,11 @@ export default function ClassHomeworkPage() {
       supabase.from('class_homework').select('id, unit_id, class_unit_id, collection_name, day_number, passage_id, modes, due_date, student_ids').eq('class_id', id),
     ]);
 
-    const assigns = (assignsRes.data ?? []) as any[];
+    // teacher_folders is a joined row that can come back null (e.g. the
+    // referenced folder was deleted but this assignment row wasn't cleaned
+    // up) — skip that one malformed row instead of crashing on it and
+    // taking down every other valid assignment with it.
+    const assigns = ((assignsRes.data ?? []) as any[]).filter(a => a.teacher_folders != null);
     const cwUnitRows = (cwUnitRes.data ?? []) as any[];
     const allHw = (hwRes.data ?? []) as any[];
 
@@ -275,7 +295,6 @@ export default function ClassHomeworkPage() {
     setCompletedModes(modeMap);
     setTotalAssigned(assigned);
     setTotalDone(done);
-    setLoading(false);
   }
 
   const collFolders: { name: string; items: CollHW[] }[] = [];
