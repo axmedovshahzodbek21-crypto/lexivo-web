@@ -124,7 +124,10 @@ export async function pushStats(): Promise<void> {
   }
 }
 
-export async function pushSettings(): Promise<void> {
+// clearAvatar forces avatar_url to NULL in both tables (the user explicitly
+// removed their photo) instead of the default "null means leave the
+// existing column alone" — see the RPC's p_clear_avatar comment.
+export async function pushSettings(clearAvatar = false): Promise<void> {
   const uid = await getUid();
   if (!uid) return;
   try {
@@ -132,28 +135,27 @@ export async function pushSettings(): Promise<void> {
     const ts = new Date().toISOString();
     const showOnLeaderboard = s.showOnLeaderboard ?? true;
     const notif = getNotifSettings();
-    await Promise.all([
-      supabase.from('user_data').upsert({
-        id: uid,
-        daily_word_goal:     s.dailyGoal,
-        quiz_direction:      s.quizDirection,
-        reduce_motion:       s.reduceMotion,
-        show_on_leaderboard: showOnLeaderboard,
-        user_name:           s.name,
-        language_level:      s.languageLevel,
-        notifications_enabled: notif.enabled,
-        notif_time:            notif.time,
-        ...(getProfilePicUrl() ? { avatar_url: getProfilePicUrl() } : {}),
-        settings_updated_at: ts,
-      }),
-      supabase.from('profiles').upsert({
-        id:                  uid,
-        name:                s.name,
-        show_on_leaderboard: showOnLeaderboard,
-        language_level:      s.languageLevel,
-        ...(getProfilePicUrl() ? { avatar_url: getProfilePicUrl() } : {}),
-      }),
-    ]);
+    // Single atomic RPC instead of two independent upserts (user_data +
+    // profiles) — see the Flutter sync_service.dart comment on the same
+    // call for why a partial failure here silently diverged what this
+    // account's own devices see (user_data) from what other users see
+    // (profiles). Passing null for avatar_url preserves the existing
+    // column value server-side, same as omitting the key used to.
+    const { error } = await supabase.rpc('sync_profile_settings', {
+      p_user_id: uid,
+      p_daily_word_goal: s.dailyGoal,
+      p_quiz_direction: s.quizDirection,
+      p_reduce_motion: s.reduceMotion,
+      p_show_on_leaderboard: showOnLeaderboard,
+      p_notifications_enabled: notif.enabled,
+      p_notif_time: notif.time,
+      p_user_name: s.name,
+      p_language_level: s.languageLevel,
+      p_avatar_url: getProfilePicUrl() || null,
+      p_settings_updated_at: ts,
+      p_clear_avatar: clearAvatar,
+    });
+    if (error) throw error;
     lsSet(S.settingsTs, ts);
   } catch (e) {
     console.error('[sync] pushSettings failed:', e);

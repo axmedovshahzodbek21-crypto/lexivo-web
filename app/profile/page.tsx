@@ -134,8 +134,11 @@ export default function ProfilePage() {
           .getPublicUrl(`${user.id}/avatar.jpg`);
         const url = `${publicUrl}?t=${Date.now()}`;
         saveProfilePicUrl(url);
+        // Atomic RPC writes both user_data and profiles together — see
+        // lib/sync.ts's pushSettings. A separate direct profiles-only
+        // upsert here previously left a window where profiles had the new
+        // avatar but user_data (this account's own devices) didn't.
         pushSettings();
-        await supabase.from('profiles').upsert({ id: user.id, avatar_url: url });
         setProfilePic(url);
       } else {
         setProfilePic(base64);
@@ -152,7 +155,9 @@ export default function ProfilePage() {
     removeProfilePicUrl();
     if (user) {
       await supabase.storage.from('avatars').remove([`${user.id}/avatar.jpg`]);
-      await supabase.from('profiles').upsert({ id: user.id, avatar_url: null });
+      // clearAvatar=true clears both tables atomically — a plain
+      // profiles-only null previously never touched user_data.avatar_url.
+      await pushSettings(true);
     }
     setProfilePic(null);
   }
