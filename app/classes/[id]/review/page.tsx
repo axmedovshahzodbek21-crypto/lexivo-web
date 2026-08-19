@@ -2,7 +2,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { displayXP, recordStudySession } from '@/lib/storage';
+import { displayXP, recordStudySession, addXP } from '@/lib/storage';
 import { recordClassXP } from '@/lib/class-xp';
 import { speak } from '@/lib/speech';
 import {
@@ -118,10 +118,13 @@ export default function ClassReviewPage() {
     await Promise.all(finalResults.map(r => advanceClassSRSWord(userId, id, r.word, r.knew)));
     const knewCount = finalResults.filter(r => r.knew).length;
     const xp = knewCount * 2; // 2 XP per correct review (matches personal SRS rate)
-    await recordClassXP(userId, id, xp, 'SRS Review'); // class XP is isolated from the app-wide pool — no level-up here
+    await recordClassXP(userId, id, xp, 'SRS Review');
+    // Class-earned XP also counts toward the account's global total, so it
+    // isn't lost if the student later leaves the class.
+    if (xp > 0) addXP(xp, 'SRS Review', `Class · ${className}`);
     setSessionXP(xp);
     recordStudySession();
-  }, [userId, id]);
+  }, [userId, id, className]);
 
   const grade = useCallback((knew: boolean) => {
     if (!current || grading.current) return;
