@@ -246,7 +246,10 @@ function WordCard({
           <p className="text-sm text-[var(--text)]">{word.definition}</p>
 
           <div className="space-y-2">
-            {[word.example1, word.example2, word.example3].filter(Boolean).map((ex, i) => (
+            {[word.example1, word.example2, word.example3]
+              .map((ex, i) => ({ ex, i }))
+              .filter(item => item.ex)
+              .map(({ ex, i }) => (
               <div key={i} className="bg-[var(--surface-2)] rounded-xl p-3">
                 <p className="text-xs text-[var(--text-muted)] mb-1">{t.starred.example(i + 1)}</p>
                 <p className="text-sm italic text-[var(--text)]">"{ex}"</p>
