@@ -11,6 +11,7 @@ import {
   scheduleOrShowNotification, sendTestNotification,
   getNotifPermission, isNotifSupported, type NotifSettings,
 } from '@/lib/notifications';
+import { linkUser, unlinkUser, requestPush, isPushSupported } from '@/lib/onesignal';
 import { exportData, importData } from '@/lib/backup';
 import type { UserSettings } from '@/lib/types';
 import { translations } from '@/lib/i18n';
@@ -46,20 +47,43 @@ export default function SettingsPage() {
   const [pendingImport, setPendingImport] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [bio, setBio] = useState('');
+  const [userId, setUserId] = useState<string | null>(null);
+  const [pushEnabled, setPushEnabled] = useState(false);
+  const [pushSupported, setPushSupported] = useState(false);
 
   useEffect(() => {
     setThemeState(getTheme());
     setNotif(getNotifSettings());
     setPermission(getNotifPermission());
     setNotifSupported(isNotifSupported());
+    setPushSupported(isPushSupported());
     supabase.auth.getUser().then(({ data: { user } }) => {
       setUserEmail(user?.email ?? null);
       if (user) {
-        supabase.from('profiles').select('bio').eq('id', user.id).maybeSingle()
-          .then(({ data }) => { if (data?.bio) setBio(data.bio); });
+        setUserId(user.id);
+        supabase.from('profiles').select('bio, push_enabled').eq('id', user.id).maybeSingle()
+          .then(({ data }) => {
+            if (data?.bio) setBio(data.bio);
+            setPushEnabled(!!data?.push_enabled);
+          });
       }
     });
   }, []);
+
+  const handlePushToggle = async () => {
+    if (!userId) return;
+    if (!pushEnabled) {
+      const granted = await requestPush();
+      if (!granted) return;
+      await linkUser(userId);
+      await supabase.from('profiles').update({ push_enabled: true }).eq('id', userId);
+      setPushEnabled(true);
+    } else {
+      await unlinkUser();
+      await supabase.from('profiles').update({ push_enabled: false }).eq('id', userId);
+      setPushEnabled(false);
+    }
+  };
 
   const handleThemeSelect = (t: Theme) => {
     setTheme(t);
@@ -733,6 +757,32 @@ export default function SettingsPage() {
             <h2 className="font-black text-base">{t.settings.dailyReminder}</h2>
           </div>
           <p className="text-sm text-[var(--text-muted)]">{t.settings.notifNotSupported}</p>
+        </div>
+      )}
+
+      {/* Homework & announcement push notifications */}
+      {pushSupported && (
+        <div className="card" style={{ borderTop: '3px solid #ef4444', boxShadow: '0 4px 20px rgba(0,0,0,0.07)' }}>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-11 h-11 rounded-2xl flex items-center justify-center text-xl shrink-0"
+              style={{ background: 'linear-gradient(135deg, #ef4444, #f87171)', boxShadow: '0 4px 0 #b91c1c, 0 8px 16px rgba(239,68,68,0.35)' }}>📚</div>
+            <h2 className="font-black text-base">Class Notifications</h2>
+          </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium">Homework & announcements</p>
+              <p className="text-xs text-[var(--text-muted)] mt-0.5">
+                {pushEnabled ? 'Notified when a teacher assigns homework or posts an announcement' : 'Off'}
+              </p>
+            </div>
+            <button
+              onClick={handlePushToggle}
+              className={`relative w-14 h-7 rounded-full transition-colors duration-300 focus:outline-none ${pushEnabled ? 'bg-[var(--primary)]' : 'bg-[var(--surface-2)]'}`}
+              aria-label="Toggle homework and announcement push notifications"
+            >
+              <span className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-300 ${pushEnabled ? 'translate-x-7' : 'translate-x-0'}`} />
+            </button>
+          </div>
         </div>
       )}
 
