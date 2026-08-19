@@ -33,13 +33,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true });
   }
 
-  // Verify the request is genuinely from Telegram
-  if (WEBHOOK_SECRET) {
-    const incoming = req.headers.get('x-telegram-bot-api-secret-token');
-    if (incoming !== WEBHOOK_SECRET) {
-      console.warn('Telegram webhook: invalid secret token');
-      return NextResponse.json({ ok: true }); // Return 200 so attacker learns nothing
-    }
+  // Verify the request is genuinely from Telegram. Fail CLOSED if the secret
+  // isn't configured — OWNER_ID falls back to a hardcoded value baked into
+  // this source file, so skipping verification here let anyone POST a
+  // fabricated update claiming to be that owner id and get full bot-admin
+  // control (broadcast to every user, dump the user list, impersonate
+  // support replies). A missing secret is treated the same as a wrong one.
+  if (!WEBHOOK_SECRET) {
+    console.error('TELEGRAM_WEBHOOK_SECRET env var is not set — refusing all webhook requests');
+    return NextResponse.json({ ok: true }); // Return 200 so attacker learns nothing
+  }
+  const incoming = req.headers.get('x-telegram-bot-api-secret-token');
+  if (incoming !== WEBHOOK_SECRET) {
+    console.warn('Telegram webhook: invalid secret token');
+    return NextResponse.json({ ok: true }); // Return 200 so attacker learns nothing
   }
 
   try {
