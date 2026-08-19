@@ -109,15 +109,15 @@ export default function LibraryPage() {
   }
 
   async function renameFolder() {
-    if (!renameId || !renameName.trim()) return;
-    await supabase.from('teacher_folders').update({ name: renameName.trim() }).eq('id', renameId);
+    if (!renameId || !renameName.trim() || !user) return;
+    await supabase.from('teacher_folders').update({ name: renameName.trim() }).eq('id', renameId).eq('teacher_id', user.id);
     setRenameId(null); setRenameName('');
     load();
   }
 
   async function deleteFolder(id: string, name: string) {
-    if (!confirm(`Delete "${name}" and all its units and words?`)) return;
-    await supabase.from('teacher_folders').delete().eq('id', id);
+    if (!confirm(`Delete "${name}" and all its units and words?`) || !user) return;
+    await supabase.from('teacher_folders').delete().eq('id', id).eq('teacher_id', user.id);
     load();
   }
 

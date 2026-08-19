@@ -179,6 +179,11 @@ export default function UnitPage() {
   async function importAll() {
     if (!parsed.length || !user) return;
     setImporting(true);
+    // Defense-in-depth: confirm this unit is actually the caller's before
+    // importing words into it — RLS is the real backstop, but nothing here
+    // previously stopped an arbitrary unitId from being trusted outright.
+    const { data: unit } = await supabase.from('teacher_units').select('teacher_id').eq('id', unitId).maybeSingle();
+    if (!unit || unit.teacher_id !== user.id) { setImporting(false); return; }
     const rows = parsed.map(w => ({
       unit_id: unitId,
       teacher_id: user.id,
@@ -198,7 +203,8 @@ export default function UnitPage() {
   }
 
   async function deleteWordIds(ids: string[]) {
-    await supabase.from('teacher_unit_words').delete().in('id', ids);
+    if (!user) return;
+    await supabase.from('teacher_unit_words').delete().in('id', ids).eq('teacher_id', user.id);
     setWords(prev => {
       const next = prev.filter(w => !ids.includes(w.id));
       const c = _cache[unitId];

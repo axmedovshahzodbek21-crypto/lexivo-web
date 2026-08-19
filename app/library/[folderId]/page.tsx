@@ -72,21 +72,26 @@ export default function FolderPage() {
   async function createUnit() {
     if (!newName.trim() || !user) return;
     setCreating(true);
+    // Defense-in-depth: confirm this folder is actually the caller's before
+    // creating a unit inside it — RLS is the real backstop, but nothing here
+    // previously stopped an arbitrary folderId from being trusted outright.
+    const { data: folder } = await supabase.from('teacher_folders').select('teacher_id').eq('id', folderId).maybeSingle();
+    if (!folder || folder.teacher_id !== user.id) { setCreating(false); return; }
     await supabase.from('teacher_units').insert({ folder_id: folderId, teacher_id: user.id, name: newName.trim() });
     setNewName(''); setShowCreate(false); setCreating(false);
     load();
   }
 
   async function renameUnit() {
-    if (!renameId || !renameName.trim()) return;
-    await supabase.from('teacher_units').update({ name: renameName.trim() }).eq('id', renameId);
+    if (!renameId || !renameName.trim() || !user) return;
+    await supabase.from('teacher_units').update({ name: renameName.trim() }).eq('id', renameId).eq('teacher_id', user.id);
     setRenameId(null); setRenameName('');
     load();
   }
 
   async function deleteUnit(id: string, name: string) {
-    if (!confirm(`Delete "${name}" and all its words?`)) return;
-    await supabase.from('teacher_units').delete().eq('id', id);
+    if (!confirm(`Delete "${name}" and all its words?`) || !user) return;
+    await supabase.from('teacher_units').delete().eq('id', id).eq('teacher_id', user.id);
     load();
   }
 
