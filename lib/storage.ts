@@ -326,42 +326,53 @@ export function markIntervalDone(wordId: string, interval: number) {
   // getDueWords already skips them (no nextInterval found), so they won't resurface as due.
 }
 
-// Removes all words for a learning date from SRS and resets their unit progress.
-// Called when the 3-day unlearn rule triggers.
-function unlearnDate(learnedDate: string) {
-  const allWords = getSRSWords();
-  const affected = allWords.filter(w => w.learnedAt === learnedDate);
+// Recomputes whether a unit's learnDone flag still holds, given the words
+// currently tombstoned out of the SRS pool for that specific unit — instead
+// of a blanket reset, this only demotes a unit that's actually missing a
+// word, leaving unrelated units (and unrelated words that merely happened
+// to be learned in the same session) untouched.
+function recomputeUnitLearnDone(collectionName: string, dayNumber: number) {
+  const key = `${KEYS.unitProgress}_${collectionName}_${dayNumber}`;
+  const p = getUnitProgress(collectionName, dayNumber);
+  if (!p.learnDone) return; // already not-done, nothing to demote
+
+  const unitWords = getSRSWordsRaw().filter(w => w.collectionName === collectionName && w.dayNumber === dayNumber);
+  const stillMissingAWord = unitWords.some(w => w.deletedAt);
+  if (stillMissingAWord) {
+    set(key, { learnDone: false, flashcardDone: false, quizDone: false });
+  }
+}
+
+// Removes a single stale word from SRS and its review history, and demotes
+// its unit's learnDone flag only if that unit is now genuinely missing a
+// word — not the whole learnedAt-dated batch it happened to be learned
+// alongside. Called when the 3-day unlearn rule triggers.
+function unlearnWord(w: SRSWord) {
   const log = getReviewLog();
-  for (const w of affected) delete log[w.id];
-  delete log[learnedDate]; // clean up any old date-keyed entries too
+  delete log[w.id];
   set(KEYS.reviewLog, log);
 
-  // Clean up lastReview dates for unlearned words
   const lastReview = getSRSLastReview();
-  for (const w of affected) delete lastReview[w.id];
+  delete lastReview[w.id];
   saveSRSLastReview(lastReview);
-
-  // Reset unit progress so words can be re-learned
-  const unitKeys = new Set(affected.map(w => `${w.collectionName}||${w.dayNumber}`));
-  for (const key of unitKeys) {
-    const sep = key.indexOf('||');
-    const col = key.slice(0, sep);
-    const day = key.slice(sep + 2);
-    set(`${KEYS.unitProgress}_${col}_${day}`, { learnDone: false, flashcardDone: false, quizDone: false });
-  }
 
   // Tombstone (not remove) so the unlearn propagates across devices instead
   // of being silently undone by the next pull's additive-only merge, which
   // would otherwise just see the word missing locally and re-add it back
   // from a cloud copy that doesn't know it was unlearned.
   const now = Date.now();
-  const affectedIds = new Set(affected.map(w => w.id));
   const rawSRS = getSRSWordsRaw();
-  set(KEYS.srs, rawSRS.map(w => affectedIds.has(w.id) ? { ...w, deletedAt: now } : w));
+  set(KEYS.srs, rawSRS.map(x => x.id === w.id ? { ...x, deletedAt: now } : x));
 
-  const affectedWords = new Set(affected.map(w => w.word));
+  // Scoped to the same collection, not just a matching word string — the
+  // same word can appear in more than one collection/unit, and only this
+  // one's copy went stale.
   const rawLearned = getLearnedWordsRaw();
-  set(KEYS.learned, rawLearned.map(w => affectedWords.has(w.word) ? { ...w, deletedAt: now } : w));
+  set(KEYS.learned, rawLearned.map(x =>
+    (x.word === w.word && x.collectionName === w.collectionName) ? { ...x, deletedAt: now } : x
+  ));
+
+  recomputeUnitLearnDone(w.collectionName, w.dayNumber);
 }
 
 // One-time migration: pre-populate reviewLog from old reviewStage data so
@@ -418,7 +429,7 @@ export function checkAndUnlearn(today: string = localDateStr()): void {
   const log = getReviewLog();
   const lastReview = getSRSLastReview();
 
-  const datesToUnlearn = new Set<string>();
+  const staleWords: SRSWord[] = [];
 
   for (const w of srsWords) {
     const completed = log[w.id] ?? [];
@@ -428,18 +439,18 @@ export function checkAndUnlearn(today: string = localDateStr()): void {
     const baseDate = lastReview[w.id] ?? w.learnedAt;
     const dueDate = addDaysToDateStr(baseDate, nextInterval);
     if (daysBetweenDateStrs(dueDate, today) >= 3) {
-      datesToUnlearn.add(w.learnedAt);
+      staleWords.push(w);
     }
   }
 
-  for (const date of datesToUnlearn) {
-    unlearnDate(date);
+  for (const w of staleWords) {
+    unlearnWord(w);
   }
 
   // Push immediately so the tombstones (and unit-progress reset) reach the
   // server right away instead of waiting for some unrelated future write.
   // Dynamic import avoids a circular dependency (sync.ts imports storage.ts).
-  if (datesToUnlearn.size > 0) {
+  if (staleWords.length > 0) {
     import('./sync').then(m => m.pushLists()).catch(() => {});
   }
 }
