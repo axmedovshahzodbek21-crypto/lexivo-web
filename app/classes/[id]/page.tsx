@@ -1105,7 +1105,11 @@ function CurriculumTab({
     setCollPickerStep(2);
     setCollPickerLoading(true);
     const col = await fetchCollectionByName(name);
-    setCollPickerDays((col?.days ?? []).map(d => ({ dayNumber: d.dayNumber, topic: d.topic, wordCount: d.words.length })));
+    // Units with no words yet are unfinished content — assigning one as
+    // homework would crash the student's Flashcards/Quiz when they open it.
+    setCollPickerDays((col?.days ?? [])
+      .filter(d => d.words.length > 0)
+      .map(d => ({ dayNumber: d.dayNumber, topic: d.topic, wordCount: d.words.length })));
     setCollPickerLoading(false);
   };
 
