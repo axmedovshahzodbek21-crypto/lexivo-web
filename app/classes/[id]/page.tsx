@@ -1083,6 +1083,7 @@ function CurriculumTab({
 
   const saveHomework = async () => {
     if (!user || (!hwUnit && !hwCollectionName && !hwPassage)) return;
+    if (hwWho !== 'class' && hwStudentIds.size === 0) return;
     setHwSaving(true);
     const { error } = await supabase.from('class_homework').insert({
       class_id: classId,
