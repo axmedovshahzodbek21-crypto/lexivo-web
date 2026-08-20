@@ -56,9 +56,13 @@ export default function ProgressPage() {
   const learnedCount = entries.length;
   const dueCount = entries.filter(e => e.next_due <= todayStr() && e.stage < 5).length;
 
-  // Calendar: set of dates with any review activity
+  // Calendar: set of dates with any review activity. last_reviewed comes
+  // back from Supabase as a UTC timestamp — slicing the string directly (as
+  // before) read the UTC calendar date, not the local one, so a late-night
+  // review could land on the wrong day cell in the local-dated 30-day
+  // calendar below. Parsing through localDateStr() fixes that.
   const reviewDates = new Set(
-    entries.map(e => e.last_reviewed?.slice(0, 10)).filter(Boolean) as string[],
+    entries.map(e => e.last_reviewed ? localDateStr(new Date(e.last_reviewed)) : null).filter(Boolean) as string[],
   );
   const days = last30Days();
 
