@@ -312,79 +312,83 @@ export default function HomePage() {
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const [{ data: taught }, { data: memberships }] = await Promise.all([
-        supabase.from('classes').select('id, name').eq('teacher_id', user.id),
-        supabase.from('class_members').select('class_id, class_xp').eq('student_id', user.id),
-      ]);
-      const taughtIds = new Set((taught ?? []).map((c: { id: string }) => c.id));
-      const cards: HomeClassSummary[] = [];
-
-      if (taught && taught.length > 0) {
-        const taughtList = taught.map((c: { id: string }) => c.id);
-        const today = localDateStr();
-        const [{ data: memberRows }, { data: activeTodayRows }] = await Promise.all([
-          supabase.from('class_members').select('class_id').in('class_id', taughtList),
-          supabase.from('class_study_days').select('class_id').in('class_id', taughtList).eq('study_date', today),
+      try {
+        const [{ data: taught }, { data: memberships }] = await Promise.all([
+          supabase.from('classes').select('id, name').eq('teacher_id', user.id),
+          supabase.from('class_members').select('class_id, class_xp').eq('student_id', user.id),
         ]);
-        const memberCount: Record<string, number> = {};
-        for (const r of memberRows ?? []) memberCount[r.class_id] = (memberCount[r.class_id] ?? 0) + 1;
-        const activeCount: Record<string, number> = {};
-        for (const r of activeTodayRows ?? []) activeCount[r.class_id] = (activeCount[r.class_id] ?? 0) + 1;
-        for (const c of taught) {
-          cards.push({ classId: c.id, className: c.name, isTeacher: true,
-            studentCount: memberCount[c.id] ?? 0, activeToday: activeCount[c.id] ?? 0,
-            classXP: 0, classStreak: 0, pendingHomework: 0 });
-        }
-      }
+        const taughtIds = new Set((taught ?? []).map((c: { id: string }) => c.id));
+        const cards: HomeClassSummary[] = [];
 
-      const studentMemberships = (memberships ?? []).filter((m: { class_id: string }) => !taughtIds.has(m.class_id));
-      if (studentMemberships.length > 0) {
-        const studentClassIds = studentMemberships.map((m: { class_id: string }) => m.class_id);
-        const xpMap: Record<string, number> = {};
-        for (const m of studentMemberships) xpMap[m.class_id] = m.class_xp ?? 0;
-        const [{ data: classNames }, { data: studyDays }, { data: pendingHw }] = await Promise.all([
-          supabase.from('classes').select('id, name').in('id', studentClassIds),
-          supabase.from('class_study_days').select('class_id, study_date')
-            .eq('student_id', user.id).in('class_id', studentClassIds)
-            .order('study_date', { ascending: false }).limit(60),
-          supabase.from('class_targets').select('class_id')
-            .eq('student_id', user.id).in('class_id', studentClassIds).is('completed_at', null),
-        ]);
-        const daysByClass: Record<string, string[]> = {};
-        for (const r of studyDays ?? []) {
-          if (!daysByClass[r.class_id]) daysByClass[r.class_id] = [];
-          daysByClass[r.class_id].push(r.study_date);
+        if (taught && taught.length > 0) {
+          const taughtList = taught.map((c: { id: string }) => c.id);
+          const today = localDateStr();
+          const [{ data: memberRows }, { data: activeTodayRows }] = await Promise.all([
+            supabase.from('class_members').select('class_id').in('class_id', taughtList),
+            supabase.from('class_study_days').select('class_id').in('class_id', taughtList).eq('study_date', today),
+          ]);
+          const memberCount: Record<string, number> = {};
+          for (const r of memberRows ?? []) memberCount[r.class_id] = (memberCount[r.class_id] ?? 0) + 1;
+          const activeCount: Record<string, number> = {};
+          for (const r of activeTodayRows ?? []) activeCount[r.class_id] = (activeCount[r.class_id] ?? 0) + 1;
+          for (const c of taught) {
+            cards.push({ classId: c.id, className: c.name, isTeacher: true,
+              studentCount: memberCount[c.id] ?? 0, activeToday: activeCount[c.id] ?? 0,
+              classXP: 0, classStreak: 0, pendingHomework: 0 });
+          }
         }
-        const pendingByClass: Record<string, number> = {};
-        for (const r of pendingHw ?? []) pendingByClass[r.class_id] = (pendingByClass[r.class_id] ?? 0) + 1;
-        for (const c of classNames ?? []) {
-          cards.push({ classId: c.id, className: c.name, isTeacher: false,
-            studentCount: 0, activeToday: 0,
-            classXP: xpMap[c.id] ?? 0,
-            classStreak: computeClassStreak(daysByClass[c.id] ?? []),
-            pendingHomework: pendingByClass[c.id] ?? 0 });
+
+        const studentMemberships = (memberships ?? []).filter((m: { class_id: string }) => !taughtIds.has(m.class_id));
+        if (studentMemberships.length > 0) {
+          const studentClassIds = studentMemberships.map((m: { class_id: string }) => m.class_id);
+          const xpMap: Record<string, number> = {};
+          for (const m of studentMemberships) xpMap[m.class_id] = m.class_xp ?? 0;
+          const [{ data: classNames }, { data: studyDays }, { data: pendingHw }] = await Promise.all([
+            supabase.from('classes').select('id, name').in('id', studentClassIds),
+            supabase.from('class_study_days').select('class_id, study_date')
+              .eq('student_id', user.id).in('class_id', studentClassIds)
+              .order('study_date', { ascending: false }).limit(60),
+            supabase.from('class_targets').select('class_id')
+              .eq('student_id', user.id).in('class_id', studentClassIds).is('completed_at', null),
+          ]);
+          const daysByClass: Record<string, string[]> = {};
+          for (const r of studyDays ?? []) {
+            if (!daysByClass[r.class_id]) daysByClass[r.class_id] = [];
+            daysByClass[r.class_id].push(r.study_date);
+          }
+          const pendingByClass: Record<string, number> = {};
+          for (const r of pendingHw ?? []) pendingByClass[r.class_id] = (pendingByClass[r.class_id] ?? 0) + 1;
+          for (const c of classNames ?? []) {
+            cards.push({ classId: c.id, className: c.name, isTeacher: false,
+              studentCount: 0, activeToday: 0,
+              classXP: xpMap[c.id] ?? 0,
+              classStreak: computeClassStreak(daysByClass[c.id] ?? []),
+              pendingHomework: pendingByClass[c.id] ?? 0 });
+          }
         }
+        setHomeClasses(cards);
+        setSectionOrder(prev => {
+          const newIds = cards.map(c => `class_${c.classId}`).filter(id => !prev.includes(id));
+          if (newIds.length === 0) return prev;
+          const insertAt = prev.indexOf('classes');
+          const updated = insertAt >= 0
+            ? [...prev.slice(0, insertAt), ...newIds, ...prev.slice(insertAt)]
+            : [...prev, ...newIds];
+          localStorage.setItem('home_section_order', updated.join(','));
+          return updated;
+        });
+        // Add newly discovered class cards to first empty slots in slotMap
+        setSlotMap(prev => {
+          const toAdd = cards.map(c => `class_${c.classId}`).filter(id => !prev.includes(id));
+          if (toAdd.length === 0) return prev;
+          const m = [...prev];
+          for (const id of toAdd) { const i = m.indexOf(null); if (i !== -1) m[i] = id; }
+          localStorage.setItem('home_slot_map', JSON.stringify(m));
+          return m;
+        });
+      } catch {
+        // best-effort — leave whatever class cards were already loaded
       }
-      setHomeClasses(cards);
-      setSectionOrder(prev => {
-        const newIds = cards.map(c => `class_${c.classId}`).filter(id => !prev.includes(id));
-        if (newIds.length === 0) return prev;
-        const insertAt = prev.indexOf('classes');
-        const updated = insertAt >= 0
-          ? [...prev.slice(0, insertAt), ...newIds, ...prev.slice(insertAt)]
-          : [...prev, ...newIds];
-        localStorage.setItem('home_section_order', updated.join(','));
-        return updated;
-      });
-      // Add newly discovered class cards to first empty slots in slotMap
-      setSlotMap(prev => {
-        const toAdd = cards.map(c => `class_${c.classId}`).filter(id => !prev.includes(id));
-        if (toAdd.length === 0) return prev;
-        const m = [...prev];
-        for (const id of toAdd) { const i = m.indexOf(null); if (i !== -1) m[i] = id; }
-        localStorage.setItem('home_slot_map', JSON.stringify(m));
-        return m;
-      });
     })();
   }, [user]);
 
