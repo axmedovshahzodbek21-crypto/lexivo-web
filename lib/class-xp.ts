@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { localDateStr } from './storage';
 
 // Class XP is intentionally isolated from the app-wide XP pool (lexivo_xp /
 // user_data.total_xp / user_stats.xp) — it only reflects activity done
@@ -13,10 +14,6 @@ export async function recordClassStudyDay(studentId: string, classId: string): P
   } catch {
     // best-effort
   }
-}
-
-function localDateStr(d: Date): string {
-  return d.toLocaleDateString('en-CA'); // YYYY-MM-DD in the user's local timezone
 }
 
 // Increments class_members.class_xp via the record_class_xp RPC rather than

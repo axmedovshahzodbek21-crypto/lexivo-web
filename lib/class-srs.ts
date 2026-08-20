@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { localDateStr } from './storage';
 
 const INTERVALS = [1, 3, 7, 14, 30]; // days, same as personal SRS
 
@@ -26,16 +27,6 @@ export interface ClassSRSEntry {
   last_reviewed: string | null;
   created_at: string;
   fail_streak: number;
-}
-
-// Local date (not UTC) — matches the personal SRS system's localDateStr()
-// in lib/storage.ts and Flutter's DateTime.now()-based date math. Using
-// toISOString() here previously computed "today" in UTC while everything
-// else in the app (including the shared class_srs_states table written to
-// by Flutter) uses local time, causing an off-by-one-day mismatch for
-// users ahead of UTC and for anyone using both web and Flutter.
-function localDateStr(d: Date): string {
-  return d.toLocaleDateString('en-CA'); // YYYY-MM-DD in the user's local timezone
 }
 
 function addDays(n: number): string {
