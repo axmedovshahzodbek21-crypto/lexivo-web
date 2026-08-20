@@ -7,10 +7,19 @@ const DAY_LABELS = ['M','T','W','T','F','S','S'];
 
 interface Props {
   history: XpEntry[];
+  // Lifetime per-day totals (see storage.ts's getXPByDate) — unlike
+  // `history` (getXPHistory, capped at 500 raw events), this never loses
+  // old days, so the calendar's coloring/totals stay consistent with the
+  // lifetime XP total shown elsewhere instead of early days silently
+  // going blank once enough recent activity pushes them out of the capped
+  // history. Optional/falls back to summing `history` if omitted.
+  xpByDate?: Record<string, number>;
   // Fired whenever the selected day changes (including being cleared), with
-  // that day's entries (newest first) and total XP — the two callers render
-  // the day-detail panel very differently (inline below vs. a side column),
-  // so that markup stays in each caller rather than being extracted here.
+  // that day's entries (newest first, possibly empty if this day's raw
+  // events already aged out of the cap) and total XP — the two callers
+  // render the day-detail panel very differently (inline below vs. a side
+  // column), so that markup stays in each caller rather than being
+  // extracted here.
   onSelectDay?: (day: string | null, entries: XpEntry[], total: number) => void;
   // XpHistoryModal clears the selected day when the month changes (it can't
   // stay selected if it's no longer visible in the grid); XpModal doesn't,
@@ -18,11 +27,11 @@ interface Props {
   resetSelectionOnMonthChange?: boolean;
 }
 
-export default function XpCalendar({ history, onSelectDay, resetSelectionOnMonthChange = false }: Props) {
+export default function XpCalendar({ history, xpByDate, onSelectDay, resetSelectionOnMonthChange = false }: Props) {
   const [calMonth, setCalMonth] = useState(() => { const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), 1); });
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
 
-  if (history.length === 0) return null;
+  if (history.length === 0 && !xpByDate) return null;
 
   const byDate: Record<string, XpEntry[]> = {};
   for (const e of history) {
@@ -40,7 +49,7 @@ export default function XpCalendar({ history, onSelectDay, resetSelectionOnMonth
   function selectDay(day: string | null) {
     setSelectedDay(day);
     const entries = day ? (byDate[day] ?? []).slice().sort((a,b) => b.timestamp - a.timestamp) : [];
-    const total = entries.reduce((s,e) => s + e.amount, 0);
+    const total = day ? (xpByDate?.[day] ?? entries.reduce((s,e) => s + e.amount, 0)) : 0;
     onSelectDay?.(day, entries, total);
   }
 
@@ -77,8 +86,8 @@ export default function XpCalendar({ history, onSelectDay, resetSelectionOnMonth
           const dateStr = `${calMonth.getFullYear()}-${mm}-${String(day).padStart(2,'0')}`;
           const isToday = dateStr === todayStr;
           const entries = byDate[dateStr];
-          const hasXp = !!entries;
-          const dayXp = hasXp ? entries.reduce((s,e) => s+e.amount, 0) : 0;
+          const dayXp = xpByDate?.[dateStr] ?? (entries ? entries.reduce((s,e) => s+e.amount, 0) : 0);
+          const hasXp = dayXp > 0;
           const isSelected = selectedDay === dateStr;
           return (
             <button key={day} onClick={() => hasXp && selectDay(isSelected ? null : dateStr)}

@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { displayXP, fetchXPHistory, type XpEntry } from '@/lib/storage';
+import { displayXP, fetchXPHistory, getXPByDate, type XpEntry } from '@/lib/storage';
 import XpCalendar from './XpCalendar';
 
 const REASON_ICONS: Record<string, string> = { Learn:'📖', Flashcard:'🃏', Quiz:'🧠', Match:'🎯', 'SRS Review':'🔄', 'Streak Bonus':'🔥', 'Level Complete':'🏆', Achievement:'⭐' };
@@ -12,10 +12,12 @@ interface Props {
 
 export default function XpHistoryModal({ xp, onClose }: Props) {
   const [history, setHistory] = useState<XpEntry[]>([]);
+  const [xpByDate, setXpByDate] = useState<Record<string, number>>({});
   const [dayDetail, setDayDetail] = useState<{ day: string; entries: XpEntry[]; total: number } | null>(null);
 
   useEffect(() => {
     fetchXPHistory().then(setHistory).catch(() => {});
+    setXpByDate(getXPByDate());
   }, []);
 
   useEffect(() => {
@@ -64,6 +66,7 @@ export default function XpHistoryModal({ xp, onClose }: Props) {
             ) : (
               <XpCalendar
                 history={history}
+                xpByDate={xpByDate}
                 resetSelectionOnMonthChange
                 onSelectDay={(day, entries, total) => setDayDetail(day ? { day, entries, total } : null)}
               />
@@ -91,6 +94,11 @@ export default function XpHistoryModal({ xp, onClose }: Props) {
               </div>
               {/* Entries */}
               <div className="overflow-y-auto overscroll-contain pb-6">
+                {dayDetail.entries.length === 0 && (
+                  <p className="text-[11px] text-center px-5 py-4" style={{ color: 'var(--text-muted)' }}>
+                    Detailed breakdown no longer available for this day — only recent activity is kept.
+                  </p>
+                )}
                 {dayDetail.entries.map((e, j) => {
                   const d = new Date(e.timestamp);
                   const time = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;

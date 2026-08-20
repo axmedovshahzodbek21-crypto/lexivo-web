@@ -39,6 +39,7 @@ const KEYS = {
   reviewLog:    'lexivo_review_log',
   srsLastReview: 'lexivo_srs_last_review',
   xpHistory: 'lexivo_xp_history',
+  xpByDate: 'lexivo_xp_by_date',
   xpUpdatedAt:       'lexivo_xp_updated_at',
   streakBonusDate:   'lexivo_streak_bonus_date',
   lastCompleteDay:   'lexivo_last_complete_day',
@@ -804,6 +805,17 @@ export function addXP(amount: number, reason = 'Study', source?: string): { leve
   if (history.length > 500) history.splice(0, history.length - 500);
   set(KEYS.xpHistory, history);
 
+  // xpHistory above is capped at 500 raw entries, so a calendar summing it
+  // directly permanently diverges from the lifetime total once old entries
+  // age out — early study days would just vanish from the calendar while
+  // the lifetime total keeps climbing. This map is one entry per calendar
+  // day (not per event), so it stays small even over years of daily use
+  // and is never evicted. Same fix as Flutter's storage_service.dart.
+  const dateKey = localDateStr(new Date(ts));
+  const byDate = get<Record<string, number>>(KEYS.xpByDate, {});
+  byDate[dateKey] = (byDate[dateKey] ?? 0) + amount;
+  set(KEYS.xpByDate, byDate);
+
   _pushXpEntryAsync(entry);
   notifyStatsChanged();
 
@@ -814,6 +826,14 @@ export function addXP(amount: number, reason = 'Study', source?: string): { leve
 
 export function getXPHistory(): XpEntry[] {
   return get<XpEntry[]>(KEYS.xpHistory, []).slice().reverse();
+}
+
+// Lifetime per-day XP totals — see the comment in addXP. Unlike
+// getXPHistory() (capped at the most recent 500 events), this always
+// reflects every day XP was ever earned, so a calendar summing this stays
+// consistent with the lifetime total shown elsewhere.
+export function getXPByDate(): Record<string, number> {
+  return get<Record<string, number>>(KEYS.xpByDate, {});
 }
 
 export async function fetchXPHistory(): Promise<XpEntry[]> {
