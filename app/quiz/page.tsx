@@ -11,6 +11,7 @@ import { checkAchievements } from '@/lib/gamification';
 import { supabase } from '@/lib/supabase';
 import { getClassWordsFull, addClassHardWord } from '@/lib/class-srs';
 import { recordClassStudyDay } from '@/lib/class-xp';
+import { shuffleArray } from '@/lib/shuffleArray';
 import type { WordItem, WordCollection, QuizType } from '@/lib/types';
 import Link from 'next/link';
 import UnitPicker from '@/components/UnitPicker';
@@ -29,15 +30,6 @@ interface QuizQuestion {
   prompt: string;
   correct: string;
   options: string[];
-}
-
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
 }
 
 function buildQuiz(
@@ -66,7 +58,7 @@ function buildQuiz(
     }
   }
 
-  const words = (dayNumber !== undefined || starredOnly || listId) ? shuffle(allWords) : shuffle(allWords).slice(0, 10);
+  const words = (dayNumber !== undefined || starredOnly || listId) ? shuffleArray(allWords) : shuffleArray(allWords).slice(0, 10);
   const types: QuizType[] = quizDirection === 'uz-to-word'
     ? ['translation_to_word', 'word_to_translation', 'definition_to_word']
     : ['word_to_translation', 'translation_to_word', 'definition_to_word'];
@@ -91,9 +83,9 @@ function buildQuiz(
     const pool = allWords
       .filter(w => w.word !== word.word)
       .map(w => type === 'word_to_translation' ? w.translation : w.word);
-    const wrongs = shuffle([...new Set(pool)].filter(w => w !== correct)).slice(0, 3);
+    const wrongs = shuffleArray([...new Set(pool)].filter(w => w !== correct)).slice(0, 3);
 
-    const options = shuffle([correct, ...wrongs]);
+    const options = shuffleArray([correct, ...wrongs]);
     return { word, type, prompt, correct, options };
   });
 }
@@ -169,7 +161,7 @@ export default function QuizPage() {
         example3: '', example3Translation: '', example3Situation: '',
         collectionName: classId, topic: classNameParam, dayNumber: 0,
       }));
-      const words = shuffle(allWords);
+      const words = shuffleArray(allWords);
       const types: ['word_to_translation', 'translation_to_word', 'definition_to_word'] =
         ['word_to_translation', 'translation_to_word', 'definition_to_word'];
       const qs: QuizQuestion[] = words.map((word, i): QuizQuestion => {
@@ -180,8 +172,8 @@ export default function QuizPage() {
         else if (type === 'translation_to_word') { prompt = word.translation; correct = word.word; }
         else { prompt = word.definition || word.word; correct = word.word; }
         const pool = allWords.filter(w => w.word !== word.word).map(w => type === 'word_to_translation' ? w.translation : w.word);
-        const wrongs = shuffle([...new Set(pool)].filter(w => w !== correct)).slice(0, 3);
-        return { word, type, prompt, correct, options: shuffle([correct, ...wrongs]) };
+        const wrongs = shuffleArray([...new Set(pool)].filter(w => w !== correct)).slice(0, 3);
+        return { word, type, prompt, correct, options: shuffleArray([correct, ...wrongs]) };
       });
       setQuestions(qs);
     })();
@@ -200,7 +192,7 @@ export default function QuizPage() {
         extraExamples: w.extraExamples ?? [], extraExampleTranslations: w.extraExampleTranslations ?? [],
         collectionName: 'class-hw', topic: w.className, dayNumber: 0,
       }));
-      const words = shuffle(allWords);
+      const words = shuffleArray(allWords);
       const types: QuizType[] = ['word_to_translation', 'translation_to_word', 'definition_to_word'];
       const qs: QuizQuestion[] = words.map((word, i): QuizQuestion => {
         const type = types[i % 3];
@@ -210,8 +202,8 @@ export default function QuizPage() {
         else if (type === 'translation_to_word') { prompt = word.translation; correct = word.word; }
         else { prompt = word.definition || word.word; correct = word.word; }
         const pool = allWords.filter(w => w.word !== word.word).map(w => type === 'word_to_translation' ? w.translation : w.word);
-        const wrongs = shuffle([...new Set(pool)].filter(w => w !== correct)).slice(0, 3);
-        const options = shuffle([correct, ...wrongs]);
+        const wrongs = shuffleArray([...new Set(pool)].filter(w => w !== correct)).slice(0, 3);
+        const options = shuffleArray([correct, ...wrongs]);
         return { word, type, prompt, correct, options };
       });
       setQuestions(qs);
@@ -230,7 +222,7 @@ export default function QuizPage() {
         language: w.language,
         collectionName: 'my-words', topic: myCollection ?? 'My Words', dayNumber: 0,
       }));
-      const words = shuffle(allWords);
+      const words = shuffleArray(allWords);
       const types: QuizType[] = ['word_to_translation', 'translation_to_word', 'definition_to_word'];
       const qs: QuizQuestion[] = words.map((word, i): QuizQuestion => {
         const type = types[i % 3];
@@ -240,8 +232,8 @@ export default function QuizPage() {
         else if (type === 'translation_to_word') { prompt = word.translation; correct = word.word; }
         else { prompt = word.definition || word.word; correct = word.word; }
         const pool = allWords.filter(w => w.word !== word.word).map(w => type === 'word_to_translation' ? w.translation : w.word);
-        const wrongs = shuffle([...new Set(pool)].filter(w => w !== correct)).slice(0, 3);
-        const options = shuffle([correct, ...wrongs]);
+        const wrongs = shuffleArray([...new Set(pool)].filter(w => w !== correct)).slice(0, 3);
+        const options = shuffleArray([correct, ...wrongs]);
         return { word, type, prompt, correct, options };
       });
       setQuestions(qs);

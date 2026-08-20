@@ -9,6 +9,7 @@ import {
   getClassDueWords, getClassSRSAll, advanceClassSRSWord,
   stageLabel, stageColor, type ClassSRSEntry,
 } from '@/lib/class-srs';
+import { shuffleArray } from '@/lib/shuffleArray';
 
 const TILE_COLORS = [
   { bg: '#e21b3c', shadow: '#a01328', shape: '▲' },
@@ -92,8 +93,8 @@ export default function ClassReviewPage() {
       if (e.translation !== correct) pool.add(e.translation);
     }
     if (pool.size < 2) return null;
-    const wrong = [...pool].sort(() => Math.random() - 0.5).slice(0, Math.min(3, pool.size));
-    return [correct, ...wrong].sort(() => Math.random() - 0.5);
+    const wrong = shuffleArray([...pool]).slice(0, Math.min(3, pool.size));
+    return shuffleArray([correct, ...wrong]);
   }, [allPool]);
 
   useEffect(() => {
@@ -106,7 +107,7 @@ export default function ClassReviewPage() {
   const toggleShuffle = () => {
     const next = !isShuffled;
     setIsShuffled(next);
-    setQueue(prev => next ? [...prev].sort(() => Math.random() - 0.5) : [...prev]);
+    setQueue(prev => next ? shuffleArray(prev) : [...prev]);
     setIndex(0); setResults([]); setRevealed(false); setTappedChoice(null);
   };
 

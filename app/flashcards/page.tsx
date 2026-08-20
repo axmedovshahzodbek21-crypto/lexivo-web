@@ -12,6 +12,7 @@ import { recordClassStudyDay } from '@/lib/class-xp';
 import { pushLists, pushStats } from '@/lib/sync';
 import { checkAchievements } from '@/lib/gamification';
 import { fireConfetti } from '@/lib/confetti';
+import { shuffleArray } from '@/lib/shuffleArray';
 import type { WordItem, WordCollection } from '@/lib/types';
 import Link from 'next/link';
 import UnitPicker from '@/components/UnitPicker';
@@ -140,7 +141,7 @@ export default function FlashcardsPage() {
         };
       });
       originalWordCount.current = list.length;
-      setDeck(list.sort(() => Math.random() - 0.5));
+      setDeck(shuffleArray(list));
     })();
   }, [sourceClass, classId, classNameParam]); // eslint-disable-line react-hooks/exhaustive-deps
 

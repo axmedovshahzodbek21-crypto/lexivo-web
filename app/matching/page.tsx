@@ -12,6 +12,7 @@ import { recordClassStudyDay } from '@/lib/class-xp';
 import { supabase } from '@/lib/supabase';
 import { checkAchievements } from '@/lib/gamification';
 import { fireConfetti } from '@/lib/confetti';
+import { shuffleArray as shuffle } from '@/lib/shuffleArray';
 import type { WordItem, WordCollection } from '@/lib/types';
 
 interface MatchWord extends WordItem {
@@ -24,15 +25,6 @@ type Selection = { side: 'left' | 'right'; id: string } | null;
 type Phase = 'playing' | 'round_done' | 'done';
 
 const BATCH_SIZE = 6;
-
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
 
 function buildList(
   collections: WordCollection[],
@@ -179,8 +171,15 @@ function MatchingInner() {
 
   const initRound = useCallback((idx: number, wordList: MatchWord[]) => {
     const batch = wordList.slice(idx * BATCH_SIZE, (idx + 1) * BATCH_SIZE);
-    const ids = batch.map(w => w.word);
-    setRoundWords(batch);
+    // Tiles are matched and keyed by word text (also passed straight through
+    // to addClassHardWord below), so two tiles sharing the same word would
+    // make both sides ambiguous — dedupe defensively within the batch in
+    // case the source list (a custom/imported list) ever contains the same
+    // word twice.
+    const seen = new Set<string>();
+    const uniqueBatch = batch.filter(w => (seen.has(w.word) ? false : (seen.add(w.word), true)));
+    const ids = uniqueBatch.map(w => w.word);
+    setRoundWords(uniqueBatch);
     setLeftOrder(shuffle(ids));
     setRightOrder(shuffle(ids));
     setMatched(new Set());

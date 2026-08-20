@@ -22,6 +22,7 @@ import { recordClassStudyDay } from '@/lib/class-xp';
 import type { Accent } from '@/lib/speech';
 import { checkAchievements } from '@/lib/gamification';
 import { fireConfetti } from '@/lib/confetti';
+import { shuffleArray } from '@/lib/shuffleArray';
 import type { WordItem, WordCollection } from '@/lib/types';
 import { getImportedWords, getImportedWordsByCollection, importedWordExampleFields, getMyActivityPendingNewWords, markMyLearnComplete } from '@/lib/storage';
 import Link from 'next/link';
@@ -193,6 +194,8 @@ function LearnInner() {
   const [learnedSinceLastCheck, setLearnedSinceLastCheck] = useState(0);
   const currentIndexRef = useRef(index);
   useEffect(() => { currentIndexRef.current = index; }, [index]);
+  const doneRef = useRef(done);
+  useEffect(() => { doneRef.current = done; }, [done]);
 
   // ── Phase 5: analytics tracking refs (no re-renders) ──────────────────────
   // Reset when words array is first populated (fires once per session load)
@@ -269,7 +272,7 @@ function LearnInner() {
         dayNumber: 0,
       }));
       const shuffled = studyOrder === 'random'
-        ? [...list].sort(() => Math.random() - 0.5)
+        ? shuffleArray(list)
         : list;
       const mySlice = shuffled.slice(0, sessionSize);
       setWords(mySlice);
@@ -337,7 +340,7 @@ function LearnInner() {
         };
       });
       const ordered = studyOrder === 'random'
-        ? [...list].sort(() => Math.random() - 0.5)
+        ? shuffleArray(list)
         : list;
       setWords(ordered);
       setMarks(new Array(ordered.length).fill(null));
@@ -357,7 +360,7 @@ function LearnInner() {
       extraExamples: w.extraExamples ?? [], extraExampleTranslations: w.extraExampleTranslations ?? [],
       collectionName: w.className, topic: w.className, dayNumber: 0,
     }));
-    setWords(list.sort(() => Math.random() - 0.5));
+    setWords(shuffleArray(list));
     setMarks(new Array(list.length).fill(null));
     setClassWordsLoaded(true);
   }, [sourceClassHW]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -421,14 +424,26 @@ function LearnInner() {
     };
     upsert();
     const id = setInterval(upsert, 30_000);
+    return () => clearInterval(id);
+  }, [done, words.length, collectionName, dayNumber, sourceClass, classNameParam]);
+
+  // Delete the presence row only on a true unmount (navigating away
+  // mid-session), not on every re-run of the upsert effect above — that
+  // effect's deps (collectionName/dayNumber/words.length) can legitimately
+  // change while the session is still active (e.g. once URL params finish
+  // resolving), and deleting+recreating the row on every such change caused
+  // a brief visibility gap on the teacher's "studying now" dashboard. Empty
+  // deps + a ref for the delete body so this really only fires once, on
+  // unmount, using whatever the latest values were.
+  useEffect(() => {
     return () => {
-      clearInterval(id);
-      // Delete presence row when navigating away mid-session (not just on done)
+      if (doneRef.current) return;
       supabase.auth.getUser().then(({ data: { user } }) => {
         if (user) supabase.from('student_presence').delete().eq('student_id', user.id).then(() => {});
       });
     };
-  }, [done, words.length, collectionName, dayNumber]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ── Emit session analytics when done ──────────────────────────────────────
   useEffect(() => {
@@ -545,8 +560,8 @@ function LearnInner() {
     if (marks[index] === 'learned') { advanceCard(); return; } // already marked — bypass gate
     if (words.length < 2) { advanceCard(); return; }
     const correct = current.translation;
-    const pool = [...words.filter(w => w.word !== current.word)].sort(() => Math.random() - 0.5);
-    const opts = [correct, ...pool.slice(0, 3).map(w => w.translation)].sort(() => Math.random() - 0.5);
+    const pool = shuffleArray(words.filter(w => w.word !== current.word));
+    const opts = shuffleArray([correct, ...pool.slice(0, 3).map(w => w.translation)]);
     setGateOptions(opts);
     setGateCorrectIndex(opts.indexOf(correct));
     setGateSelected(null);
@@ -567,8 +582,8 @@ function LearnInner() {
           if (learnedWords.length > 0) {
             const checkWord = learnedWords[Math.floor(Math.random() * learnedWords.length)];
             const correct = checkWord.translation;
-            const pool = [...words.filter(w => w.word !== checkWord.word)].sort(() => Math.random() - 0.5);
-            const opts = [correct, ...pool.slice(0, 3).map(w => w.translation)].sort(() => Math.random() - 0.5);
+            const pool = shuffleArray(words.filter(w => w.word !== checkWord.word));
+            const opts = shuffleArray([correct, ...pool.slice(0, 3).map(w => w.translation)]);
             setLearnedSinceLastCheck(0);
             setSpotCheckWord(checkWord);
             setSpotCheckOptions(opts);

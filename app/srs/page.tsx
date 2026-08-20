@@ -13,6 +13,7 @@ import { stageColor } from '@/lib/srs';
 import { checkAchievements } from '@/lib/gamification';
 import { REVIEW_XP, SRS_INTERVALS } from '@/lib/types';
 import type { DueSRSWord, SRSWord } from '@/lib/types';
+import { shuffleArray } from '@/lib/shuffleArray';
 import Link from 'next/link';
 import { useTranslation } from '@/lib/useTranslation';
 
@@ -123,8 +124,8 @@ export default function SRSReviewPage() {
       }
     }
     if (pool.size < 2) return null;
-    const wrong = [...pool].sort(() => Math.random() - 0.5).slice(0, Math.min(3, pool.size));
-    return [correct, ...wrong].sort(() => Math.random() - 0.5);
+    const wrong = shuffleArray([...pool]).slice(0, Math.min(3, pool.size));
+    return shuffleArray([correct, ...wrong]);
   }, []);
 
   useEffect(() => {
@@ -162,7 +163,7 @@ export default function SRSReviewPage() {
     const due = getDueWords();
     const next = !isShuffled;
     setIsShuffled(next);
-    setQueue(next ? [...due].sort(() => Math.random() - 0.5) : [...due]);
+    setQueue(next ? shuffleArray(due) : [...due]);
     setIndex(0);
     setResults([]);
     setRevealed(false);
