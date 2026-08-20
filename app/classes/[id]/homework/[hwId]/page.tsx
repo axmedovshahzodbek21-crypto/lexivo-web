@@ -5,18 +5,8 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { saveClassHWTemp } from '@/lib/storage';
 import type { ClassHWWord } from '@/lib/storage';
-import { loadCollections, loadCEFRCollection } from '@/lib/data';
-import type { WordCollection } from '@/lib/types';
 import { readingPassages, type ReadingPassage } from '@/lib/reading-data';
-import { dueLabel, isHomeworkDone } from '../_shared';
-
-async function fetchCollectionByName(name: string): Promise<WordCollection | null> {
-  if (name === '30 Days of Powerful Words') { const c = await loadCollections(); return c[0] ?? null; }
-  if (name === '24 Vocabulary Challenge')   { const c = await loadCollections(); return c[1] ?? null; }
-  if (name === 'Word Mastery')              { const c = await loadCollections(); return c[2] ?? null; }
-  const lvl = ({ A1: 'a1', A2: 'a2', B1: 'b1' } as Record<string, 'a1'|'a2'|'b1'>)[name];
-  return lvl ? loadCEFRCollection(lvl) : null;
-}
+import { dueLabel, isHomeworkDone, fetchCollectionByName } from '../_shared';
 
 interface UnitWord {
   word: string;

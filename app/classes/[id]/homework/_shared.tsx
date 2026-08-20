@@ -1,6 +1,22 @@
 'use client';
 import Link from 'next/link';
 import { localDateStr, addDaysToDateStr } from '@/lib/storage';
+import { loadCollections, loadCEFRCollection } from '@/lib/data';
+import type { WordCollection } from '@/lib/types';
+
+// Looks up one of the six built-in word collections by its exact display
+// name, as stored in class_homework.collection_name. Previously
+// reimplemented identically in 4 files (classes/[id]/page.tsx and three
+// files under homework/) — renaming a collection required updating every
+// copy in lockstep, or homework silently fell back to whatever the caller
+// did on a null return.
+export async function fetchCollectionByName(name: string): Promise<WordCollection | null> {
+  if (name === '30 Days of Powerful Words') { const c = await loadCollections(); return c[0] ?? null; }
+  if (name === '24 Vocabulary Challenge')   { const c = await loadCollections(); return c[1] ?? null; }
+  if (name === 'Word Mastery')              { const c = await loadCollections(); return c[2] ?? null; }
+  const lvl = ({ A1: 'a1', A2: 'a2', B1: 'b1' } as Record<string, 'a1'|'a2'|'b1'>)[name];
+  return lvl ? loadCEFRCollection(lvl) : null;
+}
 
 export const MODE_ICON: Record<string, string> = { learn: '📖', flashcard: '🃏', quiz: '❓', match: '🎯' };
 export const MODE_LABEL: Record<string, string> = { learn: 'Learn', flashcard: 'Cards', quiz: 'Quiz', match: 'Match' };

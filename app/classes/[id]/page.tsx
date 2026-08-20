@@ -4,12 +4,10 @@ import { useEffect, useState, useMemo } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
-import { loadCollections, loadCEFRCollection } from '@/lib/data';
-import type { WordCollection } from '@/lib/types';
 import { readingPassages } from '@/lib/reading-data';
 import { classifyReview, REVIEW_LABEL_META, REVIEW_WINDOW_DAYS, type ReviewEntry, type ReviewLabel } from '@/lib/reviewPattern';
 import { localDateStr, addDaysToDateStr } from '@/lib/storage';
-import { isHomeworkDone } from './homework/_shared';
+import { isHomeworkDone, fetchCollectionByName } from './homework/_shared';
 
 interface CollectionMeta {
   collection_name: string;
@@ -891,14 +889,6 @@ const COLLECTION_META = [
   { name: 'A2',                        emoji: '🔵', totalDays: 30 },
   { name: 'B1',                        emoji: '🟡', totalDays: 26 },
 ];
-
-async function fetchCollectionByName(name: string): Promise<WordCollection | null> {
-  if (name === '30 Days of Powerful Words') { const c = await loadCollections(); return c[0] ?? null; }
-  if (name === '24 Vocabulary Challenge')   { const c = await loadCollections(); return c[1] ?? null; }
-  if (name === 'Word Mastery')              { const c = await loadCollections(); return c[2] ?? null; }
-  const lvl = ({ A1: 'a1', A2: 'a2', B1: 'b1' } as Record<string, 'a1'|'a2'|'b1'>)[name];
-  return lvl ? loadCEFRCollection(lvl) : null;
-}
 
 function CurriculumTab({
   classId,

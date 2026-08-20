@@ -4,17 +4,7 @@ import { useParams, useRouter } from 'next/navigation';
 import BackButton from '@/components/BackButton';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
-import { loadCollections, loadCEFRCollection } from '@/lib/data';
-import type { WordCollection } from '@/lib/types';
-import { AssignedUnitCard, isHomeworkDone, type AssignedUnit } from '../../_shared';
-
-async function fetchCollectionByName(name: string): Promise<WordCollection | null> {
-  if (name === '30 Days of Powerful Words') { const c = await loadCollections(); return c[0] ?? null; }
-  if (name === '24 Vocabulary Challenge')   { const c = await loadCollections(); return c[1] ?? null; }
-  if (name === 'Word Mastery')              { const c = await loadCollections(); return c[2] ?? null; }
-  const lvl = ({ A1: 'a1', A2: 'a2', B1: 'b1' } as Record<string, 'a1'|'a2'|'b1'>)[name];
-  return lvl ? loadCEFRCollection(lvl) : null;
-}
+import { AssignedUnitCard, isHomeworkDone, fetchCollectionByName, type AssignedUnit } from '../../_shared';
 
 export default function ClassCollectionHomeworkPage() {
   const { id: classId, name } = useParams<{ id: string; name: string }>();
