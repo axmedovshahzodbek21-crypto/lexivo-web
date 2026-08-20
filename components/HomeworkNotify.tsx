@@ -23,36 +23,43 @@ export default function HomeworkNotify() {
 
   useEffect(() => {
     if (!user) return;
+    let cancelled = false;
+    let channel: ReturnType<typeof supabase.channel> | null = null;
 
-    // Pre-fetch joined class names
+    // Subscribing only after the class-name prefetch resolves — subscribing
+    // immediately (in parallel with the prefetch, as this used to) meant an
+    // INSERT could arrive before classNames.current was populated, and the
+    // toast would fall back to the generic 'Class' label with no way to
+    // ever correct it afterward.
     (async () => {
       const { data: memberships } = await supabase
         .from('class_members').select('class_id').eq('student_id', user.id);
-      if (!memberships?.length) return;
-      const ids = memberships.map((m: { class_id: string }) => m.class_id);
-      const { data: classes } = await supabase
-        .from('classes').select('id, name, teacher_id').in('id', ids);
-      for (const c of classes ?? []) {
-        if (c.teacher_id !== user.id) classNames.current.set(c.id, c.name);
+      if (memberships?.length) {
+        const ids = memberships.map((m: { class_id: string }) => m.class_id);
+        const { data: classes } = await supabase
+          .from('classes').select('id, name, teacher_id').in('id', ids);
+        for (const c of classes ?? []) {
+          if (c.teacher_id !== user.id) classNames.current.set(c.id, c.name);
+        }
       }
+      if (cancelled) return;
+
+      channel = supabase.channel(`hw-notify-${user.id}`)
+        .on(
+          'postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'class_targets', filter: `student_id=eq.${user.id}` },
+          (payload) => {
+            const row = payload.new as { id: string; class_id: string; title: string; due_date: string | null };
+            const className = classNames.current.get(row.class_id) ?? 'Class';
+            const toast: HWToast = { id: row.id, title: row.title, dueDate: row.due_date, className };
+            setToasts(prev => [...prev, toast]);
+            setTimeout(() => setToasts(prev => prev.filter(x => x.id !== toast.id)), 8000);
+          },
+        )
+        .subscribe();
     })();
 
-    // Subscribe to new targets assigned to this student
-    const channel = supabase.channel(`hw-notify-${user.id}`)
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'class_targets', filter: `student_id=eq.${user.id}` },
-        (payload) => {
-          const row = payload.new as { id: string; class_id: string; title: string; due_date: string | null };
-          const className = classNames.current.get(row.class_id) ?? 'Class';
-          const toast: HWToast = { id: row.id, title: row.title, dueDate: row.due_date, className };
-          setToasts(prev => [...prev, toast]);
-          setTimeout(() => setToasts(prev => prev.filter(x => x.id !== toast.id)), 8000);
-        },
-      )
-      .subscribe();
-
-    return () => { supabase.removeChannel(channel); };
+    return () => { cancelled = true; if (channel) supabase.removeChannel(channel); };
   }, [user?.id]);
 
   if (toasts.length === 0) return null;

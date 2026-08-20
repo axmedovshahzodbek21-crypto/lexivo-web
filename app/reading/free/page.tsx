@@ -218,13 +218,17 @@ export default function ReadingPage() {
     return () => ctrl.abort();
   }, [selectedText]);
 
+  // setWordHistory was previously nested inside setWordList's updater
+  // function — updater functions must be pure, and React (Strict Mode,
+  // concurrent rendering) can invoke one twice to check for exactly this,
+  // which would double-push the same undo-history entry. Read wordList
+  // directly and call both setters as separate top-level calls instead;
+  // React 18 batches them into one render regardless.
   const addToList = useCallback((word: string) => {
-    setWordList(prev => {
-      if (prev.includes(word)) return prev;
-      setWordHistory(h => [...h.slice(-29), prev]);
-      return [...prev, word];
-    });
-  }, []);
+    if (wordList.includes(word)) return;
+    setWordHistory(h => [...h.slice(-29), wordList]);
+    setWordList([...wordList, word]);
+  }, [wordList]);
 
   const addWord = useCallback(() => {
     if (!selectedText) return;
@@ -235,19 +239,15 @@ export default function ReadingPage() {
   }, [selectedText, addToList]);
 
   const removeWord = useCallback((i: number) => {
-    setWordList(prev => {
-      setWordHistory(h => [...h.slice(-29), prev]);
-      return prev.filter((_, idx) => idx !== i);
-    });
-  }, []);
+    setWordHistory(h => [...h.slice(-29), wordList]);
+    setWordList(wordList.filter((_, idx) => idx !== i));
+  }, [wordList]);
 
   const undo = useCallback(() => {
-    setWordHistory(prev => {
-      if (prev.length === 0) return prev;
-      setWordList(prev[prev.length - 1]);
-      return prev.slice(0, -1);
-    });
-  }, []);
+    if (wordHistory.length === 0) return;
+    setWordList(wordHistory[wordHistory.length - 1]);
+    setWordHistory(wordHistory.slice(0, -1));
+  }, [wordHistory]);
 
   // Ctrl+Z / Cmd+Z undo
   useEffect(() => {

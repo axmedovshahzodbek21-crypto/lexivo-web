@@ -56,6 +56,14 @@ function ProgressPage() {
 
   const { collections } = useAppStore();
 
+  // useState's initializer only runs on first mount — a Link elsewhere in
+  // the app pointing at /progress?tab=srs while this page is already
+  // mounted (soft navigation) changed tabParam but never resynced `tab`,
+  // so the tab bar silently stayed on whatever was previously selected.
+  useEffect(() => {
+    if (tabParam) setTab(tabParam);
+  }, [tabParam]);
+
   useEffect(() => {
     if (!collections.length) return;
     const result: Record<string, { done: number; total: number }> = {};
