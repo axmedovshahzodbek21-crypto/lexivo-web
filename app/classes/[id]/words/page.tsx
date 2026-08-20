@@ -282,6 +282,11 @@ export default function ClassWordsPage() {
   const [manualExample1Trans, setManualExample1Trans] = useState('');
   const [showExamples, setShowExamples] = useState(false);
   const [adding, setAdding] = useState(false);
+  // addManual/importWords/importCollectionDay/toggleStar previously
+  // swallowed every Supabase failure silently — a failed insert left the
+  // teacher staring at a spinner-then-nothing with no indication anything
+  // went wrong, and toggleStar's optimistic star/unstar never rolled back.
+  const [wordsError, setWordsError] = useState<string | null>(null);
 
   // AI import
   const [wordLang, setWordLang] = useState('English');
@@ -332,10 +337,22 @@ export default function ClassWordsPage() {
       return next;
     });
     setStarredCount(c => isStarred ? c - 1 : c + 1);
-    if (isStarred) {
-      await removeClassStarredWord(user.id, id, word);
-    } else {
-      await addClassStarredWord(user.id, id, word);
+    try {
+      if (isStarred) {
+        await removeClassStarredWord(user.id, id, word);
+      } else {
+        await addClassStarredWord(user.id, id, word);
+      }
+    } catch {
+      // Revert the optimistic update — it never made it to the server, so
+      // leaving it applied locally would desync from what's actually stored.
+      setStarredIds(prev => {
+        const next = new Set(prev);
+        isStarred ? next.add(word) : next.delete(word);
+        return next;
+      });
+      setStarredCount(c => isStarred ? c + 1 : c - 1);
+      setWordsError('Failed to update star — try again');
     }
   };
 
@@ -415,29 +432,35 @@ export default function ClassWordsPage() {
   const addManual = async () => {
     if (!user || !manualWord.trim() || !manualTranslation.trim()) return;
     setAdding(true);
-    await supabase.from('class_words').insert({
-      class_id: id,
-      teacher_id: user.id,
-      word: manualWord.trim(),
-      translation: manualTranslation.trim(),
-      definition: manualDefinition.trim() || null,
-      example1: manualExample1.trim() || null,
-      example1_translation: manualExample1Trans.trim() || null,
-      folder_name: folderInput.trim() || null,
-      collection_name: collectionInput.trim() || null,
-    });
-    setManualWord('');
-    setManualTranslation('');
-    setManualDefinition('');
-    setManualExample1('');
-    setManualExample1Trans('');
-    await loadWords();
+    setWordsError(null);
+    try {
+      await supabase.from('class_words').insert({
+        class_id: id,
+        teacher_id: user.id,
+        word: manualWord.trim(),
+        translation: manualTranslation.trim(),
+        definition: manualDefinition.trim() || null,
+        example1: manualExample1.trim() || null,
+        example1_translation: manualExample1Trans.trim() || null,
+        folder_name: folderInput.trim() || null,
+        collection_name: collectionInput.trim() || null,
+      });
+      setManualWord('');
+      setManualTranslation('');
+      setManualDefinition('');
+      setManualExample1('');
+      setManualExample1Trans('');
+      await loadWords();
+    } catch (e) {
+      setWordsError(`Failed to add word: ${e instanceof Error ? e.message : e}`);
+    }
     setAdding(false);
   };
 
   const importWords = async () => {
     if (!user || parsed.length === 0) return;
     setImporting(true);
+    setWordsError(null);
     const rows = parsed.map(w => ({
       class_id: id,
       teacher_id: user.id,
@@ -453,9 +476,13 @@ export default function ClassWordsPage() {
       folder_name: folderInput.trim() || null,
       collection_name: collectionInput.trim() || null,
     }));
-    await supabase.from('class_words').insert(rows);
-    setPasted('');
-    await loadWords();
+    try {
+      await supabase.from('class_words').insert(rows);
+      setPasted('');
+      await loadWords();
+    } catch (e) {
+      setWordsError(`Failed to import words: ${e instanceof Error ? e.message : e}`);
+    }
     setImporting(false);
   };
 
@@ -488,6 +515,7 @@ export default function ClassWordsPage() {
   const importCollectionDay = async () => {
     if (!user || !collectionData || selectedDayIdx === null) return;
     setImportingCollection(true);
+    setWordsError(null);
     try {
       const day = collectionData.days[selectedDayIdx];
       const colName = BUILT_IN_COLLECTIONS.find(c => c.file === selectedCollection)?.name ?? '';
@@ -512,7 +540,9 @@ export default function ClassWordsPage() {
       await supabase.from('class_words').insert(rows);
       setSelectedDayIdx(null);
       await loadWords();
-    } catch (_) {}
+    } catch (e) {
+      setWordsError(`Failed to import collection: ${e instanceof Error ? e.message : e}`);
+    }
     setImportingCollection(false);
   };
 
@@ -609,6 +639,13 @@ export default function ClassWordsPage() {
           </div>
         </div>
       </div>
+
+      {wordsError && (
+        <div className="mx-4 mt-4 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/30 text-sm text-red-500 flex items-center justify-between gap-3">
+          <span>{wordsError}</span>
+          <button onClick={() => setWordsError(null)} className="shrink-0 font-bold">✕</button>
+        </div>
+      )}
 
       {loading ? (
         <div className="flex justify-center py-12"><div className="text-4xl animate-bounce">📝</div></div>
