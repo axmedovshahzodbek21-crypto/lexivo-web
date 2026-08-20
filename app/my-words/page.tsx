@@ -3,7 +3,7 @@ import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/lib/useTranslation';
-import { getImportedFolders, getImportedCollections, addImportedWords, getCollectionsByFolder, getMyUnitProgress, resetMyWordsProgress } from '@/lib/storage';
+import { getImportedFolders, getImportedCollections, addImportedWords, generateImportedWordId, getCollectionsByFolder, getMyUnitProgress, resetMyWordsProgress } from '@/lib/storage';
 import { pushLists, pullAll } from '@/lib/sync';
 import type { ImportedFolder, ImportedCollection } from '@/lib/types';
 
@@ -12,12 +12,15 @@ const EXAMPLE_SEEDED_KEY = 'lexivo_mywords_example_seeded';
 // One-time real example (folder → collection → word) so a first-time user
 // sees the actual structure, not an empty page. Guarded by a local flag so
 // it never reappears even if they delete it — this is a courtesy seed, not
-// a permanent fixture.
+// a permanent fixture. The flag is set only after the seed word is actually
+// added, not before, so a failure partway through doesn't permanently lock
+// out a retry (see the equivalent teacher-folder fix in teacher_library_
+// screen.dart / app/library/page.tsx).
 function seedExampleFolderIfNeeded(): boolean {
   if (typeof window === 'undefined') return false;
   if (localStorage.getItem(EXAMPLE_SEEDED_KEY)) return false;
-  localStorage.setItem(EXAMPLE_SEEDED_KEY, '1');
   addImportedWords([{
+    id: generateImportedWordId(),
     word: 'apple',
     translation: 'olma',
     definition: 'a round fruit with red, yellow, or green skin and a whitish inside',
@@ -28,6 +31,7 @@ function seedExampleFolderIfNeeded(): boolean {
     language: 'en-US',
     addedAt: Date.now(),
   }], 'Unit 1', 'Vocabulary 101');
+  localStorage.setItem(EXAMPLE_SEEDED_KEY, '1');
   return true;
 }
 

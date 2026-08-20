@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import BackButton from '@/components/BackButton';
-import { addImportedWords } from '@/lib/storage';
+import { addImportedWords, generateImportedWordId } from '@/lib/storage';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import type { ImportedWord } from '@/lib/types';
@@ -95,6 +95,7 @@ function parseAIResponse(text: string): ImportedWord[] {
       .map(n => ({ sentence: get(`example${n}`), translation: get(`example${n}Translation`) || undefined }))
       .filter(ex => ex.sentence);
     return [{
+      id: generateImportedWordId(),
       word,
       translation: get('translation') || '',
       definition: get('definition') || '',

@@ -126,6 +126,11 @@ export interface ImportedWordExample {
 }
 
 export interface ImportedWord {
+  // Stable across the word's lifetime — selection/delete used to key off
+  // the raw word string, so two cards sharing the same displayed word could
+  // have selecting/deleting one silently affect both. See
+  // lib/storage.ts's generateImportedWordId().
+  id: string;
   word: string;
   partOfSpeech?: string;
   pronunciation?: string;

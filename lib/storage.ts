@@ -1177,6 +1177,15 @@ const IMPORTED_KEY = 'lexivo_imported_words';
 const FOLDER_MAP_KEY = 'lexivo_folder_map';
 const DEFAULT_COLLECTION = 'My Words';
 
+let _importedWordIdCounter = 0;
+// Guarantees uniqueness even for words added synchronously in the same
+// millisecond, e.g. within a single parsed-import batch — Date.now() alone
+// isn't fine-grained enough for that. Matches Flutter's
+// ImportedWord.generateId().
+export function generateImportedWordId(): string {
+  return `${Date.now()}_${_importedWordIdCounter++}`;
+}
+
 // Stores collection→folder mapping as a backup.
 function getFolderMap(): Record<string, string> {
   if (typeof window === 'undefined') return {};
@@ -1198,6 +1207,12 @@ function normalizeImportedWord(raw: Record<string, unknown>): ImportedWord {
     }
   }
   return {
+    // Records stored before this field existed have no 'id' — falling back
+    // to a composite of fields already treated as this record's identity
+    // (word/collection/folder/addedAt) keeps their id stable across reloads
+    // instead of assigning a new random one every time the same stored
+    // JSON is decoded.
+    id: (raw.id as string) ?? `${raw.addedAt ?? 0}_${raw.word ?? ''}_${raw.collectionName ?? ''}_${raw.folderName ?? ''}`,
     word: (raw.word as string) ?? '',
     partOfSpeech: raw.partOfSpeech as string | undefined,
     pronunciation: raw.pronunciation as string | undefined,
@@ -1370,11 +1385,14 @@ export function addImportedWords(words: ImportedWord[], collectionName: string, 
 }
 
 // Soft-delete: mark with a tombstone timestamp instead of removing outright,
-// so the deletion syncs to (and takes effect on) other devices too.
-export function deleteImportedWord(word: string, collectionName: string, folderName?: string) {
+// so the deletion syncs to (and takes effect on) other devices too. Matches
+// by id, not word text — two cards can share the same displayed word (see
+// ImportedWord.id's doc comment), and matching by text would delete every
+// card with that text instead of just the one selected.
+export function deleteImportedWord(id: string, collectionName: string, folderName?: string) {
   const now = Date.now();
   set(IMPORTED_KEY, getImportedWordsRaw().map(w =>
-    (w.word === word && w.collectionName === collectionName &&
+    (w.id === id && w.collectionName === collectionName &&
       (folderName === undefined ? !w.folderName : w.folderName === folderName))
       ? { ...w, deletedAt: now }
       : w
@@ -1385,11 +1403,11 @@ export function deleteImportedWord(word: string, collectionName: string, folderN
 // deleteImportedWord in a loop meant N full localStorage reads and N full
 // re-serializations of the whole imported-words array for N selected words
 // instead of one. Matches Flutter's StorageService.deleteImportedWords.
-export function deleteImportedWords(words: Set<string> | string[], collectionName: string, folderName?: string) {
-  const wordSet = words instanceof Set ? words : new Set(words);
+export function deleteImportedWords(ids: Set<string> | string[], collectionName: string, folderName?: string) {
+  const idSet = ids instanceof Set ? ids : new Set(ids);
   const now = Date.now();
   set(IMPORTED_KEY, getImportedWordsRaw().map(w =>
-    (wordSet.has(w.word) && w.collectionName === collectionName &&
+    (idSet.has(w.id) && w.collectionName === collectionName &&
       (folderName === undefined ? !w.folderName : w.folderName === folderName))
       ? { ...w, deletedAt: now }
       : w

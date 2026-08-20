@@ -3,7 +3,7 @@ import { PageLoader, SectionLoader } from '@/components/Loader';
 import { useState, useMemo, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslation } from '@/lib/useTranslation';
-import { addImportedWords } from '@/lib/storage';
+import { addImportedWords, generateImportedWordId } from '@/lib/storage';
 import { pushLists } from '@/lib/sync';
 import type { ImportedWord } from '@/lib/types';
 
@@ -180,6 +180,7 @@ function parseOutput(text: string, langCode: string): ParseResult {
       examples.push({ sentence, translation: fields[`example${n}translation`] || undefined });
     }
     words.push({
+      id: generateImportedWordId(),
       word: fields.word,
       partOfSpeech: fields.partofspeech || undefined,
       pronunciation: fields.pronunciation || undefined,

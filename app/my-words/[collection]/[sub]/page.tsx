@@ -27,7 +27,7 @@ export default function FolderCollectionPage({ params }: Props) {
   const [selectMode, setSelectMode] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [confirmModal, setConfirmModal] = useState<
-    | { type: 'word'; word: string; message: string }
+    | { type: 'word'; id: string; message: string }
     | { type: 'collection'; message: string }
     | { type: 'bulk'; count: number; message: string }
     | null
@@ -72,16 +72,16 @@ export default function FolderCollectionPage({ params }: Props) {
     setSelected(new Set());
   }
 
-  function toggleSelected(word: string) {
+  function toggleSelected(id: string) {
     setSelected(prev => {
       const next = new Set(prev);
-      if (next.has(word)) next.delete(word); else next.add(word);
+      if (next.has(id)) next.delete(id); else next.add(id);
       return next;
     });
   }
 
-  function requestDelete(word: string) {
-    setConfirmModal({ type: 'word', word, message: t.myWords.deleteConfirm });
+  function requestDelete(id: string) {
+    setConfirmModal({ type: 'word', id, message: t.myWords.deleteConfirm });
   }
 
   function requestDeleteCollection() {
@@ -96,7 +96,7 @@ export default function FolderCollectionPage({ params }: Props) {
   function confirmDelete() {
     if (!confirmModal) return;
     if (confirmModal.type === 'word') {
-      deleteImportedWord(confirmModal.word, collectionName, folder);
+      deleteImportedWord(confirmModal.id, collectionName, folder);
       pushLists();
       const w = getImportedWordsByCollection(collectionName, folder);
       setWords(w);
@@ -209,13 +209,13 @@ export default function FolderCollectionPage({ params }: Props) {
             </div>
 
             <div className="space-y-2">
-              {words.map((w, i) => {
-                const isSelected = selected.has(w.word);
+              {words.map((w) => {
+                const isSelected = selected.has(w.id);
                 return (
                   <div
-                    key={i}
+                    key={w.id}
                     className={`card space-y-2 transition-colors ${selectMode ? 'cursor-pointer' : ''} ${isSelected ? 'ring-2 ring-[var(--primary)]' : ''}`}
-                    onClick={selectMode ? () => toggleSelected(w.word) : undefined}
+                    onClick={selectMode ? () => toggleSelected(w.id) : undefined}
                   >
                     <div className="flex items-start justify-between gap-2">
                       {selectMode && (
@@ -242,7 +242,7 @@ export default function FolderCollectionPage({ params }: Props) {
                         ))}
                       </div>
                       {!selectMode && (
-                        <button onClick={() => requestDelete(w.word)} className="text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors text-sm shrink-0 mt-0.5" aria-label="Delete word">🗑️</button>
+                        <button onClick={() => requestDelete(w.id)} className="text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors text-sm shrink-0 mt-0.5" aria-label="Delete word">🗑️</button>
                       )}
                     </div>
                   </div>
