@@ -5,6 +5,7 @@ import { searchWords } from '@/lib/data';
 import { speak } from '@/lib/speech';
 import { toggleStarred, isStarred } from '@/lib/storage';
 import { pushLists } from '@/lib/sync';
+import { shuffleArray } from '@/lib/shuffleArray';
 import Link from 'next/link';
 import type { WordItem } from '@/lib/types';
 import { useTranslation } from '@/lib/useTranslation';
@@ -46,10 +47,12 @@ export default function SearchPage() {
         day.words.forEach(w => all.push({ ...w, collectionName: col.name, topic: day.topic ?? col.name }));
       });
     });
-    const base = seed * 7919;
-    return [...all]
-      .sort((a, b) => ((a.word.charCodeAt(0) * 31 + base) % 97) - ((b.word.charCodeAt(0) * 31 + base) % 97))
-      .slice(0, 24);
+    // `seed` (bumped by the shuffle button) is a useMemo dependency purely
+    // to force recomputation on demand — shuffleArray itself is unseeded.
+    // Previously sorted by a hash of only the word's first letter, which
+    // grouped/ordered mostly by starting letter rather than truly shuffling.
+    void seed;
+    return shuffleArray(all).slice(0, 24);
   }, [collections, seed]);
 
   useEffect(() => {

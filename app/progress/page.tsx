@@ -32,7 +32,10 @@ export default function ProgressPageWrapper() {
 
 function ProgressPage() {
   const searchParams = useSearchParams();
-  const tabParam = searchParams.get('tab') as 'overview' | 'calendar' | 'srs' | 'achievements' | null;
+  const rawTabParam = searchParams.get('tab');
+  const tabParam = (['overview', 'calendar', 'srs', 'achievements'] as const).includes(rawTabParam as 'overview' | 'calendar' | 'srs' | 'achievements')
+    ? (rawTabParam as 'overview' | 'calendar' | 'srs' | 'achievements')
+    : null;
   const [learnedCount, setLearnedCount] = useState(0);
   const [srsWords, setSrsWords] = useState<SRSWord[]>([]);
   const [streak, setStreak] = useState(0);
@@ -409,7 +412,7 @@ function ProgressPage() {
                       {achs.map(a => {
                         const isUnlocked = unlockedIds.includes(a.id);
                         const prog = !isUnlocked ? getAchievementProgress(a.id, stats) : null;
-                        const pct = prog ? prog.current / prog.target : 0;
+                        const pct = prog && prog.target > 0 ? prog.current / prog.target : 0;
                         return (
                           <div key={a.id} style={{
                             display: 'flex', flexDirection: 'column', padding: '10px 10px 8px',

@@ -126,7 +126,7 @@ export default function AchievementsPage() {
                 {achs.map(a => {
                   const isUnlocked = unlockedIds.includes(a.id);
                   const prog = !isUnlocked ? getAchievementProgress(a.id, stats) : null;
-                  const pct = prog ? prog.current / prog.target : 0;
+                  const pct = prog && prog.target > 0 ? prog.current / prog.target : 0;
                   return (
                     <button
                       key={a.id}
@@ -239,7 +239,7 @@ export default function AchievementsPage() {
               ) : (() => {
                 const prog = getAchievementProgress(selected.id, stats);
                 if (!prog) return null;
-                const pct = prog.current / prog.target;
+                const pct = prog.target > 0 ? prog.current / prog.target : 0;
                 return (
                   <div style={{ width:'100%' }}>
                     <div style={{ display:'flex', justifyContent:'space-between', marginBottom:7 }}>

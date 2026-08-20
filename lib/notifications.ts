@@ -1,4 +1,5 @@
-import { localDateStr, getStreak, getSettings } from './storage';
+import { localDateStr, getStreak, getSettings, getUILanguage } from './storage';
+import { translations } from './i18n';
 
 const SETTINGS_KEY = 'lexivo_notif_settings';
 const MORNING_KEY  = 'lexivo_last_notif_morning';
@@ -105,13 +106,14 @@ export async function scheduleOrShowNotification(settings: NotifSettings): Promi
 
   const streak = getStreak();
   const name = (getSettings().name ?? '').trim() || 'Learner';
+  const t = translations[getUILanguage()];
 
   // 1. Morning Motivation — fixed 8:00 AM
   scheduleAt(8, 0, MORNING_KEY, reg =>
     showNotif(
       reg,
-      '📚 Good morning!',
-      'Start your day with a few words. A small session now builds big vocabulary later.',
+      t.settings.pushMorningTitle,
+      t.settings.pushMorningBody,
       MORNING_KEY,
       'lexivo-morning',
     ),
@@ -119,13 +121,13 @@ export async function scheduleOrShowNotification(settings: NotifSettings): Promi
 
   // 2. Streak at Risk — fixed 9:00 PM
   const streakTitle = streak > 0
-    ? `🔥 Don't break your ${streak}-day streak!`
-    : '🔥 Start your streak today!';
+    ? t.settings.pushStreakTitleActive(streak)
+    : t.settings.pushStreakTitleInactive;
   scheduleAt(21, 0, STREAK_KEY, reg =>
     showNotif(
       reg,
       streakTitle,
-      "You haven't studied yet today. 5 minutes is all it takes.",
+      t.settings.pushStreakBody,
       STREAK_KEY,
       'lexivo-streak',
     ),
@@ -136,8 +138,8 @@ export async function scheduleOrShowNotification(settings: NotifSettings): Promi
   scheduleAt(h, m, CUSTOM_KEY, reg =>
     showNotif(
       reg,
-      `📖 Time to study, ${name}!`,
-      'Your daily Lexivo session is waiting. A few minutes = a few new words.',
+      t.settings.pushCustomTitle(name),
+      t.settings.pushCustomBody,
       CUSTOM_KEY,
       'lexivo-custom',
     ),
@@ -147,8 +149,9 @@ export async function scheduleOrShowNotification(settings: NotifSettings): Promi
 export async function sendTestNotification(): Promise<void> {
   if (Notification.permission !== 'granted') return;
   const reg = await navigator.serviceWorker.ready;
-  await reg.showNotification('📚 Lexivo test notification', {
-    body: "Notifications are working! You'll be reminded at your chosen time.",
+  const t = translations[getUILanguage()];
+  await reg.showNotification(t.settings.pushTestTitle, {
+    body: t.settings.pushTestBody,
     icon: '/icon-192.png',
     tag: 'lexivo-test',
   });

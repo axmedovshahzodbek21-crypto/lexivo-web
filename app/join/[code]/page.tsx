@@ -60,7 +60,7 @@ export default function JoinPage() {
         if (error?.code === '23505') setStatus('already');
         else setStatus('joined');
       });
-  }, [user, cls]);
+  }, [user, cls, status, router]);
 
   useEffect(() => {
     if (status === 'joined' || status === 'already') {
