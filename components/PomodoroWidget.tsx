@@ -158,11 +158,14 @@ export default function PomodoroWidget() {
   };
 
   // Close the PiP window if the user leaves the timer running past the whole
-  // point of a floating widget (i.e. resets the session entirely).
+  // point of a floating widget (i.e. resets the session entirely). Depends on
+  // both pomPhase and pipWin — with only [pomPhase], the check used whichever
+  // pipWin value happened to be in scope the last time pomPhase changed, so a
+  // PiP window opened while already idle (or closed re-opened) wouldn't
+  // trigger the close check again until pomPhase changed a second time.
   useEffect(() => {
     if (pomPhase === 'idle' && pipWin) closePip.current();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pomPhase]);
+  }, [pomPhase, pipWin]);
 
   useEffect(() => {
     return () => { pipWin?.close(); };

@@ -76,6 +76,8 @@ export default function Navigation() {
       setProfilePic(getProfilePicUrl() ?? getProfilePic());
     };
     refresh();
+    window.addEventListener('lexivo-stats-change', refresh);
+    return () => window.removeEventListener('lexivo-stats-change', refresh);
   }, [pathname]);
 
   const levelInfo  = getLevelInfo(xp);

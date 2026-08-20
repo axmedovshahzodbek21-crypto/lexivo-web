@@ -146,9 +146,17 @@ export function getSettings(): UserSettings {
   return { ...SETTINGS_DEFAULTS, ...stored, uiLanguage: getUILanguage() };
 }
 
+// Fired whenever name/XP/streak change, so components that cache their own
+// copy (e.g. Navigation's sidebar tile) can refresh without waiting for the
+// next route change to re-run their effect.
+export function notifyStatsChanged() {
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event('lexivo-stats-change'));
+}
+
 export function saveSettings(s: UserSettings) {
   setUILanguage(s.uiLanguage);
   set(KEYS.settings, s);
+  notifyStatsChanged();
 }
 
 export function isOnboarded(): boolean {
@@ -633,6 +641,7 @@ function checkAndUpdateStreak() {
   }
 
   set(KEYS.streak, streak);
+  notifyStatsChanged();
 
   // Grant weekly freeze now that streak is active
   checkAndGrantWeeklyFreeze();
@@ -796,6 +805,7 @@ export function addXP(amount: number, reason = 'Study', source?: string): { leve
   set(KEYS.xpHistory, history);
 
   _pushXpEntryAsync(entry);
+  notifyStatsChanged();
 
   const oldLevel = levelForXp(oldXp);
   const newLevel = levelForXp(newXp);

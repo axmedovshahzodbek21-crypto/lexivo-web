@@ -2,7 +2,7 @@ import { NextRequest, NextResponse, after } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
 const BOT_TOKEN      = process.env.TELEGRAM_BOT_TOKEN;
-const OWNER_ID       = process.env.TELEGRAM_OWNER_ID ?? '8639830756';
+const OWNER_ID       = process.env.TELEGRAM_OWNER_ID;
 const WEBHOOK_SECRET = process.env.TELEGRAM_WEBHOOK_SECRET;
 
 // In-memory dedup: ignore retried updates from Telegram within the same instance lifetime.
@@ -32,11 +32,14 @@ export async function POST(req: NextRequest) {
     console.error('TELEGRAM_BOT_TOKEN env var is not set');
     return NextResponse.json({ ok: true });
   }
+  if (!OWNER_ID) {
+    console.error('TELEGRAM_OWNER_ID env var is not set');
+    return NextResponse.json({ ok: true });
+  }
 
   // Verify the request is genuinely from Telegram. Fail CLOSED if the secret
-  // isn't configured — OWNER_ID falls back to a hardcoded value baked into
-  // this source file, so skipping verification here let anyone POST a
-  // fabricated update claiming to be that owner id and get full bot-admin
+  // isn't configured — skipping verification here would let anyone POST a
+  // fabricated update claiming to be the owner id and get full bot-admin
   // control (broadcast to every user, dump the user list, impersonate
   // support replies). A missing secret is treated the same as a wrong one.
   if (!WEBHOOK_SECRET) {
