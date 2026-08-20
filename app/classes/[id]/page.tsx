@@ -9,6 +9,7 @@ import type { WordCollection } from '@/lib/types';
 import { readingPassages } from '@/lib/reading-data';
 import { classifyReview, REVIEW_LABEL_META, REVIEW_WINDOW_DAYS, type ReviewEntry, type ReviewLabel } from '@/lib/reviewPattern';
 import { localDateStr, addDaysToDateStr } from '@/lib/storage';
+import { isHomeworkDone } from './homework/_shared';
 
 interface CollectionMeta {
   collection_name: string;
@@ -297,9 +298,10 @@ function AnalyticsTab({
             const assigned = hw.studentIds ?? students.map(s => s.student_id);
             const n = assigned.length;
             if (n === 0) return { id: u.id, name: u.name, hasHw: true, pct: 0 };
-            const completed = assigned.filter(sid =>
-              hw.modes.every(mode => prog.some(p => p.homework_id === hw.id && p.student_id === sid && p.mode === mode))
-            ).length;
+            const completed = assigned.filter(sid => isHomeworkDone(
+              hw.modes,
+              new Set(prog.filter(p => p.homework_id === hw.id && p.student_id === sid).map(p => p.mode)),
+            )).length;
             return { id: u.id, name: u.name, hasHw: true, pct: Math.round((completed / n) * 100) };
           }),
       })));

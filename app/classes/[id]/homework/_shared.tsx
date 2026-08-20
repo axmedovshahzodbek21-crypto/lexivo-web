@@ -6,6 +6,17 @@ export const MODE_ICON: Record<string, string> = { learn: '📖', flashcard: '�
 export const MODE_LABEL: Record<string, string> = { learn: 'Learn', flashcard: 'Cards', quiz: 'Quiz', match: 'Match' };
 export const MODE_COLOR: Record<string, string> = { learn: '#4f46e5', flashcard: '#ea580c', quiz: '#d97706', match: '#db2777' };
 
+// "Fully done" for a homework assignment: every assigned mode is present in
+// the completed set. Previously reimplemented independently 12+ times
+// across this file and homework/page.tsx, homework/[hwId]/page.tsx,
+// homework/collection/[name]/page.tsx, homework/folder/[folderId]/page.tsx —
+// consistent today (a real assignment's modes list is never empty; the
+// assign-homework UI always requires at least 'learn'), but with no single
+// place to fix if that definition ever changes.
+export function isHomeworkDone(modes: string[], completed: Set<string>): boolean {
+  return modes.length > 0 && modes.every(m => completed.has(m));
+}
+
 export function dueLabel(due: string | null): { text: string; overdue: boolean } | null {
   if (!due) return null;
   const today = localDateStr();
@@ -28,7 +39,7 @@ export interface AssignedUnit {
 export function AssignedUnitCard({
   classId, unit, completed,
 }: { classId: string; unit: AssignedUnit; completed: Set<string> }) {
-  const allDone = unit.modes.length > 0 && unit.modes.every(m => completed.has(m));
+  const allDone = isHomeworkDone(unit.modes, completed);
   const due = dueLabel(unit.dueDate);
   const nonMatchModes = unit.modes.filter(m => m !== 'match');
   const hasMatch = unit.modes.includes('match');

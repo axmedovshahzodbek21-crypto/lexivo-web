@@ -6,7 +6,7 @@ import { useAuth } from '@/lib/auth-context';
 import { loadCollections, loadCEFRCollection } from '@/lib/data';
 import type { WordCollection } from '@/lib/types';
 import { readingPassages } from '@/lib/reading-data';
-import { localDateStr, addDaysToDateStr } from '@/lib/storage';
+import { isHomeworkDone, dueLabel } from './_shared';
 
 interface FolderUnit {
   id: string;
@@ -56,16 +56,6 @@ async function fetchCollectionByName(name: string): Promise<WordCollection | nul
   if (name === 'Word Mastery')              { const c = await loadCollections(); return c[2] ?? null; }
   const lvl = ({ A1: 'a1', A2: 'a2', B1: 'b1' } as Record<string, 'a1'|'a2'|'b1'>)[name];
   return lvl ? loadCEFRCollection(lvl) : null;
-}
-
-function dueLabel(due: string | null): { text: string; overdue: boolean } | null {
-  if (!due) return null;
-  const today = localDateStr();
-  const tomorrow = addDaysToDateStr(today, 1);
-  if (due < today) return { text: `Overdue · ${due}`, overdue: true };
-  if (due === today) return { text: 'Due today', overdue: false };
-  if (due === tomorrow) return { text: 'Due tomorrow', overdue: false };
-  return { text: `Due ${due}`, overdue: false };
 }
 
 const MODE_ICON: Record<string, string> = { learn: '📖', flashcard: '🃏', quiz: '🧠', match: '🎯', read: '📚' };
@@ -260,21 +250,21 @@ export default function ClassHomeworkPage() {
       for (const u of f.units) {
         if (u.homeworkId) {
           assigned++;
-          if ((u.hwModes ?? []).every(m => (modeMap[u.homeworkId!] ?? new Set()).has(m))) done++;
+          if (isHomeworkDone(u.hwModes ?? [], modeMap[u.homeworkId!] ?? new Set())) done++;
         }
       }
     }
     for (const u of builtCW) {
       assigned++;
-      if ((u.hwModes ?? []).every(m => (modeMap[u.homeworkId!] ?? new Set()).has(m))) done++;
+      if (isHomeworkDone(u.hwModes ?? [], modeMap[u.homeworkId!] ?? new Set())) done++;
     }
     for (const h of collItems) {
       assigned++;
-      if (h.hwModes.every(m => (modeMap[h.id] ?? new Set()).has(m))) done++;
+      if (isHomeworkDone(h.hwModes, modeMap[h.id] ?? new Set())) done++;
     }
     for (const p of passageBuilt) {
       assigned++;
-      if (p.hwModes.every(m => (modeMap[p.homeworkId] ?? new Set()).has(m))) done++;
+      if (isHomeworkDone(p.hwModes, modeMap[p.homeworkId] ?? new Set())) done++;
     }
 
     if (cacheKey) _cache[cacheKey] = {
@@ -372,9 +362,7 @@ export default function ClassHomeworkPage() {
             {folders.map(folder => {
               const assignedUnits = folder.units.filter(u => u.homeworkId !== null);
               const doneCount = assignedUnits.filter(u => {
-                const modes = u.hwModes ?? [];
-                const completed = completedModes[u.homeworkId!] ?? new Set();
-                return modes.length > 0 && modes.every(m => completed.has(m));
+                return isHomeworkDone(u.hwModes ?? [], completedModes[u.homeworkId!] ?? new Set());
               }).length;
               const allDone = assignedUnits.length > 0 && doneCount === assignedUnits.length;
 
@@ -425,7 +413,7 @@ export default function ClassHomeworkPage() {
               {cwUnits.map(unit => {
                 const modes = unit.hwModes ?? [];
                 const completed = completedModes[unit.homeworkId!] ?? new Set();
-                const allDone = modes.length > 0 && modes.every(m => completed.has(m));
+                const allDone = isHomeworkDone(modes, completed);
                 const due = dueLabel(unit.hwDue);
                 return (
                   <button
@@ -490,7 +478,7 @@ export default function ClassHomeworkPage() {
               {passageItems.map(item => {
                 const modes = item.hwModes;
                 const completed = completedModes[item.homeworkId] ?? new Set();
-                const allDone = modes.length > 0 && modes.every(m => completed.has(m));
+                const allDone = isHomeworkDone(modes, completed);
                 const due = dueLabel(item.hwDue);
                 return (
                   <button
@@ -544,7 +532,7 @@ export default function ClassHomeworkPage() {
             <div className="space-y-2">
               {collFolders.map(folder => {
                 const doneCount = folder.items.filter(item =>
-                  item.hwModes.length > 0 && item.hwModes.every(m => (completedModes[item.id] ?? new Set()).has(m))
+                  isHomeworkDone(item.hwModes, completedModes[item.id] ?? new Set())
                 ).length;
                 const allDone = doneCount === folder.items.length;
                 return (

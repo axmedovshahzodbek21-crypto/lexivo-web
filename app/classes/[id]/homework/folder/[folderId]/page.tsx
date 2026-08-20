@@ -4,7 +4,7 @@ import { useParams, useRouter } from 'next/navigation';
 import BackButton from '@/components/BackButton';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
-import { AssignedUnitCard, UnassignedUnitCard, type AssignedUnit } from '../../_shared';
+import { AssignedUnitCard, UnassignedUnitCard, isHomeworkDone, type AssignedUnit } from '../../_shared';
 
 interface UnassignedUnit {
   id: string;
@@ -106,7 +106,7 @@ export default function ClassFolderHomeworkPage() {
   }
 
   const doneCount = assigned.filter(u =>
-    u.modes.length > 0 && u.modes.every(m => (completedModes[u.hwId] ?? new Set()).has(m))
+    isHomeworkDone(u.modes, completedModes[u.hwId] ?? new Set())
   ).length;
   const progressPct = assigned.length > 0 ? (doneCount / assigned.length) * 100 : 0;
 

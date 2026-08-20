@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { loadCollections, loadCEFRCollection } from '@/lib/data';
 import type { WordCollection } from '@/lib/types';
-import { AssignedUnitCard, type AssignedUnit } from '../../_shared';
+import { AssignedUnitCard, isHomeworkDone, type AssignedUnit } from '../../_shared';
 
 async function fetchCollectionByName(name: string): Promise<WordCollection | null> {
   if (name === '30 Days of Powerful Words') { const c = await loadCollections(); return c[0] ?? null; }
@@ -85,7 +85,7 @@ export default function ClassCollectionHomeworkPage() {
     );
   }
 
-  const totalDone = units.filter(u => u.modes.length > 0 && u.modes.every(m => (completedModes[u.hwId] ?? new Set()).has(m))).length;
+  const totalDone = units.filter(u => isHomeworkDone(u.modes, completedModes[u.hwId] ?? new Set())).length;
   const progressPct = units.length > 0 ? (totalDone / units.length) * 100 : 0;
 
   return (

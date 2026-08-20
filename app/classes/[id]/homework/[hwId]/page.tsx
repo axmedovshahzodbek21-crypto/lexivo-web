@@ -8,7 +8,7 @@ import type { ClassHWWord } from '@/lib/storage';
 import { loadCollections, loadCEFRCollection } from '@/lib/data';
 import type { WordCollection } from '@/lib/types';
 import { readingPassages, type ReadingPassage } from '@/lib/reading-data';
-import { dueLabel } from '../_shared';
+import { dueLabel, isHomeworkDone } from '../_shared';
 
 async function fetchCollectionByName(name: string): Promise<WordCollection | null> {
   if (name === '30 Days of Powerful Words') { const c = await loadCollections(); return c[0] ?? null; }
@@ -345,7 +345,7 @@ export default function UnitStudyHubPage() {
     );
   }
 
-  const allDone = modes.length > 0 && modes.every(m => completedModes.has(m));
+  const allDone = isHomeworkDone(modes, completedModes);
   const due = dueLabel(dueDate);
   const nonMatchModes = modes.filter(m => m !== 'match');
   const hasMatch = modes.includes('match');
