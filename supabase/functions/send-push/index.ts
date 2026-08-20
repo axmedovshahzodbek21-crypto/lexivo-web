@@ -89,6 +89,12 @@ Deno.serve(async (req) => {
       target_channel: 'push',
       headings: { en: heading },
       contents: { en: content },
+      // Read by the client's notification-click handler (Flutter's
+      // onesignal_service.dart, web's OneSignalProvider) to jump straight
+      // to the class instead of just opening the app to Home. Recipients
+      // here are always students (see the class_members query above), so
+      // is_teacher is fixed false.
+      data: { class_id: payload.class_id, class_name: className, is_teacher: false },
     }),
   });
 
