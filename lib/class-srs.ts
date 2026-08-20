@@ -10,12 +10,6 @@ const INTERVALS = [1, 3, 7, 14, 30]; // days, same as personal SRS
 // (graduated) is never scheduled again, so it's exempt entirely.
 const UNLEARN_GRACE_DAYS = [3, 5, 7, 10, 15];
 
-// Consecutive "Not Yet" answers allowed at Stage 0 (the floor advanceClassSRSWord's
-// Math.max already prevents demoting past) before the word unlearns outright.
-// Active, repeated failure is stronger evidence than a skipped day, so this is
-// checked independently of — and resolves faster than — the day-based cascade.
-const FAIL_STREAK_LIMIT = 3;
-
 export interface ClassSRSEntry {
   id: string;
   user_id: string;
@@ -90,12 +84,13 @@ export async function checkAndDemoteClassSRS(
   userId: string,
   classId: string,
 ): Promise<void> {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('class_srs_states')
     .select('id, stage, next_due')
     .eq('user_id', userId)
     .eq('class_id', classId)
     .lt('stage', 5);
+  if (error) console.error('[checkAndDemoteClassSRS]', error);
   const rows = (data ?? []) as { id: string; stage: number; next_due: string }[];
   if (rows.length === 0) return;
 
@@ -132,13 +127,14 @@ export async function getClassDueWords(
   classId: string,
 ): Promise<ClassSRSEntry[]> {
   await checkAndDemoteClassSRS(userId, classId);
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('class_srs_states')
     .select('*')
     .eq('user_id', userId)
     .eq('class_id', classId)
     .lte('next_due', todayStr())
     .lt('stage', 5);
+  if (error) console.error('[getClassDueWords]', error);
   return (data ?? []) as ClassSRSEntry[];
 }
 
@@ -147,65 +143,46 @@ export async function getClassSRSAll(
   userId: string,
   classId: string,
 ): Promise<ClassSRSEntry[]> {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('class_srs_states')
     .select('*')
     .eq('user_id', userId)
     .eq('class_id', classId)
     .order('created_at', { ascending: true });
+  if (error) console.error('[getClassSRSAll]', error);
   return (data ?? []) as ClassSRSEntry[];
 }
 
 // Called after the student answers a review card.
 // knew=true → advance stage; knew=false → drop stage (min 0).
+//
+// Atomic server-side read-modify-write (advance_class_srs_word RPC) — a
+// client-side select-then-update let two near-simultaneous calls (a
+// double-tap) both read the same starting stage and silently lose one
+// advance. See supabase/migrations/20260820_advance_class_srs_word.sql.
 export async function advanceClassSRSWord(
   userId: string,
   classId: string,
   word: string,
   knew: boolean,
 ): Promise<void> {
-  const { data } = await supabase
-    .from('class_srs_states')
-    .select('id, stage, fail_streak')
-    .eq('user_id', userId)
-    .eq('class_id', classId)
-    .eq('word', word)
-    .single();
-
-  if (!data) return;
-  const { id, stage: current, fail_streak: currentStreak } = data as { id: string; stage: number; fail_streak: number };
-
-  // Repeated failure at the Stage 0 floor is stronger evidence the word isn't
-  // known than a skipped day is — resolve it immediately rather than looping
-  // the same 1-day reset forever.
-  if (!knew && current === 0 && currentStreak + 1 >= FAIL_STREAK_LIMIT) {
-    await supabase.from('class_srs_states').delete().eq('id', id);
-    return;
-  }
-
-  const next = knew ? Math.min(current + 1, 5) : Math.max(current - 1, 0);
-  const interval = next >= 5 ? 36500 : INTERVALS[next]; // graduated → far future
-  const nextStreak = knew ? 0 : (next === 0 ? currentStreak + 1 : 0);
-
-  await supabase
-    .from('class_srs_states')
-    .update({
-      stage: next,
-      next_due: addDays(interval),
-      last_reviewed: new Date().toISOString(),
-      fail_streak: nextStreak,
-    })
-    .eq('id', id);
+  await supabase.rpc('advance_class_srs_word', {
+    p_user_id: userId,
+    p_class_id: classId,
+    p_word: word,
+    p_knew: knew,
+  });
 }
 
 // Teacher view: all students' SRS states for a class.
 export async function getClassSRSForTeacher(
   classId: string,
 ): Promise<ClassSRSEntry[]> {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('class_srs_states')
     .select('*')
     .eq('class_id', classId);
+  if (error) console.error('[getClassSRSForTeacher]', error);
   return (data ?? []) as ClassSRSEntry[];
 }
 
