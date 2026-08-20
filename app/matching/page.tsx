@@ -269,6 +269,15 @@ function MatchingInner() {
             if (user) void recordClassStudyDay(user.id, classId);
           });
         }
+        if (isLast && sourceClassHW && searchParams.get('hwId')) {
+          // Record completion the moment the session actually finishes, not
+          // gated behind the "Back" link's ?completed= query param — that
+          // path was skipped entirely by browser-back, closing the tab, or
+          // the cross-promo link, silently losing the student's progress/XP.
+          void supabase.rpc('record_class_homework_progress', {
+            p_homework_id: searchParams.get('hwId'), p_mode: 'match', p_client_word_count: words.length,
+          });
+        }
         setPhase(isLast ? 'done' : 'round_done');
       }
     } else {
@@ -281,7 +290,7 @@ function MatchingInner() {
         addClassHardWord(userId, classId, leftId);
       }
     }
-  }, [matched, wrongPair, selected, timerActive, roundWords, mistakes, elapsed, roundIndex, words.length, sourceClass, classId, userId, sourceMyWords, myCollection, myFolder, collectionParam, dayParam, sourceClassHW]);
+  }, [matched, wrongPair, selected, timerActive, roundWords, mistakes, elapsed, roundIndex, words.length, sourceClass, classId, userId, sourceMyWords, myCollection, myFolder, collectionParam, dayParam, sourceClassHW, searchParams]);
 
   // ── Not supported / loading ──
   if (!collectionsLoaded && !sourceMyWords && !sourceClass) {

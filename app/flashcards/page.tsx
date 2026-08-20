@@ -280,6 +280,15 @@ export default function FlashcardsPage() {
           if (user) void recordClassStudyDay(user.id, classId);
         });
       }
+      if (sourceClassHW && sp.get('hwId')) {
+        // Record completion the moment the session actually finishes, not
+        // gated behind the "Back" link's ?completed= query param — that path
+        // was skipped entirely by browser-back, closing the tab, or Retry,
+        // silently losing the student's progress and XP.
+        void supabase.rpc('record_class_homework_progress', {
+          p_homework_id: sp.get('hwId'), p_mode: 'flashcard', p_client_word_count: deck.length,
+        });
+      }
       setDone(true);
     } else {
       if (collectionName && dayNumber !== undefined && cardsSinceLastPush.current === 0) {
@@ -288,7 +297,7 @@ export default function FlashcardsPage() {
       setIndex(i => i + 1);
       setSide('front');
     }
-  }, [index, deck, collectionName, dayNumber, sourceClassHW, pushAchievement, setPendingLevelUp, sourceMyWords, myCollection, myFolder]);
+  }, [index, deck, collectionName, dayNumber, sourceClassHW, pushAchievement, setPendingLevelUp, sourceMyWords, myCollection, myFolder, sp]);
 
   const markKnown = () => advance(true);
   const markUnknown = () => advance(false);

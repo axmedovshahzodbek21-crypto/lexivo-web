@@ -333,13 +333,22 @@ export default function QuizPage() {
           if (user) void recordClassStudyDay(user.id, classId);
         });
       }
+      if (sourceClassHW && sp.get('hwId')) {
+        // Record completion the moment the session actually finishes, not
+        // gated behind the "Back" link's ?completed= query param — that path
+        // was skipped entirely by browser-back, closing the tab, or Retry,
+        // silently losing the student's progress and XP.
+        void supabase.rpc('record_class_homework_progress', {
+          p_homework_id: sp.get('hwId'), p_mode: 'quiz', p_client_word_count: questions.length,
+        });
+      }
       setDone(true);
     } else {
       setIndex(i => i + 1);
       setSelected(null);
       setState('idle');
     }
-  }, [index, questions, correct, selected, current, collectionName, sourceClassHW, sourceClass, pushAchievement, setPendingLevelUp, sourceMyWords, myCollection, myFolder]);
+  }, [index, questions, correct, selected, current, collectionName, sourceClassHW, sourceClass, pushAchievement, setPendingLevelUp, sourceMyWords, myCollection, myFolder, sp]);
 
   if (!collectionName && !starredOnly && !listId && !sourceMyWords && !sourceClassHW && !sourceClass) return <UnitPicker mode="quiz" />;
 

@@ -512,12 +512,26 @@ function LearnInner() {
           if (user) void recordClassStudyDay(user.id, classIdParam);
         });
       }
+      if (sourceClassHW && sp.get('hwId')) {
+        // Record completion the moment the session actually finishes, not
+        // gated behind a "Back"/"Continue" link's ?completed= query param —
+        // that path was skipped entirely by browser-back or closing the tab,
+        // silently losing the student's progress and XP. This matters even
+        // more for Learn specifically: on class-hw it auto-chains straight
+        // into Flashcards via classHWNextUrl, so a student who finishes
+        // Learn and then abandons before finishing Flashcards would
+        // otherwise never have Learn recorded at all (it previously only
+        // rode along as Flashcards' ?alsoCompleted=learn).
+        void supabase.rpc('record_class_homework_progress', {
+          p_homework_id: sp.get('hwId'), p_mode: 'learn', p_client_word_count: words.length,
+        });
+      }
       setDone(true);
     } else {
       setIndex(i => i + 1);
       setMaxReached(m => Math.max(m, index + 1));
     }
-  }, [current, index, words, collectionName, pushAchievement, setPendingLevelUp, sourceClass, sourceClassHW, classIdParam, classNameParam, sourceMyWords, myCollection, myFolder]);
+  }, [current, index, words, collectionName, pushAchievement, setPendingLevelUp, sourceClass, sourceClassHW, classIdParam, classNameParam, sourceMyWords, myCollection, myFolder, sp]);
 
   const advanceCard = useCallback(async () => {
     if (!current) return;
