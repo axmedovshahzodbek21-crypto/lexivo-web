@@ -172,9 +172,12 @@ function parseOutput(text: string, langCode: string): ParseResult {
       errors.push({ index: i + 1, preview, reason: 'Missing "translation:" field' });
       continue;
     }
-    // Unlimited examples — collect "exampleN" / "exampleNtranslation" for any N.
+    // Capped at 10 to match lib/storage.ts's MAX_EXAMPLES_PER_WORD — collecting
+    // more here previously let the preview show up to 20 examples that then
+    // silently got truncated to 10 on save, so what the user approved didn't
+    // match what was actually kept.
     const examples: ImportedWord['examples'] = [];
-    for (let n = 1; n <= 20; n++) {
+    for (let n = 1; n <= 10; n++) {
       const sentence = fields[`example${n}`];
       if (!sentence) continue;
       examples.push({ sentence, translation: fields[`example${n}translation`] || undefined });
