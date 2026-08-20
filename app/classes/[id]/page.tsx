@@ -1841,7 +1841,7 @@ function CurriculumTab({
                   }}
                 >
                   <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)', lineHeight: 1.35 }}>
-                    Delete this homework? Progress for all assigned students will be lost.
+                    Delete this homework? Progress for all assigned students will be lost. Any XP they already earned from it stays on the leaderboard.
                   </p>
                   <div className="flex items-center gap-2 shrink-0">
                     <button
