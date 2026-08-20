@@ -69,6 +69,7 @@ export default function JoinedClassesPage() {
   const [leaderboardLoading, setLeaderboardLoading] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [leaveTarget, setLeaveTarget] = useState<string | null>(null);
+  const [targetError, setTargetError] = useState<string | null>(null);
 
   useEffect(() => { if (user) load(); else setLoading(false); }, [user?.id]);
 
@@ -126,10 +127,23 @@ export default function JoinedClassesPage() {
 
   const toggleTargetDone = async (target: Target) => {
     const completed_at = target.completed_at ? null : new Date().toISOString();
-    await supabase.from('class_targets').update({ completed_at }).eq('id', target.id);
+    try {
+      await supabase.from('class_targets').update({ completed_at }).eq('id', target.id);
+    } catch {
+      setTargetError('Failed to update target — try again');
+      return;
+    }
     setClassTargets(prev => {
       const updated = { ...prev };
       updated[target.class_id] = (updated[target.class_id] ?? []).map(t => t.id === target.id ? { ...t, completed_at } : t);
+      // _cache is what a subsequent load() call optimistically applies
+      // before its own fresh fetch resolves — leaving the stale (pre-toggle)
+      // targets list in there would briefly flash the un-toggled state on
+      // next visit.
+      if (user) {
+        const cached = _cache.get(user.id);
+        if (cached) _cache.set(user.id, { ...cached, classTargets: updated });
+      }
       return updated;
     });
   };
@@ -180,6 +194,12 @@ export default function JoinedClassesPage() {
       </div>
 
       <div className="p-4 space-y-4 max-w-2xl mx-auto w-full">
+        {targetError && (
+          <div className="px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/30 text-sm text-red-500 flex items-center justify-between gap-3">
+            <span>{targetError}</span>
+            <button onClick={() => setTargetError(null)} className="shrink-0 font-bold">✕</button>
+          </div>
+        )}
         {loading ? (
           <SectionLoader />
         ) : joinedClasses.length === 0 ? (
