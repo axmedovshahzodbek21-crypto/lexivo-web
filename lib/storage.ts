@@ -1381,6 +1381,21 @@ export function deleteImportedWord(word: string, collectionName: string, folderN
   ));
 }
 
+// Batched version of deleteImportedWord for deleting a multi-select — calling
+// deleteImportedWord in a loop meant N full localStorage reads and N full
+// re-serializations of the whole imported-words array for N selected words
+// instead of one. Matches Flutter's StorageService.deleteImportedWords.
+export function deleteImportedWords(words: Set<string> | string[], collectionName: string, folderName?: string) {
+  const wordSet = words instanceof Set ? words : new Set(words);
+  const now = Date.now();
+  set(IMPORTED_KEY, getImportedWordsRaw().map(w =>
+    (wordSet.has(w.word) && w.collectionName === collectionName &&
+      (folderName === undefined ? !w.folderName : w.folderName === folderName))
+      ? { ...w, deletedAt: now }
+      : w
+  ));
+}
+
 export function deleteImportedCollection(collectionName: string, folderName?: string) {
   const now = Date.now();
   set(IMPORTED_KEY, getImportedWordsRaw().map(w =>

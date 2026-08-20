@@ -3,7 +3,7 @@ import { useEffect, useState, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/lib/useTranslation';
-import { getImportedWordsByCollection, deleteImportedWord, deleteImportedCollection, getMyUnitProgress, getMyUnitPendingNewWords, getMyActivityPendingNewWords } from '@/lib/storage';
+import { getImportedWordsByCollection, deleteImportedWord, deleteImportedWords, deleteImportedCollection, getMyUnitProgress, getMyUnitPendingNewWords, getMyActivityPendingNewWords } from '@/lib/storage';
 import { pushLists, pullAll } from '@/lib/sync';
 import { speakText } from '@/lib/speech';
 import type { ImportedWord } from '@/lib/types';
@@ -108,7 +108,7 @@ export default function FolderCollectionPage({ params }: Props) {
       router.push(`/my-words/${encodeURIComponent(folder)}`);
       return;
     } else if (confirmModal.type === 'bulk') {
-      selected.forEach(word => deleteImportedWord(word, collectionName, folder));
+      deleteImportedWords(selected, collectionName, folder);
       pushLists();
       const w = getImportedWordsByCollection(collectionName, folder);
       setWords(w);
