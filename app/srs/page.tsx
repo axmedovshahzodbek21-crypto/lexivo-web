@@ -38,6 +38,11 @@ export default function SRSReviewPage() {
   const [allWords, setAllWords] = useState<SRSWord[]>([]);
   const [autoPlay, setAutoPlay] = useState(true);
   const [isShuffled, setIsShuffled] = useState(false);
+  // Grades from before the most recent shuffle toggle — persisted
+  // immediately (see toggleShuffle) rather than kept in `results`, but
+  // still counted toward the session's final knew/not-yet totals.
+  const [shuffledKnew, setShuffledKnew] = useState(0);
+  const [shuffledNotYet, setShuffledNotYet] = useState(0);
   const [tappedChoice, setTappedChoice] = useState<string | null>(null);
   const [choices, setChoices] = useState<string[] | null>(null);
   const grading = useRef(false);
@@ -131,6 +136,29 @@ export default function SRSReviewPage() {
   }, [current, autoPlay, buildChoices]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const toggleShuffle = useCallback(() => {
+    // Previously this reset `results` and re-fetched the full due list
+    // without ever persisting the graded prefix — a "knew" grade given
+    // before a shuffle got no markIntervalDone call and no XP, silently
+    // dropped, and the word would resurface for a second grade with no
+    // warning the first was lost. Now: persist it immediately (mirrors the
+    // "knew" branch of applyGrades, minus the once-per-session bookkeeping
+    // — achievements/study-day/sync still only fire once, at the true end).
+    let xpGained = 0;
+    for (let i = 0; i < results.length; i++) {
+      if (results[i].grade === 'knew') {
+        markIntervalDone(queue[i].id, queue[i].dueInterval);
+        xpGained += REVIEW_XP[queue[i].dueInterval] ?? 2;
+      }
+    }
+    if (results.length > 0) {
+      setShuffledKnew(k => k + results.filter(r => r.grade === 'knew').length);
+      setShuffledNotYet(n => n + results.filter(r => r.grade === 'notYet').length);
+      if (xpGained > 0) {
+        const { leveledUp, newLevel, newXp } = addXP(xpGained, 'SRS Review');
+        if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
+        setSessionXP(xp => xp + xpGained);
+      }
+    }
     const due = getDueWords();
     const next = !isShuffled;
     setIsShuffled(next);
@@ -140,7 +168,7 @@ export default function SRSReviewPage() {
     setRevealed(false);
     setTappedChoice(null);
     sessionStorage.removeItem('srs_session');
-  }, [isShuffled]);
+  }, [isShuffled, results, queue, setPendingLevelUp]);
 
   // At session end: mark each learnedAt date's interval as done, award XP
   const applyGrades = useCallback((finalResults: { id: string; grade: 'knew' | 'notYet' }[]) => {
@@ -299,21 +327,22 @@ export default function SRSReviewPage() {
 
   // ── Session done ──────────────────────────────────────────────────────────
   if (done) {
-    const knewCount   = results.filter(r => r.grade === 'knew').length;
-    const notYetCount = results.filter(r => r.grade === 'notYet').length;
-    const score = Math.round((knewCount / results.length) * 100);
+    const knewCount   = shuffledKnew   + results.filter(r => r.grade === 'knew').length;
+    const notYetCount = shuffledNotYet + results.filter(r => r.grade === 'notYet').length;
+    const totalCount  = knewCount + notYetCount;
+    const score = Math.round((knewCount / totalCount) * 100);
     return (
       <div className="p-6 text-center flex flex-col items-center justify-center min-h-screen animate-fade-in">
         <div className="text-6xl mb-4">{score >= 80 ? '🧠' : '💪'}</div>
         <h2 className="text-2xl font-bold mb-2">{t.srs.reviewComplete}</h2>
-        <p className="text-[var(--text-muted)] mb-6">{knewCount}/{results.length} knew · +{displayXP(sessionXP)} XP</p>
+        <p className="text-[var(--text-muted)] mb-6">{knewCount}/{totalCount} knew · +{displayXP(sessionXP)} XP</p>
         <div className="grid grid-cols-3 gap-2 w-full mb-6">
           <div className="card text-center"><div className="text-xl font-bold text-[var(--success)]">{knewCount}</div><div className="text-xs text-[var(--text-muted)]">{t.srs.correct}</div></div>
           <div className="card text-center"><div className="text-xl font-bold text-[var(--danger)]">{notYetCount}</div><div className="text-xs text-[var(--text-muted)]">{t.srs.incorrect}</div></div>
           <div className="card text-center"><div className="text-xl font-bold text-[var(--primary)]">{score}%</div><div className="text-xs text-[var(--text-muted)]">{t.srs.score}</div></div>
         </div>
         <div className="flex gap-3 w-full mb-3">
-          <button onClick={() => { setIndex(0); setRevealed(false); setResults([]); setDone(false); }} className="btn-secondary flex-1">{t.common.redo}</button>
+          <button onClick={() => { setIndex(0); setRevealed(false); setResults([]); setShuffledKnew(0); setShuffledNotYet(0); setDone(false); }} className="btn-secondary flex-1">{t.common.redo}</button>
           <Link href="/" className="btn-primary flex-1 text-center">{t.srs.goHome}</Link>
         </div>
         <button onClick={() => { setAllWords(getSRSWords()); setManaging(true); }} className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] underline">
