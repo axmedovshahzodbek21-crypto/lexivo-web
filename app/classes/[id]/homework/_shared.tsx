@@ -9,11 +9,16 @@ import type { WordCollection } from '@/lib/types';
 // reimplemented identically in 4 files (classes/[id]/page.tsx and three
 // files under homework/) — renaming a collection required updating every
 // copy in lockstep, or homework silently fell back to whatever the caller
-// did on a null return.
+// did on a null return. Also previously matched the first 3 by *position*
+// in loadCollections()'s array (c[0]/c[1]/c[2]) rather than by their actual
+// .name field — reordering word_data.json's top-level array would have
+// silently matched the wrong collection to a homework row. Matches by name
+// now, same as the CEFR levels below and Flutter's collectionByName().
 export async function fetchCollectionByName(name: string): Promise<WordCollection | null> {
-  if (name === '30 Days of Powerful Words') { const c = await loadCollections(); return c[0] ?? null; }
-  if (name === '24 Vocabulary Challenge')   { const c = await loadCollections(); return c[1] ?? null; }
-  if (name === 'Word Mastery')              { const c = await loadCollections(); return c[2] ?? null; }
+  if (['30 Days of Powerful Words', '24 Vocabulary Challenge', 'Word Mastery'].includes(name)) {
+    const collections = await loadCollections();
+    return collections.find(c => c.name === name) ?? null;
+  }
   const lvl = ({ A1: 'a1', A2: 'a2', B1: 'b1' } as Record<string, 'a1'|'a2'|'b1'>)[name];
   return lvl ? loadCEFRCollection(lvl) : null;
 }
