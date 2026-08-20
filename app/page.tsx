@@ -868,7 +868,7 @@ export default function HomePage() {
                       <div className="flex-1 min-w-0">
                         <div className="text-base font-black text-white leading-tight truncate">{card.className}</div>
                         <div className="text-[10px] text-white/70 mt-1">
-                          {card.isTeacher ? `👨‍🎓 ${card.studentCount} students` : `⚡ ${(card.classXP / 10).toFixed(1)} XP`}
+                          {card.isTeacher ? `👨‍🎓 ${card.studentCount} students` : `⚡ ${displayXP(card.classXP)} XP`}
                         </div>
                       </div>
                       <span className="text-lg opacity-80 shrink-0">{card.isTeacher ? '🏫' : '🎓'}</span>

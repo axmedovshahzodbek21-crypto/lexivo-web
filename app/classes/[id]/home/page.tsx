@@ -4,7 +4,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import ClassXpHistoryModal from '@/components/ClassXpHistoryModal';
-import { localDateStr, addDaysToDateStr } from '@/lib/storage';
+import { localDateStr, addDaysToDateStr, displayXP } from '@/lib/storage';
 
 interface Announcement { id: string; message: string; created_at: string; }
 interface Target { id: string; title: string; due_date: string | null; completed_at: string | null; }
@@ -412,7 +412,7 @@ const [memberCount, setMemberCount] = useState(0);
                       {s.streak > 0 && <p className="text-xs text-[var(--text-muted)]">🔥 {s.streak} day streak</p>}
                     </div>
                     <button onClick={() => openXpHistory(s)} className="text-right shrink-0 hover:opacity-70 transition-opacity active:scale-95">
-                      <p className="text-sm font-black" style={{ color: 'var(--primary)' }}>{(s.xp / 10).toFixed(1)} XP</p>
+                      <p className="text-sm font-black" style={{ color: 'var(--primary)' }}>{displayXP(s.xp)} XP</p>
                       <p className="text-[10px] text-[var(--text-muted)]">{s.total_learned > 0 ? `${s.total_learned} words` : 'tap for history'}</p>
                     </button>
                   </div>
@@ -489,7 +489,7 @@ const [memberCount, setMemberCount] = useState(0);
               onClick={openXpCal}
               className="text-xs font-semibold bg-black/20 text-white rounded-full px-3 py-1 hover:bg-black/35 transition-colors active:scale-95"
             >
-              ⚡ {(myClassXp / 10).toFixed(1)} XP
+              ⚡ {displayXP(myClassXp)} XP
             </button>
           )}
           {!isTeacher && (

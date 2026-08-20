@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { readingPassages } from '@/lib/reading-data';
 import { classifyReview, REVIEW_LABEL_META, REVIEW_WINDOW_DAYS, type ReviewEntry, type ReviewLabel } from '@/lib/reviewPattern';
-import { localDateStr, addDaysToDateStr } from '@/lib/storage';
+import { localDateStr, addDaysToDateStr, displayXP } from '@/lib/storage';
 import { isHomeworkDone, fetchCollectionByName } from './homework/_shared';
 
 interface CollectionMeta {
@@ -2682,7 +2682,7 @@ export default function ClassDashboardPage() {
                         <p className="text-xs text-[var(--text-muted)]">Last active: {lastActiveLabel(s.last_study_date)}</p>
                       </div>
                       <div className="text-right shrink-0">
-                        <p className="text-sm font-black text-[var(--primary)]">{(s.xp / 10).toFixed(1)} XP</p>
+                        <p className="text-sm font-black text-[var(--primary)]">{displayXP(s.xp)} XP</p>
                         <p className="text-[10px] text-[var(--text-muted)]">
                           <button onClick={() => { const now = new Date(); setCalendarMonth({ year: now.getFullYear(), month: now.getMonth() }); setStreakModal(s); }} className="font-semibold hover:opacity-70 transition-opacity">🔥 {s.streak} ↗</button>
                           {' · 📚 '}{s.total_words}

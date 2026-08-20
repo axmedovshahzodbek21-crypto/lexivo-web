@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { classifyReview, REVIEW_LABEL_META } from '@/lib/reviewPattern';
-import { localDateStr, addDaysToDateStr } from '@/lib/storage';
+import { localDateStr, addDaysToDateStr, displayXP } from '@/lib/storage';
 
 const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const DAY_LABELS = ['M','T','W','T','F','S','S'];
@@ -186,7 +186,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
               <h3 className="text-xl font-black" style={{ color: 'var(--text)' }}>📅 XP History</h3>
               <div className="text-right min-w-0">
                 <p className="text-[10px] truncate max-w-[140px]" style={{ color: 'var(--text-muted)' }}>{studentName ?? 'Total class XP'}</p>
-                <p className="text-2xl font-black" style={{ color: accentColor }}>{(xp / 10).toFixed(1)}</p>
+                <p className="text-2xl font-black" style={{ color: accentColor }}>{displayXP(xp)}</p>
               </div>
             </div>
 
@@ -264,7 +264,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
                           cursor: hasXp ? 'pointer' : 'default',
                         }}>
                         <span className="text-[11px] font-bold leading-none" style={{ color: hasXp ? 'white' : 'var(--text)' }}>{day}</span>
-                        {hasXp && <span className="text-[7px] leading-none mt-0.5" style={{ color: 'rgba(255,255,255,0.8)' }}>+{(dayXp / 10).toFixed(1)}</span>}
+                        {hasXp && <span className="text-[7px] leading-none mt-0.5" style={{ color: 'rgba(255,255,255,0.8)' }}>+{displayXP(dayXp)}</span>}
                         {hasReview && (
                           <span
                             className="absolute top-0 right-0 w-3 h-3 rounded-full flex items-center justify-center"
@@ -304,7 +304,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
               <div className="flex items-center justify-between px-5 py-4 shrink-0 border-b" style={{ borderColor: 'var(--border)' }}>
                 <div>
                   <p className="text-xs font-bold" style={{ color: 'var(--text-muted)' }}>{selectedDay}</p>
-                  <p className="text-lg font-black" style={{ color: accentColor }}>+{(dayTotal / 10).toFixed(1)} XP</p>
+                  <p className="text-lg font-black" style={{ color: accentColor }}>+{displayXP(dayTotal)} XP</p>
                 </div>
                 <button onClick={() => setSelectedDay(null)} className="text-lg" style={{ color: 'var(--text-muted)' }}>✕</button>
               </div>
@@ -318,7 +318,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
                         <p className="text-sm font-semibold" style={{ color: 'var(--text)' }}>{e.reason}</p>
                         <p className="text-[11px] truncate" style={{ color: 'var(--text-muted)' }}>{exactTime(e.created_at)}</p>
                       </div>
-                      <span className="text-sm font-black shrink-0" style={{ color: accentColor }}>+{(e.amount / 10).toFixed(1)} XP</span>
+                      <span className="text-sm font-black shrink-0" style={{ color: accentColor }}>+{displayXP(e.amount)} XP</span>
                     </div>
                   </div>
                 ))}

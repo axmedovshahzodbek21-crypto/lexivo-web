@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
+import { displayXP } from '@/lib/storage';
 
 interface LeaderboardRow {
   student_id: string;
@@ -131,7 +132,7 @@ export default function ClassLeaderboardPage() {
             <p className="text-xs text-[var(--text-muted)]">Your position</p>
             <p className="text-lg font-black text-[var(--primary)]">#{myRank} in class</p>
           </div>
-          <p className="text-base font-bold text-[var(--primary)]">{((rows[myRank - 1]?.xp ?? 0) / 10).toFixed(1)} XP</p>
+          <p className="text-base font-bold text-[var(--primary)]">{displayXP(rows[myRank - 1]?.xp ?? 0)} XP</p>
         </div>
       )}
 
@@ -169,7 +170,7 @@ export default function ClassLeaderboardPage() {
                   >
                     {row.name.split(' ')[0]}
                   </p>
-                  <p className="text-[10px] font-semibold text-[var(--text-muted)]">{(row.xp / 10).toFixed(1)} XP</p>
+                  <p className="text-[10px] font-semibold text-[var(--text-muted)]">{displayXP(row.xp)} XP</p>
                   <span className="text-xl mb-1">{medal}</span>
                   {/* Animated bar */}
                   <div
@@ -241,7 +242,7 @@ export default function ClassLeaderboardPage() {
                   className="text-sm font-black shrink-0"
                   style={{ color: isMe ? 'var(--primary)' : 'var(--text)' }}
                 >
-                  {(row.xp / 10).toFixed(1)} XP
+                  {displayXP(row.xp)} XP
                 </p>
               </div>
             );
