@@ -3,11 +3,12 @@ import { useEffect, useRef, useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
-import { saveClassHWTemp, localDateStr, addDaysToDateStr } from '@/lib/storage';
+import { saveClassHWTemp } from '@/lib/storage';
 import type { ClassHWWord } from '@/lib/storage';
 import { loadCollections, loadCEFRCollection } from '@/lib/data';
 import type { WordCollection } from '@/lib/types';
 import { readingPassages, type ReadingPassage } from '@/lib/reading-data';
+import { dueLabel } from '../_shared';
 
 async function fetchCollectionByName(name: string): Promise<WordCollection | null> {
   if (name === '30 Days of Powerful Words') { const c = await loadCollections(); return c[0] ?? null; }
@@ -30,16 +31,6 @@ interface UnitWord {
 const MODE_ICON: Record<string, string> = { learn: '📖', flashcard: '🃏', quiz: '❓', match: '🎯' };
 const MODE_LABEL: Record<string, string> = { learn: 'Learn', flashcard: 'Cards', quiz: 'Quiz', match: 'Match' };
 const MODE_COLOR: Record<string, string> = { learn: '#4f46e5', flashcard: '#ea580c', quiz: '#d97706', match: '#db2777' };
-
-function dueLabel(due: string | null): { text: string; overdue: boolean } | null {
-  if (!due) return null;
-  const today = localDateStr();
-  const tomorrow = addDaysToDateStr(today, 1);
-  if (due < today) return { text: `Overdue · ${due}`, overdue: true };
-  if (due === today) return { text: 'Due today', overdue: false };
-  if (due === tomorrow) return { text: 'Due tomorrow', overdue: false };
-  return { text: `Due ${due}`, overdue: false };
-}
 
 type HWMeta = { unitName: string; modes: string[]; dueDate: string | null; words: UnitWord[]; passage: ReadingPassage | null };
 const _hwCache = new Map<string, HWMeta>();
