@@ -17,6 +17,7 @@ import XpModal from '@/components/XpModal';
 import XpHistoryModal from '@/components/XpHistoryModal';
 import TiltCard from '@/components/TiltCard';
 import { supabase } from '@/lib/supabase';
+import { APK_DOWNLOAD_URL } from '@/lib/constants';
 
 type HomeClassSummary = {
   classId: string; className: string; isTeacher: boolean;
@@ -591,7 +592,7 @@ export default function HomePage() {
       {/* ── Download banner (shown once) ── */}
       {showBanner && (
         <a
-          href="https://github.com/axmedovshahzodbek21-crypto/lexivo-web/releases/latest/download/app-release.apk"
+          href={APK_DOWNLOAD_URL}
           download
           className="flex items-center gap-4 p-4 rounded-2xl border-2 transition-colors"
           style={{ background: 'rgba(61,220,132,0.08)', borderColor: 'rgba(61,220,132,0.35)' }}
@@ -1345,25 +1346,3 @@ function StatCard({ icon, value, label, gradient, edge, glowColor, pulseClass = 
   );
 }
 
-
-function ShortcutCard({ href, icon, label, sub, gradient, edge, glow }: {
-  href: string; icon: string; label: string; sub: string;
-  gradient: string; edge: string; glow: string;
-}) {
-  return (
-    <Link href={href} className="block group">
-      <div
-        className="rounded-2xl p-4 flex flex-col items-center text-center gap-1.5 transition-all duration-200 group-hover:-translate-y-1"
-        style={{
-          background: gradient,
-          boxShadow: `0 6px 0 ${edge}, 0 10px 20px ${glow}`,
-          textShadow: '0 1px 3px rgba(0,0,0,0.35)',
-        }}
-      >
-        <div className="text-3xl">{icon}</div>
-        <div className="font-bold text-white text-xs leading-tight">{label}</div>
-        <div className="text-white/80 text-[10px]">{sub}</div>
-      </div>
-    </Link>
-  );
-}

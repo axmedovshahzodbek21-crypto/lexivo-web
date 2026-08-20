@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { getSettings, saveSettings, setOnboarded, isOnboarded, saveLevelUpdatedAt, saveNameUpdatedAt, saveSettingsUpdatedAt } from '@/lib/storage';
 import type { UserSettings } from '@/lib/types';
 import { useTranslation } from '@/lib/useTranslation';
+import { APK_DOWNLOAD_URL } from '@/lib/constants';
 
 // ── Data ────────────────────────────────────────────────────────────────────
 
@@ -141,7 +142,7 @@ function StepWelcome({ onNext }: { onNext: () => void }) {
 
       {showBanner && (
         <a
-          href="https://github.com/axmedovshahzodbek21-crypto/lexivo-web/releases/latest/download/app-release.apk"
+          href={APK_DOWNLOAD_URL}
           className="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm w-full max-w-sm"
           style={{ background: 'rgba(61,220,132,0.1)', border: '1.5px solid rgba(61,220,132,0.35)' }}
         >

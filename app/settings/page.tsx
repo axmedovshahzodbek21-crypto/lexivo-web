@@ -15,6 +15,7 @@ import { linkUser, unlinkUser, requestPush, isPushSupported } from '@/lib/onesig
 import { exportData, importData } from '@/lib/backup';
 import type { UserSettings } from '@/lib/types';
 import { translations } from '@/lib/i18n';
+import { APK_DOWNLOAD_URL } from '@/lib/constants';
 
 function to12h(t: string): string {
   const [h, m] = t.split(':').map(Number);
@@ -870,7 +871,7 @@ export default function SettingsPage() {
         </p>
         <p className="text-xs text-[var(--text-muted)]">{t.settings.aboutStorage}</p>
         <a
-          href="https://github.com/axmedovshahzodbek21-crypto/lexivo-web/releases/latest/download/app-release.apk"
+          href={APK_DOWNLOAD_URL}
           download
           className="flex items-center gap-3 p-3 rounded-2xl w-full"
           style={{ background: 'rgba(61,220,132,0.08)', border: '1.5px solid rgba(61,220,132,0.35)' }}
