@@ -11,8 +11,10 @@ export async function recordClassStudyDay(studentId: string, classId: string): P
       .from('class_study_days')
       .upsert({ student_id: studentId, class_id: classId, study_date: today },
                { onConflict: 'student_id,class_id,study_date', ignoreDuplicates: true });
-  } catch {
-    // best-effort
+  } catch (e) {
+    // best-effort — logged so a failure is at least debuggable from
+    // reports instead of vanishing with no trace.
+    console.error('[class-xp] recordClassStudyDay failed:', e);
   }
 }
 
@@ -29,7 +31,9 @@ export async function recordClassXP(studentId: string, classId: string, xp: numb
       }),
       recordClassStudyDay(studentId, classId),
     ]);
-  } catch {
-    // best-effort; don't block the study flow on xp bookkeeping
+  } catch (e) {
+    // best-effort; don't block the study flow on xp bookkeeping — but
+    // logged so a failure is at least debuggable from reports.
+    console.error('[class-xp] recordClassXP failed:', e);
   }
 }
