@@ -201,7 +201,13 @@ export default function UnitPage() {
       ...(w.definitionUz ? { definition_uz: w.definitionUz } : {}),
       examples: w.examples,
     }));
-    await supabase.from('teacher_unit_words').insert(rows);
+    try {
+      await supabase.from('teacher_unit_words').insert(rows);
+    } catch (e) {
+      alert(`Failed to add words: ${e instanceof Error ? e.message : e}`);
+      setImporting(false);
+      return;
+    }
     setPasteText(''); setWordsInput(''); setParsed([]);
     await load();
     setTab('words');
