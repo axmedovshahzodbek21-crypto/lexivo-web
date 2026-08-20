@@ -1138,7 +1138,15 @@ function CurriculumTab({
   };
 
   const deleteCWUnit = async (unit: CurrWordUnit) => {
-    if (!confirm(`Delete unit "${unit.name}"? Words will remain but lose their unit assignment.`)) return;
+    // class_homework.class_unit_id -> class_word_units(id) is ON DELETE
+    // CASCADE, so deleting this unit silently wipes any homework assigned
+    // from it (and all student completion history). Warn the teacher first.
+    const { data: assignedHw } = await supabase.from('class_homework').select('id').eq('class_unit_id', unit.id);
+    const hwCount = assignedHw?.length ?? 0;
+    const msg = hwCount === 0
+      ? `Delete unit "${unit.name}"? Words will remain but lose their unit assignment.`
+      : `Delete unit "${unit.name}"? Words will remain but lose their unit assignment. This unit is currently assigned as homework in ${hwCount} place${hwCount !== 1 ? 's' : ''} — deleting it will also remove that homework and every student's progress on it.`;
+    if (!confirm(msg)) return;
     await supabase.from('class_word_units').delete().eq('id', unit.id).eq('class_id', classId);
     await loadCurriculum();
   };
