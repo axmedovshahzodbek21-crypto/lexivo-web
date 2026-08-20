@@ -189,11 +189,12 @@ export async function getClassSRSForTeacher(
 // ── Starred words ─────────────────────────────────────────────────────────────
 
 export async function getClassStarredWordIds(userId: string, classId: string): Promise<Set<string>> {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('class_starred_words')
     .select('word')
     .eq('user_id', userId)
     .eq('class_id', classId);
+  if (error) console.error('[getClassStarredWordIds]', error);
   return new Set((data ?? []).map((r: { word: string }) => r.word));
 }
 
@@ -212,11 +213,12 @@ export async function removeClassStarredWord(userId: string, classId: string, wo
 // ── Hard words ────────────────────────────────────────────────────────────────
 
 export async function getClassHardWordIds(userId: string, classId: string): Promise<Set<string>> {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('class_hard_words')
     .select('word')
     .eq('user_id', userId)
     .eq('class_id', classId);
+  if (error) console.error('[getClassHardWordIds]', error);
   return new Set((data ?? []).map((r: { word: string }) => r.word));
 }
 
@@ -241,11 +243,12 @@ export interface ClassWordRaw {
 }
 
 export async function getClassWordsFull(classId: string): Promise<ClassWordRaw[]> {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('class_words')
     .select('id, word, translation, definition, example1, example1_translation, example2, example2_translation, examples')
     .eq('class_id', classId)
     .order('created_at', { ascending: true });
+  if (error) console.error('[getClassWordsFull]', error);
   return (data ?? []) as ClassWordRaw[];
 }
 
