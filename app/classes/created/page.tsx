@@ -81,7 +81,12 @@ export default function CreatedClassesPage() {
 
   const deleteClass = async (classId: string) => {
     if (!user) return;
-    await supabase.from('classes').delete().eq('id', classId);
+    try {
+      await supabase.from('classes').delete().eq('id', classId);
+    } catch (e) {
+      alert(`Failed to delete class: ${e instanceof Error ? e.message : e}`);
+      return;
+    }
     setDeleteConfirmId(null);
     _cache.delete(user.id); load();
   };
@@ -89,7 +94,13 @@ export default function CreatedClassesPage() {
   const saveRename = async (classId: string) => {
     if (!renameText.trim()) return;
     setRenaming(true);
-    await supabase.from('classes').update({ name: renameText.trim() }).eq('id', classId);
+    try {
+      await supabase.from('classes').update({ name: renameText.trim() }).eq('id', classId);
+    } catch (e) {
+      alert(`Failed to rename class: ${e instanceof Error ? e.message : e}`);
+      setRenaming(false);
+      return;
+    }
     setRenamingId(null); setRenaming(false);
     if (user) _cache.delete(user.id); load();
   };

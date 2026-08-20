@@ -103,21 +103,37 @@ export default function LibraryPage() {
   async function createFolder() {
     if (!newName.trim() || !user) return;
     setCreating(true);
-    await supabase.from('teacher_folders').insert({ teacher_id: user.id, name: newName.trim() });
+    try {
+      await supabase.from('teacher_folders').insert({ teacher_id: user.id, name: newName.trim() });
+    } catch (e) {
+      alert(`Failed to create folder: ${e instanceof Error ? e.message : e}`);
+      setCreating(false);
+      return;
+    }
     setNewName(''); setShowCreate(false); setCreating(false);
     load();
   }
 
   async function renameFolder() {
     if (!renameId || !renameName.trim() || !user) return;
-    await supabase.from('teacher_folders').update({ name: renameName.trim() }).eq('id', renameId).eq('teacher_id', user.id);
+    try {
+      await supabase.from('teacher_folders').update({ name: renameName.trim() }).eq('id', renameId).eq('teacher_id', user.id);
+    } catch (e) {
+      alert(`Failed to rename folder: ${e instanceof Error ? e.message : e}`);
+      return;
+    }
     setRenameId(null); setRenameName('');
     load();
   }
 
   async function deleteFolder(id: string, name: string) {
     if (!confirm(`Delete "${name}" and all its units and words?`) || !user) return;
-    await supabase.from('teacher_folders').delete().eq('id', id).eq('teacher_id', user.id);
+    try {
+      await supabase.from('teacher_folders').delete().eq('id', id).eq('teacher_id', user.id);
+    } catch (e) {
+      alert(`Failed to delete folder: ${e instanceof Error ? e.message : e}`);
+      return;
+    }
     load();
   }
 

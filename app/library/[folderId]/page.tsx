@@ -83,21 +83,37 @@ export default function FolderPage() {
     // previously stopped an arbitrary folderId from being trusted outright.
     const { data: folder } = await supabase.from('teacher_folders').select('teacher_id').eq('id', folderId).maybeSingle();
     if (!folder || folder.teacher_id !== user.id) { setCreating(false); return; }
-    await supabase.from('teacher_units').insert({ folder_id: folderId, teacher_id: user.id, name: newName.trim() });
+    try {
+      await supabase.from('teacher_units').insert({ folder_id: folderId, teacher_id: user.id, name: newName.trim() });
+    } catch (e) {
+      alert(`Failed to create unit: ${e instanceof Error ? e.message : e}`);
+      setCreating(false);
+      return;
+    }
     setNewName(''); setShowCreate(false); setCreating(false);
     load();
   }
 
   async function renameUnit() {
     if (!renameId || !renameName.trim() || !user) return;
-    await supabase.from('teacher_units').update({ name: renameName.trim() }).eq('id', renameId).eq('teacher_id', user.id);
+    try {
+      await supabase.from('teacher_units').update({ name: renameName.trim() }).eq('id', renameId).eq('teacher_id', user.id);
+    } catch (e) {
+      alert(`Failed to rename unit: ${e instanceof Error ? e.message : e}`);
+      return;
+    }
     setRenameId(null); setRenameName('');
     load();
   }
 
   async function deleteUnit(id: string, name: string) {
     if (!confirm(`Delete "${name}" and all its words?`) || !user) return;
-    await supabase.from('teacher_units').delete().eq('id', id).eq('teacher_id', user.id);
+    try {
+      await supabase.from('teacher_units').delete().eq('id', id).eq('teacher_id', user.id);
+    } catch (e) {
+      alert(`Failed to delete unit: ${e instanceof Error ? e.message : e}`);
+      return;
+    }
     load();
   }
 
