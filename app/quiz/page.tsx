@@ -1,7 +1,7 @@
 ﻿'use client';
 import { PageLoader, SectionLoader } from '@/components/Loader';
-import { useEffect, useState, useCallback, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState, useCallback, useRef, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { speak, speakText } from '@/lib/speech';
 import { recordStudySession, markQuizComplete, unlockAchievement, getStarredWords, getCustomListWords, getSettings, getUnitProgress, getImportedWords, getImportedWordsByCollection, importedWordExampleFields, getClassHWTemp, recordQuizSession, addXP, hasQuizXPAwarded, markQuizXPAwarded, hasMyWordsXPAwarded, markMyWordsXPAwarded, getMyActivityPendingNewWords, markMyQuizComplete, displayXP } from '@/lib/storage';
@@ -92,10 +92,13 @@ function buildQuiz(
 
 type QuizState = 'idle' | 'answered';
 
-export default function QuizPage() {
+function QuizInner() {
   const router = useRouter();
-  const [sp, setSp] = useState<URLSearchParams>(() => new URLSearchParams());
-  useEffect(() => { setSp(new URLSearchParams(window.location.search)); }, []);
+  // Reactive — a one-time window.location.search read here previously meant
+  // picking a different unit from the in-page picker (a client-side
+  // navigation, not a full reload) didn't actually reload the quiz, since
+  // the effect that captured search params only ever ran once on mount.
+  const sp = useSearchParams();
   const collectionName = sp.get('collection') ?? undefined;
   const dayParam = sp.get('day');
   const dayNumber = dayParam ? parseInt(dayParam) : undefined;
@@ -551,6 +554,14 @@ function Loading() {
         <p className="text-[var(--text-muted)]">{t.quiz.loading}</p>
       </div>
     </div>
+  );
+}
+
+export default function QuizPage() {
+  return (
+    <Suspense fallback={<PageLoader />}>
+      <QuizInner />
+    </Suspense>
   );
 }
 
