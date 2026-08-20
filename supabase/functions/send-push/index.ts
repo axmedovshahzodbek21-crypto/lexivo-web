@@ -1,3 +1,6 @@
+// @ts-nocheck — Deno runtime (Deno.env, jsr: imports), not part of the
+// Next.js TS project. VSCode still checks open files against the main
+// tsconfig even though supabase/functions is excluded from it.
 // Supabase Edge Function: send-push
 //
 // Called by the `notify_push()` Postgres trigger (see
