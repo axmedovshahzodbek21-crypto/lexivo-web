@@ -1,0 +1,21 @@
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Add user_data.streak_bonus_date so the once-per-day streak bonus XP award
+-- can be synced across devices.
+-- Run this in Supabase SQL Editor
+--
+-- Both the Flutter and web clients gate the streak bonus (+30/+70 XP once
+-- per day once a 7+/30+ day streak is reached) on a purely local
+-- streak_bonus_date preference/localStorage key. Since that key was never
+-- synced, two devices could each independently see "not awarded yet today"
+-- and both award the bonus — xp_history only dedupes on exact-millisecond
+-- timestamp, so both entries pass that check and the user is credited twice.
+--
+-- Syncing this date with last-write-wins (client always takes the later of
+-- local vs. cloud, same as last_study_date) closes the race for the common
+-- case: any device that has pulled since another device's award will see
+-- today's date already recorded and skip re-awarding. It does not close a
+-- true simultaneous-award race (both devices decide before either syncs),
+-- which would need a server-side atomic RPC to fully eliminate.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+alter table user_data add column if not exists streak_bonus_date date;

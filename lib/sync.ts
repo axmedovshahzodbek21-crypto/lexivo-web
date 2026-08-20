@@ -100,6 +100,10 @@ export async function pushStats(): Promise<void> {
       streak:              streak,
       streak_freezes:      freezes,
       last_study_date:     lsGet('lexivo_last_study') || null,
+      // Un-synced before, this let two devices each independently award the
+      // once-per-day streak bonus XP on the same day — see the merge below
+      // and 20260821_streak_bonus_date_sync.sql.
+      streak_bonus_date:   lsGet('lexivo_streak_bonus_date') || null,
       last_freeze_week:    lsGet('lexivo_last_freeze_week') || null,
       show_on_leaderboard: s.showOnLeaderboard ?? true,
       study_days:          studyDays,
@@ -292,6 +296,12 @@ export async function pullAll(): Promise<void> {
       if (row.last_study_date && row.last_study_date >= (lsGet('lexivo_last_study') || '')) {
         lsSet('lexivo_last_study', row.last_study_date);
       }
+      // Same last-write-wins merge — checkAndUpdateStreak() reads this key
+      // to decide whether to award today's streak bonus, so a stale local
+      // value could re-award a bonus another device already gave.
+      if (row.streak_bonus_date && row.streak_bonus_date >= (lsGet('lexivo_streak_bonus_date') || '')) {
+        lsSet('lexivo_streak_bonus_date', row.streak_bonus_date);
+      }
       if (row.last_freeze_week) lsSet('lexivo_last_freeze_week', row.last_freeze_week);
       if (row.streak_freezes != null) lsSet('lexivo_freezes', JSON.stringify(row.streak_freezes));
       lsSet(S.statTs, cloudStatsTs);
@@ -362,10 +372,13 @@ function mergeListsFromCloudRow(row: Record<string, unknown>): void {
       if (learnedChanged) lsSet('lexivo_learned_words', JSON.stringify([...byKey.values()]));
     }
 
-    // srs_words: union by key; when both sides are live, take the higher
-    // reviewStage (preserves real review progress, matching Flutter's local
-    // model); when either side is a tombstone (deletedAt), last-write-wins by
-    // timestamp instead, so an unlearn on another device isn't undone.
+    // srs_words: union by key. When either side is a tombstone (deletedAt),
+    // last-write-wins by timestamp, so an unlearn on another device isn't
+    // undone. When both sides are live and the word already exists locally,
+    // the local entry is left as-is — SRSWord here has no reviewStage field
+    // to compare, and review progress is tracked authoritatively by
+    // review_log (unioned separately below), not by this table. Only
+    // genuinely new cloud-only words get added.
     if (Array.isArray(row.srs_words) && row.srs_words.length > 0) {
       const local = lsJSON<SRSWord[]>('lexivo_srs_words', []);
       const localMap = new Map(local.map((w: SRSWord) => [`${w.collectionName}::${w.word}`, w]));
@@ -379,14 +392,7 @@ function mergeListsFromCloudRow(row: Record<string, unknown>): void {
             localMap.set(key, cw as unknown as SRSWord);
             changed = true;
           }
-        } else if (lw) {
-          const cloudStage = (cw['reviewStage'] as number) ?? 0;
-          const localStage = (lw as unknown as Record<string, unknown>)['reviewStage'] as number ?? 0;
-          if (cloudStage > localStage) {
-            localMap.set(key, cw as unknown as SRSWord);
-            changed = true;
-          }
-        } else {
+        } else if (!lw) {
           // Add new word from cloud; reviewLog tracks its progress independently
           localMap.set(key, { ...cw, id: cw['id'] ?? key } as unknown as SRSWord);
           changed = true;
