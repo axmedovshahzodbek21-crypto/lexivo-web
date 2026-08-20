@@ -29,12 +29,15 @@ const lighten = (hex: string, amt = 0.3) => {
 // Module-level cache — survives navigation within the same tab session
 const _cache: Record<string, Folder[]> = {};
 
-const EXAMPLE_SEEDED_KEY = 'lexivo_library_example_seeded';
-
 // One-time real example (folder → unit → word) so a first-time teacher sees
-// the actual structure, not an empty page. Guarded by a local flag so it
-// never reappears even if they delete it — this is a courtesy seed, not a
-// permanent fixture.
+// the actual structure, not an empty page. Guarded server-side (does this
+// teacher have zero folders at all?) rather than a local flag — a
+// localStorage flag only guards the one browser/device, so a teacher
+// signing in on a second device would get a second copy of "Vocabulary 101"
+// seeded, and setting the flag before the inserts run meant a failure
+// partway through (e.g. folder created, unit insert fails) left the flag
+// permanently set with no way to retry. Matches Flutter's
+// _seedExampleFolder in teacher_library_screen.dart.
 async function seedExampleFolder(teacherId: string): Promise<boolean> {
   try {
     const { data: folder } = await supabase
@@ -91,10 +94,7 @@ export default function LibraryPage() {
       name: f.name,
       unit_count: f.teacher_units?.[0]?.count ?? 0,
     }));
-    if (result.length === 0 && !localStorage.getItem(EXAMPLE_SEEDED_KEY)) {
-      localStorage.setItem(EXAMPLE_SEEDED_KEY, '1');
-      if (await seedExampleFolder(user.id)) { await load(); return; }
-    }
+    if (result.length === 0 && await seedExampleFolder(user.id)) { await load(); return; }
     _cache[user.id] = result;
     setFolders(result);
     setLoading(false);
