@@ -1,5 +1,7 @@
 ﻿import type { Metadata, Viewport } from 'next';
 import { Suspense } from 'react';
+import { headers } from 'next/headers';
+import Script from 'next/script';
 import './globals.css';
 import AppNav from '@/components/AppNav';
 import AchievementToast from '@/components/AchievementToast';
@@ -13,6 +15,8 @@ import PomodoroWidget from '@/components/PomodoroWidget';
 import { AuthProvider } from '@/lib/auth-context';
 import OneSignalProvider from '@/components/OneSignalProvider';
 import HomeworkNotify from '@/components/HomeworkNotify';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Lexivo – Vocabulary Learning',
@@ -28,10 +32,17 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const nonce = (await headers()).get('x-nonce') ?? '';
+
   return (
     <html lang="en">
       <body>
+        <Script
+          src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js"
+          strategy="beforeInteractive"
+          nonce={nonce}
+        />
         <AuthProvider>
         <ThemeProvider />
         <NotificationScheduler />

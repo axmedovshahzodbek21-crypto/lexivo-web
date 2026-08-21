@@ -11,7 +11,7 @@ export function middleware(request: NextRequest) {
 
   const csp = [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://cdn.onesignal.com`,
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://cdn.onesignal.com${process.env.NODE_ENV === 'development' ? " 'unsafe-eval'" : ''}`,
     "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.onesignal.com",
     "img-src 'self' data: blob: https:",
     "style-src 'self' 'unsafe-inline'",
