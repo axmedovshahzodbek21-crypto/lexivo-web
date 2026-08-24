@@ -7,14 +7,6 @@ import { NextRequest, NextResponse } from 'next/server';
 // (Content-Security-Policy used to be static in next.config.ts, but a static
 // config can't generate a per-request nonce — that's why this lives here.)
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-  const isAdminRoute = pathname.startsWith('/admin') && pathname !== '/admin/login';
-  if (isAdminRoute && request.cookies.get('admin_auth')?.value !== process.env.ADMIN_PASSWORD) {
-    const loginUrl = new URL('/admin/login', request.url);
-    loginUrl.searchParams.set('next', pathname);
-    return NextResponse.redirect(loginUrl);
-  }
-
   const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
 
   const csp = [
