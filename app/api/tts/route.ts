@@ -3,21 +3,19 @@ import { supabase } from '@/lib/supabase';
 
 // Max requests per authenticated user per minute — generous for interactive
 // study use (many single-word lookups in a session), but bounds abuse since
-// each call is billed against our own Google Cloud quota. Keyed by user id,
-// same in-memory-per-user pattern used by /api/digest.
+// each call is billed against our own Google Cloud quota. Enforced via the
+// shared Postgres check_rate_limit() RPC (see
+// supabase/migrations/20260825_shared_rate_limiter.sql) — an in-memory Map
+// doesn't enforce a real limit across serverless instances, letting the
+// same user's quota be multiplied by however many instances happen to
+// serve their requests.
 const RATE_LIMIT = 60;
-const rateLimitMap = new Map<string, { count: number; windowStart: number }>();
 
-function checkRateLimit(userId: string): boolean {
-  const now = Date.now();
-  const entry = rateLimitMap.get(userId);
-  if (!entry || now - entry.windowStart > 60_000) {
-    rateLimitMap.set(userId, { count: 1, windowStart: now });
-    return true;
-  }
-  if (entry.count >= RATE_LIMIT) return false;
-  entry.count++;
-  return true;
+async function checkRateLimit(userId: string): Promise<boolean> {
+  const { data, error } = await supabase.rpc('check_rate_limit', {
+    p_user_id: userId, p_route: 'tts', p_limit: RATE_LIMIT, p_window_seconds: 60,
+  });
+  return !error && !!data;
 }
 
 export async function POST(req: NextRequest) {
@@ -32,7 +30,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    if (!checkRateLimit(user.id)) {
+    if (!(await checkRateLimit(user.id))) {
       return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
     }
 

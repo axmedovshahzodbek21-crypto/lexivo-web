@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
 import { localDateStr } from './storage';
+import { pickByStage } from './srs';
 
 const INTERVALS = [1, 3, 7, 14, 30]; // days, same as personal SRS
 
@@ -254,10 +255,14 @@ export async function getClassWordsFull(classId: string): Promise<ClassWordRaw[]
   return (data ?? []) as ClassWordRaw[];
 }
 
-export function stageLabel(stage: number): string {
-  return ['New', '+1 done', '+3 done', '+7 done', '+14 done', 'Graduated'][Math.min(stage, 5)];
-}
+// Re-exported from lib/srs.ts rather than duplicated — both surfaces use
+// identical wording for these labels.
+export { stageLabel } from './srs';
 
+// Deliberately a different palette from lib/srs.ts's personal-SRS
+// stageColor (which uses the app's shared ACCENT colors) — class review
+// keeps its own fixed palette. Only the duplicated clamp-and-index logic
+// (pickByStage) is shared; the color choices themselves are not.
 export function stageColor(stage: number): string {
-  return ['#9CA3AF', '#F59E0B', '#3B82F6', '#8B5CF6', '#EC4899', '#10B981'][Math.min(stage, 5)];
+  return pickByStage(stage, ['#9CA3AF', '#F59E0B', '#3B82F6', '#8B5CF6', '#EC4899', '#10B981']);
 }

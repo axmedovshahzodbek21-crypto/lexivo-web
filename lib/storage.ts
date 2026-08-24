@@ -275,6 +275,19 @@ export function incrementTodayCount() {
 
 // ─── SRS ─────────────────────────────────────────────────────────────────────
 
+// Every streak/SRS-due-date computation in this file is built on the
+// device's own local clock/timezone (deliberately — it matches how the
+// Flutter app computes the same things, so "today" agrees between
+// platforms for a single device). The real tradeoff this carries: a user
+// who studies on two devices in *different* timezones (e.g. a laptop set
+// to UTC and a phone in a local zone, or genuinely traveling) can have
+// each device compute a different "today" for the same wall-clock moment,
+// which can disagree on whether a streak day was hit or an SRS word is
+// due yet. There's no per-device fix for this without a coordinated
+// change to move the day boundary onto a canonical (server-side or UTC)
+// clock on both platforms — that's a deliberate architecture decision,
+// not something to silently change here, since it would also shift every
+// existing user's streak/due-date boundaries.
 export function localDateStr(d = new Date()): string {
   return d.toLocaleDateString('en-CA'); // yields YYYY-MM-DD in the user's local timezone
 }

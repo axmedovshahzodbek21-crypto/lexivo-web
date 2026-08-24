@@ -73,54 +73,60 @@ export async function pushStats(): Promise<void> {
     const todayCountDate = lsGet('lexivo_today_count_date');
     const s = getSettings();
 
-    // Accumulators must never regress the shared cloud row: fetch its current
-    // values and take max(local, cloud) before writing, mirroring the max()
-    // merge already applied on pull. Without this, a device pushing a lower
-    // (stale) locally-computed total after another device already pushed a
-    // higher one would silently erase the other device's earned XP/streak.
-    //
-    // Freezes are NOT included in this max() — they're spendable, so a
-    // device pushing right after spending one needs its lower local value to
-    // win outright, not lose to max() against a stale higher cloud value.
-    const { data: cloudRow } = await supabase.from('user_data').select('total_xp, streak').eq('id', uid).maybeSingle();
-    const xp = Math.max(lsJSON<number>('lexivo_xp', 0), cloudRow?.total_xp ?? 0);
-    const streak = Math.max(lsJSON<number>('lexivo_streak', 0), cloudRow?.streak ?? 0);
+    const xp = lsJSON<number>('lexivo_xp', 0);
+    const streak = lsJSON<number>('lexivo_streak', 0);
     const freezes = lsJSON<number>('lexivo_freezes', 0);
 
     const studyDays = lsJSON<string[]>('lexivo_study_days', []);
     const reviewDays = lsJSON<string[]>('lexivo_review_days', []);
     const wordGoalDays = lsJSON<string[]>('lexivo_word_goal_days', []);
-    // user_stats (the leaderboard's read source) is no longer written
-    // directly — a trigger on user_data derives it in the same transaction,
-    // so the two can't diverge on a partial failure the way two separate
-    // client upserts could.
-    await supabase.from('user_data').upsert({
-      id: uid,
-      total_xp:            xp,
-      streak:              streak,
-      streak_freezes:      freezes,
-      last_study_date:     lsGet('lexivo_last_study') || null,
+
+    // Single atomic RPC instead of a SELECT (read current xp/streak) then a
+    // separate UPSERT (write max(local, cloud)) — the same read-then-write
+    // shape pushSettings() used to have before sync_profile_settings()
+    // replaced it. Between the old SELECT and UPSERT, another device's push
+    // could land with a newer value that this call's stale max() would then
+    // silently overwrite. The RPC does GREATEST() against the row's current
+    // value inside the same statement, so there's no window for that.
+    //
+    // Freezes are NOT accumulated — they're spendable, so a device pushing
+    // right after spending one needs its lower local value to win outright,
+    // not lose to a max() against a stale higher cloud value. today_xp/
+    // daily_words are only sent (non-null) when this device's own local
+    // "today" cache is fresh; the RPC coalesces onto the existing value
+    // otherwise, same as the old code omitting those keys entirely.
+    const { data, error } = await supabase.rpc('sync_user_stats', {
+      p_user_id: uid,
+      p_xp: xp,
+      p_streak: streak,
+      p_streak_freezes: freezes,
+      p_last_study_date: lsGet('lexivo_last_study') || null,
       // Un-synced before, this let two devices each independently award the
       // once-per-day streak bonus XP on the same day — see the merge below
       // and 20260821_streak_bonus_date_sync.sql.
-      streak_bonus_date:   lsGet('lexivo_streak_bonus_date') || null,
-      last_freeze_week:    lsGet('lexivo_last_freeze_week') || null,
-      show_on_leaderboard: s.showOnLeaderboard ?? true,
-      study_days:          studyDays,
-      review_days:         reviewDays,
-      word_goal_days:      wordGoalDays,
-      ...(todayXpDate === today ? {
-        today_xp:      lsJSON<number>('lexivo_today_xp', 0),
-        today_xp_date: today,
-      } : {}),
-      ...(todayCountDate === today ? {
-        daily_words_learned: lsJSON<number>('lexivo_today_count', 0),
-        daily_words_date:    today,
-      } : {}),
-      stats_updated_at:    ts,
+      p_streak_bonus_date: lsGet('lexivo_streak_bonus_date') || null,
+      p_last_freeze_week: lsGet('lexivo_last_freeze_week') || null,
+      p_show_on_leaderboard: s.showOnLeaderboard ?? true,
+      p_study_days: studyDays,
+      p_review_days: reviewDays,
+      p_word_goal_days: wordGoalDays,
+      p_today_xp: todayXpDate === today ? lsJSON<number>('lexivo_today_xp', 0) : null,
+      p_today_xp_date: todayXpDate === today ? today : null,
+      p_daily_words_learned: todayCountDate === today ? lsJSON<number>('lexivo_today_count', 0) : null,
+      p_daily_words_date: todayCountDate === today ? today : null,
+      p_stats_updated_at: ts,
     });
-    lsSet('lexivo_xp', JSON.stringify(xp));
-    lsSet('lexivo_streak', JSON.stringify(streak));
+    if (error) throw error;
+    // The RPC resolves total_xp/streak server-side (GREATEST against the
+    // row's current value) and returns the result — write it back locally
+    // so this device's own displayed XP/streak reflects the resolved value
+    // immediately, same as the old code's post-merge lsSet calls, instead
+    // of staying stale until the next pullAll().
+    const resolved = data?.[0];
+    if (resolved) {
+      lsSet('lexivo_xp', JSON.stringify(resolved.total_xp));
+      lsSet('lexivo_streak', JSON.stringify(resolved.streak));
+    }
     lsSet('lexivo_freezes', JSON.stringify(freezes));
     lsSet(S.statTs, ts);
   } catch (e) {
@@ -174,6 +180,17 @@ export async function pushLists(): Promise<void> {
     // otherwise a device pushing after being offline (or racing another
     // device's own push) would silently discard the other side's data
     // instead of just adding to it.
+    //
+    // This is still a read-then-write, unlike pushStats/pushSettings above
+    // (see sync_user_stats/sync_profile_settings) — there's a narrow TOCTOU
+    // window between this SELECT and the UPSERT below where another
+    // concurrent push could land and then get overwritten by this call's
+    // now-stale merge. Closing it fully would mean re-implementing this
+    // entire per-field union/tombstone-timestamp merge (the same logic as
+    // mergeListsFromCloudRow, called just below) as a single atomic
+    // PL/pgSQL RPC — a much larger, higher-risk change than pushStats'
+    // conversion given how many independently-merged fields are involved,
+    // left as a deliberate follow-up rather than rushed here.
     const { data: cloudRow } = await supabase.from('user_data')
       .select('learned_words, srs_words, starred_words, hard_words, study_days, review_days, word_goal_days, unit_done_days, xp_history, unit_progress, my_unit_progress, review_log, achievements, imported_words, focus_days')
       .eq('id', uid).maybeSingle();

@@ -1,21 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
-// In-memory rate limiter: max 20 transcriptions per user per minute
-const rateLimit = new Map<string, { count: number; resetAt: number }>();
-const RATE_LIMIT = 20;
-const RATE_WINDOW_MS = 60_000;
-
-function checkRateLimit(uid: string): boolean {
-  const now = Date.now();
-  const entry = rateLimit.get(uid);
-  if (!entry || now >= entry.resetAt) {
-    rateLimit.set(uid, { count: 1, resetAt: now + RATE_WINDOW_MS });
-    return true;
-  }
-  if (entry.count >= RATE_LIMIT) return false;
-  entry.count++;
-  return true;
+// Max 20 transcriptions per user per minute, enforced via the shared
+// Postgres check_rate_limit() RPC (see
+// supabase/migrations/20260825_shared_rate_limiter.sql) — an in-memory Map
+// doesn't enforce a real limit across serverless instances, letting the
+// same user's quota be multiplied by however many instances happen to
+// serve their requests.
+async function checkRateLimit(uid: string): Promise<boolean> {
+  const { data, error } = await supabase.rpc('check_rate_limit', {
+    p_user_id: uid, p_route: 'transcribe', p_limit: 20, p_window_seconds: 60,
+  });
+  return !error && !!data;
 }
 
 export async function POST(req: NextRequest) {
@@ -31,7 +27,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Rate limit per user
-  if (!checkRateLimit(user.id)) {
+  if (!(await checkRateLimit(user.id))) {
     return NextResponse.json({ error: 'Rate limit exceeded — try again in a minute' }, { status: 429 });
   }
 

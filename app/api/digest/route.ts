@@ -9,8 +9,11 @@ const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 // Max one digest request per teacher per minute. Keyed by authenticated user
 // id (not the caller-supplied classId), so it can't be bypassed by varying
-// classId — same in-memory-per-user pattern used by /api/transcribe.
-const rateLimitMap = new Map<string, number>();
+// classId. Enforced via the shared Postgres check_rate_limit() RPC (see
+// supabase/migrations/20260825_shared_rate_limiter.sql) rather than an
+// in-memory Map — a per-instance Map doesn't enforce a real limit across
+// serverless instances, letting the same user's quota be multiplied by
+// however many instances happen to serve their requests.
 
 export async function POST(req: NextRequest) {
   try {
@@ -49,11 +52,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const last = rateLimitMap.get(user.id) ?? 0;
-    if (Date.now() - last < 60_000) {
+    const { data: allowed, error: rateLimitError } = await supabase.rpc('check_rate_limit', {
+      p_user_id: user.id, p_route: 'digest', p_limit: 1, p_window_seconds: 60,
+    });
+    if (rateLimitError || !allowed) {
       return NextResponse.json({ error: 'Rate limit: one digest per minute' }, { status: 429 });
     }
-    rateLimitMap.set(user.id, Date.now());
 
     // studentName is a student's own profile display name — free text a
     // student fully controls, not something the requesting teacher wrote.
