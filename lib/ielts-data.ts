@@ -27,21 +27,12 @@ export interface IeltsQuestion {
   summaryOptions?: string[];  // for letter-based summary completion (A–H phrases)
 }
 
-export interface GlossaryEntry {
-  term: string;       // the word as it appears (marked with * in the passage text), e.g. "pulp"
-  definition: string; // shown in the footnote block below the passage
-}
-
 export interface IeltsPassageTest {
   testNumber: number;
   title: string;
   subtitle?: string;      // italic byline under the title, e.g. "Mark Rowe investigates..."
   questionRange?: string; // e.g. "1-13" or "14-26", for the time instruction header
   content: string;
-  // How paragraphs are labeled in the passage pane. Defaults to 'letters' (the historical
-  // behavior) when omitted, so existing test data renders unchanged.
-  paragraphLabelStyle?: 'none' | 'letters' | 'roman';
-  glossary?: GlossaryEntry[];
   questions: IeltsQuestion[];
 }
 
@@ -90,10 +81,7 @@ One competitive advantage that New Zealand has is its ability to source large qu
 
 However, New Zealand is not the only country with a plantation-style forestry industry, Chile, Brazil, Argentina, South Africa and Australia all have extensive plantings of fast-growing species (hardwood and softwood), and in the northern hemisphere, Scandinavian countries have all expanded their forests or controlled their use in the interests of future production.
 
-Finally, in addition to competition from other wood producers, New Zealand faces competition from goods such as wood substitutes. These include steel framing for houses. This further underlines the necessity for globally competitive production and marketing strategies.`,
-  glossary: [
-    { term: 'pulp', definition: 'wood which is crushed until soft enough to form the basis of paper.' },
-  ],
+Finally, in addition to competition from other wood producers, New Zealand faces competition from goods such as wood substitutes. These include steel framing for houses. This further underlines the necessity for globally competitive production and marketing strategies.pulp*: wood which is crushed until soft enough to form the basis of paper.`,
   questions: [
     {
       type: 'true_false_not_given',
