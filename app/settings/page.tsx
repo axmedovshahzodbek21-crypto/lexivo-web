@@ -182,16 +182,12 @@ export default function SettingsPage() {
     setResetLoading(true);
     setResetError('');
     try {
-      PROGRESS_RESET_KEYS.forEach(k => localStorage.removeItem(k));
-      const toRemove: string[] = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const k = localStorage.key(i);
-        if (k && PROGRESS_RESET_PREFIXES.some(p => k.startsWith(p))) toRemove.push(k);
-      }
-      toRemove.forEach(k => localStorage.removeItem(k));
-      resetMyWordsProgress(); // also clears lexivo_my_unit_progress_* and lexivo_my_words_xp_units
-
-      // Now delete from Supabase
+      // Cloud reset first, local clearing only after it succeeds — this used
+      // to wipe localStorage before touching Supabase, so a network/DB
+      // failure below permanently destroyed local progress even though the
+      // operation reported as failed with nothing actually reset in the
+      // cloud. If this throws, the catch block below leaves local state
+      // completely untouched.
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const ts = new Date().toISOString();
@@ -216,14 +212,26 @@ export default function SettingsPage() {
           reset_at: ts,
         });
         if (upsertErr) throw new Error(upsertErr.message);
-        localStorage.setItem('lexivo_last_reset_at', ts);
         const dels = await Promise.all([
           supabase.from('learned_words').delete().eq('user_id', user.id),
           supabase.from('xp_history').delete().eq('user_id', user.id),
         ]);
         const failed = dels.filter(r => r.error).map(r => r.error!.message);
         if (failed.length > 0) throw new Error(failed.join('; '));
+        localStorage.setItem('lexivo_last_reset_at', ts);
       }
+
+      // Cloud reset succeeded (or there's no signed-in user to sync with) —
+      // now safe to clear local state.
+      PROGRESS_RESET_KEYS.forEach(k => localStorage.removeItem(k));
+      const toRemove: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && PROGRESS_RESET_PREFIXES.some(p => k.startsWith(p))) toRemove.push(k);
+      }
+      toRemove.forEach(k => localStorage.removeItem(k));
+      resetMyWordsProgress(); // also clears lexivo_my_unit_progress_* and lexivo_my_words_xp_units
+
       await new Promise(r => setTimeout(r, 200));
       window.location.replace('/');
     } catch (e) {
