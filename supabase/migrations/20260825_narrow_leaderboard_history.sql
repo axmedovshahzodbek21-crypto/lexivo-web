@@ -10,6 +10,8 @@
 -- single-user RPC for the profile-card use case.
 -- ─────────────────────────────────────────────────────────────────────────────
 
+DROP FUNCTION IF EXISTS public.get_leaderboard();
+
 CREATE OR REPLACE FUNCTION public.get_leaderboard()
  RETURNS TABLE(user_id uuid, name text, avatar_url text, xp bigint, streak integer, last_study_date text, today_count integer, total_learned bigint)
  LANGUAGE sql
