@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
+import { localDateStr } from '@/lib/storage';
 
 const CLASS_ACCENT_COLORS = [
   '#6366f1', '#ec4899', '#22c55e', '#3b82f6',
@@ -13,20 +14,22 @@ function classAccentColor(id: string) {
   return CLASS_ACCENT_COLORS[n % CLASS_ACCENT_COLORS.length];
 }
 
-function dateStr(d: Date) {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-}
-
 function calcCurrentStreak(days: string[]): number {
   if (!days.length) return 0;
   const set = new Set(days);
-  const now = new Date(Date.now() - 2 * 3_600_000);
-  const today = dateStr(now);
-  const yesterday = dateStr(new Date(now.getTime() - 86_400_000));
+  // Plain local midnight, matching localDateStr() everywhere else this app
+  // computes a day boundary (personal streaks, study days) — this used to
+  // apply a bespoke -2hr offset found nowhere else in the codebase, which
+  // let this page's streak silently disagree with the "today" ring drawn
+  // just below it in the same file (computed with no offset) and with the
+  // streak shown on the class dashboard/leaderboard.
+  const now = new Date();
+  const today = localDateStr(now);
+  const yesterday = localDateStr(new Date(now.getTime() - 86_400_000));
   if (!set.has(today) && !set.has(yesterday)) return 0;
   let cursor = set.has(today) ? now : new Date(now.getTime() - 86_400_000);
   let streak = 0;
-  while (set.has(dateStr(cursor))) {
+  while (set.has(localDateStr(cursor))) {
     streak++;
     cursor = new Date(cursor.getTime() - 86_400_000);
   }
@@ -106,7 +109,7 @@ export default function ClassStreakPage() {
   if (!user) return null;
 
   const now = new Date();
-  const todayStr = dateStr(now);
+  const todayStr = localDateStr(now);
   const studiedSet = new Set(studyDays);
 
   const monthName = `${MONTH_NAMES[viewMonth]} ${viewYear}`;
