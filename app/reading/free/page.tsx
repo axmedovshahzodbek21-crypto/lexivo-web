@@ -225,7 +225,7 @@ export default function ReadingPage() {
   // directly and call both setters as separate top-level calls instead;
   // React 18 batches them into one render regardless.
   const addToList = useCallback((word: string) => {
-    if (wordList.includes(word)) return;
+    if (wordList.some(w => w.toLowerCase() === word.toLowerCase())) return;
     setWordHistory(h => [...h.slice(-29), wordList]);
     setWordList([...wordList, word]);
   }, [wordList]);
