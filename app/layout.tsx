@@ -15,6 +15,7 @@ import PomodoroWidget from '@/components/PomodoroWidget';
 import { AuthProvider } from '@/lib/auth-context';
 import OneSignalProvider from '@/components/OneSignalProvider';
 import HomeworkNotify from '@/components/HomeworkNotify';
+import OfflineQueueFlusher from '@/components/OfflineQueueFlusher';
 
 export const dynamic = 'force-dynamic';
 
@@ -47,6 +48,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <ThemeProvider />
         <NotificationScheduler />
         <DataLoader />
+        <OfflineQueueFlusher />
         <GlobalKeyboardHandler />
         <Suspense fallback={
           <div className="sm:flex sm:min-h-screen">
