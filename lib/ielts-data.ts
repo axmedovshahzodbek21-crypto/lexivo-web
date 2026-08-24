@@ -11,7 +11,28 @@ export type QuestionType =
   | 'matching_sentence_endings'
   | 'sentence_completion'
   | 'summary_completion'
-  | 'short_answer';
+  | 'short_answer'
+  | 'note_completion'
+  | 'flow_chart_completion';
+
+// One line of a Note Completion block. Real notes have headings/sub-headings/bullets rather
+// than true arbitrary nesting — these 4 styles cover that without needing a tree structure.
+export type NoteLineStyle = 'heading' | 'subheading' | 'bullet' | 'numbered-sub-item';
+
+export interface NoteLine {
+  style: NoteLineStyle;
+  text: string; // may contain [N] blank placeholders, same convention as summaryText
+}
+
+export interface FlowChartStep {
+  label?: string; // e.g. "Phase 1" — rendered bold before the text
+  text: string;   // may contain [N] blank placeholders, same convention as summaryText
+}
+
+export interface MatchingExample {
+  label: string;  // e.g. "Paragraph B"
+  answer: string; // e.g. "x" — shown to the candidate, not scored
+}
 
 export interface IeltsQuestion {
   type: QuestionType;
@@ -25,6 +46,12 @@ export interface IeltsQuestion {
   summaryText?: string;       // full summary paragraph with [N] placeholders for summary_completion
   summaryTitle?: string;      // e.g. "Uses of a Popular Tree" — title of the summary box
   summaryOptions?: string[];  // for letter-based summary completion (A–H phrases)
+  // Overrides the type's default word-limit phrasing (e.g. "ONE WORD ONLY",
+  // "NO MORE THAN TWO WORDS AND/OR A NUMBER"). Lives on the group's first question.
+  wordLimit?: string;
+  noteLines?: NoteLine[];           // for note_completion — lives on the group's first question
+  flowChartSteps?: FlowChartStep[]; // for flow_chart_completion — lives on the group's first question
+  example?: MatchingExample;        // worked example for matching-family groups
 }
 
 export interface GlossaryEntry {
