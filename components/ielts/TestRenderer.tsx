@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import BackButton from '@/components/BackButton';
-import { IeltsPassageTest, IeltsQuestion, MatchingExample, NoteLine, NoteLineStyle, FlowChartStep } from '@/lib/ielts-data';
+import { IeltsPassageTest, IeltsQuestion } from '@/lib/ielts-data';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -15,25 +15,9 @@ function letterList(n: number) {
   return ls.slice(0, -1).join(', ') + ' or ' + ls[ls.length - 1];
 }
 
-function ExampleBox({ example, color }: { example: MatchingExample; color: string }) {
-  return (
-    <div style={{ border: `1px solid ${color}`, display: 'inline-block', padding: '8px 16px', marginTop: 8, marginBottom: 4 }}>
-      <div style={{ display: 'flex', gap: 24, fontSize: 13, color }}>
-        <span style={{ fontStyle: 'italic', fontWeight: 700 }}>Example</span>
-        <span style={{ fontStyle: 'italic', fontWeight: 700 }}>Answer</span>
-      </div>
-      <div style={{ display: 'flex', gap: 24, fontSize: 13, color, marginTop: 4 }}>
-        <span>{example.label}</span>
-        <span style={{ fontWeight: 700 }}>{example.answer}</span>
-      </div>
-    </div>
-  );
-}
-
-function QuestionInstruction({ type, start, end, passageId, color, paragraphLabels, options, featureListTitle, wordLimit, example }: {
+function QuestionInstruction({ type, start, end, passageId, color, paragraphLabels, options, featureListTitle }: {
   type: string; start: number; end: number; passageId: string; color: string;
   paragraphLabels?: string; options?: string[]; featureListTitle?: string;
-  wordLimit?: string; example?: MatchingExample;
 }) {
   const range = end > start ? `${start}–${end}` : `${start}`;
   const it: React.CSSProperties = { fontStyle: 'italic', color, display: 'block', marginBottom: 6 };
@@ -43,7 +27,6 @@ function QuestionInstruction({ type, start, end, passageId, color, paragraphLabe
   const box: React.CSSProperties = { border: `1px solid ${color}`, display: 'inline-block', padding: '10px 20px', marginTop: 8, marginBottom: 4, minWidth: 200 };
 
   const head = <span style={{ ...it, marginBottom: 10 }}>Questions {range}</span>;
-  const exampleBox = example ? <ExampleBox example={example} color={color} /> : null;
 
   switch (type) {
     case 'true_false_not_given':
@@ -92,7 +75,6 @@ function QuestionInstruction({ type, start, end, passageId, color, paragraphLabe
         <span style={it}>Which section contains the following information?</span>
         <span style={it}>Write the correct letter, <strong>{pl}</strong>, in boxes {range} on your answer sheet.</span>
         <span style={nb}><strong>NB</strong> You may use any letter more than once.</span>
-        {exampleBox}
       </div>;
     }
 
@@ -105,7 +87,6 @@ function QuestionInstruction({ type, start, end, passageId, color, paragraphLabe
         <span style={it}>Reading Passage {passageId} has several paragraphs, <strong>{pl}</strong>.</span>
         <span style={it}>Choose the correct heading for each paragraph from the list of headings below.</span>
         <span style={it}>Write the correct number, <strong><em>{romanRange}</em></strong>, in boxes {range} on your answer sheet.</span>
-        {exampleBox}
         {options && options.length > 0 && (
           <div style={box}>
             <div style={{ fontWeight: 700, color, textAlign: 'center', marginBottom: 10 }}>List of Headings</div>
@@ -130,7 +111,6 @@ function QuestionInstruction({ type, start, end, passageId, color, paragraphLabe
         <span style={{ color, display: 'block', marginBottom: 6 }}>Look at the following statements and the list of {listLabel.replace('List of ', '').toLowerCase()} below.</span>
         <span style={{ color, display: 'block', marginBottom: 6 }}>Match each statement with the correct {noun}, <strong>{ll}</strong>.</span>
         <span style={nb}><strong>NB</strong> You may use any letter more than once.</span>
-        {exampleBox}
         {options && options.length > 0 && (
           <div style={box}>
             <div style={{ fontWeight: 700, color, marginBottom: 8 }}>{listLabel}</div>
@@ -151,7 +131,6 @@ function QuestionInstruction({ type, start, end, passageId, color, paragraphLabe
         {head}
         <span style={it}>Complete each sentence with the correct ending, <strong>{endRange}</strong>, below.</span>
         <span style={it}>Write the correct letter in boxes {range} on your answer sheet.</span>
-        {exampleBox}
       </div>;
     }
 
@@ -159,7 +138,7 @@ function QuestionInstruction({ type, start, end, passageId, color, paragraphLabe
       return <div style={{ fontSize: 13, lineHeight: 1.6 }}>
         {head}
         <span style={it}>Complete the sentences below.</span>
-        <span style={it}>Choose <strong>{wordLimit ?? 'ONE WORD ONLY'}</strong> from the passage for each answer.</span>
+        <span style={it}>Choose <strong>ONE WORD ONLY</strong> from the passage for each answer.</span>
         <span style={it}>Write your answers in boxes {range} on your answer sheet.</span>
       </div>;
 
@@ -167,7 +146,7 @@ function QuestionInstruction({ type, start, end, passageId, color, paragraphLabe
       return <div style={{ fontSize: 13, lineHeight: 1.6 }}>
         {head}
         <span style={it}>Complete the summary below.</span>
-        <span style={it}>Choose <strong>{wordLimit ?? 'ONE WORD ONLY'}</strong> from the passage for each answer.</span>
+        <span style={it}>Choose <strong>ONE WORD ONLY</strong> from the passage for each answer.</span>
         <span style={it}>Write your answers in boxes {range} on your answer sheet.</span>
       </div>;
 
@@ -175,22 +154,8 @@ function QuestionInstruction({ type, start, end, passageId, color, paragraphLabe
       return <div style={{ fontSize: 13, lineHeight: 1.6 }}>
         {head}
         <span style={it}>Answer the questions below.</span>
-        <span style={it}>Choose <strong>{wordLimit ?? 'NO MORE THAN THREE WORDS'}</strong> from the passage for each answer.</span>
+        <span style={it}>Choose <strong>NO MORE THAN THREE WORDS</strong> from the passage for each answer.</span>
         <span style={it}>Write your answers in boxes {range} on your answer sheet.</span>
-      </div>;
-
-    case 'note_completion':
-      return <div style={{ fontSize: 13, lineHeight: 1.6 }}>
-        {head}
-        <span style={it}>Complete the notes below.</span>
-        <span style={it}>Write <strong>{wordLimit ?? 'ONE WORD ONLY'}</strong> from the passage for each answer.</span>
-      </div>;
-
-    case 'flow_chart_completion':
-      return <div style={{ fontSize: 13, lineHeight: 1.6 }}>
-        {head}
-        <span style={it}>Complete the flow-chart below.</span>
-        <span style={it}>Write <strong>{wordLimit ?? 'ONE WORD ONLY'}</strong> from the passage for each answer.</span>
       </div>;
 
     default:
@@ -537,15 +502,12 @@ function AnswerReveal({ q, userAnswer, submitted, passageColor }: {
 
 // ─── Summary block ───────────────────────────────────────────────────────────
 
-// Shared by SummaryBlock, NoteBlock, and FlowChartBlock: splits text on [N] placeholders
-// and renders each blank as an editable input/select (test mode) or a reveal (review mode).
-function renderInlineBlanks({
-  text, startIdx, groupQuestions, answers, onChange, mode, submitted, passageStyle, fontSize, wordOptions,
-}: {
-  text: string; startIdx: number; groupQuestions: IeltsQuestion[];
+function SummaryBlock({ text, title, summaryOptions, groupQuestions, startIdx, answers, onChange, mode, submitted, passageStyle, fontSize }: {
+  text: string; title?: string; summaryOptions?: string[];
+  groupQuestions: IeltsQuestion[]; startIdx: number;
   answers: Record<number, string>; onChange: (idx: number, val: string) => void;
-  mode: string; submitted: boolean; passageStyle: { bg: string; color: string }; fontSize: number;
-  wordOptions?: string[];
+  mode: string; submitted: boolean;
+  passageStyle: { bg: string; color: string }; fontSize: number;
 }) {
   const parts = text.split(/\[(\d+)\]/g);
   const c = passageStyle.color;
@@ -554,60 +516,49 @@ function renderInlineBlanks({
     background: 'transparent', color: c, fontSize, padding: '0 2px',
     outline: 'none', display: 'inline',
   };
-  return parts.map((part, pi) => {
-    if (pi % 2 === 0) return <span key={pi}>{part}</span>;
-    const qNum = parseInt(part);
-    const answerIdx = qNum - 1;
-    const localIdx = qNum - (startIdx + 1);
-    const q = groupQuestions[localIdx];
-    const val = answers[answerIdx] ?? '';
-    const correct = submitted && q ? isCorrect(q, val) : null;
-    if (mode === 'test' && !submitted) {
-      if (wordOptions) {
-        return (
-          <span key={pi} style={{ display: 'inline-flex', alignItems: 'baseline', gap: 3, margin: '0 2px' }}>
-            <strong style={{ color: c }}>{qNum}</strong>
-            <select value={val} onChange={e => onChange(answerIdx, e.target.value)}
-              style={{ border: `1px solid ${c}`, background: passageStyle.bg, color: c, padding: '1px 4px', fontSize: fontSize - 1, borderRadius: 3 }}>
-              <option value="">—</option>
-              {wordOptions.map((_, si) => <option key={si} value={LETTERS[si]}>{LETTERS[si]}</option>)}
-            </select>
-          </span>
-        );
-      }
-      return (
-        <span key={pi} style={{ display: 'inline-flex', alignItems: 'baseline', gap: 3, margin: '0 2px' }}>
-          <strong style={{ color: c }}>{qNum}</strong>
-          <input value={val} onChange={e => onChange(answerIdx, e.target.value)} style={inputStyle} />
-        </span>
-      );
-    }
-    const displayVal = val || (q?.answer ?? '…');
-    return (
-      <span key={pi} style={{ display: 'inline-flex', alignItems: 'baseline', gap: 3, margin: '0 2px' }}>
-        <strong style={{ color: c }}>{qNum}</strong>
-        <span style={{ fontWeight: 700, color: correct === false ? 'rgb(239 68 68)' : correct === true ? 'rgb(34 197 94)' : 'var(--primary)', borderBottom: `1.5px solid currentColor`, padding: '0 2px' }}>
-          {displayVal}
-        </span>
-      </span>
-    );
-  });
-}
-
-function SummaryBlock({ text, title, summaryOptions, groupQuestions, startIdx, answers, onChange, mode, submitted, passageStyle, fontSize }: {
-  text: string; title?: string; summaryOptions?: string[];
-  groupQuestions: IeltsQuestion[]; startIdx: number;
-  answers: Record<number, string>; onChange: (idx: number, val: string) => void;
-  mode: string; submitted: boolean;
-  passageStyle: { bg: string; color: string }; fontSize: number;
-}) {
-  const c = passageStyle.color;
   return (
     <div style={{ margin: '8px 0' }}>
       <div style={{ border: `1px solid ${c}`, padding: '14px 20px' }}>
         {title && <p style={{ fontWeight: 700, textAlign: 'center', marginBottom: 12, color: c, fontSize }}>{title}</p>}
         <p style={{ fontSize, lineHeight: 1.85, color: c }}>
-          {renderInlineBlanks({ text, startIdx, groupQuestions, answers, onChange, mode, submitted, passageStyle, fontSize, wordOptions: summaryOptions })}
+          {parts.map((part, pi) => {
+            if (pi % 2 === 0) return <span key={pi}>{part}</span>;
+            const qNum = parseInt(part);
+            const answerIdx = qNum - 1;
+            const localIdx = qNum - (startIdx + 1);
+            const q = groupQuestions[localIdx];
+            const val = answers[answerIdx] ?? '';
+            const correct = submitted && q ? isCorrect(q, val) : null;
+            if (mode === 'test' && !submitted) {
+              if (summaryOptions) {
+                return (
+                  <span key={pi} style={{ display: 'inline-flex', alignItems: 'baseline', gap: 3, margin: '0 2px' }}>
+                    <strong style={{ color: c }}>{qNum}</strong>
+                    <select value={val} onChange={e => onChange(answerIdx, e.target.value)}
+                      style={{ border: `1px solid ${c}`, background: passageStyle.bg, color: c, padding: '1px 4px', fontSize: fontSize - 1, borderRadius: 3 }}>
+                      <option value="">—</option>
+                      {summaryOptions.map((_, si) => <option key={si} value={LETTERS[si]}>{LETTERS[si]}</option>)}
+                    </select>
+                  </span>
+                );
+              }
+              return (
+                <span key={pi} style={{ display: 'inline-flex', alignItems: 'baseline', gap: 3, margin: '0 2px' }}>
+                  <strong style={{ color: c }}>{qNum}</strong>
+                  <input value={val} onChange={e => onChange(answerIdx, e.target.value)} style={inputStyle} />
+                </span>
+              );
+            }
+            const displayVal = val || (q?.answer ?? '…');
+            return (
+              <span key={pi} style={{ display: 'inline-flex', alignItems: 'baseline', gap: 3, margin: '0 2px' }}>
+                <strong style={{ color: c }}>{qNum}</strong>
+                <span style={{ fontWeight: 700, color: correct === false ? 'rgb(239 68 68)' : correct === true ? 'rgb(34 197 94)' : 'var(--primary)', borderBottom: `1.5px solid currentColor`, padding: '0 2px' }}>
+                  {displayVal}
+                </span>
+              </span>
+            );
+          })}
         </p>
       </div>
       {summaryOptions && summaryOptions.length > 0 && (
@@ -619,55 +570,6 @@ function SummaryBlock({ text, title, summaryOptions, groupQuestions, startIdx, a
           ))}
         </div>
       )}
-    </div>
-  );
-}
-
-function NoteBlock({ lines, groupQuestions, startIdx, answers, onChange, mode, submitted, passageStyle, fontSize }: {
-  lines: NoteLine[]; groupQuestions: IeltsQuestion[]; startIdx: number;
-  answers: Record<number, string>; onChange: (idx: number, val: string) => void;
-  mode: string; submitted: boolean; passageStyle: { bg: string; color: string }; fontSize: number;
-}) {
-  const c = passageStyle.color;
-  const styleFor: Record<NoteLineStyle, React.CSSProperties> = {
-    heading: { fontWeight: 700, marginTop: 10, marginBottom: 2 },
-    subheading: { fontWeight: 700, fontStyle: 'italic', marginTop: 8, marginBottom: 2, paddingLeft: 8 },
-    bullet: { marginBottom: 2, paddingLeft: 24 },
-    'numbered-sub-item': { marginBottom: 2, paddingLeft: 40 },
-  };
-  return (
-    <div style={{ margin: '8px 0', border: `1px solid ${c}`, padding: '14px 20px' }}>
-      {lines.map((line, li) => (
-        <p key={li} style={{ fontSize, lineHeight: 1.85, color: c, ...styleFor[line.style] }}>
-          {line.style === 'bullet' && '• '}
-          {renderInlineBlanks({ text: line.text, startIdx, groupQuestions, answers, onChange, mode, submitted, passageStyle, fontSize })}
-        </p>
-      ))}
-    </div>
-  );
-}
-
-function FlowChartBlock({ steps, groupQuestions, startIdx, answers, onChange, mode, submitted, passageStyle, fontSize }: {
-  steps: FlowChartStep[]; groupQuestions: IeltsQuestion[]; startIdx: number;
-  answers: Record<number, string>; onChange: (idx: number, val: string) => void;
-  mode: string; submitted: boolean; passageStyle: { bg: string; color: string }; fontSize: number;
-}) {
-  const c = passageStyle.color;
-  return (
-    <div style={{ margin: '8px 0' }}>
-      {steps.map((step, si) => (
-        <div key={si}>
-          <div style={{ border: `1px solid ${c}`, padding: '10px 16px' }}>
-            <p style={{ fontSize, lineHeight: 1.85, color: c, margin: 0 }}>
-              {step.label && <strong>{step.label}: </strong>}
-              {renderInlineBlanks({ text: step.text, startIdx, groupQuestions, answers, onChange, mode, submitted, passageStyle, fontSize })}
-            </p>
-          </div>
-          {si < steps.length - 1 && (
-            <div style={{ textAlign: 'center', color: c, fontSize: fontSize + 4, lineHeight: 1, padding: '2px 0' }}>↓</div>
-          )}
-        </div>
-      ))}
     </div>
   );
 }
@@ -963,10 +865,6 @@ export function TestRenderer({ passageId, testId, test, mode: modeProp, preview 
               const firstQ = test.questions[group.start - 1];
               const groupQuestions = test.questions.slice(group.start - 1, group.end);
               const hasSummary = group.type === 'summary_completion' && !!firstQ?.summaryText;
-              const hasNote = group.type === 'note_completion' && !!firstQ?.noteLines?.length;
-              const hasFlowChart = group.type === 'flow_chart_completion' && !!firstQ?.flowChartSteps?.length;
-              // These types answer inline within their block, not via a per-question input.
-              const hasInlineBlanks = hasSummary || hasNote || hasFlowChart;
 
               return (
                 <div key={gi} className="flex flex-col gap-3">
@@ -981,8 +879,6 @@ export function TestRenderer({ passageId, testId, test, mode: modeProp, preview 
                       paragraphLabels={firstQ?.paragraphLabels}
                       options={firstQ?.options}
                       featureListTitle={firstQ?.featureListTitle}
-                      wordLimit={firstQ?.wordLimit}
-                      example={firstQ?.example}
                     />
                   </div>
 
@@ -992,36 +888,6 @@ export function TestRenderer({ passageId, testId, test, mode: modeProp, preview 
                       text={firstQ.summaryText!}
                       title={firstQ.summaryTitle}
                       summaryOptions={firstQ.summaryOptions}
-                      groupQuestions={groupQuestions}
-                      startIdx={group.start - 1}
-                      answers={answers}
-                      onChange={setAnswer}
-                      mode={mode}
-                      submitted={submitted}
-                      passageStyle={passageStyle}
-                      fontSize={fontSize}
-                    />
-                  )}
-
-                  {/* Note block (note_completion with noteLines) */}
-                  {hasNote && (
-                    <NoteBlock
-                      lines={firstQ.noteLines!}
-                      groupQuestions={groupQuestions}
-                      startIdx={group.start - 1}
-                      answers={answers}
-                      onChange={setAnswer}
-                      mode={mode}
-                      submitted={submitted}
-                      passageStyle={passageStyle}
-                      fontSize={fontSize}
-                    />
-                  )}
-
-                  {/* Flow-chart block (flow_chart_completion with flowChartSteps) */}
-                  {hasFlowChart && (
-                    <FlowChartBlock
-                      steps={firstQ.flowChartSteps!}
                       groupQuestions={groupQuestions}
                       startIdx={group.start - 1}
                       answers={answers}
@@ -1056,8 +922,8 @@ export function TestRenderer({ passageId, testId, test, mode: modeProp, preview 
                             <div className="flex-1 min-w-0">
                               <p className="text-sm leading-snug font-medium" style={{ color: passageStyle.color }}>{q.question}</p>
 
-                              {/* Input — hidden when the answer is inline in a summary/note/flow-chart block */}
-                              {!hasInlineBlanks && mode === 'test' && !submitted && (
+                              {/* Input — hidden for summary questions (input is inline in summary block) */}
+                              {!hasSummary && mode === 'test' && !submitted && (
                                 <QuestionInput q={q} name={`question-${i}`} value={userAnswer} onChange={v => setAnswer(i, v)} disabled={false} />
                               )}
 
