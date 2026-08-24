@@ -29,11 +29,16 @@ export default function SignupPage() {
   };
 
   const handleGoogle = async () => {
+    setError('');
     setGoogleLoading(true);
-    await supabase.auth.signInWithOAuth({
+    const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: `${window.location.origin}/` },
     });
+    // On success the browser navigates away to Google, so this line never
+    // runs. It only runs on failure — without resetting the flag here the
+    // button was stuck on "Redirecting…" forever with no error shown.
+    if (error) { setError(error.message); setGoogleLoading(false); }
   };
 
   return (

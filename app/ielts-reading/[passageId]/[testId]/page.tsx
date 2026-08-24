@@ -696,11 +696,19 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
     setAnswers(prev => ({ ...prev, [i]: val }));
   }, []);
 
+  // Guards against handleSubmit's side effects (marking submitted, clearing
+  // the timer, removing the sessionStorage entry) firing more than once —
+  // it used to be called directly from inside the setSecondsLeft functional
+  // updater below, and React can invoke a state updater more than once for
+  // the same transition, risking a double-fire.
+  const submittingRef = useRef(false);
   const handleSubmit = useCallback(() => {
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     setSubmitted(true);
     setTimerActive(false);
     sessionStorage.removeItem(timerKey);
-  }, []);
+  }, [timerKey]);
 
   useEffect(() => {
     if (!timerActive || submitted) return;

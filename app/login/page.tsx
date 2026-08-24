@@ -38,11 +38,17 @@ function LoginContent() {
   };
 
   const handleGoogle = async () => {
+    setError('');
     setGoogleLoading(true);
-    await supabase.auth.signInWithOAuth({
+    const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: `${window.location.origin}${redirect}` },
     });
+    // On success the browser navigates away to Google, so this line never
+    // runs. It only runs on failure (e.g. provider not configured, network
+    // error) — without resetting the flag here the button was stuck on
+    // "Redirecting…" forever with no error shown.
+    if (error) { setError(error.message); setGoogleLoading(false); }
   };
 
   const handleReset = async (e: React.FormEvent) => {

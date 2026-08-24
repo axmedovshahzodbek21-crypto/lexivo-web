@@ -41,6 +41,7 @@ export default function SettingsPage() {
   const [resetLoading, setResetLoading]   = useState(false);
   const [resetError, setResetError]       = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError]     = useState('');
   const [importState, setImportState] = useState<'idle' | 'confirm' | 'success' | 'error'>('idle');
@@ -91,8 +92,23 @@ export default function SettingsPage() {
     setThemeState(t);
   };
 
+  // Theme/pulse/UI-language controls already persisted immediately on
+  // click; dailyGoal/sessionSize/studyOrder/quizDirection/languageLevel/
+  // fontSize/reduceMotion instead only updated local state and relied on
+  // the header "Save" button, so navigating away without pressing it
+  // silently discarded the change even though the UI briefly showed it
+  // taking effect. This makes every preference persist the moment it's
+  // changed, matching the pattern the other controls already use.
+  const updateSettings = (patch: Partial<UserSettings>) => {
+    setSettings(s => {
+      const next = { ...s, ...patch };
+      saveSettings(next);
+      return next;
+    });
+  };
+
   const handleFontSize = (size: UserSettings['fontSize']) => {
-    setSettings(s => ({ ...s, fontSize: size }));
+    updateSettings({ fontSize: size });
     if (size === 'normal') {
       delete document.documentElement.dataset.fontSize;
     } else {
@@ -101,7 +117,7 @@ export default function SettingsPage() {
   };
 
   const handleReduceMotion = (value: boolean) => {
-    setSettings(s => ({ ...s, reduceMotion: value }));
+    updateSettings({ reduceMotion: value });
     if (value) {
       document.documentElement.dataset.reduceMotion = 'true';
     } else {
@@ -355,7 +371,7 @@ export default function SettingsPage() {
             min={1}
             max={100}
             value={settings.dailyGoal}
-            onChange={e => setSettings(s => ({ ...s, dailyGoal: parseInt(e.target.value) || 10 }))}
+            onChange={e => updateSettings({ dailyGoal: parseInt(e.target.value) || 10 })}
             className="w-full px-4 py-3 rounded-xl bg-[var(--surface-2)] border-2 border-transparent focus:border-[var(--primary)] outline-none transition-colors"
           />
         </div>
@@ -366,7 +382,7 @@ export default function SettingsPage() {
             {[5, 10, 15, 20, 30].map(n => (
               <button
                 key={n}
-                onClick={() => setSettings(s => ({ ...s, sessionSize: n }))}
+                onClick={() => updateSettings({ sessionSize: n })}
                 className={`py-2.5 rounded-xl text-sm font-semibold transition-colors ${
                   settings.sessionSize === n
                     ? 'bg-[var(--primary)] text-white'
@@ -386,7 +402,7 @@ export default function SettingsPage() {
             {(['A1', 'A2', 'B1', 'B2', 'C1', 'C2'] as const).map(level => (
               <button
                 key={level}
-                onClick={() => setSettings(s => ({ ...s, languageLevel: level }))}
+                onClick={() => updateSettings({ languageLevel: level })}
                 className={`py-2 rounded-xl text-sm font-medium transition-colors ${settings.languageLevel === level ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface-2)] text-[var(--text-muted)]'}`}
               >
                 {level}
@@ -420,7 +436,7 @@ export default function SettingsPage() {
             ] as const).map(({ value, label, icon }) => (
               <button
                 key={value}
-                onClick={() => setSettings(s => ({ ...s, studyOrder: value }))}
+                onClick={() => updateSettings({ studyOrder: value })}
                 className={`flex items-center justify-center gap-2 py-2.5 rounded-xl border-2 text-sm font-semibold transition-colors ${
                   settings.studyOrder === value
                     ? 'border-[var(--primary)] bg-[var(--primary-bg)] text-[var(--primary)]'
@@ -443,7 +459,7 @@ export default function SettingsPage() {
             ] as const).map(({ value, label }) => (
               <button
                 key={value}
-                onClick={() => setSettings(s => ({ ...s, quizDirection: value }))}
+                onClick={() => updateSettings({ quizDirection: value })}
                 className={`flex items-center justify-center gap-2 py-2.5 rounded-xl border-2 text-sm font-semibold transition-colors ${
                   settings.quizDirection === value
                     ? 'border-[var(--primary)] bg-[var(--primary-bg)] text-[var(--primary)]'
@@ -562,7 +578,7 @@ export default function SettingsPage() {
               <p className="text-xs text-[var(--text-muted)] mt-0.5">Display your name and XP publicly</p>
             </div>
             <button
-              onClick={() => setSettings(s => ({ ...s, showOnLeaderboard: !s.showOnLeaderboard }))}
+              onClick={() => updateSettings({ showOnLeaderboard: !settings.showOnLeaderboard })}
               className={`relative w-14 h-7 rounded-full transition-colors duration-300 focus:outline-none ${settings.showOnLeaderboard ?? true ? 'bg-[var(--primary)]' : 'bg-[var(--surface-2)]'}`}
               aria-label="Toggle leaderboard visibility"
             >
@@ -629,7 +645,7 @@ export default function SettingsPage() {
             {(['us', 'uk'] as const).map(a => (
               <button
                 key={a}
-                onClick={() => setSettings(s => ({ ...s, defaultAccent: a }))}
+                onClick={() => updateSettings({ defaultAccent: a })}
                 className={`px-4 py-2 text-sm font-semibold transition-colors flex items-center gap-1.5 ${
                   settings.defaultAccent === a
                     ? 'bg-[var(--primary)] text-white'
@@ -648,7 +664,7 @@ export default function SettingsPage() {
             <p className="text-xs text-[var(--text-muted)] mt-0.5">{t.settings.autoPlayHelper}</p>
           </div>
           <button
-            onClick={() => setSettings(s => ({ ...s, autoPlayOnReveal: !s.autoPlayOnReveal }))}
+            onClick={() => updateSettings({ autoPlayOnReveal: !settings.autoPlayOnReveal })}
             className={`relative w-14 h-7 rounded-full transition-colors duration-300 focus:outline-none ${settings.autoPlayOnReveal ? 'bg-[var(--primary)]' : 'bg-[var(--surface-2)]'}`}
             aria-label="Toggle auto-play on reveal"
           >
@@ -1011,20 +1027,31 @@ export default function SettingsPage() {
               <p className="text-xs font-bold text-[var(--danger)] mt-2">{t.settings.cannotUndo}</p>
             </div>
 
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-[var(--text-muted)]">{t.profile.deleteConfirmLabel}</label>
+              <input
+                type="text"
+                value={deleteConfirmText}
+                onChange={e => setDeleteConfirmText(e.target.value)}
+                placeholder={t.profile.deleteConfirmPlaceholder}
+                className="w-full px-3 py-2 rounded-xl border border-red-300 dark:border-red-700 bg-transparent text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-red-400"
+              />
+            </div>
+
             {deleteError && (
               <p className="text-xs text-[var(--danger)]">{deleteError}</p>
             )}
 
             <div className="flex gap-2">
               <button
-                onClick={() => { setDeleteConfirm(false); setDeleteError(''); }}
+                onClick={() => { setDeleteConfirm(false); setDeleteError(''); setDeleteConfirmText(''); }}
                 className="flex-1 py-2.5 rounded-xl border border-[var(--border)] text-sm text-[var(--text-muted)] hover:bg-[var(--surface-2)] transition-colors"
               >
                 {t.settings.dismiss}
               </button>
               <button
                 onClick={handleDeleteAccount}
-                disabled={deleteLoading}
+                disabled={deleteConfirmText !== 'DELETE' || deleteLoading}
                 className="flex-1 py-2.5 rounded-xl bg-[var(--danger)] text-white text-sm font-bold hover:opacity-90 transition-opacity disabled:opacity-60"
               >
                 {deleteLoading ? t.settings.deleting : t.settings.deleteForever}
