@@ -8,13 +8,21 @@ const WEBHOOK_SECRET = process.env.TELEGRAM_WEBHOOK_SECRET;
 // In-memory dedup: ignore retried updates from Telegram within the same instance lifetime.
 // Cross-instance retries are harmless because we always return 200 — Telegram's 48-hour
 // retry window only fires when it sees non-200, which the catch block below prevents.
-const _seen = new Set<number>();
+//
+// Keyed by "chatId:messageId", not message_id alone — Telegram only
+// guarantees message_id is unique *within a chat*, each chat has its own
+// incrementing sequence, so two different users' messages can legitimately
+// share the same message_id (very likely for early ids like 1, 2, 3). A
+// bare message_id key treated the second user's genuine message as an
+// already-seen retry and silently dropped it — no reply sent, no forward to
+// the owner, no error logged.
+const _seen = new Set<string>();
 const MAX_SEEN = 2000;
 
-function markSeen(id: number): boolean {
-  if (_seen.has(id)) return false; // already processed
-  _seen.add(id);
-  if (_seen.size > MAX_SEEN) _seen.delete(_seen.values().next().value as number);
+function markSeen(key: string): boolean {
+  if (_seen.has(key)) return false; // already processed
+  _seen.add(key);
+  if (_seen.size > MAX_SEEN) _seen.delete(_seen.values().next().value as string);
   return true;
 }
 
@@ -58,8 +66,14 @@ export async function POST(req: NextRequest) {
     if (!message) return NextResponse.json({ ok: true });
 
     // Deduplicate: Telegram may deliver the same update more than once.
-    // Return 200 immediately so it never retries; markSeen returns false if we've seen this id.
-    if (message.message_id != null && !markSeen(message.message_id as number)) {
+    // Return 200 immediately so it never retries; markSeen returns false if
+    // we've seen this (chat, message_id) pair. Skipped entirely if chat.id
+    // is somehow missing — dedup is best-effort, not a hard requirement for
+    // processing a message.
+    const dedupKey = message.chat?.id != null && message.message_id != null
+      ? `${message.chat.id}:${message.message_id}`
+      : null;
+    if (dedupKey != null && !markSeen(dedupKey)) {
       return NextResponse.json({ ok: true });
     }
 

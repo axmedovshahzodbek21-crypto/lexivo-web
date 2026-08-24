@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import dns from 'dns/promises';
+import http from 'http';
+import https from 'https';
+import zlib from 'zlib';
 
 // In-memory rate limiter: max 10 article fetches per user per minute
 const rateLimit = new Map<string, { count: number; resetAt: number }>();
@@ -46,8 +49,15 @@ function isPrivateOrReservedIP(ip: string): boolean {
   return false;
 }
 
-async function assertPublicHostname(hostname: string): Promise<void> {
-  let records: { address: string }[];
+// Resolves hostname once and validates every IP it returns, then hands back
+// the specific address+family to connect to. The caller MUST pin the actual
+// connection to this exact IP (see requestPinnedToIP below) rather than
+// letting the HTTP client re-resolve DNS independently for the request —
+// otherwise this validation is a TOCTOU no-op: an attacker-controlled DNS
+// server can return a public IP for this lookup and a private/cloud-
+// metadata IP a moment later for the real connection (DNS rebinding).
+async function resolveValidatedIP(hostname: string): Promise<{ address: string; family: number }> {
+  let records: { address: string; family: number }[];
   try {
     records = await dns.lookup(hostname, { all: true });
   } catch {
@@ -56,6 +66,7 @@ async function assertPublicHostname(hostname: string): Promise<void> {
   if (records.length === 0 || records.some(r => isPrivateOrReservedIP(r.address))) {
     throw new Error('Target host is not allowed');
   }
+  return records[0];
 }
 
 function extractText(html: string): string {
@@ -104,20 +115,94 @@ function extractText(html: string): string {
 const MAX_REDIRECTS = 5;
 const MAX_BYTES = 5 * 1024 * 1024; // 5MB cap on the fetched page
 
-// Fetches with redirects handled manually (not by the fetch client), so
-// every hop's hostname is re-validated against private/reserved IP ranges
-// before it's followed — otherwise a public URL that 302s to an internal
-// address would bypass the initial check entirely.
+// Decompresses a response body per its Content-Encoding header — global
+// fetch()/undici does this transparently, so a raw http/https request
+// (used below to pin the connection to a validated IP) has to replicate it
+// by hand or every gzip/br-compressed page (the large majority of real
+// sites) would come back as garbage binary instead of HTML.
+function decodeBody(buffer: Buffer, contentEncoding: string | undefined): Buffer {
+  switch ((contentEncoding ?? '').toLowerCase()) {
+    case 'gzip': return zlib.gunzipSync(buffer);
+    case 'deflate': return zlib.inflateSync(buffer);
+    case 'br': return zlib.brotliDecompressSync(buffer);
+    default: return buffer;
+  }
+}
+
+// Makes one GET request pinned to a pre-validated IP via a `lookup`
+// override that always resolves to it, regardless of what a fresh DNS query
+// for the hostname would return — the hostname/SNI/Host header are still
+// the real ones (targetUrl is used as-is), only the actual TCP connection
+// target is pinned, closing the DNS-rebinding TOCTOU window described on
+// resolveValidatedIP above. Returns a standard Response so the rest of this
+// route doesn't need to know it isn't using the global fetch().
+function requestPinnedToIP(targetUrl: URL, ip: string, family: number): Promise<Response> {
+  return new Promise((resolve, reject) => {
+    const transport = targetUrl.protocol === 'https:' ? https : http;
+    const req = transport.request(targetUrl, {
+      method: 'GET',
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; Lexivo/1.0 +https://lexivo.app)',
+        'Accept-Encoding': 'gzip, deflate, br',
+      },
+      timeout: 12000,
+      // Node's net module requests the array form (options.all) for
+      // Happy-Eyeballs-style dual-stack connection attempts — passing only
+      // the 3-arg single-address form there throws ERR_INVALID_IP_ADDRESS
+      // (confirmed by an actual test request against a real IPv6 host, not
+      // just reading Node's docs). Both forms must be pinned to the same
+      // validated IP.
+      lookup: (_hostname, options, callback) => {
+        if (options.all) {
+          (callback as (err: null, addresses: { address: string; family: number }[]) => void)(null, [{ address: ip, family }]);
+        } else {
+          callback(null, ip, family);
+        }
+      },
+    }, (res) => {
+      const chunks: Buffer[] = [];
+      let total = 0;
+      res.on('data', (chunk: Buffer) => {
+        total += chunk.length;
+        if (total > MAX_BYTES) {
+          req.destroy();
+          reject(new Error('Page is too large'));
+          return;
+        }
+        chunks.push(chunk);
+      });
+      res.on('end', () => {
+        try {
+          const raw = Buffer.concat(chunks);
+          const body = decodeBody(raw, res.headers['content-encoding']);
+          const headers = new Headers();
+          for (const [key, value] of Object.entries(res.headers)) {
+            if (key.toLowerCase() === 'content-encoding') continue; // already decoded
+            if (typeof value === 'string') headers.set(key, value);
+            else if (Array.isArray(value)) headers.set(key, value.join(', '));
+          }
+          resolve(new Response(new Uint8Array(body), { status: res.statusCode ?? 502, headers }));
+        } catch {
+          reject(new Error('Failed to decode response body'));
+        }
+      });
+    });
+    req.on('timeout', () => { req.destroy(); reject(new Error('Request timed out')); });
+    req.on('error', reject);
+    req.end();
+  });
+}
+
+// Fetches with redirects handled manually, so every hop's hostname is
+// re-validated (and re-pinned) against private/reserved IP ranges before
+// it's followed — otherwise a public URL that 302s to an internal address
+// would bypass the initial check entirely.
 async function fetchPublicUrl(url: string): Promise<Response> {
   let current = url;
   for (let i = 0; i <= MAX_REDIRECTS; i++) {
     const parsed = new URL(current);
-    await assertPublicHostname(parsed.hostname);
-    const response = await fetch(current, {
-      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; Lexivo/1.0 +https://lexivo.app)' },
-      signal: AbortSignal.timeout(12000),
-      redirect: 'manual',
-    });
+    const { address, family } = await resolveValidatedIP(parsed.hostname);
+    const response = await requestPinnedToIP(parsed, address, family);
     if (response.status >= 300 && response.status < 400) {
       const location = response.headers.get('location');
       if (!location) return response;
