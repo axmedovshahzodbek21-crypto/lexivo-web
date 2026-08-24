@@ -16,9 +16,16 @@ interface LeaderboardEntry {
   last_study_date: string | null;
   today_count: number;
   total_learned: number;
-  study_days: string[] | null;
-  review_days: string[] | null;
-  word_goal_days: string[] | null;
+}
+
+// Fetched separately, only for the one profile a viewer opens — the bulk
+// get_leaderboard() RPC used to include these day-by-day arrays for every
+// row (up to 100 users' full history shipped to every visitor), even
+// though the UI only ever renders them for a single opened profile card.
+interface LeaderboardProfileHistory {
+  study_days: string[];
+  review_days: string[];
+  word_goal_days: string[];
 }
 
 
@@ -125,6 +132,7 @@ export default function LeaderboardPage() {
   const myIndex = user ? entries.findIndex(e => e.user_id === user.id) : -1;
   const [selected, setSelected] = useState<LeaderboardEntry | null>(null);
   const [selectedBio, setSelectedBio] = useState<string | null | undefined>(undefined);
+  const [selectedHistory, setSelectedHistory] = useState<LeaderboardProfileHistory | null>(null);
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
   const [filter, setFilter] = useState<'all' | 'starred'>('all');
   const [calMonth, setCalMonth] = useState<{ year: number; month: number }>(() => {
@@ -139,10 +147,13 @@ export default function LeaderboardPage() {
 
   useEffect(() => {
     const n = new Date(); setCalMonth({ year: n.getFullYear(), month: n.getMonth() });
-    if (!selected) { setSelectedBio(undefined); return; }
+    if (!selected) { setSelectedBio(undefined); setSelectedHistory(null); return; }
     setSelectedBio(undefined);
+    setSelectedHistory(null);
     supabase.from('profiles').select('bio').eq('id', selected.user_id).maybeSingle()
       .then(({ data }) => setSelectedBio(data?.bio ?? null));
+    supabase.rpc('get_leaderboard_profile', { p_user_id: selected.user_id }).maybeSingle()
+      .then(({ data }) => setSelectedHistory(data as LeaderboardProfileHistory ?? { study_days: [], review_days: [], word_goal_days: [] }));
   }, [selected?.user_id]);
 
   const toggleSave = async (targetId: string) => {
@@ -160,9 +171,9 @@ export default function LeaderboardPage() {
     <div className="flex flex-col min-h-screen animate-fade-in pb-24">
       {/* Profile modal */}
       {selected && (() => {
-        const reviewSet = new Set(selected.review_days ?? []);
-        const wordsSet = new Set(selected.word_goal_days ?? []);
-        const totalStudyDays = selected.study_days?.length ?? 0;
+        const reviewSet = new Set(selectedHistory?.review_days ?? []);
+        const wordsSet = new Set(selectedHistory?.word_goal_days ?? []);
+        const totalStudyDays = selectedHistory?.study_days.length ?? 0;
         const avgPerDay = totalStudyDays === 0 ? 0 : Math.round(selected.total_learned / totalStudyDays);
         const { year: cYear, month: cMonth } = calMonth;
         const daysInCMonth = new Date(cYear, cMonth + 1, 0).getDate();
@@ -211,8 +222,8 @@ export default function LeaderboardPage() {
               </div>
               <div className="grid grid-cols-2 gap-2">
                 {[
-                  { emoji: '📊', value: `~${avgPerDay}`, label: 'Words / day',      color: '#9B59B6' },
-                  { emoji: '📅', value: `${activeDays}/${daysInCMonth}`, label: 'Days this month', color: '#E67E22' },
+                  { emoji: '📊', value: selectedHistory ? `~${avgPerDay}` : '…', label: 'Words / day',      color: '#9B59B6' },
+                  { emoji: '📅', value: selectedHistory ? `${activeDays}/${daysInCMonth}` : '…', label: 'Days this month', color: '#E67E22' },
                 ].map(s => (
                   <div key={s.label} className="flex flex-col items-center py-3 px-2 rounded-xl border" style={{ background: `${s.color}14`, borderColor: `${s.color}33` }}>
                     <span className="text-xl">{s.emoji}</span>
