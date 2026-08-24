@@ -49,6 +49,7 @@ export default function ClassLeaderboardPage() {
   const [loading, setLoading] = useState(true);
   const [animated, setAnimated] = useState(false);
   const [className, setClassName] = useState('');
+  const [notMember, setNotMember] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -63,18 +64,37 @@ export default function ClassLeaderboardPage() {
     }
 
     (async () => {
-      const [{ data }, { data: cls }] = await Promise.all([
-        supabase.rpc('get_class_leaderboard', { p_class_id: id }).limit(200),
-        supabase.from('classes').select('name').eq('id', id).maybeSingle(),
-      ]);
+      // The leaderboard RPC is trusted to scope rows to p_class_id, but
+      // nothing before this checked the *caller* is actually in that class
+      // — any signed-in user could load another class's leaderboard by
+      // editing the URL. Verify membership client-side too, matching the
+      // pattern used on the words/homework pages.
+      const { data: cls } = await supabase.from('classes').select('name, teacher_id').eq('id', id).maybeSingle();
+      if (!cls) { setNotMember(true); setLoading(false); return; }
+      if (cls.teacher_id !== user.id) {
+        const { data: membership } = await supabase.from('class_members').select('id').eq('class_id', id).eq('student_id', user.id).maybeSingle();
+        if (!membership) { setNotMember(true); setLoading(false); return; }
+      }
+
+      const { data } = await supabase.rpc('get_class_leaderboard', { p_class_id: id }).limit(200);
       const rows = (data as LeaderboardRow[]) ?? [];
       _classLbCache.set(id, rows);
       setRows(rows);
-      setClassName((cls as any)?.name ?? '');
+      setClassName(cls.name ?? '');
       setLoading(false);
       if (!cached) setTimeout(() => setAnimated(true), 60);
     })();
   }, [id, user]);
+
+  if (notMember) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8">
+        <div className="text-5xl">⛔</div>
+        <p className="font-bold text-[var(--text)]">You&apos;re not in this class</p>
+        <button onClick={() => router.push('/classes')} className="btn-primary">Go back</button>
+      </div>
+    );
+  }
 
   if (loading) {
     return (

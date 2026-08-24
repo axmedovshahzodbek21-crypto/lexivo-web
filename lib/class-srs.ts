@@ -199,15 +199,17 @@ export async function getClassStarredWordIds(userId: string, classId: string): P
 }
 
 export async function addClassStarredWord(userId: string, classId: string, word: string): Promise<void> {
-  await supabase.from('class_starred_words').upsert(
+  const { error } = await supabase.from('class_starred_words').upsert(
     { user_id: userId, class_id: classId, word },
     { onConflict: 'user_id,class_id,word', ignoreDuplicates: true },
   );
+  if (error) throw error;
 }
 
 export async function removeClassStarredWord(userId: string, classId: string, word: string): Promise<void> {
-  await supabase.from('class_starred_words').delete()
+  const { error } = await supabase.from('class_starred_words').delete()
     .eq('user_id', userId).eq('class_id', classId).eq('word', word);
+  if (error) throw error;
 }
 
 // ── Hard words ────────────────────────────────────────────────────────────────

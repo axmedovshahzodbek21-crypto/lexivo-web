@@ -85,18 +85,35 @@ export default function ClassStreakPage() {
   const [totalDays, setTotalDays] = useState(0);
   const [viewYear, setViewYear] = useState(() => new Date().getFullYear());
   const [viewMonth, setViewMonth] = useState(() => new Date().getMonth());
+  const [notMember, setNotMember] = useState(false);
 
   const accent = classAccentColor(id);
 
   useEffect(() => {
-    if (!targetUserId) return;
+    if (!targetUserId || !user) return;
     (async () => {
-      const [{ data: cls }, { data: rows }] = await Promise.all([
-        supabase.from('classes').select('name').eq('id', id).maybeSingle(),
-        supabase.from('class_study_days').select('study_date')
-          .eq('student_id', targetUserId).eq('class_id', id),
-      ]);
-      setClassName(cls?.name ?? '');
+      const { data: cls } = await supabase.from('classes').select('name, teacher_id').eq('id', id).maybeSingle();
+      if (!cls) { setNotMember(true); setLoading(false); return; }
+      const isTeacher = cls.teacher_id === user.id;
+      if (!isTeacher) {
+        const { data: membership } = await supabase.from('class_members').select('id').eq('class_id', id).eq('student_id', user.id).maybeSingle();
+        if (!membership) { setNotMember(true); setLoading(false); return; }
+      }
+      // ?userId= lets a teacher open a specific student's calendar from the
+      // roster — previously accepted with no verification at all, so any
+      // signed-in user could view any other student's day-by-day study
+      // calendar for any class just by crafting the URL. Only a teacher of
+      // this class may view someone else's calendar, and only for a student
+      // who's actually a member of this class.
+      if (viewUserId && viewUserId !== user.id) {
+        if (!isTeacher) { setNotMember(true); setLoading(false); return; }
+        const { data: targetMembership } = await supabase.from('class_members').select('id').eq('class_id', id).eq('student_id', viewUserId).maybeSingle();
+        if (!targetMembership) { setNotMember(true); setLoading(false); return; }
+      }
+
+      const { data: rows } = await supabase.from('class_study_days').select('study_date')
+        .eq('student_id', targetUserId).eq('class_id', id);
+      setClassName(cls.name ?? '');
       const days = ((rows ?? []) as { study_date: string }[]).map(r => r.study_date).sort();
       setStudyDays(days);
       setCurrentStreak(calcCurrentStreak(days));
@@ -104,9 +121,19 @@ export default function ClassStreakPage() {
       setTotalDays(days.length);
       setLoading(false);
     })();
-  }, [id, targetUserId]);
+  }, [id, targetUserId, user, viewUserId]);
 
   if (!user) return null;
+
+  if (notMember) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8">
+        <div className="text-5xl">⛔</div>
+        <p className="font-bold text-[var(--text)]">You&apos;re not allowed to view this</p>
+        <button onClick={() => router.push(`/classes/${id}/home`)} className="btn-primary">Go back</button>
+      </div>
+    );
+  }
 
   const now = new Date();
   const todayStr = localDateStr(now);

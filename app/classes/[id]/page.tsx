@@ -1039,14 +1039,16 @@ function CurriculumTab({
   };
 
   const assignFolder = async (folderId: string) => {
-    await supabase.from('class_library_assignments').insert({ class_id: classId, folder_id: folderId });
+    const { error } = await supabase.from('class_library_assignments').insert({ class_id: classId, folder_id: folderId });
+    if (error) { console.error('[assignFolder]', error); alert(`Failed to assign folder: ${error.message}`); return; }
     setShowFolderPicker(false);
     await loadCurriculum();
   };
 
   const unassignFolder = async (assignmentId: string) => {
     if (!confirm('Remove this folder from the class? Students will lose access to its units.')) return;
-    await supabase.from('class_library_assignments').delete().eq('id', assignmentId).eq('class_id', classId);
+    const { error } = await supabase.from('class_library_assignments').delete().eq('id', assignmentId).eq('class_id', classId);
+    if (error) { console.error('[unassignFolder]', error); alert(`Failed to remove folder: ${error.message}`); return; }
     await loadCurriculum();
   };
 
@@ -1116,7 +1118,8 @@ function CurriculumTab({
 
   const createCWUnit = async () => {
     if (!user || !cwUnitNewName.trim()) return;
-    await supabase.from('class_word_units').insert({ class_id: classId, teacher_id: user.id, name: cwUnitNewName.trim() });
+    const { error } = await supabase.from('class_word_units').insert({ class_id: classId, teacher_id: user.id, name: cwUnitNewName.trim() });
+    if (error) { console.error('[createCWUnit]', error); alert(`Failed to create unit: ${error.message}`); return; }
     setCwUnitCreating(false);
     setCwUnitNewName('');
     await loadCurriculum();
@@ -1124,7 +1127,8 @@ function CurriculumTab({
 
   const renameCWUnit = async () => {
     if (!cwUnitRenaming || !cwUnitRenameName.trim()) return;
-    await supabase.from('class_word_units').update({ name: cwUnitRenameName.trim() }).eq('id', cwUnitRenaming.id);
+    const { error } = await supabase.from('class_word_units').update({ name: cwUnitRenameName.trim() }).eq('id', cwUnitRenaming.id);
+    if (error) { console.error('[renameCWUnit]', error); alert(`Failed to rename unit: ${error.message}`); return; }
     setCwUnitRenaming(null);
     await loadCurriculum();
   };
@@ -1139,7 +1143,8 @@ function CurriculumTab({
       ? `Delete unit "${unit.name}"? Words will remain but lose their unit assignment.`
       : `Delete unit "${unit.name}"? Words will remain but lose their unit assignment. This unit is currently assigned as homework in ${hwCount} place${hwCount !== 1 ? 's' : ''} — deleting it will also remove that homework and every student's progress on it.`;
     if (!confirm(msg)) return;
-    await supabase.from('class_word_units').delete().eq('id', unit.id).eq('class_id', classId);
+    const { error } = await supabase.from('class_word_units').delete().eq('id', unit.id).eq('class_id', classId);
+    if (error) { console.error('[deleteCWUnit]', error); alert(`Failed to delete unit: ${error.message}`); return; }
     await loadCurriculum();
   };
 
@@ -1165,11 +1170,13 @@ function CurriculumTab({
       else if (!shouldBe && isMember) toRemove.push(w.id);
     }
     // Batched into at most 2 queries instead of one update per changed word.
-    await Promise.all([
+    const results = await Promise.all([
       toAdd.length > 0 ? supabase.from('class_words').update({ unit_id: cwWordsMgr.id }).in('id', toAdd) : null,
       toRemove.length > 0 ? supabase.from('class_words').update({ unit_id: null }).in('id', toRemove) : null,
     ]);
+    const failed = results.find(r => r?.error);
     setCwWordsSaving(false);
+    if (failed?.error) { console.error('[saveManageWords]', failed.error); alert(`Failed to save word changes: ${failed.error.message}`); return; }
     setCwWordsMgr(null);
     await loadCurriculum();
   };
@@ -1192,10 +1199,11 @@ function CurriculumTab({
   const deleteHomework = async () => {
     if (!hwDetail) return;
     setHwDeleting(true);
-    await supabase.from('class_homework').delete().eq('id', hwDetail.id).eq('class_id', classId);
+    const { error } = await supabase.from('class_homework').delete().eq('id', hwDetail.id).eq('class_id', classId);
+    setHwDeleting(false);
+    if (error) { console.error('[deleteHomework]', error); alert(`Failed to delete homework: ${error.message}`); return; }
     setHwDetail(null);
     setHwDeleteConfirm(false);
-    setHwDeleting(false);
     await loadCurriculum();
   };
 

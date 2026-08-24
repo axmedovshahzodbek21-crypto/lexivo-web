@@ -42,6 +42,7 @@ export default function UnitStudyHubPage() {
   const [completedModes, setCompletedModes] = useState<Set<string>>(new Set());
   const [navigating, setNavigating] = useState<string | null>(null);
   const [progressError, setProgressError] = useState<string | null>(null);
+  const [notAssigned, setNotAssigned] = useState(false);
   const autoStartedRef = useRef(false);
 
   useEffect(() => {
@@ -115,7 +116,7 @@ export default function UnitStudyHubPage() {
         .select('mode')
         .eq('homework_id', hwId)
         .eq('student_id', user!.id),
-      supabase.from('classes').select('name').eq('id', classId).maybeSingle(),
+      supabase.from('classes').select('name, teacher_id').eq('id', classId).maybeSingle(),
     ]);
     setClassName((clsRes.data as any)?.name ?? '');
 
@@ -126,6 +127,21 @@ export default function UnitStudyHubPage() {
 
     const hw = hwRes.data;
     if (!hw) { setLoading(false); return; }
+
+    // Unlike every sibling homework list (home/, homework/, homework/collection,
+    // homework/folder — all of which filter by student_ids client-side before
+    // showing a homework row at all), this page never checked student_ids
+    // against the current user. Any class member who guessed/obtained a hwId
+    // not assigned to them could load its full content (word list,
+    // translations, due date) directly. Teachers can still preview any
+    // homework in their own class.
+    const isTeacher = (clsRes.data as any)?.teacher_id === user!.id;
+    const sids = hw.student_ids as string[] | null;
+    if (!isTeacher && sids !== null && !sids.includes(user!.id)) {
+      setNotAssigned(true);
+      setLoading(false);
+      return;
+    }
 
     const passageId = hw.passage_id as number | null;
     if (passageId != null) {
@@ -251,6 +267,16 @@ export default function UnitStudyHubPage() {
     } finally {
       setMarkingRead(false);
     }
+  }
+
+  if (notAssigned) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8">
+        <div className="text-5xl">⛔</div>
+        <p className="font-bold text-[var(--text)]">This homework isn&apos;t assigned to you</p>
+        <button onClick={() => router.push(`/classes/${classId}/home`)} className="btn-primary">Go back</button>
+      </div>
+    );
   }
 
   if (loading) {
