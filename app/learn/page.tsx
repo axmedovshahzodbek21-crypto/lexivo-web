@@ -65,7 +65,17 @@ async function grantLearnReward(
           // word for repeat XP — see record_class_word_learned in
           // supabase/migrations. isNew reflects Postgres's own dedup check,
           // not a client assertion.
-          isNew = await recordClassWordLearned(user.id, opts.classIdParam, word.word, word.translation, getLearnXPAmount());
+          //
+          // Homework-sourced sessions (sourceClassHW) also fire a single
+          // bulk record_class_homework_progress call at session finish that
+          // awards word_count * 10 class XP for 'learn' mode — passing the
+          // real per-word XP here too would double-pay class_xp for the same
+          // words. Pass 0 so this call still creates/upserts the SRS row and
+          // isNew still reflects Postgres's dedup, but the bulk award at
+          // session end is the sole class-XP source, matching how
+          // flashcard/quiz/match already avoid this with !sourceClassHW.
+          const xp = opts.sourceClassHW ? 0 : getLearnXPAmount();
+          isNew = await recordClassWordLearned(user.id, opts.classIdParam, word.word, word.translation, xp);
         } catch {
           // Sync failed (network/RPC) — don't strand the student on this
           // card; the lesson still advances, just without server credit.
