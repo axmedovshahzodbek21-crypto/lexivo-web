@@ -812,11 +812,8 @@ export function TestRenderer({ passageId, testId, test, mode: modeProp, preview 
               </p>
             )}
           </div>
-          {/* Paragraphs, labeled per paragraphLabelStyle (defaults to letters for existing content).
-              'none'-style paragraphs get a wider gap than labeled ones — with no letter/numeral to
-              anchor the eye, the whitespace itself has to signal "new paragraph". flex+gap (not a
-              margin-based space-y utility) avoids margin-collapsing capping the gap unexpectedly. */}
-          <div className={`flex flex-col leading-[1.85] ${(test.paragraphLabelStyle ?? 'letters') === 'none' ? 'gap-8' : 'gap-4'}`} style={{ fontSize }}>
+          {/* Paragraphs, labeled per paragraphLabelStyle (defaults to letters for existing content) */}
+          <div className="space-y-4 leading-[1.85]" style={{ fontSize }}>
             {paragraphs.map((para, i) => {
               const labelStyle = test.paragraphLabelStyle ?? 'letters';
               if (labelStyle === 'none') {
