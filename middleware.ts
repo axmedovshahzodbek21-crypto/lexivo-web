@@ -9,10 +9,16 @@ import { NextRequest, NextResponse } from 'next/server';
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isAdminRoute = pathname.startsWith('/admin') && pathname !== '/admin/login';
-  if (isAdminRoute && request.cookies.get('admin_auth')?.value !== process.env.ADMIN_PASSWORD) {
-    const loginUrl = new URL('/admin/login', request.url);
-    loginUrl.searchParams.set('next', pathname);
-    return NextResponse.redirect(loginUrl);
+  if (isAdminRoute) {
+    // Fail closed: if ADMIN_PASSWORD isn't configured in this environment, deny access
+    // rather than let `undefined !== undefined` accidentally evaluate to "authenticated".
+    const adminPassword = process.env.ADMIN_PASSWORD;
+    const authed = !!adminPassword && request.cookies.get('admin_auth')?.value === adminPassword;
+    if (!authed) {
+      const loginUrl = new URL('/admin/login', request.url);
+      loginUrl.searchParams.set('next', pathname);
+      return NextResponse.redirect(loginUrl);
+    }
   }
 
   const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
