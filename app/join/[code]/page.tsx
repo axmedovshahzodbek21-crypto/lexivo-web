@@ -18,7 +18,7 @@ export default function JoinPage() {
   const [notFound, setNotFound] = useState(false);
   const [fetchError, setFetchError] = useState(false);
   const [retryKey, setRetryKey] = useState(0);
-  const [status, setStatus] = useState<'idle' | 'joining' | 'joined' | 'already' | 'ownClass'>('idle');
+  const [status, setStatus] = useState<'idle' | 'joining' | 'joined' | 'already' | 'ownClass' | 'joinError'>('idle');
 
   useEffect(() => {
     if (!code) return;
@@ -57,7 +57,13 @@ export default function JoinPage() {
       .from('class_members')
       .insert({ class_id: cls.id, student_id: user.id })
       .then(({ error }) => {
+        // Only 23505 (unique violation) means the insert didn't happen
+        // because a row already exists — every other error (RLS denial,
+        // network failure) meant no row was created either, but was
+        // falling through to the same 'joined' success state and showing
+        // "🎉 You joined!" regardless.
         if (error?.code === '23505') setStatus('already');
+        else if (error) setStatus('joinError');
         else setStatus('joined');
       });
   }, [user, cls, status, router]);
@@ -108,6 +114,15 @@ export default function JoinPage() {
       <p className="text-2xl font-black text-[var(--text)]">Already a member</p>
       <p className="text-[var(--text-muted)]">{cls.name}</p>
       <p className="text-sm text-[var(--text-muted)]">Redirecting…</p>
+    </div>
+  );
+
+  if (status === 'joinError') return (
+    <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8 animate-fade-in">
+      <div className="text-6xl">⚠️</div>
+      <p className="text-xl font-bold text-[var(--text)]">Couldn&apos;t join {cls.name}</p>
+      <p className="text-sm text-[var(--text-muted)]">Something went wrong. Check your connection and try again.</p>
+      <button onClick={() => setStatus('idle')} className="btn-primary">Try again</button>
     </div>
   );
 

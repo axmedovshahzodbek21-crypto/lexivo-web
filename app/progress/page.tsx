@@ -1187,7 +1187,13 @@ function MonthlyBreakdown({ history, onInfo }: { history: Record<string, number>
     const monthDates = Object.keys(history).filter(d => d.startsWith(key));
     const words = monthDates.reduce((a, d) => a + history[d], 0);
     const days = monthDates.filter(d => history[d] > 0).length;
-    const label = new Date(`${key}-01`).toLocaleString('default', { month: 'long', year: 'numeric' });
+    // `${key}-01` (e.g. "2026-08-01") is parsed as UTC midnight by the Date
+    // constructor, then toLocaleString formats in local time — for any
+    // negative-UTC-offset timezone that rolls back to the last day of the
+    // *previous* month, showing the wrong month name here. Building the
+    // Date from explicit local year/month components (as done elsewhere in
+    // this file, e.g. the calendar grid below) avoids the UTC round-trip.
+    const label = new Date(parseInt(y), parseInt(m) - 1, 1).toLocaleString('default', { month: 'long', year: 'numeric' });
     months.push({ label, words, days });
     if (months.length >= 4) break;
   }

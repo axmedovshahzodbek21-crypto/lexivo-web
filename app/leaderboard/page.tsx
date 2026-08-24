@@ -343,6 +343,18 @@ export default function LeaderboardPage() {
 
         {!loading && !error && entries.length > 0 && (() => {
           const visible = filter === 'starred' ? entries.filter(e => savedIds.has(e.user_id)) : entries;
+          // Standard competition ranking (1, 2, 2, 4, ...) — rank was
+          // previously just the list position, so two users tied on XP got
+          // sequential ranks (e.g. 4 and 5) with nothing showing they were
+          // actually tied.
+          const ranks: number[] = [];
+          const tied: boolean[] = [];
+          visible.forEach((e, i) => {
+            ranks.push(i > 0 && e.xp === visible[i - 1].xp ? ranks[i - 1] : i + 1);
+          });
+          visible.forEach((e, i) => {
+            tied.push((i > 0 && e.xp === visible[i - 1].xp) || (i < visible.length - 1 && e.xp === visible[i + 1].xp));
+          });
           return (
           <>
             {filter === 'starred' && visible.length === 0 && (
@@ -362,8 +374,11 @@ export default function LeaderboardPage() {
                     light: '#FDE047', color: '#F59E0B', dark: '#B45309' },
                   { entry: visible[2], rank: 3, medal: '🥉', avatarSize: 36, minH: 140,
                     light: '#FED7AA', color: '#F97316', dark: '#9A3412' },
-                ] as const).map(({ entry: e, rank, medal, avatarSize, minH, light, color, dark }) => {
+                ] as const).map(({ entry: e, rank: podiumPos, medal, avatarSize, minH, light, color, dark }) => {
                   const isMe = !!(user && e.user_id === user.id);
+                  const idx = podiumPos - 1;
+                  const rank = ranks[idx];
+                  const isTied = tied[idx];
                   const numStr = String(rank).padStart(2, '0');
                   return (
                     <div key={e.user_id} onClick={() => setSelected(e)} style={{ flex: 1, cursor: 'pointer' }}>
@@ -389,7 +404,7 @@ export default function LeaderboardPage() {
                           position: 'absolute', right: 4, bottom: -6, fontSize: 56,
                           fontWeight: 900, color: 'rgba(255,255,255,0.1)',
                           lineHeight: 1, userSelect: 'none', pointerEvents: 'none',
-                        }}>{numStr}</div>
+                        }}>{isTied ? '=' : ''}{numStr}</div>
 
                         <span style={{ fontSize: rank === 1 ? 30 : 22 }}>{medal}</span>
                         <div style={{ borderRadius: '50%', border: '2.5px solid rgba(255,255,255,0.55)', overflow: 'hidden', flexShrink: 0 }}>
@@ -401,6 +416,9 @@ export default function LeaderboardPage() {
                         <p style={{ fontSize: rank === 1 ? 13 : 11, fontWeight: 900, color: 'rgba(255,255,255,0.95)' }}>
                           {displayXP(e.xp)} XP
                         </p>
+                        {isTied && (
+                          <span style={{ fontSize: 9, fontWeight: 800, background: 'rgba(255,255,255,0.25)', color: '#fff', borderRadius: 20, padding: '2px 8px' }}>TIED</span>
+                        )}
                         {e.streak > 0 && (
                           <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.75)' }}>🔥 {e.streak}</p>
                         )}
@@ -417,7 +435,9 @@ export default function LeaderboardPage() {
             {/* Ranked list (4 onwards, or all if < 3) */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {visible.slice(visible.length >= 3 ? 3 : 0).map((e, i) => {
-                const rank = (visible.length >= 3 ? 3 : 0) + i + 1;
+                const idx = (visible.length >= 3 ? 3 : 0) + i;
+                const rank = ranks[idx];
+                const isTied = tied[idx];
                 const isMe = !!(user && e.user_id === user.id);
                 const rankColor = rank <= 10 ? '#6366F1' : 'var(--text-muted)';
                 return (
@@ -439,13 +459,14 @@ export default function LeaderboardPage() {
                       fontSize: 13, fontWeight: 900,
                       background: isMe ? '#6366F1' : rank <= 10 ? '#6366F118' : 'var(--surface-2)',
                       color: isMe ? '#fff' : rankColor,
-                    }}>{rank}</div>
+                    }}>{isTied ? '=' : ''}{rank}</div>
                     <Avatar name={e.name} url={e.avatar_url} size={38} userId={e.user_id} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                         {savedIds.has(e.user_id) && <span style={{ fontSize: 13, lineHeight: 1 }}>⭐</span>}
                         <p style={{ fontWeight: 700, fontSize: 14, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.name}</p>
                         {isMe && <span style={{ fontSize: 10, fontWeight: 800, background: '#6366F1', color: '#fff', borderRadius: 20, padding: '2px 7px', flexShrink: 0 }}>YOU</span>}
+                        {isTied && <span style={{ fontSize: 9, fontWeight: 700, background: 'var(--surface-2)', color: 'var(--text-muted)', borderRadius: 20, padding: '1px 7px', flexShrink: 0 }}>TIED</span>}
                       </div>
                       {e.last_study_date === today && (
                         <span style={{ fontSize: 9, fontWeight: 700, background: 'rgba(16,185,129,0.15)', color: 'var(--success)', borderRadius: 20, padding: '1px 7px' }}>TODAY</span>
