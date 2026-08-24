@@ -343,7 +343,7 @@ export default function SRSReviewPage() {
           <div className="card text-center"><div className="text-xl font-bold text-[var(--primary)]">{score}%</div><div className="text-xs text-[var(--text-muted)]">{t.srs.score}</div></div>
         </div>
         <div className="flex gap-3 w-full mb-3">
-          <button onClick={() => { setIndex(0); setRevealed(false); setResults([]); setShuffledKnew(0); setShuffledNotYet(0); setDone(false); }} className="btn-secondary flex-1">{t.common.redo}</button>
+          <button onClick={() => { setIndex(0); setRevealed(false); setResults([]); setShuffledKnew(0); setShuffledNotYet(0); setSessionXP(0); gradesApplied.current = false; setDone(false); }} className="btn-secondary flex-1">{t.common.redo}</button>
           <Link href="/" className="btn-primary flex-1 text-center">{t.srs.goHome}</Link>
         </div>
         <button onClick={() => { setAllWords(getSRSWords()); setManaging(true); }} className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] underline">

@@ -361,6 +361,7 @@ function MatchingInner() {
                 setRoundIndex(0);
                 setTotalMistakes(0);
                 setTotalTime(0);
+                setSessionXP(0);
                 initRound(0, reshuffled);
               }}
               className="flex-1 btn-primary"

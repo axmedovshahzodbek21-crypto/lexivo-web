@@ -290,7 +290,15 @@ function QuizInner() {
 
   const next = useCallback(() => {
     if (index + 1 >= questions.length) {
-      const finalCorrect = correct + (selected === current?.correct ? 1 : 0);
+      // `correct` already reflects the just-answered last question —
+      // handleSelect() increments it synchronously and triggers a re-render
+      // before "Next" is even clickable (state must be 'answered' first),
+      // so by the time next() runs here it's already up to date. Adding
+      // (selected === current?.correct ? 1 : 0) on top double-counted the
+      // final answer, letting a user who missed an earlier question still
+      // trigger the "perfect score" achievement/XP if they got the last
+      // question right.
+      const finalCorrect = correct;
       const isPerfect = finalCorrect === questions.length;
       if (!sourceClassHW && !sourceClass) {
         if (isPerfect) unlockAchievement('quiz_perfect', 100); // 10 XP
@@ -427,7 +435,7 @@ function QuizInner() {
           )}
           {wrongQuestions.length > 0 && (
             <button
-              onClick={() => { setQuestions(wrongQuestions); setIndex(0); setSelected(null); setState('idle'); setCorrect(0); setWrongQuestions([]); setDone(false); }}
+              onClick={() => { setQuestions(wrongQuestions); setIndex(0); setSelected(null); setState('idle'); setCorrect(0); setWrongQuestions([]); setSessionXP(0); setDone(false); }}
               className="w-full py-3 rounded-xl border-2 border-[var(--danger)] text-[var(--danger)] font-bold text-sm hover:bg-red-50 transition-colors"
             >
               {t.quiz.retryWrong(wrongQuestions.length)}
@@ -435,7 +443,7 @@ function QuizInner() {
           )}
           <div className="flex gap-3">
             <button
-              onClick={() => { setIndex(0); setSelected(null); setState('idle'); setCorrect(0); setWrongQuestions([]); setDone(false); if (!sourceMyWords && !sourceClassHW && !sourceClass) setQuestions(buildQuiz(collections, collectionName, dayNumber, starredOnly, listId)); }}
+              onClick={() => { setIndex(0); setSelected(null); setState('idle'); setCorrect(0); setWrongQuestions([]); setSessionXP(0); setDone(false); if (!sourceMyWords && !sourceClassHW && !sourceClass) setQuestions(buildQuiz(collections, collectionName, dayNumber, starredOnly, listId)); }}
               className="btn-secondary flex-1"
             >{t.common.retry}</button>
             <Link href={backUrl} className="btn-primary flex-1 text-center">{t.common.back}</Link>
