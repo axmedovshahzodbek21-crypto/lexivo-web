@@ -160,7 +160,137 @@ function PassageCard({ passage, isHero }: { passage: typeof PASSAGES[0]; isHero?
   );
 }
 
+const CDI_URL = 'https://ielts-cdi-mauve.vercel.app';
+
+function CdiAdCard({ onOpen }: { onOpen: () => void }) {
+  return (
+    <div
+      onClick={onOpen}
+      style={{
+        position: 'relative',
+        borderRadius: 20,
+        overflow: 'hidden',
+        cursor: 'pointer',
+        padding: '26px 28px',
+        background: 'linear-gradient(135deg, #A855F7, #7C3AED, #4C1D95)',
+        border: '3px solid #4C1D95',
+        boxShadow: '0 8px 24px rgba(124,58,237,0.35), 0 2px 8px rgba(0,0,0,0.3)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 16,
+      }}
+    >
+      <div
+        style={{
+          position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)',
+          fontSize: 110, fontWeight: 900, color: 'rgba(255,255,255,0.07)',
+          lineHeight: 1, userSelect: 'none', pointerEvents: 'none',
+        }}
+      >
+        CDI
+      </div>
+      <div style={{ position: 'relative' }}>
+        <p style={{
+          fontSize: 10, fontWeight: 900, color: 'rgba(255,255,255,0.7)',
+          textTransform: 'uppercase', letterSpacing: '0.14em', marginBottom: 8,
+        }}>
+          New from Lexivo
+        </p>
+        <p style={{ fontSize: 24, fontWeight: 900, color: '#fff', lineHeight: 1.15 }}>
+          Try IELTS Reading CDI
+        </p>
+        <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', marginTop: 6, maxWidth: 340, lineHeight: 1.5 }}>
+          A companion tool that turns paper-based reading tests into an interactive digital format.
+        </p>
+      </div>
+      <span style={{
+        position: 'relative',
+        fontSize: 12, fontWeight: 800, color: '#fff',
+        background: 'rgba(0,0,0,0.25)', borderRadius: 10,
+        padding: '8px 16px', whiteSpace: 'nowrap',
+      }}>
+        Learn more →
+      </span>
+    </div>
+  );
+}
+
+function CdiInfoModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 100,
+        background: 'rgba(0,0,0,0.6)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: 20,
+      }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{
+          width: '100%', maxWidth: 380,
+          borderRadius: 20,
+          background: 'var(--surface, #1a1a2e)',
+          border: '2px solid #7C3AED',
+          padding: '28px 26px',
+          boxShadow: '0 12px 40px rgba(0,0,0,0.5)',
+        }}
+      >
+        <p style={{
+          fontSize: 10, fontWeight: 900, color: '#A855F7',
+          textTransform: 'uppercase', letterSpacing: '0.14em', marginBottom: 8,
+        }}>
+          IELTS Reading CDI
+        </p>
+        <p style={{ fontSize: 20, fontWeight: 900, color: 'var(--text)', lineHeight: 1.2, marginBottom: 12 }}>
+          Paper tests, reimagined for the computer-delivered format
+        </p>
+        <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: 24 }}>
+          IELTS CDI takes real paper-based IELTS Reading tests and rebuilds them as an
+          on-screen, computer-delivered experience — so you can practice the way the
+          actual CDI exam looks and feels, right in your browser.
+        </p>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button
+            onClick={onClose}
+            style={{
+              flex: 1, padding: '12px 0', borderRadius: 14,
+              fontSize: 13, fontWeight: 800,
+              background: 'transparent', color: 'var(--text-muted)',
+              border: '2px solid var(--border, #333)', cursor: 'pointer',
+            }}
+          >
+            Maybe later
+          </button>
+          <a
+            href={CDI_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ flex: 1 }}
+          >
+            <button
+              style={{
+                width: '100%', padding: '12px 0', borderRadius: 14,
+                fontSize: 13, fontWeight: 800,
+                background: '#7C3AED', color: '#fff', border: 'none',
+                cursor: 'pointer',
+                boxShadow: '0 4px 16px rgba(124,58,237,0.5)',
+              }}
+            >
+              Open IELTS CDI →
+            </button>
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function IeltsReadingPage() {
+  const [showCdiInfo, setShowCdiInfo] = useState(false);
+
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 pb-24">
       <div className="mb-10">
@@ -184,7 +314,12 @@ export default function IeltsReadingPage() {
           <PassageCard passage={PASSAGES[1]} />
           <PassageCard passage={PASSAGES[2]} />
         </div>
+
+        {/* CDI ad */}
+        <CdiAdCard onOpen={() => setShowCdiInfo(true)} />
       </div>
+
+      {showCdiInfo && <CdiInfoModal onClose={() => setShowCdiInfo(false)} />}
     </div>
   );
 }
