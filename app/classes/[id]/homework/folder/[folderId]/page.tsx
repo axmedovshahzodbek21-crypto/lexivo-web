@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import BackButton from '@/components/BackButton';
 import { supabase } from '@/lib/supabase';
@@ -25,6 +25,8 @@ export default function ClassFolderHomeworkPage() {
   const [unassigned, setUnassigned] = useState<UnassignedUnit[]>([]);
   const [completedModes, setCompletedModes] = useState<Record<string, Set<string>>>({});
   const [showAll, setShowAll] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const loadIdRef = useRef(0);
 
   useEffect(() => {
     if (!user) return;
@@ -32,22 +34,34 @@ export default function ClassFolderHomeworkPage() {
   }, [user, classId, folderId]);
 
   async function load() {
+    const myLoadId = ++loadIdRef.current;
+    setLoadError(null);
     const [folderRes, unitsRes, classRes] = await Promise.all([
       supabase.from('teacher_folders').select('id, name').eq('id', folderId).maybeSingle(),
       supabase.from('teacher_units').select('id, name, teacher_unit_words(count)').eq('folder_id', folderId).order('created_at'),
       supabase.from('classes').select('name').eq('id', classId).maybeSingle(),
     ]);
+    if (loadIdRef.current !== myLoadId) return;
+    if (folderRes.error || unitsRes.error || classRes.error) {
+      const err = folderRes.error ?? unitsRes.error ?? classRes.error!;
+      console.error('folder homework load error', err);
+      setLoadError(err.message);
+      setLoading(false);
+      return;
+    }
 
     const unitRows = (unitsRes.data ?? []) as any[];
     const unitIds = unitRows.map(u => u.id as string);
 
-    const { data: hwRows } = unitIds.length > 0
+    const { data: hwRows, error: hwErr } = unitIds.length > 0
       ? await supabase
           .from('class_homework')
           .select('id, unit_id, modes, due_date, student_ids')
           .eq('class_id', classId)
           .in('unit_id', unitIds)
-      : { data: [] as any[] };
+      : { data: [] as any[], error: null };
+    if (loadIdRef.current !== myLoadId) return;
+    if (hwErr) { console.error('folder homework load error', hwErr); setLoadError(hwErr.message); setLoading(false); return; }
 
     const applicable = (hwRows ?? []).filter((h: any) => {
       const sids = h.student_ids as string[] | null;
@@ -59,9 +73,11 @@ export default function ClassFolderHomeworkPage() {
     const hwIds = applicable.map((h: any) => h.id as string);
     const modeMap: Record<string, Set<string>> = {};
     if (hwIds.length > 0) {
-      const { data: prog } = await supabase
+      const { data: prog, error: progErr } = await supabase
         .from('class_homework_progress').select('homework_id, mode')
         .eq('student_id', user!.id).in('homework_id', hwIds);
+      if (loadIdRef.current !== myLoadId) return;
+      if (progErr) { console.error('folder homework load error', progErr); setLoadError(progErr.message); setLoading(false); return; }
       for (const p of (prog ?? [])) {
         if (!modeMap[p.homework_id]) modeMap[p.homework_id] = new Set();
         modeMap[p.homework_id].add(p.mode);
@@ -89,12 +105,24 @@ export default function ClassFolderHomeworkPage() {
       }
     });
 
+    if (loadIdRef.current !== myLoadId) return;
     setFolderName((folderRes.data as any)?.name ?? 'Folder');
     setClassName((classRes.data as any)?.name ?? '');
     setAssigned(builtAssigned);
     setUnassigned(builtUnassigned);
     setCompletedModes(modeMap);
     setLoading(false);
+  }
+
+  if (loadError) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8">
+        <div className="text-5xl">⚠️</div>
+        <p className="font-bold text-[var(--text)]">Couldn&apos;t load this folder</p>
+        <p className="text-sm text-[var(--text-muted)] text-center break-all">{loadError}</p>
+        <button onClick={() => load()} className="btn-primary">Try again</button>
+      </div>
+    );
   }
 
   if (loading) {

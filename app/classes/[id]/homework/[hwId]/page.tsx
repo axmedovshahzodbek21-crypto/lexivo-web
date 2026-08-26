@@ -6,7 +6,7 @@ import { useAuth } from '@/lib/auth-context';
 import { saveClassHWTemp } from '@/lib/storage';
 import type { ClassHWWord } from '@/lib/storage';
 import { readingPassages, type ReadingPassage } from '@/lib/reading-data';
-import { dueLabel, isHomeworkDone, fetchCollectionByName } from '../_shared';
+import { dueLabel, isHomeworkDone, fetchCollectionByName, MODE_ICON, MODE_LABEL, MODE_COLOR } from '../_shared';
 
 interface UnitWord {
   word: string;
@@ -17,10 +17,6 @@ interface UnitWord {
   definitionUz: string | null;
   examples: { sentence: string; translation: string }[];
 }
-
-const MODE_ICON: Record<string, string> = { learn: '📖', flashcard: '🃏', quiz: '❓', match: '🎯' };
-const MODE_LABEL: Record<string, string> = { learn: 'Learn', flashcard: 'Cards', quiz: 'Quiz', match: 'Match' };
-const MODE_COLOR: Record<string, string> = { learn: '#4f46e5', flashcard: '#ea580c', quiz: '#d97706', match: '#db2777' };
 
 type HWMeta = { unitName: string; modes: string[]; dueDate: string | null; words: UnitWord[]; passage: ReadingPassage | null };
 const _hwCache = new Map<string, HWMeta>();
@@ -43,7 +39,10 @@ export default function UnitStudyHubPage() {
   const [navigating, setNavigating] = useState<string | null>(null);
   const [progressError, setProgressError] = useState<string | null>(null);
   const [notAssigned, setNotAssigned] = useState(false);
+  const [notFound, setNotFound] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const autoStartedRef = useRef(false);
+  const loadIdRef = useRef(0);
 
   useEffect(() => {
     if (!user) return;
@@ -90,6 +89,8 @@ export default function UnitStudyHubPage() {
   }, [searchParams, user]);
 
   async function load() {
+    const myLoadId = ++loadIdRef.current;
+    setLoadError(null);
     const cached = _hwCache.get(hwId);
     if (cached) {
       setUnitName(cached.unitName);
@@ -102,15 +103,18 @@ export default function UnitStudyHubPage() {
       setLoading(true);
     }
 
-    // Always fetch progress fresh; fetch metadata only if not cached
+    // Metadata (modes/due date/words) used to be fetched only when this
+    // hwId wasn't already cached — so once a student had visited a
+    // homework page once, every later visit kept showing that first
+    // snapshot forever, even after a teacher changed the due date or
+    // assigned modes. Cache is now just for an instant first paint; the
+    // fetch below always runs so a teacher's edit is picked up.
     const [hwRes, progRes, clsRes] = await Promise.all([
-      cached
-        ? Promise.resolve({ data: null })
-        : supabase
-            .from('class_homework')
-            .select('unit_id, class_unit_id, collection_name, day_number, passage_id, modes, due_date, student_ids, teacher_units(name), class_word_units(name)')
-            .eq('id', hwId)
-            .single(),
+      supabase
+        .from('class_homework')
+        .select('unit_id, class_unit_id, collection_name, day_number, passage_id, modes, due_date, student_ids, teacher_units(name), class_word_units(name)')
+        .eq('id', hwId)
+        .maybeSingle(),
       supabase
         .from('class_homework_progress')
         .select('mode')
@@ -118,15 +122,34 @@ export default function UnitStudyHubPage() {
         .eq('student_id', user!.id),
       supabase.from('classes').select('name, teacher_id').eq('id', classId).maybeSingle(),
     ]);
+    if (loadIdRef.current !== myLoadId) return;
+
+    if (hwRes.error || progRes.error || clsRes.error) {
+      console.error('homework load error', hwRes.error ?? progRes.error ?? clsRes.error);
+      setLoadError((hwRes.error ?? progRes.error ?? clsRes.error)!.message);
+      setLoading(false);
+      return;
+    }
+
     setClassName((clsRes.data as any)?.name ?? '');
 
     const done = new Set((progRes.data ?? []).map((p: any) => p.mode as string));
     setCompletedModes(done);
 
-    if (cached) { setLoading(false); return; }
-
     const hw = hwRes.data;
-    if (!hw) { setLoading(false); return; }
+    if (!hw) {
+      // A dead-end hwId (deleted homework, mistyped/stale link) previously
+      // fell through to the same near-empty state as any other load —
+      // an empty title, 0 words, no mode buttons — with nothing telling
+      // the student this assignment doesn't exist. _hwCache is also never
+      // populated in this branch, so a subsequent visit re-checks rather
+      // than permanently caching a "not found" that could go stale if the
+      // homework is later recreated with the same id (won't happen with
+      // uuids, but keeps this branch consistent with the rest of load()).
+      setNotFound(true);
+      setLoading(false);
+      return;
+    }
 
     // Unlike every sibling homework list (home/, homework/, homework/collection,
     // homework/folder — all of which filter by student_ids client-side before
@@ -145,6 +168,7 @@ export default function UnitStudyHubPage() {
 
     const passageId = hw.passage_id as number | null;
     if (passageId != null) {
+      if (loadIdRef.current !== myLoadId) return;
       const found = readingPassages.find(p => p.id === passageId) ?? null;
       _hwCache.set(hwId, { unitName: found?.title ?? 'Reading Passage', modes: (hw.modes as string[]) ?? ['read'], dueDate: hw.due_date as string | null, words: [], passage: found });
       setUnitName(found?.title ?? 'Reading Passage');
@@ -201,6 +225,12 @@ export default function UnitStudyHubPage() {
             .select('word, translation, definition, part_of_speech, pronunciation, definition_uz, examples')
             .eq('unit_id', unitId!)
             .order('created_at');
+      if (wordsRes.error) {
+        console.error('homework load error', wordsRes.error);
+        setLoadError(wordsRes.error.message);
+        setLoading(false);
+        return;
+      }
       unitWords = ((wordsRes.data as any[]) ?? []).map(w => ({
         word: w.word,
         translation: w.translation,
@@ -212,6 +242,7 @@ export default function UnitStudyHubPage() {
       }));
     }
 
+    if (loadIdRef.current !== myLoadId) return;
     _hwCache.set(hwId, { unitName: name, modes: hwModes, dueDate: due, words: unitWords, passage: null });
     setUnitName(name);
     setModes(hwModes);
@@ -275,6 +306,28 @@ export default function UnitStudyHubPage() {
         <div className="text-5xl">⛔</div>
         <p className="font-bold text-[var(--text)]">This homework isn&apos;t assigned to you</p>
         <button onClick={() => router.push(`/classes/${classId}/home`)} className="btn-primary">Go back</button>
+      </div>
+    );
+  }
+
+  if (notFound) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8">
+        <div className="text-5xl">🔍</div>
+        <p className="font-bold text-[var(--text)]">This homework no longer exists</p>
+        <p className="text-sm text-[var(--text-muted)] text-center">It may have been deleted by your teacher.</p>
+        <button onClick={() => router.push(`/classes/${classId}/homework`)} className="btn-primary">Go back</button>
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8">
+        <div className="text-5xl">⚠️</div>
+        <p className="font-bold text-[var(--text)]">Couldn&apos;t load this homework</p>
+        <p className="text-sm text-[var(--text-muted)] text-center break-all">{loadError}</p>
+        <button onClick={() => load()} className="btn-primary">Try again</button>
       </div>
     );
   }

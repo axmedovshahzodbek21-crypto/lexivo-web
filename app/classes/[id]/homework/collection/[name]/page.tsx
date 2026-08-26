@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import BackButton from '@/components/BackButton';
 import { supabase } from '@/lib/supabase';
@@ -16,6 +16,8 @@ export default function ClassCollectionHomeworkPage() {
   const [className, setClassName] = useState('');
   const [units, setUnits] = useState<AssignedUnit[]>([]);
   const [completedModes, setCompletedModes] = useState<Record<string, Set<string>>>({});
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const loadIdRef = useRef(0);
 
   useEffect(() => {
     if (!user) return;
@@ -23,11 +25,23 @@ export default function ClassCollectionHomeworkPage() {
   }, [user, classId, name]);
 
   async function load() {
-    const [{ data: hwRows }, { data: cls }] = await Promise.all([
+    const myLoadId = ++loadIdRef.current;
+    setLoadError(null);
+    const [hwRes, clsRes] = await Promise.all([
       supabase.from('class_homework').select('id, day_number, modes, due_date, student_ids')
         .eq('class_id', classId).eq('collection_name', collectionName),
       supabase.from('classes').select('name').eq('id', classId).maybeSingle(),
     ]);
+    if (loadIdRef.current !== myLoadId) return;
+    if (hwRes.error || clsRes.error) {
+      const err = hwRes.error ?? clsRes.error!;
+      console.error('collection homework load error', err);
+      setLoadError(err.message);
+      setLoading(false);
+      return;
+    }
+    const hwRows = hwRes.data;
+    const cls = clsRes.data;
     setClassName((cls as any)?.name ?? '');
 
     const applicable = (hwRows ?? []).filter((h: any) => {
@@ -36,6 +50,7 @@ export default function ClassCollectionHomeworkPage() {
     });
 
     const col = await fetchCollectionByName(collectionName);
+    if (loadIdRef.current !== myLoadId) return;
 
     const sorted = [...applicable].sort((a: any, b: any) => a.day_number - b.day_number);
     const built: AssignedUnit[] = sorted.map((h: any) => {
@@ -53,18 +68,32 @@ export default function ClassCollectionHomeworkPage() {
     const hwIds = built.map(u => u.hwId);
     const modeMap: Record<string, Set<string>> = {};
     if (hwIds.length > 0) {
-      const { data: prog } = await supabase
+      const { data: prog, error: progErr } = await supabase
         .from('class_homework_progress').select('homework_id, mode')
         .eq('student_id', user!.id).in('homework_id', hwIds);
+      if (loadIdRef.current !== myLoadId) return;
+      if (progErr) { console.error('collection homework load error', progErr); setLoadError(progErr.message); setLoading(false); return; }
       for (const p of (prog ?? [])) {
         if (!modeMap[p.homework_id]) modeMap[p.homework_id] = new Set();
         modeMap[p.homework_id].add(p.mode);
       }
     }
 
+    if (loadIdRef.current !== myLoadId) return;
     setUnits(built);
     setCompletedModes(modeMap);
     setLoading(false);
+  }
+
+  if (loadError) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8">
+        <div className="text-5xl">⚠️</div>
+        <p className="font-bold text-[var(--text)]">Couldn&apos;t load this collection</p>
+        <p className="text-sm text-[var(--text-muted)] text-center break-all">{loadError}</p>
+        <button onClick={() => load()} className="btn-primary">Try again</button>
+      </div>
+    );
   }
 
   if (loading) {

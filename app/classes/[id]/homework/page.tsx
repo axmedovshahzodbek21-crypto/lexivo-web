@@ -1,11 +1,11 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import type { WordCollection } from '@/lib/types';
 import { readingPassages } from '@/lib/reading-data';
-import { isHomeworkDone, dueLabel, fetchCollectionByName } from './_shared';
+import { isHomeworkDone, dueLabel, fetchCollectionByName, MODE_ICON } from './_shared';
 import { classGradientColors } from '@/lib/class-gradient';
 
 interface FolderUnit {
@@ -50,8 +50,6 @@ interface PassageHW {
   hwDue: string | null;
 }
 
-const MODE_ICON: Record<string, string> = { learn: '📖', flashcard: '🃏', quiz: '🧠', match: '🎯', read: '📚' };
-
 type CachedHW = {
   isTeacher: boolean;
   folders: AssignedFolder[];
@@ -84,6 +82,8 @@ export default function ClassHomeworkPage() {
   );
   const [totalAssigned, setTotalAssigned] = useState(cached?.totalAssigned ?? 0);
   const [totalDone, setTotalDone] = useState(cached?.totalDone ?? 0);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const loadIdRef = useRef(0);
 
   useEffect(() => {
     if (!user) return;
@@ -91,23 +91,32 @@ export default function ClassHomeworkPage() {
   }, [user, id]);
 
   async function load() {
+    const myLoadId = ++loadIdRef.current;
+    setLoadError(null);
     try {
-      await loadInner();
+      await loadInner(myLoadId);
     } catch (err) {
+      if (loadIdRef.current !== myLoadId) return;
       // folders/cwUnits/etc. are only ever updated below on a full success,
       // so on error they still hold whatever was showing before this call
       // (cached data for a background refresh, or the initial empty state
       // for a true first load) — just stop the spinner rather than clearing
       // anything, and don't let one bad row (e.g. a stale
       // class_library_assignments row whose teacher_folders was deleted)
-      // take down the whole tab.
+      // take down the whole tab. A Supabase error used to resolve with
+      // { data: null, error } instead of throwing, so it fell through to
+      // the same "no homework" empty state as a genuinely-empty class —
+      // now surfaced via loadError so the student can tell the difference.
       console.error('homework load error', err);
+      setLoadError(err instanceof Error ? err.message : String(err));
     }
-    setLoading(false);
+    if (loadIdRef.current === myLoadId) setLoading(false);
   }
 
-  async function loadInner() {
-    const { data: cls } = await supabase.from('classes').select('name, teacher_id').eq('id', id).maybeSingle();
+  async function loadInner(myLoadId: number) {
+    const { data: cls, error: clsErr } = await supabase.from('classes').select('name, teacher_id').eq('id', id).maybeSingle();
+    if (clsErr) throw clsErr;
+    if (loadIdRef.current !== myLoadId) return;
     const teacher = (cls as any)?.teacher_id === user!.id;
     setIsTeacher(teacher);
     setClassName((cls as any)?.name ?? '');
@@ -124,6 +133,9 @@ export default function ClassHomeworkPage() {
       supabase.from('class_word_units').select('id, name, class_words(count)').eq('class_id', id).order('created_at'),
       supabase.from('class_homework').select('id, unit_id, class_unit_id, collection_name, day_number, passage_id, modes, due_date, student_ids').eq('class_id', id),
     ]);
+
+    if (assignsRes.error || cwUnitRes.error || hwRes.error) throw (assignsRes.error ?? cwUnitRes.error ?? hwRes.error);
+    if (loadIdRef.current !== myLoadId) return;
 
     // teacher_folders is a joined row that can come back null (e.g. the
     // referenced folder was deleted but this assignment row wasn't cleaned
@@ -152,9 +164,10 @@ export default function ClassHomeworkPage() {
     const hwIds = applicableHw.map(h => h.id);
     const modeMap: Record<string, Set<string>> = {};
     if (hwIds.length > 0) {
-      const { data: prog } = await supabase
+      const { data: prog, error: progErr } = await supabase
         .from('class_homework_progress').select('homework_id, mode')
         .eq('student_id', userId).in('homework_id', hwIds);
+      if (progErr) throw progErr;
       for (const p of (prog ?? [])) {
         if (!modeMap[p.homework_id]) modeMap[p.homework_id] = new Set();
         modeMap[p.homework_id].add(p.mode);
@@ -165,9 +178,10 @@ export default function ClassHomeworkPage() {
     let folderUnitsData: any[] = [];
     if (assigns.length > 0) {
       const folderIds = assigns.map((a: any) => a.teacher_folders.id as string);
-      const { data: unitsData } = await supabase
+      const { data: unitsData, error: unitsErr } = await supabase
         .from('teacher_units').select('id, folder_id, name, teacher_unit_words(count)')
         .in('folder_id', folderIds).order('created_at');
+      if (unitsErr) throw unitsErr;
       folderUnitsData = (unitsData ?? []) as any[];
     }
 
@@ -259,6 +273,8 @@ export default function ClassHomeworkPage() {
       if (isHomeworkDone(p.hwModes, modeMap[p.homeworkId] ?? new Set())) done++;
     }
 
+    if (loadIdRef.current !== myLoadId) return;
+
     if (cacheKey) _cache[cacheKey] = {
       isTeacher: false,
       folders: built,
@@ -317,6 +333,16 @@ export default function ClassHomeworkPage() {
         </div>
       </div>
       <div className="p-4 space-y-1">
+
+        {loadError && (
+          <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-xl p-3 mb-4 flex items-start gap-2.5">
+            <span className="text-lg shrink-0">⚠️</span>
+            <div>
+              <p className="font-bold text-red-700 dark:text-red-400 text-xs">Couldn&apos;t load homework</p>
+              <p className="text-red-600 dark:text-red-500 text-[11px] mt-0.5 break-all">{loadError}</p>
+            </div>
+          </div>
+        )}
 
         {/* Progress bar */}
         {totalAssigned > 0 && (

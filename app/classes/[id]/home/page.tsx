@@ -100,6 +100,11 @@ const [memberCount, setMemberCount] = useState(0);
 
   useEffect(() => {
     if (!user) return;
+    // Guards the two background student fetches below (pending homework
+    // count, class streak) against setting state after this effect has
+    // been superseded by a newer run (e.g. fast navigation between two
+    // classes' home pages).
+    let cancelled = false;
     const cacheKey = `${user.id}:${id}`;
     const cached = _homeCache.get(cacheKey);
     if (cached) {
@@ -203,18 +208,22 @@ const [memberCount, setMemberCount] = useState(0);
       // Student: async homework pending count (doesn't block main render)
       if (!teacher) {
         (async () => {
-          const { data: hwRows } = await supabase
+          const { data: hwRows, error: hwErr } = await supabase
             .from('class_homework')
             .select('id, modes, student_ids')
             .eq('class_id', id);
+          if (cancelled) return;
+          if (hwErr) { console.error('pending homework count error', hwErr); return; }
           const myHw = ((hwRows ?? []) as { id: string; modes: string[]; student_ids: string[] | null }[])
             .filter(h => !h.student_ids || h.student_ids.includes(user.id));
           if (myHw.length === 0) { setPendingHwCount(0); return; }
-          const { data: prog } = await supabase
+          const { data: prog, error: progErr } = await supabase
             .from('class_homework_progress')
             .select('homework_id, mode')
             .eq('student_id', user.id)
             .in('homework_id', myHw.map(h => h.id));
+          if (cancelled) return;
+          if (progErr) { console.error('pending homework count error', progErr); return; }
           const doneMap: Record<string, Set<string>> = {};
           for (const p of (prog ?? []) as { homework_id: string; mode: string }[]) {
             if (!doneMap[p.homework_id]) doneMap[p.homework_id] = new Set();
@@ -225,11 +234,13 @@ const [memberCount, setMemberCount] = useState(0);
 
         // Student: async class streak computation
         (async () => {
-          const { data: streakRows } = await supabase
+          const { data: streakRows, error: streakErr } = await supabase
             .from('class_study_days')
             .select('study_date')
             .eq('student_id', user.id)
             .eq('class_id', id);
+          if (cancelled) return;
+          if (streakErr) { console.error('class streak load error', streakErr); return; }
           const days = ((streakRows ?? []) as { study_date: string }[])
             .map(r => r.study_date)
             .sort();
@@ -248,6 +259,7 @@ const [memberCount, setMemberCount] = useState(0);
         })();
       }
     })();
+    return () => { cancelled = true; };
   }, [id, user, router]);
 
   const openXpHistory = (s: StudentProfile) => setXpHistoryStudent(s);
