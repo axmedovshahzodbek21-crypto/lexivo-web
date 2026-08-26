@@ -104,6 +104,22 @@ export const CATEGORY_META: Record<string, { label: string; icon: string }> = {
 
 export const CATEGORY_ORDER = ['words', 'xp', 'study_days', 'study_streak', 'flash_days', 'flash_streak', 'quiz_days', 'quiz_streak', 'srs', 'milestones'];
 
+// Shared by app/achievements/page.tsx and the achievements tab in
+// app/progress/page.tsx — both independently grouped ALL_ACHIEVEMENTS by
+// category and summed unlocked/total XP the same way, just with different
+// card layouts (a dedicated full page vs. a compact in-tab summary).
+export function groupAchievementsByCategory(): Record<string, Achievement[]> {
+  const byCategory: Record<string, Achievement[]> = {};
+  for (const a of ALL_ACHIEVEMENTS) (byCategory[a.category] ??= []).push(a);
+  return byCategory;
+}
+
+export function computeAchievementXp(unlockedIds: string[]): { earned: number; total: number } {
+  const earned = ALL_ACHIEVEMENTS.filter(a => unlockedIds.includes(a.id)).reduce((s, a) => s + a.xp, 0);
+  const total = ALL_ACHIEVEMENTS.reduce((s, a) => s + a.xp, 0);
+  return { earned, total };
+}
+
 export function checkAchievements(): Achievement[] {
   const newlyUnlocked: Achievement[] = [];
   const xp            = getXP();

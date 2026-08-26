@@ -14,7 +14,7 @@ import {
 } from '@/lib/storage';
 import type { XpEntry } from '@/lib/storage';
 import { useAppStore } from '@/lib/store';
-import { getLevelInfo, ALL_ACHIEVEMENTS, CATEGORY_ORDER, CATEGORY_META, getAchievementProgress } from '@/lib/gamification';
+import { getLevelInfo, ALL_ACHIEVEMENTS, CATEGORY_ORDER, CATEGORY_META, getAchievementProgress, groupAchievementsByCategory, computeAchievementXp } from '@/lib/gamification';
 import { getUnlockedAchievements } from '@/lib/storage';
 import { stageLabel, stageColor } from '@/lib/srs';
 import type { SRSWord } from '@/lib/types';
@@ -376,10 +376,8 @@ function ProgressPage() {
           const stats = { learnedCount, streak, xp, masteredCount, totalDays,
             flashDays: getFlashcardTotalDays(), flashStreak: getFlashcardStreak(),
             quizDays: getQuizTotalDays(), quizStreak: getQuizStreak() };
-          const xpEarned = ALL_ACHIEVEMENTS.filter(a => unlockedIds.includes(a.id)).reduce((s, a) => s + a.xp, 0);
-          const xpTotal  = ALL_ACHIEVEMENTS.reduce((s, a) => s + a.xp, 0);
-          const byCategory: Record<string, typeof ALL_ACHIEVEMENTS> = {};
-          for (const a of ALL_ACHIEVEMENTS) (byCategory[a.category] ??= []).push(a);
+          const { earned: xpEarned, total: xpTotal } = computeAchievementXp(unlockedIds);
+          const byCategory = groupAchievementsByCategory();
           return (
             <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
               {/* Summary row */}
@@ -550,36 +548,6 @@ function StatBlock({
 }
 
 // ─── XP History ──────────────────────────────────────────────────────────────
-
-const XP_ICONS: Record<string, string> = {
-  Learn: '📖', Quiz: '🧠', Flashcard: '🃏', 'SRS Review': '🔄',
-  'Level Complete': '🏆', Matching: '🎯', Pronunciation: '🎤',
-};
-
-function dayLabel(timestamp: number): string {
-  const d = new Date(timestamp);
-  const today = new Date();
-  const yesterday = new Date(today);
-  yesterday.setDate(today.getDate() - 1);
-  const fmt = (dt: Date) => `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
-  const key = fmt(d);
-  if (key === fmt(today)) return 'Today';
-  if (key === fmt(yesterday)) return 'Yesterday';
-  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-}
-
-function groupByDay(entries: XpEntry[]): { label: string; total: number; items: XpEntry[] }[] {
-  const map = new Map<string, { label: string; total: number; items: XpEntry[] }>();
-  for (const e of entries) {
-    const d = new Date(e.timestamp);
-    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    if (!map.has(key)) map.set(key, { label: dayLabel(e.timestamp), total: 0, items: [] });
-    const group = map.get(key)!;
-    group.total += e.amount;
-    group.items.push(e);
-  }
-  return Array.from(map.values());
-}
 
 function XpHistorySection({ xp }: { xp: number }) {
   const [open, setOpen] = useState(false);

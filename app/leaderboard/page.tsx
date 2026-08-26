@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { localDateStr, displayXP, getSettings, saveSettings } from '@/lib/storage';
 import { pushStats, pushSettings } from '@/lib/sync';
+import { avatarColor } from '@/lib/class-gradient';
 
 interface LeaderboardEntry {
   user_id: string;
@@ -31,12 +32,6 @@ interface LeaderboardProfileHistory {
 
 function todayStr() {
   return localDateStr();
-}
-
-const AVATAR_PALETTE = ['#6366f1','#8b5cf6','#06b6d4','#10b981','#f59e0b','#ef4444','#ec4899','#3b82f6'];
-function avatarColor(userId: string): string {
-  const hash = userId.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
-  return AVATAR_PALETTE[hash % AVATAR_PALETTE.length];
 }
 
 function Avatar({ name, url, size = 40, userId }: { name: string; url: string | null; size?: number; userId: string }) {

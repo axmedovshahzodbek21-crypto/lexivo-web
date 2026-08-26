@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/auth-context';
 import { classifyReview, REVIEW_LABEL_META } from '@/lib/reviewPattern';
 import { localDateStr, addDaysToDateStr, displayXP } from '@/lib/storage';
 import { REASON_ICON } from '@/lib/xp-reason-icons';
+import { getAudioCtx, playTone } from '@/lib/web-audio';
 import XpCalendar from './XpCalendar';
 
 interface XpEntry { id: string; amount: number; reason: string; created_at: string; }
@@ -24,12 +25,15 @@ function exactTime(iso: string) {
 
 // Whoosh, overshoot-thud, then a two-note landing chime — timed to the
 // 1.1s slideInRight keyframe (whoosh through the fly-in, thud at the 60%
-// overshoot peak, chime as it settles). No audio file, same Web Audio
-// approach as lib/shuffle.ts's reveal sounds.
+// overshoot peak, chime as it settles). No audio file — shares
+// lib/web-audio.ts's context/note helpers with the app's other Web Audio
+// effects (shuffle tick/reveal, Pomodoro beep); the whoosh/thud below stay
+// bespoke since both ramp frequency over time, unlike every other note in
+// the app which plays at a constant pitch.
 function playPanelOpenSound() {
+  const ctx = getAudioCtx();
+  if (!ctx) return;
   try {
-    const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-    const ctx = new Ctx();
     const t0 = ctx.currentTime;
 
     // Whoosh: long rising sweep as the panel flies in.
@@ -64,18 +68,7 @@ function playPanelOpenSound() {
 
     // Landing chime: two bright notes as it settles into place (~80%–100%).
     [880, 1174.66].forEach((freq, i) => {
-      const start = t0 + 0.78 + i * 0.1;
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, start);
-      gain.gain.setValueAtTime(0.0001, start);
-      gain.gain.linearRampToValueAtTime(0.11, start + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.26);
-      osc.start(start);
-      osc.stop(start + 0.28);
+      playTone(ctx, { type: 'sine', freq, start: t0 + 0.78 + i * 0.1, duration: 0.26, peakGain: 0.11, attack: 0.02 });
     });
   } catch {}
 }

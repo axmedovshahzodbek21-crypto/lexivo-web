@@ -4,7 +4,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { displayXP } from '@/lib/storage';
-import { classGradientColors } from '@/lib/class-gradient';
+import { classGradientColors, classAccentColor as avatarColor } from '@/lib/class-gradient';
 
 interface LeaderboardRow {
   student_id: string;
@@ -13,15 +13,6 @@ interface LeaderboardRow {
   xp: number;
   streak: number;
   total_words: number;
-}
-
-const AVATAR_COLORS = [
-  '#6366f1', '#ec4899', '#22c55e', '#3b82f6',
-  '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4',
-];
-function avatarColor(id: string) {
-  const n = id.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
-  return AVATAR_COLORS[n % AVATAR_COLORS.length];
 }
 
 function Avatar({ row }: { row: LeaderboardRow }) {

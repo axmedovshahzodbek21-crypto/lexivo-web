@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { ALL_ACHIEVEMENTS, CATEGORY_META, CATEGORY_ORDER, getAchievementProgress } from '@/lib/gamification';
+import { ALL_ACHIEVEMENTS, CATEGORY_META, CATEGORY_ORDER, getAchievementProgress, groupAchievementsByCategory, computeAchievementXp } from '@/lib/gamification';
 import { getUnlockedAchievements, getLearnedWords, getStreak, getXP, getGraduatedCount, getTotalStudyDays, getFlashcardTotalDays, getFlashcardStreak, getQuizTotalDays, getQuizStreak, getAchievementDate } from '@/lib/storage';
 import type { Achievement } from '@/lib/types';
 
@@ -63,11 +63,8 @@ export default function AchievementsPage() {
 
   const total    = ALL_ACHIEVEMENTS.length;
   const unlocked = unlockedIds.length;
-  const totalXpAvailable = ALL_ACHIEVEMENTS.reduce((s, a) => s + a.xp, 0);
-  const xpEarned = ALL_ACHIEVEMENTS.filter(a => unlockedIds.includes(a.id)).reduce((s, a) => s + a.xp, 0);
-
-  const byCategory: Record<string, Achievement[]> = {};
-  for (const a of ALL_ACHIEVEMENTS) (byCategory[a.category] ??= []).push(a);
+  const { earned: xpEarned, total: totalXpAvailable } = computeAchievementXp(unlockedIds);
+  const byCategory = groupAchievementsByCategory();
 
   function openDetail(a: Achievement) {
     setSelected({ ...a, unlocked: unlockedIds.includes(a.id), unlockedAt: getAchievementDate(a.id) });

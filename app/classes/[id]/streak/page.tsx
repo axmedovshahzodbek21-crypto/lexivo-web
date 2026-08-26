@@ -4,15 +4,7 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { localDateStr } from '@/lib/storage';
-
-const CLASS_ACCENT_COLORS = [
-  '#6366f1', '#ec4899', '#22c55e', '#3b82f6',
-  '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4',
-];
-function classAccentColor(id: string) {
-  const n = id.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
-  return CLASS_ACCENT_COLORS[n % CLASS_ACCENT_COLORS.length];
-}
+import { classAccentColor } from '@/lib/class-gradient';
 
 function calcCurrentStreak(days: string[]): number {
   if (!days.length) return 0;

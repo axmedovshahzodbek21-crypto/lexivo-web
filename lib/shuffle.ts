@@ -14,38 +14,14 @@ export function pickRandom<T>(arr: T[], excludeIndex?: number): { item: T; index
 
 // ── Sound (Web Audio, no files) ───────────────────────────────────────────────
 
-let audioCtx: AudioContext | null = null;
-
-function getAudioCtx(): AudioContext | null {
-  if (typeof window === 'undefined') return null;
-  try {
-    if (!audioCtx) {
-      const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      audioCtx = new Ctx();
-    }
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-    return audioCtx;
-  } catch {
-    return null;
-  }
-}
+import { getAudioCtx, playTone } from './web-audio';
 
 // Soft slot-machine "tick" — pass a rising pitch multiplier as the spin decelerates.
 export function playShuffleTick(pitch = 1) {
   const ctx = getAudioCtx();
   if (!ctx) return;
   try {
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.type = 'square';
-    osc.frequency.setValueAtTime(420 * pitch, ctx.currentTime);
-    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-    gain.gain.linearRampToValueAtTime(0.09, ctx.currentTime + 0.004);
-    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.06);
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 0.07);
+    playTone(ctx, { type: 'square', freq: 420 * pitch, start: ctx.currentTime, duration: 0.06, peakGain: 0.09, attack: 0.004 });
   } catch {}
 }
 
@@ -56,18 +32,7 @@ export function playShuffleReveal() {
   try {
     const freqs = [523.25, 659.25, 783.99]; // C5, E5, G5
     freqs.forEach((freq, i) => {
-      const start = ctx.currentTime + i * 0.09;
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, start);
-      gain.gain.setValueAtTime(0.0001, start);
-      gain.gain.linearRampToValueAtTime(0.2, start + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.4);
-      osc.start(start);
-      osc.stop(start + 0.42);
+      playTone(ctx, { type: 'sine', freq, start: ctx.currentTime + i * 0.09, duration: 0.4, peakGain: 0.2, attack: 0.02 });
     });
   } catch {}
 }

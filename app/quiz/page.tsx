@@ -32,6 +32,16 @@ interface QuizQuestion {
   options: string[];
 }
 
+// Picks up to 3 distinct wrong answers from `pool` (deduped, excluding the
+// correct answer) and returns the shuffled 4-option set. Was copy-pasted
+// identically 4 times across this file's four separate question-builders
+// (the module-level buildQuiz, plus the class/class-homework/my-words
+// inline builders below) — extracted once here.
+function buildDistractorOptions(correct: string, pool: string[]): string[] {
+  const wrongs = shuffleArray([...new Set(pool)].filter(w => w !== correct)).slice(0, 3);
+  return shuffleArray([correct, ...wrongs]);
+}
+
 function buildQuiz(
   collections: WordCollection[],
   collectionName?: string,
@@ -83,9 +93,7 @@ function buildQuiz(
     const pool = allWords
       .filter(w => w.word !== word.word)
       .map(w => type === 'word_to_translation' ? w.translation : w.word);
-    const wrongs = shuffleArray([...new Set(pool)].filter(w => w !== correct)).slice(0, 3);
-
-    const options = shuffleArray([correct, ...wrongs]);
+    const options = buildDistractorOptions(correct, pool);
     return { word, type, prompt, correct, options };
   });
 }
@@ -175,8 +183,7 @@ function QuizInner() {
         else if (type === 'translation_to_word') { prompt = word.translation; correct = word.word; }
         else { prompt = word.definition || word.word; correct = word.word; }
         const pool = allWords.filter(w => w.word !== word.word).map(w => type === 'word_to_translation' ? w.translation : w.word);
-        const wrongs = shuffleArray([...new Set(pool)].filter(w => w !== correct)).slice(0, 3);
-        return { word, type, prompt, correct, options: shuffleArray([correct, ...wrongs]) };
+        return { word, type, prompt, correct, options: buildDistractorOptions(correct, pool) };
       });
       setQuestions(qs);
     })();
@@ -205,8 +212,7 @@ function QuizInner() {
         else if (type === 'translation_to_word') { prompt = word.translation; correct = word.word; }
         else { prompt = word.definition || word.word; correct = word.word; }
         const pool = allWords.filter(w => w.word !== word.word).map(w => type === 'word_to_translation' ? w.translation : w.word);
-        const wrongs = shuffleArray([...new Set(pool)].filter(w => w !== correct)).slice(0, 3);
-        const options = shuffleArray([correct, ...wrongs]);
+        const options = buildDistractorOptions(correct, pool);
         return { word, type, prompt, correct, options };
       });
       setQuestions(qs);
@@ -235,8 +241,7 @@ function QuizInner() {
         else if (type === 'translation_to_word') { prompt = word.translation; correct = word.word; }
         else { prompt = word.definition || word.word; correct = word.word; }
         const pool = allWords.filter(w => w.word !== word.word).map(w => type === 'word_to_translation' ? w.translation : w.word);
-        const wrongs = shuffleArray([...new Set(pool)].filter(w => w !== correct)).slice(0, 3);
-        const options = shuffleArray([correct, ...wrongs]);
+        const options = buildDistractorOptions(correct, pool);
         return { word, type, prompt, correct, options };
       });
       setQuestions(qs);

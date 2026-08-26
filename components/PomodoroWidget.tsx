@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { pushLists } from '@/lib/sync';
+import { getAudioCtx, playTone } from '@/lib/web-audio';
 
 type PomPhase = 'idle' | 'work' | 'break';
 
@@ -16,23 +17,13 @@ function fmt(secs: number) {
 // ── Sound ────────────────────────────────────────────────────────────────────
 
 function playBeep(toBreak: boolean) {
+  const ctx = getAudioCtx();
+  if (!ctx) return;
   try {
-    const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-    const ctx = new Ctx();
     // toBreak = descending (relax), toWork = ascending (energise)
     const freqs = toBreak ? [880, 660, 440] : [440, 660, 880];
     freqs.forEach((freq, i) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.18);
-      gain.gain.setValueAtTime(0, ctx.currentTime + i * 0.18);
-      gain.gain.linearRampToValueAtTime(0.22, ctx.currentTime + i * 0.18 + 0.03);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.18 + 0.38);
-      osc.start(ctx.currentTime + i * 0.18);
-      osc.stop(ctx.currentTime + i * 0.18 + 0.4);
+      playTone(ctx, { type: 'sine', freq, start: ctx.currentTime + i * 0.18, duration: 0.38, peakGain: 0.22, attack: 0.03 });
     });
   } catch {}
 }

@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import BackButton from '@/components/BackButton';
 import { localDateStr, addDaysToDateStr, displayXP } from '@/lib/storage';
+import { classGradientColors } from '@/lib/class-gradient';
 interface ClassRow {
   id: string;
   name: string;
@@ -40,12 +41,6 @@ function dueDateLabel(due: string | null): { text: string; overdue: boolean } | 
   return { text: `Due ${new Date(due + 'T00:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`, overdue: false };
 }
 
-const GLOW_COLORS = ['#818cf8','#ec4899','#22c55e','#3b82f6','#f59e0b','#8b5cf6','#ef4444','#06b6d4'];
-const CLASS_COLORS = ['from-indigo-500 to-purple-500','from-pink-500 to-rose-400','from-emerald-500 to-teal-400','from-blue-500 to-cyan-400','from-amber-500 to-orange-400','from-violet-500 to-purple-400','from-red-500 to-pink-400','from-cyan-500 to-blue-400'];
-function classGradient(id: string) {
-  const n = id.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % CLASS_COLORS.length;
-  return { gradient: CLASS_COLORS[n], glow: GLOW_COLORS[n] };
-}
 
 type Cache = {
   joinedClasses: ClassRow[];
@@ -214,7 +209,7 @@ export default function JoinedClassesPage() {
           const targets = classTargets[cls.id] ?? [];
           const activeTargets = targets.filter(t => !t.completed_at);
           const doneTargets = targets.filter(t => t.completed_at);
-          const { gradient, glow } = classGradient(cls.id);
+          const { gradient, glow } = classGradientColors(cls.id);
 
           return (
             <div key={cls.id} className="rounded-2xl overflow-hidden"

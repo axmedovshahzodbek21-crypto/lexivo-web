@@ -1,5 +1,5 @@
 'use client';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import BackButton from '@/components/BackButton';
 import { addImportedWords, generateImportedWordId } from '@/lib/storage';
@@ -7,11 +7,20 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import type { ImportedWord } from '@/lib/types';
 
-function highlightParagraph(text: string, collected: string[]): React.ReactNode {
-  if (collected.length === 0) return text;
+// Built once per render (via useMemo below on the word list, not the
+// paragraph text) instead of once per paragraph — every paragraph in a
+// passage shares the same collected-word list, so rebuilding this from
+// scratch inside a per-paragraph .map() recompiled an identical regex
+// once per paragraph on every render.
+function buildHighlightRegex(collected: string[]): RegExp | null {
+  if (collected.length === 0) return null;
   const sorted = [...collected].sort((a, b) => b.length - a.length);
   const escaped = sorted.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
-  const regex = new RegExp(`(${escaped.join('|')})`, 'gi');
+  return new RegExp(`(${escaped.join('|')})`, 'gi');
+}
+
+function highlightParagraph(text: string, collected: string[], regex: RegExp | null): React.ReactNode {
+  if (!regex) return text;
   const parts = text.split(regex);
   return parts.map((part, i) => {
     if (collected.some(w => w.toLowerCase() === part.toLowerCase())) {
@@ -230,6 +239,8 @@ export default function ReadingPage() {
     setWordList([...wordList, word]);
   }, [wordList]);
 
+  const highlightRegex = useMemo(() => buildHighlightRegex(wordList), [wordList]);
+
   const addWord = useCallback(() => {
     if (!selectedText) return;
     addToList(selectedText.replace(/\s+/g, ' ').trim());
@@ -435,7 +446,7 @@ export default function ReadingPage() {
             <p key={i}>
               {autoCollect
                 ? <AutoCollectParagraph text={para} collected={wordList} onAdd={addToList} />
-                : highlightParagraph(para, wordList)
+                : highlightParagraph(para, wordList, highlightRegex)
               }
             </p>
           ))}

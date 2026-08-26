@@ -17,3 +17,27 @@ export function classGradientColors(id: string): { gradient: string; glow: strin
   const n = id.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
   return { gradient: CLASS_GRADIENTS[n % 8], glow: CLASS_GLOWS[n % 8] };
 }
+
+// Same id->color hashing pattern, but for a single flat hex color used on
+// avatar circles — was independently copy-pasted (identical palette) into
+// leaderboard/page.tsx and classes/[id]/home/page.tsx.
+const AVATAR_PALETTE = ['#6366f1', '#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#3b82f6'];
+
+export function avatarColor(userId: string): string {
+  const hash = userId.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+  return AVATAR_PALETTE[hash % AVATAR_PALETTE.length];
+}
+
+// A third, differently-sized flat-hex palette — was independently
+// copy-pasted (identical palette, different variable/function names —
+// "classAccentColor" vs "avatarColor") into classes/[id]/streak/page.tsx
+// and classes/[id]/leaderboard/page.tsx.
+const CLASS_ACCENT_COLORS = [
+  '#6366f1', '#ec4899', '#22c55e', '#3b82f6',
+  '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4',
+];
+
+export function classAccentColor(id: string): string {
+  const n = id.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+  return CLASS_ACCENT_COLORS[n % CLASS_ACCENT_COLORS.length];
+}

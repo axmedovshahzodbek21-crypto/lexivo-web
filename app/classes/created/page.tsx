@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import BackButton from '@/components/BackButton';
 import { createClass as createClassRow } from '@/lib/class-create';
+import { classGradientColors } from '@/lib/class-gradient';
 
 interface ClassRow {
   id: string;
@@ -16,17 +17,6 @@ interface ClassRow {
   member_count?: number;
 }
 
-const CLASS_COLORS = [
-  'from-indigo-500 to-purple-500', 'from-pink-500 to-rose-400',
-  'from-emerald-500 to-teal-400', 'from-blue-500 to-cyan-400',
-  'from-amber-500 to-orange-400', 'from-violet-500 to-purple-400',
-  'from-red-500 to-pink-400', 'from-cyan-500 to-blue-400',
-];
-const GLOW_COLORS = ['#818cf8','#ec4899','#22c55e','#3b82f6','#f59e0b','#8b5cf6','#ef4444','#06b6d4'];
-function classGradient(id: string) {
-  const n = id.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % CLASS_COLORS.length;
-  return { gradient: CLASS_COLORS[n], glow: GLOW_COLORS[n] };
-}
 
 const _cache = new Map<string, ClassRow[]>();
 
@@ -163,7 +153,7 @@ export default function CreatedClassesPage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {myClasses.map(cls => {
-              const { gradient, glow } = classGradient(cls.id);
+              const { gradient, glow } = classGradientColors(cls.id);
               return (
                 <div key={cls.id} className={`rounded-2xl overflow-hidden bg-gradient-to-br ${gradient} flex flex-col transition-all hover:-translate-y-1 duration-200`}
                   style={{ boxShadow: `0 6px 0 ${glow}cc, 0 16px 40px ${glow}55`, position: 'relative' }}>
