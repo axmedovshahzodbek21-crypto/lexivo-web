@@ -24,6 +24,10 @@ export default function JoinPage() {
     if (!code) return;
     setNotFound(false);
     setFetchError(false);
+    // Guards against a slow stale request (e.g. from a previous retryKey,
+    // or a fast navigation between two different join links) resolving
+    // after a faster, more recent one and overwriting this page's state.
+    let cancelled = false;
     (async () => {
       try {
         const { data, error } = await supabase
@@ -31,6 +35,7 @@ export default function JoinPage() {
           .select('id, name, teacher_id')
           .eq('join_code', code.toUpperCase())
           .single();
+        if (cancelled) return;
         if (data) { setCls(data); return; }
         // PGRST116 = "no rows" from .single() — a genuinely bad code.
         // Anything else (network failure, outage) is not the same as
@@ -38,9 +43,10 @@ export default function JoinPage() {
         if (error && error.code !== 'PGRST116') { setFetchError(true); return; }
         setNotFound(true);
       } catch {
-        setFetchError(true);
+        if (!cancelled) setFetchError(true);
       }
     })();
+    return () => { cancelled = true; };
   }, [code, retryKey]);
 
   useEffect(() => {

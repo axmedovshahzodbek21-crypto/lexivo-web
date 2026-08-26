@@ -1071,7 +1071,11 @@ export function unlockAchievement(id: string, xpRaw = 0): boolean {
   set(KEYS.achievements, unlocked);
   const dates = get<Record<string, string>>(KEYS.achievementDates, {});
   if (!dates[id]) { dates[id] = new Date().toISOString(); set(KEYS.achievementDates, dates); }
+  // addXP already calls this for a rewarded unlock — but a zero-XP
+  // achievement skipped it entirely, leaving pages listening for this event
+  // (Progress, Achievements) unaware anything had unlocked.
   if (xpRaw > 0) addXP(xpRaw, 'Achievement', id);
+  else notifyStatsChanged();
   return true;
 }
 

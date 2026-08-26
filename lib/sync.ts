@@ -254,7 +254,16 @@ export async function pushLists(): Promise<void> {
         )
       );
     }
-    await Promise.all(promises);
+    // Neither .upsert() call throws on a database error (RLS rejection,
+    // constraint violation) — each just resolves with `error` set, so
+    // Promise.all alone here silently swallowed a failed write. lists_updated_at
+    // would then get stamped as if the push succeeded, and this device's data
+    // (including the study_days/review_days/word_goal_days the leaderboard
+    // profile modal and activity indicators read) could silently diverge from
+    // the cloud from that point on.
+    const results = await Promise.all(promises);
+    const failed = results.find(r => r?.error);
+    if (failed?.error) throw failed.error;
     lsSet(S.listsTs, ts);
   } catch (e) {
     console.error('[sync] pushLists failed:', e);

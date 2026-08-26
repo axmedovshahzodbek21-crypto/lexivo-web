@@ -119,7 +119,7 @@ export default function PomodoroWidget() {
     pomPhase, pomSecondsLeft, pomRunning, pomSessions, pomVisible,
     pomWorkMins, pomBreakMins,
     pausePomodoro: storePause, resumePomodoro, skipPomodoro: storeSkip, tickPomodoro, resetPomodoro: storeReset,
-    startPomodoro, hidePomodoroSetup, setPomSettings,
+    startPomodoro, hidePomodoroSetup, setPomSettings, hydratePomodoro,
   } = useAppStore();
 
   // Flush accumulated focus seconds to Supabase whenever a session pauses,
@@ -186,6 +186,12 @@ export default function PomodoroWidget() {
       setPipBody(win.document.body);
     } catch {}
   }
+
+  // Resume a session that was running when the tab closed/refreshed,
+  // replaying the wall-clock time that passed instead of resetting to
+  // idle. This component is always mounted (rendered from app/layout.tsx)
+  // regardless of pomVisible, so this runs once on every app load.
+  useEffect(() => { hydratePomodoro(); }, [hydratePomodoro]);
 
   // Initialise widget position
   useEffect(() => {

@@ -119,13 +119,28 @@ export default function LeaderboardPage() {
     if (getSettings().showOnLeaderboard === false) return;
     (async () => {
       // No settings_updated_at here — avoids triggering pullAll to overwrite local settings
-      await supabase.from('user_data').upsert({
+      const { error: upsertErr } = await supabase.from('user_data').upsert({
         id: user.id,
         show_on_leaderboard: true,
       });
+      if (upsertErr) {
+        // This upsert is the entire reason the user would newly appear on
+        // the leaderboard here — silently swallowing its error (as before)
+        // meant the re-fetch below ran regardless and just came back
+        // without this user, with nothing telling anyone the write failed.
+        console.error('[leaderboard] show_on_leaderboard upsert failed:', upsertErr);
+        return;
+      }
       // Re-fetch entries so the current user now appears
       const { data } = await supabase.rpc('get_leaderboard').limit(500);
-      if (data) setEntries(data as LeaderboardEntry[]);
+      if (data) {
+        // Previously left _leaderboardCache holding the pre-auth fetch (which
+        // may have missed this user entirely) — load() below always trusts
+        // the cache first, so navigating away and back showed a stale
+        // "not on leaderboard" flash until the background re-fetch caught up.
+        _leaderboardCache = data as LeaderboardEntry[];
+        setEntries(_leaderboardCache);
+      }
     })();
   }, [user?.id]);
 

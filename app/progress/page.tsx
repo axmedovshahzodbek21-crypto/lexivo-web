@@ -101,6 +101,12 @@ function ProgressPage() {
       setXpHistory(getXPHistory());
     };
     load();
+    // Without this, XP/streak/achievement progress earned elsewhere
+    // (another tab, or the globally-mounted PomodoroWidget) while this
+    // page stays open left it showing stale numbers until the next full
+    // navigation here.
+    window.addEventListener('lexivo-stats-change', load);
+    return () => window.removeEventListener('lexivo-stats-change', load);
   }, []);
 
   const t = useTranslation();

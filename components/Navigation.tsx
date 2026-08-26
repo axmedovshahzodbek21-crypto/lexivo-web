@@ -83,6 +83,22 @@ export default function Navigation() {
     return () => window.removeEventListener('lexivo-stats-change', refresh);
   }, [pathname]);
 
+  // lexivo-stats-change is a plain window.dispatchEvent — same-tab only, it
+  // never reaches another open tab on its own. The browser's native
+  // 'storage' event *does* fire in other tabs whenever one of them writes
+  // to localStorage, so bridging it into a re-dispatched lexivo-stats-change
+  // here (once, centrally — this component is always mounted) is what
+  // actually makes every existing/future listener of that event cross-tab
+  // aware, instead of each page needing its own storage-event handling.
+  useEffect(() => {
+    const STATS_KEYS = new Set(['lexivo_xp', 'lexivo_streak', 'lexivo_xp_by_date', 'lexivo_achievements', 'lexivo_achievement_dates', 'lexivo_settings']);
+    const onStorage = (e: StorageEvent) => {
+      if (e.key && STATS_KEYS.has(e.key)) window.dispatchEvent(new Event('lexivo-stats-change'));
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
+
   const levelInfo  = getLevelInfo(xp);
   const initial    = name.charAt(0).toUpperCase();
   const levelColor = LEVEL_COLORS[levelInfo.level] ?? LEVEL_COLORS_FALLBACK;
