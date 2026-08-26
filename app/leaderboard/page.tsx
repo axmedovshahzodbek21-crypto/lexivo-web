@@ -552,6 +552,24 @@ export default function LeaderboardPage() {
               </div>
             )}
 
+            {/* pushStats()/pushSettings() failing inside load() used to be
+                swallowed with zero UI feedback whenever the user already had
+                a leaderboard row (the block above only renders when they're
+                missing entirely) — so a since-broken sync just showed a
+                permanently stale XP/streak next to their own name with
+                nothing indicating why. */}
+            {user && myIndex !== -1 && syncError && (
+              <div className="mt-4 rounded-2xl p-4 border border-dashed border-red-400/40 text-center space-y-2">
+                <p className="text-sm font-semibold text-[var(--text)]">Your latest progress hasn't synced</p>
+                <p className="text-xs text-red-400 break-all">Error: {syncError}</p>
+                <button onClick={manualSync} disabled={syncing}
+                  className="mt-1 px-4 py-2 rounded-xl text-xs font-bold text-white disabled:opacity-50"
+                  style={{ background: 'var(--primary)' }}>
+                  {syncing ? 'Syncing…' : '⟳ Retry sync'}
+                </button>
+              </div>
+            )}
+
             {!user && (
               <div className="mt-4 rounded-2xl p-4 border border-dashed border-[var(--border)] text-center space-y-2">
                 <p className="text-sm font-semibold text-[var(--text)]">Sign in to appear on the leaderboard</p>
