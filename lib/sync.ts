@@ -159,13 +159,35 @@ export async function pushSettings(clearAvatar = false): Promise<void> {
       p_show_on_leaderboard: showOnLeaderboard,
       p_notifications_enabled: notif.enabled,
       p_notif_time: notif.time,
-      p_user_name: s.name,
+      // Trim-and-null-if-empty, matching the direct profiles upsert in
+      // app/settings/page.tsx (which omits the `name` key entirely when
+      // blank so an in-progress clear doesn't wipe the stored name) — this
+      // RPC path previously sent an empty string as-is, which would
+      // overwrite the profile's display name instead of leaving it alone.
+      p_user_name: s.name.trim() || null,
       p_language_level: s.languageLevel,
       p_avatar_url: getProfilePicUrl() || null,
       p_settings_updated_at: ts,
       p_clear_avatar: clearAvatar,
     });
     if (error) throw error;
+    // Separate RPC (see sync_learning_prefs migration) — these fields were
+    // never sent at all before, so a preference changed on one device
+    // (e.g. session size, study order, accent) silently never reached any
+    // other device. Reuses the same `ts` so pullAll's single
+    // settings_updated_at gate still covers this whole field set.
+    const { error: prefsError } = await supabase.rpc('sync_learning_prefs', {
+      p_user_id: uid,
+      p_session_size: s.sessionSize,
+      p_study_order: s.studyOrder,
+      p_default_accent: s.defaultAccent,
+      p_pulse_enabled: s.pulseEnabled ?? true,
+      p_pulse_speed: s.pulseSpeed,
+      p_font_size: s.fontSize,
+      p_auto_play_on_reveal: s.autoPlayOnReveal,
+      p_settings_updated_at: ts,
+    });
+    if (prefsError) throw prefsError;
     lsSet(S.settingsTs, ts);
   } catch (e) {
     console.error('[sync] pushSettings failed:', e);
@@ -337,6 +359,14 @@ export async function pullAll(): Promise<void> {
         ...(row.show_on_leaderboard != null && { showOnLeaderboard: row.show_on_leaderboard }),
         ...(row.user_name != null        && { name: row.user_name }),
         ...(row.language_level != null   && { languageLevel: row.language_level as UserSettings['languageLevel'] }),
+        // See sync_learning_prefs migration — previously never round-tripped.
+        ...(row.session_size != null        && { sessionSize: row.session_size }),
+        ...(row.study_order != null         && { studyOrder: row.study_order as UserSettings['studyOrder'] }),
+        ...(row.default_accent != null      && { defaultAccent: row.default_accent as UserSettings['defaultAccent'] }),
+        ...(row.pulse_enabled != null       && { pulseEnabled: row.pulse_enabled }),
+        ...(row.pulse_speed != null         && { pulseSpeed: row.pulse_speed as UserSettings['pulseSpeed'] }),
+        ...(row.font_size != null           && { fontSize: row.font_size as UserSettings['fontSize'] }),
+        ...(row.auto_play_on_reveal != null && { autoPlayOnReveal: row.auto_play_on_reveal }),
       };
       saveSettings(merged);
       if (row.avatar_url) saveProfilePicUrl(row.avatar_url as string);

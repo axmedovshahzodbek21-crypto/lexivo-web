@@ -291,7 +291,10 @@ export default function PomodoroWidget() {
     if (!drag.current) return;
     if (drag.current.moved && posRef.current) {
       wasDrag.current = true;
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(posRef.current));
+      // Matches the read path's try/catch above — localStorage.setItem can
+      // throw (Safari private browsing, quota exceeded), which would
+      // otherwise propagate out of this pointer-up handler uncaught.
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(posRef.current)); } catch {}
     }
     drag.current = null;
   }

@@ -59,6 +59,15 @@ const DEFINED_CARD_IDS = [
   'starred','match','pomodoro','leaderboard',
   'hard_words','lists','grammar','classes','xp_history','real_english','speaking',
 ];
+// Every card's hide flag lives at this key — deriving it instead of hand-listing
+// a lookup table means a card can never be silently left out of a handler that
+// forgets to add its entry (the exact way #151's "Reset to default"/"Show classes
+// only" ended up missing real_english/speaking after they were added here).
+const hideKey = (id: string) => `home_hide_${id}`;
+// Ensures every id in DEFINED_CARD_IDS appears somewhere in a hand-curated
+// order list, appending any that were forgotten instead of silently dropping
+// them — same rationale as hideKey above.
+const withAllCards = (explicit: string[]) => [...explicit, ...DEFINED_CARD_IDS.filter(id => !explicit.includes(id))];
 const CARD_META: Record<string, { icon: string; label: string }> = {
   collections:{ icon:'🗂️', label:'Collections' }, reading:{ icon:'📰', label:'Reading' },
   day_streak: { icon:'🔥', label:'Day Streak'  }, total_xp:{ icon:'⚡', label:'Total XP'  },
@@ -209,13 +218,7 @@ export default function HomePage() {
     setHideWod(localStorage.getItem('home_hide_wod') === '1');
     setHideLearn(localStorage.getItem('home_hide_learn') === '1');
     setHideSrs(localStorage.getItem('home_hide_srs') === '1');
-    const DEFAULT_ORDER = [
-      'day_streak', 'collections', 'total_xp', 'reading', 'words',
-      'daily_goal', 'level', 'wod',
-      'learn', 'flashcards', 'srs', 'quiz',
-      'starred', 'match', 'pomodoro', 'leaderboard',
-      'hard_words', 'lists', 'grammar', 'classes', 'xp_history', 'real_english', 'speaking',
-    ];
+    const DEFAULT_ORDER = DEFINED_CARD_IDS;
     const ALL_IDS = new Set(DEFAULT_ORDER);
     const savedOrder = localStorage.getItem('home_section_order');
     let order = savedOrder ? savedOrder.split(',') : DEFAULT_ORDER;
@@ -400,23 +403,8 @@ export default function HomePage() {
   const mainCollections = collections.filter(c => !LEVELED_NAMES.has(c.name) && !c.youtubeUrl);
 
   const handleHideSave = () => {
-    const LS: Record<string, string> = {
-      collections: 'home_hide_collections', reading: 'home_hide_reading',
-      day_streak: 'home_hide_day_streak',   total_xp: 'home_hide_total_xp',
-      words: 'home_hide_words',             daily_goal: 'home_hide_daily_goal',
-      level: 'home_hide_level',             wod: 'home_hide_wod',
-      learn: 'home_hide_learn',             srs: 'home_hide_srs',
-      flashcards: 'home_hide_flashcards',   quiz: 'home_hide_quiz',
-      match: 'home_hide_match',             pomodoro: 'home_hide_pomodoro',
-      leaderboard: 'home_hide_leaderboard', starred: 'home_hide_starred',
-      hard_words: 'home_hide_hard_words',   lists: 'home_hide_lists',
-      grammar: 'home_hide_grammar',         classes: 'home_hide_classes',
-      xp_history: 'home_hide_xp_history',
-      real_english: 'home_hide_real_english',
-      speaking: 'home_hide_speaking',
-    };
     hideSelection.forEach(sId => {
-      if (LS[sId]) localStorage.setItem(LS[sId], '1');
+      if (!sId.startsWith('class_')) localStorage.setItem(hideKey(sId), '1');
       if (sId === 'collections')  setHideCollections(true);
       else if (sId === 'reading')      setHideReading(true);
       else if (sId === 'day_streak')   setHideDayStreak(true);
@@ -457,23 +445,8 @@ export default function HomePage() {
   };
 
   const handleUnhideSave = () => {
-    const LS: Record<string, string> = {
-      collections: 'home_hide_collections', reading: 'home_hide_reading',
-      day_streak: 'home_hide_day_streak',   total_xp: 'home_hide_total_xp',
-      words: 'home_hide_words',             daily_goal: 'home_hide_daily_goal',
-      level: 'home_hide_level',             wod: 'home_hide_wod',
-      learn: 'home_hide_learn',             srs: 'home_hide_srs',
-      flashcards: 'home_hide_flashcards',   quiz: 'home_hide_quiz',
-      match: 'home_hide_match',             pomodoro: 'home_hide_pomodoro',
-      leaderboard: 'home_hide_leaderboard', starred: 'home_hide_starred',
-      hard_words: 'home_hide_hard_words',   lists: 'home_hide_lists',
-      grammar: 'home_hide_grammar',         classes: 'home_hide_classes',
-      xp_history: 'home_hide_xp_history',
-      real_english: 'home_hide_real_english',
-      speaking: 'home_hide_speaking',
-    };
     unhideSelection.forEach(sId => {
-      if (LS[sId]) localStorage.removeItem(LS[sId]);
+      if (!sId.startsWith('class_')) localStorage.removeItem(hideKey(sId));
       if (sId === 'collections')  setHideCollections(false);
       else if (sId === 'reading')      setHideReading(false);
       else if (sId === 'day_streak')   setHideDayStreak(false);
@@ -620,20 +593,20 @@ export default function HomePage() {
             style={{ opacity: 0.1 }}>🔔</div>
           {/* eyebrow + skip */}
           <div className="flex items-center justify-between mb-1.5">
-            <span className="text-[10px] font-black tracking-[1.2px] text-white">REVIEW DUE</span>
+            <span className="text-[10px] font-black tracking-[1.2px] text-white">{t.home.reviewDueBadge}</span>
             <button onClick={() => setShowReviewBanner(false)}
               className="text-xs font-semibold transition-opacity hover:opacity-70"
               style={{ color: 'rgba(255,255,255,0.75)' }}>
-              Skip →
+              {t.home.reviewDueSkip}
             </button>
           </div>
           {/* title */}
           <div className="text-[18px] font-black text-white leading-tight">
-            {dueCount} {dueCount === 1 ? 'word' : 'words'} due for review!
+            {t.home.reviewDueTitle(dueCount)}
           </div>
           {/* subtitle */}
           <div className="text-xs mt-1 leading-[1.4]" style={{ color: 'rgba(255,255,255,0.85)' }}>
-            Complete your reviews before learning new words for best results.
+            {t.home.reviewDueSubtitle}
           </div>
           {/* CTA */}
           <Link href="/srs"
@@ -731,15 +704,15 @@ export default function HomePage() {
           quiz:        { href: '/quiz',         icon: '❓', title: t.home.quizTitle,       subtitle: t.home.quizSub,        gradient: 'linear-gradient(135deg, #4d7c0f, #a3e635)', edge: '#365314', glow: 'rgba(77,124,15,0.4)' },
           match:       { href: '/matching',     icon: '🎯', title: t.home.matchTitle,      subtitle: t.home.matchSub,       gradient: 'linear-gradient(135deg, #ec4899, #f472b6)', edge: '#9d174d', glow: 'rgba(236,72,153,0.4)' },
           pomodoro:    { href: '/pomodoro',     icon: '🍅', title: t.home.pomodoroTitle,   subtitle: t.home.pomodoroSub,    gradient: 'linear-gradient(135deg, #7f1d1d, #b91c1c)', edge: '#450a0a', glow: 'rgba(127,29,29,0.4)' },
-          leaderboard: { href: '/leaderboard',  icon: '🏆', title: 'Leaderboard',          subtitle: 'See top learners',    gradient: 'linear-gradient(135deg, #d97706, #fbbf24)', edge: '#92400e', glow: 'rgba(217,119,6,0.4)' },
+          leaderboard: { href: '/leaderboard',  icon: '🏆', title: t.home.leaderboardTitle, subtitle: t.home.leaderboardSub, gradient: 'linear-gradient(135deg, #d97706, #fbbf24)', edge: '#92400e', glow: 'rgba(217,119,6,0.4)' },
           starred:     { href: '/starred',      icon: '⭐', title: t.home.starredTitle,    subtitle: t.home.starredSub,     gradient: 'linear-gradient(135deg, #92400e, #d97706)', edge: '#451a03', glow: 'rgba(146,64,14,0.4)' },
           hard_words:  { href: '/hard-words',   icon: '😓', title: t.home.hardTitle,       subtitle: t.home.hardSub,        gradient: 'linear-gradient(135deg, #dc2626, #ef4444)', edge: '#991b1b', glow: 'rgba(220,38,38,0.4)' },
           lists:       { href: '/lists',        icon: '📋', title: t.home.listsTitle,      subtitle: t.home.listsSub,       gradient: 'linear-gradient(135deg, #7c3aed, #8b5cf6)', edge: '#4c1d95', glow: 'rgba(124,58,237,0.4)' },
           grammar:     { href: '/grammar-tips', icon: '📚', title: t.home.grammarTitle,    subtitle: t.home.grammarSub,     gradient: 'linear-gradient(135deg, #1a9a50, #2ECC71)', edge: '#0f6634', glow: 'rgba(46,204,113,0.4)' },
           classes:     { href: '/classes',      icon: '👩‍🏫', title: t.home.classesTitle,  subtitle: t.home.classesSub,     gradient: 'linear-gradient(135deg, #0284c7, #38bdf8)', edge: '#0369a1', glow: 'rgba(2,132,199,0.4)' },
-          xp_history:  { href: '#xp-history',   icon: '📅', title: 'XP History',           subtitle: 'Your XP calendar',    gradient: 'linear-gradient(135deg, #4c1d95, #6c63ff)', edge: '#2e1065', glow: 'rgba(108,99,255,0.4)' },
-          real_english:{ href: '/real-english', icon: '🗣️', title: 'Real English',          subtitle: 'Build your listening', gradient: 'linear-gradient(135deg, #0e7490, #06b6d4)', edge: '#164e63', glow: 'rgba(14,116,144,0.4)' },
-          speaking:    { href: '/speaking',     icon: '🎤', title: 'Speaking',              subtitle: 'Practice IELTS speaking', gradient: 'linear-gradient(135deg, #be185d, #fb7185)', edge: '#831843', glow: 'rgba(190,24,93,0.4)' },
+          xp_history:  { href: '#xp-history',   icon: '📅', title: t.home.xpHistoryTitle,  subtitle: t.home.xpHistorySub,   gradient: 'linear-gradient(135deg, #4c1d95, #6c63ff)', edge: '#2e1065', glow: 'rgba(108,99,255,0.4)' },
+          real_english:{ href: '/real-english', icon: '🗣️', title: t.home.realEnglishTitle, subtitle: t.home.realEnglishSub, gradient: 'linear-gradient(135deg, #0e7490, #06b6d4)', edge: '#164e63', glow: 'rgba(14,116,144,0.4)' },
+          speaking:    { href: '/speaking',     icon: '🎤', title: t.home.speakingTitle,   subtitle: t.home.speakingSub,    gradient: 'linear-gradient(135deg, #be185d, #fb7185)', edge: '#831843', glow: 'rgba(190,24,93,0.4)' },
         };
 
         const renderCard = (sId: string, isLarge: boolean) => {
@@ -751,7 +724,7 @@ export default function HomePage() {
           );
           if (sId === 'reading') return (
             <Link href="/reading" className="block h-full">
-              <StatCard icon="📰" value="→" label="Reading"
+              <StatCard icon="📰" value="→" label={t.home.readingTitle}
                 gradient="linear-gradient(135deg, #047857, #34d399)" edge="#064e3b" glowColor="rgba(4,120,87,0.4)" pulseClass={pulseClass} />
             </Link>
           );
@@ -1236,12 +1209,11 @@ export default function HomePage() {
               {/* Classes-only shortcut */}
               <button
                 onClick={() => {
-                  const nonClassIds = [
-                    'collections','reading','day_streak','total_xp','words',
-                    'daily_goal','level','wod','learn','flashcards','srs','quiz',
-                    'starred','match','pomodoro','leaderboard','hard_words','lists',
-                    'grammar','classes','xp_history',
-                  ];
+                  // Derived from DEFINED_CARD_IDS (minus 'classes') instead of a
+                  // hand-typed list — a hand-typed copy is exactly how this button
+                  // silently kept showing Real English/Speaking after they were
+                  // added as card types (#151/#153).
+                  const nonClassIds = DEFINED_CARD_IDS.filter(cid => cid !== 'classes');
                   setHideCollections(true);  localStorage.setItem('home_hide_collections','1');
                   setHideReading(true);      localStorage.setItem('home_hide_reading','1');
                   setHideDayStreak(true);    localStorage.setItem('home_hide_day_streak','1');
@@ -1263,6 +1235,8 @@ export default function HomePage() {
                   setHideGrammar(true);      localStorage.setItem('home_hide_grammar','1');
                   setHideClasses(false);     localStorage.removeItem('home_hide_classes');
                   setHideXpHistory(true);    localStorage.setItem('home_hide_xp_history','1');
+                  setHideRealEnglish(true);  localStorage.setItem('home_hide_real_english','1');
+                  setHideSpeaking(true);     localStorage.setItem('home_hide_speaking','1');
                   setSlotMap(prev => {
                     const m = prev.map(id => (id && nonClassIds.includes(id)) ? null : id);
                     localStorage.setItem('home_slot_map', JSON.stringify(m));
@@ -1280,13 +1254,17 @@ export default function HomePage() {
             <div className="px-6 py-4 border-t border-[var(--border)] flex justify-end">
               <button
                 onClick={() => {
-                  const def = [
+                  // withAllCards appends any DEFINED_CARD_IDS entry missing from
+                  // this hand-curated order (real_english/speaking previously
+                  // fell through here after being added as card types — #151/#153)
+                  // instead of silently dropping it.
+                  const def = withAllCards([
                     'collections', 'reading', 'day_streak', 'total_xp', 'words',
                     'daily_goal', 'level', 'wod',
                     'learn', 'flashcards', 'srs', 'quiz',
                     'starred', 'match', 'pomodoro', 'leaderboard',
                     'hard_words', 'lists', 'grammar', 'classes', 'xp_history',
-                  ];
+                  ]);
                   setSectionOrder(def); localStorage.setItem('home_section_order', def.join(','));
                   setHideCollections(false);  localStorage.removeItem('home_hide_collections');
                   setHideReading(false);      localStorage.removeItem('home_hide_reading');
@@ -1309,6 +1287,8 @@ export default function HomePage() {
                   setHideGrammar(false);      localStorage.removeItem('home_hide_grammar');
                   setHideClasses(false);      localStorage.removeItem('home_hide_classes');
                   setHideXpHistory(false);    localStorage.removeItem('home_hide_xp_history');
+                  setHideRealEnglish(false);  localStorage.removeItem('home_hide_real_english');
+                  setHideSpeaking(false);     localStorage.removeItem('home_hide_speaking');
                   const defMap: (string|null)[] = Array(200).fill(null);
                   DEFINED_CARD_IDS.forEach((id, i) => { defMap[i] = id; });
                   setSlotMap(defMap); localStorage.setItem('home_slot_map', JSON.stringify(defMap));

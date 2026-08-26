@@ -43,17 +43,24 @@ export default function ClassShellNav({ classId }: { classId: string }) {
 
   useEffect(() => {
     if (!user) return;
+    // Guards against a slow stale request (from a previously-viewed class)
+    // resolving after a faster, more recent one — without this, switching
+    // classes quickly could leave isTeacher/className showing the wrong
+    // class's info, including whether the teacher-only nav items appear.
+    let cancelled = false;
     supabase
       .from('classes')
       .select('teacher_id, name')
       .eq('id', classId)
       .maybeSingle()
       .then(({ data }) => {
+        if (cancelled) return;
         if (data) {
           setIsTeacher(data.teacher_id === user.id);
           setClassName((data as any).name ?? '');
         }
       });
+    return () => { cancelled = true; };
   }, [classId, user]);
 
   // Refresh the due-review count whenever the student navigates within the class

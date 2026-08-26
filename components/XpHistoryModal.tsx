@@ -1,9 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { displayXP, fetchXPHistory, getXPByDate, type XpEntry } from '@/lib/storage';
+import { REASON_ICON as REASON_ICONS } from '@/lib/xp-reason-icons';
 import XpCalendar from './XpCalendar';
-
-const REASON_ICONS: Record<string, string> = { Learn:'📖', Flashcard:'🃏', Quiz:'🧠', Match:'🎯', 'SRS Review':'🔄', 'Streak Bonus':'🔥', 'Level Complete':'🏆', Achievement:'⭐' };
 
 interface Props {
   xp: number;

@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { displayXP, type XpEntry } from '@/lib/storage';
 
 const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -25,9 +25,21 @@ interface Props {
   // stay selected if it's no longer visible in the grid); XpModal doesn't,
   // matching each one's original behavior before this was extracted.
   resetSelectionOnMonthChange?: boolean;
+  // Per-class accent color (ClassXpHistoryModal) instead of the fixed
+  // --primary token the personal XP modals use.
+  accentColor?: string;
+  // Optional small overlay rendered in the top-right corner of a day cell
+  // (e.g. ClassXpHistoryModal's "did SRS Review" marker) — kept as a render
+  // prop rather than baked in here since it's specific to one caller.
+  dayBadge?: (dateStr: string, hasXp: boolean) => ReactNode;
+  // Optional extra legend entries appended after "XP earned".
+  legendExtra?: ReactNode;
 }
 
-export default function XpCalendar({ history, xpByDate, onSelectDay, resetSelectionOnMonthChange = false }: Props) {
+export default function XpCalendar({
+  history, xpByDate, onSelectDay, resetSelectionOnMonthChange = false,
+  accentColor = 'var(--primary)', dayBadge, legendExtra,
+}: Props) {
   const [calMonth, setCalMonth] = useState(() => { const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), 1); });
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
 
@@ -64,13 +76,13 @@ export default function XpCalendar({ history, xpByDate, onSelectDay, resetSelect
       <div className="flex items-center justify-between px-3 pt-3 pb-1">
         <button onClick={() => changeMonth(-1)}
           className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--border)] transition-colors text-lg"
-          style={{ color: 'var(--primary)' }}>‹</button>
+          style={{ color: accentColor }}>‹</button>
         <span className="text-sm font-bold" style={{ color: 'var(--text)' }}>
           {MONTH_NAMES[calMonth.getMonth()]} {calMonth.getFullYear()}
         </span>
         <button onClick={() => !isCurrentMonth && changeMonth(1)}
           className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--border)] transition-colors text-lg"
-          style={{ color: isCurrentMonth ? 'var(--border)' : 'var(--primary)', cursor: isCurrentMonth ? 'default' : 'pointer' }}>›</button>
+          style={{ color: isCurrentMonth ? 'var(--border)' : accentColor, cursor: isCurrentMonth ? 'default' : 'pointer' }}>›</button>
       </div>
       {/* Day labels */}
       <div className="grid grid-cols-7 px-2 pb-1">
@@ -91,23 +103,27 @@ export default function XpCalendar({ history, xpByDate, onSelectDay, resetSelect
           const isSelected = selectedDay === dateStr;
           return (
             <button key={day} onClick={() => hasXp && selectDay(isSelected ? null : dateStr)}
-              className="flex flex-col items-center justify-center rounded-full aspect-square transition-all"
+              className="relative flex flex-col items-center justify-center rounded-full aspect-square transition-all"
               style={{
-                background: isSelected ? 'var(--primary)' : hasXp ? 'color-mix(in srgb, var(--primary) 85%, transparent)' : 'transparent',
-                outline: isToday ? '2px solid var(--primary)' : 'none',
+                background: isSelected ? accentColor : hasXp ? `color-mix(in srgb, ${accentColor} 85%, transparent)` : 'transparent',
+                outline: isToday ? `2px solid ${accentColor}` : 'none',
                 outlineOffset: 1,
                 cursor: hasXp ? 'pointer' : 'default',
               }}>
               <span className="text-[11px] font-bold leading-none" style={{ color: hasXp ? 'white' : 'var(--text)' }}>{day}</span>
               {hasXp && <span className="text-[7px] leading-none mt-0.5" style={{ color: 'rgba(255,255,255,0.8)' }}>+{displayXP(dayXp)}</span>}
+              {dayBadge?.(dateStr, hasXp)}
             </button>
           );
         })}
       </div>
       {/* Legend */}
-      <div className="flex items-center justify-center gap-2 pb-3 text-[10px]" style={{ color: 'var(--text-muted)' }}>
-        <span className="w-3 h-3 rounded-full inline-block" style={{ background: 'color-mix(in srgb, var(--primary) 85%, transparent)' }} />
-        XP earned
+      <div className="flex items-center justify-center gap-4 pb-3 text-[10px] flex-wrap" style={{ color: 'var(--text-muted)' }}>
+        <span className="flex items-center gap-1.5">
+          <span className="w-3 h-3 rounded-full inline-block" style={{ background: `color-mix(in srgb, ${accentColor} 85%, transparent)` }} />
+          XP earned
+        </span>
+        {legendExtra}
       </div>
     </div>
   );

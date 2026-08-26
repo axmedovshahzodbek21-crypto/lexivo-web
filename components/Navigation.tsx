@@ -63,7 +63,10 @@ export default function Navigation() {
   const toggleSidebar = () => {
     const next = !sidebarOpen;
     setSidebarOpen(next);
-    localStorage.setItem('lexivo_sidebar_open', String(next));
+    // localStorage.setItem can throw (Safari private browsing, quota
+    // exceeded) unlike getItem above, which effectively never does —
+    // sidebarOpen state should still update even if persisting it fails.
+    try { localStorage.setItem('lexivo_sidebar_open', String(next)); } catch {}
   };
 
   useEffect(() => {

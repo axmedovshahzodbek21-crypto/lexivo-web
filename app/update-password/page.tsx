@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 
@@ -11,15 +11,41 @@ export default function UpdatePasswordPage() {
   const [loading, setLoading]     = useState(false);
   const [done, setDone]           = useState(false);
   const [ready, setReady]         = useState(false);
+  const readyRef = useRef(false);
 
   useEffect(() => {
+    // A legitimate recovery-link visitor's session isn't established by the
+    // time this mounts — Supabase exchanges the URL's recovery token
+    // asynchronously and fires a PASSWORD_RECOVERY auth event once it's
+    // done. A one-shot getSession() call raced that exchange: if it
+    // resolved first (session still null), this redirected a real
+    // recovery-link visitor straight to /login. onAuthStateChange below
+    // catches the session once the exchange completes instead of only
+    // checking once up front.
+    let redirected = false;
+    const markReady = () => { readyRef.current = true; setReady(true); };
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) {
-        setReady(true);
-      } else {
+      if (data.session) markReady();
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session) { markReady(); return; }
+      if (event === 'SIGNED_OUT' && !redirected) {
+        redirected = true;
         router.replace('/login');
       }
     });
+    // Fallback: if neither the initial check nor any auth event produced a
+    // session after a few seconds, this wasn't a valid recovery visit.
+    const timeout = setTimeout(() => {
+      if (!redirected && !readyRef.current) {
+        redirected = true;
+        router.replace('/login');
+      }
+    }, 5000);
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(timeout);
+    };
   }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {

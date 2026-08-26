@@ -4,18 +4,8 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { classifyReview, REVIEW_LABEL_META } from '@/lib/reviewPattern';
 import { localDateStr, addDaysToDateStr, displayXP } from '@/lib/storage';
-
-const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-const DAY_LABELS = ['M','T','W','T','F','S','S'];
-const REASON_ICON: Record<string, string> = {
-  Learn: '📖', learn: '📖',
-  Cards: '🃏', flashcard: '🃏',
-  Quiz: '🧠', quiz: '🧠',
-  Match: '🎯', match: '🎯',
-  Reading: '📚', read: '📚',
-  'SRS Review': '🔄',
-  Homework: '📋',
-};
+import { REASON_ICON } from '@/lib/xp-reason-icons';
+import XpCalendar from './XpCalendar';
 
 interface XpEntry { id: string; amount: number; reason: string; created_at: string; }
 
@@ -96,7 +86,6 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
   const [overdueCount, setOverdueCount] = useState(0);
   const [dueCount, setDueCount] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [calMonth, setCalMonth] = useState(() => { const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), 1); });
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [showReviewDetail, setShowReviewDetail] = useState(false);
 
@@ -137,12 +126,11 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
     const key = localDateStr(new Date(e.created_at));
     (byDate[key] ??= []).push(e);
   }
-  const now = new Date();
-  const todayStr = localDateStr(now);
-  const isCurrentMonth = calMonth.getFullYear() === now.getFullYear() && calMonth.getMonth() === now.getMonth();
-  const daysInMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() + 1, 0).getDate();
-  const firstWeekday = (new Date(calMonth.getFullYear(), calMonth.getMonth(), 1).getDay() + 6) % 7;
-  const mm = String(calMonth.getMonth() + 1).padStart(2, '0');
+  const todayStr = localDateStr(new Date());
+  // XpCalendar's XpEntry uses `timestamp: number`, not this component's own
+  // richer shape (id/created_at/reason) needed for the day-detail panel
+  // below — mapped once here so the shared grid can sum/group by date.
+  const calendarEntries = history.map(e => ({ amount: e.amount, reason: e.reason, timestamp: new Date(e.created_at).getTime() }));
 
   const dayEntries = selectedDay
     ? (byDate[selectedDay] ?? []).slice().sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
@@ -219,74 +207,29 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
                 <p className="text-sm">No XP earned in this class yet</p>
               </div>
             ) : (
-              <div className="rounded-2xl overflow-hidden" style={{ background: 'var(--surface-2)' }}>
-                {/* Month nav */}
-                <div className="flex items-center justify-between px-3 pt-3 pb-1">
-                  <button
-                    onClick={() => { setSelectedDay(null); setCalMonth(m => new Date(m.getFullYear(), m.getMonth() - 1, 1)); }}
-                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--border)] transition-colors text-lg"
-                    style={{ color: accentColor }}>‹</button>
-                  <span className="text-sm font-bold" style={{ color: 'var(--text)' }}>
-                    {MONTH_NAMES[calMonth.getMonth()]} {calMonth.getFullYear()}
-                  </span>
-                  <button
-                    onClick={() => { if (!isCurrentMonth) { setSelectedDay(null); setCalMonth(m => new Date(m.getFullYear(), m.getMonth() + 1, 1)); } }}
-                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--border)] transition-colors text-lg"
-                    style={{ color: isCurrentMonth ? 'var(--border)' : accentColor, cursor: isCurrentMonth ? 'default' : 'pointer' }}>›</button>
-                </div>
-                {/* Day labels */}
-                <div className="grid grid-cols-7 px-2 pb-1">
-                  {DAY_LABELS.map((d, i) => (
-                    <div key={i} className="text-center text-[10px] font-bold py-1" style={{ color: 'var(--text-muted)' }}>{d}</div>
-                  ))}
-                </div>
-                {/* Day grid */}
-                <div className="grid grid-cols-7 gap-1 px-2 pb-3">
-                  {Array.from({ length: firstWeekday }).map((_, i) => <div key={`e${i}`} />)}
-                  {Array.from({ length: daysInMonth }).map((_, i) => {
-                    const day = i + 1;
-                    const dateStr = `${calMonth.getFullYear()}-${mm}-${String(day).padStart(2, '0')}`;
-                    const isToday = dateStr === todayStr;
-                    const entries = byDate[dateStr];
-                    const hasXp = !!entries;
-                    const dayXp = hasXp ? entries.reduce((s, e) => s + e.amount, 0) : 0;
-                    const hasReview = hasXp && entries.some(e => e.reason === 'SRS Review');
-                    const isSelected = selectedDay === dateStr;
-                    return (
-                      <button key={day}
-                        onClick={() => { if (!hasXp) return; setSelectedDay(isSelected ? null : dateStr); }}
-                        title={hasReview ? 'Did SRS Review this day' : undefined}
-                        className="relative flex flex-col items-center justify-center rounded-full aspect-square transition-all"
-                        style={{
-                          background: isSelected ? accentColor : hasXp ? `color-mix(in srgb, ${accentColor} 85%, transparent)` : 'transparent',
-                          outline: isToday ? `2px solid ${accentColor}` : 'none',
-                          outlineOffset: 1,
-                          cursor: hasXp ? 'pointer' : 'default',
-                        }}>
-                        <span className="text-[11px] font-bold leading-none" style={{ color: hasXp ? 'white' : 'var(--text)' }}>{day}</span>
-                        {hasXp && <span className="text-[7px] leading-none mt-0.5" style={{ color: 'rgba(255,255,255,0.8)' }}>+{displayXP(dayXp)}</span>}
-                        {hasReview && (
-                          <span
-                            className="absolute top-0 right-0 w-3 h-3 rounded-full flex items-center justify-center"
-                            style={{ background: '#06b6d4', boxShadow: '0 0 0 1.5px var(--surface-2)', fontSize: 6 }}
-                          >🔄</span>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-                {/* Legend */}
-                <div className="flex items-center justify-center gap-4 pb-3 text-[10px] flex-wrap" style={{ color: 'var(--text-muted)' }}>
-                  <span className="flex items-center gap-1.5">
-                    <span className="w-3 h-3 rounded-full inline-block" style={{ background: `color-mix(in srgb, ${accentColor} 85%, transparent)` }} />
-                    XP earned
-                  </span>
+              <XpCalendar
+                history={calendarEntries}
+                onSelectDay={day => setSelectedDay(day)}
+                resetSelectionOnMonthChange
+                accentColor={accentColor}
+                dayBadge={(dateStr, hasXp) => {
+                  const hasReview = hasXp && (byDate[dateStr] ?? []).some(e => e.reason === 'SRS Review');
+                  if (!hasReview) return null;
+                  return (
+                    <span
+                      title="Did SRS Review this day"
+                      className="absolute top-0 right-0 w-3 h-3 rounded-full flex items-center justify-center"
+                      style={{ background: '#06b6d4', boxShadow: '0 0 0 1.5px var(--surface-2)', fontSize: 6 }}
+                    >🔄</span>
+                  );
+                }}
+                legendExtra={
                   <span className="flex items-center gap-1.5">
                     <span style={{ fontSize: 11 }}>🔄</span>
                     Did Review
                   </span>
-                </div>
-              </div>
+                }
+              />
             )}
 
             <button
