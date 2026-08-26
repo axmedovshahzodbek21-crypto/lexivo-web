@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
 
     if (text === '/start') {
       await sendMessage(fromId,
-        `👋 Welcome to Lexivo Support!\n\nHave a question or feedback? Just send it here and our team will get back to you as soon as possible.\n\n📚 Learn vocabulary at lexivo-web-six.vercel.app`
+        `👋 Welcome to Lexivo Support!\n\nHave a question or feedback? Just send it here and our team will get back to you as soon as possible.\n\n📚 Learn vocabulary at lexivo-web-nu.vercel.app`
       );
       return NextResponse.json({ ok: true });
     }
