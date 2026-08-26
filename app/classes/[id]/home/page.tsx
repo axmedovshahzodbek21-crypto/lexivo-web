@@ -246,15 +246,20 @@ const [memberCount, setMemberCount] = useState(0);
             .sort();
           if (!days.length) return;
           const set = new Set(days);
-          const now = new Date(Date.now() - 2 * 3_600_000);
-          const fmt = (d: Date) =>
-            `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-          const today = fmt(now);
-          const yesterday = fmt(new Date(now.getTime() - 86_400_000));
+          // Plain local midnight, matching localDateStr() everywhere else
+          // this app computes a day boundary (personal streaks, study
+          // days, classes/[id]/streak/page.tsx's class streak) — this used
+          // to apply a bespoke -2hr offset found nowhere else in the
+          // codebase, which let this dashboard's streak silently disagree
+          // with the streak shown on the class streak calendar page for
+          // the same student/class.
+          const now = new Date();
+          const today = localDateStr(now);
+          const yesterday = localDateStr(new Date(now.getTime() - 86_400_000));
           if (!set.has(today) && !set.has(yesterday)) return;
           let cursor = set.has(today) ? now : new Date(now.getTime() - 86_400_000);
           let streak = 0;
-          while (set.has(fmt(cursor))) { streak++; cursor = new Date(cursor.getTime() - 86_400_000); }
+          while (set.has(localDateStr(cursor))) { streak++; cursor = new Date(cursor.getTime() - 86_400_000); }
           setMyClassStreak(streak);
         })();
       }
