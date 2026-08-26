@@ -8,6 +8,7 @@ import { readingPassages } from '@/lib/reading-data';
 import { classifyReview, REVIEW_LABEL_META, REVIEW_WINDOW_DAYS, type ReviewEntry, type ReviewLabel } from '@/lib/reviewPattern';
 import { localDateStr, addDaysToDateStr, displayXP } from '@/lib/storage';
 import { isHomeworkDone, fetchCollectionByName } from './homework/_shared';
+import { classGradientColors } from '@/lib/class-gradient';
 
 interface CollectionMeta {
   collection_name: string;
@@ -957,6 +958,12 @@ function CurriculumTab({
       supabase.from('class_word_units').select('id, name, class_words(count)').eq('class_id', classId).order('created_at'),
     ]);
 
+    if (assignsRes.error || cwUnitRes.error) {
+      console.error('[loadCurriculum]', assignsRes.error ?? cwUnitRes.error);
+      alert(`Failed to load curriculum: ${(assignsRes.error ?? cwUnitRes.error)?.message}`);
+      setLoading(false);
+      return;
+    }
     const assigns = (assignsRes.data ?? []) as any[];
     const cwUnitRows = (cwUnitRes.data ?? []) as any[];
 
@@ -964,9 +971,10 @@ function CurriculumTab({
     let parsedFolders: CurrFolder[] = [];
     if (assigns.length > 0) {
       const folderIds = assigns.map((a: any) => a.teacher_folders.id);
-      const { data: unitData } = await supabase
+      const { data: unitData, error: unitErr } = await supabase
         .from('teacher_units').select('id, folder_id, name, teacher_unit_words(count)')
         .in('folder_id', folderIds).order('position').order('created_at');
+      if (unitErr) { console.error('[loadCurriculum]', unitErr); alert(`Failed to load folder units: ${unitErr.message}`); setLoading(false); return; }
       parsedFolders = assigns.map((a: any) => ({
         id: a.teacher_folders.id, assignmentId: a.id, name: a.teacher_folders.name,
         units: (unitData ?? [])
@@ -980,16 +988,18 @@ function CurriculumTab({
     }));
 
     // Homework
-    const { data: hwData } = await supabase
+    const { data: hwData, error: hwErr } = await supabase
       .from('class_homework')
       .select('id, unit_id, class_unit_id, collection_name, day_number, passage_id, modes, due_date, student_ids, teacher_units(name), class_word_units(name)')
       .eq('class_id', classId).order('created_at', { ascending: false });
+    if (hwErr) { console.error('[loadCurriculum]', hwErr); alert(`Failed to load homework: ${hwErr.message}`); setLoading(false); return; }
 
     let parsedHw: CurrHW[] = [];
     if (hwData && hwData.length > 0) {
       const hwIds = (hwData as any[]).map(h => h.id);
-      const { data: progData } = await supabase
+      const { data: progData, error: progErr } = await supabase
         .from('class_homework_progress').select('homework_id, student_id, mode').in('homework_id', hwIds);
+      if (progErr) { console.error('[loadCurriculum]', progErr); alert(`Failed to load homework progress: ${progErr.message}`); setLoading(false); return; }
       parsedHw = (hwData as any[]).map(h => {
         const rows = (progData ?? []).filter((p: any) => p.homework_id === h.id);
         const progressByMode: Record<string, number> = {};
@@ -1029,7 +1039,8 @@ function CurriculumTab({
     setShowFolderPicker(true);
     setFolderPickerLoading(true);
     const assignedIds = new Set(folders.map(f => f.id));
-    const { data } = await supabase.from('teacher_folders').select('id, name, teacher_units(count)').eq('teacher_id', user.id).order('position');
+    const { data, error } = await supabase.from('teacher_folders').select('id, name, teacher_units(count)').eq('teacher_id', user.id).order('position');
+    if (error) { console.error('[openFolderPicker]', error); alert(`Failed to load folders: ${error.message}`); setFolderPickerLoading(false); return; }
     setAvailFolders(
       ((data ?? []) as any[])
         .filter(f => !assignedIds.has(f.id))
@@ -1137,19 +1148,33 @@ function CurriculumTab({
     // class_homework.class_unit_id -> class_word_units(id) is ON DELETE
     // CASCADE, so deleting this unit silently wipes any homework assigned
     // from it (and all student completion history). Warn the teacher first.
-    const { data: assignedHw } = await supabase.from('class_homework').select('id').eq('class_unit_id', unit.id);
+    const { data: assignedHw, error: countErr } = await supabase.from('class_homework').select('id').eq('class_unit_id', unit.id);
+    if (countErr) { console.error('[deleteCWUnit]', countErr); alert(`Failed to check homework impact: ${countErr.message}`); return; }
     const hwCount = assignedHw?.length ?? 0;
     const msg = hwCount === 0
       ? `Delete unit "${unit.name}"? Words will remain but lose their unit assignment.`
       : `Delete unit "${unit.name}"? Words will remain but lose their unit assignment. This unit is currently assigned as homework in ${hwCount} place${hwCount !== 1 ? 's' : ''} — deleting it will also remove that homework and every student's progress on it.`;
     if (!confirm(msg)) return;
+    // confirm() can sit open for a while — the warning above may now be
+    // stale (homework could've been assigned/removed from this unit in the
+    // meantime by this teacher in another tab, or a co-teacher). Re-check
+    // right before the actual delete so a changed impact count aborts
+    // instead of silently cascading more (or less) than what was shown.
+    const { data: recheckHw, error: recheckErr } = await supabase.from('class_homework').select('id').eq('class_unit_id', unit.id);
+    if (recheckErr) { console.error('[deleteCWUnit]', recheckErr); alert(`Failed to re-check homework impact: ${recheckErr.message}`); return; }
+    const recheckCount = recheckHw?.length ?? 0;
+    if (recheckCount !== hwCount) {
+      alert(`This unit's homework assignments changed (now ${recheckCount}, was ${hwCount}) while you were confirming. Please try deleting again to see the up-to-date impact.`);
+      return;
+    }
     const { error } = await supabase.from('class_word_units').delete().eq('id', unit.id).eq('class_id', classId);
     if (error) { console.error('[deleteCWUnit]', error); alert(`Failed to delete unit: ${error.message}`); return; }
     await loadCurriculum();
   };
 
   const openManageWords = async (unit: CurrWordUnit) => {
-    const { data } = await supabase.from('class_words').select('id, word, translation, unit_id').eq('class_id', classId).order('created_at');
+    const { data, error } = await supabase.from('class_words').select('id, word, translation, unit_id').eq('class_id', classId).order('created_at');
+    if (error) { console.error('[openManageWords]', error); alert(`Failed to load words: ${error.message}`); return; }
     const words = (data ?? []) as any[];
     const pending: Record<string, boolean> = {};
     for (const w of words) pending[w.id] = w.unit_id === unit.id;
@@ -1185,7 +1210,8 @@ function CurriculumTab({
     setHwDetail(hw);
     setHwDeleteConfirm(false);
     setDetailLoading(true);
-    const { data } = await supabase.from('class_homework_progress').select('student_id, mode').eq('homework_id', hw.id);
+    const { data, error } = await supabase.from('class_homework_progress').select('student_id, mode').eq('homework_id', hw.id);
+    if (error) { console.error('[openHwDetail]', error); alert(`Failed to load homework progress: ${error.message}`); setDetailLoading(false); return; }
     const byStudent: Record<string, Set<string>> = {};
     for (const p of (data ?? []) as any[]) {
       if (!byStudent[p.student_id]) byStudent[p.student_id] = new Set();
@@ -2271,27 +2297,39 @@ export default function ClassDashboardPage() {
   useEffect(() => { if (tab === 'review' && !reviewLoaded) loadReviewPattern(); }, [tab]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!streakModal || !id) return;
+    // Guards against fast-clicking between two students' streak modals: the
+    // slower of two in-flight requests could otherwise resolve after the
+    // faster one and paint the wrong student's calendar under the
+    // currently-open modal.
+    let cancelled = false;
     setStreakLoading(true);
     setStudyDates(new Set());
     supabase.rpc('get_student_study_calendar', { p_class_id: id, p_student_id: streakModal.student_id })
       .then(({ data }) => {
+        if (cancelled) return;
         setStudyDates(new Set((data as { study_date: string }[] ?? []).map(r => r.study_date)));
         setStreakLoading(false);
       });
+    return () => { cancelled = true; };
   }, [streakModal]);
 
   useEffect(() => {
     if (!collectionModal || !id) return;
+    // Same fast-click race as the streak modal above, but for the
+    // collection-detail modal.
+    let cancelled = false;
     setUnitLoading(true);
     setUnitRows([]);
     Promise.all([
       supabase.rpc('get_student_collection_progress', { p_class_id: id, p_student_id: collectionModal.student.student_id, p_collection_name: collectionModal.collectionName }),
       fetchTopics(collectionModal.collectionName),
     ]).then(([{ data }, topics]) => {
+      if (cancelled) return;
       setUnitRows((data as UnitRow[]) ?? []);
       setUnitTopics(topics);
       setUnitLoading(false);
     });
+    return () => { cancelled = true; };
   }, [collectionModal]);
 
   const openCollection = (s: StudentRow, col: CollectionMeta) =>
@@ -2395,9 +2433,7 @@ export default function ClassDashboardPage() {
     { key: 'inactive', label: '😴 Inactive' },
   ];
 
-  const _n = (id as string).split('').reduce((a: number, c: string) => a + c.charCodeAt(0), 0);
-  const _grad = ['from-indigo-500 to-purple-500','from-pink-500 to-rose-400','from-emerald-500 to-teal-400','from-blue-500 to-cyan-400','from-amber-500 to-orange-400','from-violet-500 to-purple-400','from-red-500 to-pink-400','from-cyan-500 to-blue-400'][_n % 8];
-  const _glow = ['#818cf8','#ec4899','#22c55e','#3b82f6','#f59e0b','#8b5cf6','#ef4444','#06b6d4'][_n % 8];
+  const { gradient: _grad, glow: _glow } = classGradientColors(id as string);
 
   return (
     <div className="flex flex-col min-h-screen pb-24 animate-fade-in">

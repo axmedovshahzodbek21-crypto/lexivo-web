@@ -4,6 +4,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { getClassDueWords, getClassSRSAll, getClassStarredWordIds, addClassStarredWord, removeClassStarredWord } from '@/lib/class-srs';
+import { classGradientColors } from '@/lib/class-gradient';
 
 type InputTab = 'manual' | 'ai' | 'collection';
 
@@ -195,6 +196,11 @@ function groupWords(words: ClassWord[]) {
 }
 
 type WordsCache = { className: string; words: ClassWord[] };
+// Keyed by `${classId}::${userId}`, not classId alone — a bare classId key
+// meant a different account signing in on the same browser (or a student
+// who'd just been removed from the class) could momentarily see the
+// previous viewer's cached word list rendered before the membership check
+// below resolves.
 const _wordsCache = new Map<string, WordsCache>();
 
 function WordCard({ w }: { w: ClassWord }) {
@@ -399,13 +405,15 @@ export default function ClassWordsPage() {
 
     const fetched = [...classWords, ...libWords];
     setWords(fetched);
-    if (clsName !== undefined) _wordsCache.set(id, { className: clsName, words: fetched });
-    else { const c = _wordsCache.get(id); if (c) _wordsCache.set(id, { ...c, words: fetched }); }
+    if (!user) return;
+    const cacheKey = `${id}::${user.id}`;
+    if (clsName !== undefined) _wordsCache.set(cacheKey, { className: clsName, words: fetched });
+    else { const c = _wordsCache.get(cacheKey); if (c) _wordsCache.set(cacheKey, { ...c, words: fetched }); }
   };
 
   useEffect(() => {
     if (!user || !id) return;
-    const cached = _wordsCache.get(id);
+    const cached = _wordsCache.get(`${id}::${user.id}`);
     if (cached) {
       setClassName(cached.className);
       setWords(cached.words);
@@ -502,7 +510,7 @@ export default function ClassWordsPage() {
     }
     setWords(prev => {
       const next = prev.filter(w => w.id !== wordId);
-      const c = _wordsCache.get(id); if (c) _wordsCache.set(id, { ...c, words: next });
+      if (user) { const c = _wordsCache.get(`${id}::${user.id}`); if (c) _wordsCache.set(`${id}::${user.id}`, { ...c, words: next }); }
       return next;
     });
   };
@@ -627,9 +635,7 @@ export default function ClassWordsPage() {
     </div>
   );
 
-  const _n = (id as string).split('').reduce((a: number, c: string) => a + c.charCodeAt(0), 0);
-  const _grad = ['from-indigo-500 to-purple-500','from-pink-500 to-rose-400','from-emerald-500 to-teal-400','from-blue-500 to-cyan-400','from-amber-500 to-orange-400','from-violet-500 to-purple-400','from-red-500 to-pink-400','from-cyan-500 to-blue-400'][_n % 8];
-  const _glow = ['#818cf8','#ec4899','#22c55e','#3b82f6','#f59e0b','#8b5cf6','#ef4444','#06b6d4'][_n % 8];
+  const { gradient: _grad, glow: _glow } = classGradientColors(id as string);
 
   return (
     <div className="flex flex-col min-h-screen pb-24 animate-fade-in">

@@ -4,6 +4,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { displayXP } from '@/lib/storage';
+import { classGradientColors } from '@/lib/class-gradient';
 
 interface LeaderboardRow {
   student_id: string;
@@ -34,6 +35,10 @@ function Avatar({ row }: { row: LeaderboardRow }) {
   );
 }
 
+// Keyed by `${classId}::${userId}`, not classId alone — a bare classId key
+// meant a removed student (or a different account on the same browser)
+// could briefly see the previous viewer's cached leaderboard rendered
+// before the membership check below resolves.
 const _classLbCache = new Map<string, LeaderboardRow[]>();
 
 const MEDALS = ['🥇', '🥈', '🥉'];
@@ -53,7 +58,8 @@ export default function ClassLeaderboardPage() {
 
   useEffect(() => {
     if (!user) return;
-    const cached = _classLbCache.get(id);
+    const cacheKey = `${id}::${user.id}`;
+    const cached = _classLbCache.get(cacheKey);
     if (cached) {
       setRows(cached);
       setLoading(false);
@@ -78,7 +84,7 @@ export default function ClassLeaderboardPage() {
 
       const { data } = await supabase.rpc('get_class_leaderboard', { p_class_id: id }).limit(200);
       const rows = (data as LeaderboardRow[]) ?? [];
-      _classLbCache.set(id, rows);
+      _classLbCache.set(cacheKey, rows);
       setRows(rows);
       setClassName(cls.name ?? '');
       setLoading(false);
@@ -104,9 +110,7 @@ export default function ClassLeaderboardPage() {
     );
   }
 
-  const _n = (id as string).split('').reduce((a: number, c: string) => a + c.charCodeAt(0), 0);
-  const _grad = ['from-indigo-500 to-purple-500','from-pink-500 to-rose-400','from-emerald-500 to-teal-400','from-blue-500 to-cyan-400','from-amber-500 to-orange-400','from-violet-500 to-purple-400','from-red-500 to-pink-400','from-cyan-500 to-blue-400'][_n % 8];
-  const _glow = ['#818cf8','#ec4899','#22c55e','#3b82f6','#f59e0b','#8b5cf6','#ef4444','#06b6d4'][_n % 8];
+  const { gradient: _grad, glow: _glow } = classGradientColors(id as string);
 
   const lbHero = (
     <div className={`bg-gradient-to-br ${_grad} px-5 pt-5 pb-7 relative`}
