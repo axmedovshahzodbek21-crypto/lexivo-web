@@ -498,6 +498,17 @@ function LearnInner() {
       const { leveledUp, newLevel, newXp } = addXP(learnXP, 'Learn', `Unit ${current.dayNumber} · ${current.collectionName}`);
       if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
       setSessionXP(prev => prev + learnXP);
+      // XP and the learned-word itself (saveLearnedWord, above in
+      // grantLearnReward) are credited locally as soon as each word is
+      // marked, but used to only reach the cloud via the pushStats()/
+      // pushLists() calls at the very end of the session (index + 1 >=
+      // words.length below) — a student who closed the tab or navigated
+      // away before finishing the whole list would have every word already
+      // learned in this session stuck in localStorage forever, never
+      // syncing to the leaderboard or other devices. Pushing right after
+      // each award closes that gap.
+      pushStats();
+      pushLists();
     } else if (isNew && (sourceClassHW || sourceClass) && classIdParam) {
       // Class-earned XP counts toward the class leaderboard AND the
       // account's global total, so it isn't lost if the student later
@@ -508,6 +519,7 @@ function LearnInner() {
       const { leveledUp, newLevel, newXp } = addXP(learnXP, 'Learn', `Class · ${classNameParam}`);
       if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
       setSessionXP(prev => prev + learnXP);
+      pushStats();
     }
     recordStudySession();
     setSessionCount(c => c + 1);
