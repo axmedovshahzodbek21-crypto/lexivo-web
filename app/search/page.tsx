@@ -57,11 +57,19 @@ export default function SearchPage() {
 
   useEffect(() => {
     if (query.length < 1) { setResults([]); return; }
-    const found = searchWords(collections, query);
-    setResults(found);
-    const map: Record<string, boolean> = {};
-    found.forEach(r => { map[r.word] = isStarred(r.word); });
-    setStarredMap(map);
+    // searchWords does a full linear scan over every word in every
+    // collection (2,500+ words, 3 substring checks each) — running it on
+    // every single keystroke wasted a full scan's worth of work on each
+    // character typed. Debounced so a burst of keystrokes only triggers
+    // one scan once typing pauses.
+    const timer = setTimeout(() => {
+      const found = searchWords(collections, query);
+      setResults(found);
+      const map: Record<string, boolean> = {};
+      found.forEach(r => { map[r.word] = isStarred(r.word); });
+      setStarredMap(map);
+    }, 200);
+    return () => clearTimeout(timer);
   }, [query, collections]);
 
   const handleStar = (word: string) => {

@@ -212,9 +212,9 @@ function buildGroups(questions: IeltsQuestion[]) {
 
 const ANSWER_HIGHLIGHT_COLOR = 'rgba(251, 146, 60, 0.45)'; // amber — distinct from manual highlights
 
-function highlightChunk(nodes: { node: Text; start: number }[], accumulated: string, chunk: string, color: string): HTMLElement[] {
-  const matchIdx = accumulated.toLowerCase().indexOf(chunk.toLowerCase());
-  if (matchIdx === -1) return [];
+function highlightChunk(nodes: { node: Text; start: number }[], accumulated: string, chunk: string, color: string, searchFrom = 0): { spans: HTMLElement[]; matchEnd: number } {
+  const matchIdx = accumulated.toLowerCase().indexOf(chunk.toLowerCase(), searchFrom);
+  if (matchIdx === -1) return { spans: [], matchEnd: searchFrom };
   const matchEnd = matchIdx + chunk.length;
   const highlighted: HTMLElement[] = [];
   for (const { node, start } of nodes) {
@@ -236,7 +236,7 @@ function highlightChunk(nodes: { node: Text; start: number }[], accumulated: str
     }
     highlighted.push(span);
   }
-  return highlighted;
+  return { spans: highlighted, matchEnd };
 }
 
 function findAndHighlightExcerpt(container: HTMLElement, excerpt: string): HTMLElement[] {
@@ -254,10 +254,26 @@ function findAndHighlightExcerpt(container: HTMLElement, excerpt: string): HTMLE
     accumulated += node.textContent ?? '';
   }
 
+  // Each chunk's search starts right after the previous chunk's match
+  // instead of always scanning from the top of the passage. Previously
+  // every chunk (including the first) always matched the leftmost
+  // occurrence of its text anywhere in the passage — if a short phrase
+  // legitimately repeats (common in reading passages), a multi-chunk
+  // excerpt (foo … bar) could end up with "foo" and "bar" highlighted in
+  // two unrelated places instead of together, and any two questions whose
+  // excerpts shared repeated wording always lit up the same first
+  // instance regardless of which one the answer actually referred to.
+  // Anchoring subsequent chunks after the prior match keeps a multi-chunk
+  // excerpt's pieces coherent; a lone repeated single-chunk excerpt still
+  // can't be disambiguated without a position hint the source data
+  // doesn't carry, so this narrows — but doesn't eliminate — that case.
   const allHighlighted: HTMLElement[] = [];
+  let searchFrom = 0;
   for (const chunk of chunks) {
-    const spans = highlightChunk(nodes, accumulated, chunk, ANSWER_HIGHLIGHT_COLOR);
+    const { spans, matchEnd } = highlightChunk(nodes, accumulated, chunk, ANSWER_HIGHLIGHT_COLOR, searchFrom);
+    if (spans.length === 0) continue;
     allHighlighted.push(...spans);
+    searchFrom = matchEnd;
   }
   if (allHighlighted.length > 0) allHighlighted[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
   return allHighlighted;
@@ -696,11 +712,9 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
     setAnswers(prev => ({ ...prev, [i]: val }));
   }, []);
 
-  // Guards against handleSubmit's side effects (marking submitted, clearing
-  // the timer, removing the sessionStorage entry) firing more than once —
-  // it used to be called directly from inside the setSecondsLeft functional
-  // updater below, and React can invoke a state updater more than once for
-  // the same transition, risking a double-fire.
+  // Extra idempotency guard on top of the pure-updater fix below — kept as
+  // defense in depth in case handleSubmit is ever invoked from more than
+  // one call site again in the future.
   const submittingRef = useRef(false);
   const handleSubmit = useCallback(() => {
     if (submittingRef.current) return;
@@ -710,16 +724,25 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
     sessionStorage.removeItem(timerKey);
   }, [timerKey]);
 
+  // The countdown updater used to call handleSubmit() (which itself calls
+  // three more setState functions plus a sessionStorage write) directly
+  // from inside setSecondsLeft's functional updater. React requires
+  // updaters to be pure and can invoke one more than once for the same
+  // transition, so a side effect inside it is never actually safe — the
+  // ref guard above only hid the symptom. The updater here is now pure
+  // (just decrements), and expiry is handled by a separate effect that
+  // reacts to secondsLeft hitting 0.
   useEffect(() => {
     if (!timerActive || submitted) return;
     const id = setInterval(() => {
-      setSecondsLeft(s => {
-        if (s <= 1) { handleSubmit(); return 0; }
-        return s - 1;
-      });
+      setSecondsLeft(s => Math.max(0, s - 1));
     }, 1000);
     return () => clearInterval(id);
-  }, [timerActive, submitted, handleSubmit]);
+  }, [timerActive, submitted]);
+
+  useEffect(() => {
+    if (timerActive && !submitted && secondsLeft <= 0) handleSubmit();
+  }, [secondsLeft, timerActive, submitted, handleSubmit]);
 
   if (!test) {
     return (

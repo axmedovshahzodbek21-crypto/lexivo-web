@@ -132,9 +132,19 @@ export default function RealEnglishSetPage({ params }: { params: Promise<{ id: s
     if (!set) return;
     async function load() {
       const counts: Record<string, number> = {};
+      // Each video's count is caught individually — one malformed/missing
+      // collection used to reject the whole Promise.all (an unhandled
+      // rejection, since load() isn't awaited or .catch()'d by anyone),
+      // which meant setWordCounts never ran and every video on the page
+      // stayed stuck showing "Coming soon" forever, not just the bad one.
       await Promise.all(set!.videos.map(async v => {
-        const col = await loadRealEnglishCollection(v.id);
-        counts[v.id] = col ? col.days.reduce((s, d) => s + d.words.length, 0) : 0;
+        try {
+          const col = await loadRealEnglishCollection(v.id);
+          counts[v.id] = col ? col.days.reduce((s, d) => s + d.words.length, 0) : 0;
+        } catch (err) {
+          console.error(`[real-english] failed to load word count for ${v.id}`, err);
+          counts[v.id] = 0;
+        }
       }));
       setWordCounts(counts);
     }
