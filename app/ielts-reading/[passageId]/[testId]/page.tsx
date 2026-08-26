@@ -212,8 +212,29 @@ function buildGroups(questions: IeltsQuestion[]) {
 
 const ANSWER_HIGHLIGHT_COLOR = 'rgba(251, 146, 60, 0.45)'; // amber — distinct from manual highlights
 
-function highlightChunk(nodes: { node: Text; start: number }[], accumulated: string, chunk: string, color: string, searchFrom = 0): { spans: HTMLElement[]; matchEnd: number } {
-  const matchIdx = accumulated.toLowerCase().indexOf(chunk.toLowerCase(), searchFrom);
+// Finds every occurrence of `needle` at or after `searchFrom`, then picks
+// the first one that doesn't overlap any range in `avoidRanges` — those
+// are text spans already claimed by another currently-revealed question's
+// excerpt. Two different questions' answers shouldn't legitimately point
+// at the exact same passage text, so when a phrase repeats and one
+// occurrence is already spoken for, the other is the better guess. Falls
+// back to the first occurrence at/after searchFrom if every one found is
+// already claimed (or there's only one).
+function findBestMatch(haystack: string, needle: string, searchFrom: number, avoidRanges: { start: number; end: number }[]): number {
+  const first = haystack.indexOf(needle, searchFrom);
+  if (first === -1) return -1;
+  let idx = first;
+  while (idx !== -1) {
+    const end = idx + needle.length;
+    const overlaps = avoidRanges.some(r => idx < r.end && end > r.start);
+    if (!overlaps) return idx;
+    idx = haystack.indexOf(needle, idx + 1);
+  }
+  return first;
+}
+
+function highlightChunk(nodes: { node: Text; start: number }[], accumulated: string, chunk: string, color: string, searchFrom: number, avoidRanges: { start: number; end: number }[]): { spans: HTMLElement[]; matchEnd: number } {
+  const matchIdx = findBestMatch(accumulated.toLowerCase(), chunk.toLowerCase(), searchFrom, avoidRanges);
   if (matchIdx === -1) return { spans: [], matchEnd: searchFrom };
   const matchEnd = matchIdx + chunk.length;
   const highlighted: HTMLElement[] = [];
@@ -239,11 +260,13 @@ function highlightChunk(nodes: { node: Text; start: number }[], accumulated: str
   return { spans: highlighted, matchEnd };
 }
 
-function findAndHighlightExcerpt(container: HTMLElement, excerpt: string): HTMLElement[] {
+function findAndHighlightExcerpt(
+  container: HTMLElement, excerpt: string, avoidRanges: { start: number; end: number }[] = []
+): { spans: HTMLElement[]; range: { start: number; end: number } | null } {
   // Strip trailing ellipsis, then split on mid-excerpt ellipsis
   const trimmed = excerpt.replace(/\s*(?:…|\.{3})$/, '').trim();
   const chunks = trimmed.split(/\s*(?:…|\.{3})\s*/).map(c => c.trim()).filter(c => c.length > 8);
-  if (chunks.length === 0) return [];
+  if (chunks.length === 0) return { spans: [], range: null };
 
   const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
   let accumulated = '';
@@ -264,19 +287,24 @@ function findAndHighlightExcerpt(container: HTMLElement, excerpt: string): HTMLE
   // excerpts shared repeated wording always lit up the same first
   // instance regardless of which one the answer actually referred to.
   // Anchoring subsequent chunks after the prior match keeps a multi-chunk
-  // excerpt's pieces coherent; a lone repeated single-chunk excerpt still
-  // can't be disambiguated without a position hint the source data
-  // doesn't carry, so this narrows — but doesn't eliminate — that case.
+  // excerpt's pieces coherent, and avoidRanges (text spans other
+  // currently-revealed questions already claimed) steers a repeated
+  // single-chunk excerpt away from re-using another question's answer
+  // location, since two questions shouldn't legitimately point at the
+  // same passage text.
   const allHighlighted: HTMLElement[] = [];
   let searchFrom = 0;
+  let rangeStart = -1, rangeEnd = -1;
   for (const chunk of chunks) {
-    const { spans, matchEnd } = highlightChunk(nodes, accumulated, chunk, ANSWER_HIGHLIGHT_COLOR, searchFrom);
+    const { spans, matchEnd } = highlightChunk(nodes, accumulated, chunk, ANSWER_HIGHLIGHT_COLOR, searchFrom, avoidRanges);
     if (spans.length === 0) continue;
     allHighlighted.push(...spans);
+    if (rangeStart === -1) rangeStart = matchEnd - chunk.length;
+    rangeEnd = matchEnd;
     searchFrom = matchEnd;
   }
   if (allHighlighted.length > 0) allHighlighted[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
-  return allHighlighted;
+  return { spans: allHighlighted, range: rangeStart !== -1 ? { start: rangeStart, end: rangeEnd } : null };
 }
 
 function removeAnswerHighlights(spans: HTMLElement[]) {
@@ -632,6 +660,7 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
   const isDragging = useRef(false);
   const passageRef = useRef<HTMLDivElement>(null);
   const answerHighlights = useRef<Map<number, HTMLElement[]>>(new Map());
+  const answerHighlightRanges = useRef<Map<number, { start: number; end: number }>>(new Map());
 
   // Sync answer highlights with revealed set (review mode only)
   useEffect(() => {
@@ -641,6 +670,7 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
       if (!revealed.has(idx)) {
         removeAnswerHighlights(spans);
         answerHighlights.current.delete(idx);
+        answerHighlightRanges.current.delete(idx);
       }
     }
     // Add highlights for newly revealed questions
@@ -648,8 +678,15 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
       if (!answerHighlights.current.has(idx)) {
         const excerpt = test.questions[idx]?.passage_excerpt;
         if (excerpt && passageRef.current) {
-          const spans = findAndHighlightExcerpt(passageRef.current, excerpt);
-          if (spans.length > 0) answerHighlights.current.set(idx, spans);
+          // Steer away from text spans other already-revealed questions
+          // already claimed, so a repeated phrase doesn't keep re-pointing
+          // every question at the same first occurrence.
+          const avoidRanges = [...answerHighlightRanges.current.values()];
+          const { spans, range } = findAndHighlightExcerpt(passageRef.current, excerpt, avoidRanges);
+          if (spans.length > 0) {
+            answerHighlights.current.set(idx, spans);
+            if (range) answerHighlightRanges.current.set(idx, range);
+          }
         }
       }
     }
