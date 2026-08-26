@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
+import { unitCache as _cache } from '@/lib/teacher-library-cache';
 
 interface WordExample { sentence: string; translation: string; }
 interface UnitWord {
@@ -101,10 +102,6 @@ ${exampleBlock(wordLang, transLang)}
 Output only the formatted blocks. No commentary.`;
 }
 
-// Module-level cache keyed by unitId — avoids re-showing the loading
-// spinner every time this page is revisited (e.g. switching tabs away and back).
-const _cache: Record<string, { unitName: string; folderName: string; words: UnitWord[] }> = {};
-
 export default function UnitPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
@@ -139,6 +136,7 @@ export default function UnitPage() {
     | { type: 'bulk'; ids: string[]; message: string }
     | null
   >(null);
+  const loadIdRef = useRef(0);
 
   useEffect(() => {
     if (authLoading) return;
@@ -152,11 +150,16 @@ export default function UnitPage() {
 
   async function load() {
     if (!user) return;
+    // Guard against a slow stale request (e.g. from a previously-viewed
+    // unitId) resolving after a faster, more recent one and overwriting
+    // this page's state with outdated data.
+    const myLoadId = ++loadIdRef.current;
     const [unitRes, folderRes, wordsRes] = await Promise.all([
       supabase.from('teacher_units').select('name, teacher_id').eq('id', unitId).maybeSingle(),
       supabase.from('teacher_folders').select('name').eq('id', folderId).maybeSingle(),
       supabase.from('teacher_unit_words').select('id, word, translation, definition, part_of_speech, pronunciation, definition_uz, examples').eq('unit_id', unitId).order('position').order('created_at'),
     ]);
+    if (loadIdRef.current !== myLoadId) return;
     // Defense-in-depth: RLS is the real backstop, but confirm this unit is
     // actually the caller's before trusting an arbitrary unitId's data.
     if (!unitRes.data || unitRes.data.teacher_id !== user.id) {

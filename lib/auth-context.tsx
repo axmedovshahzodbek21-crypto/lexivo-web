@@ -5,6 +5,7 @@ import { supabase } from './supabase';
 import { clearUserData } from './storage';
 import { pullAll } from './sync';
 import { linkUser, unlinkUser } from './onesignal';
+import { clearTeacherLibraryCaches } from './teacher-library-cache';
 
 interface AuthCtx {
   user: User | null;
@@ -53,6 +54,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Covers automatic sign-out (token expiry) — manual sign-out calls
         // clearUserData() directly before reaching here, so calling twice is safe.
         clearUserData();
+        clearTeacherLibraryCaches();
         unlinkUser();
       }
       if (event === 'PASSWORD_RECOVERY' && typeof window !== 'undefined' && !window.location.pathname.includes('update-password')) {
@@ -87,6 +89,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     clearUserData();
+    clearTeacherLibraryCaches();
     await supabase.auth.signOut();
   };
 

@@ -1,9 +1,10 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
+import { folderCache as _cache } from '@/lib/teacher-library-cache';
 
 interface Unit {
   id: string;
@@ -26,9 +27,6 @@ const lighten = (hex: string, amt = 0.3) => {
   return `rgb(${Math.round(r+(255-r)*amt)},${Math.round(g+(255-g)*amt)},${Math.round(b+(255-b)*amt)})`;
 };
 
-// Module-level cache keyed by folderId
-const _cache: Record<string, { name: string; units: Unit[] }> = {};
-
 export default function FolderPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
@@ -44,6 +42,7 @@ export default function FolderPage() {
   const [creating, setCreating] = useState(false);
   const [renameId, setRenameId] = useState<string | null>(null);
   const [renameName, setRenameName] = useState('');
+  const loadIdRef = useRef(0);
 
   useEffect(() => {
     if (authLoading) return;
@@ -53,10 +52,15 @@ export default function FolderPage() {
 
   async function load() {
     if (!user) return;
+    // Guard against a slow stale request (e.g. from a previously-viewed
+    // folderId) resolving after a faster, more recent one and overwriting
+    // this page's state with outdated data.
+    const myLoadId = ++loadIdRef.current;
     const [folderRes, unitsRes] = await Promise.all([
       supabase.from('teacher_folders').select('name, teacher_id').eq('id', folderId).maybeSingle(),
       supabase.from('teacher_units').select('id, name, teacher_unit_words(count)').eq('folder_id', folderId).order('position').order('created_at'),
     ]);
+    if (loadIdRef.current !== myLoadId) return;
     // Defense-in-depth: RLS is the real backstop, but confirm this folder
     // is actually the caller's before trusting an arbitrary folderId's data.
     if (!folderRes.data || folderRes.data.teacher_id !== user.id) {

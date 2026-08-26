@@ -91,6 +91,7 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
 
   useEffect(() => {
     if (!collection) return;
+    let cancelled = false;
     const reviewLog = getReviewLog();
     const srsWords = getSRSWords();
     const learnedWords = getLearnedWords();
@@ -99,6 +100,7 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
 
     const build = async () => {
       const { data: { user } } = await supabase.auth.getUser();
+      if (cancelled) return;
       const gateMap: Record<string, { attempts: number; correct: number }> = {};
       if (user) {
         const { data } = await supabase
@@ -106,6 +108,7 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
           .select('per_word_data')
           .eq('student_id', user.id)
           .eq('collection_name', collectionName);
+        if (cancelled) return;
         for (const row of data ?? []) {
           for (const w of (row.per_word_data ?? []) as { word: string; gate_attempts: number; gate_correct_first: boolean }[]) {
             if (!gateMap[w.word]) gateMap[w.word] = { attempts: 0, correct: 0 };
@@ -135,11 +138,13 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
         return { dayNumber: day.dayNumber, topic: day.topic ?? `Unit ${day.dayNumber}`, words, avgScore };
       });
 
+      if (cancelled) return;
       setUnitMastery(result);
       setHeatmapLoaded(true);
     };
 
     build();
+    return () => { cancelled = true; };
   }, [collection, collectionName]);
 
   if (!collectionsLoaded) {

@@ -249,26 +249,6 @@ function QuizInner() {
 
   const current = questions[index];
 
-  // Keyboard shortcuts: 1-4 for options
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (!current) return;
-      if (state === 'idle') {
-        const n = parseInt(e.key);
-        if (n >= 1 && n <= current.options.length) {
-          handleSelect(current.options[n - 1]);
-        }
-      }
-      if (state === 'answered' && (e.key === 'ArrowRight' || e.key === 'Enter' || e.key === ' ')) {
-        e.preventDefault();
-        next();
-      }
-      if (e.key === 's' || e.key === 'S') { current.word.language ? speakText(current.word.word, current.word.language) : speak(current.word.word); }
-    };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [current, state]);
-
   const handleSelect = useCallback((option: string) => {
     if (state === 'answered' || selecting.current) return;
     selecting.current = true;
@@ -352,6 +332,33 @@ function QuizInner() {
       setState('idle');
     }
   }, [index, questions, correct, selected, current, collectionName, sourceClassHW, sourceClass, pushAchievement, setPendingLevelUp, sourceMyWords, myCollection, myFolder, sp]);
+
+  // Keyboard shortcuts: 1-4 for options
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (!current) return;
+      if (state === 'idle') {
+        const n = parseInt(e.key);
+        if (n >= 1 && n <= current.options.length) {
+          handleSelect(current.options[n - 1]);
+        }
+      }
+      if (state === 'answered' && (e.key === 'ArrowRight' || e.key === 'Enter' || e.key === ' ')) {
+        e.preventDefault();
+        next();
+      }
+      if (e.key === 's' || e.key === 'S') { current.word.language ? speakText(current.word.word, current.word.language) : speak(current.word.word); }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+    // handleSelect/next were previously omitted here — this effect only
+    // re-registered the listener when current/state changed, so it could
+    // keep calling a stale handleSelect closure built while userId was
+    // still null (auth resolves asynchronously). An answer given via
+    // keyboard before that resolved silently skipped addClassHardWord's
+    // class-mode tracking, even though the *next* click-driven answer
+    // (using the current render's fresh handleSelect) would have worked.
+  }, [current, state, handleSelect, next]);
 
   if (!collectionName && !starredOnly && !listId && !sourceMyWords && !sourceClassHW && !sourceClass) return <UnitPicker mode="quiz" />;
 

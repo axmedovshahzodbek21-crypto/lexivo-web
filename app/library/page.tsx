@@ -1,9 +1,10 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
+import { folderListCache as _cache } from '@/lib/teacher-library-cache';
 
 interface Folder {
   id: string;
@@ -25,9 +26,6 @@ const lighten = (hex: string, amt = 0.3) => {
   const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
   return `rgb(${Math.round(r+(255-r)*amt)},${Math.round(g+(255-g)*amt)},${Math.round(b+(255-b)*amt)})`;
 };
-
-// Module-level cache — survives navigation within the same tab session
-const _cache: Record<string, Folder[]> = {};
 
 // One-time real example (folder → unit → word) so a first-time teacher sees
 // the actual structure, not an empty page. Guarded server-side (does this
@@ -74,6 +72,7 @@ export default function LibraryPage() {
   const [showCreate, setShowCreate] = useState(false);
   const [renameId, setRenameId] = useState<string | null>(null);
   const [renameName, setRenameName] = useState('');
+  const loadIdRef = useRef(0);
 
   useEffect(() => {
     if (authLoading) return;
@@ -83,12 +82,17 @@ export default function LibraryPage() {
 
   async function load() {
     if (!user) return;
+    // Guard against a slow stale request (e.g. from a previous account on
+    // this same browser session) resolving after a faster, more recent one
+    // and overwriting this page's state with outdated data.
+    const myLoadId = ++loadIdRef.current;
     const { data } = await supabase
       .from('teacher_folders')
       .select('id, name, teacher_units(count)')
       .eq('teacher_id', user.id)
       .order('position')
       .order('created_at');
+    if (loadIdRef.current !== myLoadId) return;
     const result = (data ?? []).map((f: any) => ({
       id: f.id,
       name: f.name,
