@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -6,7 +6,7 @@ import { useTranslation } from '@/lib/useTranslation';
 import { useAppStore } from '@/lib/store';
 import { useShallow } from 'zustand/react/shallow';
 import { getWordOfDay } from '@/lib/data';
-import { getStreak, getXP, getTodayXP, getTodayLearnedCount, getDueWords, getLearnedWords, getSettings, isOnboarded, setOnboarded, getFreezes, checkAndGrantWeeklyFreeze, getImportedWords, getLastStudyDate, localDateStr, addDaysToDateStr, displayXP } from '@/lib/storage';
+import { getStreak, getXP, getTodayXP, getTodayLearnedCount, getDueWords, getLearnedWords, getSettings, isOnboarded, setOnboarded, getFreezes, checkAndGrantWeeklyFreeze, getLastStudyDate, localDateStr, addDaysToDateStr, displayXP } from '@/lib/storage';
 import { pullAll } from '@/lib/sync';
 import { useAuth } from '@/lib/auth-context';
 import { getLevelInfo } from '@/lib/gamification';
@@ -14,10 +14,10 @@ import { speak } from '@/lib/speech';
 import { getTheme, toggleTheme, type Theme } from '@/lib/theme';
 import type { WordItem, UserSettings } from '@/lib/types';
 import XpModal from '@/components/XpModal';
-import XpHistoryModal from '@/components/XpHistoryModal';
-import TiltCard from '@/components/TiltCard';
+import DailyGoalModal from '@/components/DailyGoalModal';
 import { supabase } from '@/lib/supabase';
 import { APK_DOWNLOAD_URL } from '@/lib/constants';
+import { HUB_CATEGORIES } from '@/lib/hubCategories';
 
 type HomeClassSummary = {
   classId: string; className: string; isTeacher: boolean;
@@ -52,46 +52,6 @@ function computeClassStreak(datesDesc: string[]): number {
   return streak;
 }
 
-const DEFINED_CARD_IDS = [
-  'day_streak','collections','total_xp','reading','words',
-  'daily_goal','level','wod',
-  'learn','flashcards','srs','quiz',
-  'starred','match','pomodoro','leaderboard',
-  'hard_words','lists','grammar','classes','xp_history','real_english','speaking',
-];
-// Every card's hide flag lives at this key — deriving it instead of hand-listing
-// a lookup table means a card can never be silently left out of a handler that
-// forgets to add its entry (the exact way #151's "Reset to default"/"Show classes
-// only" ended up missing real_english/speaking after they were added here).
-const hideKey = (id: string) => `home_hide_${id}`;
-// Ensures every id in DEFINED_CARD_IDS appears somewhere in a hand-curated
-// order list, appending any that were forgotten instead of silently dropping
-// them — same rationale as hideKey above.
-const withAllCards = (explicit: string[]) => [...explicit, ...DEFINED_CARD_IDS.filter(id => !explicit.includes(id))];
-const CARD_META: Record<string, { icon: string; label: string }> = {
-  collections:{ icon:'🗂️', label:'Collections' }, reading:{ icon:'📰', label:'Reading' },
-  day_streak: { icon:'🔥', label:'Day Streak'  }, total_xp:{ icon:'⚡', label:'Total XP'  },
-  words:      { icon:'📚', label:'Words'        }, daily_goal:{ icon:'🎯', label:'Daily Goal' },
-  level:      { icon:'⭐', label:'Level'        }, wod:{ icon:'💬', label:'Word of Day' },
-  learn:      { icon:'📖', label:'Learn'        }, srs:{ icon:'🔄', label:'SRS Review'  },
-  flashcards: { icon:'🃏', label:'Flashcards'   }, quiz:{ icon:'❓', label:'Quiz'        },
-  match:      { icon:'🎯', label:'Match'        }, pomodoro:{ icon:'🍅', label:'Pomodoro'    },
-  leaderboard:{ icon:'🏆', label:'Leaderboard'  }, starred:{ icon:'⭐', label:'Starred'      },
-  hard_words: { icon:'😓', label:'Hard Words'   }, lists:{ icon:'📋', label:'My Lists'    },
-  grammar:    { icon:'📚', label:'Grammar'      }, classes:{ icon:'👩‍🏫', label:'Classes'    },
-  xp_history:  { icon:'📅', label:'XP History'   },
-  real_english:{ icon:'🗣️', label:'Real English'  },
-  speaking:    { icon:'🎤', label:'Speaking'      },
-};
-
-const COLLECTION_META: Record<string, { icon: string; color: string; desc: string }> = {
-  '30 Days of Powerful Words': { icon: '🏆', color: 'var(--primary)', desc: 'Essential IELTS vocabulary by topic' },
-  '24 Vocabulary Challenge':   { icon: '💡', color: '#FF6584', desc: 'Idioms and phrases for fluent speakers' },
-  'Word Mastery':              { icon: '🎯', color: '#2ECC71', desc: 'High-level C1 & B2 collocations' },
-};
-
-const LEVELED_NAMES = new Set(['A1', 'A2', 'B1', 'Advanced']);
-
 export default function HomePage() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
@@ -108,60 +68,13 @@ export default function HomePage() {
   const [settings, setSettings] = useState<UserSettings>({ name: 'Learner', dailyGoal: 10, languageLevel: 'B1', defaultAccent: 'us', autoPlayOnReveal: true, sessionSize: 20, fontSize: 'normal', studyOrder: 'random', quizDirection: 'word-to-uz', reduceMotion: false, uiLanguage: 'en', showOnLeaderboard: true, pulseEnabled: true, pulseSpeed: 'normal' });
   const [freezes, setFreezes] = useState(0);
   const [streakRisk, setStreakRisk] = useState<'safe' | 'at-risk' | 'freeze-saves'>('safe');
-  const [importedCount, setImportedCount] = useState(0);
   const [wodRevealed, setWodRevealed] = useState(false);
   const [theme, setThemeState] = useState<Theme>('light');
   const [showXpModal, setShowXpModal] = useState(false);
-  const [showXpHistoryModal, setShowXpHistoryModal] = useState(false);
+  const [showDailyGoalModal, setShowDailyGoalModal] = useState(false);
   const [showBanner, setShowBanner] = useState(false);
   const [showReviewBanner, setShowReviewBanner] = useState(true);
-  const [hideCollections, setHideCollections] = useState(false);
-  const [hideReading, setHideReading] = useState(false);
-  const [hideDayStreak, setHideDayStreak] = useState(false);
-  const [hideTotalXp, setHideTotalXp] = useState(false);
-  const [hideWords, setHideWords] = useState(false);
-  const [hideDailyGoal, setHideDailyGoal] = useState(false);
-  const [hideLevel, setHideLevel] = useState(false);
-  const [hideWod, setHideWod] = useState(false);
-  const [hideLearn, setHideLearn] = useState(false);
-  const [hideSrs, setHideSrs] = useState(false);
-  const [hideFlashcards, setHideFlashcards] = useState(false);
-  const [hideQuiz, setHideQuiz] = useState(false);
-  const [hideMatch, setHideMatch] = useState(false);
-  const [hidePomodoro, setHidePomodoro] = useState(false);
-  const [hideLeaderboard, setHideLeaderboard] = useState(false);
-  const [hideStarred, setHideStarred] = useState(false);
-  const [hideHardWords, setHideHardWords] = useState(false);
-  const [hideLists, setHideLists] = useState(false);
-  const [hideGrammar, setHideGrammar] = useState(false);
-  const [hideClasses, setHideClasses] = useState(false);
-  const [hideXpHistory, setHideXpHistory] = useState(false);
-  const [hideRealEnglish, setHideRealEnglish] = useState(false);
-  const [hideSpeaking, setHideSpeaking] = useState(false);
-  // Slot-map: 20-element array, each entry is a card ID or null (empty slot)
-  const [slotMap, setSlotMap] = useState<(string|null)[]>(Array(200).fill(null));
-  const [arrangeMode, setArrangeMode] = useState(false);
-  const [workingSlots, setWorkingSlots] = useState<(string|null)[]>(Array(200).fill(null));
-  const [pickedCard, setPickedCard] = useState<string|null>(null);
-  const [pickedFromSlot, setPickedFromSlot] = useState<number|'tray'|null>(null);
-  const [heroEnabled, setHeroEnabled] = useState(true);
-  const [hideMode, setHideMode] = useState(false);
-  const [hideSelection, setHideSelection] = useState<Set<string>>(new Set());
-  const [unhideMode, setUnhideMode] = useState(false);
-  const [unhideSelection, setUnhideSelection] = useState<Set<string>>(new Set());
-  const [switchMode, setSwitchMode] = useState(false);
-  const [workingOrder, setWorkingOrder] = useState<string[]>([]);
-  const [switchFirst, setSwitchFirst] = useState<string | null>(null);
-  const [showCustomize, setShowCustomize] = useState(false);
   const [homeClasses, setHomeClasses] = useState<HomeClassSummary[]>([]);
-  const [hiddenClassIds, setHiddenClassIds] = useState<Set<string>>(new Set());
-  const [sectionOrder, setSectionOrder] = useState([
-    'collections', 'reading', 'day_streak', 'total_xp', 'words',
-    'daily_goal', 'level', 'wod',
-    'learn', 'flashcards', 'srs', 'quiz',
-    'starred', 'match', 'pomodoro', 'leaderboard',
-    'hard_words', 'lists', 'grammar', 'classes', 'xp_history',
-  ]);
 
   useEffect(() => {
     if (authLoading) return;
@@ -203,95 +116,9 @@ export default function HomePage() {
     setLearnedCount(getLearnedWords().length);
     setSettings(getSettings());
     setThemeState(getTheme());
-    setImportedCount(getImportedWords().length);
     if (!localStorage.getItem('android_banner_seen')) {
       localStorage.setItem('android_banner_seen', '1');
       setShowBanner(true);
-    }
-    setHideCollections(localStorage.getItem('home_hide_collections') === '1');
-    setHideReading(localStorage.getItem('home_hide_reading') === '1');
-    setHideDayStreak(localStorage.getItem('home_hide_day_streak') === '1');
-    setHideTotalXp(localStorage.getItem('home_hide_total_xp') === '1');
-    setHideWords(localStorage.getItem('home_hide_words') === '1');
-    setHideDailyGoal(localStorage.getItem('home_hide_daily_goal') === '1');
-    setHideLevel(localStorage.getItem('home_hide_level') === '1');
-    setHideWod(localStorage.getItem('home_hide_wod') === '1');
-    setHideLearn(localStorage.getItem('home_hide_learn') === '1');
-    setHideSrs(localStorage.getItem('home_hide_srs') === '1');
-    const DEFAULT_ORDER = DEFINED_CARD_IDS;
-    const ALL_IDS = new Set(DEFAULT_ORDER);
-    const savedOrder = localStorage.getItem('home_section_order');
-    let order = savedOrder ? savedOrder.split(',') : DEFAULT_ORDER;
-    if (order.includes('stats')) {
-      const idx = order.indexOf('stats');
-      order = [...order.slice(0, idx), 'collections', 'reading', 'day_streak', 'total_xp', 'words', ...order.slice(idx + 1)];
-    }
-    if (order.includes('goal')) {
-      const idx = order.indexOf('goal');
-      order = [...order.slice(0, idx), 'daily_goal', 'level', ...order.slice(idx + 1)];
-    }
-    if (order.includes('actions')) {
-      const idx = order.indexOf('actions');
-      order = [...order.slice(0, idx), 'learn', 'srs', 'flashcards', 'quiz', 'match', 'pomodoro', 'leaderboard', 'starred', 'hard_words', 'lists', 'grammar', 'classes', ...order.slice(idx + 1)];
-    }
-    order = order.filter(s => s !== 'shortcuts');
-    const missing = DEFAULT_ORDER.filter(id => !order.includes(id));
-    setSectionOrder([...order.filter(id => ALL_IDS.has(id) || id.startsWith('class_')), ...missing]);
-    const hiddenCls = new Set(
-      Object.keys(localStorage)
-        .filter(k => k.startsWith('home_hide_class_') && localStorage.getItem(k) === '1')
-        .map(k => k.replace('home_hide_class_', ''))
-    );
-    setHiddenClassIds(hiddenCls);
-    setHideFlashcards(localStorage.getItem('home_hide_flashcards') === '1');
-    setHideQuiz(localStorage.getItem('home_hide_quiz') === '1');
-    setHideMatch(localStorage.getItem('home_hide_match') === '1');
-    setHidePomodoro(localStorage.getItem('home_hide_pomodoro') === '1');
-    setHideLeaderboard(localStorage.getItem('home_hide_leaderboard') === '1');
-    setHideStarred(localStorage.getItem('home_hide_starred') === '1');
-    setHideHardWords(localStorage.getItem('home_hide_hard_words') === '1');
-    setHideLists(localStorage.getItem('home_hide_lists') === '1');
-    setHideGrammar(localStorage.getItem('home_hide_grammar') === '1');
-    setHideClasses(localStorage.getItem('home_hide_classes') === '1');
-    setHideXpHistory(localStorage.getItem('home_hide_xp_history') === '1');
-    setHideRealEnglish(localStorage.getItem('home_hide_real_english') === '1');
-    setHideSpeaking(localStorage.getItem('home_hide_speaking') === '1');
-
-    // Load hero toggle
-    setHeroEnabled(localStorage.getItem('home_hero_enabled') !== '0');
-
-    // Load or build slot map
-    const savedSlotMap = localStorage.getItem('home_slot_map');
-    if (savedSlotMap) {
-      try {
-        const parsed: (string|null)[] = JSON.parse(savedSlotMap);
-        while (parsed.length < 200) parsed.push(null);
-        let dirty = false;
-        // Migrate: add any DEFINED_CARD_IDS missing from the saved map
-        const inMap = new Set(parsed.filter((id): id is string => !!id));
-        const toAdd = DEFINED_CARD_IDS.filter(id => !inMap.has(id) && localStorage.getItem('home_hide_' + id) !== '1');
-        if (toAdd.length > 0) {
-          let lastFilled = -1;
-          for (let i = 0; i < 200; i++) if (parsed[i]) lastFilled = i;
-          let si = lastFilled + 1;
-          for (const id of toAdd) parsed[si++] = id;
-          dirty = true;
-        }
-        // Migrate: slot 0 must be day_streak (large center). If it's elsewhere in the
-        // hero area (slots 0-4) but not at 0, swap it into position.
-        const dsIdx = parsed.slice(0, 5).indexOf('day_streak');
-        if (dsIdx > 0) { [parsed[0], parsed[dsIdx]] = [parsed[dsIdx], parsed[0]]; dirty = true; }
-        if (dirty) localStorage.setItem('home_slot_map', JSON.stringify(parsed));
-        setSlotMap(parsed);
-      } catch { /* fall through to build */ }
-    } else {
-      const map: (string|null)[] = Array(200).fill(null);
-      let si = 0;
-      for (const id of DEFINED_CARD_IDS) {
-        if (localStorage.getItem('home_hide_' + id) !== '1') map[si++] = id;
-      }
-      setSlotMap(map);
-      localStorage.setItem('home_slot_map', JSON.stringify(map));
     }
 
     const refreshState = () => {
@@ -371,25 +198,6 @@ export default function HomePage() {
           }
         }
         setHomeClasses(cards);
-        setSectionOrder(prev => {
-          const newIds = cards.map(c => `class_${c.classId}`).filter(id => !prev.includes(id));
-          if (newIds.length === 0) return prev;
-          const insertAt = prev.indexOf('classes');
-          const updated = insertAt >= 0
-            ? [...prev.slice(0, insertAt), ...newIds, ...prev.slice(insertAt)]
-            : [...prev, ...newIds];
-          localStorage.setItem('home_section_order', updated.join(','));
-          return updated;
-        });
-        // Add newly discovered class cards to first empty slots in slotMap
-        setSlotMap(prev => {
-          const toAdd = cards.map(c => `class_${c.classId}`).filter(id => !prev.includes(id));
-          if (toAdd.length === 0) return prev;
-          const m = [...prev];
-          for (const id of toAdd) { const i = m.indexOf(null); if (i !== -1) m[i] = id; }
-          localStorage.setItem('home_slot_map', JSON.stringify(m));
-          return m;
-        });
       } catch {
         // best-effort — leave whatever class cards were already loaded
       }
@@ -400,131 +208,6 @@ export default function HomePage() {
   const levelInfo = getLevelInfo(xp);
   const dailyProgress = Math.min((todayCount / settings.dailyGoal) * 100, 100);
   const pulseClass = (settings.pulseEnabled ?? true) ? `animate-heartbeat-${settings.pulseSpeed ?? 'normal'}` : '';
-  const mainCollections = collections.filter(c => !LEVELED_NAMES.has(c.name) && !c.youtubeUrl);
-
-  const handleHideSave = () => {
-    hideSelection.forEach(sId => {
-      if (!sId.startsWith('class_')) localStorage.setItem(hideKey(sId), '1');
-      if (sId === 'collections')  setHideCollections(true);
-      else if (sId === 'reading')      setHideReading(true);
-      else if (sId === 'day_streak')   setHideDayStreak(true);
-      else if (sId === 'total_xp')     setHideTotalXp(true);
-      else if (sId === 'words')        setHideWords(true);
-      else if (sId === 'daily_goal')   setHideDailyGoal(true);
-      else if (sId === 'level')        setHideLevel(true);
-      else if (sId === 'wod')          setHideWod(true);
-      else if (sId === 'learn')        setHideLearn(true);
-      else if (sId === 'srs')          setHideSrs(true);
-      else if (sId === 'flashcards')   setHideFlashcards(true);
-      else if (sId === 'quiz')         setHideQuiz(true);
-      else if (sId === 'match')        setHideMatch(true);
-      else if (sId === 'pomodoro')     setHidePomodoro(true);
-      else if (sId === 'leaderboard')  setHideLeaderboard(true);
-      else if (sId === 'starred')      setHideStarred(true);
-      else if (sId === 'hard_words')   setHideHardWords(true);
-      else if (sId === 'lists')        setHideLists(true);
-      else if (sId === 'grammar')      setHideGrammar(true);
-      else if (sId === 'classes')      setHideClasses(true);
-      else if (sId === 'xp_history')   setHideXpHistory(true);
-      else if (sId === 'real_english') setHideRealEnglish(true);
-      else if (sId === 'speaking')     setHideSpeaking(true);
-      else if (sId.startsWith('class_')) {
-        const cId = sId.replace('class_', '');
-        localStorage.setItem(`home_hide_class_${cId}`, '1');
-        setHiddenClassIds(prev => new Set([...prev, cId]));
-      }
-    });
-    setSlotMap(prev => {
-      const m = [...prev];
-      hideSelection.forEach(sId => { const i = m.indexOf(sId); if (i !== -1) m[i] = null; });
-      localStorage.setItem('home_slot_map', JSON.stringify(m));
-      return m;
-    });
-    setHideMode(false);
-    setHideSelection(new Set());
-  };
-
-  const handleUnhideSave = () => {
-    unhideSelection.forEach(sId => {
-      if (!sId.startsWith('class_')) localStorage.removeItem(hideKey(sId));
-      if (sId === 'collections')  setHideCollections(false);
-      else if (sId === 'reading')      setHideReading(false);
-      else if (sId === 'day_streak')   setHideDayStreak(false);
-      else if (sId === 'total_xp')     setHideTotalXp(false);
-      else if (sId === 'words')        setHideWords(false);
-      else if (sId === 'daily_goal')   setHideDailyGoal(false);
-      else if (sId === 'level')        setHideLevel(false);
-      else if (sId === 'wod')          setHideWod(false);
-      else if (sId === 'learn')        setHideLearn(false);
-      else if (sId === 'srs')          setHideSrs(false);
-      else if (sId === 'flashcards')   setHideFlashcards(false);
-      else if (sId === 'quiz')         setHideQuiz(false);
-      else if (sId === 'match')        setHideMatch(false);
-      else if (sId === 'pomodoro')     setHidePomodoro(false);
-      else if (sId === 'leaderboard')  setHideLeaderboard(false);
-      else if (sId === 'starred')      setHideStarred(false);
-      else if (sId === 'hard_words')   setHideHardWords(false);
-      else if (sId === 'lists')        setHideLists(false);
-      else if (sId === 'grammar')      setHideGrammar(false);
-      else if (sId === 'classes')      setHideClasses(false);
-      else if (sId === 'xp_history')   setHideXpHistory(false);
-      else if (sId === 'real_english') setHideRealEnglish(false);
-      else if (sId === 'speaking')     setHideSpeaking(false);
-      else if (sId.startsWith('class_')) {
-        const cId = sId.replace('class_', '');
-        localStorage.removeItem(`home_hide_class_${cId}`);
-        setHiddenClassIds(prev => { const n = new Set(prev); n.delete(cId); return n; });
-      }
-    });
-    setSlotMap(prev => {
-      const m = [...prev];
-      unhideSelection.forEach(sId => {
-        if (!m.includes(sId)) { const i = m.indexOf(null); if (i !== -1) m[i] = sId; }
-      });
-      localStorage.setItem('home_slot_map', JSON.stringify(m));
-      return m;
-    });
-    setUnhideMode(false);
-    setUnhideSelection(new Set());
-  };
-
-  const handleSwitchSave = () => {
-    setSectionOrder(workingOrder);
-    localStorage.setItem('home_section_order', workingOrder.join(','));
-    setSwitchMode(false);
-    setSwitchFirst(null);
-    setWorkingOrder([]);
-  };
-
-  const handleArrangeSave = () => {
-    const m = [...workingSlots];
-    setSlotMap(m);
-    localStorage.setItem('home_slot_map', JSON.stringify(m));
-    setArrangeMode(false);
-    setPickedCard(null);
-    setPickedFromSlot(null);
-  };
-
-  const handleSlotClick = (slotIdx: number) => {
-    const cardAtSlot = workingSlots[slotIdx] ?? null;
-    if (pickedCard === null) {
-      if (cardAtSlot) { setPickedCard(cardAtSlot); setPickedFromSlot(slotIdx); }
-    } else {
-      const m = [...workingSlots];
-      m[slotIdx] = pickedCard;
-      if (typeof pickedFromSlot === 'number') m[pickedFromSlot] = cardAtSlot;
-      setWorkingSlots(m);
-      setPickedCard(null); setPickedFromSlot(null);
-    }
-  };
-
-  const handleTrayCardClick = (cardId: string) => {
-    if (pickedCard === cardId && pickedFromSlot === 'tray') {
-      setPickedCard(null); setPickedFromSlot(null);
-    } else {
-      setPickedCard(cardId); setPickedFromSlot('tray');
-    }
-  };
 
   return (
     <div className="p-4 space-y-6 animate-fade-in">
@@ -541,20 +224,6 @@ export default function HomePage() {
             aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
           >
             {theme === 'dark' ? '☀️' : '🌙'}
-          </button>
-          <button
-            onClick={() => setShowCustomize(true)}
-            className="w-10 h-10 rounded-full bg-[var(--surface-2)] flex items-center justify-center hover:bg-[var(--primary-bg)] transition-colors text-[var(--text-muted)]"
-            aria-label="Customize home"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-              <line x1="4" y1="6" x2="20" y2="6"/>
-              <line x1="4" y1="12" x2="20" y2="12"/>
-              <line x1="4" y1="18" x2="20" y2="18"/>
-              <circle cx="9" cy="6" r="2.5" fill="currentColor" stroke="none"/>
-              <circle cx="15" cy="12" r="2.5" fill="currentColor" stroke="none"/>
-              <circle cx="9" cy="18" r="2.5" fill="currentColor" stroke="none"/>
-            </svg>
           </button>
           <Link href="/settings" className="w-10 h-10 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-lg">
             ⚙️
@@ -618,688 +287,176 @@ export default function HomePage() {
       )}
 
       {showXpModal && <XpModal xp={xp} onClose={() => setShowXpModal(false)} />}
-      {showXpHistoryModal && <XpHistoryModal xp={xp} onClose={() => setShowXpHistoryModal(false)} />}
+      {showDailyGoalModal && (
+        <DailyGoalModal
+          settings={settings}
+          todayCount={todayCount}
+          onSave={goal => setSettings(s => ({ ...s, dailyGoal: goal }))}
+          onClose={() => setShowDailyGoalModal(false)}
+        />
+      )}
 
-      {(() => {
-        // Slot-map rendering (normal + arrange mode)
-        const useSlotMap = !hideMode && !unhideMode && !switchMode;
-        const activeSlots = arrangeMode ? workingSlots : slotMap;
+      {/* ── Today ── */}
+      <div>
+        <h2 className="text-xs font-bold uppercase tracking-wide text-[var(--text-muted)] mb-2 px-1">{t.hub.today}</h2>
+        <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
+          <Link href="/progress?tab=calendar" className="block">
+            <div className={`rounded-2xl p-4 h-full flex flex-col items-center justify-center text-center gap-2 hover:-translate-y-1 transition-all duration-200 ${pulseClass}`}
+              style={{ background: 'linear-gradient(135deg, #FF6B35, #ff9f7f)', boxShadow: '0 10px 0 #b84a1a, 0 18px 40px rgba(255,107,53,0.55)', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>
+              <div className="text-3xl">🔥</div>
+              <div className="text-xl font-black text-white">{streak}</div>
+              <div className="text-xs text-white/85 font-semibold">{t.home.dayStreak}</div>
+            </div>
+          </Link>
 
-        // Normal mode: compact slots (no gaps from hidden cards).
-        // Arrange mode: preserve exact positions so empty slots show as drop targets.
-        const displayCards: (string | null)[] = arrangeMode
-          ? activeSlots
-          : activeSlots.filter((id): id is string => !!id);
+          <button onClick={() => setShowXpModal(true)} className="block w-full h-full text-left">
+            <StatCard icon="⚡" value={displayXP(xp)} label={t.home.totalXp}
+              gradient="linear-gradient(135deg, #a78bfa, #6C63FF, #4C1D95)" edge="#3D1F9E" glowColor="rgba(108,99,255,0.4)" pulseClass={pulseClass} />
+          </button>
 
-        // Last filled index drives FRAME_SLOTS generation.
-        // For legacy modes (hide/unhide/switch) use sectionOrder length so ghost cards get slots.
-        const lastFilledIdx = arrangeMode
-          ? (() => { let l = -1; for (let i = 0; i < 200; i++) if (activeSlots[i]) l = i; return l; })()
-          : useSlotMap
-          ? displayCards.length - 1
-          : sectionOrder.length - 1;
+          <Link href="/progress" className="block h-full">
+            <StatCard icon="📚" value={learnedCount} label={t.home.words}
+              gradient="linear-gradient(135deg, #0284c7, #38bdf8)" edge="#0369a1" glowColor="rgba(2,132,199,0.4)" pulseClass={pulseClass} />
+          </Link>
 
-        // Build FRAME_SLOTS: hero (fixed) + uniform rows.
-        // In normal slot-map mode the partial last row is rendered in a flex container
-        // (outside the grid) so it can be truly centered — not in FRAME_SLOTS.
-        const FRAME_SLOTS: { gridColumn: string; gridRow: string }[] = [];
-        const extraSlots = arrangeMode ? 5 : 0;
-        // true only in normal mode; legacy/arrange modes keep partial row in the grid
-        const flexPartialRow = useSlotMap && !arrangeMode;
-
-        const buildUniformRows = (startRow: number, filledCount: number) => {
-          const total = filledCount + extraSlots;
-          const fullRows = Math.floor(total / 5);
-          const lastCount = total % 5;
-          let row = startRow;
-          for (let r = 0; r < fullRows; r++, row++)
-            for (let col = 1; col <= 5; col++)
-              FRAME_SLOTS.push({ gridColumn: String(col), gridRow: String(row) });
-          if (!flexPartialRow && lastCount > 0) {
-            const leftPad = Math.round((5 - lastCount) / 2);
-            for (let i = 0; i < lastCount; i++)
-              FRAME_SLOTS.push({ gridColumn: String(leftPad + 1 + i), gridRow: String(row) });
-          }
-          // In flexPartialRow mode the last `lastCount` displayCards are rendered outside the grid.
-        };
-
-        if (heroEnabled) {
-          FRAME_SLOTS.push(
-            { gridColumn: '2 / 5', gridRow: '1 / 3' }, // slot 0 – large center
-            { gridColumn: '1',     gridRow: '1'     }, // slot 1 – top-left
-            { gridColumn: '5',     gridRow: '1'     }, // slot 2 – top-right
-            { gridColumn: '1',     gridRow: '2'     }, // slot 3 – bottom-left
-            { gridColumn: '5',     gridRow: '2'     }, // slot 4 – bottom-right
-          );
-          buildUniformRows(3, Math.max(0, lastFilledIdx - 4));
-        } else {
-          buildUniformRows(1, Math.max(0, lastFilledIdx + 1));
-        }
-
-        const visibleSlots = FRAME_SLOTS;
-        const HIDE_MAP: Record<string, boolean> = {
-          collections: hideCollections, reading: hideReading, day_streak: hideDayStreak,
-          total_xp: hideTotalXp, words: hideWords, daily_goal: hideDailyGoal,
-          level: hideLevel, wod: hideWod, learn: hideLearn, srs: hideSrs,
-          flashcards: hideFlashcards, quiz: hideQuiz, match: hideMatch,
-          pomodoro: hidePomodoro, leaderboard: hideLeaderboard, starred: hideStarred,
-          hard_words: hideHardWords, lists: hideLists, grammar: hideGrammar, classes: hideClasses,
-          xp_history: hideXpHistory,
-          real_english: hideRealEnglish,
-          speaking: hideSpeaking,
-          ...Object.fromEntries(homeClasses.map(c => [`class_${c.classId}`, hiddenClassIds.has(c.classId)])),
-        };
-        const visible = sectionOrder.filter(sId => !HIDE_MAP[sId]);
-        const displaySections = unhideMode
-          ? sectionOrder
-          : switchMode
-          ? workingOrder.filter(sId => !HIDE_MAP[sId])
-          : visible;
-
-        type ActionDef = { href: string; icon: string; title: string; subtitle: string; gradient: string; edge: string; glow: string; badge?: string };
-        const ACTION_MAP: Record<string, ActionDef> = {
-          learn:       { href: '/learn',        icon: '📖', title: t.home.learnTitle,     subtitle: t.home.learnSub,       gradient: 'linear-gradient(135deg, #4338ca, #818cf8)', edge: '#312e81', glow: 'rgba(67,56,202,0.4)' },
-          srs:         { href: dueCount > 0 ? '/srs' : '/free-time', icon: '🔄', title: t.home.srsTitle, subtitle: dueCount > 0 ? t.home.srsDue(dueCount) : t.home.srsAllCaughtUp, gradient: dueCount > 0 ? 'linear-gradient(135deg, #ef4444, #f87171)' : 'linear-gradient(135deg, #1a9a50, #2ECC71)', edge: dueCount > 0 ? '#b91c1c' : '#0f6634', glow: dueCount > 0 ? 'rgba(239,68,68,0.4)' : 'rgba(46,204,113,0.4)', badge: dueCount > 0 ? String(dueCount) : undefined },
-          flashcards:  { href: '/flashcards',   icon: '🃏', title: t.home.flashcardsTitle, subtitle: t.home.flashcardsSub,  gradient: 'linear-gradient(135deg, #b45309, #fcd34d)', edge: '#78350f', glow: 'rgba(180,83,9,0.4)' },
-          quiz:        { href: '/quiz',         icon: '❓', title: t.home.quizTitle,       subtitle: t.home.quizSub,        gradient: 'linear-gradient(135deg, #4d7c0f, #a3e635)', edge: '#365314', glow: 'rgba(77,124,15,0.4)' },
-          match:       { href: '/matching',     icon: '🎯', title: t.home.matchTitle,      subtitle: t.home.matchSub,       gradient: 'linear-gradient(135deg, #ec4899, #f472b6)', edge: '#9d174d', glow: 'rgba(236,72,153,0.4)' },
-          pomodoro:    { href: '/pomodoro',     icon: '🍅', title: t.home.pomodoroTitle,   subtitle: t.home.pomodoroSub,    gradient: 'linear-gradient(135deg, #7f1d1d, #b91c1c)', edge: '#450a0a', glow: 'rgba(127,29,29,0.4)' },
-          leaderboard: { href: '/leaderboard',  icon: '🏆', title: t.home.leaderboardTitle, subtitle: t.home.leaderboardSub, gradient: 'linear-gradient(135deg, #d97706, #fbbf24)', edge: '#92400e', glow: 'rgba(217,119,6,0.4)' },
-          starred:     { href: '/starred',      icon: '⭐', title: t.home.starredTitle,    subtitle: t.home.starredSub,     gradient: 'linear-gradient(135deg, #92400e, #d97706)', edge: '#451a03', glow: 'rgba(146,64,14,0.4)' },
-          hard_words:  { href: '/hard-words',   icon: '😓', title: t.home.hardTitle,       subtitle: t.home.hardSub,        gradient: 'linear-gradient(135deg, #dc2626, #ef4444)', edge: '#991b1b', glow: 'rgba(220,38,38,0.4)' },
-          lists:       { href: '/lists',        icon: '📋', title: t.home.listsTitle,      subtitle: t.home.listsSub,       gradient: 'linear-gradient(135deg, #7c3aed, #8b5cf6)', edge: '#4c1d95', glow: 'rgba(124,58,237,0.4)' },
-          grammar:     { href: '/grammar-tips', icon: '📚', title: t.home.grammarTitle,    subtitle: t.home.grammarSub,     gradient: 'linear-gradient(135deg, #1a9a50, #2ECC71)', edge: '#0f6634', glow: 'rgba(46,204,113,0.4)' },
-          classes:     { href: '/classes',      icon: '👩‍🏫', title: t.home.classesTitle,  subtitle: t.home.classesSub,     gradient: 'linear-gradient(135deg, #0284c7, #38bdf8)', edge: '#0369a1', glow: 'rgba(2,132,199,0.4)' },
-          xp_history:  { href: '#xp-history',   icon: '📅', title: t.home.xpHistoryTitle,  subtitle: t.home.xpHistorySub,   gradient: 'linear-gradient(135deg, #4c1d95, #6c63ff)', edge: '#2e1065', glow: 'rgba(108,99,255,0.4)' },
-          real_english:{ href: '/real-english', icon: '🗣️', title: t.home.realEnglishTitle, subtitle: t.home.realEnglishSub, gradient: 'linear-gradient(135deg, #0e7490, #06b6d4)', edge: '#164e63', glow: 'rgba(14,116,144,0.4)' },
-          speaking:    { href: '/speaking',     icon: '🎤', title: t.home.speakingTitle,   subtitle: t.home.speakingSub,    gradient: 'linear-gradient(135deg, #be185d, #fb7185)', edge: '#831843', glow: 'rgba(190,24,93,0.4)' },
-        };
-
-        const renderCard = (sId: string, isLarge: boolean) => {
-          if (sId === 'collections') return (
-            <Link href="/collections" className="block h-full">
-              <StatCard icon="🗂️" value={mainCollections.length + 2} label={t.home.collections}
-                gradient="linear-gradient(135deg, #1d4ed8, #60a5fa)" edge="#1e3a8a" glowColor="rgba(29,78,216,0.4)" pulseClass={pulseClass} />
-            </Link>
-          );
-          if (sId === 'reading') return (
-            <Link href="/reading" className="block h-full">
-              <StatCard icon="📰" value="→" label={t.home.readingTitle}
-                gradient="linear-gradient(135deg, #047857, #34d399)" edge="#064e3b" glowColor="rgba(4,120,87,0.4)" pulseClass={pulseClass} />
-            </Link>
-          );
-          if (sId === 'day_streak') return (
-            <Link href="/progress?tab=calendar" className="block h-full">
-              <div className={`rounded-2xl h-full flex flex-col items-center justify-center text-center gap-3 hover:-translate-y-1 transition-all duration-200 ${pulseClass}`}
-                style={{ background: 'linear-gradient(135deg, #FF6B35, #ff9f7f)', boxShadow: '0 12px 0 #b84a1a, 0 22px 50px rgba(255,107,53,0.55)', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>
-                <div className={isLarge ? 'text-7xl' : 'text-4xl'}>🔥</div>
-                <div className={isLarge ? 'text-6xl font-black text-white' : 'text-3xl font-black text-white'}>{streak}</div>
-                <div className={isLarge ? 'text-base text-white/85 font-semibold' : 'text-xs text-white/85 font-semibold'}>{t.home.dayStreak}</div>
-              </div>
-            </Link>
-          );
-          if (sId === 'total_xp') return (
-            <button onClick={() => setShowXpModal(true)} className="block h-full w-full">
-              <StatCard icon="⚡" value={displayXP(xp)} label={t.home.totalXp}
-                gradient="linear-gradient(135deg, #a78bfa, #6C63FF, #4C1D95)" edge="#3D1F9E" glowColor="rgba(108,99,255,0.4)" pulseClass={pulseClass} />
-            </button>
-          );
-          if (sId === 'words') return (
-            <Link href="/progress" className="block h-full">
-              <StatCard icon="📚" value={learnedCount} label={t.home.words}
-                gradient="linear-gradient(135deg, #0284c7, #38bdf8)" edge="#0369a1" glowColor="rgba(2,132,199,0.4)" pulseClass={pulseClass} />
-            </Link>
-          );
-          if (sId === 'daily_goal') return (
-            <div className={`rounded-2xl h-full p-4 flex flex-col justify-between ${pulseClass}`}
+          <button onClick={() => setShowDailyGoalModal(true)} className="block w-full h-full text-left">
+            <div className={`rounded-2xl p-4 h-full flex flex-col justify-center gap-3 hover:-translate-y-1 transition-all duration-200 ${pulseClass}`}
               style={{ background: 'linear-gradient(135deg, #5b21b6, #8b5cf6)', boxShadow: '0 10px 0 #3b0764, 0 18px 40px rgba(91,33,182,0.5)' }}>
-              <div className="flex items-center gap-3">
-                <div className="relative shrink-0" style={{ width: 50, height: 50 }}>
-                  <svg width="50" height="50" style={{ transform: 'rotate(-90deg)' }}>
-                    <circle cx="25" cy="25" r="20" fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="5" />
-                    <circle cx="25" cy="25" r="20" fill="none" stroke="white" strokeWidth="5" strokeLinecap="round"
-                      strokeDasharray={`${Math.min(dailyProgress, 100) / 100 * 125.7} 125.7`}
-                      style={{ transition: 'stroke-dasharray 0.5s ease' }} />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-sm font-black text-white" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>{dailyProgress >= 100 ? '✓' : todayCount}</span>
-                  </div>
-                </div>
-                <div style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
-                  <div className="text-sm font-black text-white">{todayCount} / {settings.dailyGoal}</div>
-                  <div className="text-xs text-white/75">{t.home.dailyGoal}</div>
+              <div className="relative self-center" style={{ width: 42, height: 42 }}>
+                <svg width="42" height="42" style={{ transform: 'rotate(-90deg)' }}>
+                  <circle cx="21" cy="21" r="17" fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="4" />
+                  <circle cx="21" cy="21" r="17" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round"
+                    strokeDasharray={`${Math.min(dailyProgress, 100) / 100 * 106.8} 106.8`}
+                    style={{ transition: 'stroke-dasharray 0.5s ease' }} />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-xs font-black text-white" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>{dailyProgress >= 100 ? '✓' : todayCount}</span>
                 </div>
               </div>
-              <div>
-                <div className="h-1.5 rounded-full bg-white/25 overflow-hidden mb-2">
-                  <div className="h-full rounded-full bg-white transition-all duration-500" style={{ width: `${Math.min(dailyProgress, 100)}%` }} />
-                </div>
-                <p className="text-[10px] text-white/75" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
-                  {dailyProgress >= 100 ? t.home.goalReached : `${displayXP(todayXp)} XP · ${Math.max(0, settings.dailyGoal - todayCount)} to go`}
-                </p>
+              <div className="text-center" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
+                <div className="text-xs font-black text-white">{todayCount} / {settings.dailyGoal}</div>
+                <div className="text-[10px] text-white/75">{t.home.dailyGoal}</div>
               </div>
             </div>
-          );
-          if (sId === 'level') return (
-            <button onClick={() => setShowXpModal(true)} className="block h-full w-full text-left">
-              <div className={`rounded-2xl h-full p-4 flex flex-col justify-between ${pulseClass}`}
-                style={{ background: 'linear-gradient(135deg, #be123c, #fb7185)', boxShadow: '0 10px 0 #881337, 0 18px 40px rgba(190,18,60,0.5)', textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
-                <div>
-                  <div className="text-2xl mb-1">⭐</div>
-                  <div className="text-sm font-black text-white leading-tight">{levelInfo.level}</div>
-                  <div className="text-xs text-white/75 mt-0.5">{displayXP(xp)} XP</div>
-                </div>
-                <div>
-                  <div className="h-2 rounded-full bg-white/25 overflow-hidden mb-1">
-                    <div className="h-full rounded-full bg-white transition-all duration-500" style={{ width: `${levelInfo.progress}%` }} />
-                  </div>
-                  {levelInfo.next && <p className="text-[10px] text-white/75">{displayXP(levelInfo.xpToNext)} → {levelInfo.next}</p>}
-                </div>
-              </div>
-            </button>
-          );
-          if (sId === 'wod') return wod ? (
-            <div className={`rounded-2xl h-full p-4 flex flex-col justify-between ${pulseClass}`}
+          </button>
+
+          <Link href="/progress" className="block h-full">
+            <div className={`rounded-2xl p-4 h-full flex flex-col items-center justify-center text-center gap-1 ${pulseClass}`}
+              style={{ background: 'linear-gradient(135deg, #be123c, #fb7185)', boxShadow: '0 10px 0 #881337, 0 18px 40px rgba(190,18,60,0.5)', textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
+              <div className="text-2xl mb-1">⭐</div>
+              <div className="text-sm font-black text-white leading-tight">{levelInfo.level}</div>
+              <div className="text-xs text-white/75 mt-0.5">{displayXP(xp)} XP</div>
+            </div>
+          </Link>
+
+          {wod ? (
+            <div className={`rounded-2xl p-4 h-full flex flex-col justify-between ${pulseClass}`}
               style={{ background: 'linear-gradient(135deg, #a21caf, #e879f9)', boxShadow: '0 10px 0 #701a75, 0 18px 40px rgba(162,28,175,0.5)', textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
               <div className="flex items-start justify-between gap-1">
                 <div className="flex-1 min-w-0">
                   <div className="text-[9px] font-bold text-white/60 uppercase tracking-wider mb-1">{t.home.wordOfDay}</div>
                   <div className="text-sm font-black text-white leading-tight">{wod.word}</div>
-                  <div className="text-[10px] text-white/70 mt-0.5">{wod.partOfSpeech}</div>
-                  <div className="text-xs font-semibold text-white/90 mt-1">{wod.translation}</div>
                 </div>
                 <button onClick={() => speak(wod.word)}
-                  className="shrink-0 w-7 h-7 rounded-full bg-white/20 flex items-center justify-center text-xs hover:bg-white/30 transition-colors"
+                  className="shrink-0 w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-xs hover:bg-white/30 transition-colors"
                   style={{ textShadow: 'none' }} aria-label="Pronounce">🔊</button>
               </div>
               {wodRevealed ? (
-                <p className="text-[10px] text-white/85 leading-snug mt-2">{wod.definition}</p>
+                <p className="text-[10px] text-white/85 leading-snug mt-1 line-clamp-2">{wod.definition}</p>
               ) : (
                 <button onClick={() => setWodRevealed(true)}
-                  className="mt-auto text-[10px] font-semibold text-white bg-white/20 hover:bg-white/30 rounded-xl px-2 py-1 transition-colors self-start"
+                  className="mt-1 text-[10px] font-semibold text-white bg-white/20 hover:bg-white/30 rounded-xl px-2 py-1 transition-colors self-start"
                   style={{ textShadow: 'none' }}>{t.home.showDefinition}</button>
               )}
             </div>
           ) : (
-            <div className="rounded-2xl h-full animate-pulse" style={{ background: 'rgba(162,28,175,0.2)' }} />
-          );
-          if (sId.startsWith('class_')) {
-            const classId = sId.replace('class_', '');
-            const card = homeClasses.find(c => c.classId === classId);
-            if (!card) return null;
-            const { bg, edge, glow } = classGradient(card.classId);
-            return (
-              <div className="relative h-full">
-                {card.pendingHomework > 0 && (
-                  <div className="absolute -top-1.5 -right-1.5 min-w-[22px] h-[22px] rounded-full bg-white text-[var(--danger)] text-[10px] flex items-center justify-center font-black z-10 shadow px-1">
-                    {card.pendingHomework}
-                  </div>
-                )}
-                <Link href={`/classes/${card.classId}/home`} className="block h-full">
-                  <div className={`rounded-2xl h-full p-3 flex flex-col justify-between hover:-translate-y-1 transition-all duration-200 ${pulseClass}`}
-                    style={{ background: bg, boxShadow: `0 10px 0 ${edge}, 0 18px 40px ${glow}`, textShadow: '0 1px 3px rgba(0,0,0,0.35)' }}>
-                    <div className="flex items-start justify-between gap-1">
-                      <div className="flex-1 min-w-0">
-                        <div className="text-base font-black text-white leading-tight truncate">{card.className}</div>
-                        <div className="text-[10px] text-white/70 mt-1">
-                          {card.isTeacher ? `👨‍🎓 ${card.studentCount} students` : `⚡ ${displayXP(card.classXP)} XP`}
-                        </div>
-                      </div>
-                      <span className="text-lg opacity-80 shrink-0">{card.isTeacher ? '🏫' : '🎓'}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold bg-white/20 text-white rounded-full px-2 py-0.5">
-                        {card.isTeacher ? 'Teacher' : 'Student'}
-                      </span>
-                      {!card.isTeacher && card.classStreak > 0 && (
-                        <span className="text-[10px] text-white/70">🔥 {card.classStreak}d</span>
-                      )}
-                    </div>
-                  </div>
-                </Link>
-              </div>
-            );
-          }
-          if (sId === 'xp_history') {
-            const a = ACTION_MAP['xp_history'];
-            return (
-              <button onClick={() => setShowXpHistoryModal(true)} className="block h-full w-full">
-                <div className={`rounded-2xl h-full p-4 flex flex-col items-center justify-center text-center gap-2 hover:-translate-y-1 transition-all duration-200 ${pulseClass}`}
-                  style={{ background: a.gradient, boxShadow: `0 10px 0 ${a.edge}, 0 18px 40px ${a.glow}`, textShadow: '0 1px 3px rgba(0,0,0,0.35)' }}>
-                  <div className="text-3xl">{a.icon}</div>
-                  <div className="font-bold text-sm text-white leading-tight">{a.title}</div>
-                  <div className="text-[10px] text-white/70">{a.subtitle}</div>
-                </div>
-              </button>
-            );
-          }
-          if (sId in ACTION_MAP) {
-            const a = ACTION_MAP[sId];
-            return (
-              <div className="relative h-full">
-                {a.badge && (
-                  <div className="absolute -top-1.5 -right-1.5 min-w-[22px] h-[22px] rounded-full bg-white text-[var(--danger)] text-[10px] flex items-center justify-center font-black z-10 shadow px-1">
-                    {a.badge}
-                  </div>
-                )}
-                <Link href={a.href} className="block h-full">
-                  <div className={`rounded-2xl h-full p-4 flex flex-col items-center justify-center text-center gap-2 hover:-translate-y-1 transition-all duration-200 ${pulseClass}`}
-                    style={{ background: a.gradient, boxShadow: `0 10px 0 ${a.edge}, 0 18px 40px ${a.glow}`, textShadow: '0 1px 3px rgba(0,0,0,0.35)' }}>
-                    <div className="text-3xl">{a.icon}</div>
-                    <div className="font-bold text-sm text-white leading-tight">{a.title}</div>
-                    <div className="text-[10px] text-white/70">{a.subtitle}</div>
-                  </div>
-                </Link>
-              </div>
-            );
-          }
-          return null;
-        };
-
-        return (
-          <>
-            {hideMode && (
-              <div className="flex items-center justify-between px-4 py-3 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)]">
-                <div>
-                  <p className="text-sm font-bold text-[var(--text)]">Tap cards to hide</p>
-                  <p className="text-xs text-[var(--text-muted)] mt-0.5">
-                    {hideSelection.size === 0 ? 'None selected yet' : `${hideSelection.size} selected`}
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => { setHideMode(false); setHideSelection(new Set()); }}
-                    className="px-3 py-1.5 rounded-xl text-sm font-semibold bg-[var(--surface)] border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text)] transition-colors"
-                  >Discard</button>
-                  <button
-                    onClick={handleHideSave}
-                    disabled={hideSelection.size === 0}
-                    className="px-3 py-1.5 rounded-xl text-sm font-bold bg-[var(--danger)] text-white disabled:opacity-40 transition-opacity"
-                  >{hideSelection.size > 0 ? `Hide (${hideSelection.size})` : 'Hide'}</button>
-                </div>
-              </div>
-            )}
-            {unhideMode && (
-              <div className="flex items-center justify-between px-4 py-3 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)]">
-                <div>
-                  <p className="text-sm font-bold text-[var(--text)]">Tap ghost cards to unhide</p>
-                  <p className="text-xs text-[var(--text-muted)] mt-0.5">
-                    {unhideSelection.size === 0 ? 'None selected yet' : `${unhideSelection.size} selected`}
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => { setUnhideMode(false); setUnhideSelection(new Set()); }}
-                    className="px-3 py-1.5 rounded-xl text-sm font-semibold bg-[var(--surface)] border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text)] transition-colors"
-                  >Discard</button>
-                  <button
-                    onClick={handleUnhideSave}
-                    disabled={unhideSelection.size === 0}
-                    className="px-3 py-1.5 rounded-xl text-sm font-bold bg-green-500 text-white disabled:opacity-40 transition-opacity"
-                  >{unhideSelection.size > 0 ? `Unhide (${unhideSelection.size})` : 'Unhide'}</button>
-                </div>
-              </div>
-            )}
-            {arrangeMode && (
-              <div className="flex items-center justify-between px-4 py-3 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)]">
-                <div>
-                  <p className="text-sm font-bold text-[var(--text)]">
-                    {pickedCard ? `Moving "${CARD_META[pickedCard]?.label ?? pickedCard}" — tap a slot` : 'Tap a card to pick it up'}
-                  </p>
-                  <p className="text-xs text-[var(--text-muted)] mt-0.5">
-                    {pickedCard ? 'Tap any slot to place it, or tap another card to swap' : 'Then tap any slot (including empty ones) to place it'}
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  <button onClick={() => { setArrangeMode(false); setPickedCard(null); setPickedFromSlot(null); }}
-                    className="px-3 py-1.5 rounded-xl text-sm font-semibold bg-[var(--surface)] border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">Discard</button>
-                  <button onClick={handleArrangeSave}
-                    className="px-3 py-1.5 rounded-xl text-sm font-bold text-white" style={{ background: 'var(--primary)' }}>Save</button>
-                </div>
-              </div>
-            )}
-            {switchMode && (
-              <div className="flex items-center justify-between px-4 py-3 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)]">
-                <div>
-                  <p className="text-sm font-bold text-[var(--text)]">
-                    {switchFirst
-                      ? `Swap "${switchFirst.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}" with…`
-                      : 'Tap a card to select it'}
-                  </p>
-                  <p className="text-xs text-[var(--text-muted)] mt-0.5">
-                    {switchFirst ? 'Tap another card to swap, or same card to deselect' : 'Then tap another card to swap positions'}
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => { setSwitchMode(false); setSwitchFirst(null); setWorkingOrder([]); }}
-                    className="px-3 py-1.5 rounded-xl text-sm font-semibold bg-[var(--surface)] border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text)] transition-colors"
-                  >Discard</button>
-                  <button
-                    onClick={handleSwitchSave}
-                    className="px-3 py-1.5 rounded-xl text-sm font-bold bg-[var(--primary)] text-white"
-                  >Save</button>
-                </div>
-              </div>
-            )}
-            <div className="grid gap-4"
-              style={{ gridTemplateColumns: 'repeat(5, 1fr)', gridTemplateRows: heroEnabled ? '140px 140px' : undefined, gridAutoRows: '130px' }}>
-              {useSlotMap ? visibleSlots.map((slot, slotIdx) => {
-                const sId = displayCards[slotIdx] ?? null;
-                const isPicked = arrangeMode && pickedFromSlot === slotIdx;
-                const isTarget = arrangeMode && pickedCard !== null && !isPicked;
-                if (!sId) {
-                  // Empty slot
-                  return (
-                    <div key={`empty-${slotIdx}`} style={slot}>
-                      {arrangeMode && (
-                        <button onClick={() => handleSlotClick(slotIdx)}
-                          className={`h-full w-full rounded-2xl border-2 border-dashed flex items-center justify-center transition-all ${isTarget ? 'border-[var(--primary)] bg-[var(--primary-bg)] cursor-pointer' : 'border-[var(--border)] bg-transparent cursor-default'}`}>
-                          {isTarget && <span className="text-3xl" style={{ color: 'var(--primary)' }}>↓</span>}
-                        </button>
-                      )}
-                    </div>
-                  );
-                }
-                return (
-                  <div key={sId + slotIdx} style={slot}
-                    className={`h-full relative ${arrangeMode ? 'cursor-pointer' : ''}`}
-                    onClick={arrangeMode ? () => handleSlotClick(slotIdx) : undefined}>
-                    <div className={`h-full transition-all duration-150 ${arrangeMode ? 'pointer-events-none select-none' : ''} ${isPicked ? 'opacity-40 scale-95' : ''} ${isTarget ? 'ring-2 ring-white/30 rounded-2xl' : ''}`}>
-                      {renderCard(sId, heroEnabled && slotIdx === 0)}
-                    </div>
-                    {arrangeMode && (
-                      <div className={`absolute inset-0 rounded-2xl transition-all ${isPicked ? 'ring-2 ring-inset ring-white' : isTarget ? 'hover:bg-white/10' : ''}`}>
-                        {isPicked && <div className="flex items-center justify-center h-full pointer-events-none"><div className="w-9 h-9 rounded-full bg-white/80 flex items-center justify-center text-lg shadow">✊</div></div>}
-                      </div>
-                    )}
-                  </div>
-                );
-              }) : displaySections.map((sId, idx) => {
-                const slot = FRAME_SLOTS[idx];
-                if (!slot) return null;
-                const isHidden = HIDE_MAP[sId];
-                const isHideSelected = hideSelection.has(sId);
-                const toggleHideSelect = () => setHideSelection(prev => {
-                  const next = new Set(prev); if (next.has(sId)) next.delete(sId); else next.add(sId); return next;
-                });
-                const isUnhideSelected = unhideSelection.has(sId);
-                const toggleUnhideSelect = () => {
-                  if (!isHidden) return;
-                  setUnhideSelection(prev => {
-                    const next = new Set(prev); if (next.has(sId)) next.delete(sId); else next.add(sId); return next;
-                  });
-                };
-                const isInteractive = hideMode || (unhideMode && isHidden) || switchMode;
-                const handleSwitchTap = () => {
-                  if (switchFirst === null) {
-                    setSwitchFirst(sId);
-                  } else if (switchFirst === sId) {
-                    setSwitchFirst(null);
-                  } else {
-                    const newOrder = [...workingOrder];
-                    const aIdx = newOrder.indexOf(switchFirst);
-                    const bIdx = newOrder.indexOf(sId);
-                    if (aIdx !== -1 && bIdx !== -1) {
-                      [newOrder[aIdx], newOrder[bIdx]] = [newOrder[bIdx], newOrder[aIdx]];
-                      setWorkingOrder(newOrder);
-                    }
-                    setSwitchFirst(null);
-                  }
-                };
-                return (
-                  <div
-                    key={sId}
-                    style={slot}
-                    className={`h-full relative group ${isInteractive ? 'cursor-pointer' : ''}`}
-                    onClick={switchMode ? handleSwitchTap : (hideMode ? toggleHideSelect : (unhideMode ? toggleUnhideSelect : undefined))}
-                  >
-                    <div className={`h-full transition-opacity duration-150
-                      ${hideMode || switchMode || (unhideMode && !isHidden) ? 'pointer-events-none' : ''}
-                      ${unhideMode && isHidden ? (isUnhideSelected ? 'opacity-65 pointer-events-none' : 'opacity-25 pointer-events-none') : ''}`}>
-                      {renderCard(sId, idx === 0)}
-                    </div>
-
-                    {/* Hide mode overlay */}
-                    {hideMode && (
-                      <div className={`absolute inset-0 rounded-2xl flex items-center justify-center transition-all duration-150
-                        ${isHideSelected ? 'bg-black/55' : 'bg-transparent hover:bg-black/15'}`}>
-                        {isHideSelected ? (
-                          <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center text-xl shadow-lg">✕</div>
-                        ) : (
-                          <div className="absolute top-2 right-2 w-5 h-5 rounded-full border-2 border-white/70 bg-black/10" />
-                        )}
-                      </div>
-                    )}
-
-                    {/* Unhide mode overlay — only on ghost (hidden) cards */}
-                    {unhideMode && isHidden && (
-                      <div className={`absolute inset-0 rounded-2xl flex items-center justify-center transition-all duration-150
-                        ${isUnhideSelected ? 'ring-2 ring-inset ring-green-400' : 'hover:bg-white/10'}`}>
-                        {isUnhideSelected ? (
-                          <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-white text-xl shadow-lg">✓</div>
-                        ) : (
-                          <div className="absolute top-2 right-2 w-5 h-5 rounded-full border-2 border-white/50 bg-black/20 flex items-center justify-center">
-                            <span className="text-white/70 text-[10px] font-bold leading-none">+</span>
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Switch mode overlay */}
-                    {switchMode && (
-                      <div className={`absolute inset-0 rounded-2xl pointer-events-none transition-all duration-150
-                        ${sId === switchFirst ? 'ring-2 ring-inset ring-white bg-white/20' : 'group-hover:bg-white/10'}`}>
-                        {sId === switchFirst ? (
-                          <div className="flex items-center justify-center h-full">
-                            <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center text-xl shadow-lg">⇄</div>
-                          </div>
-                        ) : (
-                          <div className="absolute top-2 right-2 text-white/40 text-xs font-black">⇄</div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Partial last row — rendered outside the grid for true visual centering */}
-            {flexPartialRow && (() => {
-              const partialCards = displayCards.slice(FRAME_SLOTS.length) as string[];
-              if (partialCards.length === 0) return null;
-              return (
-                <div className="flex justify-center gap-4">
-                  {partialCards.map(sId => (
-                    <div key={sId} className="flex-none" style={{ width: 'calc((100% - 4rem) / 5)', height: '130px' }}>
-                      {renderCard(sId, false)}
-                    </div>
-                  ))}
-                </div>
-              );
-            })()}
-
-            {/* Arrange mode tray — unplaced cards */}
-            {arrangeMode && (() => {
-              const placed = new Set(workingSlots.filter(Boolean));
-              const allIds = [...DEFINED_CARD_IDS, ...homeClasses.map(c => `class_${c.classId}`)];
-              const trayIds = allIds.filter(id => !placed.has(id));
-              if (trayIds.length === 0) return null;
-              return (
-                <div className="mt-2 p-3 rounded-2xl" style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}>
-                  <p className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--text-muted)' }}>Unplaced — tap to pick up, then tap a slot</p>
-                  <div className="flex gap-2 flex-wrap">
-                    {trayIds.map(id => {
-                      const classCard = homeClasses.find(c => `class_${c.classId}` === id);
-                      const icon = classCard ? '🎓' : (CARD_META[id]?.icon ?? '📦');
-                      const label = classCard ? classCard.className : (CARD_META[id]?.label ?? id);
-                      const isPicked = pickedCard === id && pickedFromSlot === 'tray';
-                      return (
-                        <button key={id} onClick={() => handleTrayCardClick(id)}
-                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all"
-                          style={{
-                            background: isPicked ? 'var(--primary)' : 'var(--surface)',
-                            color: isPicked ? 'white' : 'var(--text)',
-                            border: isPicked ? '2px solid white' : '1px solid var(--border)',
-                            boxShadow: isPicked ? '0 0 0 3px color-mix(in srgb, var(--primary) 30%, transparent)' : 'none',
-                          }}>
-                          <span>{icon}</span><span>{label}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })()}
-          </>
-        );
-      })()}
-
-
-      {/* Customize home modal */}
-      {showCustomize && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" onClick={() => setShowCustomize(false)}>
-          <div className="absolute inset-0 bg-black/50" />
-          <div
-            className="relative w-full sm:max-w-sm bg-[var(--surface)] rounded-t-3xl sm:rounded-3xl shadow-2xl"
-            onClick={e => e.stopPropagation()}
-          >
-            <div className="px-6 pt-6 pb-4">
-              <div className="w-10 h-1 rounded-full bg-[var(--border)] mx-auto mb-5 sm:hidden" />
-              <div className="flex items-center justify-between mb-5">
-                <h2 className="text-lg font-bold text-[var(--text)]">Customize Home</h2>
-                <button onClick={() => setShowCustomize(false)}
-                  className="w-8 h-8 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">✕</button>
-              </div>
-              <div className="grid grid-cols-4 gap-3 mb-4">
-                <button
-                  onClick={() => { setShowCustomize(false); setHideMode(true); setHideSelection(new Set()); }}
-                  className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--danger)] hover:text-[var(--danger)] hover:bg-red-500/5 transition-all"
-                ><span className="text-2xl">🙈</span><span className="text-xs font-semibold">Hide</span></button>
-                <button
-                  onClick={() => { setShowCustomize(false); setUnhideMode(true); setUnhideSelection(new Set()); }}
-                  className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-[var(--border)] text-[var(--text-muted)] hover:border-green-500 hover:text-green-500 hover:bg-green-500/5 transition-all"
-                ><span className="text-2xl">👁</span><span className="text-xs font-semibold">Unhide</span></button>
-                <button
-                  onClick={() => { setShowCustomize(false); setArrangeMode(true); setWorkingSlots([...slotMap]); setPickedCard(null); setPickedFromSlot(null); }}
-                  className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--primary)] hover:text-[var(--primary)] hover:bg-[var(--primary-bg)] transition-all"
-                ><span className="text-2xl">⊞</span><span className="text-xs font-semibold">Arrange</span></button>
-                <button
-                  onClick={() => { setShowCustomize(false); setSwitchMode(true); setWorkingOrder([...sectionOrder]); setSwitchFirst(null); }}
-                  className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--primary)] hover:text-[var(--primary)] hover:bg-[var(--primary-bg)] transition-all"
-                ><span className="text-2xl">⇄</span><span className="text-xs font-semibold">Switch</span></button>
-              </div>
-              {/* Hero section toggle */}
-              <button
-                onClick={() => {
-                  const next = !heroEnabled;
-                  setHeroEnabled(next);
-                  localStorage.setItem('home_hero_enabled', next ? '1' : '0');
-                }}
-                className="w-full flex items-center justify-between px-4 py-3 rounded-2xl border transition-all"
-                style={{
-                  borderColor: heroEnabled ? 'var(--primary)' : 'var(--border)',
-                  background: heroEnabled ? 'var(--primary-bg)' : 'transparent',
-                  color: heroEnabled ? 'var(--primary)' : 'var(--text-muted)',
-                }}
-              >
-                <span className="text-sm font-semibold">Special hero layout (top 5 slots)</span>
-                <span className="text-lg">{heroEnabled ? '✦ On' : '○ Off'}</span>
-              </button>
-              {/* Classes-only shortcut */}
-              <button
-                onClick={() => {
-                  // Derived from DEFINED_CARD_IDS (minus 'classes') instead of a
-                  // hand-typed list — a hand-typed copy is exactly how this button
-                  // silently kept showing Real English/Speaking after they were
-                  // added as card types (#151/#153).
-                  const nonClassIds = DEFINED_CARD_IDS.filter(cid => cid !== 'classes');
-                  setHideCollections(true);  localStorage.setItem('home_hide_collections','1');
-                  setHideReading(true);      localStorage.setItem('home_hide_reading','1');
-                  setHideDayStreak(true);    localStorage.setItem('home_hide_day_streak','1');
-                  setHideTotalXp(true);      localStorage.setItem('home_hide_total_xp','1');
-                  setHideWords(true);        localStorage.setItem('home_hide_words','1');
-                  setHideDailyGoal(true);    localStorage.setItem('home_hide_daily_goal','1');
-                  setHideLevel(true);        localStorage.setItem('home_hide_level','1');
-                  setHideWod(true);          localStorage.setItem('home_hide_wod','1');
-                  setHideLearn(true);        localStorage.setItem('home_hide_learn','1');
-                  setHideSrs(true);          localStorage.setItem('home_hide_srs','1');
-                  setHideFlashcards(true);   localStorage.setItem('home_hide_flashcards','1');
-                  setHideQuiz(true);         localStorage.setItem('home_hide_quiz','1');
-                  setHideMatch(true);        localStorage.setItem('home_hide_match','1');
-                  setHidePomodoro(true);     localStorage.setItem('home_hide_pomodoro','1');
-                  setHideLeaderboard(true);  localStorage.setItem('home_hide_leaderboard','1');
-                  setHideStarred(true);      localStorage.setItem('home_hide_starred','1');
-                  setHideHardWords(true);    localStorage.setItem('home_hide_hard_words','1');
-                  setHideLists(true);        localStorage.setItem('home_hide_lists','1');
-                  setHideGrammar(true);      localStorage.setItem('home_hide_grammar','1');
-                  setHideClasses(false);     localStorage.removeItem('home_hide_classes');
-                  setHideXpHistory(true);    localStorage.setItem('home_hide_xp_history','1');
-                  setHideRealEnglish(true);  localStorage.setItem('home_hide_real_english','1');
-                  setHideSpeaking(true);     localStorage.setItem('home_hide_speaking','1');
-                  setSlotMap(prev => {
-                    const m = prev.map(id => (id && nonClassIds.includes(id)) ? null : id);
-                    localStorage.setItem('home_slot_map', JSON.stringify(m));
-                    return m;
-                  });
-                  setShowCustomize(false);
-                }}
-                className="w-full flex items-center justify-between px-4 py-3 rounded-2xl border border-[var(--border)] transition-all hover:border-[var(--primary)] hover:bg-[var(--primary-bg)] hover:text-[var(--primary)] text-[var(--text-muted)]"
-              >
-                <span className="text-sm font-semibold">Show classes only</span>
-                <span className="text-lg">👩‍🏫</span>
-              </button>
-            </div>
-
-            <div className="px-6 py-4 border-t border-[var(--border)] flex justify-end">
-              <button
-                onClick={() => {
-                  // withAllCards appends any DEFINED_CARD_IDS entry missing from
-                  // this hand-curated order (real_english/speaking previously
-                  // fell through here after being added as card types — #151/#153)
-                  // instead of silently dropping it.
-                  const def = withAllCards([
-                    'collections', 'reading', 'day_streak', 'total_xp', 'words',
-                    'daily_goal', 'level', 'wod',
-                    'learn', 'flashcards', 'srs', 'quiz',
-                    'starred', 'match', 'pomodoro', 'leaderboard',
-                    'hard_words', 'lists', 'grammar', 'classes', 'xp_history',
-                  ]);
-                  setSectionOrder(def); localStorage.setItem('home_section_order', def.join(','));
-                  setHideCollections(false);  localStorage.removeItem('home_hide_collections');
-                  setHideReading(false);      localStorage.removeItem('home_hide_reading');
-                  setHideDayStreak(false);    localStorage.removeItem('home_hide_day_streak');
-                  setHideTotalXp(false);      localStorage.removeItem('home_hide_total_xp');
-                  setHideWords(false);        localStorage.removeItem('home_hide_words');
-                  setHideDailyGoal(false);    localStorage.removeItem('home_hide_daily_goal');
-                  setHideLevel(false);        localStorage.removeItem('home_hide_level');
-                  setHideWod(false);          localStorage.removeItem('home_hide_wod');
-                  setHideLearn(false);        localStorage.removeItem('home_hide_learn');
-                  setHideSrs(false);          localStorage.removeItem('home_hide_srs');
-                  setHideFlashcards(false);   localStorage.removeItem('home_hide_flashcards');
-                  setHideQuiz(false);         localStorage.removeItem('home_hide_quiz');
-                  setHideMatch(false);        localStorage.removeItem('home_hide_match');
-                  setHidePomodoro(false);     localStorage.removeItem('home_hide_pomodoro');
-                  setHideLeaderboard(false);  localStorage.removeItem('home_hide_leaderboard');
-                  setHideStarred(false);      localStorage.removeItem('home_hide_starred');
-                  setHideHardWords(false);    localStorage.removeItem('home_hide_hard_words');
-                  setHideLists(false);        localStorage.removeItem('home_hide_lists');
-                  setHideGrammar(false);      localStorage.removeItem('home_hide_grammar');
-                  setHideClasses(false);      localStorage.removeItem('home_hide_classes');
-                  setHideXpHistory(false);    localStorage.removeItem('home_hide_xp_history');
-                  setHideRealEnglish(false);  localStorage.removeItem('home_hide_real_english');
-                  setHideSpeaking(false);     localStorage.removeItem('home_hide_speaking');
-                  const defMap: (string|null)[] = Array(200).fill(null);
-                  DEFINED_CARD_IDS.forEach((id, i) => { defMap[i] = id; });
-                  setSlotMap(defMap); localStorage.setItem('home_slot_map', JSON.stringify(defMap));
-                  setHeroEnabled(true); localStorage.setItem('home_hero_enabled', '1');
-                }}
-                className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors"
-              >Reset to default</button>
-            </div>
-          </div>
+            <div className="rounded-2xl h-full animate-pulse" style={{ background: 'rgba(162,28,175,0.2)', minHeight: 92 }} />
+          )}
         </div>
-      )}
+      </div>
+
+      {/* ── Explore ── */}
+      <div>
+        <h2 className="text-xs font-bold uppercase tracking-wide text-[var(--text-muted)] mb-2 px-1">{t.hub.explore}</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-6 gap-3">
+          {HUB_CATEGORIES.map(cat => {
+            const label = t.hub.categories[cat.key as keyof typeof t.hub.categories];
+            return (
+              <Link key={cat.key} href={`/hub/${cat.key}`} className="block">
+                <div className="rounded-2xl h-full min-h-[128px] p-4 flex flex-col justify-between hover:-translate-y-1 transition-all duration-200"
+                  style={{ background: cat.gradient, boxShadow: `0 10px 0 ${cat.edge}, 0 18px 40px ${cat.glow}`, textShadow: '0 1px 3px rgba(0,0,0,0.35)' }}>
+                  <span className="text-2xl">{cat.icon}</span>
+                  <div>
+                    <div className="font-black text-sm text-white leading-tight">{label.title}</div>
+                    <div className="text-[10px] text-white/70 mt-0.5">{label.sub}</div>
+                  </div>
+                  <span className="text-[10px] font-mono text-white/60 self-end">{cat.items.length} →</span>
+                </div>
+              </Link>
+            );
+          })}
+
+          <Link href="/classes" className="block">
+            <div className="rounded-2xl h-full min-h-[128px] p-4 flex flex-col justify-between hover:-translate-y-1 transition-all duration-200"
+              style={{ background: 'linear-gradient(135deg, #0284c7, #38bdf8)', boxShadow: '0 10px 0 #0369a1, 0 18px 40px rgba(2,132,199,0.4)', textShadow: '0 1px 3px rgba(0,0,0,0.35)' }}>
+              <span className="text-2xl">👩‍🏫</span>
+              <div>
+                <div className="font-black text-sm text-white leading-tight">{t.home.classesTitle}</div>
+                <div className="text-[10px] text-white/70 mt-0.5">{t.home.classesSub}</div>
+              </div>
+              <span className="text-[10px] font-mono text-white/60 self-end">{homeClasses.length > 0 ? `${homeClasses.length} →` : '→'}</span>
+            </div>
+          </Link>
+        </div>
+      </div>
+
+      {/* ── Classes ── */}
+      <div>
+        <h2 className="text-xs font-bold uppercase tracking-wide text-[var(--text-muted)] mb-2 px-1">{t.hub.yourClasses}</h2>
+        {homeClasses.length > 0 ? (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {homeClasses.map(card => {
+              const { bg, edge, glow } = classGradient(card.classId);
+              return (
+                <div key={card.classId} className="relative">
+                  {card.pendingHomework > 0 && (
+                    <div className="absolute -top-1.5 -right-1.5 min-w-[22px] h-[22px] rounded-full bg-white text-[var(--danger)] text-[10px] flex items-center justify-center font-black z-10 shadow px-1">
+                      {card.pendingHomework}
+                    </div>
+                  )}
+                  <Link href={`/classes/${card.classId}/home`} className="block h-full">
+                    <div className={`rounded-2xl h-full min-h-[104px] p-3 flex flex-col justify-between hover:-translate-y-1 transition-all duration-200 ${pulseClass}`}
+                      style={{ background: bg, boxShadow: `0 10px 0 ${edge}, 0 18px 40px ${glow}`, textShadow: '0 1px 3px rgba(0,0,0,0.35)' }}>
+                      <div className="flex items-start justify-between gap-1">
+                        <div className="flex-1 min-w-0">
+                          <div className="text-base font-black text-white leading-tight truncate">{card.className}</div>
+                          <div className="text-[10px] text-white/70 mt-1">
+                            {card.isTeacher ? `👨‍🎓 ${card.studentCount} students` : `⚡ ${displayXP(card.classXP)} XP`}
+                          </div>
+                        </div>
+                        <span className="text-lg opacity-80 shrink-0">{card.isTeacher ? '🏫' : '🎓'}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold bg-white/20 text-white rounded-full px-2 py-0.5">
+                          {card.isTeacher ? 'Teacher' : 'Student'}
+                        </span>
+                        {!card.isTeacher && card.classStreak > 0 && (
+                          <span className="text-[10px] text-white/70">🔥 {card.classStreak}d</span>
+                        )}
+                      </div>
+                    </div>
+                  </Link>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <Link href="/classes" className="flex items-center justify-between px-4 py-3.5 rounded-2xl border border-dashed border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--primary)] hover:text-[var(--primary)] transition-colors">
+            <span className="text-sm font-semibold">{t.hub.joinClass}</span>
+            <span className="text-lg">👩‍🏫</span>
+          </Link>
+        )}
+      </div>
 
       <div className="pb-4" />
     </div>
@@ -1325,4 +482,3 @@ function StatCard({ icon, value, label, gradient, edge, glowColor, pulseClass = 
     </div>
   );
 }
-

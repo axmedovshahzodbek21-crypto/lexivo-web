@@ -156,67 +156,82 @@ export default function ClassesPage() {
         ))}
       </div>
 
-      <div className="flex-1 flex flex-col gap-4 p-4 max-w-lg mx-auto w-full">
+      <div className="flex-1 flex flex-col gap-4 p-4 max-w-3xl mx-auto w-full">
         {loading ? (
           <div className="flex-1 flex items-center justify-center">
             <div className="w-8 h-8 border-2 border-[var(--primary)] border-t-transparent rounded-full animate-spin" />
           </div>
         ) : activeTab === 'overview' ? (
-          <>
-            {/* My Classes card */}
-            <button
-              onClick={() => router.push('/classes/created')}
-              className="group w-full rounded-3xl text-left transition-all duration-200 hover:-translate-y-1 active:translate-y-0"
-              style={{ background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)', boxShadow: '0 8px 0 rgba(79,50,220,0.5), 0 16px 40px rgba(99,60,255,0.3)' }}
-            >
-              <div className="p-6 flex items-center gap-5">
-                <div className="w-16 h-16 rounded-2xl bg-white/15 flex items-center justify-center text-3xl shrink-0">🏫</div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xl font-black text-white">My Classes</p>
-                  <p className="text-sm text-white/60 mt-0.5">
-                    {createdCount === 0 ? 'No classes yet' : `${createdCount} class${createdCount !== 1 ? 'es' : ''} created`}
-                  </p>
-                </div>
-                <span className="text-2xl text-white/50 group-hover:text-white/90 transition-colors">→</span>
-              </div>
-            </button>
-
-            {/* Joined Classes card */}
-            <button
-              onClick={() => router.push('/classes/joined')}
-              className="group w-full rounded-3xl text-left transition-all duration-200 hover:-translate-y-1 active:translate-y-0"
-              style={{ background: 'linear-gradient(135deg, #10b981 0%, #06b6d4 100%)', boxShadow: '0 8px 0 rgba(10,160,100,0.5), 0 16px 40px rgba(16,180,130,0.3)' }}
-            >
-              <div className="p-6 flex items-center gap-5">
-                <div className="w-16 h-16 rounded-2xl bg-white/15 flex items-center justify-center text-3xl shrink-0">🎓</div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xl font-black text-white">Joined Classes</p>
-                  <p className="text-sm text-white/60 mt-0.5">
-                    {joinedCount === 0 ? 'Not enrolled yet' : `${joinedCount} class${joinedCount !== 1 ? 'es' : ''} joined`}
-                  </p>
-                </div>
-                <span className="text-2xl text-white/50 group-hover:text-white/90 transition-colors">→</span>
-              </div>
-            </button>
-
-            {/* Action buttons */}
-            <div className="flex gap-3 mt-2">
+          <div className="flex flex-col-reverse sm:flex-row gap-4 items-stretch sm:items-start">
+            <div className="flex-1 min-w-0 flex flex-col gap-4">
+              {/* My Classes card */}
               <button
-                onClick={() => setShowCreate(true)}
-                className="flex-1 py-4 rounded-2xl font-black text-sm text-white transition-all hover:-translate-y-0.5 active:translate-y-0"
-                style={{ background: 'linear-gradient(135deg, var(--primary) 0%, #9333ea 100%)', boxShadow: '0 5px 0 rgba(80,30,200,0.5)' }}
+                onClick={() => router.push('/classes/created')}
+                className="group w-full rounded-3xl text-left transition-all duration-200 hover:-translate-y-1 active:translate-y-0"
+                style={{ background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)', boxShadow: '0 8px 0 rgba(79,50,220,0.5), 0 16px 40px rgba(99,60,255,0.3)' }}
               >
-                + Create Class
+                <div className="p-6 flex items-center gap-5">
+                  <div className="w-16 h-16 rounded-2xl bg-white/15 flex items-center justify-center text-3xl shrink-0">🏫</div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xl font-black text-white">My Classes</p>
+                    <p className="text-sm text-white/60 mt-0.5">
+                      {createdCount === 0 ? 'No classes yet' : `${createdCount} class${createdCount !== 1 ? 'es' : ''} created`}
+                    </p>
+                  </div>
+                  <span className="text-2xl text-white/50 group-hover:text-white/90 transition-colors">→</span>
+                </div>
               </button>
+
+              {/* Joined Classes card */}
               <button
-                onClick={() => setShowJoin(true)}
-                className="flex-1 py-4 rounded-2xl font-black text-sm text-white transition-all hover:-translate-y-0.5 active:translate-y-0"
-                style={{ background: 'linear-gradient(135deg, #10b981, #0891b2)', boxShadow: '0 5px 0 rgba(7,120,100,0.55), 0 8px 20px rgba(16,185,129,0.25)' }}
+                onClick={() => router.push('/classes/joined')}
+                className="group w-full rounded-3xl text-left transition-all duration-200 hover:-translate-y-1 active:translate-y-0"
+                style={{ background: 'linear-gradient(135deg, #10b981 0%, #06b6d4 100%)', boxShadow: '0 8px 0 rgba(10,160,100,0.5), 0 16px 40px rgba(16,180,130,0.3)' }}
               >
-                Join a Class
+                <div className="p-6 flex items-center gap-5">
+                  <div className="w-16 h-16 rounded-2xl bg-white/15 flex items-center justify-center text-3xl shrink-0">🎓</div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xl font-black text-white">Joined Classes</p>
+                    <p className="text-sm text-white/60 mt-0.5">
+                      {joinedCount === 0 ? 'Not enrolled yet' : `${joinedCount} class${joinedCount !== 1 ? 'es' : ''} joined`}
+                    </p>
+                  </div>
+                  <span className="text-2xl text-white/50 group-hover:text-white/90 transition-colors">→</span>
+                </div>
               </button>
+
+              {/* Action buttons */}
+              <div className="flex gap-3 mt-2">
+                <button
+                  onClick={() => setShowCreate(true)}
+                  className="flex-1 py-4 rounded-2xl font-black text-sm text-white transition-all hover:-translate-y-0.5 active:translate-y-0"
+                  style={{ background: 'linear-gradient(135deg, var(--primary) 0%, #9333ea 100%)', boxShadow: '0 5px 0 rgba(80,30,200,0.5)' }}
+                >
+                  + Create Class
+                </button>
+                <button
+                  onClick={() => setShowJoin(true)}
+                  className="flex-1 py-4 rounded-2xl font-black text-sm text-white transition-all hover:-translate-y-0.5 active:translate-y-0"
+                  style={{ background: 'linear-gradient(135deg, #10b981, #0891b2)', boxShadow: '0 5px 0 rgba(7,120,100,0.55), 0 8px 20px rgba(16,185,129,0.25)' }}
+                >
+                  Join a Class
+                </button>
+              </div>
             </div>
-          </>
+
+            {/* Library — a quiet secondary shortcut, not a peer destination like My/Joined Classes */}
+            <button
+              onClick={() => router.push('/library')}
+              className="group flex w-full sm:w-36 shrink-0 rounded-2xl text-left flex-row sm:flex-col items-center sm:items-start gap-2.5 sm:gap-1.5 p-3.5 transition-colors hover:bg-[var(--surface-2)]"
+              style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+            >
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center text-base shrink-0" style={{ background: 'rgba(163,230,53,0.15)' }}>📚</div>
+              <div>
+                <p className="text-xs font-bold" style={{ color: 'var(--text)' }}>Library</p>
+                <p className="text-[10px] text-[var(--text-muted)] mt-0.5">Folders &amp; units</p>
+              </div>
+            </button>
+          </div>
         ) : (
           /* ── My Words tab ── */
           <>

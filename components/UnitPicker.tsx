@@ -6,17 +6,34 @@ import { useAppStore } from '@/lib/store';
 import { getUnitProgress } from '@/lib/storage';
 import type { UnitProgress, WordCollection } from '@/lib/types';
 
-type Mode = 'learn' | 'flashcards' | 'quiz';
+type Mode = 'learn' | 'flashcards' | 'quiz' | 'match';
 
-const MODE_CONFIG: Record<Mode, { label: string; icon: string; color: string }> = {
-  learn:      { label: 'Learn',      icon: '📖', color: 'var(--primary)' },
-  flashcards: { label: 'Flashcards', icon: '🃏', color: '#FF6B35' },
-  quiz:       { label: 'Quiz',       icon: '❓', color: 'var(--warning)' },
+// The matching game lives at /matching, not /match — every other mode's
+// route matches its name, so this is the one exception when building hrefs.
+const ROUTE_PATH: Record<Mode, string> = {
+  learn: '/learn', flashcards: '/flashcards', quiz: '/quiz', match: '/matching',
+};
+
+const MODE_CONFIG: Record<Mode, {
+  label: string; icon: string; color: string; desc: string; requires?: Mode;
+  // Non-learn modes tint every collection card with the mode's own color instead
+  // of each collection's individual color, so the whole screen reads as
+  // "this is Flashcards mode" rather than looking identical to Learn.
+  cardGradient?: string; cardEdge?: string; cardGlow?: string;
+}> = {
+  learn:      { label: 'Learn',      icon: '📖', color: '#4338CA', desc: 'Study new words, one at a time' },
+  flashcards: { label: 'Flashcards', icon: '🃏', color: '#D97706', desc: "Drill words you've already learned", requires: 'learn',
+    cardGradient: 'linear-gradient(135deg, #b45309, #fcd34d)', cardEdge: '#78350f', cardGlow: 'rgba(180,83,9,0.45)' },
+  quiz:       { label: 'Quiz',       icon: '❓', color: '#65A30D', desc: 'Test what you remember', requires: 'flashcards',
+    cardGradient: 'linear-gradient(135deg, #4d7c0f, #a3e635)', cardEdge: '#365314', cardGlow: 'rgba(77,124,15,0.45)' },
+  match:      { label: 'Matching',   icon: '🎯', color: '#EC4899', desc: 'Pair up the words', requires: 'learn',
+    cardGradient: 'linear-gradient(135deg, #db2777, #f472b6)', cardEdge: '#9d174d', cardGlow: 'rgba(219,39,119,0.45)' },
 };
 
 function isLocked(mode: Mode, p: UnitProgress): boolean {
   if (mode === 'flashcards') return !p.learnDone;
   if (mode === 'quiz') return !p.flashcardDone;
+  if (mode === 'match') return !p.learnDone;
   return false;
 }
 
@@ -24,12 +41,14 @@ function isDone(mode: Mode, p: UnitProgress): boolean {
   if (mode === 'learn')      return p.learnDone;
   if (mode === 'flashcards') return p.flashcardDone;
   if (mode === 'quiz')       return p.quizDone;
+  if (mode === 'match')      return !!p.matchDone;
   return false;
 }
 
 function lockLabel(mode: Mode): string {
   if (mode === 'flashcards') return 'Complete Learn first';
   if (mode === 'quiz')       return 'Complete Flashcards first';
+  if (mode === 'match')      return 'Complete Learn first';
   return '';
 }
 
@@ -64,6 +83,24 @@ function UnitList({
 }) {
   return (
     <div className="p-4 animate-fade-in pb-24">
+      {/* Mode banner */}
+      <div className="rounded-2xl px-4 py-2.5 mb-4 flex items-center gap-2.5"
+        style={{ background: `${cfg.color}18`, border: `1px solid ${cfg.color}40` }}>
+        <span className="text-xl">{cfg.icon}</span>
+        <div>
+          <p className="text-[10px] font-black uppercase tracking-wide" style={{ color: cfg.color }}>{cfg.label} mode</p>
+          <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>{cfg.desc}</p>
+          {cfg.requires && (
+            <p className="text-[11px] mt-0.5 flex items-center gap-1" style={{ color: 'var(--text-muted)' }}>
+              🔒 <span>Units unlock after you complete{' '}
+                <Link href={ROUTE_PATH[cfg.requires]} className="underline font-bold" style={{ color: cfg.color }}>
+                  {MODE_CONFIG[cfg.requires].label}
+                </Link>{' '}for them</span>
+            </p>
+          )}
+        </div>
+      </div>
+
       {/* Header */}
       <div className="flex items-center gap-3 pt-2 mb-5">
         <button onClick={onBack} className="btn-icon text-lg" aria-label="Go back">←</button>
@@ -81,7 +118,7 @@ function UnitList({
           const locked    = isLocked(mode, progress);
           const done      = isDone(mode, progress);
           const fullyDone = isFullyDone(progress);
-          const href      = `/${mode}?collection=${encodeURIComponent(col.name)}&day=${day.dayNumber}`;
+          const href      = `${ROUTE_PATH[mode]}?collection=${encodeURIComponent(col.name)}&day=${day.dayNumber}`;
           const { color, light, dark } = UNIT_COLORS[i % UNIT_COLORS.length];
           const numStr    = String(day.dayNumber).padStart(2, '0');
 
@@ -256,6 +293,24 @@ export default function UnitPicker({ mode }: { mode: Mode }) {
 
   return (
     <div className="p-4 pb-24 animate-fade-in">
+      {/* Mode banner */}
+      <div className="rounded-2xl px-4 py-2.5 mb-4 flex items-center gap-2.5"
+        style={{ background: `${cfg.color}18`, border: `1px solid ${cfg.color}40` }}>
+        <span className="text-xl">{cfg.icon}</span>
+        <div>
+          <p className="text-[10px] font-black uppercase tracking-wide" style={{ color: cfg.color }}>{cfg.label} mode</p>
+          <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>{cfg.desc}</p>
+          {cfg.requires && (
+            <p className="text-[11px] mt-0.5 flex items-center gap-1" style={{ color: 'var(--text-muted)' }}>
+              🔒 <span>Units unlock after you complete{' '}
+                <Link href={ROUTE_PATH[cfg.requires]} className="underline font-bold" style={{ color: cfg.color }}>
+                  {MODE_CONFIG[cfg.requires].label}
+                </Link>{' '}for them</span>
+            </p>
+          )}
+        </div>
+      </div>
+
       {/* Header */}
       <div className="flex items-center gap-3 pt-2 mb-5">
         <button onClick={() => router.back()} className="btn-icon" aria-label="Go back">←</button>
@@ -271,6 +326,9 @@ export default function UnitPicker({ mode }: { mode: Mode }) {
           const modeDoneCount = col.days.filter(d => isDone(mode, getUnitProgress(col.name, d.dayNumber))).length;
           const allDone       = modeDoneCount === totalUnits;
           const pct           = totalUnits ? (modeDoneCount / totalUnits) * 100 : 0;
+          // Every collection keeps its own vivid color, same as Learn — a mode
+          // badge (below) is what signals "you're in Flashcards mode" instead
+          // of flattening every card to one repeated hue.
           const meta          = COLLECTION_META[col.name] ?? {
             icon: '📖',
             gradient: 'linear-gradient(135deg, #6c63ff, #8b5cf6)',
@@ -285,12 +343,20 @@ export default function UnitPicker({ mode }: { mode: Mode }) {
               className="block group text-left w-full"
             >
               <div
-                className="rounded-3xl p-4 flex flex-col gap-3 transition-all duration-200 group-hover:-translate-y-1 h-full"
+                className="relative rounded-3xl p-4 flex flex-col gap-3 transition-all duration-200 group-hover:-translate-y-1 h-full"
                 style={{
                   background: meta.gradient,
                   boxShadow: `0 8px 0 ${meta.edge}, 0 14px 32px ${meta.glow}`,
                 }}
               >
+                {cfg.cardGradient && (
+                  <span
+                    className="absolute top-3 right-3 flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-black"
+                    style={{ background: 'rgba(0,0,0,0.35)', color: '#fff' }}
+                  >
+                    {cfg.icon} {cfg.label}
+                  </span>
+                )}
                 <div className="text-4xl" style={{ filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.35))' }}>
                   {allDone ? '🏆' : meta.icon}
                 </div>

@@ -5,6 +5,7 @@ import { LEVEL_THRESHOLDS } from '@/lib/types';
 import { displayXP, fetchXPHistory, getXPByDate, type XpEntry } from '@/lib/storage';
 import { REASON_ICON as REASON_ICONS } from '@/lib/xp-reason-icons';
 import XpCalendar from './XpCalendar';
+import XpHistoryModal from './XpHistoryModal';
 
 interface Props {
   xp: number;
@@ -16,6 +17,7 @@ export default function XpModal({ xp, onClose }: Props) {
   const [history, setHistory] = useState<XpEntry[]>([]);
   const [xpByDate, setXpByDate] = useState<Record<string, number>>({});
   const [dayDetail, setDayDetail] = useState<{ day: string; entries: XpEntry[]; total: number } | null>(null);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
   const levelInfo = getLevelInfo(xp);
 
   useEffect(() => {
@@ -83,6 +85,15 @@ export default function XpModal({ xp, onClose }: Props) {
           {/* Next-level callout */}
           {levelInfo.next ? (
             <div className="rounded-2xl p-4 space-y-3" style={{ background: 'var(--primary-bg)' }}>
+              <div className="flex justify-end -mt-1 -mb-1">
+                <button
+                  onClick={() => setShowHistoryModal(true)}
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold transition-colors hover:opacity-80"
+                  style={{ background: 'var(--surface)', color: 'var(--primary)' }}
+                >
+                  📅 XP history
+                </button>
+              </div>
               <div className="text-center">
                 <p className="text-4xl font-black" style={{ color: 'var(--primary)' }}>
                   {displayXP(levelInfo.xpToNext)} XP
@@ -103,12 +114,23 @@ export default function XpModal({ xp, onClose }: Props) {
               </div>
             </div>
           ) : (
-            <div className="rounded-2xl p-4 text-center" style={{ background: 'var(--primary-bg)' }}>
+            <div className="rounded-2xl p-4 text-center space-y-2" style={{ background: 'var(--primary-bg)' }}>
+              <div className="flex justify-end -mt-1 -mb-1">
+                <button
+                  onClick={() => setShowHistoryModal(true)}
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold transition-colors hover:opacity-80"
+                  style={{ background: 'var(--surface)', color: 'var(--primary)' }}
+                >
+                  📅 XP history
+                </button>
+              </div>
               <p className="text-3xl mb-1">🏆</p>
               <p className="font-bold" style={{ color: 'var(--primary)' }}>Legend Level reached!</p>
               <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>You&apos;ve conquered all levels.</p>
             </div>
           )}
+
+          {showHistoryModal && <XpHistoryModal xp={xp} onClose={() => setShowHistoryModal(false)} />}
 
           {/* Level ladder */}
           <div>

@@ -13,6 +13,7 @@ import { supabase } from '@/lib/supabase';
 import { checkAchievements } from '@/lib/gamification';
 import { fireConfetti } from '@/lib/confetti';
 import { shuffleArray as shuffle } from '@/lib/shuffleArray';
+import UnitPicker from '@/components/UnitPicker';
 import type { WordItem, WordCollection } from '@/lib/types';
 
 interface MatchWord extends WordItem {
@@ -298,6 +299,11 @@ function MatchingInner() {
         <SectionLoader />
       </div>
     );
+  }
+
+  // No specific selection made — ask which collection/unit to match, same as Learn/Flashcards/Quiz.
+  if (!collectionParam && !starredParam && !hardParam && !listId && !sourceMyWords && !sourceClassHW && !sourceClass) {
+    return <UnitPicker mode="match" />;
   }
 
   if (words.length < 2) {

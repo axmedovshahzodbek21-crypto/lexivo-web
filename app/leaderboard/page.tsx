@@ -107,6 +107,17 @@ export default function LeaderboardPage() {
 
   useEffect(() => { load(); }, []);
 
+  // XP earned on another page (e.g. finishing a matching round) only reaches
+  // Supabase on the next pushStats() call — refetch when that happens so the
+  // leaderboard doesn't keep showing pre-session numbers after navigating in.
+  // load() already refreshes silently in the background when a cache exists
+  // (it shows the cached entries immediately, no loading spinner), so this
+  // just needs to re-trigger it — not clear the cache first.
+  useEffect(() => {
+    window.addEventListener('lexivo-stats-change', load);
+    return () => window.removeEventListener('lexivo-stats-change', load);
+  }, []);
+
   // When auth resolves after the initial load(), upsert show_on_leaderboard
   // then re-fetch so the user appears without a manual refresh
   useEffect(() => {
@@ -453,10 +464,9 @@ export default function LeaderboardPage() {
               </div>
             )}
 
-            {/* Ranked list (4 onwards, or all if < 3) */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {visible.slice(visible.length >= 3 ? 3 : 0).map((e, i) => {
-                const idx = (visible.length >= 3 ? 3 : 0) + i;
+            {/* Shared row renderer for everyone below the podium (ranks 4+) */}
+            {(() => {
+              const renderRow = (e: typeof visible[number], idx: number) => {
                 const rank = ranks[idx];
                 const isTied = tied[idx];
                 const isMe = !!(user && e.user_id === user.id);
@@ -499,8 +509,34 @@ export default function LeaderboardPage() {
                     </div>
                   </div>
                 );
-              })}
-            </div>
+              };
+
+              const podiumEnd = visible.length >= 3 ? 3 : 0;
+              const boxedEnd = Math.min(visible.length, podiumEnd + 4);
+              const boxed = visible.slice(podiumEnd, boxedEnd);
+              const rest = visible.slice(boxedEnd);
+
+              return (
+                <>
+                  {/* Ranks 4-7 — boxed group, distinct from both the podium and everyone else */}
+                  {boxed.length > 0 && (
+                    <div style={{ borderRadius: 20, border: '1.5px solid var(--border)', background: 'var(--surface-2)', padding: 12, marginBottom: rest.length > 0 ? 16 : 0 }}>
+                      <p style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 0.5, padding: '0 4px 8px' }}>
+                        Almost there
+                      </p>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        {boxed.map((e, i) => renderRow(e, podiumEnd + i))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Everyone else */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {rest.map((e, i) => renderRow(e, boxedEnd + i))}
+                  </div>
+                </>
+              );
+            })()}
 
             {/* Your rank if outside top list */}
             {user && myIndex === -1 && (

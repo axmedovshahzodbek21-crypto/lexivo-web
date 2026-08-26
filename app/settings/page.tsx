@@ -364,7 +364,7 @@ export default function SettingsPage() {
           <p className="text-[10px] text-[var(--text-muted)] mt-1">{bio.length}/200 · Shared on leaderboard and in classes</p>
         </div>
 
-        <div>
+        <div id="daily-goal">
           <label className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide block mb-1.5">{t.settings.dailyGoal}</label>
           <input
             type="number"
