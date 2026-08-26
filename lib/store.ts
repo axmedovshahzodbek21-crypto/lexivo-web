@@ -20,28 +20,39 @@ interface PomSnapshot {
 
 // Walks the pomodoro forward by `elapsedSecs` of real wall-clock time from
 // its current phase/secondsLeft, crossing as many phase boundaries as
-// necessary. Used both by tickPomodoro (elapsed since the last tick) and by
-// hydratePomodoro (elapsed since the tab was last open) — the same replay
-// logic fixes two different bugs: tickPomodoro no longer assumes exactly
-// 1s passed between ticks (background-tab setInterval throttling made it
-// undercount real elapsed time), and a page refresh/reopen can resume
-// mid-session instead of resetting to idle.
+// necessary, and reports how much of that elapsed time fell inside a
+// 'work' phase (as opposed to 'break') so the caller can credit the right
+// number of focus-seconds regardless of whether a phase boundary was
+// crossed mid-span. Used both by tickPomodoro (elapsed since the last
+// tick) and by hydratePomodoro (elapsed since the tab was last open) — the
+// same replay logic fixes two different bugs: tickPomodoro no longer
+// assumes exactly 1s passed between ticks (background-tab setInterval
+// throttling made it undercount real elapsed time), and a page
+// refresh/reopen can resume mid-session instead of resetting to idle.
 function advancePhase(
   phase: PomPhase, secondsLeft: number, sessions: number,
   workMins: number, breakMins: number, elapsedSecs: number,
-): { phase: PomPhase; secondsLeft: number; sessions: number } {
+): { phase: PomPhase; secondsLeft: number; sessions: number; workSecondsElapsed: number } {
   let remaining = elapsedSecs;
   let p = phase, left = secondsLeft, s = sessions;
+  let workSecondsElapsed = 0;
   // Capped at 100 iterations — a genuinely stuck loop (e.g. a 0-minute
   // phase length) would otherwise hang the tab instead of just producing
-  // an approximate result.
-  for (let i = 0; i < 100 && remaining > 0 && p !== 'idle'; i++) {
+  // an approximate result. If the cap is hit, `left` is clamped to 0
+  // rather than left holding a stale full-phase duration, so the very
+  // next real tick immediately advances the phase again instead of
+  // silently freezing the display for however much time was left unwalked.
+  let i = 0;
+  for (; i < 100 && remaining > 0 && p !== 'idle'; i++) {
+    const consumed = Math.min(remaining, left);
+    if (p === 'work') workSecondsElapsed += consumed;
     if (remaining < left) { left -= remaining; remaining = 0; break; }
     remaining -= left;
     if (p === 'work') { p = 'break'; left = breakMins * 60; s += 1; }
     else { p = 'work'; left = workMins * 60; }
   }
-  return { phase: p, secondsLeft: left, sessions: s };
+  if (i >= 100 && remaining > 0) left = 0;
+  return { phase: p, secondsLeft: left, sessions: s, workSecondsElapsed };
 }
 
 interface AppState {
@@ -157,6 +168,12 @@ export const useAppStore = create<AppState>((set, get) => {
       }
       const elapsed = Math.max(0, Math.floor((Date.now() - snap.savedAt) / 1000));
       const next = advancePhase(snap.phase, snap.secondsLeft, snap.sessions, snap.workMins, snap.breakMins, elapsed);
+      // The session was "still running" for `elapsed` seconds of real time
+      // while the tab was closed, per the wall-clock model — the work
+      // portion of that gap needs the same focus-seconds credit a live
+      // tick would have given it, or the counter permanently falls behind
+      // the (now correctly resumed) countdown.
+      if (next.workSecondsElapsed > 0) addFocusSeconds(next.workSecondsElapsed);
       set({
         pomPhase: next.phase, pomSecondsLeft: next.secondsLeft, pomRunning: true,
         pomWorkMins: snap.workMins, pomBreakMins: snap.breakMins,
@@ -213,8 +230,12 @@ export const useAppStore = create<AppState>((set, get) => {
     // focus-seconds counter undercount real elapsed time.
     const elapsed = s.pomLastTickAt ? Math.max(0, Math.round((now - s.pomLastTickAt) / 1000)) : 1;
     if (elapsed <= 0) return;
-    if (s.pomPhase === 'work') addFocusSeconds(elapsed);
     const next = advancePhase(s.pomPhase, s.pomSecondsLeft, s.pomSessions, s.pomWorkMins, s.pomBreakMins, elapsed);
+    // Attributed via advancePhase's walk rather than a flat "elapsed if
+    // currently in work phase" check, so a tick whose elapsed span crosses
+    // a work->break boundary (a big throttled gap, or a very short work
+    // length) still credits only the portion that was actually work time.
+    if (next.workSecondsElapsed > 0) addFocusSeconds(next.workSecondsElapsed);
     set({ pomPhase: next.phase, pomSecondsLeft: next.secondsLeft, pomSessions: next.sessions, pomLastTickAt: now });
     persistPom();
   },
