@@ -14,7 +14,7 @@ export function middleware(request: NextRequest) {
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://cdn.onesignal.com${process.env.NODE_ENV === 'development' ? " 'unsafe-eval'" : ''}`,
     "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.onesignal.com",
     "img-src 'self' data: blob: https:",
-    "style-src 'self' 'unsafe-inline'",
+    "style-src 'self' 'unsafe-inline' https://onesignal.com",
     "font-src 'self' data:",
     "worker-src 'self' blob: https://cdn.onesignal.com",
     "frame-ancestors 'none'",
