@@ -78,9 +78,9 @@ export async function recordClassWordLearned(
 // Cascades every overdue, non-graduated word for this student down through
 // UNLEARN_GRACE_DAYS one stage at a time, resolving a long absence in a single
 // pass rather than needing a check every day the gap grows. A word that falls
-// through Stage 0's own grace window is unlearned (deleted) outright — same
-// hard-reset behavior as the fail-streak path in advanceClassSRSWord, and as
-// personal SRS's existing checkAndUnlearn.
+// all the way through Stage 0's grace window is NOT deleted (unlike personal
+// SRS's checkAndUnlearn) — class words are curriculum, so it's just reset to
+// Stage 0 and made due now.
 export async function checkAndDemoteClassSRS(
   userId: string,
   classId: string,
@@ -96,7 +96,6 @@ export async function checkAndDemoteClassSRS(
   if (rows.length === 0) return;
 
   const today = todayStr();
-  const toDelete: string[] = [];
   const toUpdate: { id: string; stage: number; next_due: string }[] = [];
 
   for (const row of rows) {
@@ -110,16 +109,16 @@ export async function checkAndDemoteClassSRS(
       changed = true;
     }
     if (stage === 0 && daysBetween(nextDue, today) >= UNLEARN_GRACE_DAYS[0]) {
-      toDelete.push(row.id);
+      // Fell through Stage 0's window — keep the word, just make it due now.
+      toUpdate.push({ id: row.id, stage: 0, next_due: today });
       continue;
     }
     if (changed) toUpdate.push({ id: row.id, stage, next_due: nextDue });
   }
 
-  await Promise.all([
-    ...toUpdate.map(u => supabase.from('class_srs_states').update({ stage: u.stage, next_due: u.next_due, fail_streak: 0 }).eq('id', u.id)),
-    toDelete.length > 0 ? supabase.from('class_srs_states').delete().in('id', toDelete) : Promise.resolve(),
-  ]);
+  await Promise.all(
+    toUpdate.map(u => supabase.from('class_srs_states').update({ stage: u.stage, next_due: u.next_due, fail_streak: 0 }).eq('id', u.id)),
+  );
 }
 
 // Returns all words due for review today (or overdue) for this student in this class.

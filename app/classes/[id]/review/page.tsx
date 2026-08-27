@@ -297,8 +297,13 @@ export default function ClassReviewPage() {
       </div>
 
       <div className="flex-1 p-4 flex flex-col gap-4">
-        {/* Stage badge */}
-        <div className="flex justify-end">
+        {/* Stage badge + struggling hint */}
+        <div className="flex justify-between items-center">
+          {current.fail_streak >= 2 ? (
+            <div className="badge text-xs" style={{ background: '#f59e0b20', color: '#f59e0b' }}>
+              Keeps tripping you up
+            </div>
+          ) : <span />}
           <div
             className="badge text-xs"
             style={{ background: `${stageColor(stage)}20`, color: stageColor(stage) }}
