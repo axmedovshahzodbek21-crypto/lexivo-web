@@ -31,19 +31,27 @@ function PassageCard({ passage, isHero }: { passage: typeof PASSAGES[0]; isHero?
 
   return (
     <div
+      className={`flip-card${flipped ? ' is-flipped' : ''}`}
       style={{ perspective: '1200px', height, cursor: 'pointer' }}
-      onMouseEnter={() => setFlipped(true)}
-      onMouseLeave={() => setFlipped(false)}
       onClick={() => setFlipped(f => !f)}
     >
+      {/* Hover flips via plain CSS :hover (below) — it never depends on JS
+          mouseenter/mouseleave event timing, which is the more fragile path.
+          The is-flipped class (driven by onClick above) is what makes the
+          flip work on touch devices, which have no hover state at all. */}
+      <style jsx>{`
+        .flip-inner { transform: rotateY(0deg); }
+        .flip-card:hover .flip-inner,
+        .flip-card.is-flipped .flip-inner { transform: rotateY(180deg); }
+      `}</style>
       <div
+        className="flip-inner"
         style={{
           position: 'relative',
           width: '100%',
           height: '100%',
           transformStyle: 'preserve-3d',
           transition: 'transform 0.45s cubic-bezier(0.4,0,0.2,1)',
-          transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
         }}
       >
         {/* Front */}
