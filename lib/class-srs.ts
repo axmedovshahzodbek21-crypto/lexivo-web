@@ -4,6 +4,12 @@ import { pickByStage } from './srs';
 
 const INTERVALS = [1, 3, 7, 14, 30]; // days, same as personal SRS
 
+// At most this many never-reviewed words enter one review session, so a
+// freshly-learned batch of 40 doesn't land as one wall. Genuine spaced
+// repetitions (last_reviewed set) are never capped. Keep in sync with Flutter's
+// _newWordsPerSession.
+const NEW_WORDS_PER_SESSION = 10;
+
 // Grace period (days overdue) a word gets at each stage before it demotes one
 // stage — indexed by stage 0-4. A fresh Stage 0 word is fragile and gets a
 // generous buffer; a Stage 4 word already survived a 30-day gap once, so it
@@ -121,7 +127,9 @@ export async function checkAndDemoteClassSRS(
   );
 }
 
-// Returns all words due for review today (or overdue) for this student in this class.
+// Returns the words to review now: every due spaced repetition, plus at most
+// NEW_WORDS_PER_SESSION never-reviewed words (oldest first) so a big fresh batch
+// is paced instead of dumped all at once.
 export async function getClassDueWords(
   userId: string,
   classId: string,
@@ -133,9 +141,13 @@ export async function getClassDueWords(
     .eq('user_id', userId)
     .eq('class_id', classId)
     .lte('next_due', todayStr())
-    .lt('stage', 5);
+    .lt('stage', 5)
+    .order('created_at', { ascending: true });
   if (error) console.error('[getClassDueWords]', error);
-  return (data ?? []) as ClassSRSEntry[];
+  const rows = (data ?? []) as ClassSRSEntry[];
+  const review = rows.filter(r => r.last_reviewed !== null);
+  const fresh  = rows.filter(r => r.last_reviewed === null);
+  return [...review, ...fresh.slice(0, NEW_WORDS_PER_SESSION)];
 }
 
 // Returns every SRS entry for the student in this class (all stages).
