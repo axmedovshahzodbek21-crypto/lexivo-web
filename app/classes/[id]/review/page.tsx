@@ -2,11 +2,11 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { displayXP, recordStudySession, addXP } from '@/lib/storage';
-import { recordClassXP } from '@/lib/class-xp';
+import { displayXP } from '@/lib/storage';
+import { recordClassXP, recordClassStudyDay } from '@/lib/class-xp';
 import { speak } from '@/lib/speech';
 import {
-  getClassDueWords, getClassSRSAll, advanceClassSRSWord,
+  getClassDueWords, getClassSRSAll, advanceClassSRSWord, addClassHardWord,
   stageLabel, stageColor, type ClassSRSEntry,
 } from '@/lib/class-srs';
 import { shuffleArray } from '@/lib/shuffleArray';
@@ -27,7 +27,6 @@ export default function ClassReviewPage() {
   const [revealed,   setRevealed]   = useState(false);
   const [done,       setDone]       = useState(false);
   const [results,    setResults]    = useState<{ word: string; knew: boolean }[]>([]);
-  const [sessionXP,  setSessionXP]  = useState(0);
   const [autoPlay,   setAutoPlay]   = useState(true);
   const [isShuffled, setIsShuffled] = useState(false);
   const [tappedChoice, setTappedChoice] = useState<string | null>(null);
@@ -37,8 +36,9 @@ export default function ClassReviewPage() {
   const [className,  setClassName]  = useState('');
   const [loading,    setLoading]    = useState(true);
 
-  const grading        = useRef(false);
-  const gradesApplied  = useRef(false);
+  // Guards grade() against a double-tap re-entering with the same card before
+  // React commits the index advance. Mirrors Flutter's _answering flag.
+  const grading = useRef(false);
 
   // Resolve user + class name
   useEffect(() => {
@@ -50,6 +50,9 @@ export default function ClassReviewPage() {
         ]);
         setUserId(user?.id ?? null);
         setClassName((cls as { name: string } | null)?.name ?? 'Class');
+        // No session → nothing to load; clear the spinner here since the
+        // loadQueue effect below bails on a null userId.
+        if (!user) setLoading(false);
       } finally {
         // Distinguishes "no session" from "still resolving" — without this,
         // an expired/missing session (userId stays null either way) left
@@ -60,24 +63,32 @@ export default function ClassReviewPage() {
     })();
   }, [id]);
 
-  // Load due words + full pool once userId is known
+  // Load due words + full pool. Also used by the "Redo" button — it re-fetches
+  // whatever is still due rather than replaying the just-graded queue, since
+  // grades are now persisted per-card (replaying would double-advance stages).
+  const loadQueue = useCallback(async () => {
+    if (!userId) return;
+    try {
+      const [due, all] = await Promise.all([
+        getClassDueWords(userId, id),
+        getClassSRSAll(userId, id),
+      ]);
+      setQueue(due);
+      setAllPool(all);
+      setIndex(0);
+      setResults([]);
+      setRevealed(false);
+      setTappedChoice(null);
+      setDone(due.length === 0);
+    } finally {
+      setLoading(false);
+    }
+  }, [userId, id]);
+
   useEffect(() => {
-    if (!authChecked || !id) return;
-    (async () => {
-      if (!userId) { setLoading(false); return; }
-      try {
-        const [due, all] = await Promise.all([
-          getClassDueWords(userId, id),
-          getClassSRSAll(userId, id),
-        ]);
-        setQueue(due);
-        setAllPool(all);
-        if (due.length === 0) setDone(true);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [authChecked, userId, id]);
+    if (!authChecked || !id || !userId) return;
+    void loadQueue();
+  }, [authChecked, id, userId, loadQueue]);
 
   const current = queue[index];
 
@@ -111,36 +122,35 @@ export default function ClassReviewPage() {
     setIndex(0); setResults([]); setRevealed(false); setTappedChoice(null);
   };
 
-  const applyGrades = useCallback(async (finalResults: { word: string; knew: boolean }[]) => {
-    if (gradesApplied.current || !userId) return;
-    gradesApplied.current = true;
-    if (finalResults.length === 0) return;
-    // Update Supabase for each graded word
-    await Promise.all(finalResults.map(r => advanceClassSRSWord(userId, id, r.word, r.knew)));
-    const knewCount = finalResults.filter(r => r.knew).length;
-    const xp = knewCount * 2; // 2 XP per correct review (matches personal SRS rate)
-    await recordClassXP(userId, id, xp, 'SRS Review');
-    // Class-earned XP also counts toward the account's global total, so it
-    // isn't lost if the student later leaves the class.
-    if (xp > 0) addXP(xp, 'SRS Review', `Class · ${className}`);
-    setSessionXP(xp);
-    recordStudySession();
-  }, [userId, id, className]);
-
   const grade = useCallback((knew: boolean) => {
     if (!current || grading.current) return;
     grading.current = true;
     setTimeout(() => { grading.current = false; }, 100);
-    const newResults = [...results, { word: current.word, knew }];
-    setResults(newResults);
+
+    // Persist this card's result immediately, fire-and-forget. The session no
+    // longer batches grades to the end, so closing the tab / hitting Back /
+    // navigating away mid-session can't lose already-answered cards. Every
+    // write here is class-domain only (class_srs_states, class_members.class_xp,
+    // class_study_days, class_hard_words) — nothing touches the personal XP
+    // pool or streak. Mirrors Flutter's _recordAnswer in class_review_screen.dart.
+    if (userId) {
+      void advanceClassSRSWord(userId, id, current.word, knew);
+      if (knew) {
+        void recordClassXP(userId, id, 2, 'SRS Review'); // 2 XP per correct review; also logs the class study day
+      } else {
+        void addClassHardWord(userId, id, current.word);
+        void recordClassStudyDay(userId, id); // no XP for a miss, but the session still counts as class activity
+      }
+    }
+
+    setResults(prev => [...prev, { word: current.word, knew }]);
     setTappedChoice(null);
     if (index + 1 >= queue.length) {
-      void applyGrades(newResults);
       setDone(true);
     } else {
       setIndex(i => i + 1);
     }
-  }, [current, index, queue, results, applyGrades]);
+  }, [current, index, queue, userId, id]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -192,6 +202,7 @@ export default function ClassReviewPage() {
     const knewCount   = results.filter(r => r.knew).length;
     const notYetCount = results.filter(r => !r.knew).length;
     const score = Math.round((knewCount / results.length) * 100);
+    const sessionXP = knewCount * 2; // matches the per-card award in grade()
     return (
       <div className="p-6 text-center flex flex-col items-center justify-center min-h-screen animate-fade-in">
         <div className="text-6xl mb-4">{score >= 80 ? '🧠' : '💪'}</div>
@@ -204,7 +215,7 @@ export default function ClassReviewPage() {
         </div>
         <div className="flex gap-3 w-full">
           <button
-            onClick={() => { gradesApplied.current = false; setIndex(0); setRevealed(false); setResults([]); setDone(false); }}
+            onClick={() => { setLoading(true); void loadQueue(); }}
             className="btn-secondary flex-1"
           >Redo</button>
           <button onClick={() => router.push(`/classes/${id}/words`)} className="btn-primary flex-1">
@@ -225,7 +236,7 @@ export default function ClassReviewPage() {
       {/* Header */}
       <div className="flex items-center justify-between p-4">
         <button
-          onClick={() => { void applyGrades(results); router.push(`/classes/${id}/words`); }}
+          onClick={() => router.push(`/classes/${id}/words`)}
           className="btn-icon" aria-label="Exit review"
         >✕</button>
         <div className="text-center">
