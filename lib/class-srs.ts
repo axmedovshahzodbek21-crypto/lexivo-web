@@ -167,12 +167,21 @@ export async function advanceClassSRSWord(
   word: string,
   knew: boolean,
 ): Promise<void> {
-  await supabase.rpc('advance_class_srs_word', {
+  // supabase.rpc resolves (never rejects) on a Postgres error — it comes back
+  // in `error`. The review page fires this without awaiting, so an unchecked
+  // error here is doubly invisible; that's how a text/date type mismatch in
+  // the function body (fixed by migration 20260827) silently broke class SRS
+  // advancement in production. Surface it.
+  const { error } = await supabase.rpc('advance_class_srs_word', {
     p_user_id: userId,
     p_class_id: classId,
     p_word: word,
     p_knew: knew,
   });
+  if (error) {
+    console.error('[advanceClassSRSWord] failed', { word, knew, error });
+    throw error;
+  }
 }
 
 // Teacher view: all students' SRS states for a class.

@@ -134,7 +134,10 @@ export default function ClassReviewPage() {
     // class_study_days, class_hard_words) — nothing touches the personal XP
     // pool or streak. Mirrors Flutter's _recordAnswer in class_review_screen.dart.
     if (userId) {
-      void advanceClassSRSWord(userId, id, current.word, knew);
+      // .catch: advanceClassSRSWord already console.errors on failure; this
+      // just keeps the fire-and-forget call from surfacing as an unhandled
+      // rejection.
+      void advanceClassSRSWord(userId, id, current.word, knew).catch(() => {});
       if (knew) {
         void recordClassXP(userId, id, 2, 'SRS Review'); // 2 XP per correct review; also logs the class study day
       } else {
