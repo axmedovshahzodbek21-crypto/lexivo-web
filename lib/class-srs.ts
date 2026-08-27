@@ -196,6 +196,21 @@ export async function advanceClassSRSWord(
   }
 }
 
+// One row per graded review card — reveal->grade time for pacing analytics.
+// Fire-and-forget; a failed insert must never disrupt the review session.
+export async function recordClassReviewEvent(
+  userId: string,
+  classId: string,
+  word: string,
+  knew: boolean,
+  responseMs: number | null,
+): Promise<void> {
+  const { error } = await supabase.from('class_review_events').insert({
+    user_id: userId, class_id: classId, word, knew, response_ms: responseMs,
+  });
+  if (error) console.error('[recordClassReviewEvent] failed', error);
+}
+
 // Teacher view: all students' SRS states for a class.
 export async function getClassSRSForTeacher(
   classId: string,

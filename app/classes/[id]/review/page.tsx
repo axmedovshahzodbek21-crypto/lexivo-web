@@ -7,7 +7,7 @@ import { recordClassStudyDay } from '@/lib/class-xp';
 import { speak } from '@/lib/speech';
 import {
   getClassDueWords, getClassSRSAll, advanceClassSRSWord, addClassHardWord,
-  stageLabel, stageColor, type ClassSRSEntry,
+  recordClassReviewEvent, stageLabel, stageColor, type ClassSRSEntry,
 } from '@/lib/class-srs';
 import { shuffleArray } from '@/lib/shuffleArray';
 
@@ -53,6 +53,9 @@ export default function ClassReviewPage() {
   // The pending REVEAL_BEAT_MS timer, cleared on card change so a beat armed
   // for a previous card can't unlock grading early on the next one.
   const beatTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  // performance.now() when the current card's answer was revealed, for the
+  // reveal->grade timing logged to class_review_events.
+  const revealedAt = useRef<number | undefined>(undefined);
 
   // Resolve user + class name
   useEffect(() => {
@@ -132,6 +135,7 @@ export default function ClassReviewPage() {
     setChoices(buildChoices(index, queue));
     if (current && autoPlay) speak(current.word);
     clearTimeout(beatTimer.current);
+    revealedAt.current = undefined;
     const t = setTimeout(() => setCardLocked(false), CARD_LOCKOUT_MS);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -142,6 +146,7 @@ export default function ClassReviewPage() {
   const reveal = useCallback(() => {
     if (cardLocked || revealed) return;
     setRevealed(true);
+    revealedAt.current = performance.now();
     clearTimeout(beatTimer.current);
     beatTimer.current = setTimeout(() => setGradeUnlocked(true), REVEAL_BEAT_MS);
   }, [cardLocked, revealed]);
@@ -173,6 +178,8 @@ export default function ClassReviewPage() {
       void advanceClassSRSWord(userId, id, current.word, knew).catch(() => {});
       void recordClassStudyDay(userId, id); // count the session as class activity (knew and miss alike)
       if (!knew) void addClassHardWord(userId, id, current.word);
+      const responseMs = revealedAt.current == null ? null : Math.round(performance.now() - revealedAt.current);
+      void recordClassReviewEvent(userId, id, current.word, knew, responseMs);
     }
 
     setResults(prev => [...prev, { word: current.word, knew }]);
