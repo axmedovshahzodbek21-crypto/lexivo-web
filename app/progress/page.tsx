@@ -21,6 +21,7 @@ import type { SRSWord } from '@/lib/types';
 import { SRS_INTERVALS } from '@/lib/types';
 import { useTranslation } from '@/lib/useTranslation';
 import XpHistoryModal from '@/components/XpHistoryModal';
+import BackButton from '@/components/BackButton';
 
 export default function ProgressPageWrapper() {
   return (
@@ -143,6 +144,7 @@ function ProgressPage() {
   return (
     <div className="flex flex-col min-h-screen">
       <div className="p-4">
+        <BackButton className="mb-3" />
         <h1 className="text-2xl font-bold mb-4">{t.progress.title}</h1>
 
         {/* Tabs */}
