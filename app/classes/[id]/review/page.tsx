@@ -18,6 +18,15 @@ const TILE_COLORS = [
   { bg: '#26890c', shadow: '#1c6409', shape: '■' },
 ] as const;
 
+// Anti-mash gates: with per-card persistence a student can otherwise clear the
+// whole queue by rapidly tapping one grade button without reading anything,
+// which pollutes their SRS scheduling (and, once review XP is gated on stage
+// change, farms XP). REVEAL_BEAT_MS = the answer must be visible this long
+// before it can be graded; CARD_LOCKOUT_MS = input is ignored this long after
+// each grade so a queued/double tap can't fall through onto the next card.
+const REVEAL_BEAT_MS = 800;
+const CARD_LOCKOUT_MS = 350;
+
 export default function ClassReviewPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
@@ -25,6 +34,8 @@ export default function ClassReviewPage() {
   const [allPool,    setAllPool]    = useState<ClassSRSEntry[]>([]); // for choice generation
   const [index,      setIndex]      = useState(0);
   const [revealed,   setRevealed]   = useState(false);
+  const [gradeUnlocked, setGradeUnlocked] = useState(false); // answer has been visible >= REVEAL_BEAT_MS
+  const [cardLocked, setCardLocked] = useState(false);       // within CARD_LOCKOUT_MS of the last grade
   const [done,       setDone]       = useState(false);
   const [results,    setResults]    = useState<{ word: string; knew: boolean }[]>([]);
   const [autoPlay,   setAutoPlay]   = useState(true);
@@ -39,6 +50,9 @@ export default function ClassReviewPage() {
   // Guards grade() against a double-tap re-entering with the same card before
   // React commits the index advance. Mirrors Flutter's _answering flag.
   const grading = useRef(false);
+  // The pending REVEAL_BEAT_MS timer, cleared on card change so a beat armed
+  // for a previous card can't unlock grading early on the next one.
+  const beatTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   // Resolve user + class name
   useEffect(() => {
@@ -108,22 +122,40 @@ export default function ClassReviewPage() {
     return shuffleArray([correct, ...wrong]);
   }, [allPool]);
 
+  // New card: clear the answer + re-arm both gates, and hold input locked for
+  // CARD_LOCKOUT_MS so a tap meant for the previous card can't land on this one.
   useEffect(() => {
     setTappedChoice(null);
     setRevealed(false);
+    setGradeUnlocked(false);
+    setCardLocked(true);
     setChoices(buildChoices(index, queue));
     if (current && autoPlay) speak(current.word);
-  }, [current, autoPlay, buildChoices]); // eslint-disable-line react-hooks/exhaustive-deps
+    clearTimeout(beatTimer.current);
+    const t = setTimeout(() => setCardLocked(false), CARD_LOCKOUT_MS);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [current, autoPlay, buildChoices]);
+
+  // Reveal the answer and start the beat before grading is allowed. Central so
+  // the tile tap, the Reveal button, and the keyboard path all gate identically.
+  const reveal = useCallback(() => {
+    if (cardLocked || revealed) return;
+    setRevealed(true);
+    clearTimeout(beatTimer.current);
+    beatTimer.current = setTimeout(() => setGradeUnlocked(true), REVEAL_BEAT_MS);
+  }, [cardLocked, revealed]);
 
   const toggleShuffle = () => {
     const next = !isShuffled;
     setIsShuffled(next);
     setQueue(prev => next ? shuffleArray(prev) : [...prev]);
     setIndex(0); setResults([]); setRevealed(false); setTappedChoice(null);
+    setGradeUnlocked(false); setCardLocked(false);
   };
 
   const grade = useCallback((knew: boolean) => {
-    if (!current || grading.current) return;
+    if (!current || grading.current || cardLocked || !gradeUnlocked) return;
     grading.current = true;
     setTimeout(() => { grading.current = false; }, 100);
 
@@ -153,7 +185,7 @@ export default function ClassReviewPage() {
     } else {
       setIndex(i => i + 1);
     }
-  }, [current, index, queue, userId, id]);
+  }, [current, index, queue, userId, id, cardLocked, gradeUnlocked]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -161,20 +193,20 @@ export default function ClassReviewPage() {
       if (e.target instanceof HTMLInputElement) return;
       if (!current) return;
       switch (e.key) {
-        case ' ': case 'Enter': e.preventDefault(); if (!revealed) setRevealed(true); break;
-        case 'ArrowRight': case 'k': case 'K': if (revealed) grade(true); break;
-        case 'ArrowLeft':  case 'j': case 'J': if (revealed) grade(false); break;
+        case ' ': case 'Enter': e.preventDefault(); reveal(); break;
+        case 'ArrowRight': case 'k': case 'K': if (gradeUnlocked && !cardLocked) grade(true); break;
+        case 'ArrowLeft':  case 'j': case 'J': if (gradeUnlocked && !cardLocked) grade(false); break;
         case 's': case 'S': speak(current.word); break;
       }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [current, revealed, grade]);
+  }, [current, reveal, gradeUnlocked, cardLocked, grade]);
 
   const handleChoiceTap = (choice: string) => {
-    if (tappedChoice || !current) return;
+    if (tappedChoice || !current || cardLocked) return;
     setTappedChoice(choice);
-    setRevealed(true);
+    reveal();
   };
 
   // ── Loading ──────────────────────────────────────────────────────────────────
@@ -299,7 +331,7 @@ export default function ClassReviewPage() {
               </div>
             </div>
           ) : choices === null ? (
-            <button onClick={() => setRevealed(true)} className="mt-4 btn-secondary w-full">
+            <button onClick={reveal} disabled={cardLocked} className="mt-4 btn-secondary w-full disabled:opacity-40">
               Reveal
             </button>
           ) : null}
@@ -341,10 +373,10 @@ export default function ClassReviewPage() {
             </div>
             {tappedChoice && (
               <div className="flex gap-2 animate-slide-up">
-                <button onClick={() => grade(false)} className="flex-1 py-3 rounded-xl border-2 border-[var(--danger)] text-[var(--danger)] font-bold text-sm hover:bg-red-50 transition-colors">
+                <button onClick={() => grade(false)} disabled={!gradeUnlocked} className="flex-1 py-3 rounded-xl border-2 border-[var(--danger)] text-[var(--danger)] font-bold text-sm hover:bg-red-50 transition-colors disabled:opacity-40 disabled:hover:bg-transparent">
                   Not yet
                 </button>
-                <button onClick={() => grade(true)} className="flex-1 py-3 rounded-xl border-2 border-[var(--success)] text-[var(--success)] font-bold text-sm hover:bg-green-50 transition-colors">
+                <button onClick={() => grade(true)} disabled={!gradeUnlocked} className="flex-1 py-3 rounded-xl border-2 border-[var(--success)] text-[var(--success)] font-bold text-sm hover:bg-green-50 transition-colors disabled:opacity-40 disabled:hover:bg-transparent">
                   Knew it ✓
                 </button>
               </div>
@@ -353,10 +385,10 @@ export default function ClassReviewPage() {
         ) : (
           revealed && (
             <div className="flex gap-2 animate-slide-up">
-              <button onClick={() => grade(false)} className="flex-1 py-4 rounded-xl border-2 border-[var(--danger)] text-[var(--danger)] font-bold text-sm hover:bg-red-50 transition-colors flex flex-col items-center gap-1">
+              <button onClick={() => grade(false)} disabled={!gradeUnlocked} className="flex-1 py-4 rounded-xl border-2 border-[var(--danger)] text-[var(--danger)] font-bold text-sm hover:bg-red-50 transition-colors flex flex-col items-center gap-1 disabled:opacity-40 disabled:hover:bg-transparent">
                 <span>✗</span><span className="text-xs font-normal">Not yet</span>
               </button>
-              <button onClick={() => grade(true)} className="flex-1 py-4 rounded-xl border-2 border-[var(--success)] text-[var(--success)] font-bold text-sm hover:bg-green-50 transition-colors flex flex-col items-center gap-1">
+              <button onClick={() => grade(true)} disabled={!gradeUnlocked} className="flex-1 py-4 rounded-xl border-2 border-[var(--success)] text-[var(--success)] font-bold text-sm hover:bg-green-50 transition-colors flex flex-col items-center gap-1 disabled:opacity-40 disabled:hover:bg-transparent">
                 <span>✓</span><span className="text-xs font-normal">Knew it</span>
               </button>
             </div>
