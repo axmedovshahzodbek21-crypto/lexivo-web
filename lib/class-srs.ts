@@ -177,6 +177,7 @@ export async function advanceClassSRSWord(
     p_class_id: classId,
     p_word: word,
     p_knew: knew,
+    p_today: todayStr(), // schedule next_due on the device's local date, matching getClassDueWords
   });
   if (error) {
     console.error('[advanceClassSRSWord] failed', { word, knew, error });
