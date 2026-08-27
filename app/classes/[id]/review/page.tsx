@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { displayXP } from '@/lib/storage';
-import { recordClassXP, recordClassStudyDay } from '@/lib/class-xp';
+import { recordClassStudyDay } from '@/lib/class-xp';
 import { speak } from '@/lib/speech';
 import {
   getClassDueWords, getClassSRSAll, advanceClassSRSWord, addClassHardWord,
@@ -166,16 +166,13 @@ export default function ClassReviewPage() {
     // class_study_days, class_hard_words) — nothing touches the personal XP
     // pool or streak. Mirrors Flutter's _recordAnswer in class_review_screen.dart.
     if (userId) {
-      // .catch: advanceClassSRSWord already console.errors on failure; this
-      // just keeps the fire-and-forget call from surfacing as an unhandled
-      // rejection.
+      // advanceClassSRSWord awards the 2 XP for a correct answer itself, on the
+      // server, only when the stage actually advances (migration 20260827) —
+      // nothing here passes review XP to record_class_xp any more. .catch: the
+      // wrapper already console.errors on failure.
       void advanceClassSRSWord(userId, id, current.word, knew).catch(() => {});
-      if (knew) {
-        void recordClassXP(userId, id, 2, 'SRS Review'); // 2 XP per correct review; also logs the class study day
-      } else {
-        void addClassHardWord(userId, id, current.word);
-        void recordClassStudyDay(userId, id); // no XP for a miss, but the session still counts as class activity
-      }
+      void recordClassStudyDay(userId, id); // count the session as class activity (knew and miss alike)
+      if (!knew) void addClassHardWord(userId, id, current.word);
     }
 
     setResults(prev => [...prev, { word: current.word, knew }]);
