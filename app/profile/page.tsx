@@ -454,6 +454,21 @@ export default function ProfilePage() {
               </div>
             </Link>
           </TiltCard>
+          <TiltCard className="card flex items-center gap-3 overflow-hidden hover:border-[var(--primary)] transition-colors depth-in-4" intensity={5}>
+            <a
+              href="https://lexivo-projects.vercel.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 w-full"
+              style={{ margin: '-20px', padding: '20px' }}
+            >
+              <span className="text-2xl animate-float-icon">🧩</span>
+              <div>
+                <p className="text-sm font-semibold text-[var(--text)]">Other projects ↗</p>
+                <p className="text-xs text-[var(--text-muted)]">IELTS CDI, Batch &amp; more</p>
+              </div>
+            </a>
+          </TiltCard>
         </div>
 
         {/* ── Account ── */}

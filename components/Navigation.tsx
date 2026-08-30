@@ -204,6 +204,23 @@ export default function Navigation() {
               </Link>
             );
           })}
+
+          {/* External: sibling projects preview site */}
+          <a
+            href="https://lexivo-projects.vercel.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            onMouseEnter={() => setHoveredKey('other_projects')}
+            onMouseLeave={() => setHoveredKey(null)}
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-semibold"
+            style={hoveredKey === 'other_projects'
+              ? { background: '#6C63FF18', color: '#6C63FF' }
+              : { color: 'var(--text-muted)' }}
+          >
+            <span className="text-lg transition-transform duration-200">🧩</span>
+            <span>Other projects</span>
+            <span className="ml-auto text-[10px] text-[var(--text-muted)]">↗</span>
+          </a>
         </nav>
 
         {/* ── Profile block ── */}
