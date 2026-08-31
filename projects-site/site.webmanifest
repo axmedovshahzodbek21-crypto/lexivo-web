@@ -1,0 +1,13 @@
+{
+  "name": "Lexivo Projects",
+  "short_name": "Lexivo Projects",
+  "description": "The Lexivo studio project shelf: Lexivo, IELTS CDI, and Batch.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "browser",
+  "background_color": "#FBFAF6",
+  "theme_color": "#FBFAF6",
+  "icons": [
+    { "src": "/favicon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any" }
+  ]
+}

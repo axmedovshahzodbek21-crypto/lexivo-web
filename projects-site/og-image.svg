@@ -1,0 +1,21 @@
+<!-- Source for the social share image. Most crawlers (Twitter/X, Facebook,
+     LinkedIn, Slack, iMessage) do NOT render SVG OG images — export this to
+     og-image.png (1200x630) before shipping. See README.md. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#FBFAF6"/>
+  <circle cx="1010" cy="120" r="220" fill="#FF5A4C" fill-opacity="0.14"/>
+  <circle cx="180" cy="560" r="240" fill="#6C63FF" fill-opacity="0.12"/>
+  <circle cx="640" cy="80" r="160" fill="#3FA46B" fill-opacity="0.12"/>
+
+  <g transform="translate(90,150)">
+    <circle cx="14" cy="14" r="14" fill="#FF5A4C"/>
+    <circle cx="30" cy="14" r="14" fill="#6C63FF" fill-opacity="0.9"/>
+    <circle cx="46" cy="14" r="14" fill="#3FA46B" fill-opacity="0.85"/>
+    <text x="80" y="26" font-family="'Bricolage Grotesque','Segoe UI',sans-serif" font-size="34" font-weight="800" fill="#6B655C" letter-spacing="1">LEXIVO STUDIO &#183; PROJECTS</text>
+  </g>
+
+  <text x="88" y="330" font-family="'Bricolage Grotesque','Segoe UI',sans-serif" font-size="92" font-weight="800" fill="#211E1B" letter-spacing="-2">Small, sharp apps for</text>
+  <text x="88" y="430" font-family="'Bricolage Grotesque','Segoe UI',sans-serif" font-size="92" font-weight="800" fill="#211E1B" letter-spacing="-2">learning and training.</text>
+
+  <text x="90" y="545" font-family="'JetBrains Mono','Courier New',monospace" font-size="30" fill="#6B655C">Lexivo &#183; IELTS CDI &#183; Batch</text>
+</svg>

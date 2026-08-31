@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- ==== Primary SEO ==== -->
+  <title>Lexivo Projects — vocabulary trainer, IELTS test builder &amp; Cindy tracker</title>
+  <meta name="description" content="The Lexivo studio project shelf: Lexivo, a spaced-repetition vocabulary trainer for classrooms; IELTS CDI, a computer-delivered IELTS Reading test builder; and Batch, a 24-week training plan for the CrossFit 'Cindy' benchmark." />
+  <link rel="canonical" href="https://lexivo-projects.vercel.app/" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <meta name="author" content="Lexivo" />
+  <meta name="keywords" content="Lexivo, IELTS CDI, computer-delivered IELTS, IELTS Reading test builder, spaced repetition vocabulary, Cindy CrossFit benchmark, workout tracker PWA" />
+
+  <!-- ==== Open Graph ==== -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Lexivo Projects" />
+  <meta property="og:title" content="Lexivo Projects — small, sharp apps for learning and training" />
+  <meta property="og:description" content="Three projects from the Lexivo studio: a vocabulary trainer, an IELTS computer-delivered test builder, and a 6-month Cindy training plan." />
+  <meta property="og:url" content="https://lexivo-projects.vercel.app/" />
+  <meta property="og:image" content="https://lexivo-projects.vercel.app/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:locale" content="en_US" />
+
+  <!-- ==== Twitter ==== -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Lexivo Projects" />
+  <meta name="twitter:description" content="A vocabulary trainer, an IELTS computer-delivered test builder, and a 6-month Cindy training plan." />
+  <meta name="twitter:image" content="https://lexivo-projects.vercel.app/og-image.png" />
+
+  <!-- ==== Icons / theme ==== -->
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#FBFAF6" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#131512" media="(prefers-color-scheme: dark)" />
+
+  <!-- ==== Fonts ==== -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+  <link rel="stylesheet" href="/styles.css" />
+
+  <!-- ==== Structured data ==== -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://lexivo-projects.vercel.app/#org",
+        "name": "Lexivo",
+        "url": "https://lexivo-web-nu.vercel.app",
+        "description": "A small studio building learning and training apps."
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://lexivo-projects.vercel.app/#site",
+        "url": "https://lexivo-projects.vercel.app/",
+        "name": "Lexivo Projects",
+        "publisher": { "@id": "https://lexivo-projects.vercel.app/#org" }
+      },
+      {
+        "@type": "ItemList",
+        "name": "Lexivo projects",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "item": {
+              "@type": "SoftwareApplication",
+              "name": "Lexivo",
+              "applicationCategory": "EducationalApplication",
+              "operatingSystem": "Web",
+              "url": "https://lexivo-web-nu.vercel.app",
+              "description": "A spaced-repetition vocabulary trainer for learners and classrooms, with teacher-run review sessions and multiple-choice drills that grade on tap."
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "item": {
+              "@type": "SoftwareApplication",
+              "name": "IELTS CDI",
+              "applicationCategory": "EducationalApplication",
+              "operatingSystem": "Web, Android",
+              "url": "https://ielts-cdi-mauve.vercel.app",
+              "description": "Converts paper IELTS Academic Reading passages into a computer-delivered format: authoring, an interactive test-taker with band-score estimate, static HTML export, and Google Play distribution."
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "item": {
+              "@type": "SoftwareApplication",
+              "name": "Batch",
+              "applicationCategory": "HealthApplication",
+              "operatingSystem": "Web, Android",
+              "url": "https://dist-one-eta-78.vercel.app",
+              "description": "A personal Cindy training tracker: a fixed 24-week progression toward the CrossFit benchmark WOD, with a guided workout runner, timing splits, and local-only logging."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="brand" href="/"><span class="dot"></span>Lexivo&nbsp;<span class="brand-sub">/ projects</span></a>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Switch color theme">theme: auto</button>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+  <div class="wrap">
+    <p class="eyebrow">Lexivo studio &middot; <span id="projCount">3</span> projects</p>
+    <h1>Small, sharp apps for learning&nbsp;and&nbsp;training.</h1>
+    <p class="lede">A living shelf of what Lexivo is building &mdash; a vocabulary trainer, an IELTS test builder, and a 6&#8209;month workout plan. More slots stay open.</p>
+    <p class="nowline">Now working toward:&nbsp;<b id="nowWord">band scores</b><span class="cursor" aria-hidden="true">&#9608;</span></p>
+  </div>
+</section>
+
+<main class="wrap">
+  <h2 class="sr-only">Projects</h2>
+  <div class="shelf" id="shelf"></div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span class="powered">IELTS CDI &amp; Batch are <b>Powered by Lexivo</b></span>
+    <span>&copy; <span id="year">2026</span> Lexivo &middot; <a href="https://lexivo-web-nu.vercel.app" target="_blank" rel="noopener">lexivo-web-nu.vercel.app</a></span>
+  </div>
+</footer>
+
+<script src="/script.js"></script>
+</body>
+</html>

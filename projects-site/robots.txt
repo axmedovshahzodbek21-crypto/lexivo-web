@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://lexivo-projects.vercel.app/sitemap.xml
