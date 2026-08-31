@@ -26,11 +26,15 @@ const TILE_COLORS = [
 //   RESULT_REVEAL_*_MS  – MCQ path: how long the green/red result shows before
 //                         the tap auto-advances. Longer on a miss so the correct
 //                         answer can register.
+//   OPTIONS_BEAT_MS     – MCQ path: the option tiles are dimmed and inert this
+//                         long after the prompt is tapped, so the recall-first
+//                         reveal can't be blown past with a queued tap.
 //   CARD_LOCKOUT_MS     – input ignored this long after each grade so a
 //                         queued/double tap can't fall through onto the next card.
 const REVEAL_BEAT_MS = 800;
 const RESULT_REVEAL_CORRECT_MS = 800;
 const RESULT_REVEAL_WRONG_MS = 1600;
+const OPTIONS_BEAT_MS = 450;
 const CARD_LOCKOUT_MS = 350;
 
 export default function ClassReviewPage() {
@@ -47,6 +51,8 @@ export default function ClassReviewPage() {
   const [autoPlay,   setAutoPlay]   = useState(true);
   const [isShuffled, setIsShuffled] = useState(false);
   const [tappedChoice, setTappedChoice] = useState<string | null>(null);
+  const [optionsShown, setOptionsShown] = useState(false);    // MCQ: prompt tapped, option tiles revealed
+  const [optionsUnlocked, setOptionsUnlocked] = useState(false); // MCQ: OPTIONS_BEAT_MS elapsed since reveal
   const [choices,    setChoices]    = useState<string[] | null>(null);
   const [userId,     setUserId]     = useState<string | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
@@ -105,6 +111,8 @@ export default function ClassReviewPage() {
       setResults([]);
       setRevealed(false);
       setTappedChoice(null);
+      setOptionsShown(false);
+      setOptionsUnlocked(false);
       setDone(due.length === 0);
     } finally {
       setLoading(false);
@@ -140,6 +148,8 @@ export default function ClassReviewPage() {
     setTappedChoice(null);
     setRevealed(false);
     setGradeUnlocked(false);
+    setOptionsShown(false);
+    setOptionsUnlocked(false);
     setCardLocked(true);
     setChoices(buildChoices(index, queue));
     if (current && autoPlay) speak(current.word);
@@ -158,7 +168,9 @@ export default function ClassReviewPage() {
   const reveal = useCallback((autoGradeKnew?: boolean) => {
     if (cardLocked || revealed) return;
     setRevealed(true);
-    revealedAt.current = performance.now();
+    // In MCQ mode revealedAt is already stamped by showOptions (recall-first
+    // gate); only the fallback path reaches here with it still unset.
+    if (revealedAt.current === undefined) revealedAt.current = performance.now();
     autoGrade.current = autoGradeKnew;
     const delay = autoGradeKnew === undefined
       ? REVEAL_BEAT_MS
@@ -167,12 +179,25 @@ export default function ClassReviewPage() {
     beatTimer.current = setTimeout(() => setGradeUnlocked(true), delay);
   }, [cardLocked, revealed]);
 
+  // MCQ recall gate: the student taps the prompt to reveal the option tiles,
+  // having tried to recall the translation first. Tiles are dimmed and inert
+  // for OPTIONS_BEAT_MS after this so a queued tap can't fall straight onto one.
+  const showOptions = useCallback(() => {
+    if (cardLocked || optionsShown) return;
+    setOptionsShown(true);
+    setOptionsUnlocked(false);
+    revealedAt.current = performance.now();
+    clearTimeout(beatTimer.current);
+    beatTimer.current = setTimeout(() => setOptionsUnlocked(true), OPTIONS_BEAT_MS);
+  }, [cardLocked, optionsShown]);
+
   const toggleShuffle = () => {
     const next = !isShuffled;
     setIsShuffled(next);
     setQueue(prev => next ? shuffleArray(prev) : [...prev]);
     setIndex(0); setResults([]); setRevealed(false); setTappedChoice(null);
     setGradeUnlocked(false); setCardLocked(false);
+    setOptionsShown(false); setOptionsUnlocked(false);
   };
 
   const grade = useCallback((knew: boolean) => {
@@ -220,7 +245,7 @@ export default function ClassReviewPage() {
       if (e.target instanceof HTMLInputElement) return;
       if (!current) return;
       switch (e.key) {
-        case ' ': case 'Enter': e.preventDefault(); reveal(); break;
+        case ' ': case 'Enter': e.preventDefault(); if (choices === null) reveal(); else showOptions(); break;
         // Arrow/j/k grade only on the fallback path — in MCQ mode the tile tap
         // is the answer.
         case 'ArrowRight': case 'k': case 'K': if (choices === null && gradeUnlocked && !cardLocked) grade(true); break;
@@ -230,10 +255,10 @@ export default function ClassReviewPage() {
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [current, reveal, gradeUnlocked, cardLocked, grade, choices]);
+  }, [current, reveal, showOptions, gradeUnlocked, cardLocked, grade, choices]);
 
   const handleChoiceTap = (choice: string) => {
-    if (tappedChoice || !current || cardLocked) return;
+    if (tappedChoice || !current || cardLocked || !optionsUnlocked) return;
     setTappedChoice(choice);
     reveal(choice === current.translation); // auto-grades once the result has shown
   };
@@ -344,12 +369,17 @@ export default function ClassReviewPage() {
           </div>
         </div>
 
-        {/* Word card */}
-        <div className="card animate-slide-up flex flex-col gap-3" style={{ minHeight: choices !== null ? 'auto' : 280 }}>
+        {/* Word card — in MCQ mode the whole card is the recall-first tap target */}
+        <div
+          className={`card animate-slide-up flex flex-col gap-3${choices !== null && !optionsShown && !cardLocked ? ' cursor-pointer' : ''}`}
+          style={{ minHeight: choices !== null ? 'auto' : 280 }}
+          onClick={choices !== null && !optionsShown && !cardLocked ? showOptions : undefined}
+          role={choices !== null && !optionsShown ? 'button' : undefined}
+        >
           <div className="flex items-center justify-between">
             <span className="badge text-xs">Class word</span>
             <button
-              onClick={() => speak(current.word)}
+              onClick={(e) => { e.stopPropagation(); speak(current.word); }}
               className="w-8 h-8 rounded-full bg-[var(--primary-bg)] flex items-center justify-center hover:bg-[var(--primary)] hover:text-white transition-colors"
               aria-label="Listen"
             >🔊</button>
@@ -368,11 +398,15 @@ export default function ClassReviewPage() {
             <button onClick={() => reveal()} disabled={cardLocked} className="mt-4 btn-secondary w-full disabled:opacity-40">
               Reveal
             </button>
+          ) : !optionsShown ? (
+            <p className="mt-3 text-sm text-[var(--text-muted)] flex items-center gap-1.5">
+              <span aria-hidden>👆</span> Tap to see options
+            </p>
           ) : null}
         </div>
 
         {/* Quiz mode tiles */}
-        {choices !== null ? (
+        {choices !== null && optionsShown ? (
           <div className="animate-slide-up space-y-3">
             <div className="grid grid-cols-2 gap-3">
               {choices.map((choice, i) => {
@@ -393,9 +427,9 @@ export default function ClassReviewPage() {
                   <button
                     key={choice}
                     onClick={() => handleChoiceTap(choice)}
-                    disabled={answered}
+                    disabled={answered || !optionsUnlocked}
                     className={`relative rounded-2xl p-4 flex flex-col gap-2 min-h-[100px] transition-all duration-200 text-left active:translate-y-1${isLast ? ' col-span-2' : ''}`}
-                    style={{ backgroundColor: bgColor, boxShadow: `0 4px 0 ${shadowColor}`, opacity }}
+                    style={{ backgroundColor: bgColor, boxShadow: `0 4px 0 ${shadowColor}`, opacity: !answered && !optionsUnlocked ? 0.5 : opacity }}
                   >
                     <span className="text-xl text-white/70 leading-none">{tile.shape}</span>
                     <span className="text-white font-bold text-sm leading-snug" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.4)' }}>{choice}</span>
