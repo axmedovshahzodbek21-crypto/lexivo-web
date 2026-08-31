@@ -24,6 +24,12 @@ const TILE_COLORS = [
   { bg: '#26890c', shadow: '#1c6409', shape: '■' },
 ] as const;
 
+// Recall-first gate: the option tiles stay hidden until the word card is
+// tapped, so the user tries to remember the translation before seeing choices.
+// After the reveal they're dimmed and inert this long so a queued tap can't
+// fall straight onto one. Matches the class review (OPTIONS_BEAT_MS there).
+const OPTIONS_BEAT_MS = 450;
+
 export default function SRSReviewPage() {
   const router = useRouter();
   const t = useTranslation();
@@ -46,9 +52,12 @@ export default function SRSReviewPage() {
   const [shuffledNotYet, setShuffledNotYet] = useState(0);
   const [tappedChoice, setTappedChoice] = useState<string | null>(null);
   const [choices, setChoices] = useState<string[] | null>(null);
+  const [optionsShown, setOptionsShown] = useState(false);       // MCQ: word card tapped, tiles revealed
+  const [optionsUnlocked, setOptionsUnlocked] = useState(false); // MCQ: OPTIONS_BEAT_MS elapsed since reveal
   const grading = useRef(false);
   const gradesApplied = useRef(false);
   const autoAdvanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const optionsBeatTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const indexRef = useRef(0);
   const resultsLenRef = useRef(0);
   const queueBuiltRef = useRef(false);
@@ -145,8 +154,11 @@ export default function SRSReviewPage() {
 
   useEffect(() => {
     if (autoAdvanceTimer.current) clearTimeout(autoAdvanceTimer.current);
+    if (optionsBeatTimer.current) clearTimeout(optionsBeatTimer.current);
     setTappedChoice(null);
     setRevealed(false);
+    setOptionsShown(false);
+    setOptionsUnlocked(false);
     setChoices(buildChoices(index, queue));
     if (current && autoPlay) { current.language ? speakText(current.word, current.language) : speak(current.word); }
   }, [current, autoPlay, buildChoices]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -183,6 +195,8 @@ export default function SRSReviewPage() {
     setResults([]);
     setRevealed(false);
     setTappedChoice(null);
+    setOptionsShown(false);
+    setOptionsUnlocked(false);
     sessionStorage.removeItem('srs_session');
   }, [isShuffled, results, queue, setPendingLevelUp]);
 
@@ -234,20 +248,33 @@ export default function SRSReviewPage() {
   const goBack = useCallback(() => {
     if (index === 0) return;
     if (autoAdvanceTimer.current) clearTimeout(autoAdvanceTimer.current);
+    if (optionsBeatTimer.current) clearTimeout(optionsBeatTimer.current);
     grading.current = false;
     setTappedChoice(null);
     setIndex(i => i - 1);
     setResults(r => r.slice(0, -1));
     setRevealed(false);
+    setOptionsShown(false);
+    setOptionsUnlocked(false);
   }, [index]);
 
+  // Recall-first: tapping the word card reveals the option tiles. They're inert
+  // for OPTIONS_BEAT_MS after so a queued tap can't land on one immediately.
+  const showOptions = useCallback(() => {
+    if (optionsShown) return;
+    setOptionsShown(true);
+    setOptionsUnlocked(false);
+    if (optionsBeatTimer.current) clearTimeout(optionsBeatTimer.current);
+    optionsBeatTimer.current = setTimeout(() => setOptionsUnlocked(true), OPTIONS_BEAT_MS);
+  }, [optionsShown]);
+
   const handleChoiceTap = useCallback((choice: string) => {
-    if (tappedChoice || !current) return;
+    if (tappedChoice || !current || !optionsUnlocked) return;
     if (autoAdvanceTimer.current) clearTimeout(autoAdvanceTimer.current);
     setTappedChoice(choice);
     setRevealed(true);
     // No auto-advance — user picks their own grade via the buttons below (matches app)
-  }, [tappedChoice, current]);
+  }, [tappedChoice, current, optionsUnlocked]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -255,7 +282,9 @@ export default function SRSReviewPage() {
       if (managing) { if (e.key === 'Escape') setManaging(false); return; }
       if (!current) return;
       switch (e.key) {
-        case ' ': case 'Enter': e.preventDefault(); if (!revealed) setRevealed(true); break;
+        // MCQ mode: Space reveals the tiles (recall-first gate). Fallback mode:
+        // Space reveals the answer.
+        case ' ': case 'Enter': e.preventDefault(); if (choices !== null) showOptions(); else if (!revealed) setRevealed(true); break;
         case 'ArrowRight': case 'k': case 'K': if (revealed) grade('knew'); break;
         case 'ArrowLeft': case 'j': case 'J': if (revealed) grade('notYet'); break;
         case 's': case 'S': current.language ? speakText(current.word, current.language) : speak(current.word); break;
@@ -264,7 +293,7 @@ export default function SRSReviewPage() {
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [current, revealed, managing, grade, goBack]);
+  }, [current, revealed, managing, grade, goBack, choices, showOptions]);
 
   const handleRemove = (id: string) => {
     removeSRSWord(id);
@@ -430,8 +459,13 @@ export default function SRSReviewPage() {
           </div>
         </div>
 
-        {/* Word card */}
-        <div className="card animate-slide-up flex flex-col gap-3 relative overflow-hidden" style={{ minHeight: choices !== null ? 'auto' : 280, borderLeft: '3px solid var(--primary)' }}>
+        {/* Word card — in MCQ mode it's the recall-first tap target that reveals the tiles */}
+        <div
+          className={`card animate-slide-up flex flex-col gap-3 relative overflow-hidden${choices !== null && !optionsShown ? ' cursor-pointer' : ''}`}
+          style={{ minHeight: choices !== null ? 'auto' : 280, borderLeft: '3px solid var(--primary)' }}
+          onClick={choices !== null && !optionsShown ? showOptions : undefined}
+          role={choices !== null && !optionsShown ? 'button' : undefined}
+        >
           {/* Watermark letter */}
           <div style={{
             position: 'absolute', right: -12, bottom: -20,
@@ -445,7 +479,7 @@ export default function SRSReviewPage() {
           <div className="flex items-center justify-between">
             <span className="badge text-xs">{current.topic}</span>
             <button
-              onClick={() => current.language ? speakText(current.word, current.language) : speak(current.word)}
+              onClick={(e) => { e.stopPropagation(); if (current.language) speakText(current.word, current.language); else speak(current.word); }}
               className="w-8 h-8 rounded-full bg-[var(--primary-bg)] flex items-center justify-center hover:bg-[var(--primary)] hover:text-white transition-colors"
               aria-label="Listen"
             >🔊</button>
@@ -482,6 +516,10 @@ export default function SRSReviewPage() {
                 )}
               </div>
             </div>
+          ) : choices !== null && !optionsShown ? (
+            <p className="mt-3 text-sm text-[var(--text-muted)] flex items-center gap-1.5">
+              <span aria-hidden>👆</span> Tap to see options
+            </p>
           ) : choices === null ? (
             <button
               onClick={() => setRevealed(true)}
@@ -497,8 +535,8 @@ export default function SRSReviewPage() {
           ) : null}
         </div>
 
-        {/* Quiz mode: Kahoot-style tiles */}
-        {choices !== null ? (
+        {/* Quiz mode: Kahoot-style tiles — hidden until the word card is tapped */}
+        {choices !== null && optionsShown ? (
           <div className="animate-slide-up space-y-3">
             <div className="grid grid-cols-2 gap-3">
               {choices.map((choice, i) => {
@@ -519,9 +557,9 @@ export default function SRSReviewPage() {
                   <button
                     key={choice}
                     onClick={() => handleChoiceTap(choice)}
-                    disabled={answered}
+                    disabled={answered || !optionsUnlocked}
                     className={`relative rounded-2xl p-4 flex flex-col gap-2 min-h-[100px] transition-all duration-200 text-left active:translate-y-1${isLast ? ' col-span-2' : ''}`}
-                    style={{ backgroundColor: bgColor, boxShadow: `0 4px 0 ${shadowColor}`, opacity }}
+                    style={{ backgroundColor: bgColor, boxShadow: `0 4px 0 ${shadowColor}`, opacity: !answered && !optionsUnlocked ? 0.5 : opacity }}
                   >
                     <span className="text-xl text-white/70 leading-none">{tile.shape}</span>
                     <span className="text-white font-bold text-sm leading-snug" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.4)' }}>{choice}</span>
