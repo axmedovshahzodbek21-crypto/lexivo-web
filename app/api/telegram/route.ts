@@ -35,6 +35,30 @@ async function sendMessage(chatId: string | number, text: string) {
   return res.json();
 }
 
+// Re-send an arbitrary message (photo, video, document, …) that already lives
+// in `fromChatId` to `chatId`, without a "forwarded from" header. Telegram
+// resends by internal reference, so there's no re-upload and no size cost
+// beyond the original 50 MB bot upload limit. An explicit `caption` replaces
+// the original one (pass undefined to keep it).
+async function copyMessage(
+  chatId: string | number,
+  fromChatId: string | number,
+  messageId: number,
+  caption?: string,
+) {
+  const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/copyMessage`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      chat_id: String(chatId),
+      from_chat_id: String(fromChatId),
+      message_id: messageId,
+      ...(caption != null ? { caption } : {}),
+    }),
+  });
+  return res.json();
+}
+
 export async function POST(req: NextRequest) {
   if (!BOT_TOKEN) {
     console.error('TELEGRAM_BOT_TOKEN env var is not set');
@@ -81,6 +105,13 @@ export async function POST(req: NextRequest) {
     const fromName = [message.from?.first_name, message.from?.last_name].filter(Boolean).join(' ') || 'Unknown';
     const username = message.from?.username ?? null;
     const text     = (message.text ?? '').trim();
+    const caption  = (message.caption ?? '').trim();
+    const command  = text || caption;   // slash-commands can arrive as a media caption
+    const hasMedia = Boolean(
+      message.photo || message.video || message.document ||
+      message.audio || message.animation || message.voice || message.video_note
+    );
+    const srcChatId = message.chat?.id; // chat the message currently lives in — copyMessage source
     const isOwner  = String(fromId) === OWNER_ID;
 
     // Save user to database
@@ -101,19 +132,25 @@ export async function POST(req: NextRequest) {
     // ── Owner commands ─────────────────────────────────────────────────────────
 
     if (isOwner && message.reply_to_message) {
-      const repliedText = message.reply_to_message.text ?? '';
+      const repliedText = message.reply_to_message.text ?? message.reply_to_message.caption ?? '';
       const idMatch = repliedText.match(/🆔\s*(\d+)/);
       if (idMatch) {
         const targetId = idMatch[1];
-        await sendMessage(targetId, `💬 Reply from Lexivo Support:\n\n${text}`);
+        if (hasMedia && srcChatId != null) {
+          await sendMessage(targetId, `💬 Reply from Lexivo Support:`);
+          await copyMessage(targetId, srcChatId, message.message_id, caption || undefined);
+        } else {
+          await sendMessage(targetId, `💬 Reply from Lexivo Support:\n\n${text}`);
+        }
         await sendMessage(OWNER_ID, `✅ Reply sent.`);
         return NextResponse.json({ ok: true });
       }
     }
 
-    if (isOwner && text.startsWith('/broadcast ')) {
-      const broadcastText = text.slice('/broadcast '.length).trim();
-      if (!broadcastText) return NextResponse.json({ ok: true });
+    if (isOwner && (command === '/broadcast' || command.startsWith('/broadcast '))) {
+      const broadcastText = command.slice('/broadcast'.length).trim();
+      // Need something to send: either caption/body text or an attached file.
+      if (!broadcastText && !hasMedia) return NextResponse.json({ ok: true });
 
       // Rate limit: max 1 broadcast per 5 minutes
       const { data: ownerRow } = await supabase
@@ -143,13 +180,15 @@ export async function POST(req: NextRequest) {
         let sent = 0;
         try {
           for (const u of targets) {
-            const r = await sendMessage(u.chat_id, broadcastText);
+            const r = hasMedia && srcChatId != null
+              ? await copyMessage(u.chat_id, srcChatId, message.message_id, broadcastText || undefined)
+              : await sendMessage(u.chat_id, broadcastText);
             if (r.ok) sent++;
             await new Promise(resolve => setTimeout(resolve, 34)); // ≈29 msgs/sec
           }
           await supabase.from('bot_broadcasts').insert({
             sent_by: fromId,
-            message: broadcastText,
+            message: broadcastText || '[media]',
             recipient_count: sent,
             sent_at: new Date().toISOString(),
           });
@@ -204,7 +243,12 @@ export async function POST(req: NextRequest) {
     }
 
     const usernameDisplay = username ? `@${username}` : 'no username';
-    await sendMessage(OWNER_ID, `📩 New support message\n👤 ${fromName} (${usernameDisplay})\n🆔 ${fromId}\n\n${text}`);
+    await sendMessage(OWNER_ID, `📩 New support message\n👤 ${fromName} (${usernameDisplay})\n🆔 ${fromId}\n\n${text || caption}`);
+    // Relay any attached file too. Reply to the text message above (it carries
+    // the 🆔) to answer the user — replying to this copied media won't parse.
+    if (hasMedia && srcChatId != null) {
+      await copyMessage(OWNER_ID, srcChatId, message.message_id);
+    }
 
     return NextResponse.json({ ok: true });
   } catch (err) {
