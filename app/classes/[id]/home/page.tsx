@@ -16,6 +16,7 @@ interface StudentProfile {
 
 type HomeCache = {
   className: string; isTeacher: boolean; teacherName: string; teacherId: string; teacherBio: string;
+  teacherAvatar: string | null;
   announcements: Announcement[]; targets: Target[];
   memberCount: number; activeToday: number;
   needsAttention: number; readCounts: Record<string, number>;
@@ -75,6 +76,7 @@ export default function ClassHomePage() {
   const [teacherName, setTeacherName] = useState('');
   const [teacherId, setTeacherId] = useState('');
   const [teacherBio, setTeacherBio] = useState('');
+  const [teacherAvatar, setTeacherAvatar] = useState<string | null>(null);
   const [showTeacherBio, setShowTeacherBio] = useState(false);
   const [showHW, setShowHW] = useState(false);
   const [showStudents, setShowStudents] = useState(false);
@@ -109,6 +111,7 @@ const [memberCount, setMemberCount] = useState(0);
       setTeacherName(cached.teacherName);
       setTeacherId(cached.teacherId);
       setTeacherBio(cached.teacherBio);
+      setTeacherAvatar(cached.teacherAvatar);
       setAnnouncements(cached.announcements);
       setTargets(cached.targets);
       setMemberCount(cached.memberCount);
@@ -155,8 +158,8 @@ const [memberCount, setMemberCount] = useState(0);
               .eq('class_id', id).eq('student_id', user.id).order('created_at', { ascending: false })
           : Promise.resolve({ data: [] as Target[] }),
         !teacher
-          ? supabase.from('profiles').select('name, bio').eq('id', cls.teacher_id).maybeSingle()
-          : Promise.resolve({ data: null as { name?: string; bio?: string } | null }),
+          ? supabase.from('profiles').select('name, bio, avatar_url').eq('id', cls.teacher_id).maybeSingle()
+          : Promise.resolve({ data: null as { name?: string; bio?: string; avatar_url?: string | null } | null }),
       ]);
 
       const today = localDateStr();
@@ -175,12 +178,13 @@ const [memberCount, setMemberCount] = useState(0);
           .upsert(annIds.map(aid => ({ announcement_id: aid, student_id: user.id })), { onConflict: 'announcement_id,student_id' });
       }
 
-      const tProfileData = tProfile as { name?: string; bio?: string } | null;
+      const tProfileData = tProfile as { name?: string; bio?: string; avatar_url?: string | null } | null;
       const snapshot: HomeCache = {
         className: cls.name, isTeacher: teacher,
         teacherName: tProfileData?.name ?? 'Teacher',
         teacherId: cls.teacher_id,
         teacherBio: tProfileData?.bio ?? '',
+        teacherAvatar: tProfileData?.avatar_url ?? null,
         announcements: (anns ?? []) as Announcement[],
         targets: (tgts ?? []) as Target[],
         memberCount, activeToday, needsAttention,
@@ -193,6 +197,7 @@ const [memberCount, setMemberCount] = useState(0);
       setTeacherName(snapshot.teacherName);
       setTeacherId(snapshot.teacherId);
       setTeacherBio(snapshot.teacherBio);
+      setTeacherAvatar(snapshot.teacherAvatar);
       setAnnouncements(snapshot.announcements);
       setTargets(snapshot.targets);
       setMemberCount(snapshot.memberCount);
@@ -319,10 +324,14 @@ const [memberCount, setMemberCount] = useState(0);
           <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-5 flex flex-col gap-4" onClick={e => e.stopPropagation()}>
             <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto" />
             <div className="flex flex-col items-center gap-2">
-              <div className="w-16 h-16 rounded-full flex items-center justify-center text-white font-black text-2xl shadow-lg"
-                style={{ background: avatarColor(teacherId) }}>
-                {(teacherName[0] || 'T').toUpperCase()}
-              </div>
+              {teacherAvatar ? (
+                <img src={teacherAvatar} alt={teacherName} className="w-16 h-16 rounded-full object-cover shadow-lg" />
+              ) : (
+                <div className="w-16 h-16 rounded-full flex items-center justify-center text-white font-black text-2xl shadow-lg"
+                  style={{ background: avatarColor(teacherId) }}>
+                  {(teacherName[0] || 'T').toUpperCase()}
+                </div>
+              )}
               <p className="text-lg font-bold text-[var(--text)]">{teacherName}</p>
               <span className="text-[10px] font-bold bg-[var(--primary-bg)] text-[var(--primary)] rounded-full px-2.5 py-0.5">Teacher</span>
             </div>
@@ -459,10 +468,15 @@ const [memberCount, setMemberCount] = useState(0);
             <span className="text-3xl">🏫</span>
           ) : (
             <button onClick={() => setShowTeacherBio(true)} className="shrink-0 focus:outline-none active:scale-95 transition-transform" aria-label="View teacher profile">
-              <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-black text-xl border-2 border-white/30 shadow-md"
-                style={{ background: avatarColor(teacherId || id) }}>
-                {(teacherName[0] || 'T').toUpperCase()}
-              </div>
+              {teacherAvatar ? (
+                <img src={teacherAvatar} alt={teacherName}
+                  className="w-12 h-12 rounded-full object-cover border-2 border-white/30 shadow-md" />
+              ) : (
+                <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-black text-xl border-2 border-white/30 shadow-md"
+                  style={{ background: avatarColor(teacherId || id) }}>
+                  {(teacherName[0] || 'T').toUpperCase()}
+                </div>
+              )}
             </button>
           )}
           <div className="flex-1 min-w-0">
