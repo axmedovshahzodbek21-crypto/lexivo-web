@@ -112,21 +112,36 @@ export default function SRSReviewPage() {
     return `/learn?collection=${encodeURIComponent(current.collectionName)}&day=${current.dayNumber}&startIndex=${wi >= 0 ? wi : 0}`;
   }, [current, collections]);
 
+  // Distractors for the MCQ tiles. Drawn, in order of preference, from: other
+  // words due this session → the rest of the user's SRS words → learned words →
+  // any word in any collection. The collection fallback means a tiny session
+  // (even 1/1) still gets a real 4-option question instead of dropping to the
+  // plain "Reveal Answer" card; only a user with literally no other word
+  // anywhere falls back (pool < 1).
   const buildChoices = useCallback((idx: number, q: DueSRSWord[]): string[] | null => {
     if (!q[idx]) return null;
     const correct = q[idx].translation;
+    const correctKey = correct.trim().toLowerCase();
     const pool = new Set<string>();
-    q.forEach((w, i) => { if (i !== idx && w.translation !== correct) pool.add(w.translation); });
-    if (pool.size < 3) {
-      for (const lw of getLearnedWords()) {
-        if (lw.translation !== correct) pool.add(lw.translation);
-        if (pool.size >= 3) break;
+    const add = (t?: string | null) => {
+      const v = t?.trim();
+      if (v && v.toLowerCase() !== correctKey) pool.add(v);
+    };
+    const FULL = 12; // stop once we have plenty to shuffle 3 from
+    q.forEach((w, i) => { if (i !== idx) add(w.translation); });
+    for (const w of allWords) { if (pool.size >= FULL) break; add(w.translation); }
+    if (pool.size < FULL) for (const lw of getLearnedWords()) { if (pool.size >= FULL) break; add(lw.translation); }
+    if (pool.size < FULL) {
+      outer: for (const col of collections) {
+        for (const day of col.days) {
+          for (const w of day.words) { add(w.translation); if (pool.size >= FULL) break outer; }
+        }
       }
     }
-    if (pool.size < 2) return null;
+    if (pool.size < 1) return null;
     const wrong = shuffleArray([...pool]).slice(0, Math.min(3, pool.size));
     return shuffleArray([correct, ...wrong]);
-  }, []);
+  }, [allWords, collections]);
 
   useEffect(() => {
     if (autoAdvanceTimer.current) clearTimeout(autoAdvanceTimer.current);
