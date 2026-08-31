@@ -21,19 +21,16 @@ const TILE_COLORS = [
 // Anti-mash gates: with per-card persistence a student can otherwise clear the
 // whole queue by rapidly tapping without reading anything, which pollutes their
 // SRS scheduling (and, once review XP is gated on stage change, farms XP).
-//   REVEAL_BEAT_MS      – fallback (no-tiles) path: the answer must be visible
-//                         this long before the Not yet / Knew it buttons work.
-//   RESULT_REVEAL_*_MS  – MCQ path: how long the green/red result shows before
-//                         the tap auto-advances. Longer on a miss so the correct
-//                         answer can register.
+//   REVEAL_BEAT_MS      – the answer must be visible this long before the
+//                         Not yet / Knew it buttons work. Applies to both the
+//                         fallback (no-tiles) path and the MCQ path (after a
+//                         tile is tapped) — in both the student self-grades.
 //   OPTIONS_BEAT_MS     – MCQ path: the option tiles are dimmed and inert this
 //                         long after the prompt is tapped, so the recall-first
 //                         reveal can't be blown past with a queued tap.
 //   CARD_LOCKOUT_MS     – input ignored this long after each grade so a
 //                         queued/double tap can't fall through onto the next card.
 const REVEAL_BEAT_MS = 800;
-const RESULT_REVEAL_CORRECT_MS = 800;
-const RESULT_REVEAL_WRONG_MS = 1600;
 const OPTIONS_BEAT_MS = 450;
 const CARD_LOCKOUT_MS = 350;
 
@@ -65,12 +62,9 @@ export default function ClassReviewPage() {
   // The pending REVEAL_BEAT_MS timer, cleared on card change so a beat armed
   // for a previous card can't unlock grading early on the next one.
   const beatTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  // performance.now() when the current card's answer was revealed, for the
-  // reveal->grade timing logged to class_review_events.
+  // performance.now() when the current card's answer/options were revealed, for
+  // the reveal->grade timing logged to class_review_events.
   const revealedAt = useRef<number | undefined>(undefined);
-  // Set when a tile is tapped (MCQ path): the grade to apply once the result
-  // has been shown. undefined => fallback path, grade manually via the buttons.
-  const autoGrade = useRef<boolean | undefined>(undefined);
 
   // Resolve user + class name
   useEffect(() => {
@@ -155,28 +149,23 @@ export default function ClassReviewPage() {
     if (current && autoPlay) speak(current.word);
     clearTimeout(beatTimer.current);
     revealedAt.current = undefined;
-    autoGrade.current = undefined;
     const t = setTimeout(() => setCardLocked(false), CARD_LOCKOUT_MS);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [current, autoPlay, buildChoices]);
 
-  // Reveal the answer and start the timer that unlocks grading. Pass
-  // autoGradeKnew (MCQ tile tap) to auto-apply that grade once the result has
-  // been shown; omit it (Reveal button / keyboard) to just enable the buttons
-  // after REVEAL_BEAT_MS.
-  const reveal = useCallback((autoGradeKnew?: boolean) => {
+  // Reveal the answer (fallback Reveal button / keyboard, or after an MCQ tile
+  // is tapped) and start the beat that unlocks the Not yet / Knew it buttons.
+  // The student always self-grades — the tile tap just shows whether they were
+  // right, it doesn't decide the SRS outcome.
+  const reveal = useCallback(() => {
     if (cardLocked || revealed) return;
     setRevealed(true);
     // In MCQ mode revealedAt is already stamped by showOptions (recall-first
     // gate); only the fallback path reaches here with it still unset.
     if (revealedAt.current === undefined) revealedAt.current = performance.now();
-    autoGrade.current = autoGradeKnew;
-    const delay = autoGradeKnew === undefined
-      ? REVEAL_BEAT_MS
-      : autoGradeKnew ? RESULT_REVEAL_CORRECT_MS : RESULT_REVEAL_WRONG_MS;
     clearTimeout(beatTimer.current);
-    beatTimer.current = setTimeout(() => setGradeUnlocked(true), delay);
+    beatTimer.current = setTimeout(() => setGradeUnlocked(true), REVEAL_BEAT_MS);
   }, [cardLocked, revealed]);
 
   // MCQ recall gate: the student taps the prompt to reveal the option tiles,
@@ -232,13 +221,6 @@ export default function ClassReviewPage() {
     }
   }, [current, index, queue, userId, id, cardLocked, gradeUnlocked]);
 
-  // MCQ path: once the result has been shown (gradeUnlocked), apply the grade
-  // the tapped tile implies. The fallback path leaves autoGrade unset and the
-  // student presses a button instead.
-  useEffect(() => {
-    if (gradeUnlocked && autoGrade.current !== undefined) grade(autoGrade.current);
-  }, [gradeUnlocked, grade]);
-
   // Keyboard shortcuts
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -246,21 +228,21 @@ export default function ClassReviewPage() {
       if (!current) return;
       switch (e.key) {
         case ' ': case 'Enter': e.preventDefault(); if (choices === null) reveal(); else showOptions(); break;
-        // Arrow/j/k grade only on the fallback path — in MCQ mode the tile tap
-        // is the answer.
-        case 'ArrowRight': case 'k': case 'K': if (choices === null && gradeUnlocked && !cardLocked) grade(true); break;
-        case 'ArrowLeft':  case 'j': case 'J': if (choices === null && gradeUnlocked && !cardLocked) grade(false); break;
+        // Grade with j/k/arrows once the answer is visible: fallback path after
+        // Reveal, MCQ path after a tile has been tapped.
+        case 'ArrowRight': case 'k': case 'K': if ((choices === null || tappedChoice) && gradeUnlocked && !cardLocked) grade(true); break;
+        case 'ArrowLeft':  case 'j': case 'J': if ((choices === null || tappedChoice) && gradeUnlocked && !cardLocked) grade(false); break;
         case 's': case 'S': speak(current.word); break;
       }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [current, reveal, showOptions, gradeUnlocked, cardLocked, grade, choices]);
+  }, [current, reveal, showOptions, gradeUnlocked, cardLocked, grade, choices, tappedChoice]);
 
   const handleChoiceTap = (choice: string) => {
     if (tappedChoice || !current || cardLocked || !optionsUnlocked) return;
     setTappedChoice(choice);
-    reveal(choice === current.translation); // auto-grades once the result has shown
+    reveal(); // shows the result + unlocks the grade buttons; the student self-grades
   };
 
   // ── Loading ──────────────────────────────────────────────────────────────────
@@ -319,6 +301,20 @@ export default function ClassReviewPage() {
 
   const progress = ((index + 1) / queue.length) * 100;
   const stage = current.stage;
+
+  // Not yet / Knew it — the student's self-grade. Shown on the fallback path
+  // after Reveal, and on the MCQ path once a tile has been tapped. Disabled
+  // until the reveal beat elapses so a queued tap can't fall straight onto one.
+  const gradeButtons = (
+    <div className="flex gap-2 animate-slide-up">
+      <button onClick={() => grade(false)} disabled={!gradeUnlocked} className="flex-1 py-4 rounded-xl border-2 border-[var(--danger)] text-[var(--danger)] font-bold text-sm hover:bg-red-50 transition-colors flex flex-col items-center gap-1 disabled:opacity-40 disabled:hover:bg-transparent">
+        <span>✗</span><span className="text-xs font-normal">Not yet <span className="opacity-50">J</span></span>
+      </button>
+      <button onClick={() => grade(true)} disabled={!gradeUnlocked} className="flex-1 py-4 rounded-xl border-2 border-[var(--success)] text-[var(--success)] font-bold text-sm hover:bg-green-50 transition-colors flex flex-col items-center gap-1 disabled:opacity-40 disabled:hover:bg-transparent">
+        <span>✓</span><span className="text-xs font-normal">Knew it <span className="opacity-50">K</span></span>
+      </button>
+    </div>
+  );
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -440,22 +436,16 @@ export default function ClassReviewPage() {
               })}
             </div>
             {tappedChoice && (
-              <p className="text-center text-xs text-[var(--text-muted)] animate-fade-in">
-                {tappedChoice === current.translation ? 'Correct — nice' : `Answer: ${current.translation}`}
-              </p>
+              <>
+                <p className="text-center text-xs text-[var(--text-muted)] animate-fade-in">
+                  {tappedChoice === current.translation ? 'Correct — nice' : `Answer: ${current.translation}`}
+                </p>
+                {gradeButtons}
+              </>
             )}
           </div>
         ) : (
-          revealed && (
-            <div className="flex gap-2 animate-slide-up">
-              <button onClick={() => grade(false)} disabled={!gradeUnlocked} className="flex-1 py-4 rounded-xl border-2 border-[var(--danger)] text-[var(--danger)] font-bold text-sm hover:bg-red-50 transition-colors flex flex-col items-center gap-1 disabled:opacity-40 disabled:hover:bg-transparent">
-                <span>✗</span><span className="text-xs font-normal">Not yet</span>
-              </button>
-              <button onClick={() => grade(true)} disabled={!gradeUnlocked} className="flex-1 py-4 rounded-xl border-2 border-[var(--success)] text-[var(--success)] font-bold text-sm hover:bg-green-50 transition-colors flex flex-col items-center gap-1 disabled:opacity-40 disabled:hover:bg-transparent">
-                <span>✓</span><span className="text-xs font-normal">Knew it</span>
-              </button>
-            </div>
-          )
+          revealed && gradeButtons
         )}
       </div>
     </div>
