@@ -10,7 +10,7 @@ import { fireConfetti } from '@/lib/confetti';
 import { checkAchievements } from '@/lib/gamification';
 import { supabase } from '@/lib/supabase';
 import { getClassWordsFull, addClassHardWord } from '@/lib/class-srs';
-import { recordClassStudyDay } from '@/lib/class-xp';
+import { recordClassXP } from '@/lib/class-xp';
 import { shuffleArray } from '@/lib/shuffleArray';
 import type { WordItem, WordCollection, QuizType } from '@/lib/types';
 import Link from 'next/link';
@@ -317,8 +317,17 @@ function QuizInner() {
       pushLists();
       pushStats();
       if (sourceClass && classId) {
+        // Class practice XP: awarded on every completed session (no per-day
+        // gate), scoped to the class leaderboard via recordClassXP AND mirrored
+        // into the personal pool with addXP — matching how a class Learn
+        // session credits XP (see app/learn/page.tsx's grantLearnReward tail).
+        const xpAmount = questions.length * 5;
+        setSessionXP(xpAmount);
+        const result = addXP(xpAmount, 'Quiz', `Class · ${classNameParam}`);
+        if (result.leveledUp) setPendingLevelUp({ level: result.newLevel, xp: result.newXp });
+        recordQuizSession();
         supabase.auth.getUser().then(({ data: { user } }) => {
-          if (user) void recordClassStudyDay(user.id, classId);
+          if (user) void recordClassXP(user.id, classId, xpAmount, 'Quiz');
         });
       }
       if (sourceClassHW && sp.get('hwId')) {
@@ -336,7 +345,7 @@ function QuizInner() {
       setSelected(null);
       setState('idle');
     }
-  }, [index, questions, correct, selected, current, collectionName, sourceClassHW, sourceClass, pushAchievement, setPendingLevelUp, sourceMyWords, myCollection, myFolder, sp]);
+  }, [index, questions, correct, selected, current, collectionName, sourceClassHW, sourceClass, classId, classNameParam, pushAchievement, setPendingLevelUp, sourceMyWords, myCollection, myFolder, sp]);
 
   // Keyboard shortcuts: 1-4 for options
   useEffect(() => {

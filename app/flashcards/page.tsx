@@ -8,7 +8,7 @@ import { speak, speakText } from '@/lib/speech';
 import { recordStudySession, markFlashcardComplete, getStarredWords, getHardWords, getCustomListWords, getUnitProgress, saveFlashcardProgress, getFlashcardProgress, clearFlashcardProgress, getImportedWords, getImportedWordsByCollection, importedWordExampleFields, getClassHWTemp, recordFlashcardSession, addXP, hasFlashcardXPAwarded, markFlashcardXPAwarded, hasMyWordsXPAwarded, markMyWordsXPAwarded, getMyActivityPendingNewWords, markMyFlashcardComplete, displayXP } from '@/lib/storage';
 import { supabase } from '@/lib/supabase';
 import { getClassWordsFull } from '@/lib/class-srs';
-import { recordClassStudyDay } from '@/lib/class-xp';
+import { recordClassXP } from '@/lib/class-xp';
 import { pushLists, pushStats } from '@/lib/sync';
 import { checkAchievements } from '@/lib/gamification';
 import { fireConfetti } from '@/lib/confetti';
@@ -280,8 +280,17 @@ function FlashcardsInner() {
       pushLists();
       pushStats();
       if (sourceClass && classId) {
+        // Class practice XP: every completed session (no per-day gate, no
+        // "zero unknowns" requirement), scoped to the class leaderboard via
+        // recordClassXP AND mirrored into the personal pool with addXP —
+        // matching class Learn.
+        const xpAmount = Math.round(originalWordCount.current * 3);
+        setSessionXP(xpAmount);
+        const result = addXP(xpAmount, 'Flashcard', `Class · ${classNameParam}`);
+        if (result.leveledUp) setPendingLevelUp({ level: result.newLevel, xp: result.newXp });
+        recordFlashcardSession();
         supabase.auth.getUser().then(({ data: { user } }) => {
-          if (user) void recordClassStudyDay(user.id, classId);
+          if (user) void recordClassXP(user.id, classId, xpAmount, 'Flashcard');
         });
       }
       if (sourceClassHW && sp.get('hwId')) {
@@ -301,7 +310,7 @@ function FlashcardsInner() {
       setIndex(i => i + 1);
       setSide('front');
     }
-  }, [index, deck, collectionName, dayNumber, sourceClassHW, pushAchievement, setPendingLevelUp, sourceMyWords, myCollection, myFolder, sp]);
+  }, [index, deck, collectionName, dayNumber, sourceClassHW, sourceClass, classId, classNameParam, pushAchievement, setPendingLevelUp, sourceMyWords, myCollection, myFolder, sp]);
 
   const markKnown = () => advance(true);
   const markUnknown = () => advance(false);

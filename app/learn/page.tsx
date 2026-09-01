@@ -206,6 +206,13 @@ function LearnInner() {
   useEffect(() => { currentIndexRef.current = index; }, [index]);
   const doneRef = useRef(done);
   useEffect(() => { doneRef.current = done; }, [done]);
+  // Mirrored into refs so the once-on-unmount save below (empty deps) reads
+  // the latest marks when the student leaves a class session by any route —
+  // browser back, tab close, or the header ← button.
+  const skippedRef = useRef(skipped);
+  useEffect(() => { skippedRef.current = skipped; }, [skipped]);
+  const pureSkippedRef = useRef(pureSkipped);
+  useEffect(() => { pureSkippedRef.current = pureSkipped; }, [pureSkipped]);
 
   // ── Phase 5: analytics tracking refs (no re-renders) ──────────────────────
   // Reset when words array is first populated (fires once per session load)
@@ -349,12 +356,27 @@ function LearnInner() {
           dayNumber: 0,
         };
       });
-      const ordered = studyOrder === 'random'
+      // Class Learn progress is keyed on (className, day 0) — the same scheme
+      // as regular collections. When the student has a saved position, keep
+      // the words in their stable created_at order so "word N" still points
+      // at the same card they left on; only shuffle a fresh session.
+      const savedIdx = getLearnProgress(classNameParam, 0);
+      const resuming = savedIdx != null && savedIdx > 0 && savedIdx < list.length;
+      const ordered = (studyOrder === 'random' && !resuming)
         ? shuffleArray(list)
         : list;
       setWords(ordered);
       setMarks(new Array(ordered.length).fill(null));
       setClassWordsLoaded(true);
+      if (resuming) {
+        const savedMarks = getLearnMarks(classNameParam, 0);
+        setResumePrompt({
+          savedIndex: savedIdx!,
+          total: ordered.length,
+          tooHard: savedMarks?.tooHard ?? [],
+          skipped: savedMarks?.skipped ?? [],
+        });
+      }
     })();
   }, [sourceClass, classIdParam]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -448,6 +470,13 @@ function LearnInner() {
   useEffect(() => {
     return () => {
       if (doneRef.current) return;
+      // Persist the class session position on any exit route (not just the
+      // header ← button), so re-entering offers "resume where you left off".
+      if (sourceClass && currentIndexRef.current > 0) {
+        saveLearnProgress(classNameParam, 0, currentIndexRef.current);
+        saveLearnMarks(classNameParam, 0,
+          skippedRef.current.map(w => w.word), pureSkippedRef.current.map(w => w.word));
+      }
       supabase.auth.getUser().then(({ data: { user } }) => {
         if (user) supabase.from('student_presence').delete().eq('student_id', user.id).then(() => {});
       });
@@ -539,6 +568,8 @@ function LearnInner() {
       if (collectionName && words.length > 0) {
         markLearningComplete(collectionName, words[0].dayNumber);
         clearLearnProgress(collectionName, words[0].dayNumber);
+      } else if (sourceClass) {
+        clearLearnProgress(classNameParam, 0);
       } else if (sourceMyWords && myCollection) {
         if (markMyLearnComplete(myFolder, myCollection)) { setMyUnitCompleted(true); fireConfetti(); }
       }
@@ -786,6 +817,7 @@ function LearnInner() {
             className="btn-secondary"
             onClick={() => {
               if (collectionName && dayNumber !== undefined) clearLearnProgress(collectionName, dayNumber);
+              else if (sourceClass) clearLearnProgress(classNameParam, 0);
               setResumePrompt(null);
             }}
           >
@@ -811,6 +843,9 @@ function LearnInner() {
             if (index > 0 && !done && collectionName && dayNumber !== undefined) {
               saveLearnProgress(collectionName, dayNumber, index);
               saveLearnMarks(collectionName, dayNumber, skipped.map(w => w.word), pureSkipped.map(w => w.word));
+            } else if (index > 0 && !done && sourceClass) {
+              saveLearnProgress(classNameParam, 0, index);
+              saveLearnMarks(classNameParam, 0, skipped.map(w => w.word), pureSkipped.map(w => w.word));
             }
             if (sourceClassHW && sp.get('hwId')) {
               router.push(`/classes/${sp.get('classId')}/homework/${sp.get('hwId')}`);

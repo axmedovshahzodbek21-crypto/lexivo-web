@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
 import { getHardWords, getStarredWords, getCustomListWords, getImportedWords, getImportedWordsByCollection, importedWordExampleFields, getClassHWTemp, addXP, hasMatchXPAwarded, markMatchXPAwarded, hasMyWordsXPAwarded, markMyWordsXPAwarded, markMatchComplete, getMyActivityPendingNewWords, markMyMatchComplete, displayXP } from '@/lib/storage';
 import { getClassWordsFull, addClassHardWord } from '@/lib/class-srs';
-import { recordClassStudyDay } from '@/lib/class-xp';
+import { recordClassXP } from '@/lib/class-xp';
 import { supabase } from '@/lib/supabase';
 import { checkAchievements } from '@/lib/gamification';
 import { fireConfetti } from '@/lib/confetti';
@@ -265,8 +265,15 @@ function MatchingInner() {
           if (markMyMatchComplete(myFolder, myCollection)) { setMyUnitCompleted(true); fireConfetti(); }
         }
         if (isLast && sourceClass && classId) {
+          // Class practice XP: every completed session (no per-day gate),
+          // scoped to the class leaderboard via recordClassXP AND mirrored
+          // into the personal pool with addXP — matching class Learn.
+          const xpAmount = words.length * 4;
+          setSessionXP(xpAmount);
+          const result = addXP(xpAmount, 'Match', `Class · ${classNameParam}`);
+          if (result.leveledUp) setPendingLevelUp({ level: result.newLevel, xp: result.newXp });
           supabase.auth.getUser().then(({ data: { user } }) => {
-            if (user) void recordClassStudyDay(user.id, classId);
+            if (user) void recordClassXP(user.id, classId, xpAmount, 'Match');
           });
         }
         if (isLast && sourceClassHW && searchParams.get('hwId')) {
@@ -290,7 +297,7 @@ function MatchingInner() {
         addClassHardWord(userId, classId, leftId);
       }
     }
-  }, [matched, wrongPair, selected, timerActive, roundWords, mistakes, elapsed, roundIndex, words.length, sourceClass, classId, userId, sourceMyWords, myCollection, myFolder, collectionParam, dayParam, sourceClassHW, searchParams]);
+  }, [matched, wrongPair, selected, timerActive, roundWords, mistakes, elapsed, roundIndex, words.length, sourceClass, classId, classNameParam, userId, sourceMyWords, myCollection, myFolder, collectionParam, dayParam, sourceClassHW, searchParams]);
 
   // ── Not supported / loading ──
   if (!collectionsLoaded && !sourceMyWords && !sourceClass) {
