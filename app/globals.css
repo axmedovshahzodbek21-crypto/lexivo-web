@@ -192,6 +192,15 @@ body.focus-mode .focus-container {
 .animate-fade-in { animation: fadeIn 0.3s ease; }
 .animate-pop { animation: pop 0.4s ease; }
 
+/* "+N XP" chip that rises a little and fades — one-shot, ~1.3s */
+@keyframes xpFloat {
+  0%   { transform: translateY(6px) scale(0.9); opacity: 0; }
+  15%  { transform: translateY(0) scale(1);     opacity: 1; }
+  70%  { transform: translateY(-10px);          opacity: 1; }
+  100% { transform: translateY(-24px);          opacity: 0; }
+}
+.animate-xp-float { animation: xpFloat 1.3s ease-out forwards; }
+
 /* Page-flip: hinges on the panel's left edge (the shared border with the
    calendar column), like a book page turning open. A lifting drop-shadow
    (on the panel) plus a shading sweep near the spine (::before) sell the

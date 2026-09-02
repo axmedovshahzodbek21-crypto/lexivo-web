@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { speak, speakText } from '@/lib/speech';
-import { recordStudySession, markQuizComplete, unlockAchievement, getStarredWords, getCustomListWords, getSettings, getUnitProgress, getImportedWords, getImportedWordsByCollection, importedWordExampleFields, getClassHWTemp, recordQuizSession, addXP, hasQuizXPAwarded, markQuizXPAwarded, hasMyWordsXPAwarded, markMyWordsXPAwarded, getMyActivityPendingNewWords, markMyQuizComplete, displayXP } from '@/lib/storage';
+import { recordStudySession, markQuizComplete, unlockAchievement, getStarredWords, getCustomListWords, getSettings, getUnitProgress, getImportedWords, getImportedWordsByCollection, importedWordExampleFields, getClassHWTemp, recordQuizSession, addXP, hasQuizXPAwarded, markQuizXPAwarded, hasQuizPerfectXPAwarded, markQuizPerfectXPAwarded, hasMyWordsXPAwarded, markMyWordsXPAwarded, getMyActivityPendingNewWords, markMyQuizComplete, displayXP } from '@/lib/storage';
 import { pushLists, pushStats } from '@/lib/sync';
 import { fireConfetti } from '@/lib/confetti';
 import { checkAchievements } from '@/lib/gamification';
@@ -290,12 +290,21 @@ function QuizInner() {
         unlockAchievement('quiz_first', 30); // 3 XP
         if (collectionName) {
           const qDayNumber = dayNumber ?? questions[0]?.word.dayNumber ?? 1;
+          const base = questions.length * 5;
           if (!hasQuizXPAwarded(collectionName, qDayNumber)) {
-            const xpAmount = questions.length * 5;
-            const result = addXP(xpAmount, 'Quiz', `Unit ${qDayNumber} · ${collectionName}`);
+            const result = addXP(base, 'Quiz', `Unit ${qDayNumber} · ${collectionName}`);
             markQuizXPAwarded(collectionName, qDayNumber);
-            setSessionXP(xpAmount);
+            setSessionXP(base);
             if (result.leveledUp) setPendingLevelUp({ level: result.newLevel, xp: result.newXp });
+          }
+          // +25% bonus for a flawless run, granted right at completion, once
+          // per unit (own gate so it can still land on a later perfect run).
+          if (isPerfect && !hasQuizPerfectXPAwarded(collectionName, qDayNumber)) {
+            const bonus = Math.round(base * 0.25);
+            const r = addXP(bonus, 'Quiz (perfect)', `Unit ${qDayNumber} · ${collectionName}`);
+            markQuizPerfectXPAwarded(collectionName, qDayNumber);
+            setSessionXP(prev => prev + bonus);
+            if (r.leveledUp) setPendingLevelUp({ level: r.newLevel, xp: r.newXp });
           }
           markQuizComplete(collectionName, qDayNumber);
           const p = getUnitProgress(collectionName, qDayNumber);
@@ -321,13 +330,17 @@ function QuizInner() {
         // gate), scoped to the class leaderboard via recordClassXP AND mirrored
         // into the personal pool with addXP — matching how a class Learn
         // session credits XP (see app/learn/page.tsx's grantLearnReward tail).
-        const xpAmount = questions.length * 5;
+        const base = questions.length * 5;
+        // +25% for a flawless run, every perfect session (class practice has
+        // no per-session gate, matching the base award).
+        const xpAmount = base + (isPerfect ? Math.round(base * 0.25) : 0);
+        const reason = isPerfect ? 'Quiz (perfect)' : 'Quiz';
         setSessionXP(xpAmount);
-        const result = addXP(xpAmount, 'Quiz', `Class · ${classNameParam}`);
+        const result = addXP(xpAmount, reason, `Class · ${classNameParam}`);
         if (result.leveledUp) setPendingLevelUp({ level: result.newLevel, xp: result.newXp });
         recordQuizSession();
         supabase.auth.getUser().then(({ data: { user } }) => {
-          if (user) void recordClassXP(user.id, classId, xpAmount, 'Quiz');
+          if (user) void recordClassXP(user.id, classId, xpAmount, reason);
         });
       }
       if (sourceClassHW && sp.get('hwId')) {

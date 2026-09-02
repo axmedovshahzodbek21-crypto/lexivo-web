@@ -54,6 +54,7 @@ const KEYS = {
   achievementDates:  'lexivo_achievement_dates',
   flashcardXpUnits:  'lexivo_flash_xp_units',
   quizXpUnits:       'lexivo_quiz_xp_units',
+  quizPerfectXpUnits:'lexivo_quiz_perfect_xp_units',
   matchXpUnits:      'lexivo_match_xp_units',
   myWordsXpUnits:    'lexivo_my_words_xp_units',
   srsLockedDays:     'lexivo_srs_locked_days',
@@ -1123,6 +1124,18 @@ export function markQuizXPAwarded(collectionName: string, dayNumber: number): vo
   const list = get<string[]>(KEYS.quizXpUnits, []);
   const k = _unitKey(collectionName, dayNumber);
   if (!list.includes(k)) { list.push(k); set(KEYS.quizXpUnits, list); }
+}
+
+// Separate gate from the base quiz XP so the +25% perfect bonus can still be
+// earned once on a later 100% run even if the base was already granted on an
+// earlier imperfect run of the same unit.
+export function hasQuizPerfectXPAwarded(collectionName: string, dayNumber: number): boolean {
+  return get<string[]>(KEYS.quizPerfectXpUnits, []).includes(_unitKey(collectionName, dayNumber));
+}
+export function markQuizPerfectXPAwarded(collectionName: string, dayNumber: number): void {
+  const list = get<string[]>(KEYS.quizPerfectXpUnits, []);
+  const k = _unitKey(collectionName, dayNumber);
+  if (!list.includes(k)) { list.push(k); set(KEYS.quizPerfectXpUnits, list); }
 }
 
 export function hasMatchXPAwarded(collectionName: string, dayNumber: number): boolean {

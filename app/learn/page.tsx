@@ -182,6 +182,19 @@ function LearnInner() {
   const [myUnitCompleted, setMyUnitCompleted] = useState(false);
   const [sessionCount, setSessionCount] = useState(0);
   const [sessionXP, setSessionXP] = useState(0);
+  // Transient "+N XP" chip shown above the action bar each time a word is
+  // credited, so XP visibly accrues per card rather than only as a total on
+  // the finish screen. `id` re-keys the element so the CSS animation replays;
+  // the timer is tokenised so a fast run of marks can't clear a newer chip.
+  const [xpFlash, setXpFlash] = useState<{ amount: number; id: number } | null>(null);
+  const xpFlashTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const flashXp = useCallback((amount: number) => {
+    if (amount <= 0) return;
+    const id = Date.now();
+    setXpFlash({ amount, id });
+    if (xpFlashTimer.current) clearTimeout(xpFlashTimer.current);
+    xpFlashTimer.current = setTimeout(() => setXpFlash(null), 1300);
+  }, []);
   const [starred, setStarredState] = useState(false);
   const [defaultAccent, setDefaultAccent] = useState<Accent>('us');
   const [autoPlayOnReveal, setAutoPlayOnReveal] = useState(true);
@@ -527,6 +540,7 @@ function LearnInner() {
       const { leveledUp, newLevel, newXp } = addXP(learnXP, 'Learn', `Unit ${current.dayNumber} · ${current.collectionName}`);
       if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
       setSessionXP(prev => prev + learnXP);
+      flashXp(learnXP);
       // XP and the learned-word itself (saveLearnedWord, above in
       // grantLearnReward) are credited locally as soon as each word is
       // marked, but used to only reach the cloud via the pushStats()/
@@ -548,6 +562,7 @@ function LearnInner() {
       const { leveledUp, newLevel, newXp } = addXP(learnXP, 'Learn', `Class · ${classNameParam}`);
       if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
       setSessionXP(prev => prev + learnXP);
+      flashXp(learnXP);
       pushStats();
     }
     recordStudySession();
@@ -599,7 +614,7 @@ function LearnInner() {
       setIndex(i => i + 1);
       setMaxReached(m => Math.max(m, index + 1));
     }
-  }, [current, index, words, collectionName, pushAchievement, setPendingLevelUp, sourceClass, sourceClassHW, classIdParam, classNameParam, sourceMyWords, myCollection, myFolder, sp]);
+  }, [current, index, words, collectionName, pushAchievement, setPendingLevelUp, sourceClass, sourceClassHW, classIdParam, classNameParam, sourceMyWords, myCollection, myFolder, sp, flashXp]);
 
   const advanceCard = useCallback(async () => {
     if (!current) return;
@@ -1118,6 +1133,18 @@ function LearnInner() {
           {t.learn.remaining(words.length - index - 1)} · <kbd>S</kbd> {t.learn.listenShort} · <kbd>H</kbd> {revealed ? t.learn.tooHardShort : t.learn.hintShort}{!revealed ? <> · <kbd>K</kbd> {t.learn.skipShort}</> : null}
         </div>
       </div>
+
+      {/* Per-word "+N XP" flash */}
+      {xpFlash && (
+        <div className="no-focus fixed left-0 right-0 bottom-28 z-40 flex justify-center pointer-events-none">
+          <span
+            key={xpFlash.id}
+            className="animate-xp-float inline-block rounded-full bg-[#22c55e] text-white font-bold text-sm px-3.5 py-1.5 shadow-lg"
+          >
+            +{displayXP(xpFlash.amount)} XP
+          </span>
+        </div>
+      )}
 
       {/* Full-screen quiz overlay */}
       {(inSpotCheck || inQuizGate) && (() => {
