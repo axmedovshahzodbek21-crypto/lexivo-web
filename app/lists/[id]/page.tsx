@@ -8,6 +8,7 @@ import {
   getCustomLists, saveCustomList, removeWordFromList,
   addWordToList, getCustomListWords, isWordInList,
 } from '@/lib/storage';
+import { pushLists } from '@/lib/sync';
 import { speak } from '@/lib/speech';
 import type { CustomList, WordItem, WordCollection } from '@/lib/types';
 
@@ -82,6 +83,7 @@ export default function ListDetailPage({ params }: { params: Promise<{ id: strin
     if (!list || !nameInput.trim()) return;
     const updated = { ...list, name: nameInput.trim() };
     saveCustomList(updated);
+    pushLists();
     setList(updated);
     setEditingName(false);
   };
@@ -89,6 +91,7 @@ export default function ListDetailPage({ params }: { params: Promise<{ id: strin
   const handleRemove = (word: string) => {
     if (!confirm(`Remove "${word}" from this list?`)) return;
     removeWordFromList(id, word);
+    pushLists();
     reload();
   };
 
@@ -98,6 +101,7 @@ export default function ListDetailPage({ params }: { params: Promise<{ id: strin
     } else {
       addWordToList(id, word);
     }
+    pushLists();
     reload();
     // Keep search results live — just re-render
   };

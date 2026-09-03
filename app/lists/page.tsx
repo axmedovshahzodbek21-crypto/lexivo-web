@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import BackButton from '@/components/BackButton';
 import { getCustomLists, saveCustomList, deleteCustomList } from '@/lib/storage';
+import { pushLists } from '@/lib/sync';
 import type { CustomList } from '@/lib/types';
 
 function newList(name: string): CustomList {
@@ -33,6 +34,7 @@ export default function ListsPage() {
     if (!name) return;
     const list = newList(name);
     saveCustomList(list);
+    pushLists();
     setNewName('');
     setCreating(false);
     reload();
@@ -41,6 +43,7 @@ export default function ListsPage() {
 
   const handleDelete = (id: string) => {
     deleteCustomList(id);
+    pushLists();
     setDeleteId(null);
     reload();
   };

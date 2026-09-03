@@ -1,6 +1,6 @@
 import { supabase } from './supabase';
-import type { UserSettings, LearnedWord, SRSWord, UnitProgress, MyUnitProgress } from './types';
-import { getSettings, saveSettings, getLearnedWords, getLearnedWordsRaw, getSRSWordsRaw, getImportedWordsRaw, localDateStr, getProfilePicUrl, saveProfilePicUrl, resetMyWordsProgress, PROGRESS_RESET_KEYS, PROGRESS_RESET_PREFIXES } from './storage';
+import type { UserSettings, LearnedWord, SRSWord, UnitProgress, MyUnitProgress, CustomList } from './types';
+import { getSettings, saveSettings, getLearnedWords, getLearnedWordsRaw, getSRSWordsRaw, getImportedWordsRaw, getCustomListsRaw, localDateStr, getProfilePicUrl, saveProfilePicUrl, resetMyWordsProgress, PROGRESS_RESET_KEYS, PROGRESS_RESET_PREFIXES } from './storage';
 import type { HardWordEntry } from './storage';
 import { getNotifSettings, saveNotifSettings } from './notifications';
 
@@ -214,7 +214,7 @@ export async function pushLists(): Promise<void> {
     // conversion given how many independently-merged fields are involved,
     // left as a deliberate follow-up rather than rushed here.
     const { data: cloudRow } = await supabase.from('user_data')
-      .select('learned_words, srs_words, starred_words, hard_words, study_days, review_days, word_goal_days, unit_done_days, xp_history, unit_progress, my_unit_progress, review_log, achievements, imported_words, focus_days')
+      .select('learned_words, srs_words, starred_words, hard_words, study_days, review_days, word_goal_days, unit_done_days, xp_history, unit_progress, my_unit_progress, review_log, achievements, imported_words, custom_lists, focus_days')
       .eq('id', uid).maybeSingle();
     if (cloudRow) mergeListsFromCloudRow(cloudRow);
 
@@ -237,6 +237,7 @@ export async function pushLists(): Promise<void> {
         review_log:       lsJSON<Record<string, number[]>>('lexivo_review_log', {}),
         focus_days:       lsJSON<Record<string, number>>('lexivo_focus_days', {}),
         imported_words:   getImportedWordsRaw(), // includes tombstones so deletions propagate
+        custom_lists:     getCustomListsRaw(),   // includes tombstones so deletions propagate
         achievements:     Object.entries(lsJSON<Record<string, string>>('lexivo_achievement_dates', {})).map(([id, date]) => ({ id, date })),
         lists_updated_at: ts,
       }),
@@ -637,6 +638,32 @@ function mergeListsFromCloudRow(row: Record<string, unknown>): void {
         }
       }
       if (changed) lsSet('lexivo_imported_words', JSON.stringify(Array.from(byKey.values())));
+    }
+
+    // custom_lists — per-id last-write-wins, tombstone-aware. Effective ts =
+    // max(updatedAt ?? createdAt, deletedAt). Tombstones are kept so a delete
+    // on another device isn't undone by a stale live copy here; a tombstone
+    // older than 30 days is dropped so they don't accumulate forever.
+    if (Array.isArray(row.custom_lists)) {
+      const TOMB_TTL = 30 * 24 * 60 * 60 * 1000;
+      const local = lsJSON<CustomList[]>('lexivo_custom_lists', []);
+      const tsOf = (l: CustomList) => Math.max(
+        Date.parse(l.updatedAt ?? l.createdAt) || 0,
+        l.deletedAt ? (Date.parse(l.deletedAt) || 0) : 0,
+      );
+      const byId = new Map<string, CustomList>(local.map(l => [l.id, l]));
+      let changed = false;
+      for (const cl of row.custom_lists as CustomList[]) {
+        const existing = byId.get(cl.id);
+        if (!existing || tsOf(cl) > tsOf(existing)) { byId.set(cl.id, cl); changed = true; }
+      }
+      const now = Date.now();
+      const merged = [...byId.values()].filter(
+        l => !(l.deletedAt && now - (Date.parse(l.deletedAt) || 0) > TOMB_TTL),
+      );
+      if (changed || merged.length !== local.length) {
+        lsSet('lexivo_custom_lists', JSON.stringify(merged));
+      }
     }
   } catch (e) {
     console.error('[sync] mergeListsFromCloudRow failed:', e);

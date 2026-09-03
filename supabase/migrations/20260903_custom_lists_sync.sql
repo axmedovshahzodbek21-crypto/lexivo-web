@@ -1,0 +1,37 @@
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Add Custom Lists sync to user_data
+-- Run this in Supabase SQL Editor
+--
+-- custom_lists stores the user's hand-made word lists (the "Lists" screen) as
+-- a JSON array of records:
+--
+--   [
+--     {
+--       "id":        "<stable uuid/string>",
+--       "name":      "My tricky verbs",
+--       "createdAt": "2026-09-03T10:00:00.000Z",  -- ISO, set once
+--       "updatedAt": "2026-09-03T10:42:00.000Z",  -- ISO, bumped on every
+--                                                 --   rename / add-word / remove-word
+--       "words":     ["enormous", "scarce", ...], -- word.word values
+--       "deletedAt": "2026-09-04T08:00:00.000Z"   -- ISO, present only on tombstones
+--     },
+--     ...
+--   ]
+--
+-- Merge semantics (client-side, in sync.ts / sync_service.dart — mirrors the
+-- imported_words / learned_words fields):
+--   * union by `id`
+--   * on conflict, per-record last-write-wins by the record's effective
+--     timestamp = max(updatedAt, deletedAt) — so a rename or word-removal on
+--     one device wins over a stale copy, and a delete on one device isn't
+--     undone by another device still holding the live list.
+--   * tombstones (deletedAt set) are kept in the pushed payload so the delete
+--     propagates; each client prunes tombstones older than 30 days on read.
+--
+-- Backward compatible: older app builds that don't send `updatedAt` are read as
+-- updatedAt == createdAt; the column defaults to an empty array so a client
+-- that never writes it is unaffected.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+alter table user_data
+  add column if not exists custom_lists jsonb not null default '[]'::jsonb;

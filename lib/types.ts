@@ -116,8 +116,13 @@ export interface UserSettings {
 export interface CustomList {
   id: string;
   name: string;
-  createdAt: string; // ISO
-  words: string[];   // word.word values
+  createdAt: string;  // ISO, set once
+  updatedAt?: string; // ISO, bumped on every rename / add-word / remove-word.
+                      // Absent on records written by an older build — read as createdAt.
+  deletedAt?: string; // ISO, present only on tombstones (soft delete, so the
+                      // deletion propagates through sync instead of a stale
+                      // copy on another device resurrecting the list)
+  words: string[];    // word.word values
 }
 
 export interface ImportedWordExample {

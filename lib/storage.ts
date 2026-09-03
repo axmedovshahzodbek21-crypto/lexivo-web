@@ -1215,20 +1215,44 @@ export function removeHardWord(word: string) {
 
 // ─── Custom lists ────────────────────────────────────────────────────────────
 
-export function getCustomLists(): CustomList[] {
+const CUSTOM_LIST_TOMBSTONE_TTL = 30 * 24 * 60 * 60 * 1000; // 30 days
+
+// Raw store — includes soft-deleted tombstones. Used by sync (so a delete
+// propagates) and by the mutators below (so rewriting the array doesn't drop
+// other devices' tombstones). Mirrors getImportedWordsRaw / getImportedWords.
+export function getCustomListsRaw(): CustomList[] {
   return get<CustomList[]>(KEYS.customLists, []);
 }
 
+// Live lists only — what every screen should read.
+export function getCustomLists(): CustomList[] {
+  return getCustomListsRaw().filter(l => !l.deletedAt);
+}
+
+// Prunes tombstones older than the TTL, then persists.
+function persistCustomLists(lists: CustomList[]) {
+  const now = Date.now();
+  const kept = lists.filter(
+    l => !(l.deletedAt && now - (Date.parse(l.deletedAt) || 0) > CUSTOM_LIST_TOMBSTONE_TTL),
+  );
+  set(KEYS.customLists, kept);
+}
+
 export function saveCustomList(list: CustomList) {
-  const lists = getCustomLists();
+  const lists = getCustomListsRaw();
+  const stamped = { ...list, updatedAt: new Date().toISOString() };
   const idx = lists.findIndex(l => l.id === list.id);
-  if (idx === -1) lists.push(list);
-  else lists[idx] = list;
-  set(KEYS.customLists, lists);
+  if (idx === -1) lists.push(stamped);
+  else lists[idx] = stamped;
+  persistCustomLists(lists);
 }
 
 export function deleteCustomList(id: string) {
-  set(KEYS.customLists, getCustomLists().filter(l => l.id !== id));
+  const lists = getCustomListsRaw();
+  const idx = lists.findIndex(l => l.id === id);
+  if (idx === -1) return;
+  lists[idx] = { ...lists[idx], deletedAt: new Date().toISOString() };
+  persistCustomLists(lists);
 }
 
 // ─── Imported Words ──────────────────────────────────────────────────────────
@@ -1494,19 +1518,21 @@ export function saveImportedWords(words: ImportedWord[]) {
 }
 
 export function addWordToList(listId: string, word: string) {
-  const lists = getCustomLists();
-  const list = lists.find(l => l.id === listId);
+  const lists = getCustomListsRaw();
+  const list = lists.find(l => l.id === listId && !l.deletedAt);
   if (!list || list.words.includes(word)) return;
   list.words.push(word);
-  set(KEYS.customLists, lists);
+  list.updatedAt = new Date().toISOString();
+  persistCustomLists(lists);
 }
 
 export function removeWordFromList(listId: string, word: string) {
-  const lists = getCustomLists();
-  const list = lists.find(l => l.id === listId);
+  const lists = getCustomListsRaw();
+  const list = lists.find(l => l.id === listId && !l.deletedAt);
   if (!list) return;
   list.words = list.words.filter(w => w !== word);
-  set(KEYS.customLists, lists);
+  list.updatedAt = new Date().toISOString();
+  persistCustomLists(lists);
 }
 
 export function getCustomListWords(
