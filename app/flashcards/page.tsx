@@ -245,8 +245,10 @@ function FlashcardsInner() {
       cardsSinceLastPush.current++;
       if (cardsSinceLastPush.current >= 5) { cardsSinceLastPush.current = 0; }
     }
-    recordStudySession();
+    // Class work is its own world — no personal Lexivo study-streak tick
+    // (the class keeps its own study-day streak).
     if (!sourceClassHW && !sourceClass) {
+      recordStudySession();
       recordFlashcardSession();
       const newAchievements = checkAchievements();
       newAchievements.forEach(pushAchievement);

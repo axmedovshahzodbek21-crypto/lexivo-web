@@ -270,8 +270,10 @@ function QuizInner() {
         }
       }
     }
-    recordStudySession();
-  }, [state, current, sourceClass, classId, userId]);
+    // Class work is its own world — it must not keep the personal Lexivo
+    // study streak alive (the class has its own study-day streak).
+    if (!sourceClass && !sourceClassHW) recordStudySession();
+  }, [state, current, sourceClass, sourceClassHW, classId, userId]);
 
   const next = useCallback(() => {
     if (index + 1 >= questions.length) {

@@ -50,11 +50,10 @@ async function grantLearnReward(
 ): Promise<boolean> {
   let isNew: boolean;
   if (opts.sourceClass || opts.sourceClassHW) {
-    // Class mode: SRS lives in Supabase, not personal localStorage. Always
-    // counts toward the daily goal since XP is unified across activities —
-    // that's independent of whether the word itself was already learned,
-    // which is what isNew (used below for XP) actually tracks.
-    incrementTodayCount();
+    // Class mode is its own world: SRS lives in Supabase, and class work does
+    // NOT feed any personal Lexivo signal — not the daily word-goal counter
+    // (incrementTodayCount), not XP, not the study streak. Only the class's
+    // own progress/streak/leaderboard move. Matches the Flutter app.
     isNew = false;
     if (opts.classIdParam) {
       const { data: { user } } = await supabase.auth.getUser();
@@ -563,7 +562,9 @@ function LearnInner() {
       setSessionXP(prev => prev + learnXP);
       flashXp(learnXP);
     }
-    recordStudySession();
+    // Personal Lexivo study streak — class work is its own world and must not
+    // keep the personal streak alive (the class has its own study-day streak).
+    if (!sourceClass && !sourceClassHW) recordStudySession();
     setSessionCount(c => c + 1);
     perWordDataRef.current.push({
       word: current.word,
