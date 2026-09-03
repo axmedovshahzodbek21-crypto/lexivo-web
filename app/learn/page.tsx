@@ -17,7 +17,7 @@ import { pushLists, pushStats } from '@/lib/sync';
 import { supabase } from '@/lib/supabase';
 import { createSRSWord } from '@/lib/srs';
 import { addSRSWord as storeSRSWord } from '@/lib/storage';
-import { recordClassWordLearned } from '@/lib/class-srs';
+import { recordClassWordLearned, addClassHardWord, addClassStarredWord, removeClassStarredWord, getClassStarredWordIds } from '@/lib/class-srs';
 import { recordClassStudyDay } from '@/lib/class-xp';
 import type { Accent } from '@/lib/speech';
 import { checkAchievements } from '@/lib/gamification';
@@ -195,6 +195,10 @@ function LearnInner() {
     xpFlashTimer.current = setTimeout(() => setXpFlash(null), 1300);
   }, []);
   const [starred, setStarredState] = useState(false);
+  // In a class session the star / Too Hard buttons act on the CLASS lists
+  // (class_starred_words / class_hard_words) — never the personal ones — so
+  // the teacher sees them and they don't pollute personal Starred/Hard Words.
+  const [classStarred, setClassStarred] = useState<Set<string>>(new Set());
   const [defaultAccent, setDefaultAccent] = useState<Accent>('us');
   const [autoPlayOnReveal, setAutoPlayOnReveal] = useState(true);
   const [sessionSize, setSessionSize] = useState(20);
@@ -392,6 +396,15 @@ function LearnInner() {
     })();
   }, [sourceClass, classIdParam]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Load the class's starred-word set so the star button reflects/toggles it
+  // (covers both `class` and `class-hw`, which both carry ?classId).
+  useEffect(() => {
+    if ((!sourceClass && !sourceClassHW) || !classIdParam) return;
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) getClassStarredWordIds(user.id, classIdParam).then(setClassStarred).catch(() => {});
+    });
+  }, [sourceClass, sourceClassHW, classIdParam]);
+
   useEffect(() => {
     if (!sourceClassHW) return;
     const hw = getClassHWTemp();
@@ -413,7 +426,7 @@ function LearnInner() {
 
   useEffect(() => {
     if (current) {
-      setStarredState(isStarred(current.word));
+      setStarredState((sourceClass || sourceClassHW) ? classStarred.has(current.word) : isStarred(current.word));
       setRevealed(false);
       setShowHint(false);
       setShowEx1Translation(false);
@@ -430,7 +443,7 @@ function LearnInner() {
       wordGateAttemptsRef.current = 0;
       wordGateCorrectFirstRef.current = true;
     }
-  }, [current]);
+  }, [current, sourceClass, sourceClassHW, classStarred]);
 
   useEffect(() => {
     if (revealed && current && autoPlayOnReveal) {
@@ -689,10 +702,17 @@ function LearnInner() {
   const markTooHard = useCallback(async () => {
     if (!current) return;
     // Too Hard earns the same XP/SRS reward as Learned (see grantLearnReward)
-    // — only difference is it also lands in the Hard Words list below, so
-    // students can't game the leaderboard by mis-marking hard words as
-    // Learned just to avoid losing the reward.
-    addHardWord(current.word);
+    // — the only extra effect is that the word lands in a Hard Words list so
+    // students can't game things by mis-marking hard words as Learned. In a
+    // class session that list is the CLASS one (so the teacher sees it), not
+    // the personal /hard-words.
+    if ((sourceClass || sourceClassHW) && classIdParam) {
+      supabase.auth.getUser().then(({ data: { user } }) => {
+        if (user) void addClassHardWord(user.id, classIdParam, current.word);
+      });
+    } else {
+      addHardWord(current.word);
+    }
     setSkipped(s => [...s, current]);
     const isNew = await grantLearnReward(current, { sourceClass, sourceClassHW, classIdParam });
     finishWordMark('too-hard', isNew, 0, true);
@@ -721,7 +741,23 @@ function LearnInner() {
 
   const handleStar = () => {
     if (!current) return;
-    setStarredState(toggleStarred(current.word));
+    const w = current.word;
+    if ((sourceClass || sourceClassHW) && classIdParam) {
+      const nowStarred = !classStarred.has(w);
+      setClassStarred(prev => {
+        const n = new Set(prev);
+        if (nowStarred) n.add(w); else n.delete(w);
+        return n;
+      });
+      setStarredState(nowStarred);
+      supabase.auth.getUser().then(({ data: { user } }) => {
+        if (!user) return;
+        void (nowStarred ? addClassStarredWord(user.id, classIdParam, w)
+                         : removeClassStarredWord(user.id, classIdParam, w));
+      });
+    } else {
+      setStarredState(toggleStarred(w));
+    }
   };
 
   useEffect(() => {
