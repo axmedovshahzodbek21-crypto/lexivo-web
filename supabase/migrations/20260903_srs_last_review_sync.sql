@@ -1,0 +1,35 @@
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Add SRS last-review-date sync to user_data
+-- Run this in Supabase SQL Editor BEFORE deploying the web/Flutter builds that
+-- write `last_review` — an upsert naming a column that doesn't exist yet fails
+-- the whole call, which would break ALL list sync, not just SRS.
+--
+-- last_review stores, per SRS word, the date (yyyy-MM-dd) of the most recent
+-- completed review:
+--
+--   { "30 Days::enormous": "2026-09-01", "A2 Collection::scarce": "2026-08-28", ... }
+--
+-- Key = "<collectionName>::<word>", the same key space as review_log and web's
+-- lexivo_srs_last_review localStorage map / Flutter's srs_last_review pref.
+--
+-- Why it exists: getDueWords()/checkAndUnlearn() space the next SRS interval
+-- from a base date. Web already used `lastReview[id] ?? learnedAt`; Flutter had
+-- no last-review concept and always used learnedAt, so once a review ran late
+-- the two platforms disagreed on which words were due (and Flutter could even
+-- mass-unlearn words web still considered on-schedule). Syncing this map makes
+-- both platforms compute the same due dates.
+--
+-- Merge semantics (client-side, in sync.ts / sync_service.dart):
+--   * union by word key
+--   * on conflict, newest date wins (yyyy-MM-dd sorts lexically == chronologically)
+--   * no tombstones — an unlearn drops the word from srs_words (which IS
+--     tombstone-synced) and from this map; a stale cloud entry can't resurrect
+--     a tombstoned word, and a re-learn is clamped to the new learnedAt
+--     (base = max(last_review, learnedAt)) so an old date can't pull it earlier.
+--
+-- Backward compatible: defaults to an empty object, so a client that never
+-- writes it is unaffected and falls back to learnedAt-based spacing.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+alter table user_data
+  add column if not exists last_review jsonb not null default '{}'::jsonb;

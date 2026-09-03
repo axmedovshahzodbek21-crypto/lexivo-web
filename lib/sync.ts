@@ -214,7 +214,7 @@ export async function pushLists(): Promise<void> {
     // conversion given how many independently-merged fields are involved,
     // left as a deliberate follow-up rather than rushed here.
     const { data: cloudRow } = await supabase.from('user_data')
-      .select('learned_words, srs_words, starred_words, hard_words, study_days, review_days, word_goal_days, unit_done_days, xp_history, unit_progress, my_unit_progress, review_log, achievements, imported_words, custom_lists, focus_days')
+      .select('learned_words, srs_words, starred_words, hard_words, study_days, review_days, word_goal_days, unit_done_days, xp_history, unit_progress, my_unit_progress, review_log, last_review, achievements, imported_words, custom_lists, focus_days')
       .eq('id', uid).maybeSingle();
     if (cloudRow) mergeListsFromCloudRow(cloudRow);
 
@@ -235,6 +235,7 @@ export async function pushLists(): Promise<void> {
         unit_progress:    getAllUnitProgress(),
         my_unit_progress: getAllMyUnitProgress(),
         review_log:       lsJSON<Record<string, number[]>>('lexivo_review_log', {}),
+        last_review:      lsJSON<Record<string, string>>('lexivo_srs_last_review', {}),
         focus_days:       lsJSON<Record<string, number>>('lexivo_focus_days', {}),
         imported_words:   getImportedWordsRaw(), // includes tombstones so deletions propagate
         custom_lists:     getCustomListsRaw(),   // includes tombstones so deletions propagate
@@ -586,6 +587,20 @@ function mergeListsFromCloudRow(row: Record<string, unknown>): void {
         if (merged.length > localIntervals.length) { local[wordKey] = merged; changed = true; }
       }
       if (changed) lsSet('lexivo_review_log', JSON.stringify(local));
+    }
+
+    // last_review: per-word newest-date-wins. review_log (above) tracks which
+    // intervals are done; this tracks the date the next one is spaced from,
+    // so Flutter and web agree on when a word is due. yyyy-MM-dd sorts
+    // lexically the same as chronologically.
+    if (row.last_review && typeof row.last_review === 'object') {
+      const local = lsJSON<Record<string, string>>('lexivo_srs_last_review', {});
+      let changed = false;
+      for (const [wordKey, date] of Object.entries(row.last_review as Record<string, string>)) {
+        if (typeof date !== 'string') continue;
+        if (!local[wordKey] || date > local[wordKey]) { local[wordKey] = date; changed = true; }
+      }
+      if (changed) lsSet('lexivo_srs_last_review', JSON.stringify(local));
     }
 
     // focus_days: per-day accumulator, take max(local, cloud) for each date so
