@@ -484,7 +484,11 @@ export function checkAndUnlearn(today: string = localDateStr()): void {
     const nextInterval = SRS_INTERVALS.find(i => !completed.includes(i));
     if (nextInterval === undefined) continue; // graduated
 
-    const baseDate = lastReview[w.id] ?? w.learnedAt;
+    // Clamp to >= learnedAt: a synced last_review that somehow predates the
+    // learn date must never pull the due date earlier (that path is what
+    // mass-unlearned words once). Matches Flutter's _srsBaseDate.
+    const lr = lastReview[w.id];
+    const baseDate = lr && lr > w.learnedAt ? lr : w.learnedAt;
     const dueDate = addDaysToDateStr(baseDate, nextInterval);
     if (daysBetweenDateStrs(dueDate, today) >= 3) {
       staleWords.push(w);
@@ -519,7 +523,11 @@ export function getDueWords(): DueSRSWord[] {
     const nextInterval = SRS_INTERVALS.find(i => !completed.includes(i));
     if (nextInterval === undefined) continue; // graduated
 
-    const baseDate = lastReview[w.id] ?? w.learnedAt;
+    // Clamp to >= learnedAt: a synced last_review that somehow predates the
+    // learn date must never pull the due date earlier (that path is what
+    // mass-unlearned words once). Matches Flutter's _srsBaseDate.
+    const lr = lastReview[w.id];
+    const baseDate = lr && lr > w.learnedAt ? lr : w.learnedAt;
     const dueDate = addDaysToDateStr(baseDate, nextInterval);
     if (dueDate > today) continue; // not yet due
 

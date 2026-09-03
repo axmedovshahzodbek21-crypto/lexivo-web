@@ -73,7 +73,8 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
       if (srs) {
         const completed = getReviewLog()[srs.id] ?? [];
         const nextInterval = SRS_INTERVALS.find(i => !completed.includes(i));
-        const baseDate = getSRSLastReview()[srs.id] ?? srs.learnedAt;
+        const lr = getSRSLastReview()[srs.id];
+        const baseDate = lr && lr > srs.learnedAt ? lr : srs.learnedAt; // clamp >= learnedAt (matches getDueWords / Flutter)
         const nextReview = nextInterval ? addDaysToDateStr(baseDate, nextInterval) : 'Graduated';
         setSrsInfo({ completedCount: completed.length, nextReview });
       }
