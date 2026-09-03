@@ -600,8 +600,9 @@ function LearnInner() {
       } else if (sourceMyWords && myCollection) {
         if (markMyLearnComplete(myFolder, myCollection)) { setMyUnitCompleted(true); fireConfetti(); }
       }
-      pushLists();
-      pushStats();
+      // Class sessions change nothing in the personal Lexivo store, so there's
+      // nothing to sync up — skip the round-trip.
+      if (!sourceClass && !sourceClassHW) { pushLists(); pushStats(); }
       if (sourceClass && classIdParam) {
         supabase.auth.getUser().then(({ data: { user } }) => {
           if (user) void recordClassStudyDay(user.id, classIdParam);

@@ -279,8 +279,8 @@ function FlashcardsInner() {
       } else if (sourceMyWords && myCollection) {
         if (markMyFlashcardComplete(myFolder, myCollection)) { setMyUnitCompleted(true); fireConfetti(); }
       }
-      pushLists();
-      pushStats();
+      // Class sessions touch nothing in the personal Lexivo store — no sync.
+      if (!sourceClassHW && !sourceClass) { pushLists(); pushStats(); }
       if (sourceClass && classId) {
         // Class practice XP: every completed session (no per-day gate, no
         // "zero unknowns" requirement), and isolated to the class leaderboard

@@ -325,8 +325,8 @@ function QuizInner() {
         const newAchievements = checkAchievements();
         newAchievements.forEach(pushAchievement);
       }
-      pushLists();
-      pushStats();
+      // Class sessions touch nothing in the personal Lexivo store — no sync.
+      if (!sourceClass && !sourceClassHW) { pushLists(); pushStats(); }
       if (sourceClass && classId) {
         // Class practice XP: every completed session (no per-day gate), and
         // isolated to the class leaderboard via recordClassXP only — it must
