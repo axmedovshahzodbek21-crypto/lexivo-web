@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslation } from '@/lib/useTranslation';
 import { addImportedWords, generateImportedWordId } from '@/lib/storage';
 import { pushLists } from '@/lib/sync';
+import { buildAiImportPrompt, parseAiImportOutput } from '@/lib/ai-import';
 import type { ImportedWord } from '@/lib/types';
 
 const TUTORIAL = {
@@ -51,154 +52,6 @@ const LANGUAGES = [
   { label: 'Uzbek', code: 'uz-UZ' },
 ];
 
-// Shared illustrative "enormous" example block shown to the AI, up to 10 examples.
-const EXAMPLE_FORMAT_BLOCK = `example1: The enormous building towered above the city.
-example1Translation: Ulkan bino shahar ustida baland turardi.
-example2: She faced an enormous challenge at work.
-example2Translation: U ishda ulkan muammoga duch keldi.
-example3: The storm caused enormous damage to the coastline.
-example3Translation: Bo'ron qirg'oqqa ulkan zarar yetkazdi.
-example4: He made an enormous effort to finish the project on time.
-example4Translation: U loyihani o'z vaqtida tugatish uchun ulkan harakat qildi.
-example5: The discovery had an enormous impact on modern science.
-example5Translation: Bu kashfiyot zamonaviy fanga ulkan ta'sir ko'rsatdi.
-example6: The company invested an enormous amount of money in research.
-example6Translation: Kompaniya tadqiqotlarga ulkan miqdorda mablag' sarfladi.
-example7: Cleaning up after the enormous storm took several weeks.
-example7Translation: Ulkan bo'rondan keyin tozalash bir necha hafta davom etdi.
-example8: The enormous crowd gathered to watch the festival.
-example8Translation: Festivalni tomosha qilish uchun ulkan olomon to'plandi.
-example9: Losing his job was an enormous setback for him.
-example9Translation: Ishini yo'qotish u uchun ulkan qiyinchilik bo'ldi.
-example10: The enormous mountain range stretched across the horizon.
-example10Translation: Ulkan tog' tizmasi ufq bo'ylab cho'zilgan edi.`;
-
-function buildPrompt1(wordLang: string, transLang: string, words: string): string {
-  return `I have a list of ${wordLang} words I want to learn. For each word, provide the translation in ${transLang}, a short definition in ${wordLang}, and up to 10 example sentences in ${wordLang} with their ${transLang} translations.
-
-Format EXACTLY like this for every word. Use plain text only — no markdown, no bold, no asterisks, no extra formatting:
-
-word: enormous
-partOfSpeech: adjective
-pronunciation: /ɪˈnɔːrməs/
-translation: ulkan
-definition: extremely large in size or extent
-definitionUz: Ulkan — juda katta yoki keng hajmga ega bo'lgan narsa yoki hodisa.
-${EXAMPLE_FORMAT_BLOCK}
----
-
-Important: the example above uses English/Uzbek only to show the format. In your actual response, write the definition, part of speech, and examples in ${wordLang}, the translations and definitionUz in ${transLang}.
-
-Here are my words:
-${words}`;
-}
-
-function buildPrompt2(wordLang: string, transLang: string, words: string): string {
-  return `I have ${wordLang}-${transLang} word pairs. For each pair, keep my translation exactly as written. Add a short definition in ${wordLang}, a short explanation in ${transLang} (definitionUz), and up to 10 example sentences in ${wordLang} with their ${transLang} translations.
-
-Format EXACTLY like this for every word. Use plain text only — no markdown, no bold, no asterisks, no extra formatting:
-
-word: enormous
-partOfSpeech: adjective
-pronunciation: /ɪˈnɔːrməs/
-translation: ulkan
-definition: extremely large in size or extent
-definitionUz: Ulkan — juda katta yoki keng hajmga ega bo'lgan narsa yoki hodisa.
-${EXAMPLE_FORMAT_BLOCK}
----
-
-Important: the example above uses English/Uzbek only to show the format. In your actual response, write the definition, part of speech, and examples in ${wordLang}, the translations and definitionUz in ${transLang}.
-
-Here are my pairs (word - translation):
-${words}`;
-}
-
-interface ParseResult {
-  words: ImportedWord[];
-  totalBlocks: number;
-  errors: { index: number; preview: string; reason: string }[];
-}
-
-function splitIntoBlocks(text: string): string[] {
-  // Primary: split by --- separator
-  if (/---+/.test(text)) {
-    return text.split(/---+/).map(b => b.trim()).filter(Boolean);
-  }
-  // Fallback: split each time a new 'word:' line appears after one already seen
-  const blocks: string[] = [];
-  const lines = text.split('\n');
-  let current: string[] = [];
-  for (const line of lines) {
-    if (/^word\s*:/i.test(line.trim()) && current.some(l => /^word\s*:/i.test(l.trim()))) {
-      blocks.push(current.join('\n').trim());
-      current = [line];
-    } else {
-      current.push(line);
-    }
-  }
-  if (current.length) blocks.push(current.join('\n').trim());
-  return blocks.filter(Boolean);
-}
-
-function parseOutput(text: string, langCode: string): ParseResult {
-  const blocks = splitIntoBlocks(text);
-  const words: ImportedWord[] = [];
-  const errors: ParseResult['errors'] = [];
-
-  for (let i = 0; i < blocks.length; i++) {
-    const block = blocks[i];
-    const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
-    const fields: Record<string, string> = {};
-    for (const line of lines) {
-      const colon = line.indexOf(':');
-      if (colon === -1) continue;
-      // Strip whitespace too so "Example 1:" / "Part of speech:" (Library-prompt
-      // style) and "example1:" / "partOfSpeech:" (My Words-prompt style) both parse.
-      let key = line.slice(0, colon).trim().toLowerCase().replace(/[*_`#\s]/g, '');
-      if (key === 'uzbekdefinition') key = 'definitionuz';
-      const val = line.slice(colon + 1).trim().replace(/[*_`]/g, '');
-      fields[key] = val;
-    }
-    const preview = block.slice(0, 40).replace(/\n/g, ' ');
-    if (!fields.word && !fields.translation) {
-      errors.push({ index: i + 1, preview, reason: 'Missing both "word:" and "translation:" fields' });
-      continue;
-    }
-    if (!fields.word) {
-      errors.push({ index: i + 1, preview, reason: 'Missing "word:" field' });
-      continue;
-    }
-    if (!fields.translation) {
-      errors.push({ index: i + 1, preview, reason: 'Missing "translation:" field' });
-      continue;
-    }
-    // Capped at 10 to match lib/storage.ts's MAX_EXAMPLES_PER_WORD — collecting
-    // more here previously let the preview show up to 20 examples that then
-    // silently got truncated to 10 on save, so what the user approved didn't
-    // match what was actually kept.
-    const examples: ImportedWord['examples'] = [];
-    for (let n = 1; n <= 10; n++) {
-      const sentence = fields[`example${n}`];
-      if (!sentence) continue;
-      examples.push({ sentence, translation: fields[`example${n}translation`] || undefined });
-    }
-    words.push({
-      id: generateImportedWordId(),
-      word: fields.word,
-      partOfSpeech: fields.partofspeech || undefined,
-      pronunciation: fields.pronunciation || undefined,
-      translation: fields.translation,
-      definition: fields.definition ?? '',
-      definitionUz: fields.definitionuz || undefined,
-      examples,
-      language: langCode,
-      addedAt: Date.now(),
-    });
-  }
-
-  return { words, totalBlocks: blocks.length, errors };
-}
-
 function ImportPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -226,12 +79,12 @@ function ImportPageInner() {
     }
   }, []);
 
-  const parseResult = useMemo(() => parseOutput(pasted, wordLangCode), [pasted, wordLangCode]);
+  const parseResult = useMemo(() => parseAiImportOutput(pasted), [pasted]);
   const parsed = parseResult.words;
 
   function copyPrompt(hasTranslations: boolean) {
     const words = wordsInput.trim() || (hasTranslations ? 'apple - olma\nbook - kitob' : 'apple, book, water');
-    const text = hasTranslations ? buildPrompt2(wordLang, transLang, words) : buildPrompt1(wordLang, transLang, words);
+    const text = buildAiImportPrompt({ wordLang, translationLang: transLang, words, hasTranslations });
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
@@ -244,7 +97,19 @@ function ImportPageInner() {
       alert('Please enter a folder name before saving.');
       return;
     }
-    addImportedWords(parsed, name, folder);
+    const rows: ImportedWord[] = parsed.map(w => ({
+      id: generateImportedWordId(),
+      word: w.word,
+      partOfSpeech: w.partOfSpeech,
+      pronunciation: w.pronunciation,
+      translation: w.translation,
+      definition: w.definition,
+      definitionUz: w.definitionUz,
+      examples: w.examples.map(e => ({ sentence: e.sentence, translation: e.translation || undefined })),
+      language: wordLangCode,
+      addedAt: Date.now(),
+    }));
+    addImportedWords(rows, name, folder);
     pushLists();
     setAdded(true);
     setTimeout(() => router.push(`/my-words/${encodeURIComponent(folder)}/${encodeURIComponent(name)}`), 1200);

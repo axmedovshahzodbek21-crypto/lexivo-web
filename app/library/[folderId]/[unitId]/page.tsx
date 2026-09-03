@@ -4,6 +4,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { unitCache as _cache } from '@/lib/teacher-library-cache';
+import { buildAiImportPrompt, parseAiImportOutput } from '@/lib/ai-import';
 
 interface WordExample { sentence: string; translation: string; }
 interface UnitWord {
@@ -27,80 +28,6 @@ interface ParsedWord {
 }
 
 const LANGUAGES = ['English','Uzbek','Russian','Turkish','German','French','Spanish','Korean','Japanese','Chinese','Arabic'];
-
-function parseOutput(text: string): ParsedWord[] {
-  const results: ParsedWord[] = [];
-  const blocks = text.split(/\n---\n|\n---$|^---\n/m).map(b => b.trim()).filter(Boolean);
-  for (const block of blocks) {
-    const w: ParsedWord = { word: '', translation: '', definition: '', partOfSpeech: '', pronunciation: '', definitionUz: '', examples: [] };
-    const sentences: Record<number, string> = {};
-    const translations: Record<number, string> = {};
-    for (const line of block.split('\n')) {
-      const colon = line.indexOf(':');
-      if (colon < 0) continue;
-      // Strip whitespace so "Example 1:" / "Part of speech:" (this prompt's own
-      // style) and "example1:" / "partOfSpeech:" (My Words-prompt style) both parse.
-      const key = line.slice(0, colon).trim().toLowerCase().replace(/\s+/g, '');
-      const val = line.slice(colon + 1).trim();
-      if (key === 'word') w.word = val;
-      else if (key === 'translation') w.translation = val;
-      else if (key === 'definition') w.definition = val;
-      else if (key === 'partofspeech') w.partOfSpeech = val;
-      else if (key === 'pronunciation') w.pronunciation = val;
-      else if (key === 'uzbekdefinition' || key === 'definitionuz') w.definitionUz = val;
-      else {
-        const sm = key.match(/^example(\d+)$/);
-        const tm = key.match(/^example(\d+)translation$/);
-        if (sm) sentences[+sm[1]] = val;
-        if (tm) translations[+tm[1]] = val;
-      }
-    }
-    const nums = [...new Set([...Object.keys(sentences), ...Object.keys(translations)].map(Number))].sort((a,b)=>a-b);
-    w.examples = nums.filter(n => sentences[n]).map(n => ({ sentence: sentences[n], translation: translations[n] ?? '' }));
-    if (w.word && w.translation) results.push(w);
-  }
-  return results;
-}
-
-function exampleBlock(wordLang: string, transLang: string): string {
-  return Array.from({ length: 10 }, (_, i) => {
-    const n = i + 1;
-    const desc = n === 1 ? 'natural sentence using the word' : 'another natural sentence';
-    return `Example ${n}: [${desc} in ${wordLang.toLowerCase()}]\nExample ${n} Translation: [${transLang.toLowerCase()} translation of example ${n}]`;
-  }).join('\n');
-}
-
-// hasTranslations: true when the pasted input is already word-translation pairs
-// (their translation is kept verbatim) rather than a bare word list to translate.
-function buildPrompt(wordLang: string, transLang: string, words: string, hasTranslations: boolean): string {
-  const intro = hasTranslations
-    ? `I have ${wordLang.toLowerCase()}-${transLang.toLowerCase()} word pairs. For each pair, keep my translation exactly as written. Add a short definition in ${wordLang.toLowerCase()}, a short definition in Uzbek, and 10 example sentences in ${wordLang.toLowerCase()} with their ${transLang.toLowerCase()} translations.`
-    : `You are a vocabulary flashcard generator. Create detailed flashcard data for these ${wordLang.toLowerCase()} words, with translations in ${transLang.toLowerCase()}.`;
-  const label = hasTranslations ? 'Word pairs to process (word - translation)' : 'Words to process';
-  const wordLine = hasTranslations
-    ? `Word: [the ${wordLang.toLowerCase()} word — keep exactly as given]`
-    : `Word: [the ${wordLang.toLowerCase()} word]`;
-  const transLine = hasTranslations
-    ? `Translation: [keep exactly as given in my pairs]`
-    : `Translation: [${transLang.toLowerCase()} translation]`;
-
-  return `${intro}
-
-${label}:
-${words}
-
-For each word output exactly this format, separated by ---:
-
-${wordLine}
-Part of speech: [noun / verb / adjective / adverb / phrase / etc., written in ${wordLang.toLowerCase()}]
-Pronunciation: [IPA pronunciation, e.g. /wɜːrd/]
-${transLine}
-Definition: [short definition in ${wordLang.toLowerCase()}, max 20 words]
-Uzbek definition: [short definition in Uzbek, max 20 words]
-${exampleBlock(wordLang, transLang)}
-
-Output only the formatted blocks. No commentary.`;
-}
 
 export default function UnitPage() {
   const { user, loading: authLoading } = useAuth();
@@ -145,7 +72,17 @@ export default function UnitPage() {
   }, [user, authLoading, unitId]);
 
   useEffect(() => {
-    setParsed(pasteText.trim() ? parseOutput(pasteText) : []);
+    setParsed(pasteText.trim()
+      ? parseAiImportOutput(pasteText).words.map(w => ({
+          word: w.word,
+          translation: w.translation,
+          definition: w.definition,
+          partOfSpeech: w.partOfSpeech ?? '',
+          pronunciation: w.pronunciation ?? '',
+          definitionUz: w.definitionUz ?? '',
+          examples: w.examples,
+        }))
+      : []);
   }, [pasteText]);
 
   async function load() {
@@ -265,7 +202,7 @@ export default function UnitPage() {
 
   function copyPrompt(hasTranslations: boolean) {
     const words = wordsInput.trim() || (hasTranslations ? 'apple - olma\nbook - kitob' : 'apple, book, water');
-    const prompt = buildPrompt(wordLang, transLang, words, hasTranslations);
+    const prompt = buildAiImportPrompt({ wordLang, translationLang: transLang, words, hasTranslations });
     navigator.clipboard.writeText(prompt);
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);

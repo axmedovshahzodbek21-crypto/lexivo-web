@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { getClassDueWords, getClassSRSAll, getClassStarredWordIds, addClassStarredWord, removeClassStarredWord } from '@/lib/class-srs';
 import { classGradientColors } from '@/lib/class-gradient';
+import { buildAiImportPrompt, parseAiImportOutput } from '@/lib/ai-import';
 
 type InputTab = 'manual' | 'ai' | 'collection';
 
@@ -40,19 +41,6 @@ interface ClassWord {
   source?: 'class' | 'library';
 }
 
-interface ParsedWord {
-  word: string;
-  translation: string;
-  definition: string;
-  examples: WordExample[];
-  language: string;
-}
-
-interface ParseResult {
-  words: ParsedWord[];
-  errors: { index: number; preview: string; reason: string }[];
-}
-
 const LANGUAGES = [
   { label: 'English', code: 'en-US' },
   { label: 'Russian', code: 'ru-RU' },
@@ -66,119 +54,6 @@ const LANGUAGES = [
   { label: 'Japanese', code: 'ja-JP' },
   { label: 'Chinese', code: 'zh-CN' },
 ];
-
-const EXAMPLE_FORMAT = `example1: The enormous building towered above the city.
-example1Translation: Ulkan bino shahar ustida baland turardi.
-example2: She faced an enormous challenge at work.
-example2Translation: U ishda ulkan muammoga duch keldi.
-example3: The enormous whale surfaced near the boat.
-example3Translation: Ulkan kit qayiq yonida suvdan chiqdi.
-example4: They needed an enormous amount of funding.
-example4Translation: Ularga juda katta miqdorda mablag' kerak edi.
-example5: His enormous appetite surprised everyone at the table.
-example5Translation: Uning ulkan ishtahasi dasturxon atrofidagilarni hayratga soldi.
-example6: The storm caused enormous damage to the coast.
-example6Translation: Bo'ron qirg'oqda ulkan zarar keltirdi.
-example7: She had an enormous influence on her students.
-example7Translation: U o'z o'quvchilariga ulkan ta'sir ko'rsatdi.
-example8: The project required enormous effort from the whole team.
-example8Translation: Loyiha butun jamoadan ulkan kuch talab qildi.
-example9: An enormous crowd gathered in the central square.
-example9Translation: Markaziy maydonga ulkan olomon to'plandi.
-example10: The enormous pressure made it hard to focus.
-example10Translation: Ulkan bosim diqqatni jamlashni qiyinlashtirdi.`;
-
-function buildPrompt1(wordLang: string, transLang: string): string {
-  return `I have a list of ${wordLang} words I want to learn. For each word, provide the translation in ${transLang}, a short definition in ${wordLang}, and 10 example sentences in ${wordLang} with their ${transLang} translations.
-
-Format EXACTLY like this for every word. Use plain text only — no markdown, no bold, no asterisks, no extra formatting:
-
-word: enormous
-translation: ulkan
-definition: extremely large in size or extent
-${EXAMPLE_FORMAT}
----
-
-Important: the example above uses English/Uzbek only to show the format. In your actual response, write the definition and examples in ${wordLang}, and the translations in ${transLang}.
-
-Here are my words:
-[PASTE YOUR WORDS HERE, one per line]`;
-}
-
-function buildPrompt2(wordLang: string, transLang: string): string {
-  return `I have ${wordLang}-${transLang} word pairs. For each pair, keep my translation exactly as written. Add a short definition in ${wordLang} and 10 example sentences in ${wordLang} with their ${transLang} translations.
-
-Format EXACTLY like this for every word. Use plain text only — no markdown, no bold, no asterisks, no extra formatting:
-
-word: enormous
-translation: ulkan
-definition: extremely large in size or extent
-${EXAMPLE_FORMAT}
----
-
-Important: the example above uses English/Uzbek only to show the format. In your actual response, write the definition and examples in ${wordLang}, and the translations in ${transLang}.
-
-Here are my pairs (word - translation):
-[PASTE YOUR PAIRS HERE, one per line]`;
-}
-
-function splitIntoBlocks(text: string): string[] {
-  if (/---+/.test(text)) {
-    return text.split(/---+/).map(b => b.trim()).filter(Boolean);
-  }
-  const blocks: string[] = [];
-  const lines = text.split('\n');
-  let current: string[] = [];
-  for (const line of lines) {
-    if (/^word\s*:/i.test(line.trim()) && current.some(l => /^word\s*:/i.test(l.trim()))) {
-      blocks.push(current.join('\n').trim());
-      current = [line];
-    } else {
-      current.push(line);
-    }
-  }
-  if (current.length) blocks.push(current.join('\n').trim());
-  return blocks.filter(Boolean);
-}
-
-function parseOutput(text: string, langCode: string): ParseResult {
-  const blocks = splitIntoBlocks(text);
-  const words: ParsedWord[] = [];
-  const errors: ParseResult['errors'] = [];
-  for (let i = 0; i < blocks.length; i++) {
-    const block = blocks[i];
-    const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
-    const fields: Record<string, string> = {};
-    for (const line of lines) {
-      const colon = line.indexOf(':');
-      if (colon === -1) continue;
-      const key = line.slice(0, colon).trim().toLowerCase().replace(/[*_`#]/g, '');
-      const val = line.slice(colon + 1).trim().replace(/[*_`]/g, '');
-      fields[key] = val;
-    }
-    const preview = block.slice(0, 40).replace(/\n/g, ' ');
-    if (!fields.word && !fields.translation) {
-      errors.push({ index: i + 1, preview, reason: 'Missing both "word:" and "translation:" fields' });
-      continue;
-    }
-    if (!fields.word) {
-      errors.push({ index: i + 1, preview, reason: 'Missing "word:" field' });
-      continue;
-    }
-    if (!fields.translation) {
-      errors.push({ index: i + 1, preview, reason: 'Missing "translation:" field' });
-      continue;
-    }
-    const examples: WordExample[] = [];
-    for (let n = 1; n <= 10; n++) {
-      const s = fields[`example${n}`];
-      const t = fields[`example${n}translation`];
-      if (s) examples.push({ sentence: s, translation: t ?? '' });
-    }
-    words.push({ word: fields.word, translation: fields.translation, definition: fields.definition ?? '', examples, language: langCode });
-  }
-  return { words, errors };
-}
 
 // Group words by folder → collection hierarchy
 function groupWords(words: ClassWord[]) {
@@ -313,8 +188,10 @@ export default function ClassWordsPage() {
   const [loadingCollection, setLoadingCollection] = useState(false);
   const [importingCollection, setImportingCollection] = useState(false);
 
-  const parseResult = useMemo(() => parseOutput(pasted, wordLangCode), [pasted, wordLangCode]);
+  const parseResult = useMemo(() => parseAiImportOutput(pasted), [pasted]);
   const parsed = parseResult.words;
+  const aiPrompt1 = buildAiImportPrompt({ wordLang, translationLang: transLang, words: '[PASTE YOUR WORDS HERE, one per line]' });
+  const aiPrompt2 = buildAiImportPrompt({ wordLang, translationLang: transLang, words: '[PASTE YOUR PAIRS HERE, one per line]', hasTranslations: true });
 
   useEffect(() => {
     if (!user || !id) return;
@@ -481,7 +358,7 @@ export default function ClassWordsPage() {
       example2: w.examples[1]?.sentence || null,
       example2_translation: w.examples[1]?.translation || null,
       examples: w.examples.length > 0 ? w.examples : null,
-      language: w.language,
+      language: wordLangCode,
       folder_name: folderInput.trim() || null,
       collection_name: collectionInput.trim() || null,
     }));
@@ -889,8 +766,8 @@ export default function ClassWordsPage() {
                 </button>
                 {open1 && (
                   <div className="space-y-2">
-                    <pre className="text-xs bg-[var(--surface-2)] rounded-xl p-3 whitespace-pre-wrap text-[var(--text)] leading-relaxed overflow-x-auto">{buildPrompt1(wordLang, transLang)}</pre>
-                    <button onClick={() => copyPrompt(buildPrompt1(wordLang, transLang), 1)} className="w-full py-2 rounded-xl bg-[var(--primary)] text-white text-sm font-semibold">
+                    <pre className="text-xs bg-[var(--surface-2)] rounded-xl p-3 whitespace-pre-wrap text-[var(--text)] leading-relaxed overflow-x-auto">{aiPrompt1}</pre>
+                    <button onClick={() => copyPrompt(aiPrompt1, 1)} className="w-full py-2 rounded-xl bg-[var(--primary)] text-white text-sm font-semibold">
                       {copied1 ? '✅ Copied!' : '📋 Copy prompt'}
                     </button>
                   </div>
@@ -908,8 +785,8 @@ export default function ClassWordsPage() {
                 </button>
                 {open2 && (
                   <div className="space-y-2">
-                    <pre className="text-xs bg-[var(--surface-2)] rounded-xl p-3 whitespace-pre-wrap text-[var(--text)] leading-relaxed overflow-x-auto">{buildPrompt2(wordLang, transLang)}</pre>
-                    <button onClick={() => copyPrompt(buildPrompt2(wordLang, transLang), 2)} className="w-full py-2 rounded-xl bg-[var(--primary)] text-white text-sm font-semibold">
+                    <pre className="text-xs bg-[var(--surface-2)] rounded-xl p-3 whitespace-pre-wrap text-[var(--text)] leading-relaxed overflow-x-auto">{aiPrompt2}</pre>
+                    <button onClick={() => copyPrompt(aiPrompt2, 2)} className="w-full py-2 rounded-xl bg-[var(--primary)] text-white text-sm font-semibold">
                       {copied2 ? '✅ Copied!' : '📋 Copy prompt'}
                     </button>
                   </div>
