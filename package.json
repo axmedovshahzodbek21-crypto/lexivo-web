@@ -6,7 +6,9 @@
     "dev": "next dev --webpack",
     "build": "next build --webpack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "gen:reading-data": "node scripts/ts-to-dart.js",
+    "check:reading-data": "node scripts/ts-to-dart.js --check"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.115.0",

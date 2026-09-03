@@ -1,7 +1,17 @@
 // Converts lib/reading-data.ts → ../../lexivo/lib/data/reading_data.dart
+//
+// reading-data.ts is the single source of truth for the "Ideas" reading
+// passages. The Flutter app ships a generated Dart copy — NEVER hand-edit
+// reading_data.dart; edit the .ts and re-run this script.
+//
+//   node scripts/ts-to-dart.js           regenerate the Dart file
+//   node scripts/ts-to-dart.js --check   exit 1 if the Dart file is stale
+//                                        (used by `npm run check:reading-data`)
 const fs = require('fs');
 const vm = require('vm');
 const path = require('path');
+
+const CHECK = process.argv.includes('--check');
 
 const tsPath = path.join(__dirname, '../lib/reading-data.ts');
 const dartPath = path.join(__dirname, '../../lexivo/lib/data/reading_data.dart');
@@ -43,7 +53,11 @@ function escTriple(s) {
 }
 
 // Build Dart file
-let out = `class ReadingQuestion {
+let out = `// GENERATED FILE — DO NOT EDIT.
+// Source of truth: lexivo-web/lib/reading-data.ts
+// Regenerate:      node scripts/ts-to-dart.js   (in the lexivo-web repo)
+
+class ReadingQuestion {
   final String question;
   final String explanation;
 
@@ -95,5 +109,14 @@ for (const p of passages) {
 
 out += `];\n`;
 
-fs.writeFileSync(dartPath, out, 'utf-8');
-console.log(`✅ Converted ${passages.length} passages → reading_data.dart`);
+if (CHECK) {
+  const current = fs.existsSync(dartPath) ? fs.readFileSync(dartPath, 'utf-8') : '';
+  if (current !== out) {
+    console.error('❌ reading_data.dart is stale — run: node scripts/ts-to-dart.js');
+    process.exit(1);
+  }
+  console.log(`✅ reading_data.dart is up to date (${passages.length} passages)`);
+} else {
+  fs.writeFileSync(dartPath, out, 'utf-8');
+  console.log(`✅ Converted ${passages.length} passages → reading_data.dart`);
+}
