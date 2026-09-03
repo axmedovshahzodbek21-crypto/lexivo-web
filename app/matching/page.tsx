@@ -265,13 +265,13 @@ function MatchingInner() {
           if (markMyMatchComplete(myFolder, myCollection)) { setMyUnitCompleted(true); fireConfetti(); }
         }
         if (isLast && sourceClass && classId) {
-          // Class practice XP: every completed session (no per-day gate),
-          // scoped to the class leaderboard via recordClassXP AND mirrored
-          // into the personal pool with addXP — matching class Learn.
+          // Class practice XP: every completed session (no per-day gate), and
+          // isolated to the class leaderboard via recordClassXP only — it must
+          // NOT touch the personal Lexivo pool (level / global leaderboard).
+          // Matches the Flutter app and lib/class-xp.ts. setSessionXP just
+          // drives this class session's "+N XP" summary.
           const xpAmount = words.length * 4;
           setSessionXP(xpAmount);
-          const result = addXP(xpAmount, 'Match', `Class · ${classNameParam}`);
-          if (result.leveledUp) setPendingLevelUp({ level: result.newLevel, xp: result.newXp });
           supabase.auth.getUser().then(({ data: { user } }) => {
             if (user) void recordClassXP(user.id, classId, xpAmount, 'Match');
           });

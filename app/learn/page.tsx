@@ -553,17 +553,15 @@ function LearnInner() {
       pushStats();
       pushLists();
     } else if (isNew && (sourceClassHW || sourceClass) && classIdParam) {
-      // Class-earned XP counts toward the class leaderboard AND the
-      // account's global total, so it isn't lost if the student later
-      // leaves the class. The class-side award already happened atomically
-      // inside grantLearnReward's recordClassWordLearned call — this only
-      // updates the local/account-wide total and session display.
+      // Class XP is isolated to the class leaderboard — it must NOT also
+      // land in the personal Lexivo pool (lexivo_xp / level / global
+      // leaderboard). The class-side award already happened atomically
+      // inside grantLearnReward's recordClassWordLearned call; here we only
+      // reflect it in this session's own "+N XP" display. Matches the
+      // Flutter app and lib/class-xp.ts's "intentionally isolated" contract.
       const learnXP = getLearnXPAmount();
-      const { leveledUp, newLevel, newXp } = addXP(learnXP, 'Learn', `Class · ${classNameParam}`);
-      if (leveledUp) setPendingLevelUp({ level: newLevel, xp: newXp });
       setSessionXP(prev => prev + learnXP);
       flashXp(learnXP);
-      pushStats();
     }
     recordStudySession();
     setSessionCount(c => c + 1);

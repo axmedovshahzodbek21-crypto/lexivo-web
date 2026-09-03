@@ -281,14 +281,12 @@ function FlashcardsInner() {
       pushStats();
       if (sourceClass && classId) {
         // Class practice XP: every completed session (no per-day gate, no
-        // "zero unknowns" requirement), scoped to the class leaderboard via
-        // recordClassXP AND mirrored into the personal pool with addXP —
-        // matching class Learn.
+        // "zero unknowns" requirement), and isolated to the class leaderboard
+        // via recordClassXP only — it must NOT touch the personal Lexivo pool
+        // (level / global leaderboard). Matches the Flutter app and
+        // lib/class-xp.ts. setSessionXP just drives the "+N XP" summary.
         const xpAmount = Math.round(originalWordCount.current * 3);
         setSessionXP(xpAmount);
-        const result = addXP(xpAmount, 'Flashcard', `Class · ${classNameParam}`);
-        if (result.leveledUp) setPendingLevelUp({ level: result.newLevel, xp: result.newXp });
-        recordFlashcardSession();
         supabase.auth.getUser().then(({ data: { user } }) => {
           if (user) void recordClassXP(user.id, classId, xpAmount, 'Flashcard');
         });

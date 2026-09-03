@@ -326,19 +326,16 @@ function QuizInner() {
       pushLists();
       pushStats();
       if (sourceClass && classId) {
-        // Class practice XP: awarded on every completed session (no per-day
-        // gate), scoped to the class leaderboard via recordClassXP AND mirrored
-        // into the personal pool with addXP — matching how a class Learn
-        // session credits XP (see app/learn/page.tsx's grantLearnReward tail).
+        // Class practice XP: every completed session (no per-day gate), and
+        // isolated to the class leaderboard via recordClassXP only — it must
+        // NOT touch the personal Lexivo pool (level / global leaderboard).
+        // Matches the Flutter app and lib/class-xp.ts's isolation contract.
+        // setSessionXP just drives this class session's "+N XP" summary.
         const base = questions.length * 5;
-        // +25% for a flawless run, every perfect session (class practice has
-        // no per-session gate, matching the base award).
+        // +25% for a flawless run, every perfect session (no per-session gate).
         const xpAmount = base + (isPerfect ? Math.round(base * 0.25) : 0);
         const reason = isPerfect ? 'Quiz (perfect)' : 'Quiz';
         setSessionXP(xpAmount);
-        const result = addXP(xpAmount, reason, `Class · ${classNameParam}`);
-        if (result.leveledUp) setPendingLevelUp({ level: result.newLevel, xp: result.newXp });
-        recordQuizSession();
         supabase.auth.getUser().then(({ data: { user } }) => {
           if (user) void recordClassXP(user.id, classId, xpAmount, reason);
         });
