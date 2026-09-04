@@ -133,7 +133,7 @@ const [memberCount, setMemberCount] = useState(0);
       const [{ data: anns }, { data: members }, { data: myMembership }] = await Promise.all([
         supabase.from('class_announcements').select('id, message, created_at')
           .eq('class_id', id).order('created_at', { ascending: false }).limit(5),
-        supabase.from('class_members').select('student_id').eq('class_id', id),
+        supabase.from('class_members').select('student_id').eq('class_id', id).eq('status', 'approved'),
         !teacher
           ? supabase.from('class_members').select('class_xp').eq('class_id', id).eq('student_id', user.id).maybeSingle()
           : Promise.resolve({ data: null }),
@@ -276,9 +276,18 @@ const [memberCount, setMemberCount] = useState(0);
     setShowStudents(true);
     setStudentsLoading(true);
     setStudentsError('');
-    const { data, error } = await supabase.rpc('get_class_dashboard', { p_class_id: id });
+    // get_class_dashboard's own definition isn't reconstructible from this
+    // repo's migrations (created directly via the Supabase dashboard), so
+    // whether it excludes pending members server-side can't be verified —
+    // cross-check against class_members.status here instead of trusting it.
+    const [{ data, error }, { data: approvedRows }] = await Promise.all([
+      supabase.rpc('get_class_dashboard', { p_class_id: id }),
+      supabase.from('class_members').select('student_id').eq('class_id', id).eq('status', 'approved'),
+    ]);
     if (error) { setStudentsError(error.message); setStudentsLoading(false); return; }
+    const approvedIds = new Set((approvedRows ?? []).map(r => r.student_id as string));
     const list: StudentProfile[] = ((data ?? []) as { student_id: string; name: string; avatar_url: string | null; xp: number; streak: number; last_study_date: string | null; total_words: number }[])
+      .filter(r => approvedIds.has(r.student_id))
       .map(r => ({ id: r.student_id, name: r.name, avatar_url: r.avatar_url, xp: r.xp ?? 0, streak: r.streak ?? 0, last_study_date: r.last_study_date, total_learned: r.total_words ?? 0 }));
     list.sort((a, b) => b.xp - a.xp);
     setStudents(list);

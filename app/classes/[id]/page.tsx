@@ -2267,17 +2267,24 @@ export default function ClassDashboardPage() {
     const { data: cls } = await supabase.from('classes').select('*').eq('id', id).single();
     if (!cls || cls.teacher_id !== user.id) { setNotTeacher(true); setLoading(false); return; }
     setClassInfo(cls);
-    const [{ data }, { data: colData }] = await Promise.all([
+    const [{ data }, { data: colData }, { data: approvedRows }] = await Promise.all([
       supabase.rpc('get_class_dashboard', { p_class_id: id }),
       supabase.from('collections').select('*').order('display_order'),
+      supabase.from('class_members').select('student_id').eq('class_id', id).eq('status', 'approved'),
     ]);
-    setStudents((data as StudentRow[]) ?? []);
+    // get_class_dashboard's own definition isn't reconstructible from this
+    // repo's migrations (created directly via the Supabase dashboard), so
+    // whether it excludes pending members server-side can't be verified —
+    // cross-check against class_members.status here instead of trusting it.
+    const approvedIds = new Set((approvedRows ?? []).map(r => r.student_id as string));
+    const approvedStudents = ((data as StudentRow[]) ?? []).filter(s => approvedIds.has(s.student_id));
+    setStudents(approvedStudents);
     setCollections((colData as CollectionMeta[]) ?? []);
     const { data: hwData } = await supabase.rpc('get_hard_words', { p_class_id: id });
     setHardWords((hwData as HardWord[]) ?? []);
     _classCache.set(cacheKey, {
       classInfo: cls as ClassInfo,
-      students: (data as StudentRow[]) ?? [],
+      students: approvedStudents,
       collections: (colData as CollectionMeta[]) ?? [],
       hardWords: (hwData as HardWord[]) ?? [],
     });

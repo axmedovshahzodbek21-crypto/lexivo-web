@@ -50,7 +50,7 @@ export default function CreatedClassesPage() {
     const taughtIds = (taught ?? []).map((c: ClassRow) => c.id);
     let classes: ClassRow[] = [];
     if (taughtIds.length > 0) {
-      const { data: memberRows } = await supabase.from('class_members').select('class_id').in('class_id', taughtIds);
+      const { data: memberRows } = await supabase.from('class_members').select('class_id').in('class_id', taughtIds).eq('status', 'approved');
       const countMap: Record<string, number> = {};
       for (const m of memberRows ?? []) countMap[m.class_id] = (countMap[m.class_id] ?? 0) + 1;
       classes = (taught ?? []).map((c: ClassRow) => ({ ...c, member_count: countMap[c.id] ?? 0 }));
