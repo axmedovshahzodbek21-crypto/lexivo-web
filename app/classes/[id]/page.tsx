@@ -2011,6 +2011,7 @@ export default function ClassDashboardPage() {
   const { user } = useAuth();
   const [classInfo, setClassInfo] = useState<ClassInfo | null>(null);
   const [students, setStudents] = useState<StudentRow[]>([]);
+  const [pendingMembers, setPendingMembers] = useState<{ student_id: string; name: string }[]>([]);
   const [collections, setCollections] = useState<CollectionMeta[]>([]);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
@@ -2284,7 +2285,7 @@ export default function ClassDashboardPage() {
     setLoading(false);
   };
 
-  useEffect(() => { if (user) load(); else { _classCache.clear(); setLoading(false); } }, [user, id]);
+  useEffect(() => { if (user) { load(); loadPendingMembers(); } else { _classCache.clear(); setLoading(false); } }, [user, id]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (tab === 'activity' && activityFeed.length === 0) loadActivity(); }, [tab]);
   useEffect(() => {
     if (tab !== 'analytics') return;
@@ -2366,6 +2367,30 @@ export default function ClassDashboardPage() {
       return;
     }
     load();
+  };
+
+  const loadPendingMembers = async () => {
+    const { data: rows } = await supabase.from('class_members').select('student_id').eq('class_id', id).eq('status', 'pending');
+    const ids = (rows ?? []).map((r: { student_id: string }) => r.student_id);
+    let names: Record<string, string> = {};
+    if (ids.length > 0) {
+      const { data: profiles } = await supabase.from('profiles').select('id, name').in('id', ids);
+      for (const p of profiles ?? []) names[p.id] = p.name ?? 'Student';
+    }
+    setPendingMembers(ids.map((sid: string) => ({ student_id: sid, name: names[sid] ?? 'Student' })));
+  };
+
+  const approvePending = async (studentId: string) => {
+    const { error } = await supabase.from('class_members').update({ status: 'approved' }).eq('class_id', id).eq('student_id', studentId);
+    if (error) { alert('Failed to approve — try again.'); return; }
+    setPendingMembers(prev => prev.filter(m => m.student_id !== studentId));
+    load();
+  };
+
+  const rejectPending = async (studentId: string) => {
+    const { error } = await supabase.from('class_members').delete().eq('class_id', id).eq('student_id', studentId);
+    if (error) { alert('Failed to reject — try again.'); return; }
+    setPendingMembers(prev => prev.filter(m => m.student_id !== studentId));
   };
 
   const openNoteModal = async (s: StudentRow) => {
@@ -2489,6 +2514,20 @@ export default function ClassDashboardPage() {
               {t === 'students' ? '👥' : t === 'activity' ? '📡' : t === 'radar' ? '🎯' : t === 'analytics' ? '📊' : t === 'srs' ? '📚' : t === 'review' ? '🔄' : '📋'}
               {' '}{t === 'students' ? 'Students' : t === 'activity' ? 'Activity' : t === 'radar' ? 'Radar' : t === 'analytics' ? 'Analytics' : t === 'srs' ? 'SRS' : t === 'review' ? 'Review' : 'Curriculum'}
             </button>
+          ))}
+        </div>
+      )}
+
+      {/* Pending join requests — students tab only */}
+      {!loading && tab === 'students' && pendingMembers.length > 0 && (
+        <div className="mx-4 mt-3 mb-1 rounded-2xl p-3.5 space-y-2.5" style={{ background: 'var(--primary-bg)', border: '1px solid color-mix(in srgb, var(--primary) 30%, transparent)' }}>
+          <p className="text-xs font-bold text-[var(--text)]">⏳ Pending approval ({pendingMembers.length})</p>
+          {pendingMembers.map(m => (
+            <div key={m.student_id} className="flex items-center gap-3">
+              <p className="flex-1 text-sm text-[var(--text)] truncate">{m.name}</p>
+              <button onClick={() => rejectPending(m.student_id)} className="text-xs font-bold text-[var(--danger)] px-2 py-1">Reject</button>
+              <button onClick={() => approvePending(m.student_id)} className="text-xs font-bold text-white px-3 py-1.5 rounded-lg" style={{ background: 'var(--primary)' }}>Approve</button>
+            </div>
           ))}
         </div>
       )}

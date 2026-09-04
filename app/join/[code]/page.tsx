@@ -18,7 +18,7 @@ export default function JoinPage() {
   const [notFound, setNotFound] = useState(false);
   const [fetchError, setFetchError] = useState(false);
   const [retryKey, setRetryKey] = useState(0);
-  const [status, setStatus] = useState<'idle' | 'joining' | 'joined' | 'already' | 'ownClass' | 'joinError'>('idle');
+  const [status, setStatus] = useState<'idle' | 'joining' | 'joined' | 'pending' | 'already' | 'ownClass' | 'joinError'>('idle');
 
   useEffect(() => {
     if (!code) return;
@@ -61,7 +61,7 @@ export default function JoinPage() {
     setStatus('joining');
     supabase
       .from('class_members')
-      .insert({ class_id: cls.id, student_id: user.id })
+      .insert({ class_id: cls.id, student_id: user.id, status: 'pending' })
       .then(({ error }) => {
         // Only 23505 (unique violation) means the insert didn't happen
         // because a row already exists — every other error (RLS denial,
@@ -70,12 +70,12 @@ export default function JoinPage() {
         // "🎉 You joined!" regardless.
         if (error?.code === '23505') setStatus('already');
         else if (error) setStatus('joinError');
-        else setStatus('joined');
+        else setStatus('pending');
       });
   }, [user, cls, status, router]);
 
   useEffect(() => {
-    if (status === 'joined' || status === 'already') {
+    if (status === 'joined' || status === 'already' || status === 'pending') {
       const t = setTimeout(() => router.replace('/classes'), 2000);
       return () => clearTimeout(t);
     }
@@ -110,6 +110,15 @@ export default function JoinPage() {
       <div className="text-6xl">🎉</div>
       <p className="text-2xl font-black text-[var(--text)]">You joined!</p>
       <p className="text-[var(--text-muted)]">{cls.name}</p>
+      <p className="text-sm text-[var(--text-muted)]">Redirecting…</p>
+    </div>
+  );
+
+  if (status === 'pending') return (
+    <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8 animate-fade-in">
+      <div className="text-6xl">⏳</div>
+      <p className="text-2xl font-black text-[var(--text)]">Request sent!</p>
+      <p className="text-[var(--text-muted)]">Waiting for your teacher to approve you into {cls.name}</p>
       <p className="text-sm text-[var(--text-muted)]">Redirecting…</p>
     </div>
   );

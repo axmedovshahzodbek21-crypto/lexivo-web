@@ -88,7 +88,7 @@ export default function ClassesPage() {
     const { data: cls } = await supabase.from('classes').select('id, teacher_id').eq('join_code', code).single();
     if (!cls) { setJoinError('Class not found. Check the code and try again.'); return; }
     if (cls.teacher_id === user.id) { setJoinError("You can't join your own class."); return; }
-    const { error: err } = await supabase.from('class_members').insert({ class_id: cls.id, student_id: user.id });
+    const { error: err } = await supabase.from('class_members').insert({ class_id: cls.id, student_id: user.id, status: 'pending' });
     if (err) { setJoinError(err.code === '23505' ? 'Already in this class.' : 'Failed to join.'); return; }
     setJoinCode(''); setShowJoin(false);
     router.push('/classes/joined');

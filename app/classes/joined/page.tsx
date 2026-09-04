@@ -48,6 +48,7 @@ type Cache = {
   classNotes: Record<string, Note[]>;
   classTargets: Record<string, Target[]>;
   classAnnouncements: Record<string, Announcement[]>;
+  membershipStatus: Record<string, string>;
 };
 const _cache = new Map<string, Cache>();
 
@@ -59,6 +60,7 @@ export default function JoinedClassesPage() {
   const [classNotes, setClassNotes] = useState<Record<string, Note[]>>({});
   const [classTargets, setClassTargets] = useState<Record<string, Target[]>>({});
   const [classAnnouncements, setClassAnnouncements] = useState<Record<string, Announcement[]>>({});
+  const [membershipStatus, setMembershipStatus] = useState<Record<string, string>>({});
   const [classLeaderboards, setClassLeaderboards] = useState<Record<string, LeaderboardRow[]>>({});
   const [expandedLeaderboard, setExpandedLeaderboard] = useState<string | null>(null);
   const [leaderboardLoading, setLeaderboardLoading] = useState<string | null>(null);
@@ -74,6 +76,7 @@ export default function JoinedClassesPage() {
     setClassNotes(c.classNotes);
     setClassTargets(c.classTargets);
     setClassAnnouncements(c.classAnnouncements);
+    setMembershipStatus(c.membershipStatus);
   };
 
   const load = async () => {
@@ -82,9 +85,13 @@ export default function JoinedClassesPage() {
     if (cached) { applyCache(cached); setLoading(false); }
     else setLoading(true);
 
-    const { data: memberships } = await supabase.from('class_members').select('class_id').eq('student_id', user.id);
+    const { data: memberships } = await supabase.from('class_members').select('class_id, status').eq('student_id', user.id);
     let newJoined: ClassRow[] = [];
+    let newMembershipStatus: Record<string, string> = {};
     if (memberships && memberships.length > 0) {
+      for (const m of memberships as { class_id: string; status: string | null }[]) {
+        newMembershipStatus[m.class_id] = m.status ?? 'approved';
+      }
       const classIds = memberships.map((m: { class_id: string }) => m.class_id);
       const { data } = await supabase.from('classes').select('*').in('id', classIds);
       newJoined = (data ?? []).filter((c: ClassRow) => c.teacher_id !== user.id);
@@ -114,7 +121,7 @@ export default function JoinedClassesPage() {
       for (const a of announcementsData ?? []) { if (!newAnnouncements[a.class_id]) newAnnouncements[a.class_id] = []; newAnnouncements[a.class_id].push(a); }
     }
 
-    const fresh: Cache = { joinedClasses: newJoined, teacherProfiles: newTeacherProfiles, classNotes: newNotes, classTargets: newTargets, classAnnouncements: newAnnouncements };
+    const fresh: Cache = { joinedClasses: newJoined, teacherProfiles: newTeacherProfiles, classNotes: newNotes, classTargets: newTargets, classAnnouncements: newAnnouncements, membershipStatus: newMembershipStatus };
     _cache.set(user.id, fresh);
     applyCache(fresh);
     setLoading(false);
@@ -152,6 +159,7 @@ export default function JoinedClassesPage() {
   };
 
   const toggleLeaderboard = async (classId: string) => {
+    if (membershipStatus[classId] !== 'approved') return;
     if (expandedLeaderboard === classId) { setExpandedLeaderboard(null); return; }
     setExpandedLeaderboard(classId);
     if (classLeaderboards[classId]) return;
@@ -223,6 +231,7 @@ export default function JoinedClassesPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <p className="font-black text-white text-xl leading-tight" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>{cls.name}</p>
+                      {membershipStatus[cls.id] === 'pending' && <span className="bg-white/25 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">⏳ Pending approval</span>}
                       {unreadNotes > 0 && <span className="bg-white/25 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">{unreadNotes} new</span>}
                     </div>
                     <p className="text-sm text-white/70 mt-0.5">👩‍🏫 {teacherProfiles[cls.teacher_id]?.name ?? 'Teacher'} · {cls.join_code}</p>
