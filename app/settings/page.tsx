@@ -231,6 +231,13 @@ export default function SettingsPage() {
         const dels = await Promise.all([
           supabase.from('learned_words').delete().eq('user_id', user.id),
           supabase.from('xp_history').delete().eq('user_id', user.id),
+          // Per-word Learn analytics feeds the Word Mastery Heatmap's "gate"
+          // score (collections/[name]/page.tsx). Without this the heatmap
+          // keeps showing up to 40% mastery for every previously-learned
+          // word after a reset, since a leftover analytics row alone marks
+          // a word "studied". NB: also clears the teacher-side record of
+          // this student's Learn sessions. Mirrors the Flutter reset.
+          supabase.from('learn_session_analytics').delete().eq('student_id', user.id),
         ]);
         const failed = dels.filter(r => r.error).map(r => r.error!.message);
         if (failed.length > 0) throw new Error(failed.join('; '));
