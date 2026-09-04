@@ -137,6 +137,12 @@ function LearnInner() {
   // Class-homework Learn persists its resume position under a key derived from
   // the (stable) homework id, mirroring how `collection+day` and `class` do it.
   const classHWKey = `classhw_${hwId}`;
+  // Cross-device resume: class Learn sessions also mirror the bookmark to the
+  // class_learn_progress table so the "Resume where you left off?" prompt shows
+  // even if the session was paused on another device. `scope` distinguishes a
+  // homework session from a class-words session. null = not a class session.
+  const classScope: string | null =
+    sourceClassHW && hwId ? `hw:${hwId}` : sourceClass ? 'words' : null;
   const starredUnitIndex = parseInt(sp.get('unit') ?? '1') - 1; // 0-based
   const myCollection = sp.get('myCollection') ?? undefined;
   const myFolder     = sp.get('myFolder') ?? undefined;
@@ -224,6 +230,43 @@ function LearnInner() {
   const currentIndexRef = useRef(index);
   useEffect(() => { currentIndexRef.current = index; }, [index]);
 
+  // Cross-device class Learn bookmark: upsert / delete the class_learn_progress
+  // row. Reassigned every render so it sees the live index + marks. Fire-and-
+  // forget — the device-local save below is the instant/offline path; this is
+  // best-effort so the resume prompt can also show on the student's other
+  // devices. Called from the exit routes and the 30s heartbeat.
+  const classBookmarkRef = useRef<{ save: () => void; clear: () => void }>({ save: () => {}, clear: () => {} });
+  useEffect(() => {
+    classBookmarkRef.current = {
+      save: () => {
+        if (!classIdParam || !classScope || done || index <= 0) return;
+        const marksPayload = {
+          // `learned` lets the Flutter app restore green marks exactly; web
+          // itself reconstructs them by position and only reads tooHard/skipped.
+          learned: words.filter((_, i) => marks[i] === 'learned').map(w => w.word),
+          tooHard: skipped.map(w => w.word),
+          skipped: pureSkipped.map(w => w.word),
+        };
+        supabase.auth.getUser().then(({ data: { user } }) => {
+          if (!user) return;
+          void supabase.from('class_learn_progress').upsert({
+            user_id: user.id, class_id: classIdParam, scope: classScope,
+            word_index: index, total: words.length, marks: marksPayload,
+            updated_at: new Date().toISOString(),
+          }, { onConflict: 'user_id,class_id,scope' });
+        });
+      },
+      clear: () => {
+        if (!classIdParam || !classScope) return;
+        supabase.auth.getUser().then(({ data: { user } }) => {
+          if (!user) return;
+          void supabase.from('class_learn_progress').delete()
+            .eq('user_id', user.id).eq('class_id', classIdParam).eq('scope', classScope);
+        });
+      },
+    };
+  });
+
   // Single source of truth for "save my place on the way out", shared by every
   // exit route: the header ← button, a React unmount (in-app back nav), and a
   // browser tab close / mobile-web backgrounding (pagehide / visibilitychange).
@@ -245,6 +288,7 @@ function LearnInner() {
         saveLearnProgress(classHWKey, 0, index);
         saveLearnMarks(classHWKey, 0, tooHard, pure);
       }
+      classBookmarkRef.current.save();
     };
   });
 
@@ -355,6 +399,36 @@ function LearnInner() {
     }
   }, [collectionsLoaded, collections, collectionName, dayNumber, hardOnly, sourceMyWords, sourceStarred, starredUnitIndex, myCollection, myFolder, onlyNew]);
 
+  // Merge the device-local class bookmark with the cross-device one in
+  // class_learn_progress, preferring whichever is further along. Falls back to
+  // the local value on any error (offline / not signed in) so resume still
+  // works on the device the session was actually paused on.
+  const resolveClassResume = useCallback(async (
+    scope: string,
+    localIdx: number | null,
+    localMarks: { tooHard: string[]; skipped: string[] } | null,
+  ): Promise<{ idx: number | null; marks: { tooHard: string[]; skipped: string[] } | null }> => {
+    let idx = localIdx;
+    let marks = localMarks;
+    if (!classIdParam) return { idx, marks };
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: row } = await supabase.from('class_learn_progress')
+          .select('word_index, marks')
+          .eq('user_id', user.id).eq('class_id', classIdParam).eq('scope', scope)
+          .maybeSingle();
+        const cloudIdx = (row as { word_index?: number } | null)?.word_index ?? null;
+        if (cloudIdx != null && cloudIdx > (idx ?? 0)) {
+          idx = cloudIdx;
+          const m = ((row as { marks?: { tooHard?: string[]; skipped?: string[] } } | null)?.marks) ?? {};
+          marks = { tooHard: m.tooHard ?? [], skipped: m.skipped ?? [] };
+        }
+      }
+    } catch { /* offline / RLS — the device-local bookmark still applies */ }
+    return { idx, marks };
+  }, [classIdParam]);
+
   useEffect(() => {
     if (!sourceClass || !classIdParam) return;
     (async () => {
@@ -390,23 +464,20 @@ function LearnInner() {
           dayNumber: 0,
         };
       });
-      // Class Learn progress is keyed on (className, day 0) — the same scheme
-      // as regular collections. When the student has a saved position, keep
-      // the words in their stable created_at order so "word N" still points
-      // at the same card they left on; only shuffle a fresh session.
-      const savedIdx = getLearnProgress(classNameParam, 0);
-      const resuming = savedIdx != null && savedIdx > 0 && savedIdx < list.length;
-      const ordered = (studyOrder === 'random' && !resuming)
-        ? shuffleArray(list)
-        : list;
-      setWords(ordered);
-      setMarks(new Array(ordered.length).fill(null));
+      // Class Learn always uses the stable created_at order — never the
+      // personal `studyOrder` shuffle. Class is its own world (a personal
+      // setting shouldn't leak in), the Flutter app does the same, and it
+      // keeps "word N" meaning the same card across sessions and devices so
+      // the resume bookmark (local + class_learn_progress) is portable.
+      const { idx: savedIdx, marks: savedMarks } = await resolveClassResume(
+        'words', getLearnProgress(classNameParam, 0), getLearnMarks(classNameParam, 0));
+      setWords(list);
+      setMarks(new Array(list.length).fill(null));
       setClassWordsLoaded(true);
-      if (resuming) {
-        const savedMarks = getLearnMarks(classNameParam, 0);
+      if (savedIdx != null && savedIdx > 0 && savedIdx < list.length) {
         setResumePrompt({
-          savedIndex: savedIdx!,
-          total: ordered.length,
+          savedIndex: savedIdx,
+          total: list.length,
           tooHard: savedMarks?.tooHard ?? [],
           skipped: savedMarks?.skipped ?? [],
         });
@@ -425,32 +496,39 @@ function LearnInner() {
 
   useEffect(() => {
     if (!sourceClassHW) return;
-    const hw = getClassHWTemp();
-    const list: StudyWord[] = hw.map(w => ({
-      word: w.word, partOfSpeech: w.partOfSpeech ?? '', pronunciation: w.pronunciation ?? '',
-      translation: w.translation, definition: w.definition, definitionUz: w.definitionUz ?? '',
-      example1: w.example1, example1Situation: '', example1Translation: w.example1Translation,
-      example2: w.example2, example2Situation: '', example2Translation: w.example2Translation,
-      example3: w.example3 ?? '', example3Situation: '', example3Translation: w.example3Translation ?? '',
-      extraExamples: w.extraExamples ?? [], extraExampleTranslations: w.extraExampleTranslations ?? [],
-      collectionName: w.className, topic: w.className, dayNumber: 0,
-    }));
-    // getClassHWTemp() is written in a stable order by the homework page, so a
-    // resumed session keeps the same card at "word N". Only shuffle a fresh run.
-    const savedIdx = hwId ? getLearnProgress(classHWKey, 0) : null;
-    const resuming = savedIdx != null && savedIdx > 0 && savedIdx < list.length;
-    setWords(resuming ? list : shuffleArray(list));
-    setMarks(new Array(list.length).fill(null));
-    setClassWordsLoaded(true);
-    if (resuming) {
-      const savedMarks = getLearnMarks(classHWKey, 0);
-      setResumePrompt({
-        savedIndex: savedIdx!,
-        total: list.length,
-        tooHard: savedMarks?.tooHard ?? [],
-        skipped: savedMarks?.skipped ?? [],
-      });
-    }
+    let cancelled = false;
+    (async () => {
+      const hw = getClassHWTemp();
+      const list: StudyWord[] = hw.map(w => ({
+        word: w.word, partOfSpeech: w.partOfSpeech ?? '', pronunciation: w.pronunciation ?? '',
+        translation: w.translation, definition: w.definition, definitionUz: w.definitionUz ?? '',
+        example1: w.example1, example1Situation: '', example1Translation: w.example1Translation,
+        example2: w.example2, example2Situation: '', example2Translation: w.example2Translation,
+        example3: w.example3 ?? '', example3Situation: '', example3Translation: w.example3Translation ?? '',
+        extraExamples: w.extraExamples ?? [], extraExampleTranslations: w.extraExampleTranslations ?? [],
+        collectionName: w.className, topic: w.className, dayNumber: 0,
+      }));
+      // getClassHWTemp() is written in a stable order by the homework page, and
+      // class Learn never shuffles (matches the Flutter app + keeps "word N" a
+      // fixed card so the resume bookmark is portable across devices).
+      const { idx: savedIdx, marks: savedMarks } = await resolveClassResume(
+        `hw:${hwId}`,
+        hwId ? getLearnProgress(classHWKey, 0) : null,
+        hwId ? getLearnMarks(classHWKey, 0) : null);
+      if (cancelled) return;
+      setWords(list);
+      setMarks(new Array(list.length).fill(null));
+      setClassWordsLoaded(true);
+      if (savedIdx != null && savedIdx > 0 && savedIdx < list.length) {
+        setResumePrompt({
+          savedIndex: savedIdx,
+          total: list.length,
+          tooHard: savedMarks?.tooHard ?? [],
+          skipped: savedMarks?.skipped ?? [],
+        });
+      }
+    })();
+    return () => { cancelled = true; };
   }, [sourceClassHW]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const current = words[index];
@@ -510,8 +588,9 @@ function LearnInner() {
         last_heartbeat: new Date().toISOString(),
       }, { onConflict: 'student_id' });
     };
-    upsert();
-    const id = setInterval(upsert, 30_000);
+    const tick = () => { upsert(); classBookmarkRef.current.save(); };
+    tick();
+    const id = setInterval(tick, 30_000);
     return () => clearInterval(id);
   }, [done, words.length, collectionName, dayNumber, sourceClass, classNameParam]);
 
@@ -665,6 +744,8 @@ function LearnInner() {
           p_homework_id: sp.get('hwId'), p_mode: 'learn', p_client_word_count: words.length,
         });
       }
+      // Session finished — drop the cross-device resume bookmark too.
+      if (sourceClass || sourceClassHW) classBookmarkRef.current.clear();
       setDone(true);
     } else {
       setIndex(i => i + 1);
@@ -913,6 +994,7 @@ function LearnInner() {
               if (collectionName && dayNumber !== undefined) clearLearnProgress(collectionName, dayNumber);
               else if (sourceClass) clearLearnProgress(classNameParam, 0);
               else if (sourceClassHW && hwId) clearLearnProgress(classHWKey, 0);
+              classBookmarkRef.current.clear();
               setResumePrompt(null);
             }}
           >
