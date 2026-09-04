@@ -96,12 +96,15 @@ async function grantLearnReward(
   return isNew;
 }
 
+// Learn always presents words in their source order (the order they appear in
+// the collection / unit data). No shuffle — so a card is at the same position
+// every time, which keeps the resume bookmark meaningful and stops a
+// hard-refresh from reshuffling mid-unit.
 function buildStudyList(
   collections: WordCollection[],
   collectionName?: string,
   dayNumber?: number,
   hardOnly?: boolean,
-  order: 'random' | 'in-order' = 'random',
 ): StudyWord[] {
   const hardSet = hardOnly ? new Set(getHardWords()) : null;
   const words: StudyWord[] = [];
@@ -113,12 +116,6 @@ function buildStudyList(
         if (hardSet && !hardSet.has(word.word)) continue;
         words.push({ ...word, collectionName: col.name, topic: day.topic, dayNumber: day.dayNumber });
       }
-    }
-  }
-  if (order === 'random') {
-    for (let i = words.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [words[i], words[j]] = [words[j], words[i]];
     }
   }
   return words;
@@ -211,7 +208,6 @@ function LearnInner() {
   const [defaultAccent, setDefaultAccent] = useState<Accent>('us');
   const [autoPlayOnReveal, setAutoPlayOnReveal] = useState(true);
   const [sessionSize, setSessionSize] = useState(20);
-  const [studyOrder, setStudyOrder] = useState<'random' | 'in-order'>('random');
   const [showSkipTip, setShowSkipTip] = useState(false);
   const [classWordsLoaded, setClassWordsLoaded] = useState(false);
 
@@ -314,7 +310,6 @@ function LearnInner() {
     setDefaultAccent(s.defaultAccent);
     setAutoPlayOnReveal(s.autoPlayOnReveal);
     setSessionSize(s.sessionSize);
-    setStudyOrder(s.studyOrder);
     if (!localStorage.getItem('lexivo_seen_skip_tip')) {
       setShowSkipTip(true);
     }
@@ -366,16 +361,13 @@ function LearnInner() {
         topic: myCollection ?? 'My Words',
         dayNumber: 0,
       }));
-      const shuffled = studyOrder === 'random'
-        ? shuffleArray(list)
-        : list;
-      const mySlice = shuffled.slice(0, sessionSize);
+      const mySlice = list.slice(0, sessionSize);
       setWords(mySlice);
       setMarks(new Array(mySlice.length).fill(null));
       return;
     }
     if (collectionsLoaded && collections.length > 0) {
-      const list = buildStudyList(collections, collectionName, dayNumber, hardOnly, studyOrder);
+      const list = buildStudyList(collections, collectionName, dayNumber, hardOnly);
       const sliced = (dayNumber !== undefined || hardOnly) ? list : list.slice(0, sessionSize);
       setWords(sliced);
       setMarks(new Array(sliced.length).fill(null));
@@ -464,11 +456,9 @@ function LearnInner() {
           dayNumber: 0,
         };
       });
-      // Class Learn always uses the stable created_at order — never the
-      // personal `studyOrder` shuffle. Class is its own world (a personal
-      // setting shouldn't leak in), the Flutter app does the same, and it
-      // keeps "word N" meaning the same card across sessions and devices so
-      // the resume bookmark (local + class_learn_progress) is portable.
+      // Stable created_at order (Learn never shuffles) — keeps "word N" the
+      // same card across sessions and devices so the resume bookmark
+      // (local + class_learn_progress) stays meaningful.
       const { idx: savedIdx, marks: savedMarks } = await resolveClassResume(
         'words', getLearnProgress(classNameParam, 0), getLearnMarks(classNameParam, 0));
       setWords(list);
