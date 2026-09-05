@@ -407,6 +407,18 @@ export default function HomePage() {
               <span className="text-[10px] font-mono text-white/60 self-end">{homeClasses.length > 0 ? `${homeClasses.length} →` : '→'}</span>
             </div>
           </Link>
+
+          <Link href="/battle-ready" className="block">
+            <div className="rounded-2xl h-full min-h-[128px] p-4 flex flex-col justify-between hover:-translate-y-1 transition-all duration-200"
+              style={{ background: 'linear-gradient(135deg, #b91c1c, #f87171)', boxShadow: '0 10px 0 #7f1d1d, 0 18px 40px rgba(185,28,28,0.4)', textShadow: '0 1px 3px rgba(0,0,0,0.35)' }}>
+              <span className="text-2xl">🛡️</span>
+              <div>
+                <div className="font-black text-sm text-white leading-tight">{t.home.battleReadyTitle}</div>
+                <div className="text-[10px] text-white/70 mt-0.5">{t.home.battleReadySub}</div>
+              </div>
+              <span className="text-[10px] font-mono text-white/60 self-end">→</span>
+            </div>
+          </Link>
         </div>
       </div>
 
