@@ -1,15 +1,23 @@
 'use client';
+import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import BackButton from '@/components/BackButton';
 import { getDebateTopic } from '@/lib/debateMock';
 import { getBRSideContent } from '@/lib/battleReadyContent';
+import { isTopicDone, toggleTopicDone } from '@/lib/battleReadyDone';
 
 export default function BattleReadyTopicPage() {
   const params = useParams();
   const slug = String(params.topic);
   const topic = getDebateTopic(slug);
+  const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    setDone(isTopicDone(slug));
+  }, [slug]);
+
   if (!topic) notFound();
 
   return (
@@ -18,7 +26,16 @@ export default function BattleReadyTopicPage() {
 
       <div className="flex items-center gap-3">
         <span className="text-3xl">{topic.emoji}</span>
-        <h1 className="text-2xl font-bold text-[var(--text)]">{topic.title}</h1>
+        <h1 className="text-2xl font-bold text-[var(--text)] flex-1">{topic.title}</h1>
+        <button
+          onClick={() => setDone(toggleTopicDone(slug))}
+          className="text-xs font-bold px-3 py-1.5 rounded-full border transition-colors shrink-0"
+          style={done
+            ? { background: '#22c55e', borderColor: '#15803d', color: 'white' }
+            : { background: 'var(--surface)', borderColor: 'var(--border)', color: 'var(--text-muted)' }}
+        >
+          {done ? '✓ Done' : 'Mark as Done'}
+        </button>
       </div>
 
       <div className="grid grid-cols-2 gap-4 pt-2">
