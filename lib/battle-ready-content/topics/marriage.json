@@ -1,1 +1,407 @@
-null
+{
+  "motion": "This House believes that marriage is a vital institution that should be actively promoted for the benefit of individuals and society",
+  "for": {
+    "vocab": [
+      {
+        "term": "social stability",
+        "definition": "The capacity of a society to maintain order, continuity and low levels of conflict across generations",
+        "example": "Decades of research link higher rates of stable marriage to greater social stability and lower crime."
+      },
+      {
+        "term": "child welfare",
+        "definition": "The overall physical, emotional and developmental well-being of children",
+        "example": "On average, children raised by their married biological parents enjoy significant advantages in child welfare outcomes."
+      },
+      {
+        "term": "intergenerational commitment",
+        "definition": "A durable bond that links adults to each other and to the raising of the next generation",
+        "example": "Marriage uniquely institutionalises intergenerational commitment in a way cohabitation does not."
+      },
+      {
+        "term": "marital premium",
+        "definition": "The measurable economic, health and longevity advantages associated with being married",
+        "example": "The marital premium in earnings and health persists even after controlling for selection effects."
+      },
+      {
+        "term": "family formation",
+        "definition": "The process by which stable adult partnerships and households with children are created",
+        "example": "Healthy family formation remains one of the strongest predictors of upward mobility."
+      },
+      {
+        "term": "normative ideal",
+        "definition": "A widely shared standard of behaviour that societies encourage because of its social benefits",
+        "example": "Treating marriage as a normative ideal does not outlaw alternatives; it simply recognises superior average outcomes."
+      },
+      {
+        "term": "commitment device",
+        "definition": "A social or legal mechanism that helps people bind themselves to long-term cooperative behaviour",
+        "example": "Marriage functions as a powerful commitment device that reduces the temptation to exit when difficulties arise."
+      },
+      {
+        "term": "relational permanence",
+        "definition": "The expectation and practice of lasting partnership rather than contingent or serial arrangements",
+        "example": "Children benefit particularly from the relational permanence that marriage is designed to provide."
+      },
+      {
+        "term": "spousal support",
+        "definition": "The practical, emotional and economic mutual aid that husbands and wives uniquely exchange",
+        "example": "In illness and old age, spousal support remains the most reliable form of informal care."
+      },
+      {
+        "term": "cultural transmission",
+        "definition": "The passing of values, habits and social skills from one generation to the next within the family",
+        "example": "Stable marriage is one of the most effective vehicles for positive cultural transmission."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "Marriage is not merely a private lifestyle choice; it is a social institution with public consequences.",
+        "examples": [
+          "Marriage is not merely a private lifestyle choice; it is a social institution with public consequences.",
+          "When family structures shift at scale, marriage is not merely a private lifestyle choice; it is a social institution with public consequences.",
+          "Policy must recognise that marriage is not merely a private lifestyle choice; it is a social institution with public consequences."
+        ]
+      },
+      {
+        "phrase": "The evidence on child outcomes is too consistent to ignore.",
+        "examples": [
+          "The evidence on child outcomes is too consistent to ignore.",
+          "Whatever our ideological preferences, the evidence on child outcomes is too consistent to ignore.",
+          "A responsible society accepts that the evidence on child outcomes is too consistent to ignore."
+        ]
+      },
+      {
+        "phrase": "We can respect individual freedom while still recognising that some family forms work better on average.",
+        "examples": [
+          "We can respect individual freedom while still recognising that some family forms work better on average.",
+          "Promoting marriage does not require stigma; we can respect individual freedom while still recognising that some family forms work better on average.",
+          "Good policy holds both truths: we can respect individual freedom while still recognising that some family forms work better on average."
+        ]
+      },
+      {
+        "phrase": "A society that stops affirming marriage will not remain neutral; it will actively undermine it.",
+        "examples": [
+          "A society that stops affirming marriage will not remain neutral; it will actively undermine it.",
+          "Cultural silence has effects; a society that stops affirming marriage will not remain neutral; it will actively undermine it.",
+          "The status quo is not neutral ground — a society that stops affirming marriage will not remain neutral; it will actively undermine it."
+        ]
+      },
+      {
+        "phrase": "Children did not choose their family structure; adults have a duty to consider their interests.",
+        "examples": [
+          "Children did not choose their family structure; adults have a duty to consider their interests.",
+          "In debates about adult autonomy we must remember that children did not choose their family structure; adults have a duty to consider their interests.",
+          "The most vulnerable party is often invisible: children did not choose their family structure; adults have a duty to consider their interests."
+        ]
+      },
+      {
+        "phrase": "Stable marriage remains one of the strongest anti-poverty and pro-mobility institutions we possess.",
+        "examples": [
+          "Stable marriage remains one of the strongest anti-poverty and pro-mobility institutions we possess.",
+          "When we examine the data, stable marriage remains one of the strongest anti-poverty and pro-mobility institutions we possess.",
+          "Ignoring this reality means discarding one of the strongest anti-poverty and pro-mobility institutions we possess."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "to tie the knot",
+        "definition": "To get married; to enter a formal, recognised commitment",
+        "examples": [
+          "Couples who tie the knot show measurably higher average commitment than those who merely cohabit.",
+          "The public act of tying the knot still carries social and psychological weight that private agreements lack.",
+          "Encouraging more couples to tie the knot is a legitimate public-interest goal."
+        ]
+      },
+      {
+        "idiom": "for better or for worse",
+        "definition": "A commitment that endures through both favourable and difficult circumstances",
+        "examples": [
+          "The traditional vow for better or for worse captures the distinctive promise of marriage.",
+          "Societies benefit when more adults bind themselves for better or for worse rather than for as long as it suits them.",
+          "Children especially need adults who will stay for better or for worse."
+        ]
+      },
+      {
+        "idiom": "a pillar of society",
+        "definition": "A fundamental institution that supports the wider social order",
+        "examples": [
+          "Marriage has long been regarded as a pillar of society for good empirical reasons.",
+          "Weakening a pillar of society has consequences that appear only gradually and then suddenly.",
+          "Healthy cultures treat marriage as a pillar of society rather than as one lifestyle option among many."
+        ]
+      },
+      {
+        "idiom": "to settle down",
+        "definition": "To adopt a more stable, responsible and committed way of life, often associated with marriage",
+        "examples": [
+          "Marriage remains one of the strongest cultural signals to settle down and invest in the future.",
+          "Young men in particular show behavioural changes when they settle down within marriage.",
+          "Communities benefit when more adults choose to settle down rather than prolong indefinite adolescence."
+        ]
+      },
+      {
+        "idiom": "the fabric of society",
+        "definition": "The interconnected relationships and norms that hold a community together",
+        "examples": [
+          "Stable marriages form a crucial part of the fabric of society.",
+          "When marriage declines, the fabric of society frays in measurable ways.",
+          "Repairing the fabric of society requires renewed attention to the institutions that once sustained it."
+        ]
+      },
+      {
+        "idiom": "to put down roots",
+        "definition": "To establish lasting ties to a place, a partner and a way of life",
+        "examples": [
+          "Marriage encourages couples to put down roots and invest in local communities.",
+          "People who put down roots through marriage are more likely to build social capital around them.",
+          "A culture of temporary arrangements makes it harder for adults to put down roots."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "Children raised by their married biological parents consistently show better average outcomes across education, health and behaviour.",
+        "explanation": "Large-scale studies in multiple countries control for income, parental education and other variables and still find advantages for children in intact married households. These include higher school achievement, lower rates of behavioural problems, better physical and mental health, and reduced likelihood of early parenthood or criminal involvement. The advantages appear for both boys and girls, though the presence of a married father is particularly consequential for boys’ development. While many children from other family forms thrive, and selection effects exist, the directional pattern is robust. A society that cares about child welfare cannot treat this evidence as irrelevant. Actively promoting marriage is one of the few population-level interventions that aligns adult behaviour with children’s developmental needs. Neutrality toward family structure is not neutrality toward child outcomes."
+      },
+      {
+        "claim": "Marriage functions as a powerful commitment device that increases the durability of partnerships.",
+        "explanation": "Cohabiting relationships break up at significantly higher rates than marriages, even after accounting for selection. The public, legal and social architecture of marriage raises the cost of exit and signals serious intent. This commitment device helps couples weather periods of dissatisfaction that temporary arrangements often do not survive. Longitudinal data show that the intention to marry and the act of marrying both predict greater stability. In an age of high individual autonomy, institutional supports for long-term cooperation become more rather than less important. Without such supports, relationships become more contingent and children experience more transitions. Promoting marriage is therefore a way of strengthening the conditions under which durable partnerships form and last."
+      },
+      {
+        "claim": "Married adults enjoy substantial advantages in physical health, mental health and longevity.",
+        "explanation": "The marital premium in health is one of the most replicated findings in social science. Married people have lower rates of depression, better cardiovascular outcomes, stronger immune function and longer life expectancy on average than their unmarried peers. Some of this is selection, but careful studies find evidence of causal protective effects, especially for men. Spouses monitor each other’s health, provide care during illness, and reduce risky behaviours. These private benefits generate public savings in healthcare and social care systems. A culture that treats marriage as optional or outdated therefore forgoes a major source of population health. Encouraging marriage is a form of preventative public health policy that operates through relationships rather than through clinics."
+      },
+      {
+        "claim": "Marriage remains one of the strongest available anti-poverty institutions, particularly for children.",
+        "explanation": "Family structure is a powerful predictor of child poverty. Children in single-parent households face substantially higher poverty rates than children in married-couple households, even after adjusting for parental education. The two-earner potential, economies of scale, and mutual insurance that marriage provides reduce material hardship. While many single parents raise children successfully against the odds, the statistical association is clear and large. Policies that increase the share of children raised in stable married homes therefore function as anti-poverty measures. Conversely, cultural and policy environments that accelerate family fragmentation increase the number of children growing up in economically precarious settings. Promoting marriage is not a substitute for other anti-poverty tools, but it is a high-leverage complement to them."
+      },
+      {
+        "claim": "The decline of marriage has been accompanied by measurable increases in social problems that impose costs on everyone.",
+        "explanation": "Over recent decades, falling marriage rates and rising family instability have tracked increases in certain forms of child poverty, adolescent mental-health difficulties, and disengaged young men. While causation is complex and multi-factorial, the correlational patterns are strong enough to warrant concern. Communities with very low marriage rates often display higher crime, lower social trust and weaker informal support networks. These are not private costs; they appear in public budgets for criminal justice, special education, mental health and welfare. A purely individualistic view of family formation ignores these externalities. Societies have always regulated and encouraged family institutions precisely because private choices aggregate into public consequences. Renewed cultural and policy support for marriage is a legitimate response to those consequences."
+      },
+      {
+        "claim": "Marriage channels male investment in children more effectively than alternative arrangements.",
+        "explanation": "Across cultures and history, marriage has been the primary mechanism for attaching men to the children they help create and to the mothers of those children. When marriage weakens, rates of non-resident fatherhood rise and average paternal investment falls. Boys raised without consistent fathers show elevated risks of behavioural problems and lower educational attainment. While many non-resident fathers remain involved and many single mothers compensate heroically, the population-level pattern is clear. Marriage creates both legal and normative expectations of paternal responsibility that cohabitation and non-marital childbearing supply more weakly. Promoting marriage is therefore one of the most direct ways to increase the share of children who grow up with the active involvement of both parents."
+      },
+      {
+        "claim": "Cultural neutrality toward marriage is an illusion; every society shapes family behaviour through norms and incentives.",
+        "explanation": "No society is neutral about family structure. Tax systems, welfare rules, housing policy, school curricula and media all send signals about which arrangements are expected, celebrated or merely tolerated. In recent decades many of those signals have shifted away from marriage. The result has not been a vacuum but a new set of norms that treat long-term commitment as optional and family stability as a private lifestyle matter. Restoring a measure of cultural affirmation for marriage is not an authoritarian imposition; it is a rebalancing of the messages society already sends. Adults remain free to choose otherwise. What changes is the default expectation and the social recognition given to the institution that still delivers the best average outcomes for children and adults alike."
+      },
+      {
+        "claim": "Marriage provides a unique combination of emotional, practical and economic mutual insurance that other relationships supply less reliably.",
+        "explanation": "In illness, unemployment, disability and old age, spouses remain the first and most dependable source of informal care and financial support. Adult children and friends help, but the intensity and reliability of spousal support is distinctive. As populations age and formal care systems face strain, the presence of a spouse becomes an even more important buffer against isolation and institutionalisation. Cohabiting partners and serial relationships provide weaker guarantees of this long-term mutual aid. The legal and social architecture of marriage strengthens the expectation of standing by one another when costs rise. A society that allows marriage to atrophy therefore increases the future burden on public services and leaves more individuals without the intimate safety net that marriage has historically provided."
+      },
+      {
+        "claim": "High-quality research finds that the benefits of marriage are not solely the result of selection effects.",
+        "explanation": "Critics often claim that the advantages associated with marriage simply reflect the prior characteristics of people who marry. While selection is real, multiple research strategies — including longitudinal designs, sibling comparisons, and studies of policy changes that alter marriage rates — find residual benefits that appear causal. The act of marrying and the experience of marital stability themselves seem to improve outcomes for adults and children. Dismissing the entire literature as pure selection is no longer tenable. Policymakers and cultural leaders are therefore justified in treating marriage as a causal contributor to well-being rather than as a mere marker of pre-existing advantage. Promoting the institution can expand the number of people who obtain those benefits."
+      },
+      {
+        "claim": "A culture that affirms marriage expands rather than contracts meaningful freedom for most people.",
+        "explanation": "Critics portray marriage promotion as restrictive. In reality, the alternative is often not greater freedom but greater contingency and insecurity. Many people, especially those with fewer economic resources, express a desire for stable marriage yet find the social and economic conditions for achieving it deteriorating. Cultural affirmation, realistic preparation, and policy that does not penalise marriage can increase the proportion of people who achieve the lasting partnership they want. Freedom includes the freedom to make binding commitments and to live in a society where such commitments are understood and supported. A purely contractual, easily dissolved model of relationships may suit a minority; for the majority it has produced more instability than liberation. Promoting marriage is therefore compatible with a rich understanding of human freedom."
+      }
+    ]
+  },
+  "against": {
+    "vocab": [
+      {
+        "term": "individual autonomy",
+        "definition": "The right and capacity of adults to shape their intimate lives according to their own values and circumstances",
+        "example": "State promotion of any single family form risks infringing individual autonomy in deeply personal decisions."
+      },
+      {
+        "term": "relationship diversity",
+        "definition": "The variety of stable, caring adult partnerships and household forms that exist in modern societies",
+        "example": "Good policy recognises relationship diversity rather than ranking one form as superior for everyone."
+      },
+      {
+        "term": "cohabitation stability",
+        "definition": "The capacity of non-marital partnerships to provide lasting support and effective parenting",
+        "example": "In several countries cohabitation stability now approaches that of marriage for many couples."
+      },
+      {
+        "term": "selection effects",
+        "definition": "The tendency for observed advantages of a status to reflect the prior characteristics of those who enter it",
+        "example": "Much of the apparent marital premium disappears once selection effects are properly controlled."
+      },
+      {
+        "term": "stigma amplification",
+        "definition": "The process by which official preference for one family form increases social disapproval of others",
+        "example": "Government campaigns that elevate marriage risk stigma amplification against single parents and unmarried couples."
+      },
+      {
+        "term": "plural family forms",
+        "definition": "The range of household structures — including single parent, cohabiting, and blended families — that successfully raise children",
+        "example": "Millions of children thrive in plural family forms; policy should support them rather than imply deficiency."
+      },
+      {
+        "term": "personal fulfilment",
+        "definition": "The subjective sense of meaning, satisfaction and growth that individuals derive from their relationships",
+        "example": "For many adults, personal fulfilment is higher outside traditional marriage than within an unhappy one."
+      },
+      {
+        "term": "institutional coercion",
+        "definition": "The use of law, policy or strong cultural pressure to channel people into preferred life arrangements",
+        "example": "Even soft state preference can become a form of institutional coercion when alternatives are subtly penalised."
+      },
+      {
+        "term": "evolving norms",
+        "definition": "The historical process by which social expectations around intimacy, gender and family continuously change",
+        "example": "Evolving norms have already expanded the possibilities for dignified life outside marriage; trying to reverse them is futile."
+      },
+      {
+        "term": "supportive neutrality",
+        "definition": "A policy stance that assists all stable caring relationships without officially ranking them",
+        "example": "Supportive neutrality allows the state to help families without privileging one institutional form."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "Adults should be free to form the intimate lives that work for them without official ranking.",
+        "examples": [
+          "Adults should be free to form the intimate lives that work for them without official ranking.",
+          "A liberal society accepts that adults should be free to form the intimate lives that work for them without official ranking.",
+          "State preference for marriage contradicts the principle that adults should be free to form the intimate lives that work for them without official ranking."
+        ]
+      },
+      {
+        "phrase": "Correlation is not causation; much of the marriage advantage reflects who marries, not marriage itself.",
+        "examples": [
+          "Correlation is not causation; much of the marriage advantage reflects who marries, not marriage itself.",
+          "Before we design policy around averages we must remember that correlation is not causation; much of the marriage advantage reflects who marries, not marriage itself.",
+          "Careful research shows that correlation is not causation; much of the marriage advantage reflects who marries, not marriage itself."
+        ]
+      },
+      {
+        "phrase": "Happy, stable unmarried families are not second-class; policy should not treat them as such.",
+        "examples": [
+          "Happy, stable unmarried families are not second-class; policy should not treat them as such.",
+          "Millions of children are thriving outside marriage; happy, stable unmarried families are not second-class; policy should not treat them as such.",
+          "Any serious commitment to equality requires recognising that happy, stable unmarried families are not second-class; policy should not treat them as such."
+        ]
+      },
+      {
+        "phrase": "Promoting one family form inevitably casts a shadow over others.",
+        "examples": [
+          "Promoting one family form inevitably casts a shadow over others.",
+          "Even well-intentioned campaigns have this effect: promoting one family form inevitably casts a shadow over others.",
+          "We should be honest that promoting one family form inevitably casts a shadow over others."
+        ]
+      },
+      {
+        "phrase": "The state’s role is to support children and reduce harm, not to prescribe the adult relationships around them.",
+        "examples": [
+          "The state’s role is to support children and reduce harm, not to prescribe the adult relationships around them.",
+          "Once we accept that the state’s role is to support children and reduce harm, not to prescribe the adult relationships around them, marriage promotion looks less necessary.",
+          "Good family policy focuses on resources and stability; the state’s role is to support children and reduce harm, not to prescribe the adult relationships around them."
+        ]
+      },
+      {
+        "phrase": "Forcing or heavily nudging people into marriage does not produce the good marriages the statistics describe.",
+        "examples": [
+          "Forcing or heavily nudging people into marriage does not produce the good marriages the statistics describe.",
+          "Selection matters: forcing or heavily nudging people into marriage does not produce the good marriages the statistics describe.",
+          "Unhappy marriages help no one; forcing or heavily nudging people into marriage does not produce the good marriages the statistics describe."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "one size does not fit all",
+        "definition": "A single model cannot suit every person or situation",
+        "examples": [
+          "Family policy must accept that one size does not fit all.",
+          "Marriage works well for many, yet one size does not fit all in intimate life.",
+          "Imposing a preferred model ignores the reality that one size does not fit all."
+        ]
+      },
+      {
+        "idiom": "to live and let live",
+        "definition": "To accept different choices without interference or ranking",
+        "examples": [
+          "In private life the civilised stance is to live and let live.",
+          "State promotion of marriage sits uneasily with the principle of live and let live.",
+          "A diverse society functions better when it chooses to live and let live on family form."
+        ]
+      },
+      {
+        "idiom": "the grass is always greener",
+        "definition": "The tendency to idealise an alternative arrangement one does not have",
+        "examples": [
+          "Nostalgia for a golden age of marriage often reflects the grass is always greener effect.",
+          "Before we engineer a return to higher marriage rates we should remember that the grass is always greener on the other side of history.",
+          "Idealising marriage while downplaying its costs is a classic case of the grass is always greener."
+        ]
+      },
+      {
+        "idiom": "to each their own",
+        "definition": "Acceptance that different people legitimately prefer different arrangements",
+        "examples": [
+          "On questions of intimate partnership the default should be to each their own.",
+          "Cultural campaigns that elevate marriage undermine the spirit of to each their own.",
+          "A mature society can affirm that for family form it is to each their own."
+        ]
+      },
+      {
+        "idiom": "square peg in a round hole",
+        "definition": "Forcing something into a role or form for which it is unsuited",
+        "examples": [
+          "Pushing people who are incompatible into marriage is putting a square peg in a round hole.",
+          "Not every couple is suited to lifelong marriage; treating them as if they are creates square pegs in round holes.",
+          "Policy should avoid forcing square pegs into the round hole of a single institutional model."
+        ]
+      },
+      {
+        "idiom": "out of step with the times",
+        "definition": "No longer aligned with current social realities and expectations",
+        "examples": [
+          "Heavy state promotion of traditional marriage feels increasingly out of step with the times.",
+          "Younger generations often regard official marriage preference as out of step with the times.",
+          "Institutions that remain out of step with the times lose legitimacy and effectiveness."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "Much of the observed advantage of marriage is the result of selection rather than of marriage itself.",
+        "explanation": "People who marry tend to have higher education, better mental health, stronger impulse control and more resources than those who do not. These pre-existing differences explain a large share of the gaps in child outcomes, adult health and economic status that are commonly attributed to marriage. When researchers use stronger methods to account for selection — sibling comparisons, longitudinal controls, or natural experiments — the residual causal effect of marriage shrinks substantially and sometimes disappears. Policy that treats the raw correlation as a simple causal lever therefore risks overestimating what marriage promotion can achieve. Improving the underlying characteristics that both select people into marriage and produce good outcomes is likely to be more effective than trying to induce more marriages among people who currently do not choose them."
+      },
+      {
+        "claim": "Many children thrive in non-marital and single-parent households; treating marriage as essential stigmatises successful families.",
+        "explanation": "Millions of children raised by unmarried cohabiting parents or by single parents go on to do well in education, work and relationships. High-quality parenting, adequate resources and low conflict predict child well-being more powerfully than marital status alone. When public messaging and policy imply that these families are inherently deficient, they add stigma and stress to households that are already managing complex lives. The ethical cost of that stigma is borne by children as well as adults. A better approach supports the conditions that help children in all family forms — stable housing, parental mental health, adequate income — rather than ranking institutional forms and thereby casting some children as products of suboptimal arrangements. Excellence in family life is not the monopoly of marriage."
+      },
+      {
+        "claim": "State promotion of marriage risks coercing or heavily nudging people into relationships that are wrong for them.",
+        "explanation": "Not every adult finds a compatible partner, and not every couple is well-suited to lifelong marriage. Cultural and policy campaigns that elevate marriage as the ideal can increase pressure on people to marry for status, parental approval or perceived social advantage rather than genuine readiness and compatibility. Unhappy or high-conflict marriages are harmful to both adults and children — in some studies more harmful than low-conflict separation. Inducing additional marriages at the margin is therefore not guaranteed to produce the benefits observed in the existing stock of marriages. Respect for autonomy requires that the decision to marry remain free of official preference gradients that make alternatives appear second-best. The state’s proper role is to support whatever stable, caring arrangements people actually form."
+      },
+      {
+        "claim": "Contemporary cohabitation in many countries already provides high levels of stability and effective parenting.",
+        "explanation": "In parts of Northern Europe and elsewhere, long-term cohabitation has become a functional equivalent of marriage for large shares of the population. Legal recognition of de facto relationships, shared parenting norms, and cultural expectations of commitment have reduced the gap in stability and child outcomes that once clearly favoured marriage. In these contexts, additional official preference for the married form adds little practical benefit while reintroducing hierarchy among family types. Even in countries where cohabitation remains less stable on average, the variance within both married and cohabiting groups is large. Policy that continues to treat marriage as uniquely necessary ignores the extent to which functional equivalents have already emerged and the capacity of further legal and cultural adaptation to close remaining gaps."
+      },
+      {
+        "claim": "Heavy emphasis on marriage can obscure the more direct drivers of child and adult well-being.",
+        "explanation": "Poverty, parental mental illness, high conflict, housing instability and neighbourhood disadvantage harm children whether or not their parents are married. Focusing political and cultural energy on raising marriage rates can divert attention and resources from interventions that address these proximate causes more directly — income support, mental-health services, high-quality early education, and conflict-reduction programmes. Some of the apparent benefits of marriage operate through higher household income and lower stress; those benefits can be pursued without requiring a particular institutional form. A results-oriented approach asks which levers most reliably improve outcomes rather than which traditional institution should be restored. Marriage may be one pathway to certain goods; it is not the only or necessarily the most efficient pathway."
+      },
+      {
+        "claim": "Historical and cross-cultural variation shows that human societies have organised intimate life and child-rearing in multiple successful ways.",
+        "explanation": "The modern Western model of lifelong, companionate, nuclear marriage is not a human universal. Extended-family systems, sequential partnerships, and various forms of recognised non-marital unions have all supported child-rearing and social order in different times and places. Treating one historically specific form as essential risks ethnocentrism and ignores the adaptive capacity of human family arrangements. As economic conditions, gender roles and longevity have changed, family forms have responded. Attempting to freeze or restore a particular mid-twentieth-century pattern is both unrealistic and unnecessary. Societies can maintain high levels of child welfare and adult support through a plurality of arrangements provided the underlying functions — care, resource sharing, socialisation — are performed. Institutional flexibility is a strength, not a weakness."
+      },
+      {
+        "claim": "Official preference for marriage disproportionately harms groups with already lower marriage rates.",
+        "explanation": "Marriage rates vary sharply by education, income, race and region. Groups that already face economic precarity and thinner marriage markets would experience any renewed cultural or policy elevation of marriage as an additional source of status disadvantage. Children in those communities would grow up under a stronger official message that their family form is suboptimal. The resulting stigma compounds existing inequalities rather than reducing them. Equity-oriented policy therefore favours supportive neutrality: assistance based on need and on the presence of stable care, not on whether the adults have formalised their relationship in a particular way. Elevating marriage as a social ideal risks widening the very gaps that progressive family policy should be trying to close."
+      },
+      {
+        "claim": "Personal fulfilment and psychological health for many adults are higher outside traditional marriage than within low-quality marriages.",
+        "explanation": "Forcing or strongly encouraging marriage does not guarantee the companionate, low-conflict relationships that produce the famous marital premium. Many people leave or avoid marriages precisely because those relationships were damaging to their mental health or sense of self. Surveys of life satisfaction show substantial numbers of unmarried adults reporting high well-being, and substantial numbers of married adults reporting the opposite. The relevant comparison is not between average married and average unmarried people, but between the realistic alternatives available to particular individuals. For those alternatives, non-marriage or exit from marriage is often the welfare-maximising choice. A policy stance that treats marriage as the default superior option undervalues the gains that many people realise by remaining outside it or by leaving it."
+      },
+      {
+        "claim": "The state lacks both the competence and the legitimacy to engineer intimate life at scale.",
+        "explanation": "Governments can tax, subsidise and regulate; they are far less effective at creating the emotional and interpersonal conditions that make marriages succeed. Previous attempts at social engineering in family life — from mid-century conformity pressures to certain welfare rules — have produced unintended consequences and often harmed the people they intended to help. Intimate decisions are among the most personal that adults make. Legitimacy in a liberal society requires that the state remain cautious about ranking and steering those decisions. Providing a neutral legal framework for those who wish to marry, protecting children, and offering support based on need are appropriate roles. Campaigning for higher marriage rates or treating non-marriage as a social problem exceeds both the practical capacity and the proper authority of government."
+      },
+      {
+        "claim": "A focus on promoting marriage can become a distraction from building the economic and social conditions that make stable partnerships more achievable for everyone.",
+        "explanation": "Many people who value marriage nonetheless delay or forgo it because of economic insecurity, housing costs, student debt, or the difficulty of finding a reliable partner in strained marriage markets. Addressing these material and social preconditions — higher wages for low- and middle-income workers, affordable family housing, reduced economic precarity — would likely do more to support stable family life than cultural campaigns or symbolic policy preferences for marriage. When the underlying conditions are hostile, exhortation to marry rings hollow and can appear blame-shifting. The most effective pro-family agenda may therefore be an agenda of broad-based economic security and opportunity rather than an agenda of institutional preference. Stable partnerships of whatever legal form become more common when adults can realistically offer one another a secure future."
+      }
+    ]
+  }
+}

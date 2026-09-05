@@ -1,1 +1,407 @@
-null
+{
+  "motion": "Large-scale immigration brings net benefits to receiving countries.",
+  "for": {
+    "vocab": [
+      {
+        "term": "demographic dividend",
+        "definition": "The economic advantage gained when immigration supplies working-age people to offset ageing native populations.",
+        "example": "Countries with low birth rates rely on immigration to secure a demographic dividend that sustains pensions and growth."
+      },
+      {
+        "term": "labour mobility",
+        "definition": "The free movement of workers to places where their skills are most needed and most productive.",
+        "example": "Labour mobility fills shortages in healthcare, agriculture and technology that native workforces cannot meet alone."
+      },
+      {
+        "term": "skills complementarity",
+        "definition": "The way immigrant workers often perform tasks that enhance rather than replace the productivity of native workers.",
+        "example": "Skills complementarity explains why immigration can raise wages for many natives by allowing specialisation."
+      },
+      {
+        "term": "fiscal contribution",
+        "definition": "The net taxes paid by immigrants over their lifetimes after accounting for public services they use.",
+        "example": "Long-term studies in several countries show a positive average fiscal contribution from working-age immigrants."
+      },
+      {
+        "term": "cultural enrichment",
+        "definition": "The broadening of ideas, food, arts and perspectives that results from diverse populations living together.",
+        "example": "Major cities demonstrate cultural enrichment through restaurants, festivals and creative industries sustained by immigration."
+      },
+      {
+        "term": "entrepreneurial dynamism",
+        "definition": "The higher rate of business creation and innovation frequently observed among immigrant communities.",
+        "example": "Entrepreneurial dynamism from immigrants has founded numerous high-growth companies in technology and services."
+      },
+      {
+        "term": "human capital inflow",
+        "definition": "The arrival of educated and skilled individuals who raise the overall knowledge and capability of the workforce.",
+        "example": "Selective systems maximise human capital inflow and accelerate technological progress."
+      },
+      {
+        "term": "global talent competition",
+        "definition": "The international contest among countries to attract the most capable workers and students.",
+        "example": "Nations that restrict immigration too tightly risk losing the global talent competition to more open rivals."
+      },
+      {
+        "term": "remittance-supported development",
+        "definition": "The economic support that migrants provide to their countries of origin, which can reduce pressure for further migration.",
+        "example": "While primarily benefiting origin countries, remittance-supported development also stabilises regions that send migrants."
+      },
+      {
+        "term": "integration capacity",
+        "definition": "The ability of institutions and society to absorb newcomers into economic and civic life over time.",
+        "example": "Strong education and employment systems raise integration capacity and turn immigration into lasting advantage."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "Ageing societies need working-age immigrants to sustain prosperity and public finances.",
+        "examples": [
+          "With fertility below replacement, ageing societies need working-age immigrants to sustain prosperity and public finances.",
+          "Pension systems and healthcare demand show that ageing societies need working-age immigrants to sustain prosperity and public finances.",
+          "Ignoring demography is not an option: ageing societies need working-age immigrants to sustain prosperity and public finances."
+        ]
+      },
+      {
+        "phrase": "Immigrants fill jobs that natives are unwilling or unavailable to do at prevailing wages.",
+        "examples": [
+          "In agriculture, care work and hospitality, immigrants fill jobs that natives are unwilling or unavailable to do at prevailing wages.",
+          "Labour shortages persist precisely because immigrants fill jobs that natives are unwilling or unavailable to do at prevailing wages.",
+          "Restricting entry does not automatically raise native employment when immigrants fill jobs that natives are unwilling or unavailable to do at prevailing wages."
+        ]
+      },
+      {
+        "phrase": "The economic record of major immigrant nations demonstrates large net gains over time.",
+        "examples": [
+          "The United States, Canada and Australia show that the economic record of major immigrant nations demonstrates large net gains over time.",
+          "Innovation, patents and firm creation data confirm that the economic record of major immigrant nations demonstrates large net gains over time.",
+          "Historical and contemporary evidence aligns: the economic record of major immigrant nations demonstrates large net gains over time."
+        ]
+      },
+      {
+        "phrase": "Diversity of experience and perspective is a source of creativity and problem-solving strength.",
+        "examples": [
+          "Research teams and cities benefit because diversity of experience and perspective is a source of creativity and problem-solving strength.",
+          "Closed societies forgo the advantage that diversity of experience and perspective is a source of creativity and problem-solving strength.",
+          "In an interconnected world, diversity of experience and perspective is a source of creativity and problem-solving strength."
+        ]
+      },
+      {
+        "phrase": "Most immigrants come to work and contribute; the alternative is demographic and economic stagnation.",
+        "examples": [
+          "Employment rates among working-age arrivals are high; most immigrants come to work and contribute; the alternative is demographic and economic stagnation.",
+          "Selective and well-managed systems ensure that most immigrants come to work and contribute; the alternative is demographic and economic stagnation.",
+          "Fear-based policy forgets that most immigrants come to work and contribute; the alternative is demographic and economic stagnation."
+        ]
+      },
+      {
+        "phrase": "Successful integration turns newcomers into net assets within a generation.",
+        "examples": [
+          "Education and labour-market access mean successful integration turns newcomers into net assets within a generation.",
+          "Children of immigrants often outperform; successful integration turns newcomers into net assets within a generation.",
+          "Policy should focus on the conditions under which successful integration turns newcomers into net assets within a generation."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "a rising tide lifts all boats",
+        "definition": "Overall economic growth generated by immigration can improve conditions for natives as well as newcomers.",
+        "examples": [
+          "When immigration expands the economy, a rising tide lifts all boats through higher demand and specialisation.",
+          "Productivity gains mean a rising tide lifts all boats rather than simple redistribution.",
+          "Evidence of complementary skills supports the claim that a rising tide lifts all boats."
+        ]
+      },
+      {
+        "idiom": "the engine of growth",
+        "definition": "The primary driving force behind economic expansion.",
+        "examples": [
+          "In several high-income countries immigration has become an engine of growth in key sectors.",
+          "Technology and care services treat migrant labour as the engine of growth.",
+          "Restricting the engine of growth while populations age carries clear costs."
+        ]
+      },
+      {
+        "idiom": "brain gain",
+        "definition": "The net increase in skilled human capital that receiving countries obtain through immigration.",
+        "examples": [
+          "Selective systems produce brain gain in medicine, engineering and research.",
+          "Universities and hospitals rely on brain gain to maintain capacity.",
+          "Countries that attract global talent enjoy sustained brain gain."
+        ]
+      },
+      {
+        "idiom": "melting pot",
+        "definition": "A society in which diverse groups gradually form a shared culture while retaining some distinctiveness.",
+        "examples": [
+          "Historical immigrant nations functioned as a melting pot that generated new identities and energies.",
+          "Successful cities still operate as a melting pot of talent and ambition.",
+          "The melting pot ideal remains a powerful alternative to rigid cultural separation."
+        ]
+      },
+      {
+        "idiom": "open doors",
+        "definition": "Policies that allow entry and opportunity rather than closure.",
+        "examples": [
+          "Nations that open doors to skilled and motivated people outperform those that remain closed.",
+          "Economic history favours societies willing to open doors.",
+          "Strategic openness means knowing when and how to open doors."
+        ]
+      },
+      {
+        "idiom": "the demographic time bomb",
+        "definition": "The approaching crisis of too few workers supporting too many retirees.",
+        "examples": [
+          "Immigration is one practical response to the demographic time bomb facing many developed countries.",
+          "Ignoring the demographic time bomb while restricting immigration is inconsistent.",
+          "Working-age arrivals help defuse the demographic time bomb."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "Immigration supplies working-age labour that offsets native population ageing and supports public finances.",
+        "explanation": "Most developed countries face fertility rates well below replacement and rapidly rising old-age dependency ratios. Without immigration, the ratio of workers to retirees deteriorates, placing severe pressure on pensions, healthcare and long-term care. Immigrants arrive predominantly in prime working ages and participate in the labour force at high rates. Their taxes help fund the benefits of native retirees while they themselves are still decades from drawing pensions. Long-term fiscal studies in the United States, Canada, the United Kingdom and several European countries find that working-age immigrants, especially those with skills or strong employment records, make positive net contributions over their lifetimes. The alternative of relying solely on higher native birth rates or later retirement faces practical and political limits. Immigration is therefore not merely a social question; it is a structural response to demographic imbalance that protects the living standards of existing citizens."
+      },
+      {
+        "claim": "Immigrants fill critical labour shortages and enable native workers to move into higher-productivity roles.",
+        "explanation": "Many sectors experience persistent vacancies that native workers do not fill at current wages and conditions: seasonal agriculture, social care, construction, hospitality, and certain technical trades. Immigrants take these roles, allowing the services and products to continue. At the same time, the presence of immigrant labour in complementary tasks raises the productivity and wages of many native workers who specialise in language-intensive, managerial or highly skilled work. Empirical research on skills complementarity shows that immigration often expands the overall economic pie rather than simply redistributing a fixed number of jobs. Restrictions that leave shortages unfilled raise costs for consumers and constrain output. The claim that every immigrant job is a job lost by a native is not supported by the aggregate evidence from flexible labour markets."
+      },
+      {
+        "claim": "Immigrant entrepreneurship and innovation deliver measurable economic gains.",
+        "explanation": "Immigrants start businesses at higher rates than natives in many receiving countries. In the United States a disproportionate share of high-growth technology firms and Fortune 500 companies have immigrant founders or co-founders. Patents, research publications and STEM employment also show elevated immigrant contributions. These activities generate employment for natives, tax revenue, and technological spillovers. Similar patterns appear in Canada, Australia and the United Kingdom. The dynamism arises from selection effects, risk tolerance, and transnational networks that natives may lack. Closing the door to such talent imposes an opportunity cost in forgone innovation and firm creation. Countries competing for global talent already treat immigration policy as industrial strategy; those that do not risk falling behind."
+      },
+      {
+        "claim": "Cultural and intellectual diversity strengthens problem-solving, creativity and urban vitality.",
+        "explanation": "Cities that have absorbed successive waves of immigration consistently rank high on measures of innovation, cultural production and economic performance. Diverse teams bring different heuristics and experiences that improve decision-making and creativity in research, business and the arts. Food, music, literature and design are visibly enriched. While rapid change can create friction, the long-run record of major immigrant destinations is one of successful incorporation and mutual adaptation. Homogeneous societies forgo these gains. The alternative of cultural closure carries its own costs in stagnation and reduced attractiveness to mobile talent. Managed diversity is an asset; the historical evidence from open societies supports that conclusion more strongly than the fears of irreversible fragmentation."
+      },
+      {
+        "claim": "Well-designed selection systems maximise benefits while controlling costs.",
+        "explanation": "Not all immigration is identical. Points-based and employment-based systems that prioritise skills, language ability and employability produce stronger fiscal and economic outcomes than purely humanitarian or uncontrolled inflows. Canada and Australia demonstrate that selective immigration can deliver consistently positive net effects. Even within less selective systems, the second generation typically converges toward or exceeds native outcomes in education and earnings. Policy design therefore matters more than the binary choice of open versus closed. The existence of integration challenges does not invalidate the overall case; it identifies the conditions under which benefits are realised. Countries that invest in language training, credential recognition and anti-discrimination enforcement convert potential into realised advantage."
+      },
+      {
+        "claim": "Historical experience of major immigrant nations shows large long-term gains despite periodic social tension.",
+        "explanation": "The United States, Canada, Australia and Argentina absorbed massive immigration in earlier eras and emerged as prosperous, innovative societies. Contemporary data continue to show higher growth and dynamism in regions with sustained inflows. Social tensions and political backlash occur, yet they have not reversed the underlying economic trajectory. Integration is imperfect and uneven, but the direction of change over generations is toward convergence and contribution. Catastrophic predictions about permanent underclasses or cultural collapse have repeatedly failed to materialise at the national level. The burden of proof lies with those who claim that present immigration is uniquely harmful compared with past waves that ultimately succeeded. Evidence of net historical benefit remains robust."
+      },
+      {
+        "claim": "Restricting immigration does not automatically improve outcomes for low-skilled native workers.",
+        "explanation": "The simple displacement model assumes a fixed number of jobs and perfect substitutability. In practice, immigration affects labour demand as well as supply: immigrants consume goods and services, creating employment. Many low-skilled natives work in different occupations or locations from recent arrivals. Empirical estimates of wage effects on natives are typically small, and some studies find positive effects through complementarity. Where negative effects appear, they are concentrated and modest. Meanwhile, the fiscal and growth contributions of immigration fund public services that benefit low-income natives. Policy focused solely on reducing immigration often leaves the structural causes of low-wage stagnation—technology, education, bargaining power—unaddressed. Immigration restriction is a weak and incomplete instrument for improving native low-skilled fortunes."
+      },
+      {
+        "claim": "Humanitarian and refugee admissions, while costly in the short run, align with values and can yield long-term contributions.",
+        "explanation": "Refugee and asylum flows are more expensive initially because of lower average skills and higher support needs. Yet many refugee groups have shown strong intergenerational mobility once given access to education and work. The moral case for protection of those fleeing persecution remains independent of economic calculation. Even on narrow economic grounds, the children of refugees frequently enter the labour force as net contributors. Countries that maintain credible asylum systems also strengthen international cooperation and soft power. Blanket rejection of humanitarian migration in the name of pure economic optimisation abandons commitments that most liberal societies claim to uphold. Managed humanitarian intake is compatible with overall net benefit when paired with effective integration policy."
+      },
+      {
+        "claim": "Global competition for talent means that overly restrictive policies impose opportunity costs.",
+        "explanation": "Highly skilled workers and students choose among destinations. Countries with clearer pathways to residence, work and citizenship attract a larger share of this mobile talent. Those that create lengthy uncertainty, hostile rhetoric or closed occupational lists lose candidates to more open rivals. In research, medicine, engineering and entrepreneurship the losses are measurable. As population ageing intensifies worldwide, the competition will sharpen. Immigration policy is therefore an instrument of national competitiveness. Framing the issue solely as a domestic distributional conflict ignores the external opportunity cost of forgoing talent that will go elsewhere and generate value for competitors."
+      },
+      {
+        "claim": "Integration challenges are real but solvable; they do not negate the overall positive ledger.",
+        "explanation": "Concentrated settlement, language barriers, parallel social norms and occasional crime problems generate legitimate public concern. These problems are not imaginary. However, they vary dramatically with policy design, selection criteria and investment in integration. Countries and cities that enforce language requirements, recognise qualifications, combat discrimination and avoid long-term welfare dependency achieve better outcomes. The existence of difficulties is an argument for better management, not for permanent low immigration. Every large social process produces friction; the relevant test is net effect over time. On employment, fiscal balance, innovation and demographic support the net effect of well-managed immigration remains positive. Policy should therefore focus on maximising integration success rather than minimising inflows as an end in itself."
+      }
+    ]
+  },
+  "against": {
+    "vocab": [
+      {
+        "term": "social cohesion",
+        "definition": "The shared sense of trust, belonging and common identity that enables cooperation within a society.",
+        "example": "Rapid demographic change can erode social cohesion when integration lags behind inflows."
+      },
+      {
+        "term": "wage suppression",
+        "definition": "The downward pressure on pay for certain native workers caused by increased labour supply in specific segments.",
+        "example": "In low-skilled service and construction occupations, wage suppression is a documented risk of large inflows."
+      },
+      {
+        "term": "fiscal burden",
+        "definition": "The net cost to public budgets when immigrants consume more in services and benefits than they pay in taxes.",
+        "example": "Low-skilled and family-based immigration often generates a fiscal burden, especially in high-welfare states."
+      },
+      {
+        "term": "integration failure",
+        "definition": "Persistent gaps in employment, education, language and social norms between immigrant groups and the wider population.",
+        "example": "Integration failure produces parallel communities and long-term dependency that undermine public support."
+      },
+      {
+        "term": "parallel societies",
+        "definition": "Separate social worlds within the same country that operate with limited interaction or shared values.",
+        "example": "Concentrated settlement and weak assimilation policies risk creating parallel societies."
+      },
+      {
+        "term": "public service strain",
+        "definition": "The pressure placed on housing, schools, healthcare and transport by rapid population growth through immigration.",
+        "example": "In high-inflow cities, public service strain appears as overcrowded classrooms and long waiting lists."
+      },
+      {
+        "term": "cultural displacement",
+        "definition": "The sense among established residents that their norms, language and public culture are being rapidly altered without consent.",
+        "example": "Cultural displacement fuels political backlash when change is fast and consultation is absent."
+      },
+      {
+        "term": "selection deficit",
+        "definition": "Immigration systems that admit large numbers of people with low skills, weak language ability or poor employment prospects.",
+        "example": "A selection deficit converts potential economic gain into long-term fiscal and social costs."
+      },
+      {
+        "term": "security externalities",
+        "definition": "Increased risks of crime, terrorism or social disorder associated with poorly screened or poorly integrated inflows.",
+        "example": "Security externalities, even if limited to small minorities, impose real costs and political consequences."
+      },
+      {
+        "term": "democratic consent",
+        "definition": "The requirement that major demographic and social changes should reflect the informed preferences of the existing citizenry.",
+        "example": "Large-scale immigration without clear democratic consent produces lasting legitimacy problems."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "Rapid, large-scale immigration can outpace a society’s capacity to integrate newcomers successfully.",
+        "examples": [
+          "Housing, schools and social trust have limits; rapid, large-scale immigration can outpace a society’s capacity to integrate newcomers successfully.",
+          "When numbers rise too quickly, rapid, large-scale immigration can outpace a society’s capacity to integrate newcomers successfully.",
+          "Evidence from several European cities shows that rapid, large-scale immigration can outpace a society’s capacity to integrate newcomers successfully."
+        ]
+      },
+      {
+        "phrase": "The fiscal and wage effects are not evenly distributed; lower-income natives often bear the costs.",
+        "examples": [
+          "Aggregate GDP may rise, yet the fiscal and wage effects are not evenly distributed; lower-income natives often bear the costs.",
+          "Competition in specific labour markets means the fiscal and wage effects are not evenly distributed; lower-income natives often bear the costs.",
+          "Political resentment follows because the fiscal and wage effects are not evenly distributed; lower-income natives often bear the costs."
+        ]
+      },
+      {
+        "phrase": "Social trust and cooperation decline when communities change too fast for mutual adjustment.",
+        "examples": [
+          "Research on diversity and trust indicates that social trust and cooperation decline when communities change too fast for mutual adjustment.",
+          "Neighbourhood studies repeatedly find that social trust and cooperation decline when communities change too fast for mutual adjustment.",
+          "High-trust societies are valuable; social trust and cooperation decline when communities change too fast for mutual adjustment."
+        ]
+      },
+      {
+        "phrase": "Uncontrolled or poorly selected inflows turn a potential economic asset into a lasting liability.",
+        "examples": [
+          "Skills, language and employability matter; uncontrolled or poorly selected inflows turn a potential economic asset into a lasting liability.",
+          "High-welfare states are especially vulnerable when uncontrolled or poorly selected inflows turn a potential economic asset into a lasting liability.",
+          "Policy design determines whether immigration helps or whether uncontrolled or poorly selected inflows turn a potential economic asset into a lasting liability."
+        ]
+      },
+      {
+        "phrase": "Citizens are entitled to stable communities and a say over the scale of demographic change.",
+        "examples": [
+          "Democratic self-government includes the right to decide; citizens are entitled to stable communities and a say over the scale of demographic change.",
+          "Ignoring public concern does not make it illegitimate; citizens are entitled to stable communities and a say over the scale of demographic change.",
+          "Sustainable policy requires that citizens are entitled to stable communities and a say over the scale of demographic change."
+        ]
+      },
+      {
+        "phrase": "Integration is not automatic; it requires selection, enforcement and realistic time horizons.",
+        "examples": [
+          "Language, employment and value convergence take effort; integration is not automatic; it requires selection, enforcement and realistic time horizons.",
+          "Wishful thinking fails; integration is not automatic; it requires selection, enforcement and realistic time horizons.",
+          "Countries that succeed treat integration as policy, recognising that integration is not automatic; it requires selection, enforcement and realistic time horizons."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "a strain on the system",
+        "definition": "Pressure that exceeds the capacity of public services or social institutions.",
+        "examples": [
+          "Sudden inflows place a strain on the system of housing and schooling in high-arrival areas.",
+          "Welfare and healthcare budgets feel a strain on the system when integration is slow.",
+          "Ignoring capacity limits guarantees a strain on the system."
+        ]
+      },
+      {
+        "idiom": "parallel lives",
+        "definition": "Groups living in the same country with little meaningful interaction or shared experience.",
+        "examples": [
+          "Concentrated settlement patterns produce parallel lives that hinder mutual understanding.",
+          "Schools and neighbourhoods can reinforce parallel lives across generations.",
+          "Policy should aim to reduce parallel lives rather than accept them as inevitable."
+        ]
+      },
+      {
+        "idiom": "the elephant in the room",
+        "definition": "An obvious problem that polite discussion avoids.",
+        "examples": [
+          "Crime and cultural incompatibilities are often the elephant in the room in immigration debates.",
+          "Fiscal costs for low-skilled inflows remain the elephant in the room in optimistic accounts.",
+          "Honest policy requires naming the elephant in the room."
+        ]
+      },
+      {
+        "idiom": "kicking the can down the road",
+        "definition": "Postponing difficult decisions about numbers and integration.",
+        "examples": [
+          "Successive governments have been kicking the can down the road on sustainable immigration levels.",
+          "Short-term labour needs lead to kicking the can down the road on long-term social consequences.",
+          "Eventually the accumulated problems end the practice of kicking the can down the road."
+        ]
+      },
+      {
+        "idiom": "a race to the bottom",
+        "definition": "Competitive pressure that lowers wages or standards; invoked here regarding labour-market effects.",
+        "examples": [
+          "In certain low-skill sectors immigration can contribute to a race to the bottom in pay and conditions.",
+          "Employers may prefer a race to the bottom over training native workers.",
+          "Labour standards require vigilance against a race to the bottom."
+        ]
+      },
+      {
+        "idiom": "out of sight, out of mind",
+        "definition": "The tendency of decision-makers to ignore problems concentrated in specific localities.",
+        "examples": [
+          "National averages hide local pressures; problems remain out of sight, out of mind for many policymakers.",
+          "Affluent areas experience less change, leaving difficulties out of sight, out of mind.",
+          "Effective policy cannot treat integration challenges as out of sight, out of mind."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "Large and rapid immigration frequently imposes net fiscal costs, especially in high-welfare states.",
+        "explanation": "Immigrants who arrive with low skills, limited language ability or family dependents tend to use more in public services and benefits than they pay in taxes, at least during their early years and sometimes over their lifetimes. Education for children, housing support, healthcare and income transfers are expensive. Studies in several European countries and some US analyses of specific cohorts find negative net fiscal positions for lower-skilled groups. High-welfare systems amplify the cost because benefits are universal or generous. While high-skilled immigrants usually contribute positively, many actual inflows are not high-skilled. Aggregate GDP growth does not automatically translate into improved public finances or higher living standards for existing taxpayers. Ignoring the composition of immigration produces an overly optimistic fiscal picture. Sustainable policy requires selection and integration measures that keep the fiscal ledger positive."
+      },
+      {
+        "claim": "Increased labour supply in low- and middle-skilled occupations exerts downward pressure on wages and employment conditions for competing natives.",
+        "explanation": "Basic economics predicts that a significant increase in the supply of workers with particular skills will reduce relative wages for those skills unless demand rises correspondingly. Empirical work finds small average effects across the whole economy but larger negative effects for earlier immigrants and for native workers without higher education in specific sectors and localities. Construction, hospitality, care and certain service jobs show particular sensitivity. Employers gain from lower labour costs; the workers who compete directly do not. Over time, reduced incentives to train native workers or to improve conditions can lock in lower-quality employment. The distributional consequence is regressive: the costs fall disproportionately on those already near the bottom of the labour market. Claims of universal benefit obscure this concentrated harm."
+      },
+      {
+        "claim": "Rapid demographic change can erode social trust and the willingness to support shared institutions.",
+        "explanation": "Research across multiple countries links higher ethnic diversity, especially when change is fast, with lower levels of social trust, reduced cooperation and weaker support for redistribution. People are more willing to fund public goods and accept political compromise when they feel part of a shared community. Large-scale immigration that outpaces mutual adjustment weakens that feeling. The effect is not universal or permanent, but it is repeatedly observed in neighbourhood and national studies. High-trust societies enjoy economic and civic advantages that are costly to rebuild once lost. Policy that treats social cohesion as a secondary concern risks damaging the cultural foundations that make generous welfare states and peaceful politics possible. Scale and speed of immigration therefore matter independently of pure economic calculations."
+      },
+      {
+        "claim": "Integration outcomes remain weak for significant groups, producing persistent parallel communities and dependency.",
+        "explanation": "In several European countries, employment rates, educational attainment and social indicators for certain immigrant-origin populations lag native averages by large margins even in the second generation. Concentrated housing, weak language acquisition and cultural distance contribute to separate social worlds. Crime rates in some subgroups exceed native rates by substantial factors, generating fear and political polarisation. These patterns are not true of every immigrant group; East Asian and some other communities often succeed rapidly. The existence of successful groups does not cancel the costs created by unsuccessful ones. When integration fails at scale, the result is long-term fiscal drain, social tension and reduced public support for immigration itself. Assuming automatic assimilation has repeatedly proved unrealistic."
+      },
+      {
+        "claim": "Public services and housing in high-inflow areas experience measurable strain that reduces quality for existing residents.",
+        "explanation": "Population growth through immigration increases demand for school places, GP appointments, hospital beds, social housing and transport. In cities and regions with high net migration, waiting times lengthen, class sizes grow and housing costs rise faster than wages for many natives. Infrastructure investment lags because planning and construction cycles are slow. The congestion and competition are felt most acutely by lower-income residents who cannot buy their way out of affected neighbourhoods. National averages conceal these localised pressures. Political backlash is therefore rational for those experiencing the everyday costs. Sustainable immigration levels must respect the absorptive capacity of housing and services rather than treating them as infinitely expandable."
+      },
+      {
+        "claim": "Democratic legitimacy requires that the scale of immigration reflect the preferences of existing citizens.",
+        "explanation": "Surveys in many receiving countries show consistent majorities favouring lower immigration than current levels. When governments maintain high inflows against clear public opinion, trust in political institutions declines and support grows for parties that promise restriction. Immigration is not a minor administrative matter; it permanently alters the composition of the political community. Citizens have a legitimate interest in the cultural and demographic character of the society they will hand to their children. Treating opposition as mere prejudice dismisses democratic agency. Sustainable policy must operate within the bounds of what electorates will accept over time. Large-scale immigration without consent produces polarisation and policy instability that ultimately harm both natives and immigrants."
+      },
+      {
+        "claim": "Security and crime risks, even if confined to minorities within immigrant populations, impose real social costs.",
+        "explanation": "Most immigrants are not criminals. Nevertheless, in multiple countries certain national-origin or asylum cohorts show elevated rates of violent crime, sexual offences or involvement in extremism. These patterns generate fear, change behaviour in public spaces, and require additional policing resources. High-profile attacks by individuals who entered as migrants or asylum seekers have altered political landscapes. Screening systems are imperfect, especially under high-volume pressure. The costs of even small absolute numbers of serious offences are concentrated and visible, while the economic benefits are diffuse. Public willingness to accept immigration falls when security externalities are dismissed as statistically negligible. Effective control and removal capacity are therefore prerequisites for maintaining broader public support."
+      },
+      {
+        "claim": "Cultural and normative differences can impede integration and generate ongoing friction over core values.",
+        "explanation": "Not all cultural differences are equally compatible with liberal democratic norms. Attitudes toward gender equality, free speech, religious authority, and the use of violence vary significantly across origin countries. When large numbers arrive from societies with markedly different distributions of these attitudes, and when residential and social segregation slows convergence, value conflicts persist. Surveys of some Muslim-majority origin populations in Europe, for example, show substantial minorities holding views on apostasy, gender roles or homosexuality that diverge sharply from mainstream opinion. These differences fuel mutual suspicion and complicate the formation of a shared civic culture. Assuming that economic participation alone produces value convergence has proved overly optimistic. Selection and integration policy must address normative compatibility as well as skills."
+      },
+      {
+        "claim": "The benefits of immigration are often captured by employers and higher-income groups while costs fall on lower-income natives and public budgets.",
+        "explanation": "Employers gain from a larger labour pool and downward pressure on wages in certain occupations. Property owners gain from higher housing demand. Consumers of immigrant-intensive services may pay less. The workers who compete most directly with new arrivals, and the taxpayers who fund additional services, see fewer gains and clearer costs. This distributional pattern helps explain why elite and business opinion is more favourable to high immigration than working-class opinion. Aggregate GDP figures conceal the uneven incidence of benefits and burdens. A fair assessment of net effects must include distribution, not only totals. Policy that systematically transfers resources and opportunities from lower-income natives to employers and immigrants requires stronger justification than simple growth accounting provides."
+      },
+      {
+        "claim": "Sustainable immigration policy requires prioritising selection, control and integration capacity over maximising numbers.",
+        "explanation": "The strongest economic and social outcomes appear in systems that select for skills, language and employability, maintain credible enforcement, and invest in rapid integration. Open-ended or weakly controlled inflows produce the problems of fiscal cost, wage pressure, parallel communities and political backlash. The binary choice between “pro-immigration” and “anti-immigration” obscures the decisive importance of design. Countries can capture many of the benefits of immigration while minimising the costs by keeping numbers within absorptive capacity and composition favourable to success. Treating volume itself as the goal, or treating any restriction as illegitimate, leads to outcomes that ultimately reduce public support for immigration of any kind. Responsible policy is selective, controlled and integration-focused rather than maximising."
+      }
+    ]
+  }
+}

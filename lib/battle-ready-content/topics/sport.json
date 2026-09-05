@@ -1,1 +1,407 @@
-null
+{
+  "motion": "This House believes that elite-level competitive sport causes more harm than benefit to participants and society.",
+  "for": {
+    "vocab": [
+      {
+        "term": "performance-at-all-costs",
+        "definition": "A culture that treats winning and record-breaking as more important than the long-term health and well-being of the athlete.",
+        "example": "Performance-at-all-costs thinking has normalised dangerous training loads and early specialisation."
+      },
+      {
+        "term": "athletic exploitation",
+        "definition": "The use of athletes’ bodies and labour primarily for commercial or national prestige with inadequate protection of their interests.",
+        "example": "Athletic exploitation is visible when young talents are discarded as soon as their commercial value declines."
+      },
+      {
+        "term": "chronic injury burden",
+        "definition": "The long-term physical damage that accumulates from repetitive high-intensity training and competition.",
+        "example": "The chronic injury burden of elite sport often continues to limit quality of life decades after retirement."
+      },
+      {
+        "term": "win-at-all-costs culture",
+        "definition": "An environment in which ethical limits, fair play and personal welfare are subordinated to the single goal of victory.",
+        "example": "Win-at-all-costs culture explains the persistence of doping, cheating and abusive coaching practices."
+      },
+      {
+        "term": "early specialisation pressure",
+        "definition": "The demand that children focus intensively on one sport from a young age in order to have any chance of elite success.",
+        "example": "Early specialisation pressure increases overuse injuries and burns out many promising young athletes."
+      },
+      {
+        "term": "body commodification",
+        "definition": "The treatment of the athlete’s physical form as a product to be optimised, marketed and discarded.",
+        "example": "Body commodification turns natural variation into a problem to be surgically or chemically corrected."
+      },
+      {
+        "term": "identity foreclosure",
+        "definition": "The premature and narrow commitment to an athletic identity that leaves the person without alternative sources of meaning when sport ends.",
+        "example": "Identity foreclosure leaves many retired athletes struggling with depression and purposelessness."
+      },
+      {
+        "term": "spectator pathology",
+        "definition": "The unhealthy emotional investment, aggression and tribalism that elite sport can encourage in fans.",
+        "example": "Spectator pathology is visible in violence, online abuse and the elevation of sporting results over civic values."
+      },
+      {
+        "term": "resource misallocation",
+        "definition": "The channelling of large amounts of public and private money into elite performance at the expense of broader participation and social needs.",
+        "example": "Resource misallocation prioritises Olympic medals over accessible community facilities and physical education."
+      },
+      {
+        "term": "moral hazard in sport",
+        "definition": "The incentive for athletes, coaches and organisations to take excessive risks because the potential rewards of success are so high.",
+        "example": "Moral hazard in sport drives the continued use of dangerous techniques and prohibited substances."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "Elite sport systematically sacrifices the long-term health of athletes for short-term spectacle.",
+        "examples": [
+          "Elite sport systematically sacrifices the long-term health of athletes for short-term spectacle and commercial gain.",
+          "The evidence is clear that elite sport systematically sacrifices the long-term health of athletes for short-term spectacle.",
+          "We cannot ignore that elite sport systematically sacrifices the long-term health of athletes for short-term spectacle."
+        ]
+      },
+      {
+        "phrase": "The glory is temporary; the damage is often permanent.",
+        "examples": [
+          "The glory is temporary; the damage is often permanent, whether physical, psychological or both.",
+          "Retired athletes know that the glory is temporary; the damage is often permanent.",
+          "A honest appraisal admits that the glory is temporary; the damage is often permanent."
+        ]
+      },
+      {
+        "phrase": "Winning has been elevated above every other human value in the sporting world.",
+        "examples": [
+          "Winning has been elevated above every other human value in the sporting world, including health, education and basic ethics.",
+          "The culture shows that winning has been elevated above every other human value in the sporting world.",
+          "We reject a system in which winning has been elevated above every other human value in the sporting world."
+        ]
+      },
+      {
+        "phrase": "Most aspiring elite athletes pay a heavy price for a success that only a tiny fraction will ever reach.",
+        "examples": [
+          "Most aspiring elite athletes pay a heavy price for a success that only a tiny fraction will ever reach.",
+          "The statistics are brutal: most aspiring elite athletes pay a heavy price for a success that only a tiny fraction will ever reach.",
+          "We should stop romanticising a path where most aspiring elite athletes pay a heavy price for a success that only a tiny fraction will ever reach."
+        ]
+      },
+      {
+        "phrase": "Sport at the highest level has become an industry that consumes people and discards them.",
+        "examples": [
+          "Sport at the highest level has become an industry that consumes people and discards them when they are no longer useful.",
+          "The human cost reveals that sport at the highest level has become an industry that consumes people and discards them.",
+          "We must confront the reality that sport at the highest level has become an industry that consumes people and discards them."
+        ]
+      },
+      {
+        "phrase": "The social benefits claimed for elite sport are largely available from participation sport without the same harms.",
+        "examples": [
+          "The social benefits claimed for elite sport are largely available from participation sport without the same harms.",
+          "A rational policy recognises that the social benefits claimed for elite sport are largely available from participation sport without the same harms.",
+          "We can keep the goods of physical activity while accepting that the social benefits claimed for elite sport are largely available from participation sport without the same harms."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "pyrrhic victory",
+        "definition": "A success that comes at such a high cost that it is almost equivalent to defeat.",
+        "examples": [
+          "Many championship titles are pyrrhic victories when measured against the athlete’s later health and life prospects.",
+          "The pursuit of gold often ends in a pyrrhic victory for the body and mind.",
+          "We should stop celebrating pyrrhic victories as if they were unambiguous triumphs."
+        ]
+      },
+      {
+        "idiom": "cannon fodder",
+        "definition": "People treated as expendable material in the pursuit of a larger goal.",
+        "examples": [
+          "Thousands of young athletes function as cannon fodder for the handful who reach the very top.",
+          "The talent pipeline treats developing players as cannon fodder rather than as developing human beings.",
+          "A humane system would refuse to use children as cannon fodder for elite success."
+        ]
+      },
+      {
+        "idiom": "sell one’s soul",
+        "definition": "To abandon moral or personal integrity in exchange for success or reward.",
+        "examples": [
+          "The pressure of elite sport leads some to sell their soul through doping or abusive compliance.",
+          "When the only measure is winning, the temptation to sell one’s soul becomes intense.",
+          "We should not create conditions in which athletes feel they must sell their soul to compete."
+        ]
+      },
+      {
+        "idiom": "the tip of the iceberg",
+        "definition": "A small visible part of a much larger hidden problem.",
+        "examples": [
+          "Public doping scandals are only the tip of the iceberg of performance-enhancing practices.",
+          "Career-ending injuries are the tip of the iceberg of the chronic damage elite sport produces.",
+          "We must look beneath the tip of the iceberg to the full human cost."
+        ]
+      },
+      {
+        "idiom": "burn out",
+        "definition": "To exhaust one’s physical or mental resources through prolonged overwork or pressure, often permanently reducing capacity.",
+        "examples": [
+          "Many promising athletes burn out before they ever reach senior level.",
+          "The system is designed in ways that make it easy to burn out and hard to recover.",
+          "Preventing athletes from burning out should be a higher priority than extracting maximum performance."
+        ]
+      },
+      {
+        "idiom": "a race to the bottom",
+        "definition": "Competition that drives standards of safety, ethics and welfare steadily lower.",
+        "examples": [
+          "Without strong regulation, elite sport becomes a race to the bottom on athlete welfare.",
+          "Commercial and national pressures create a race to the bottom that responsible voices struggle to resist.",
+          "We need rules that stop the race to the bottom before more athletes are damaged."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "Elite sport imposes a severe and often permanent physical cost on participants.",
+        "explanation": "High training volumes, repetitive loading, and the acceptance of playing through pain produce high rates of osteoarthritis, chronic joint damage, spinal problems and, in contact sports, neurodegenerative disease. Studies of former professional athletes in football, rugby, American football and gymnastics show elevated rates of joint replacement, chronic pain and reduced mobility in middle age. Concussion-related conditions such as CTE have been documented across multiple sports. These outcomes are not rare accidents; they are predictable consequences of the demands placed on the body. The short career of peak performance is frequently followed by decades of physical limitation. When the central product of elite sport is athletic spectacle, the long-term health of the performers is treated as a secondary concern. That ordering of priorities is difficult to justify once the medical evidence is faced honestly."
+      },
+      {
+        "claim": "The psychological pressures of elite competition produce high rates of mental-health problems.",
+        "explanation": "Constant evaluation, public scrutiny, fear of failure, and the collapse of identity after injury or deselection create conditions for anxiety, depression and disordered eating. Research across Olympic and professional cohorts finds significantly elevated prevalence of mental-health disorders compared with age-matched populations. The culture of toughness often discourages help-seeking until crisis point. Retirement, whether planned or forced, removes the structure and status that many athletes have built their entire adult identity around, leading to further vulnerability. While support services have improved in some systems, the underlying incentive structure that creates the pressure remains largely unchanged. The mental cost is therefore not an unfortunate side-effect; it is a structural feature of the elite environment."
+      },
+      {
+        "claim": "Early specialisation and intense youth systems damage large numbers of children for the benefit of a tiny elite.",
+        "explanation": "To produce a handful of senior champions, talent pathways subject thousands of children to high training loads, year-round competition and educational disruption. Overuse injuries, burnout and dropout rates are high. Many of those who do not reach the top leave sport altogether, sometimes with lasting physical or psychological effects. The opportunity cost in education, social development and enjoyment of varied physical activity is substantial. The system is rational from the perspective of national medal tables or professional clubs; it is far less rational from the perspective of the majority of children who pass through it. A society that accepts this attrition as the necessary price of elite success is prioritising spectacle over the welfare of the young."
+      },
+      {
+        "claim": "Commercial and political interests systematically exploit athletes while externalising the costs onto them.",
+        "explanation": "Broadcasters, sponsors, governing bodies and governments extract enormous value from elite performance. Athletes, especially in their developmental years or in less lucrative sports, often receive a small share of that value while carrying the physical and career risk. Short contracts, one-sided image rights, and inadequate long-term medical provision are common. When athletes are injured or decline, the commercial apparatus moves on with little residual responsibility. The result is a classic externalisation of costs: private and public organisations enjoy the benefits of peak performance while the long-term burdens fall on the individual. This arrangement is presented as the natural order of high-performance sport; it is better understood as a failure of reciprocal obligation."
+      },
+      {
+        "claim": "The win-at-all-costs ethos repeatedly produces ethical corruption.",
+        "explanation": "Doping, technical cheating, age falsification, match-fixing and abusive coaching practices continue to surface across sports and countries. These are not isolated failures of character; they are predictable responses to an incentive system in which the rewards of winning and the costs of losing are both extreme. Anti-doping systems catch only a fraction of violations, and the technological race between detection and evasion continues. Young athletes absorb the message that results matter more than rules. The damage is not only to the integrity of competition but to the moral development of participants and to public trust. A domain that regularly generates such corruption cannot claim to be a reliable school of virtue."
+      },
+      {
+        "claim": "Elite sport concentrates resources and attention in ways that undermine broader participation and physical education.",
+        "explanation": "Public funding, media coverage and facility investment are heavily skewed toward high-performance pathways and major events. Community sport, school physical education and recreational facilities often remain under-resourced by comparison. The claimed ‘trickle-down’ inspiration effect is weaker and less consistent than advocates assert; many people are as likely to be intimidated or alienated by elite standards as inspired by them. Meanwhile the opportunity cost is real: money spent on elite preparation is money not spent on making everyday physical activity accessible, enjoyable and safe for the whole population. If the goal is population health and social inclusion, the current distribution of sporting resources is difficult to defend."
+      },
+      {
+        "claim": "Spectator culture around elite sport frequently amplifies aggression, tribalism and unhealthy emotional investment.",
+        "explanation": "While many fans engage in good-humoured support, elite sport also generates abuse of players, referees and opposing supporters, both in stadiums and online. National and club identities are mobilised in ways that spill into hostility and, at times, violence. The emotional intensity encouraged by media coverage can crowd out proportion and perspective in public conversation. Children absorb models of aggressive masculinity or win-at-all-costs behaviour. These social costs are rarely entered into the ledger when the benefits of elite sport are calculated. A full assessment must include the darker side of spectator identity and the behavioural norms it sometimes normalises."
+      },
+      {
+        "claim": "The educational and developmental opportunity costs for elite-track athletes are high and under-discussed.",
+        "explanation": "Serious pursuit of elite status often requires reduced academic engagement, geographic relocation, and the subordination of other interests during the critical years of secondary and tertiary education. While some athletes succeed in balancing both, many emerge from their sporting careers with limited qualifications and a narrow skill set. When the sporting career ends—as it almost always does by the mid-thirties at latest—the transition is frequently difficult. Societies that celebrate the medals rarely track the later employment, health and well-being outcomes of the much larger group who invested heavily and did not reach the podium. The human capital cost of the elite pathway is therefore larger than the success stories imply."
+      },
+      {
+        "claim": "The claimed character-building benefits of elite sport are overstated and often contradicted by the behaviours the system rewards.",
+        "explanation": "Proponents argue that elite competition teaches discipline, resilience and teamwork. In practice the same environments frequently reward gamesmanship, the concealment of injury, deference to abusive authority, and the treatment of opponents as obstacles rather than fellow participants. Resilience is developed, but so is a brittle dependence on external validation. Teamwork exists, yet so does intra-team competition that can be ruthless. The net moral education is therefore ambiguous. Participation sport and other demanding collective activities can teach similar positive lessons without the same intensity of harmful incentives. The special claim that elite sport is uniquely character-forming does not survive close examination of what the system actually selects for and reinforces."
+      },
+      {
+        "claim": "A rational society would reorient resources toward inclusive participation and treat elite spectacle as a limited, tightly regulated exception rather than the organising ideal of sport.",
+        "explanation": "The benefits most commonly attributed to sport—physical health, social connection, enjoyment, basic physical literacy—are delivered more efficiently and with far lower harm by well-designed participation programmes. Elite sport, by contrast, concentrates harm on a small group while consuming disproportionate attention and funding. There is a place for high-level competition and for the pleasure of watching extraordinary skill. That place should be bounded by strong protections for athlete welfare, realistic education about risks, and a clear public ranking of priorities that places population-level physical activity and enjoyment above medal tables. Continuing to treat elite success as the pinnacle and main justification of the entire sporting enterprise perpetuates a system whose harms are predictable, severe and largely avoidable."
+      }
+    ]
+  },
+  "against": {
+    "vocab": [
+      {
+        "term": "inspirational capital",
+        "definition": "The capacity of outstanding sporting achievement to motivate wider participation, effort and national or community pride.",
+        "example": "Inspirational capital from elite success has repeatedly increased grassroots participation in multiple sports."
+      },
+      {
+        "term": "physical literacy",
+        "definition": "The confidence, competence and motivation to remain active throughout life, often first developed through structured sport.",
+        "example": "Physical literacy gained in youth sport is one of the strongest predictors of lifelong health-related activity."
+      },
+      {
+        "term": "character formation",
+        "definition": "The development of discipline, resilience, cooperation and emotional regulation through sustained sporting commitment.",
+        "example": "Character formation in demanding team environments produces transferable skills valued in education and work."
+      },
+      {
+        "term": "social cohesion",
+        "definition": "The strengthening of shared identity, mutual regard and collective emotion that major sporting events can generate.",
+        "example": "Social cohesion is visible when diverse communities unite around a national team’s campaign."
+      },
+      {
+        "term": "excellence aspiration",
+        "definition": "The human drive to push the limits of skill, strength and strategy, which elite sport expresses in pure form.",
+        "example": "Excellence aspiration is a legitimate and culturally valuable motive that elite sport institutionalises."
+      },
+      {
+        "term": "role-model effect",
+        "definition": "The positive behavioural and attitudinal influence that visible high-performing athletes can exert on younger people.",
+        "example": "The role-model effect of athletes from under-represented groups has opened pathways previously thought closed."
+      },
+      {
+        "term": "economic multiplier",
+        "definition": "The wider financial activity generated by elite sport through events, media, tourism and related industries.",
+        "example": "The economic multiplier of major championships supports employment far beyond the athletes themselves."
+      },
+      {
+        "term": "resilience training",
+        "definition": "The repeated experience of setback, recovery and renewed effort that competitive sport provides in a structured setting.",
+        "example": "Resilience training through sport equips many young people to handle pressure in later academic and professional life."
+      },
+      {
+        "term": "meritocratic stage",
+        "definition": "A domain in which performance, rather than background, is the primary currency of recognition and reward.",
+        "example": "Sport remains one of the most visible meritocratic stages available to talent from any social origin."
+      },
+      {
+        "term": "collective effervescence",
+        "definition": "The intense shared emotion and sense of unity that large-scale sporting occasions can produce among spectators and participants.",
+        "example": "Collective effervescence during major events creates memories and bonds that strengthen social fabric."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "The harms of elite sport are real but are outweighed by its unique capacity to inspire and unite.",
+        "examples": [
+          "The harms of elite sport are real but are outweighed by its unique capacity to inspire and unite people across divides.",
+          "A balanced ledger shows that the harms of elite sport are real but are outweighed by its unique capacity to inspire and unite.",
+          "We acknowledge problems while maintaining that the harms of elite sport are real but are outweighed by its unique capacity to inspire and unite."
+        ]
+      },
+      {
+        "phrase": "Human beings have always sought to test the limits of physical and mental performance.",
+        "examples": [
+          "Human beings have always sought to test the limits of physical and mental performance; elite sport is the modern expression of that drive.",
+          "The impulse is ancient: human beings have always sought to test the limits of physical and mental performance.",
+          "We should not pathologise the fact that human beings have always sought to test the limits of physical and mental performance."
+        ]
+      },
+      {
+        "phrase": "Most of the worst abuses are failures of governance, not inevitable consequences of competition itself.",
+        "examples": [
+          "Most of the worst abuses are failures of governance, not inevitable consequences of competition itself, and are therefore reformable.",
+          "The distinction matters: most of the worst abuses are failures of governance, not inevitable consequences of competition itself.",
+          "We can protect athletes once we accept that most of the worst abuses are failures of governance, not inevitable consequences of competition itself."
+        ]
+      },
+      {
+        "phrase": "Participation and elite excellence are not enemies; they reinforce each other when the system is well designed.",
+        "examples": [
+          "Participation and elite excellence are not enemies; they reinforce each other when the system is well designed.",
+          "Healthy sporting cultures show that participation and elite excellence are not enemies; they reinforce each other when the system is well designed.",
+          "Policy should build on the truth that participation and elite excellence are not enemies; they reinforce each other when the system is well designed."
+        ]
+      },
+      {
+        "phrase": "The educational and social lessons of high-level sport remain valuable when welfare is properly protected.",
+        "examples": [
+          "The educational and social lessons of high-level sport remain valuable when welfare is properly protected.",
+          "We can retain the benefits once we ensure that the educational and social lessons of high-level sport remain valuable when welfare is properly protected.",
+          "The motion understates how far the educational and social lessons of high-level sport remain valuable when welfare is properly protected."
+        ]
+      },
+      {
+        "phrase": "A society without spaces for extraordinary physical achievement would be culturally poorer.",
+        "examples": [
+          "A society without spaces for extraordinary physical achievement would be culturally poorer and less able to celebrate human potential.",
+          "We defend the place of elite sport because a society without spaces for extraordinary physical achievement would be culturally poorer.",
+          "The loss would be real: a society without spaces for extraordinary physical achievement would be culturally poorer."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "the thrill of victory and the agony of defeat",
+        "definition": "The intense emotional highs and lows that competitive sport uniquely provides to participants and spectators.",
+        "examples": [
+          "The thrill of victory and the agony of defeat remain among the most powerful shared experiences modern societies offer.",
+          "People return to sport precisely because of the thrill of victory and the agony of defeat.",
+          "We should not empty sport of the thrill of victory and the agony of defeat in the name of risk elimination."
+        ]
+      },
+      {
+        "idiom": "raise the bar",
+        "definition": "To set a higher standard that others then attempt to reach or surpass.",
+        "examples": [
+          "Elite athletes raise the bar for what is considered possible and thereby expand the horizon of human performance.",
+          "Each generation of champions raises the bar for the next.",
+          "The cultural value of sport includes its capacity to raise the bar."
+        ]
+      },
+      {
+        "idiom": "a level playing field",
+        "definition": "Conditions of fair competition in which success depends on ability and effort rather than unfair advantage.",
+        "examples": [
+          "When rules are enforced, sport still offers one of the clearest examples of a level playing field.",
+          "The ideal of a level playing field continues to inspire efforts against doping and discrimination.",
+          "Protecting a level playing field is a reason to reform elite sport, not to abandon it."
+        ]
+      },
+      {
+        "idiom": "in the arena",
+        "definition": "The position of those who actually test themselves under pressure rather than criticising from the sidelines.",
+        "examples": [
+          "Athletes who step into the arena accept risks that spectators and critics do not share.",
+          "Credit belongs to those in the arena who strive, even when they fall short.",
+          "Policy should respect the willingness of people to enter the arena while still protecting them."
+        ]
+      },
+      {
+        "idiom": "more than a game",
+        "definition": "The recognition that sport carries meanings, identities and emotions that exceed the formal result.",
+        "examples": [
+          "For many communities sport is more than a game; it is a central thread of identity and memory.",
+          "The claim that it is more than a game explains both its power and the need for careful stewardship.",
+          "We take sport seriously precisely because it is more than a game."
+        ]
+      },
+      {
+        "idiom": "build character",
+        "definition": "To develop resilience, discipline and moral qualities through demanding experience.",
+        "examples": [
+          "Demanding sport continues to build character when coaching and culture are oriented toward that end.",
+          "The traditional claim that sport can build character is supported by both testimony and research when conditions are right.",
+          "We should design elite pathways so that they genuinely build character rather than merely extract performance."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "Elite sport generates powerful and measurable inspiration that increases wider participation and aspiration.",
+        "explanation": "Major championships and visible role models repeatedly produce spikes in grassroots registration, facility use and public interest in physical activity. Young people from diverse backgrounds cite elite athletes as the reason they began or persisted in sport. National success has been linked to increased funding and cultural support for participation programmes. While not every viewer becomes a participant, the directional effect is real and has been documented across multiple sports and countries. The alternative of a purely recreational sporting culture lacks this catalytic visibility. Inspiration is a public good that elite performance uniquely supplies; its value should be weighed alongside the acknowledged risks to the athletes themselves."
+      },
+      {
+        "claim": "The physical and psychological risks of elite sport are serious but are increasingly manageable through better science, regulation and support systems.",
+        "explanation": "Awareness of concussion, overuse injury, mental-health vulnerability and transition difficulties has grown rapidly. Many sports have introduced stricter return-to-play protocols, load management, independent medical decision-making and athlete-welfare programmes. While implementation remains uneven, the trajectory is toward greater protection rather than greater harm. Historical comparison shows that earlier eras of elite sport were often more dangerous and less accountable. Continuing improvement is possible without abandoning high-performance competition. The existence of risk does not automatically make the activity a net harm; it makes intelligent risk management obligatory. Progress on that front is already visible and should be accelerated rather than treated as proof that the enterprise itself is indefensible."
+      },
+      {
+        "claim": "Elite sport remains one of the most open routes to recognition and mobility for talent from any social background.",
+        "explanation": "In many societies, sporting excellence still allows individuals from modest or marginalised origins to achieve visibility, financial security and social status that would otherwise be difficult to obtain. The criteria of success are comparatively transparent and performance-based. While barriers of resource and access exist, they are often lower than in domains that depend heavily on credentials, networks or inherited cultural capital. The stories of athletes who have used sport to change their life circumstances are not merely anecdotal; they form a recurring pattern. Removing or heavily devaluing the elite pathway would close one of the remaining channels through which raw talent can still compel recognition. That loss would fall disproportionately on those with fewer alternative routes."
+      },
+      {
+        "claim": "The educational and developmental benefits of high-level sport are real when coaching and structures are oriented toward the whole person.",
+        "explanation": "Demanding training teaches time management, goal setting, emotional regulation under pressure, and the capacity to recover from setbacks. Team environments require cooperation, role acceptance and communication. Many athletes successfully combine elite pathways with education and later transfer these capacities into professional and civic life. Problems arise when the system becomes single-minded about results and neglects the wider development of the person. Those problems are failures of design and culture, not proofs that high-level competition is inherently anti-educational. Systems that integrate education, dual-career support and welfare show that the developmental goods can be retained. The appropriate response is to generalise those better models rather than to conclude that the activity itself is net harmful."
+      },
+      {
+        "claim": "Major sporting events create shared public experiences that strengthen social bonds across ordinary divisions.",
+        "explanation": "International championships, derbies and national-team campaigns generate moments of collective attention and emotion that cut across class, age and sometimes political lines. These episodes of shared focus are increasingly rare in fragmented media environments. They supply common reference points, conversational currency and, at their best, a temporary expansion of ‘us’. While they can also inflame rivalry, the net contribution to social glue is positive in many documented cases. Communities invest meaning in their teams and athletes; that investment is a form of social capital. A cultural landscape without such focal points would be thinner. The task is to reduce the toxic expressions of sporting identity while preserving the capacity for collective celebration."
+      },
+      {
+        "claim": "The economic activity generated by elite sport supports employment and infrastructure that benefit wider communities.",
+        "explanation": "Professional leagues, major events and associated media rights create jobs in coaching, medicine, event management, broadcasting, hospitality and construction. Stadiums and training facilities often serve community use outside elite schedules. Tax revenues and tourism associated with big events provide public resources. While the distribution of these benefits is uneven and some projects are wasteful, the overall economic footprint is substantial. Participation sport alone does not generate the same scale of activity or visibility. The economic argument is not decisive on its own, yet it forms part of a full accounting. Dismantling or heavily shrinking the elite sector would carry employment and fiscal consequences that also deserve consideration."
+      },
+      {
+        "claim": "Human cultures have always celebrated exceptional physical prowess; elite sport is a structured and relatively safe modern vehicle for that celebration.",
+        "explanation": "From ancient games to traditional contests across continents, societies have set aside spaces for the display of extraordinary speed, strength, skill and courage. These practices serve expressive and communal functions that go beyond utility. Modern elite sport inherits that role while adding rules, medical oversight and anti-doping frameworks that, for all their imperfections, represent an advance on unregulated contest. Suppressing or stigmatising the pursuit of physical excellence would not eliminate the underlying human impulse; it would merely push it into less organised and potentially more dangerous forms. Better to retain an institutionalised version that can be criticised, regulated and improved than to pretend the impulse itself is a modern pathology."
+      },
+      {
+        "claim": "Many of the most serious problems in elite sport are concentrated in specific sports, countries or governance regimes and are therefore reformable.",
+        "explanation": "Contact sports with high concussion risk, systems that permit authoritarian coaching cultures, and environments with weak independent athlete representation produce disproportionate harm. Other sports and well-regulated systems demonstrate that high performance can coexist with substantially better welfare outcomes. Treating ‘elite sport’ as a single undifferentiated harm obscures these differences and weakens the case for targeted reform. Progress on concussion protocols, athlete unions, independent medical authority and financial transparency shows that improvement is possible. The existence of bad practice is a reason to enforce better standards, not a reason to declare the entire domain a net social loss."
+      },
+      {
+        "claim": "Athletes themselves overwhelmingly continue to choose the elite pathway with knowledge of the risks, indicating that they judge the benefits worth the costs.",
+        "explanation": "Adult athletes are not passive victims; they are agents who weigh the demands of high-performance sport against its rewards of mastery, recognition, camaraderie and, in some cases, material security. Surveys and testimony repeatedly show high levels of commitment and retrospective affirmation even among those who have experienced injury or disappointment. Paternalistic claims that the activity is net harmful must therefore overcome the revealed preferences of the participants themselves. Where young athletes are concerned, stronger safeguards and delayed specialisation are justified. For consenting adults, however, the default should be respect for their assessment of the trade-offs, combined with robust information and protection rather than a general verdict of harm."
+      },
+      {
+        "claim": "A balanced policy protects athletes and expands participation while still preserving space for the pursuit and celebration of excellence.",
+        "explanation": "The motion frames elite sport as a net harm that society would be better without. A more accurate and constructive position distinguishes the goods of high performance from the specific practices that generate unnecessary damage. Stronger welfare standards, better education-sport balance, independent medical authority, and a rebalancing of public funding toward participation can reduce harms without eliminating the inspirational, economic and cultural contributions of elite competition. Societies that have maintained both vibrant grassroots sport and credible high-performance systems show that the two are compatible. The goal should be a sporting culture that is safer, fairer and more inclusive while still allowing human beings to test and display the limits of physical possibility. That goal is more demanding than simple condemnation, and more worth pursuing."
+      }
+    ]
+  }
+}
