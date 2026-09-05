@@ -1,0 +1,407 @@
+{
+  "motion": "This House believes that the widening generation gap is one of the greatest threats to social cohesion in the modern world.",
+  "for": {
+    "vocab": [
+      {
+        "term": "intergenerational fracture",
+        "definition": "A deep and growing break in understanding, trust and shared purpose between age groups that weakens the whole society.",
+        "example": "Intergenerational fracture is visible when young people and older adults no longer share basic assumptions about work, family or the future."
+      },
+      {
+        "term": "value divergence",
+        "definition": "The increasing separation of core beliefs and priorities between generations, making common ground harder to find.",
+        "example": "Value divergence on issues such as climate, gender and authority is widening the gap faster than earlier periods of change."
+      },
+      {
+        "term": "gerontocracy",
+        "definition": "A system in which older people hold disproportionate political, economic and cultural power long after their experience has ceased to match present realities.",
+        "example": "Gerontocracy leaves younger generations locked out of decisions that will shape the rest of their lives."
+      },
+      {
+        "term": "future discounting",
+        "definition": "The tendency to undervalue long-term consequences that will fall mainly on people who are not yet in power.",
+        "example": "Future discounting explains why climate and debt policies so often protect present comfort at the expense of the next generation."
+      },
+      {
+        "term": "mutual alienation",
+        "definition": "The process by which each generation comes to see the other as foreign, unreasonable or even hostile.",
+        "example": "Mutual alienation turns ordinary disagreement into entrenched suspicion and contempt."
+      },
+      {
+        "term": "institutional capture",
+        "definition": "The control of key institutions by one generation in ways that block renewal and exclude younger voices.",
+        "example": "Institutional capture in politics, universities and corporations slows adaptation to new economic and technological realities."
+      },
+      {
+        "term": "empathy deficit",
+        "definition": "The reduced capacity or willingness of one generation to understand the lived pressures and constraints of another.",
+        "example": "An empathy deficit makes it easy for older adults to dismiss housing and job insecurity as lack of effort."
+      },
+      {
+        "term": "narrative polarisation",
+        "definition": "The tendency of each generation to tell a simplified and self-flattering story about the other that hardens division.",
+        "example": "Narrative polarisation turns complex economic shifts into moral tales of entitlement or selfishness."
+      },
+      {
+        "term": "legacy burden",
+        "definition": "The accumulated environmental, fiscal and social costs that one generation passes to the next without adequate preparation or consent.",
+        "example": "The legacy burden of climate damage and public debt is a central source of justified resentment."
+      },
+      {
+        "term": "social discontinuity",
+        "definition": "The breakdown of the informal transmission of skills, norms and mutual support that once linked age groups.",
+        "example": "Social discontinuity leaves both young and old more isolated and less resilient."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "A society that cannot talk across age lines cannot solve its hardest problems.",
+        "examples": [
+          "A society that cannot talk across age lines cannot solve its hardest problems, from climate to care for the elderly.",
+          "The evidence is clear: a society that cannot talk across age lines cannot solve its hardest problems.",
+          "We must recognise that a society that cannot talk across age lines cannot solve its hardest problems."
+        ]
+      },
+      {
+        "phrase": "Younger generations are inheriting risks they did not create and power they do not yet hold.",
+        "examples": [
+          "Younger generations are inheriting risks they did not create and power they do not yet hold, which is a recipe for lasting bitterness.",
+          "The core injustice is that younger generations are inheriting risks they did not create and power they do not yet hold.",
+          "Any honest debate must start from the fact that younger generations are inheriting risks they did not create and power they do not yet hold."
+        ]
+      },
+      {
+        "phrase": "Mutual caricature has replaced mutual curiosity.",
+        "examples": [
+          "Mutual caricature has replaced mutual curiosity, and both sides are poorer for it.",
+          "The generation gap deepens when mutual caricature has replaced mutual curiosity.",
+          "We need to reverse the trend in which mutual caricature has replaced mutual curiosity."
+        ]
+      },
+      {
+        "phrase": "Experience is valuable only when it remains open to new evidence.",
+        "examples": [
+          "Experience is valuable only when it remains open to new evidence; otherwise it becomes dogma.",
+          "Older generations must accept that experience is valuable only when it remains open to new evidence.",
+          "The motion insists that experience is valuable only when it remains open to new evidence."
+        ]
+      },
+      {
+        "phrase": "Social cohesion requires more than shared geography; it requires shared stakes in the future.",
+        "examples": [
+          "Social cohesion requires more than shared geography; it requires shared stakes in the future.",
+          "Without deliberate effort, social cohesion requires more than shared geography; it requires shared stakes in the future will remain an empty phrase.",
+          "We argue that social cohesion requires more than shared geography; it requires shared stakes in the future."
+        ]
+      },
+      {
+        "phrase": "Ignoring the gap does not make it smaller; it makes it more dangerous.",
+        "examples": [
+          "Ignoring the gap does not make it smaller; it makes it more dangerous for democratic stability and everyday trust.",
+          "History shows that ignoring the gap does not make it smaller; it makes it more dangerous.",
+          "We cannot afford a strategy in which ignoring the gap does not make it smaller; it makes it more dangerous."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "talking past each other",
+        "definition": "To discuss an issue without genuine understanding because each side uses different assumptions and language.",
+        "examples": [
+          "On climate, housing and work, the generations are increasingly talking past each other.",
+          "Policy debates fail when participants are only talking past each other.",
+          "Bridging the gap begins when we stop talking past each other and start listening."
+        ]
+      },
+      {
+        "idiom": "out of touch",
+        "definition": "No longer aware of or responsive to present realities and the lives of others.",
+        "examples": [
+          "Many young people experience political leadership as fundamentally out of touch with their economic pressures.",
+          "Institutions become out of touch when they are dominated by one age cohort for too long.",
+          "The charge of being out of touch is not mere insult; it is a diagnosis of the gap."
+        ]
+      },
+      {
+        "idiom": "pass the buck",
+        "definition": "To shift responsibility for a problem onto someone else, especially a future group.",
+        "examples": [
+          "Delaying climate action is a classic way to pass the buck to younger generations.",
+          "Fiscal policies that load debt onto the future pass the buck in the most literal sense.",
+          "A responsible society refuses to pass the buck on the hardest long-term choices."
+        ]
+      },
+      {
+        "idiom": "two solitudes",
+        "definition": "Two groups that live side by side yet remain largely separate and mutually uncomprehending.",
+        "examples": [
+          "In many countries the generations risk becoming two solitudes divided by media, work and values.",
+          "We must not accept a future of two solitudes within the same society.",
+          "The generation gap is turning shared public space into two solitudes."
+        ]
+      },
+      {
+        "idiom": "the writing on the wall",
+        "definition": "Clear evidence that a serious problem is developing and will become worse without action.",
+        "examples": [
+          "Polling on trust, housing and climate already shows the writing on the wall for intergenerational relations.",
+          "Declining contact between age groups is the writing on the wall.",
+          "We ignore the writing on the wall at the cost of future social stability."
+        ]
+      },
+      {
+        "idiom": "burn bridges",
+        "definition": "To destroy the possibility of future cooperation or understanding through hostile words or actions.",
+        "examples": [
+          "Harsh public rhetoric from both sides risks burning bridges that will be needed in crises.",
+          "A wise society avoids burning bridges between its own generations.",
+          "We still have time to stop burning bridges and start rebuilding them."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "The generation gap is no longer a temporary phase of life but a structural divide with lasting political consequences.",
+        "explanation": "In earlier decades the differences between young and old were largely developmental: people expected to grow more conservative or more measured with age. Today the divergences on climate urgency, economic security, gender, technology and institutional trust are deeper and more durable. Voting patterns, media consumption and even geographic sorting increasingly follow age lines. When major political choices consistently split by generation, democratic legitimacy itself is strained because the losing side feels permanently outvoted on issues that will define its entire future. This is not ordinary disagreement; it is the emergence of parallel societies within one polity. Without deliberate bridging, the gap hardens into lasting political cleavage that weakens collective problem-solving capacity."
+      },
+      {
+        "claim": "Younger generations face material conditions that older cohorts neither experienced nor adequately prepared for.",
+        "explanation": "Housing costs relative to income, the rise of precarious work, the scale of climate risk, and the burden of public and private debt create a lived reality that differs sharply from the post-war and late-twentieth-century experience of many older adults. When older generations interpret these pressures through the lens of their own youth—hard work, delayed gratification, gradual progress—they often misdiagnose structural problems as character failures. The resulting lectures deepen resentment rather than produce solutions. Empathy requires recognising that the same personal virtues produce different outcomes under different macroeconomic and environmental conditions. Failure to make that recognition turns the generation gap into a moral accusation instead of a shared practical challenge."
+      },
+      {
+        "claim": "Concentrated power in older hands slows necessary adaptation and fuels justified frustration.",
+        "explanation": "In many democracies the median voter, the bulk of wealth, and the leadership of major institutions remain significantly older than the median citizen. Policy on pensions, housing regulation, climate timelines and education funding therefore tends to protect existing interests more effectively than it creates opportunities for those still entering adult life. This is not a conspiracy; it is the predictable result of demographic and institutional inertia. Yet the effect is the same: younger people experience the system as rigged against their long-term interests. When formal power and informal cultural authority remain with those who will live with the consequences for fewer years, the gap becomes a question of justice as well as misunderstanding. Bridging it requires genuine power-sharing, not merely better communication."
+      },
+      {
+        "claim": "Media ecosystems now actively widen the gap by feeding each generation a different reality.",
+        "explanation": "Algorithmic feeds, generationally targeted content, and the decline of shared broadcast experiences mean that young and old increasingly inhabit separate information worlds. Each side sees the other through simplified, often hostile representations. Older adults encounter portrayals of youth as fragile or entitled; younger people encounter portrayals of age as obstructive or nostalgic. These caricatures harden into default assumptions and make face-to-face conversation more difficult. The absence of common factual and emotional reference points removes one of the traditional solvents of intergenerational tension. Rebuilding social cohesion therefore requires deliberate creation of shared spaces and shared narratives, not the passive hope that the market will supply them."
+      },
+      {
+        "claim": "The gap undermines the informal systems of mutual support that societies need in times of stress.",
+        "explanation": "Healthy intergenerational contact supplies practical help, emotional ballast and the transmission of hard-won knowledge in both directions. When contact declines and suspicion rises, families and communities lose resilience. Older people become more isolated; younger people lose access to mentoring and practical wisdom; both lose the sense that they are part of a continuing story larger than themselves. In ageing societies this mutual withdrawal is especially costly. The generation gap is therefore not only a cultural inconvenience; it is a practical threat to the everyday solidarity that buffers economic and health shocks. Closing it is an investment in social infrastructure as real as any physical one."
+      },
+      {
+        "claim": "Climate and long-term fiscal choices make the gap uniquely consequential for the future.",
+        "explanation": "Decisions taken in the next two decades on emissions, infrastructure and public debt will shape living conditions for the rest of the century. The generations that will live longest with those decisions currently hold the least formal power over them. When older cohorts treat rapid decarbonisation or structural economic reform as optional or excessive, they are effectively deciding the risk level for people who cannot yet outvote them. This temporal asymmetry turns ordinary policy disagreement into a profound intergenerational equity issue. The resulting sense of dispossession is rational, not merely emotional. A society that allows this pattern to continue invites lasting loss of trust in democratic institutions themselves."
+      },
+      {
+        "claim": "Cultural condescension from either side accelerates the breakdown of basic respect.",
+        "explanation": "Public discourse is now filled with sweeping generational insults—ok boomer, snowflake, entitled, out-of-touch—that function as conversation-stoppers. Once a group is reduced to a dismissive label, listening becomes unnecessary. Both older and younger people participate in this rhetoric, and both suffer the consequences. The loss of elementary respect makes compromise on concrete issues harder because the other side is no longer seen as a full moral equal. Social cohesion depends on the presumption of good faith across difference. The generation gap has begun to erode that presumption, and the longer the pattern continues the more difficult it becomes to restore."
+      },
+      {
+        "claim": "Educational and workplace structures increasingly segregate age groups and reduce natural contact.",
+        "explanation": "Extended schooling, age-homogeneous workplaces, and residential sorting by life stage mean that many people spend far less time in sustained cooperation with those significantly older or younger than themselves. The informal learning and mutual adjustment that once occurred in multi-generational households, apprenticeships and mixed communities have declined. Without regular contact, stereotypes flourish and the skills of intergenerational communication atrophy. The gap is therefore partly an unintended consequence of modern organisational design. Reversing it requires intentional redesign of institutions so that different ages regularly solve problems together rather than remaining in parallel tracks."
+      },
+      {
+        "claim": "Unaddressed resentment is already feeding political radicalisation on multiple fronts.",
+        "explanation": "When younger people conclude that existing parties and institutions will not deliver on housing, climate or fair economic opportunity, some turn toward more extreme movements that promise rupture. When older people feel their contributions and security are under cultural attack, some move toward defensive populism. Both trajectories are visible in recent electoral data across several countries. The generation gap thus becomes a recruitment ground for forces that further polarise society. Treating the gap as a soft cultural issue underestimates its capacity to destabilise the political centre. Bridging it is a form of democratic self-defence."
+      },
+      {
+        "claim": "Deliberate bridging is possible and has historical precedent; fatalism is a choice, not a necessity.",
+        "explanation": "Earlier periods of rapid change also produced sharp generational tension, yet societies found ways to renegotiate the social contract through policy, cultural adaptation and institutional reform. Expanding the franchise, building welfare systems, and opening educational opportunity were all, in part, responses to intergenerational pressure. The same capacity exists today. Housing policy, climate investment, pension redesign, and structured intergenerational programmes in education and civic life can reduce material drivers of the gap while rebuilding habits of cooperation. The motion does not claim the gap is permanent; it claims that without conscious effort it will continue to widen and to damage the shared life of society. That effort is both possible and urgent."
+      }
+    ]
+  },
+  "against": {
+    "vocab": [
+      {
+        "term": "developmental difference",
+        "definition": "The natural variation in perspective that arises from being at different stages of the life cycle rather than from permanent cultural opposition.",
+        "example": "Much of what is called a generation gap is simply developmental difference that has always existed."
+      },
+      {
+        "term": "creative tension",
+        "definition": "The productive friction between established experience and new energy that drives social and cultural renewal.",
+        "example": "Creative tension between generations has repeatedly pushed societies to adapt and improve."
+      },
+      {
+        "term": "life-cycle effect",
+        "definition": "The tendency for people’s priorities and risk tolerance to change predictably as they age, independent of the era in which they were born.",
+        "example": "The life-cycle effect explains why the same individuals often hold different views at twenty-five and at sixty-five."
+      },
+      {
+        "term": "continuity of values",
+        "definition": "The underlying persistence of core moral and practical commitments across generations despite surface disagreements.",
+        "example": "Continuity of values on fairness, family and competence is stronger than the loudest public arguments suggest."
+      },
+      {
+        "term": "selective memory",
+        "definition": "The tendency of each generation to remember its own youth as uniquely difficult or idealistic while forgetting parallel struggles of other eras.",
+        "example": "Selective memory inflates the sense that today’s gap is unprecedented."
+      },
+      {
+        "term": "institutional adaptation",
+        "definition": "The capacity of existing structures to absorb new cohorts and gradually update rules and norms without rupture.",
+        "example": "Institutional adaptation has historically managed generational change more successfully than radical breaks."
+      },
+      {
+        "term": "mutual dependence",
+        "definition": "The practical reality that young and old rely on each other for care, knowledge, labour and social meaning.",
+        "example": "Mutual dependence is the everyday fact that alarmist talk of a generation gap often obscures."
+      },
+      {
+        "term": "over-dramatisation",
+        "definition": "The exaggeration of ordinary disagreement into a narrative of profound and dangerous conflict.",
+        "example": "Media over-dramatisation turns routine policy differences into a story of generational war."
+      },
+      {
+        "term": "cohort replacement",
+        "definition": "The gradual process by which younger people enter positions of influence as older cohorts retire, producing change without crisis.",
+        "example": "Cohort replacement is the normal mechanism of renewal in any healthy society."
+      },
+      {
+        "term": "shared humanity",
+        "definition": "The common experiences of vulnerability, aspiration and mortality that remain more fundamental than age-based differences.",
+        "example": "Shared humanity is the ground on which intergenerational cooperation can always be rebuilt."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "Every generation has believed it faced an unprecedented gap with its parents.",
+        "examples": [
+          "Every generation has believed it faced an unprecedented gap with its parents, and every generation has eventually discovered continuity.",
+          "Historical perspective shows that every generation has believed it faced an unprecedented gap with its parents.",
+          "We should treat with caution the claim that every generation has believed it faced an unprecedented gap with its parents no longer applies."
+        ]
+      },
+      {
+        "phrase": "Difference is not the same as danger.",
+        "examples": [
+          "Difference is not the same as danger, and treating every disagreement as a threat inflates the problem.",
+          "A calm assessment recognises that difference is not the same as danger.",
+          "The motion confuses the fact that difference is not the same as danger."
+        ]
+      },
+      {
+        "phrase": "Experience and innovation need each other.",
+        "examples": [
+          "Experience and innovation need each other; neither generation has a monopoly on wisdom.",
+          "Healthy societies understand that experience and innovation need each other.",
+          "We reject any framing that denies that experience and innovation need each other."
+        ]
+      },
+      {
+        "phrase": "Most people still live in multi-generational relationships of care and obligation.",
+        "examples": [
+          "Most people still live in multi-generational relationships of care and obligation that the crisis narrative ignores.",
+          "Daily life shows that most people still live in multi-generational relationships of care and obligation.",
+          "The abstract generation gap looks different when we remember that most people still live in multi-generational relationships of care and obligation."
+        ]
+      },
+      {
+        "phrase": "Alarmism about the gap can become a self-fulfilling prophecy.",
+        "examples": [
+          "Alarmism about the gap can become a self-fulfilling prophecy by teaching each side to expect hostility.",
+          "We must avoid a situation in which alarmism about the gap can become a self-fulfilling prophecy.",
+          "Responsible leadership refuses to let alarmism about the gap can become a self-fulfilling prophecy."
+        ]
+      },
+      {
+        "phrase": "Gradual cohort replacement has always been the main engine of social change.",
+        "examples": [
+          "Gradual cohort replacement has always been the main engine of social change, not sudden intergenerational rupture.",
+          "History demonstrates that gradual cohort replacement has always been the main engine of social change.",
+          "We should trust that gradual cohort replacement has always been the main engine of social change rather than fear permanent fracture."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "nothing new under the sun",
+        "definition": "The observation that many supposedly novel conflicts have appeared in similar form before.",
+        "examples": [
+          "Complaints about disrespectful youth and rigid elders are nothing new under the sun.",
+          "A longer view reveals that the current gap is nothing new under the sun.",
+          "We should remember that much of the rhetoric is nothing new under the sun."
+        ]
+      },
+      {
+        "idiom": "the more things change, the more they stay the same",
+        "definition": "Surface differences often conceal deeper continuities in human behaviour and social need.",
+        "examples": [
+          "On family, fairness and security, the more things change, the more they stay the same across generations.",
+          "Public argument focuses on conflict, yet the more things change, the more they stay the same in private life.",
+          "A balanced account notes that the more things change, the more they stay the same."
+        ]
+      },
+      {
+        "idiom": "bridge the gap",
+        "definition": "To reduce distance and restore understanding between separated groups.",
+        "examples": [
+          "Practical cooperation in families and workplaces already helps bridge the gap every day.",
+          "Policy should aim to bridge the gap rather than dramatise it.",
+          "Most citizens want to bridge the gap, not widen it for political advantage."
+        ]
+      },
+      {
+        "idiom": "a storm in a teacup",
+        "definition": "A situation that is treated as far more serious or dramatic than the underlying facts justify.",
+        "examples": [
+          "Much media coverage of the generation gap is a storm in a teacup compared with actual daily relations.",
+          "We should not turn ordinary disagreement into a storm in a teacup.",
+          "Historical perspective reduces many claims to a storm in a teacup."
+        ]
+      },
+      {
+        "idiom": "give and take",
+        "definition": "The mutual adjustment and compromise required for any lasting relationship.",
+        "examples": [
+          "Intergenerational life has always required give and take on both sides.",
+          "Healthy families practise give and take across age differences without declaring a crisis.",
+          "Social policy works best when it encourages give and take rather than zero-sum framing."
+        ]
+      },
+      {
+        "idiom": "the benefit of the doubt",
+        "definition": "The willingness to assume good intentions rather than hostility when interpreting another’s actions.",
+        "examples": [
+          "Both generations would do better to extend the benefit of the doubt more often.",
+          "Social media rewards the opposite of the benefit of the doubt.",
+          "Rebuilding trust starts with granting the benefit of the doubt across age lines."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "Much of what is labelled a generation gap is the ordinary life-cycle difference that has always existed.",
+        "explanation": "Young adults are typically more open to risk, more focused on identity and future possibility, and less attached to existing institutions. Older adults are typically more focused on security, continuity and the protection of what has already been built. These patterns appear across cultures and historical periods. As individuals age, their own views often shift in predictable directions. Treating today’s differences as a unique and dangerous rupture ignores this recurring developmental pattern. The appearance of a wider gap is amplified by longer lifespans and more visible media, but the underlying psychology is familiar. Societies have managed this tension for centuries without collapsing. Framing it as an existential threat risks over-reaction and unnecessary polarisation."
+      },
+      {
+        "claim": "Intergenerational disagreement has repeatedly been a source of necessary social progress.",
+        "explanation": "Many of the reforms now regarded as moral advances—expanded civil rights, environmental awareness, changes in gender roles, greater openness about mental health—were driven in significant part by younger cohorts challenging the settled assumptions of their elders. The friction was real and often uncomfortable, yet the outcome was widely beneficial. A society with no generation gap would be a society with little internal pressure to update its practices. Creative tension between experience and new energy is a feature of healthy adaptation, not a bug. The motion’s emphasis on harm underweights the historical record in which generational challenge produced net improvement rather than lasting fracture."
+      },
+      {
+        "claim": "Daily life continues to be characterised by extensive intergenerational cooperation and care.",
+        "explanation": "Despite public rhetoric, most people still live inside families and communities where grandparents, parents and children exchange practical help, emotional support and practical knowledge. Grandparents provide childcare; adult children provide elder care; workplaces still contain multiple age groups solving problems together. These routine forms of mutual dependence are statistically more common than the dramatic conflicts that dominate headlines. The crisis narrative selectively highlights the loudest disagreements while ignoring the quiet majority of functioning relationships. Any accurate assessment of social cohesion must weight the ordinary cooperative reality more heavily than the exceptional cases of estrangement."
+      },
+      {
+        "claim": "Media and political incentives systematically exaggerate the scale and hostility of the gap.",
+        "explanation": "Conflict attracts attention. Stories of generational warfare generate more engagement than stories of quiet mutual adjustment. Political actors also find it useful to mobilise one age group against another. The result is a public conversation that over-represents the most antagonistic voices and under-represents the large middle that continues to practise compromise. Survey data on actual attitudes often show more overlap and goodwill than the prevailing narrative suggests. When the volume of alarm is driven by attention economics rather than by careful measurement, policy and cultural responses risk being calibrated to a distorted picture. A cooler empirical approach reduces the perceived threat without denying real points of friction."
+      },
+      {
+        "claim": "Cohort replacement remains an effective and non-violent mechanism of social renewal.",
+        "explanation": "As older cohorts leave the workforce and political leadership, younger people naturally enter those roles and bring updated priorities with them. This process is slower than activists sometimes wish, yet it is also more stable than revolutionary rupture. Historical examples show that major value shifts on issues such as race, gender and environmental responsibility have occurred largely through this gradual replacement rather than through permanent intergenerational civil conflict. Trusting the mechanism of cohort replacement does not mean ignoring present injustices; it means recognising that democratic societies already possess a built-in pathway for change that does not require framing the gap as an existential emergency."
+      },
+      {
+        "claim": "Material differences between generations are real but are better addressed as policy problems than as moral wars.",
+        "explanation": "Housing affordability, climate risk and fiscal burdens are genuine issues that affect age cohorts differently. Treating them primarily as evidence of generational betrayal, however, turns practical problems into identity conflicts. Policy tools—housing supply reform, carbon pricing, pension redesign, targeted investment—can reduce the material drivers of resentment without requiring one generation to accept collective guilt. Moralised framing makes compromise harder because it converts negotiable interests into questions of virtue and villainy. A problem-solving orientation keeps the focus on outcomes that can improve conditions for younger people while preserving the legitimate security interests of older ones."
+      },
+      {
+        "claim": "Core values show more continuity across generations than public argument acknowledges.",
+        "explanation": "Large-scale attitude surveys repeatedly find substantial agreement across age groups on fundamental questions of fairness, the importance of family, the value of education, and the undesirability of corruption or extreme inequality. Disagreements concentrate on means, timing and emphasis rather than on the complete rejection of shared ends. The generation gap is therefore narrower at the level of basic moral commitments than at the level of cultural style and policy preference. Emphasising the deeper continuity makes cooperation more feasible and reduces the sense that the two sides inhabit incompatible moral universes. Social cohesion is better served by highlighting common ground than by maximising the visibility of every difference."
+      },
+      {
+        "claim": "Both generations have legitimate interests that deserve respect rather than hierarchical ranking.",
+        "explanation": "Younger people have a strong claim to policies that protect their long-term environmental and economic prospects. Older people have a strong claim to security after decades of contribution and to a voice in the society they helped build. Framing the situation as a zero-sum contest in which one side must prevail over the other misrepresents the possibility of arrangements that honour both sets of interests. Pension systems, healthcare, climate investment and housing policy can be designed with intergenerational fairness as an explicit criterion. The motion’s crisis language encourages a contest of moral priority; a more constructive approach treats the relationship as one of ongoing negotiation among parties with standing on both sides."
+      },
+      {
+        "claim": "Historical perspective shows that earlier generation gaps were also described in catastrophic language yet were ultimately managed.",
+        "explanation": "The 1960s counter-culture, the interwar youth movements, and even earlier periods of rapid industrial change all produced contemporary commentary that spoke of irreversible rupture and civilisational risk. In each case societies absorbed the tension, updated some norms, preserved others, and continued. The recurrence of the apocalyptic framing suggests that it is partly a rhetorical habit rather than a reliable diagnosis. While present conditions—longer lives, faster technological change, sharper media amplification—are distinctive, the claim that this gap is uniquely dangerous requires stronger evidence than the repetition of familiar alarm. Continuity of social life through previous episodes of tension is grounds for measured confidence rather than fatalism."
+      },
+      {
+        "claim": "The most effective response is practical cooperation on shared problems, not the elevation of the gap into a master narrative of threat.",
+        "explanation": "Climate adaptation, healthcare for ageing populations, skills training for changing labour markets, and the design of sustainable pension systems are all domains in which young and old have overlapping interests and complementary capacities. Working together on these concrete tasks builds the habits of mutual regard that abstract appeals to cohesion cannot create. Elevating the generation gap itself into the central drama of contemporary life risks turning every policy disagreement into further evidence of fracture. A better strategy keeps the focus on solvable problems and lets improved relationships emerge as a by-product of joint success. Social cohesion is strengthened more by doing things together than by repeatedly diagnosing the distance between us."
+      }
+    ]
+  }
+}

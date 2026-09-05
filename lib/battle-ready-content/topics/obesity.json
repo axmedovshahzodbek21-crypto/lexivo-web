@@ -1,0 +1,407 @@
+{
+  "motion": "This House believes that obesity is primarily the result of individual choices rather than systemic factors",
+  "for": {
+    "vocab": [
+      {
+        "term": "personal agency",
+        "definition": "The capacity of individuals to make deliberate choices about their behaviour and to shape their own outcomes through those choices.",
+        "example": "Recognising personal agency is essential if people are to take ownership of their health rather than waiting for external solutions."
+      },
+      {
+        "term": "caloric surplus",
+        "definition": "A sustained state in which energy intake from food and drink exceeds energy expenditure, leading to fat storage.",
+        "example": "At the most basic physiological level, obesity develops through a prolonged caloric surplus that only the individual controls day by day."
+      },
+      {
+        "term": "behavioural accountability",
+        "definition": "The principle that people remain responsible for the foreseeable consequences of their repeated voluntary actions.",
+        "example": "Behavioural accountability does not deny difficulty; it insists that difficulty does not erase responsibility for patterns of eating and activity."
+      },
+      {
+        "term": "lifestyle pattern",
+        "definition": "The recurring combination of diet, physical activity, sleep and daily habits that collectively determine long-term health outcomes.",
+        "example": "Obesity is almost always the cumulative result of a lifestyle pattern rather than a single decision or external event."
+      },
+      {
+        "term": "self-regulation",
+        "definition": "The ability to manage impulses, delay gratification and maintain chosen behaviours in the face of temptation or discomfort.",
+        "example": "Successful long-term weight management depends heavily on the development of reliable self-regulation skills."
+      },
+      {
+        "term": "volitional control",
+        "definition": "The conscious direction of one’s actions according to chosen goals rather than automatic responses to the environment.",
+        "example": "Even in an obesogenic environment, individuals retain volitional control over what they purchase, prepare and consume."
+      },
+      {
+        "term": "habituation effect",
+        "definition": "The process by which repeated behaviours become automatic and require less deliberate effort over time.",
+        "example": "Both healthy and unhealthy eating can become entrenched through the habituation effect, which is why early choices matter."
+      },
+      {
+        "term": "trade-off awareness",
+        "definition": "The recognition that immediate pleasures of food or inactivity carry longer-term costs to health and capability.",
+        "example": "Education should strengthen trade-off awareness so that people can weigh short-term satisfaction against future consequences."
+      },
+      {
+        "term": "capability building",
+        "definition": "The deliberate development of knowledge, skills and routines that expand a person’s ability to maintain healthy behaviour.",
+        "example": "Focusing on capability building empowers individuals rather than treating them as passive victims of their surroundings."
+      },
+      {
+        "term": "outcome ownership",
+        "definition": "The acceptance that the long-term results of one’s pattern of choices belong primarily to the person who made those choices.",
+        "example": "Outcome ownership is the psychological foundation of any sustained effort to change weight and health."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "Ultimate control over what enters the body remains with the individual.",
+        "examples": [
+          "Ultimate control over what enters the body remains with the individual, regardless of how heavily the environment is marketed.",
+          "No external force can compel daily overeating; ultimate control over what enters the body remains with the individual.",
+          "The physiological reality is simple: ultimate control over what enters the body remains with the individual."
+        ]
+      },
+      {
+        "phrase": "Difficulty does not equal impossibility, and hardship does not erase responsibility.",
+        "examples": [
+          "Difficulty does not equal impossibility, and hardship does not erase responsibility for the choices that accumulate into obesity.",
+          "We can acknowledge real obstacles while still insisting that difficulty does not equal impossibility, and hardship does not erase responsibility.",
+          "A serious approach to the problem begins with the principle that difficulty does not equal impossibility, and hardship does not erase responsibility."
+        ]
+      },
+      {
+        "phrase": "Millions of people in the same environments maintain healthy weight through consistent choices.",
+        "examples": [
+          "Millions of people in the same environments maintain healthy weight through consistent choices, demonstrating that outcomes are not predetermined.",
+          "The existence of those who succeed shows that millions of people in the same environments maintain healthy weight through consistent choices.",
+          "Systemic explanations struggle to account for the fact that millions of people in the same environments maintain healthy weight through consistent choices."
+        ]
+      },
+      {
+        "phrase": "Treating adults as incapable of self-control is both inaccurate and ultimately disempowering.",
+        "examples": [
+          "Treating adults as incapable of self-control is both inaccurate and ultimately disempowering, because it removes the basis for personal change.",
+          "Public messaging that treats adults as incapable of self-control is both inaccurate and ultimately disempowering.",
+          "The most respectful stance is to refuse the idea that treating adults as incapable of self-control is both inaccurate and ultimately disempowering."
+        ]
+      },
+      {
+        "phrase": "Sustainable change begins with ownership of the behaviours that produce the result.",
+        "examples": [
+          "Sustainable change begins with ownership of the behaviours that produce the result, not with waiting for the environment to be perfected.",
+          "Clinical experience shows that sustainable change begins with ownership of the behaviours that produce the result.",
+          "Any effective strategy must recognise that sustainable change begins with ownership of the behaviours that produce the result."
+        ]
+      },
+      {
+        "phrase": "Energy balance remains a matter of arithmetic that only individual actions can alter day by day.",
+        "examples": [
+          "Energy balance remains a matter of arithmetic that only individual actions can alter day by day, week by week and year by year.",
+          "No policy can repeal the fact that energy balance remains a matter of arithmetic that only individual actions can alter day by day.",
+          "The biological foundation is clear: energy balance remains a matter of arithmetic that only individual actions can alter day by day."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "to take ownership",
+        "definition": "To accept personal responsibility for a situation and for the actions required to change it.",
+        "examples": [
+          "Lasting improvement in weight almost always begins when a person decides to take ownership of daily eating and activity patterns.",
+          "Externalising every cause makes it harder to take ownership and therefore harder to change.",
+          "Coaches and clinicians emphasise the need to take ownership because without it motivation remains fragile."
+        ]
+      },
+      {
+        "idiom": "you are what you eat",
+        "definition": "A concise statement that long-term dietary patterns shape the body’s composition and health.",
+        "examples": [
+          "The old saying you are what you eat remains a useful reminder that cumulative food choices determine body weight.",
+          "While not literally precise, you are what you eat captures the central truth that intake drives the outcome.",
+          "Public understanding still benefits from the simple insight contained in you are what you eat."
+        ]
+      },
+      {
+        "idiom": "to vote with one's fork",
+        "definition": "To express priorities and values through the concrete choices made at each meal.",
+        "examples": [
+          "Every day people vote with their fork for the kinds of food that will be produced and sold.",
+          "Market signals are generated when consumers vote with their fork rather than when they merely express preferences in surveys.",
+          "Personal change starts when individuals begin to vote with their fork in line with their health goals."
+        ]
+      },
+      {
+        "idiom": "no pain, no gain",
+        "definition": "The recognition that meaningful improvement usually requires sustained effort and the acceptance of temporary discomfort.",
+        "examples": [
+          "Changing established eating habits involves a period of difficulty; the principle of no pain, no gain still applies.",
+          "Physical activity that improves health rarely feels effortless at the beginning; no pain, no gain remains relevant.",
+          "Cultures that abandon the idea of no pain, no gain often struggle to maintain the discipline required for long-term health."
+        ]
+      },
+      {
+        "idiom": "to bite the bullet",
+        "definition": "To face a difficult but necessary course of action with resolve rather than continued avoidance.",
+        "examples": [
+          "At some point most people who succeed decide to bite the bullet and change the patterns that produced excess weight.",
+          "Delaying the moment when one must bite the bullet only extends the period of declining health.",
+          "Support systems help, yet the individual still has to bite the bullet and sustain the new behaviours."
+        ]
+      },
+      {
+        "idiom": "the ball is in your court",
+        "definition": "Responsibility for the next action rests with the person being addressed.",
+        "examples": [
+          "After information and support have been provided, the ball is in your court regarding daily implementation.",
+          "Health professionals can advise, but ultimately the ball is in your court for the choices made between appointments.",
+          "A culture of agency keeps returning to the simple truth that the ball is in your court."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "Obesity develops through a sustained caloric surplus that is produced by repeated individual decisions about food and activity.",
+        "explanation": "Human physiology is unambiguous on the central mechanism. Body fat increases when energy intake exceeds energy expenditure over extended periods. Every unit of food consumed and every decision to remain inactive is an action taken by the individual. Environmental factors can make surplus easier or harder to achieve, yet they do not force the hand that lifts the food or the decision to skip movement. Large numbers of people living in the same food environment, exposed to the same advertising and facing similar time pressures, maintain healthy weights through consistent patterns of restraint and activity. Their existence demonstrates that the pathway from environment to body composition runs through personal behaviour. Any account that treats systemic forces as decisive must still explain how those forces are translated into the specific acts of eating and moving that only the individual performs."
+      },
+      {
+        "claim": "Millions of people successfully maintain healthy weight in the same environments that others blame for their obesity.",
+        "explanation": "If systemic factors were truly decisive, variation in outcomes within the same environment would be minimal. The data show the opposite. In every high-income country, substantial portions of the population remain within healthy weight ranges despite ubiquitous processed food, sedentary jobs and commercial promotion of calorie-dense products. Twin and adoption studies further reveal large differences in weight between individuals who share genes or early environments, pointing to the continuing importance of behavioural patterns. The practical implication is clear: the environment sets a context, but it does not determine the result. People who treat the environment as an excuse rather than a challenge forgo the agency that others in identical conditions continue to exercise. Policy can improve the context; it cannot replace the daily choices that ultimately decide energy balance."
+      },
+      {
+        "claim": "Framing obesity primarily as a systemic failure removes the psychological foundation required for sustained personal change.",
+        "explanation": "Behavioural science and clinical experience both show that lasting change in eating and activity depends on a sense of ownership and self-efficacy. When public narratives repeatedly locate the cause of obesity outside the individual—in the food industry, urban design, or economic inequality—they weaken that sense of ownership. People come to view themselves as passive objects of forces they cannot control. Motivation to monitor intake, plan meals, or maintain activity declines because the effort appears futile against larger systems. Successful interventions, by contrast, emphasise capability, incremental mastery and personal responsibility while still acknowledging real obstacles. Treating adults as incapable of meaningful self-direction is not compassionate; it is disempowering. A public discourse that restores agency is a precondition for the widespread behavioural shifts that any effective response requires."
+      },
+      {
+        "claim": "Personal responsibility is compatible with recognition of difficulty; it does not require denial of real obstacles.",
+        "explanation": "Acknowledging personal responsibility does not entail the claim that change is easy or that all individuals face identical conditions. Genetics influence appetite and metabolism; income affects food access; stress and sleep disruption raise the difficulty of self-regulation. These factors are real. Responsibility language simply insists that difficulty is not the same as impossibility and that the final pathway to energy surplus still runs through voluntary behaviour. Many people with genetic predispositions, limited budgets or high stress nevertheless maintain healthy weights through deliberate strategies. Their success shows that obstacles raise the required effort without eliminating the possibility of control. A mature ethic of responsibility holds both truths at once: conditions vary, and individuals remain accountable for the patterns they sustain within those conditions."
+      },
+      {
+        "claim": "Historical and cross-cultural evidence shows that population weight can change rapidly when behavioural norms shift.",
+        "explanation": "Obesity rates have risen sharply in many countries within a single generation. Genetic pools do not change at that speed. What changed were patterns of food availability, portion sizes, occupational activity and leisure habits—patterns enacted through countless individual decisions. Conversely, populations that maintain strong cultural norms around food restraint, physical labour or communal activity show lower obesity even when some processed foods are present. Wartime rationing, temporary economic hardship and deliberate public campaigns have all produced measurable downward shifts in average weight when behaviour changed at scale. These episodes demonstrate that population-level outcomes remain sensitive to the aggregate of personal choices. Systemic factors influence the ease of those choices; they do not write them out of the causal story."
+      },
+      {
+        "claim": "Most effective clinical and public-health interventions ultimately work by changing individual behaviour.",
+        "explanation": "Pharmacological treatments, bariatric surgery and structured programmes all produce their benefits by altering the amount of energy people consume or expend. Appetite-suppressing drugs reduce intake; surgery restricts capacity or absorption; behavioural programmes teach monitoring, planning and stimulus control. In every case the physiological endpoint is a change in the individual’s energy balance. Environmental reforms—labelling, reformulation, urban design—likewise succeed only to the extent that they prompt different purchasing, preparation and activity decisions by individuals. There is no pathway to lower population weight that bypasses behaviour. Policy that improves the choice architecture is valuable, yet it remains a means of influencing the same personal actions that responsibility language places at the centre. Denying the primacy of those actions simply obscures the mechanism through which any solution must operate."
+      },
+      {
+        "claim": "Children require guidance, yet adult obesity is the result of years of post-childhood choices that remain under personal control.",
+        "explanation": "Early environments and parental modelling matter. Once individuals reach adulthood, however, they acquire legal and practical control over their own food purchases, preparation methods and activity patterns. The majority of people who are obese as adults have spent many years making the daily decisions that sustained a caloric surplus. Genetic and early-life factors may raise the set point or the difficulty of change, but they do not compel continued overconsumption in the face of knowledge and alternatives. Adult status brings both rights and responsibilities; one of those responsibilities is stewardship of one’s own health. Extending childhood-style externalisation of blame into adult life delays the point at which people accept the need for sustained personal effort. A clear distinction between the dependencies of childhood and the agency of adulthood is therefore essential for any honest account of the problem."
+      },
+      {
+        "claim": "Economic and time pressures are real, yet they do not uniquely determine dietary outcomes.",
+        "explanation": "Lower-income households face genuine constraints on food budgets and often on time. These constraints make certain healthy patterns more difficult. They do not, however, dictate a unique outcome. Within the same income bands there is wide variation in diet quality and weight status. Cooking from basic ingredients, prioritising protein and vegetables, and limiting calorie-dense snacks remain possible on modest budgets; many households demonstrate this daily. Time pressure can be mitigated by batch preparation, simpler meal structures and the deliberate reduction of low-value activities. Treating economic difficulty as an automatic cause of obesity both underestimates the practical intelligence of people living with constraint and overstates the determinism of income. Support that expands real options is valuable; narratives that portray constraint as destiny are not."
+      },
+      {
+        "claim": "The language of systemic causation risks becoming a self-fulfilling barrier to the very changes it claims to seek.",
+        "explanation": "When public discussion repeatedly frames obesity as the near-inevitable product of food systems, marketing and inequality, individuals absorb the message that their own efforts are marginal. Self-efficacy declines, experimentation with new habits decreases, and the threshold for abandoning attempts at change falls. The result is that a descriptive claim about causes becomes a prescriptive obstacle to improvement. Clinical programmes that succeed do the opposite: they restore a sense of control, break the problem into manageable behavioural units, and celebrate incremental mastery. Population messaging that undermines those psychological conditions works against the behavioural shifts that any realistic reduction in obesity requires. Accuracy about environmental influences is compatible with a strong emphasis on agency; one-sided systemic narratives are not."
+      },
+      {
+        "claim": "A society that systematically downplays personal responsibility in health will struggle to maintain the behavioural foundations of public health more broadly.",
+        "explanation": "Obesity is only one domain in which behaviour strongly influences outcomes. Smoking, physical inactivity, excessive alcohol use and poor medication adherence all follow similar logic. If the dominant public response to obesity is to relocate causation outside the individual, the same relocation will be demanded for every other behaviour-linked condition. The cumulative effect is a culture that treats adults as objects of systems rather than as agents capable of self-direction. Such a culture finds it harder to sustain the voluntary disciplines that underpin vaccination uptake, preventive screening and the everyday management of chronic disease. Restoring a balanced language of responsibility in the domain of weight is therefore not a narrow argument about body size; it is a defence of the broader psychological and civic capacity required for a population to steward its own health."
+      }
+    ]
+  },
+  "against": {
+    "vocab": [
+      {
+        "term": "obesogenic environment",
+        "definition": "A set of physical, economic and social conditions that systematically promote excessive energy intake and discourage energy expenditure.",
+        "example": "Modern cities and food systems have created an obesogenic environment in which healthy choices require constant swimming against the current."
+      },
+      {
+        "term": "commercial determinants",
+        "definition": "The strategies and practices of industries that shape consumption patterns in ways that prioritise profit over population health.",
+        "example": "Aggressive marketing of ultra-processed foods is one of the clearest commercial determinants of the obesity epidemic."
+      },
+      {
+        "term": "energy-dense convenience",
+        "definition": "The widespread availability of inexpensive, highly palatable foods that deliver large amounts of calories with minimal preparation effort.",
+        "example": "Energy-dense convenience products have transformed the default option in many households and workplaces."
+      },
+      {
+        "term": "structural inequality",
+        "definition": "Systematic differences in resources, opportunities and exposure to risk that track socioeconomic position and constrain healthy options.",
+        "example": "Structural inequality means that the poorest communities often face the most intense exposure to unhealthy food environments."
+      },
+      {
+        "term": "choice architecture",
+        "definition": "The way options are presented, priced, portioned and promoted so that certain decisions become far easier than others.",
+        "example": "Supermarket layout and product formulation are powerful forms of choice architecture that steer behaviour without overt coercion."
+      },
+      {
+        "term": "metabolic predisposition",
+        "definition": "Genetic and early-life factors that influence appetite regulation, fat storage and the physiological response to overeating.",
+        "example": "Metabolic predisposition explains why identical behaviours can produce very different weight outcomes across individuals."
+      },
+      {
+        "term": "time scarcity",
+        "definition": "The chronic shortage of discretionary time created by long working hours, commuting and caregiving responsibilities.",
+        "example": "Time scarcity makes reliance on quick, energy-dense foods a rational adaptation rather than a simple failure of will."
+      },
+      {
+        "term": "normalised excess",
+        "definition": "The cultural and commercial process by which large portions and frequent snacking come to be treated as ordinary rather than exceptional.",
+        "example": "Normalised excess has shifted the baseline of what counts as a standard meal or a normal day’s intake."
+      },
+      {
+        "term": "health gradient",
+        "definition": "The stepwise relationship between socioeconomic position and health outcomes, including rates of obesity and related disease.",
+        "example": "The steep health gradient in obesity demonstrates that outcomes track social position more closely than isolated personal virtue."
+      },
+      {
+        "term": "policy neglect",
+        "definition": "The failure of governments to use available regulatory and fiscal tools to reshape the food and activity environment in healthier directions.",
+        "example": "Decades of policy neglect have left the commercial drivers of obesity largely unconstrained while responsibility is assigned to individuals."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "Individuals make choices, but they do not choose the conditions under which those choices are made.",
+        "examples": [
+          "Individuals make choices, but they do not choose the conditions under which those choices are made, and those conditions have become systematically unhealthy.",
+          "The central insight is that individuals make choices, but they do not choose the conditions under which those choices are made.",
+          "Any serious analysis must start from the fact that individuals make choices, but they do not choose the conditions under which those choices are made."
+        ]
+      },
+      {
+        "phrase": "When unhealthy options are cheaper, more convenient and more heavily promoted, blaming the individual becomes a form of victim-blaming.",
+        "examples": [
+          "When unhealthy options are cheaper, more convenient and more heavily promoted, blaming the individual becomes a form of victim-blaming.",
+          "The moral language of personal responsibility collapses when unhealthy options are cheaper, more convenient and more heavily promoted.",
+          "Public health cannot ignore that when unhealthy options are cheaper, more convenient and more heavily promoted, blaming the individual becomes a form of victim-blaming."
+        ]
+      },
+      {
+        "phrase": "Population-level changes in weight track environmental shifts far more closely than changes in individual character.",
+        "examples": [
+          "Population-level changes in weight track environmental shifts far more closely than changes in individual character or willpower.",
+          "The speed of the obesity epidemic shows that population-level changes in weight track environmental shifts far more closely than changes in individual character.",
+          "Genetic pools do not transform in a generation; population-level changes in weight track environmental shifts far more closely than changes in individual character."
+        ]
+      },
+      {
+        "phrase": "Treating a systemic problem as a collection of private failings guarantees that the problem will persist.",
+        "examples": [
+          "Treating a systemic problem as a collection of private failings guarantees that the problem will persist and that stigma will deepen.",
+          "The policy consequence is clear: treating a systemic problem as a collection of private failings guarantees that the problem will persist.",
+          "History shows that treating a systemic problem as a collection of private failings guarantees that the problem will persist."
+        ]
+      },
+      {
+        "phrase": "The same people who demand personal responsibility often defend the commercial freedoms that undermine it.",
+        "examples": [
+          "The same people who demand personal responsibility often defend the commercial freedoms that undermine it through unrestricted marketing and formulation.",
+          "There is a deep inconsistency when the same people who demand personal responsibility often defend the commercial freedoms that undermine it.",
+          "Intellectual honesty requires noticing that the same people who demand personal responsibility often defend the commercial freedoms that undermine it."
+        ]
+      },
+      {
+        "phrase": "Effective responses to obesity have always combined individual support with changes to the wider environment.",
+        "examples": [
+          "Effective responses to obesity have always combined individual support with changes to the wider environment rather than relying on willpower alone.",
+          "International evidence shows that effective responses to obesity have always combined individual support with changes to the wider environment.",
+          "The practical lesson is that effective responses to obesity have always combined individual support with changes to the wider environment."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "swimming against the tide",
+        "definition": "Attempting to maintain a difficult course of action when powerful surrounding forces push in the opposite direction.",
+        "examples": [
+          "Maintaining a healthy weight in an obesogenic environment often feels like swimming against the tide every single day.",
+          "Expecting entire populations to succeed by swimming against the tide is an unrealistic basis for public policy.",
+          "Individual effort still matters, yet the cumulative difficulty of swimming against the tide explains much of the population pattern."
+        ]
+      },
+      {
+        "idiom": "stacked deck",
+        "definition": "A situation in which the conditions are systematically arranged so that one outcome is far more likely than another.",
+        "examples": [
+          "For many households the food environment is a stacked deck that makes energy-dense choices the path of least resistance.",
+          "Talk of free choice ignores how thoroughly the deck is stacked by price, convenience and marketing.",
+          "Policy should aim to unstack the deck rather than simply urge people to play more skilfully."
+        ]
+      },
+      {
+        "idiom": "level the playing field",
+        "definition": "To alter conditions so that healthier options become genuinely competitive with unhealthy ones.",
+        "examples": [
+          "Fiscal and regulatory measures are needed to level the playing field between ultra-processed products and healthier foods.",
+          "Without efforts to level the playing field, appeals to personal responsibility remain hollow for those facing the greatest constraints.",
+          "Public health succeeds when it levels the playing field rather than merely exhorting individuals to try harder."
+        ]
+      },
+      {
+        "idiom": "the tip of the iceberg",
+        "definition": "A small visible part of a much larger underlying problem.",
+        "examples": [
+          "Individual cases of successful weight loss are the tip of the iceberg; the bulk of the population continues to face the same environmental pressures.",
+          "Focusing only on personal stories mistakes the tip of the iceberg for the whole structure of causation.",
+          "Clinical success stories remain the tip of the iceberg while the commercial and urban drivers of obesity continue unchecked."
+        ]
+      },
+      {
+        "idiom": "a rising tide lifts all boats",
+        "definition": "Broad improvements in conditions produce benefits across the whole population rather than only for the most motivated.",
+        "examples": [
+          "Improving the food environment is a rising tide that lifts all boats, including those with the least capacity for constant vigilance.",
+          "Individual programmes help some people; environmental change is a rising tide that lifts all boats.",
+          "The most equitable gains come when policy creates a rising tide that lifts all boats rather than demanding exceptional effort from everyone."
+        ]
+      },
+      {
+        "idiom": "to move the goalposts",
+        "definition": "To change the standards or conditions in a way that makes previous success criteria no longer sufficient.",
+        "examples": [
+          "The food industry has effectively moved the goalposts by expanding portion sizes and normalising constant snacking.",
+          "What counted as normal intake a generation ago has been altered as commercial practices moved the goalposts.",
+          "Individuals are told to take responsibility while the surrounding conditions continually move the goalposts toward higher consumption."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "The speed and scale of the global rise in obesity cannot be explained by sudden mass failure of individual character.",
+        "explanation": "Obesity prevalence has increased dramatically in dozens of countries within a few decades. Genetic composition of populations does not shift at that pace. What has changed is the food supply, the marketing environment, the structure of work, the design of cities and the cultural normalisation of large portions and frequent snacking. These are systemic transformations. Treating the resulting population shift as the aggregate of private moral failings requires the implausible assumption that willpower collapsed simultaneously across highly diverse societies. A more parsimonious explanation is that the choice environment itself was re-engineered in ways that make sustained energy surplus the default outcome for a much larger fraction of people. Individual variation remains; the shift in the distribution is environmental."
+      },
+      {
+        "claim": "Modern food environments are deliberately engineered to maximise consumption of energy-dense products.",
+        "explanation": "The leading firms in the food industry employ sensory science, behavioural research and sophisticated marketing to increase the palatability, convenience and purchase frequency of their products. Formulations are optimised for bliss points that override ordinary satiety signals. Distribution systems place these products in every available retail and food-service setting. Advertising, especially to children, builds brand loyalty and normalises frequent consumption. The result is not a neutral marketplace of options but a commercial apparatus whose commercial success depends on elevating population energy intake. Individuals still choose, yet they choose inside a choice architecture designed by organisations with far greater resources and information than any single consumer. Assigning primary causal weight to the consumer while leaving this apparatus largely unexamined is analytically incomplete."
+      },
+      {
+        "claim": "Socioeconomic gradients in obesity demonstrate that outcomes track structural position more closely than isolated personal virtue.",
+        "explanation": "In most high-income countries, obesity rates rise as income and education fall. This gradient appears early in life and persists across adulthood. Neighbourhoods with higher poverty show higher densities of fast-food outlets, lower access to affordable fresh food, and fewer safe spaces for physical activity. Time pressure from precarious or multiple jobs further constrains the capacity for home preparation and regular exercise. These patterned differences are difficult to reconcile with an account that treats weight primarily as a reflection of individual character. Character is not distributed so neatly by postcode and income band. The gradient is evidence that the opportunity to maintain healthy weight is itself unequally distributed. Responsibility language that ignores this distribution systematically misattributes the sources of population inequality in health."
+      },
+      {
+        "claim": "Children cannot be held to adult standards of responsibility, yet childhood environments strongly shape later risk.",
+        "explanation": "A substantial fraction of adult obesity has roots in childhood and adolescence. Children do not control the food purchased for the household, the marketing they are exposed to, the quality of school meals, or the safety and attractiveness of play spaces. Early excess weight tends to track into adulthood through both physiological and behavioural pathways. By the time individuals reach the age of full legal responsibility, many already carry elevated risk that was established under conditions they did not choose. An account that begins the causal story only at the moment of adult choice therefore truncates the actual developmental sequence. Effective prevention must address the environments that shape children’s trajectories; waiting until adulthood and then invoking personal responsibility arrives too late for a large part of the problem."
+      },
+      {
+        "claim": "Successful population-level reductions in other health risks have relied on environmental and regulatory change, not solely on personal exhortation.",
+        "explanation": "Tobacco control, road safety, and reductions in industrial pollution all achieved major gains by altering the context in which individuals act: taxation, advertising restrictions, product standards, infrastructure redesign and enforcement. Parallel reliance on information campaigns and appeals to personal responsibility produced far smaller effects. Obesity policy has so far remained closer to the weaker model. Where jurisdictions have introduced meaningful restrictions on marketing to children, taxes on sugar-sweetened beverages, or reformulation targets, measurable changes in purchasing and intake have followed. The comparative lesson is that environments can be redesigned to make healthier patterns easier and default. Continuing to treat obesity as a uniquely personal domain while every analogous public-health success has used structural levers is inconsistent and self-limiting."
+      },
+      {
+        "claim": "Genetic and early-life metabolic factors create large differences in susceptibility that pure responsibility accounts cannot accommodate.",
+        "explanation": "Twin, adoption and genomic studies consistently show substantial heritability of body-mass index and of specific appetitive traits. Early nutrition and stress also programme metabolic responses that persist across the lifespan. Two people can follow outwardly similar diets and activity patterns and still diverge in weight because their physiological set-points and hunger signalling differ. A moralised responsibility framework that treats all excess weight as evidence of equivalent behavioural failure therefore misreads the biology. It also risks deepening stigma against those whose biology makes the same behaviours more costly. Recognition of differential susceptibility does not eliminate the role of behaviour; it does require that causal accounts and policy responses take biological variation seriously rather than assuming a uniform capacity for self-regulation across the population."
+      },
+      {
+        "claim": "Time scarcity and the structure of modern work systematically favour energy-dense, low-effort eating.",
+        "explanation": "Long and irregular working hours, extended commuting, and the dual demands of paid work and unpaid care leave many adults with limited discretionary time and high cognitive load. Under these conditions, foods that are quick, inexpensive and highly rewarding become rational adaptations rather than simple lapses of discipline. Cooking from raw ingredients, planning varied meals, and fitting in structured activity all require temporal and mental resources that are unequally available. The expansion of the convenience-food sector is both a response to and a reinforcement of this time pressure. Responsibility narratives that abstract from the temporal structure of daily life therefore describe an idealised agent who does not match the circumstances of large parts of the working population. Policy that ignores time scarcity will continue to miss a central driver of dietary patterns."
+      },
+      {
+        "claim": "Stigma and the moralisation of weight produce additional harm without delivering population-level improvement.",
+        "explanation": "Heavy emphasis on personal responsibility easily slides into moral judgement of individuals living with obesity. The resulting stigma is associated with delayed healthcare seeking, psychological distress, disordered eating, and avoidance of physical activity in public settings. These effects can themselves worsen health and make sustained behaviour change harder. At the same time, decades of responsibility-focused messaging have coincided with continued rises in obesity in most countries, suggesting limited efficacy. A public-health approach that prioritises environmental change and supportive clinical care over moral diagnosis is both more humane and more consistent with evidence from other domains of prevention. Reducing stigma is not an alternative to addressing behaviour; it is a condition for creating the psychological safety in which behaviour change becomes more feasible."
+      },
+      {
+        "claim": "The commercial and political power of industries that profit from high consumption systematically blocks effective responses.",
+        "explanation": "Major food and beverage corporations deploy substantial resources to shape research agendas, public messaging, and regulatory outcomes. Voluntary reformulation pledges, industry-funded education campaigns, and lobbying against fiscal or marketing restrictions have repeatedly diluted or delayed stronger measures. The result is a policy environment in which the default remains heavy promotion of the very products most strongly linked to excess energy intake. Individuals are urged to resist while the organisational capacity to make resistance unnecessary is politically constrained. Any causal account that stops at the consumer therefore omits the upstream exercise of power that maintains the unhealthy choice architecture. Addressing obesity at scale requires confronting that power rather than treating its effects as the sum of private weaknesses."
+      },
+      {
+        "claim": "A coherent public-health strategy treats individual behaviour as real while locating primary preventive leverage in the systems that shape it.",
+        "explanation": "Denying the role of personal behaviour is neither accurate nor helpful. People do make daily decisions that affect energy balance, and support for those decisions remains necessary. The decisive analytical step is to recognise that the probability and difficulty of healthy decisions are themselves products of commercial, urban, economic and cultural systems. Primary prevention at population scale therefore focuses on altering those systems: the composition and marketing of the food supply, the relative price of healthy and unhealthy options, the design of places that invite or discourage movement, and the protection of children from commercial pressure. Individual-level interventions continue as secondary support. This division of labour matches the evidence from successful public-health campaigns in other fields and avoids the twin errors of pure voluntarism and pure structural determinism. The epidemic is real; the most powerful levers lie upstream of the individual plate."
+      }
+    ]
+  }
+}

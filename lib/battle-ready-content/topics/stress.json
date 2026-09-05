@@ -1,0 +1,407 @@
+{
+  "motion": "Systemic factors are the primary cause of harmful stress in contemporary society.",
+  "for": {
+    "vocab": [
+      {
+        "term": "systemic pressure",
+        "definition": "Widespread structural forces such as work demands, economic insecurity and constant connectivity that generate stress across large populations.",
+        "example": "Long hours and job insecurity are forms of systemic pressure that no amount of personal resilience can fully neutralise."
+      },
+      {
+        "term": "always-on culture",
+        "definition": "The expectation of continuous availability created by digital technology and competitive workplaces.",
+        "example": "The always-on culture erodes recovery time and turns evenings and weekends into extensions of the working day."
+      },
+      {
+        "term": "economic precarity",
+        "definition": "Chronic uncertainty about income, housing and employment that keeps people in a state of heightened alert.",
+        "example": "Economic precarity forces many workers to accept stressful conditions because the alternative is worse."
+      },
+      {
+        "term": "workload intensification",
+        "definition": "The steady increase in the volume and pace of tasks expected within the same or fewer hours.",
+        "example": "Workload intensification in many sectors has outpaced any gains from technology or efficiency."
+      },
+      {
+        "term": "social comparison",
+        "definition": "The constant measuring of one’s life against curated images of success that digital media amplify.",
+        "example": "Social comparison on platforms fuels dissatisfaction and stress even among people who are objectively secure."
+      },
+      {
+        "term": "recovery deficit",
+        "definition": "The chronic shortfall in genuine rest and detachment needed to restore mental and physical resources.",
+        "example": "A recovery deficit accumulates when work emails invade evenings and sleep is routinely sacrificed."
+      },
+      {
+        "term": "structural inequality",
+        "definition": "Unequal distribution of power, income and security that concentrates stress on those with least control over their lives.",
+        "example": "Structural inequality means the same economic shock produces far higher stress for those without savings or status."
+      },
+      {
+        "term": "organisational toxicity",
+        "definition": "Workplace cultures characterised by bullying, unrealistic targets, poor leadership and lack of psychological safety.",
+        "example": "Organisational toxicity drives burnout even when individual employees are highly capable and motivated."
+      },
+      {
+        "term": "attention fragmentation",
+        "definition": "The continuous interruption of focus by notifications, messages and competing demands that exhausts cognitive resources.",
+        "example": "Attention fragmentation at work and home leaves people feeling busy yet unproductive and tense."
+      },
+      {
+        "term": "collective responsibility",
+        "definition": "The recognition that reducing harmful stress requires changes in institutions and policy, not only personal coping strategies.",
+        "example": "Collective responsibility means redesigning jobs and social protections rather than simply teaching resilience workshops."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "Telling people to manage stress better while intensifying the conditions that produce it is both ineffective and unjust.",
+        "examples": [
+          "When deadlines multiply and staffing falls, telling people to manage stress better while intensifying the conditions that produce it is both ineffective and unjust.",
+          "Resilience training has limits; telling people to manage stress better while intensifying the conditions that produce it is both ineffective and unjust.",
+          "The individual focus becomes victim-blaming when telling people to manage stress better while intensifying the conditions that produce it is both ineffective and unjust."
+        ]
+      },
+      {
+        "phrase": "Modern work and technology have removed the natural boundaries that once protected recovery time.",
+        "examples": [
+          "Email and messaging mean modern work and technology have removed the natural boundaries that once protected recovery time.",
+          "The working day no longer ends at the office door; modern work and technology have removed the natural boundaries that once protected recovery time.",
+          "Without deliberate limits, modern work and technology have removed the natural boundaries that once protected recovery time."
+        ]
+      },
+      {
+        "phrase": "Stress becomes harmful when it is chronic, uncontrollable and unequally distributed.",
+        "examples": [
+          "Short-term pressure can be motivating, yet stress becomes harmful when it is chronic, uncontrollable and unequally distributed.",
+          "The public-health problem arises because stress becomes harmful when it is chronic, uncontrollable and unequally distributed.",
+          "Policy should target the conditions under which stress becomes harmful when it is chronic, uncontrollable and unequally distributed."
+        ]
+      },
+      {
+        "phrase": "Individual coping strategies cannot compensate for systematically toxic environments.",
+        "examples": [
+          "Mindfulness apps have value, but individual coping strategies cannot compensate for systematically toxic environments.",
+          "When bullying and overload are normal, individual coping strategies cannot compensate for systematically toxic environments.",
+          "Responsibility must be shared: individual coping strategies cannot compensate for systematically toxic environments."
+        ]
+      },
+      {
+        "phrase": "The rising incidence of burnout and anxiety tracks changes in work, technology and economic security, not a sudden collapse in personal character.",
+        "examples": [
+          "Data over recent decades show that the rising incidence of burnout and anxiety tracks changes in work, technology and economic security, not a sudden collapse in personal character.",
+          "Blaming weakness ignores the evidence that the rising incidence of burnout and anxiety tracks changes in work, technology and economic security, not a sudden collapse in personal character.",
+          "A serious analysis recognises that the rising incidence of burnout and anxiety tracks changes in work, technology and economic security, not a sudden collapse in personal character."
+        ]
+      },
+      {
+        "phrase": "Societies that reduce systemic stressors show better population mental health without sacrificing performance.",
+        "examples": [
+          "Countries with stronger labour protections and shorter working hours demonstrate that societies that reduce systemic stressors show better population mental health without sacrificing performance.",
+          "Workplace design and social policy matter: societies that reduce systemic stressors show better population mental health without sacrificing performance.",
+          "The comparative record supports the claim that societies that reduce systemic stressors show better population mental health without sacrificing performance."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "burning the candle at both ends",
+        "definition": "Exhausting oneself by working or living at an unsustainable pace with insufficient recovery.",
+        "examples": [
+          "Many employees are burning the candle at both ends because organisational demands never switch off.",
+          "Economic pressure leaves households burning the candle at both ends just to stay afloat.",
+          "Chronic overwork is the institutionalised form of burning the candle at both ends."
+        ]
+      },
+      {
+        "idiom": "the straw that breaks the camel’s back",
+        "definition": "A final small demand that causes collapse after accumulated pressure.",
+        "examples": [
+          "In overloaded systems, a minor extra task becomes the straw that breaks the camel’s back.",
+          "People snap not from one event but from the straw that breaks the camel’s back after months of strain.",
+          "Managers often see only the final incident and miss the straw that breaks the camel’s back."
+        ]
+      },
+      {
+        "idiom": "running on empty",
+        "definition": "Continuing to function after reserves of energy and resilience have been depleted.",
+        "examples": [
+          "Large numbers of workers report running on empty yet still facing rising targets.",
+          "When recovery time disappears, people end up running on empty for years.",
+          "Public services themselves are often running on empty because of understaffing and demand."
+        ]
+      },
+      {
+        "idiom": "a pressure cooker",
+        "definition": "An environment in which stress builds continuously with little release.",
+        "examples": [
+          "Certain corporate and public-sector cultures function as a pressure cooker.",
+          "Always-on technology turns the home into an extension of the workplace pressure cooker.",
+          "Without structural change the pressure cooker simply produces more burnout."
+        ]
+      },
+      {
+        "idiom": "swimming against the tide",
+        "definition": "Struggling to maintain well-being while larger forces push in the opposite direction.",
+        "examples": [
+          "Individual self-care is swimming against the tide when organisational norms reward overwork.",
+          "Parents trying to protect family time find themselves swimming against the tide of economic expectations.",
+          "Mental-health advice that ignores context leaves people swimming against the tide."
+        ]
+      },
+      {
+        "idiom": "the tip of the iceberg",
+        "definition": "The visible cases of breakdown that represent a much larger volume of hidden strain.",
+        "examples": [
+          "Diagnosed burnout and anxiety are only the tip of the iceberg of chronic workplace stress.",
+          "Sickness absence figures capture the tip of the iceberg; presenteeism hides the rest.",
+          "Policy focused solely on treatment addresses the tip of the iceberg while leaving causes untouched."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "The organisation of modern work systematically generates chronic stress through overload, insecurity and loss of control.",
+        "explanation": "Across many sectors, employees face rising task volume, tighter deadlines, constant monitoring and the expectation of immediate responsiveness. Job security has declined for large groups through precarious contracts, restructuring and the threat of automation. Psychological research consistently identifies high demand combined with low control as a core driver of harmful stress. These conditions are not the result of individual weakness; they are designed into performance management systems, staffing models and competitive cultures. When entire industries normalise sixty-hour weeks or permanent availability, the stress that follows is predictable and widespread. Interventions that teach individuals to cope more skilfully leave the generating conditions intact. Reducing harmful stress therefore requires changes in how work is structured, measured and rewarded, not only changes in personal mindset."
+      },
+      {
+        "claim": "Digital technology has erased traditional boundaries between work and recovery, creating a structural recovery deficit.",
+        "explanation": "Smartphones and cloud systems make it possible, and increasingly expected, to remain reachable at all hours. Emails, messages and notifications invade evenings, weekends and holidays. The result is fragmented attention and incomplete psychological detachment from work. Sleep quality and the capacity to restore cognitive and emotional resources decline. Studies of always-on cultures show elevated rates of exhaustion and anxiety even among high performers. This is not a failure of individual discipline; it is the foreseeable outcome of tools and norms that remove the off-switch. Organisations that measure responsiveness and celebrate constant availability actively produce the deficit. Restoring boundaries through policy, technology design and cultural expectation is a systemic task. Personal digital detoxes remain fragile when the surrounding system continues to demand permanent connection."
+      },
+      {
+        "claim": "Economic insecurity and inequality concentrate stress on those with least power to change their circumstances.",
+        "explanation": "People with unstable incomes, high housing costs, limited savings and weak bargaining power experience continuous low-level threat. The same external event—a delayed payment, a rent increase, a period of illness—produces far higher stress for them than for those with buffers. Structural inequality therefore amplifies the impact of ordinary life events. Labour-market dualism, declining union coverage and the erosion of social protections have widened the group living with precarity. Telling individuals in these positions to practise gratitude or resilience ignores the material sources of their tension. Population-level data show clear gradients of stress-related illness by income and job quality. Addressing harmful stress requires attention to wages, housing security and social insurance, not only to individual coping skills."
+      },
+      {
+        "claim": "Workplace cultures that reward overwork and punish boundary-setting make personal stress management a losing strategy.",
+        "explanation": "In many organisations the employees who stay late, answer messages at night and accept impossible workloads are praised and promoted. Those who protect recovery time risk being labelled uncommitted. Under these incentives, individual attempts to manage stress become career liabilities. The rational response is to suppress signals of strain until breakdown occurs. Surveys repeatedly find that fear of appearing weak prevents people from using formal support or reducing hours. Culture change—modelling sustainable behaviour by leaders, evaluating output rather than visibility, and protecting recovery—is therefore a prerequisite for any successful stress-reduction effort. Without it, resilience programmes function mainly as public relations while the underlying selection pressure continues to favour self-exploitation."
+      },
+      {
+        "claim": "The scale and rise of stress-related illness track systemic changes more closely than any plausible decline in individual character.",
+        "explanation": "Rates of reported burnout, anxiety and stress-related absence have increased across many high-income countries over recent decades. It is implausible that personal resilience has suddenly collapsed on such a scale. More coherent explanations lie in longer working hours for some groups, intensified performance pressure, the spread of always-on technology, rising housing and childcare costs, and the weakening of traditional community supports. Comparative data show lower average stress in societies with stronger labour protections, shorter standard hours and more generous social safety nets. These patterns point to modifiable institutional causes. Framing the problem primarily as individual failure misdirects attention and resources away from the levers that actually move population outcomes."
+      },
+      {
+        "claim": "Social media and performance-oriented culture amplify stress through relentless comparison and status competition.",
+        "explanation": "Digital platforms present highly curated images of success, attractiveness and productivity. Users measure their own ordinary lives against these selective displays and frequently feel inadequate. The same dynamic operates inside workplaces through visible metrics, rankings and the performance of busyness. Status competition that was once limited by local knowledge is now permanent and global. The resulting pressure is external in origin even though it operates through individual psychology. Design features of platforms and organisational systems deliberately exploit attention and comparison. Treating the consequent stress as purely personal overlooks the engineered environment that produces it. Regulation of attention-extracting design and reform of workplace evaluation practices are systemic responses that individual mindfulness cannot replace."
+      },
+      {
+        "claim": "Certain occupations and sectors institutionalise harmful stress through understaffing, emotional labour and zero-error cultures.",
+        "explanation": "Healthcare, education, social care, emergency services and parts of the gig economy routinely operate with chronic staff shortages and high emotional demands. Workers are expected to absorb the consequences of system under-resourcing while maintaining composure and high performance. Error is punished severely even when conditions make error more likely. These features are organisational and political choices, not individual ones. High rates of burnout in these sectors are therefore predictable. Improving staffing ratios, redesigning roles, and creating psychological safety are structural interventions. Advising individual nurses or teachers to manage their stress better while leaving caseloads impossible is an evasion of responsibility."
+      },
+      {
+        "claim": "Effective reduction of harmful stress has been achieved through collective and policy measures, not only through individual therapy.",
+        "explanation": "Historical improvements in working time, occupational safety, parental leave and job security reduced population stress long before modern psychology popularised personal coping techniques. Contemporary examples include organisations that have shortened the working week without loss of output, cities that have limited after-hours email, and countries that have strengthened employment protection. These changes operate on the causes rather than the symptoms. Clinical treatment remains essential for those already harmed, yet it cannot substitute for prevention at scale. A strategy that relies primarily on individual resilience while leaving systemic drivers untouched will continuously generate new cases faster than they can be treated. The evidence favours a dual approach in which structural reform carries the main preventive weight."
+      },
+      {
+        "claim": "Presenteeism and hidden strain show that official figures understate the true volume of work-related stress.",
+        "explanation": "Many employees continue to work while exhausted, anxious or unwell because absence is penalised or staffing is already critical. This presenteeism conceals the prevalence of harmful stress and further depletes capacity. Surveys of self-reported strain consistently exceed formal sickness statistics. The gap indicates that the problem is larger and more normalised than visible breakdowns suggest. When entire teams operate in a state of continuous overload, the absence of mass collapse is not evidence of manageable conditions; it is evidence of adaptation at high personal cost. Recognising the hidden burden strengthens the case for systemic intervention before more people reach clinical thresholds."
+      },
+      {
+        "claim": "Assigning primary responsibility to individuals serves institutional interests by deflecting pressure for organisational and policy change.",
+        "explanation": "Framing stress as a personal failing or skill deficit allows employers and governments to offer low-cost wellness programmes while avoiding more expensive reforms to workload, staffing, pay or regulation. The individualisation of stress has ideological convenience. It preserves existing power relations and performance demands. Critical analysis of workplace mental health initiatives often reveals a focus on employee adjustment rather than job redesign. While personal strategies have value, their elevation to the primary solution is politically useful to those who benefit from current arrangements. A balanced account restores systemic factors to their proper causal weight and opens space for collective remedies that match the collective origins of the problem."
+      }
+    ]
+  },
+  "against": {
+    "vocab": [
+      {
+        "term": "personal agency",
+        "definition": "The capacity of individuals to make choices, set boundaries and shape their own responses to pressure.",
+        "example": "Even in demanding environments, personal agency determines whether stress remains manageable or becomes overwhelming."
+      },
+      {
+        "term": "cognitive appraisal",
+        "definition": "The mental process by which people interpret events as threatening, challenging or irrelevant, strongly influencing the stress response.",
+        "example": "Two people facing the same deadline can experience very different stress levels because of differences in cognitive appraisal."
+      },
+      {
+        "term": "resilience capacity",
+        "definition": "The set of psychological, social and behavioural resources that enable recovery from difficulty without lasting harm.",
+        "example": "Resilience capacity can be strengthened through deliberate practice and is not fixed by external conditions alone."
+      },
+      {
+        "term": "over-medicalisation",
+        "definition": "The tendency to treat ordinary and manageable pressures as clinical disorders requiring professional intervention.",
+        "example": "Over-medicalisation risks turning normal adaptive stress into a permanent identity of vulnerability."
+      },
+      {
+        "term": "adaptive stress",
+        "definition": "Moderate, time-limited pressure that sharpens focus, builds capability and supports performance.",
+        "example": "Athletes and professionals routinely use adaptive stress to reach higher levels of skill."
+      },
+      {
+        "term": "boundary management",
+        "definition": "The practical skills of protecting time, attention and energy from unnecessary intrusion.",
+        "example": "Effective boundary management allows people to participate in demanding work without chronic overload."
+      },
+      {
+        "term": "locus of control",
+        "definition": "The degree to which individuals believe outcomes depend on their own actions rather than external forces.",
+        "example": "A stronger internal locus of control is associated with lower perceived stress under similar objective conditions."
+      },
+      {
+        "term": "lifestyle factors",
+        "definition": "Daily choices regarding sleep, exercise, nutrition, substances and social connection that powerfully moderate stress.",
+        "example": "Neglect of basic lifestyle factors amplifies stress responses far beyond what external demands alone would produce."
+      },
+      {
+        "term": "victimhood narrative",
+        "definition": "An interpretive frame that emphasises powerlessness and external blame at the expense of practical response.",
+        "example": "A pervasive victimhood narrative can discourage the very actions that would reduce personal stress."
+      },
+      {
+        "term": "individual accountability",
+        "definition": "The recognition that adults retain responsibility for how they interpret, prioritise and respond to life’s demands.",
+        "example": "Individual accountability does not deny external pressures; it insists they are not the whole story."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "Two people can face identical external demands and experience radically different levels of harmful stress.",
+        "examples": [
+          "This simple observation shows that two people can face identical external demands and experience radically different levels of harmful stress.",
+          "Appraisal and coping skills explain why two people can face identical external demands and experience radically different levels of harmful stress.",
+          "Any complete account must recognise that two people can face identical external demands and experience radically different levels of harmful stress."
+        ]
+      },
+      {
+        "phrase": "Personal habits of sleep, movement, attention and recovery remain the strongest daily moderators of stress.",
+        "examples": [
+          "Even in difficult jobs, personal habits of sleep, movement, attention and recovery remain the strongest daily moderators of stress.",
+          "Neglecting these foundations makes everything harder; personal habits of sleep, movement, attention and recovery remain the strongest daily moderators of stress.",
+          "Systemic reform is important, yet personal habits of sleep, movement, attention and recovery remain the strongest daily moderators of stress."
+        ]
+      },
+      {
+        "phrase": "Framing all stress as systemic removes agency and can become self-fulfilling.",
+        "examples": [
+          "When people conclude they are powerless, framing all stress as systemic removes agency and can become self-fulfilling.",
+          "Practical progress requires retaining a sense of control; framing all stress as systemic removes agency and can become self-fulfilling.",
+          "The risk of learned helplessness appears when framing all stress as systemic removes agency and can become self-fulfilling."
+        ]
+      },
+      {
+        "phrase": "Some degree of stress is inherent in meaningful work and adult responsibility; the goal is management, not elimination.",
+        "examples": [
+          "Challenging goals produce tension; some degree of stress is inherent in meaningful work and adult responsibility; the goal is management, not elimination.",
+          "A zero-stress ideal is unrealistic; some degree of stress is inherent in meaningful work and adult responsibility; the goal is management, not elimination.",
+          "Resilient people accept that some degree of stress is inherent in meaningful work and adult responsibility; the goal is management, not elimination."
+        ]
+      },
+      {
+        "phrase": "Over-emphasising external causes risks creating a culture of fragility rather than capability.",
+        "examples": [
+          "If every difficulty is treated as trauma, over-emphasising external causes risks creating a culture of fragility rather than capability.",
+          "Young people especially need models of agency; over-emphasising external causes risks creating a culture of fragility rather than capability.",
+          "Support should build strength; over-emphasising external causes risks creating a culture of fragility rather than capability."
+        ]
+      },
+      {
+        "phrase": "Effective individuals and organisations treat stress as a signal to be interpreted and acted upon, not merely a harm to be avoided.",
+        "examples": [
+          "High performers use pressure as information; effective individuals and organisations treat stress as a signal to be interpreted and acted upon, not merely a harm to be avoided.",
+          "Avoidance strategies often increase long-term strain; effective individuals and organisations treat stress as a signal to be interpreted and acted upon, not merely a harm to be avoided.",
+          "The most useful stance is that effective individuals and organisations treat stress as a signal to be interpreted and acted upon, not merely a harm to be avoided."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "mind over matter",
+        "definition": "The capacity of interpretation and attitude to shape the impact of external circumstances.",
+        "examples": [
+          "In many stressful situations mind over matter determines whether pressure becomes debilitating.",
+          "Training attention and appraisal is a practical application of mind over matter.",
+          "Dismissing mind over matter leaves people more vulnerable than they need to be."
+        ]
+      },
+      {
+        "idiom": "take ownership",
+        "definition": "To accept responsibility for one’s responses and choices rather than attributing everything to outside forces.",
+        "examples": [
+          "Progress begins when people take ownership of their sleep, boundaries and priorities.",
+          "Organisations improve when leaders take ownership of culture instead of blaming market forces alone.",
+          "Personal development requires the willingness to take ownership."
+        ]
+      },
+      {
+        "idiom": "a double-edged sword",
+        "definition": "Something that has both beneficial and harmful potential depending on use.",
+        "examples": [
+          "Pressure is a double-edged sword: it can build capability or cause harm according to dose and response.",
+          "Technology is a double-edged sword in the stress equation; the same tools enable recovery or intrusion.",
+          "High expectations function as a double-edged sword in demanding careers."
+        ]
+      },
+      {
+        "idiom": "get a grip",
+        "definition": "To regain composure and practical control rather than remaining overwhelmed.",
+        "examples": [
+          "In acute situations the first step is often simply to get a grip and prioritise.",
+          "Cultures that never encourage people to get a grip risk permanent helplessness.",
+          "Support and self-management together help people get a grip under pressure."
+        ]
+      },
+      {
+        "idiom": "the power of perspective",
+        "definition": "The significant difference made by how a situation is framed and understood.",
+        "examples": [
+          "Reframing a challenge as temporary and solvable illustrates the power of perspective.",
+          "Two colleagues can experience the same meeting differently because of the power of perspective.",
+          "Building the power of perspective is a core resilience skill."
+        ]
+      },
+      {
+        "idiom": "own worst enemy",
+        "definition": "The tendency of unhelpful thoughts and habits to create more suffering than external events require.",
+        "examples": [
+          "Catastrophising and rumination make many people their own worst enemy under stress.",
+          "Perfectionism often turns capable individuals into their own worst enemy.",
+          "Learning to interrupt these patterns stops people being their own worst enemy."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "Identical external conditions produce widely different stress outcomes, demonstrating the decisive role of individual appraisal and response.",
+        "explanation": "In any workplace, team or family facing similar demands, some people remain functional and even energised while others become depleted or ill. The difference lies substantially in how events are interpreted, what coping strategies are used, and what recovery practices are maintained. Cognitive-behavioural research shows that changing appraisal and behaviour reduces stress symptoms even when objective circumstances stay constant. This variability is not a denial of external pressure; it is evidence that external pressure is filtered through personal psychology. Policies and cultures that treat stress as purely systemic understate the leverage individuals still possess. Strengthening that leverage through skills training, coaching and habit formation produces measurable benefits that wait for systemic reform would delay."
+      },
+      {
+        "claim": "Core lifestyle behaviours remain among the most powerful and immediately available moderators of stress.",
+        "explanation": "Sleep duration and quality, physical activity, nutrition, alcohol and substance use, and the protection of attention strongly influence physiological and psychological stress responses. These factors are largely under individual control even inside imperfect systems. People who maintain them consistently report lower perceived stress and better performance under pressure. Conversely, neglect of these foundations amplifies the impact of every external demand. While organisations can support healthy behaviour, the daily choices remain personal. Emphasising systemic causes while ignoring the compounding effect of poor sleep or sedentary living produces an incomplete and less practical account. The highest-leverage early interventions are often behavioural rather than structural."
+      },
+      {
+        "claim": "An exclusive focus on systemic causes risks fostering helplessness and reducing the motivation to act on what remains controllable.",
+        "explanation": "When stress is framed as the inevitable product of large forces beyond influence, individuals may conclude that personal effort is futile. This belief itself increases vulnerability. Learned helplessness research demonstrates that perceived lack of control worsens outcomes even when some control exists. A balanced message acknowledges external pressures while insisting on residual agency. People who retain a sense of efficacy experiment, adapt and recover more effectively. Cultures that over-emphasise victimhood can unintentionally discourage the very behaviours that build resilience. Responsibility and support are not opposites; both are required. Removing individual accountability in the name of systemic analysis weakens one of the most reliable protective factors."
+      },
+      {
+        "claim": "Some stress is adaptive and necessary for growth, learning and high performance.",
+        "explanation": "Complete elimination of stress is neither possible nor desirable. Moderate, time-bounded pressure sharpens attention, motivates preparation and builds capacity. Athletes, performers, students and professionals routinely seek challenging conditions that produce temporary stress precisely because of these benefits. The public-health concern is chronic, uncontrollable and excessive stress, not the presence of demand itself. Conflating all stress with harm leads to unrealistic expectations and the medicalisation of ordinary difficulty. A mature approach distinguishes eustress from distress and equips people to use the former while limiting the latter. Systemic reform should target toxic excess, not the existence of standards, deadlines or competition."
+      },
+      {
+        "claim": "Many sources of stress arise from personal priorities, relationships and choices that lie outside the workplace or economic system.",
+        "explanation": "Family conflict, caring responsibilities, financial decisions, social media habits, perfectionism and interpersonal difficulties generate substantial stress independently of organisational design. These domains are only partially shaped by public policy. Individuals retain significant influence over how they manage relationships, spend, use technology and set internal standards. Attributing the bulk of harmful stress to systemic factors risks overlooking the large contribution of private life. Effective support must address both spheres. A narrative that locates almost all causality in employers and governments leaves people less prepared to handle the stressors that no structural change will remove."
+      },
+      {
+        "claim": "Over-medicalisation of everyday pressure can create identity effects that prolong and deepen distress.",
+        "explanation": "Labelling ordinary and manageable strain as clinical disorder risks altering self-concept and expectations. People may come to see themselves as fragile or permanently damaged rather than as temporarily overloaded. Diagnostic expansion and the rapid spread of mental-health language have coincided with rising self-reported symptoms, raising questions of looping effects. While serious conditions require treatment, the extension of clinical framing to mild and transient states can reduce tolerance for discomfort and delay practical coping. A calibrated approach reserves medical pathways for clear disorder and emphasises skills, habits and social support for the broader range of stress experiences. Systemic analysis should not become a route to universal pathologising."
+      },
+      {
+        "claim": "High-performing individuals and teams routinely operate under significant pressure without high rates of harmful stress, indicating that management is possible.",
+        "explanation": "Certain occupations and elite environments sustain intense demand while maintaining lower than expected rates of breakdown. Selection, training, culture, recovery protocols and individual skill all contribute. These examples demonstrate that high external pressure need not translate into high harmful stress when mediating factors are strong. The existence of such cases weakens claims that systemic demand automatically produces population-level harm. Instead it directs attention to the quality of mediation—how demand is appraised, recovered from and shared. Organisations and individuals can learn from these successful adaptations rather than treating pressure itself as the sole variable to be minimised."
+      },
+      {
+        "claim": "Personal boundary-setting and selective engagement remain effective even inside imperfect systems.",
+        "explanation": "Individuals can limit after-hours communication, decline low-value tasks, protect sleep, curate information intake and choose environments that better match their capacities. These actions do not require waiting for perfect institutional reform. Many people successfully reduce their stress load through such choices while continuing to work in demanding sectors. The possibility of boundary management is itself evidence that external conditions do not fully determine outcomes. Encouraging and equipping people to exercise these options is a practical complement to longer-term systemic change. Denying their efficacy in the name of structural analysis leaves available relief unused."
+      },
+      {
+        "claim": "Comparative and historical evidence shows that material conditions have improved while reported stress has risen, pointing to changing expectations and interpretations.",
+        "explanation": "In many high-income countries absolute living standards, safety and healthcare access are higher than in previous generations, yet self-reported stress and anxiety have increased. This divergence suggests that rising expectations, greater awareness, expanded diagnostic categories and cultural shifts in the meaning of difficulty play substantial roles. If systemic material pressures were the dominant and sufficient cause, the long-term trend should have been downward. The upward trend in reported distress under improved objective conditions implicates changes in appraisal, discourse and social norms. Any serious analysis must therefore include the cultural and psychological dimensions rather than treating stress purely as a readout of external hardship."
+      },
+      {
+        "claim": "A balanced approach recognises systemic contributors while preserving and strengthening individual capacity as the most immediate and reliable resource.",
+        "explanation": "External conditions clearly shape the distribution and intensity of stress. Work design, technology norms, economic security and inequality matter. At the same time, the translation of those conditions into personal harm is powerfully mediated by appraisal, habits, relationships and skills. Effective strategy therefore operates on both levels. Systemic reform reduces unnecessary and unequal pressure; individual development increases the capacity to meet remaining demands without lasting damage. Elevating either level to the exclusion of the other produces incomplete policy and weaker outcomes. The most robust position holds that systemic factors are important causes while insisting that personal agency remains real, trainable and essential."
+      }
+    ]
+  }
+}

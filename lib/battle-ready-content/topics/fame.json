@@ -1,0 +1,407 @@
+{
+  "motion": "This House believes that the pursuit and attainment of fame ultimately damages individuals and society more than it benefits them.",
+  "for": {
+    "vocab": [
+      {
+        "term": "parasocial obsession",
+        "definition": "The one-sided emotional attachment that audiences form with famous people, treating them as intimate friends while remaining complete strangers.",
+        "example": "Parasocial obsession turns ordinary admiration into unhealthy dependency on the private lives of celebrities."
+      },
+      {
+        "term": "identity fragmentation",
+        "definition": "The splitting of a person’s sense of self between their public image and their private reality, often leading to psychological distress.",
+        "example": "Identity fragmentation leaves many famous people unsure which version of themselves is real."
+      },
+      {
+        "term": "privacy erosion",
+        "definition": "The progressive loss of personal boundaries and private space caused by constant public scrutiny and media intrusion.",
+        "example": "Privacy erosion is the price almost every famous person eventually pays for visibility."
+      },
+      {
+        "term": "ephemeral validation",
+        "definition": "The short-lived sense of worth that comes from public attention and disappears as soon as the spotlight moves on.",
+        "example": "Ephemeral validation keeps people chasing the next hit of attention long after it has stopped satisfying them."
+      },
+      {
+        "term": "celebrity culture",
+        "definition": "A social system that elevates fame itself as a primary measure of success and worth, often independent of achievement.",
+        "example": "Celebrity culture teaches young people that being known matters more than being skilled or useful."
+      },
+      {
+        "term": "reputational volatility",
+        "definition": "The extreme and sudden swings in public opinion that can destroy a famous person’s standing overnight.",
+        "example": "Reputational volatility means that years of careful image-building can be erased by a single controversy."
+      },
+      {
+        "term": "attention economy",
+        "definition": "The modern marketplace in which human attention is the scarce resource and fame is the most valuable currency.",
+        "example": "In the attention economy, the most extreme or superficial behaviour is often rewarded with the greatest visibility."
+      },
+      {
+        "term": "psychological attrition",
+        "definition": "The gradual wearing down of mental health caused by sustained public pressure, criticism and loss of normal life.",
+        "example": "Psychological attrition explains why rates of anxiety, addiction and depression are so high among the famous."
+      },
+      {
+        "term": "commodified self",
+        "definition": "The process by which a person’s identity, relationships and even suffering become products to be packaged and sold.",
+        "example": "Once fame arrives, the individual risks becoming a commodified self rather than a free human being."
+      },
+      {
+        "term": "social distortion",
+        "definition": "The warping of collective values and priorities that occurs when fame is treated as the highest form of success.",
+        "example": "Social distortion is visible when children dream of being influencers rather than teachers, engineers or carers."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "Fame promises connection but delivers isolation.",
+        "examples": [
+          "Fame promises connection but delivers isolation, surrounding people with crowds while leaving them profoundly alone.",
+          "The central paradox is that fame promises connection but delivers isolation.",
+          "We should recognise that fame promises connection but delivers isolation before encouraging anyone to chase it."
+        ]
+      },
+      {
+        "phrase": "The spotlight burns as often as it illuminates.",
+        "examples": [
+          "The spotlight burns as often as it illuminates, and many who enter it never fully recover.",
+          "History is full of examples where the spotlight burns as often as it illuminates.",
+          "Young people need to hear that the spotlight burns as often as it illuminates."
+        ]
+      },
+      {
+        "phrase": "Being known by everyone means being understood by almost no one.",
+        "examples": [
+          "Being known by everyone means being understood by almost no one, which is a lonely form of existence.",
+          "The tragedy of fame is that being known by everyone means being understood by almost no one.",
+          "We must stop selling the fantasy that being known by everyone means being understood by almost no one is somehow desirable."
+        ]
+      },
+      {
+        "phrase": "Fame turns private pain into public entertainment.",
+        "examples": [
+          "Fame turns private pain into public entertainment, and the audience rarely considers the human cost.",
+          "A society that accepts that fame turns private pain into public entertainment has lost its moral compass.",
+          "We cannot ignore how fame turns private pain into public entertainment."
+        ]
+      },
+      {
+        "phrase": "The hunger for attention is never permanently satisfied.",
+        "examples": [
+          "The hunger for attention is never permanently satisfied; each dose creates the need for a larger one.",
+          "Those who achieve fame quickly discover that the hunger for attention is never permanently satisfied.",
+          "Chasing fame is dangerous precisely because the hunger for attention is never permanently satisfied."
+        ]
+      },
+      {
+        "phrase": "A culture that worships fame teaches the wrong lessons about a life well lived.",
+        "examples": [
+          "A culture that worships fame teaches the wrong lessons about a life well lived, prioritising visibility over substance.",
+          "We must challenge a culture that worships fame teaches the wrong lessons about a life well lived.",
+          "The motion exists because a culture that worships fame teaches the wrong lessons about a life well lived."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "a double-edged sword",
+        "definition": "Something that has both positive and negative consequences, with the negative often outweighing the positive.",
+        "examples": [
+          "Fame is a double-edged sword that cuts the famous as deeply as it elevates them.",
+          "What looks like success from the outside is often a double-edged sword in private.",
+          "We should stop presenting fame as pure gain when it is clearly a double-edged sword."
+        ]
+      },
+      {
+        "idiom": "sell one’s soul",
+        "definition": "To sacrifice personal integrity, privacy or values in exchange for success or recognition.",
+        "examples": [
+          "Many who chase fame end up feeling they have sold their soul for public approval.",
+          "The industry often requires people to sell their soul in order to stay visible.",
+          "We should question a system that pressures individuals to sell their soul for attention."
+        ]
+      },
+      {
+        "idiom": "fifteen minutes of fame",
+        "definition": "A brief period of public attention that is quickly forgotten and often leaves the person worse off.",
+        "examples": [
+          "In the age of social media, fifteen minutes of fame can destroy a reputation that took years to build.",
+          "The promise of fifteen minutes of fame draws people into situations they later regret.",
+          "Society encourages the pursuit of fifteen minutes of fame without warning of the aftermath."
+        ]
+      },
+      {
+        "idiom": "live in a goldfish bowl",
+        "definition": "To live under constant observation with no genuine privacy or escape from public view.",
+        "examples": [
+          "Famous people often describe their lives as living in a goldfish bowl where every movement is watched.",
+          "No one can thrive long-term when forced to live in a goldfish bowl.",
+          "The loss of ordinary anonymity is the reality of having to live in a goldfish bowl."
+        ]
+      },
+      {
+        "idiom": "pay the price",
+        "definition": "To suffer the negative consequences of a choice or situation.",
+        "examples": [
+          "Those who attain fame almost always pay the price in mental health, relationships or freedom.",
+          "The public rarely sees the full price that the famous are forced to pay.",
+          "We must ask whether any amount of recognition is worth the price that fame exacts."
+        ]
+      },
+      {
+        "idiom": "hollow victory",
+        "definition": "An achievement that looks successful on the surface but feels empty or damaging once attained.",
+        "examples": [
+          "For many, fame turns out to be a hollow victory that fails to deliver lasting satisfaction.",
+          "What society celebrates as success is often experienced as a hollow victory by those who achieve it.",
+          "We should stop encouraging young people to chase what so often proves a hollow victory."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "Fame systematically destroys privacy and the possibility of ordinary human relationships.",
+        "explanation": "Once a person becomes widely recognisable, simple activities such as walking in a park, eating in a restaurant or meeting friends become public events. Paparazzi, fans and social-media users treat the famous person’s life as content. Intimate relationships are strained by jealousy, distrust and the knowledge that private moments may be recorded and shared. Children of famous parents grow up under scrutiny that no child should face. The result is profound isolation: the individual is surrounded by people yet unable to experience unguarded connection. Psychological research and countless personal accounts from actors, musicians and influencers confirm that this loss of privacy is among the most consistently reported and least recoverable costs of fame. A society that treats this condition as an acceptable price of success has lost sight of what makes a human life bearable."
+      },
+      {
+        "claim": "The psychological toll of fame is severe and well-documented.",
+        "explanation": "Rates of depression, anxiety, substance abuse and suicide are markedly higher among celebrities than in the general population. The combination of constant evaluation, unpredictable public mood swings, sleep disruption from travel and performance, and the collapse of normal support networks creates chronic stress. Identity becomes unstable because the public image is constantly being rewritten by media and fans. Many famous people describe feeling that they no longer know who they are outside the role. High-profile cases from Marilyn Monroe to contemporary musicians and reality-television figures illustrate the pattern. While not every famous person collapses, the elevated risk is structural rather than accidental. Encouraging the pursuit of fame therefore means encouraging entry into an environment known to damage mental health at scale."
+      },
+      {
+        "claim": "Celebrity culture distorts the values of the wider society, especially the young.",
+        "explanation": "When fame is presented as the ultimate achievement, children and adolescents absorb the message that visibility equals worth. Surveys repeatedly show that large numbers of young people now rank ‘being famous’ above careers in medicine, teaching or engineering. Social-media platforms amplify this distortion by rewarding the most extreme, sexualised or conflict-driven content with the greatest reach. The result is a generation that invests energy in personal branding rather than skill, character or contribution. Schools and families struggle to compete with the constant messaging that ordinary life is inadequate. This cultural shift has measurable consequences for aspiration, self-esteem and civic engagement. A society that elevates fame as a primary goal is actively mis-educating its young about what constitutes a meaningful life."
+      },
+      {
+        "claim": "Fame creates perverse incentives that reward spectacle over substance.",
+        "explanation": "In the attention economy, the fastest route to visibility is rarely careful work or quiet excellence. Outrage, scandal, physical extremes and emotional exhibitionism generate more engagement than competence or integrity. Individuals who might otherwise have developed genuine talent are drawn toward the quicker rewards of notoriety. Media organisations and platforms profit from this dynamic and therefore perpetuate it. The long-term effect is a public sphere crowded with people famous for being famous, while serious achievement in science, art or public service receives comparatively little attention. This inversion of values impoverishes collective culture and misdirects human energy on a large scale."
+      },
+      {
+        "claim": "The famous themselves frequently describe the experience as a trap rather than a triumph.",
+        "explanation": "Autobiographies, interviews and documentaries are filled with accounts of people who achieved the visibility they once desired and then found it empty or actively destructive. Many speak of the impossibility of returning to anonymity, the loss of spontaneous friendship, and the persistent fear that their relevance will vanish. Some attempt to withdraw, only to discover that the public and the industry refuse to release them. Others continue performing long after the work has ceased to bring satisfaction because the alternative—being forgotten—feels like annihilation. These testimonies are not isolated complaints; they form a consistent pattern across decades and cultures. When the people who have actually lived the experience warn against it, society should listen rather than continue to sell the fantasy."
+      },
+      {
+        "claim": "Fame amplifies existing vulnerabilities and can destroy those who were already struggling.",
+        "explanation": "People who seek fame often do so partly to fill an internal void—low self-worth, unresolved trauma, or a need for external affirmation. The industry selects for and intensifies these traits. Once fame arrives, the coping mechanisms that previously managed insecurity are overwhelmed by the scale of attention and criticism. Substance abuse, disordered eating and self-harm frequently escalate. The public then consumes the resulting breakdown as entertainment or moral lesson. This cycle is visible in the careers of numerous musicians, actors and internet personalities. A system that takes vulnerable individuals, places them under extreme pressure, and profits from both their rise and their collapse is ethically indefensible. The pursuit of fame therefore functions as a socially approved form of self-endangerment."
+      },
+      {
+        "claim": "The economic and social benefits of fame are heavily concentrated and largely illusory for most who pursue it.",
+        "explanation": "For every person who achieves lasting, lucrative fame, thousands attempt the path and fail, often after significant personal and financial investment. Even among those who succeed, income is frequently unstable, controlled by intermediaries, and accompanied by high costs of image maintenance, security and legal protection. The widely publicised wealth of top celebrities obscures the precarious reality for the majority. Meanwhile, the social status that fame appears to confer is fragile and contingent on continued relevance. The rational calculation for most individuals is therefore negative: high probability of failure or harm, low probability of durable benefit. Encouraging mass pursuit of such a skewed lottery is socially irresponsible."
+      },
+      {
+        "claim": "Fame corrodes authentic achievement by making recognition the goal rather than the by-product.",
+        "explanation": "When the primary aim becomes being known, the quality and integrity of the work itself become secondary. Artists begin to create for algorithms, politicians prioritise viral moments over policy, and scientists may exaggerate findings for media attention. The internal standards that once guided excellence are replaced by the external metric of attention. Over time this shifts entire fields toward the production of what is noticeable rather than what is true, beautiful or useful. The result is a cultural landscape filled with noise and short on lasting value. A healthy society treats recognition as a possible consequence of good work, not as the purpose of the work. Fame culture inverts that order and thereby lowers the standard of what is produced."
+      },
+      {
+        "claim": "The public’s relationship with the famous is fundamentally extractive and often cruel.",
+        "explanation": "Audiences demand constant access, emotional disclosure and moral perfection while retaining the right to turn on the famous person at any moment. Social media has intensified this dynamic, allowing millions to express contempt, speculation or false intimacy with no accountability. The famous individual is expected to absorb this treatment as the cost of their position. Empathy is selectively applied: suffering is interesting when it is dramatic, and boring or irritating when it is prolonged. This collective behaviour reveals an ugly aspect of human psychology that fame culture actively cultivates. A society that normalises the treatment of real people as disposable entertainment content is damaging its own capacity for ordinary decency."
+      },
+      {
+        "claim": "Alternative sources of meaning and contribution are systematically undervalued by a fame-obsessed culture.",
+        "explanation": "Teaching, nursing, skilled trades, scientific research, local community work and quiet artistic practice all generate substantial human value yet receive little public glamour. When fame is held up as the pinnacle of success, these forms of contribution are implicitly ranked as second-class. Talented individuals are diverted away from them, and those who remain in them may feel their work is less worthy. The cumulative effect is a misallocation of human energy and a thinning of the social fabric that depends on unglamorous reliability. Reorienting cultural values away from fame and toward competence, care and craft would produce both healthier individuals and a more resilient society. The motion simply asks us to stop treating the most damaging form of recognition as the highest good."
+      }
+    ]
+  },
+  "against": {
+    "vocab": [
+      {
+        "term": "inspirational reach",
+        "definition": "The capacity of a well-known person to motivate, educate or elevate large numbers of people who would otherwise never encounter their message.",
+        "example": "Inspirational reach allows a single voice to change attitudes across continents."
+      },
+      {
+        "term": "platform amplification",
+        "definition": "The multiplication of influence that fame provides, enabling ideas, causes and talents to travel far beyond their original circle.",
+        "example": "Platform amplification turns private conviction into public movement."
+      },
+      {
+        "term": "merit recognition",
+        "definition": "The public acknowledgement of genuine excellence, skill or contribution that fame can sometimes deliver.",
+        "example": "Merit recognition, when it functions properly, rewards real achievement rather than mere visibility."
+      },
+      {
+        "term": "cultural contribution",
+        "definition": "The lasting enrichment of shared artistic, intellectual or social life that certain famous figures provide.",
+        "example": "Cultural contribution is the reason societies continue to value great performers, writers and thinkers."
+      },
+      {
+        "term": "agency expansion",
+        "definition": "The increased ability of an individual to shape their own life and environment that can come with resources and visibility.",
+        "example": "Agency expansion allows famous people to fund projects and advocate for causes beyond the reach of private citizens."
+      },
+      {
+        "term": "symbolic power",
+        "definition": "The capacity of a public figure to embody and communicate values, aspirations or warnings to a wide audience.",
+        "example": "Symbolic power explains why certain athletes or artists become representatives of larger social hopes."
+      },
+      {
+        "term": "aspirational model",
+        "definition": "A visible example of success that demonstrates what is possible and encourages others to develop their own abilities.",
+        "example": "An aspirational model can raise the ambitions of an entire generation in a particular field."
+      },
+      {
+        "term": "accountability visibility",
+        "definition": "The greater scrutiny that fame brings, which can deter misconduct and force public figures to justify their actions.",
+        "example": "Accountability visibility is one reason powerful people behave differently when they know they are being watched."
+      },
+      {
+        "term": "resource leverage",
+        "definition": "The ability to convert public attention into funding, partnerships and practical capacity for large-scale work.",
+        "example": "Resource leverage enables famous individuals to build hospitals, schools or research initiatives that would otherwise lack support."
+      },
+      {
+        "term": "narrative influence",
+        "definition": "The power to shape public conversation and collective understanding through storytelling and personal example.",
+        "example": "Narrative influence has been decisive in shifting attitudes on issues from mental health to environmental responsibility."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "Fame is a tool; its moral value depends on how it is used.",
+        "examples": [
+          "Fame is a tool; its moral value depends on how it is used, not on the mere fact of being known.",
+          "We should judge outcomes, remembering that fame is a tool; its moral value depends on how it is used.",
+          "The motion treats fame as inherently toxic, yet fame is a tool; its moral value depends on how it is used."
+        ]
+      },
+      {
+        "phrase": "Visibility can be placed in the service of justice and knowledge.",
+        "examples": [
+          "Visibility can be placed in the service of justice and knowledge, as countless advocates and educators have shown.",
+          "We reject the claim that fame is only destructive when visibility can be placed in the service of justice and knowledge.",
+          "History demonstrates that visibility can be placed in the service of justice and knowledge."
+        ]
+      },
+      {
+        "phrase": "Extraordinary achievement deserves public recognition.",
+        "examples": [
+          "Extraordinary achievement deserves public recognition, and fame is one form that recognition takes.",
+          "A healthy society accepts that extraordinary achievement deserves public recognition.",
+          "Denying that extraordinary achievement deserves public recognition flattens human aspiration."
+        ]
+      },
+      {
+        "phrase": "The existence of misuse does not invalidate the legitimate uses of fame.",
+        "examples": [
+          "The existence of misuse does not invalidate the legitimate uses of fame any more than bad medicine invalidates all medicine.",
+          "We must keep perspective: the existence of misuse does not invalidate the legitimate uses of fame.",
+          "A balanced view recognises that the existence of misuse does not invalidate the legitimate uses of fame."
+        ]
+      },
+      {
+        "phrase": "Many of the greatest contributions to human welfare have been amplified by fame.",
+        "examples": [
+          "Many of the greatest contributions to human welfare have been amplified by fame, from scientific discoveries to humanitarian campaigns.",
+          "It is simply untrue that many of the greatest contributions to human welfare have been amplified by fame is a rare exception.",
+          "We should celebrate rather than lament that many of the greatest contributions to human welfare have been amplified by fame."
+        ]
+      },
+      {
+        "phrase": "Personal cost does not automatically outweigh public benefit.",
+        "examples": [
+          "Personal cost does not automatically outweigh public benefit when the work made possible by fame serves millions.",
+          "Weighing consequences carefully shows that personal cost does not automatically outweigh public benefit.",
+          "The motion assumes that personal cost does not automatically outweigh public benefit is false; the evidence is more complex."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "a force for good",
+        "definition": "Something that produces significant positive effects despite possible drawbacks.",
+        "examples": [
+          "When directed toward serious causes, fame can be a genuine force for good.",
+          "We should evaluate whether a particular case of fame functions as a force for good.",
+          "Dismissing all fame ignores the many instances in which it has been a force for good."
+        ]
+      },
+      {
+        "idiom": "rise to the occasion",
+        "definition": "To meet a demanding situation with the necessary ability and character.",
+        "examples": [
+          "Some individuals rise to the occasion of fame and use it with responsibility and creativity.",
+          "The possibility that people can rise to the occasion is ignored by the motion’s blanket condemnation.",
+          "History records many who rose to the occasion and turned visibility into lasting value."
+        ]
+      },
+      {
+        "idiom": "the price of admission",
+        "definition": "The necessary cost that must be paid to gain access to a valuable opportunity or position.",
+        "examples": [
+          "Certain personal sacrifices may be the price of admission to a platform that can change lives.",
+          "Adults are capable of deciding whether the price of admission is worth paying.",
+          "We should not pretend that any worthwhile public role comes without a price of admission."
+        ]
+      },
+      {
+        "idiom": "shine a light",
+        "definition": "To bring public attention to an issue, problem or achievement that would otherwise remain hidden.",
+        "examples": [
+          "Famous people can shine a light on neglected injustices and force institutions to respond.",
+          "The ability to shine a light is one of the clearest social benefits of visibility.",
+          "Without the capacity to shine a light, many important stories would never reach a wide audience."
+        ]
+      },
+      {
+        "idiom": "stand on the shoulders of giants",
+        "definition": "To achieve more by building on the prior work and recognition of outstanding predecessors.",
+        "examples": [
+          "Young artists and scientists stand on the shoulders of giants whose fame kept their ideas alive.",
+          "Cultural memory depends on our willingness to let exceptional people stand on the shoulders of giants.",
+          "Fame, at its best, allows new generations to stand on the shoulders of giants."
+        ]
+      },
+      {
+        "idiom": "make a difference",
+        "definition": "To produce a noticeable and positive change in a situation or in people’s lives.",
+        "examples": [
+          "Fame multiplies the capacity of determined individuals to make a difference on a large scale.",
+          "The motion underestimates how often fame has helped people make a difference.",
+          "We should ask whether a given instance of fame helps someone make a difference before condemning it."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "Fame provides an unmatched platform for advancing knowledge, justice and public health.",
+        "explanation": "When a scientist, activist or survivor becomes widely known, their message can reach millions who would never encounter it through academic journals or local organising. Examples include the global impact of figures who used their visibility to accelerate vaccination campaigns, challenge discriminatory laws, or fund medical research. The same platform that can spread triviality can also spread life-saving information and moral urgency. The existence of frivolous fame does not cancel the cases in which visibility has been decisive in changing policy or behaviour. A complete assessment must therefore include the public goods that only large-scale attention can generate. Suppressing or stigmatising fame would also suppress these beneficial channels of influence."
+      },
+      {
+        "claim": "Recognition of excellence is a legitimate and healthy social function.",
+        "explanation": "Human beings have always celebrated outstanding skill, courage and creativity. Fame, in its best form, is simply the modern expression of that recognition. When a great musician, athlete, writer or inventor becomes known, the public affirmation reinforces the value of the underlying achievement and encourages others to pursue similar excellence. Removing or shaming that recognition would flatten cultural life and reduce the incentives for high effort. The fact that fame is sometimes given to the undeserving does not mean that deserved fame is itself harmful. A society that refuses to honour genuine accomplishment impoverishes its own standards and demoralises those who strive for them."
+      },
+      {
+        "claim": "Many famous individuals deliberately use their position to create lasting public benefit.",
+        "explanation": "Numerous well-known people establish foundations, advocate for policy change, fund scholarships, or lend their names to under-resourced causes. The resources and attention they command make possible projects that private citizens or even governments struggle to launch. Documented cases range from disease-eradication campaigns to large-scale educational initiatives and environmental protection. These outcomes are not accidental by-products; they are the result of intentional choices by people who decided that their visibility carried responsibility. The motion’s blanket claim that fame damages more than it benefits erases this substantial record of constructive use. Evaluating fame requires looking at what is done with it, not merely at its existence."
+      },
+      {
+        "claim": "The personal costs of fame are real but are often voluntarily accepted by adults who judge the trade-offs worthwhile.",
+        "explanation": "Most people who become famous in fields such as entertainment, sport or public life enter those fields knowing that visibility is part of the professional landscape. They weigh the loss of privacy and the pressure against the opportunity to practise their craft at the highest level, to reach large audiences, and to secure financial independence. While some later regret the bargain, many continue to affirm that the work and the impact justify the costs. Treating all such individuals as victims denies their agency and their capacity to make informed choices. A free society allows adults to accept demanding careers, including those that involve public exposure, without declaring the entire domain illegitimate."
+      },
+      {
+        "claim": "Fame can democratise influence that was once restricted to inherited wealth or political office.",
+        "explanation": "In earlier eras, the ability to shape public conversation was largely confined to those born into elite families or who held formal power. Modern fame, especially through media and digital platforms, has opened pathways for people from ordinary backgrounds to gain a hearing. Musicians, athletes, writers and activists from marginalised communities have used visibility to challenge established narratives and bring new perspectives into the mainstream. This expansion of who can be heard is a net social gain. While the system is imperfect and still skewed by existing inequalities, it remains more open than the closed hierarchies it partially replaced. Condemning fame as such risks closing one of the few remaining routes by which non-elite voices can reach a mass audience."
+      },
+      {
+        "claim": "Cultural memory and continuity depend on the remembrance of exceptional individuals.",
+        "explanation": "Societies transmit values, techniques and warnings through stories of particular people who embodied them. The fame of great artists, scientists, leaders and moral exemplars keeps their contributions alive across generations. Without some mechanism of public recognition, the signal of what a culture has found valuable would be much weaker. Educational curricula, public monuments and popular biographies all rely on the fact that certain lives are remembered more vividly than others. This selective remembrance is not mere celebrity worship; it is how collective identity and aspiration are maintained. A world that systematically devalued fame would also weaken its ability to remember and learn from its own highest achievements."
+      },
+      {
+        "claim": "The harms associated with fame are often produced by media practices and audience behaviour rather than by fame itself.",
+        "explanation": "Intrusive photography, speculative reporting, coordinated online abuse and the commercial packaging of personal breakdowns are choices made by media organisations and by the public. These practices can be regulated, criticised and changed without abolishing the underlying phenomenon of public recognition. Many famous people maintain relatively stable lives when they work in fields with stronger professional norms or when they set firm boundaries that the industry eventually respects. Attributing every negative outcome to ‘fame’ as an abstract force obscures the specific agents and incentives that generate harm. Reforming those incentives is more precise and more constructive than declaring the entire pursuit illegitimate."
+      },
+      {
+        "claim": "Aspirational figures provide concrete models that raise collective ambition.",
+        "explanation": "Seeing someone from a similar background achieve mastery and recognition can expand a young person’s sense of what is possible. This effect is documented in sport, science, the arts and public life. The famous person functions as living proof that high performance is attainable. While unhealthy comparison is a risk, the complete absence of visible high achievers would leave ambition without landmarks. Societies that celebrate excellence in multiple domains tend to produce more of it. Fame, when it attaches to real skill, supplies those landmarks. The motion’s focus on the failures and casualties of fame underweights this positive modelling function that benefits people who never become famous themselves."
+      },
+      {
+        "claim": "Complete rejection of fame would impoverish public discourse and collective experience.",
+        "explanation": "Shared reference points—iconic performances, breakthrough discoveries, memorable public stands—give a society common language and emotional texture. These reference points are created by people who become known for their work. A culture that treated all such visibility as suspect would thin out the stock of shared stories and symbols. Public conversation would become more fragmented and less able to mobilise around common purposes. While excess and triviality exist, they do not cancel the coordinating and enriching role that legitimate fame plays. The alternative to a fame-conscious culture is not a pure meritocracy of invisible excellence; it is often a flatter, less memorable public life."
+      },
+      {
+        "claim": "The motion overgeneralises from the most damaged cases and ignores the wide variation in how fame is experienced and used.",
+        "explanation": "Some famous people are destroyed by the experience; others manage it, set boundaries, and continue productive work for decades. Some use their platform for narcissistic display; others use it for sustained public service. The distribution of outcomes is wide. A responsible evaluation must acknowledge that variation rather than treating the worst cases as the inevitable essence of fame. Policy and cultural attitudes should aim to reduce the specific practices that generate harm—predatory media, lack of mental-health support, perverse algorithmic incentives—while preserving the channels through which recognition and influence can serve valuable ends. Blanket condemnation is analytically crude and practically counterproductive. Fame is neither pure blessing nor pure curse; it is a powerful social phenomenon whose effects depend on institutions, incentives and individual character. The motion’s absolute claim fails to capture that complexity."
+      }
+    ]
+  }
+}

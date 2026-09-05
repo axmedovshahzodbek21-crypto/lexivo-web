@@ -1,0 +1,407 @@
+{
+  "motion": "This House believes that computer games cause significant social, psychological and developmental harm and should be strictly regulated through age restrictions, content controls and limits on playtime.",
+  "for": {
+    "vocab": [
+      {
+        "term": "behavioural addiction",
+        "definition": "A compulsive pattern of activity that continues despite clear negative consequences for health, relationships or responsibilities.",
+        "example": "Many young players develop behavioural addiction to online games that crowds out sleep, study and real-world friendships."
+      },
+      {
+        "term": "desensitisation",
+        "definition": "The gradual reduction of emotional response to violence or suffering through repeated exposure.",
+        "example": "Prolonged exposure to graphic content in games can produce desensitisation that carries over into real-life attitudes."
+      },
+      {
+        "term": "social withdrawal",
+        "definition": "The progressive retreat from face-to-face interaction and community participation in favour of solitary or online activity.",
+        "example": "Excessive gaming often leads to social withdrawal that leaves adolescents isolated from peers and family."
+      },
+      {
+        "term": "developmental interference",
+        "definition": "Disruption of the normal stages of cognitive, emotional or social growth during childhood and adolescence.",
+        "example": "Heavy screen-based play during critical years risks developmental interference with attention, empathy and self-regulation."
+      },
+      {
+        "term": "predatory monetisation",
+        "definition": "Business practices that deliberately exploit psychological vulnerabilities to extract maximum spending from players.",
+        "example": "Loot boxes and endless battle passes are forms of predatory monetisation aimed especially at younger and impulsive users."
+      },
+      {
+        "term": "attention fragmentation",
+        "definition": "The erosion of sustained focus caused by constant rapid rewards and stimuli.",
+        "example": "Games designed for continuous micro-rewards contribute to attention fragmentation that harms academic performance."
+      },
+      {
+        "term": "normative distortion",
+        "definition": "The shifting of what is perceived as normal or acceptable behaviour through repeated virtual experience.",
+        "example": "When violence is the primary solution in game after game, normative distortion can occur in a player’s moral framework."
+      },
+      {
+        "term": "parental displacement",
+        "definition": "The progressive replacement of parental guidance and family time by unsupervised digital entertainment.",
+        "example": "Unregulated gaming often produces parental displacement as children spend more hours with screens than with caregivers."
+      },
+      {
+        "term": "escalating compulsion",
+        "definition": "A pattern in which the need for longer or more intense play grows over time to achieve the same satisfaction.",
+        "example": "What begins as casual play can turn into escalating compulsion that dominates a young person’s daily schedule."
+      },
+      {
+        "term": "civic disengagement",
+        "definition": "The decline in interest and participation in community, political or collective life.",
+        "example": "Heavy immersion in virtual worlds is linked to civic disengagement among some groups of young adults."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "Entertainment that systematically undermines health and development is not harmless fun.",
+        "examples": [
+          "Entertainment that systematically undermines health and development is not harmless fun; it is a public-interest concern.",
+          "When sleep, study and relationships suffer, entertainment that systematically undermines health and development is not harmless fun.",
+          "Society has the right to say that entertainment that systematically undermines health and development is not harmless fun."
+        ]
+      },
+      {
+        "phrase": "The industry designs for compulsion, not for the well-being of its youngest users.",
+        "examples": [
+          "The industry designs for compulsion, not for the well-being of its youngest users, and regulation must correct that imbalance.",
+          "Loot boxes and infinite progression systems prove that the industry designs for compulsion, not for the well-being of its youngest users.",
+          "We cannot pretend the industry designs for compulsion, not for the well-being of its youngest users, is an accident."
+        ]
+      },
+      {
+        "phrase": "Parental responsibility alone cannot counter multi-billion-dollar psychological engineering.",
+        "examples": [
+          "Parental responsibility alone cannot counter multi-billion-dollar psychological engineering aimed at maximising engagement.",
+          "Expecting every family to outsmart sophisticated design is unrealistic; parental responsibility alone cannot counter multi-billion-dollar psychological engineering.",
+          "Policy must recognise that parental responsibility alone cannot counter multi-billion-dollar psychological engineering."
+        ]
+      },
+      {
+        "phrase": "Virtual violence is not consequence-free when it shapes real attitudes and emotional responses.",
+        "examples": [
+          "Virtual violence is not consequence-free when it shapes real attitudes and emotional responses in developing minds.",
+          "Repeated studies suggest that virtual violence is not consequence-free when it shapes real attitudes and emotional responses.",
+          "We should stop claiming that virtual violence is not consequence-free when it shapes real attitudes and emotional responses."
+        ]
+      },
+      {
+        "phrase": "Unrestricted access treats children as fair commercial targets rather than as developing citizens.",
+        "examples": [
+          "Unrestricted access treats children as fair commercial targets rather than as developing citizens who need protection.",
+          "Current market practice shows that unrestricted access treats children as fair commercial targets rather than as developing citizens.",
+          "A responsible society refuses to allow unrestricted access that treats children as fair commercial targets rather than as developing citizens."
+        ]
+      },
+      {
+        "phrase": "The long-term social costs of widespread gaming harm will fall on families, schools and public services.",
+        "examples": [
+          "The long-term social costs of widespread gaming harm will fall on families, schools and public services, not on the companies that profit.",
+          "When attention disorders, obesity and social isolation rise, the long-term social costs of widespread gaming harm will fall on families, schools and public services.",
+          "Policy must account for the fact that the long-term social costs of widespread gaming harm will fall on families, schools and public services."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "the thin end of the wedge",
+        "definition": "A small and seemingly minor change that opens the way for much larger and more damaging developments.",
+        "examples": [
+          "Normalising extreme violence in games marketed to teenagers is the thin end of the wedge for broader desensitisation.",
+          "Allowing unrestricted loot boxes for minors is the thin end of the wedge toward full gambling mechanics in children’s entertainment.",
+          "Ignoring early signs of addiction is the thin end of the wedge that leads to severe behavioural problems later."
+        ]
+      },
+      {
+        "idiom": "play with fire",
+        "definition": "To take a dangerous risk that is likely to produce serious harm.",
+        "examples": [
+          "Giving unrestricted access to highly compulsive games is playing with fire where young brains are concerned.",
+          "Governments that refuse any meaningful limits are playing with fire on a population scale.",
+          "Parents who dismiss all concerns as moral panic may still be playing with fire if the design is deliberately addictive."
+        ]
+      },
+      {
+        "idiom": "a slippery slope",
+        "definition": "A course of action that is likely to lead to increasingly negative outcomes.",
+        "examples": [
+          "Treating every call for limits as censorship starts society down a slippery slope of ignoring real developmental risks.",
+          "Once predatory monetisation is accepted for children, we are on a slippery slope toward deeper commercial exploitation.",
+          "Normalising all-night play sessions is a slippery slope toward chronic sleep deprivation and academic failure."
+        ]
+      },
+      {
+        "idiom": "the tip of the iceberg",
+        "definition": "A small visible part of a much larger underlying problem.",
+        "examples": [
+          "Visible cases of gaming addiction are only the tip of the iceberg of wider attention and social problems.",
+          "School reports of declining concentration are the tip of the iceberg of what heavy gaming is doing to young minds.",
+          "Publicised incidents of aggression linked to games may be the tip of the iceberg of broader emotional effects."
+        ]
+      },
+      {
+        "idiom": "pay the price",
+        "definition": "To suffer the negative consequences of earlier choices or neglect.",
+        "examples": [
+          "If we fail to regulate, families and schools will pay the price in damaged attention spans and fractured relationships.",
+          "Young people themselves will pay the price through lost opportunities and poorer mental health.",
+          "Society will pay the price later in higher public health and education costs."
+        ]
+      },
+      {
+        "idiom": "hold the line",
+        "definition": "To maintain firm protective standards against pressure to weaken them.",
+        "examples": [
+          "Regulators must hold the line on age ratings and advertising rules despite intense industry lobbying.",
+          "Schools and parents need support so they can hold the line on healthy screen limits.",
+          "Democratic societies should hold the line on protecting children rather than surrendering to commercial freedom arguments."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "Computer games are deliberately engineered to maximise compulsive engagement, producing clear patterns of behavioural addiction especially among the young.",
+        "explanation": "Modern games use variable reward schedules, social pressure, daily login bonuses, battle passes and infinite progression systems that mirror the psychological mechanisms of gambling. These design choices are not accidental; they are the product of extensive user-data analysis and behavioural research aimed at increasing session length and spending. Clinical and epidemiological studies in multiple countries have documented rising numbers of young people who meet criteria for internet gaming disorder, with symptoms including loss of control, prioritisation of gaming over other activities, and continued play despite harm. South Korea, China and the World Health Organization have all recognised the phenomenon formally. When an entertainment product is built to override ordinary self-regulation in developing brains, it ceases to be a purely private matter. Strict age verification, mandatory cool-down periods, spending limits and clear addiction warnings are proportionate responses to a product category that systematically targets compulsion rather than balanced leisure."
+      },
+      {
+        "claim": "Heavy gaming during childhood and adolescence interferes with critical developmental processes of attention, sleep and social learning.",
+        "explanation": "The prefrontal cortex, responsible for impulse control and long-term planning, continues to mature into the mid-twenties. Extended exposure to rapid, high-intensity digital rewards during this period is associated with reduced capacity for sustained attention and delayed gratification. Sleep is routinely sacrificed for late-night sessions, and chronic sleep loss itself impairs emotional regulation and academic performance. Face-to-face social interaction, which teaches nuanced reading of emotion and conflict resolution, is displaced by more predictable and controllable online interaction. Longitudinal studies tracking screen time and later outcomes repeatedly find correlations with poorer educational attainment, higher rates of anxiety and weaker real-world social skills. While correlation is not proof of sole causation, the consistency of findings across cultures and the biological plausibility of the mechanisms justify precautionary limits. Treating unlimited gaming as a neutral leisure choice ignores the developmental window that, once missed, is difficult to recover."
+      },
+      {
+        "claim": "Violent content in games contributes to desensitisation and, for some players, to increased aggressive cognition and behaviour.",
+        "explanation": "Decades of experimental and correlational research have examined the link between exposure to virtual violence and real-world aggression. Meta-analyses find small but consistent effects on aggressive thoughts, feelings and some behaviours, particularly in younger or already at-risk individuals. More importantly, repeated exposure reduces physiological and emotional responses to violence, a form of desensitisation that can lower empathy. While most players do not become violent criminals, the relevant policy question is not whether games are the sole cause of real-world violence but whether a mass entertainment medium that rehearses killing as the primary problem-solving method is appropriate for unrestricted access by children. Film and television already carry age ratings and content warnings; games, which are interactive and often more immersive, warrant at least equivalent and preferably stronger controls. The commercial argument that “it is only a game” does not erase the cumulative psychological impact of thousands of hours of rehearsed aggression."
+      },
+      {
+        "claim": "Predatory monetisation systems turn children’s entertainment into a vehicle for gambling-like spending and financial harm.",
+        "explanation": "Loot boxes, gacha mechanics, randomised rewards and endless cosmetic progression are designed to trigger the same reward pathways as gambling. In several jurisdictions these systems have already been classified as gambling when real money is involved. Children and adolescents, whose impulse control and financial literacy are still developing, are especially vulnerable. Documented cases include young players spending hundreds or thousands of pounds or dollars without parental knowledge, sometimes leading to family debt or criminal activity to fund continued play. The industry’s defence that these are “optional” ignores the sophisticated psychological pressure built into the design and the social status attached to rare items. Strict regulation — including bans on randomised paid rewards for minors, mandatory spending caps, and clear probability disclosures — is a necessary consumer-protection measure. Allowing an industry to treat children’s pocket money and parents’ credit cards as a revenue stream through quasi-gambling mechanics is a failure of basic safeguarding."
+      },
+      {
+        "claim": "Excessive gaming displaces physical activity, outdoor play and face-to-face socialisation, contributing to broader public-health problems.",
+        "explanation": "Time is finite. Hours spent in front of screens are hours not spent moving, playing outdoors, or interacting in person. Multiple countries report rising childhood obesity, declining fitness levels and increased rates of myopia linked in part to sedentary screen time. Social skills that develop through unstructured group play and real-world negotiation are under-practised when leisure is dominated by mediated interaction. The COVID-19 period demonstrated how quickly online gaming can expand to fill the vacuum left by restricted physical social life, and how difficult it is afterwards to re-establish healthier balances. Public-health policy already intervenes on diet, smoking and road safety because individual choices aggregate into population-level harm. The same logic applies to an entertainment form that systematically reduces physical activity and real-world social contact for a large and growing share of young people. Reasonable playtime guidelines and design rules that discourage endless sessions are legitimate public-health tools."
+      },
+      {
+        "claim": "The commercial incentives of the industry systematically conflict with the developmental interests of children and adolescents.",
+        "explanation": "Game companies maximise revenue by maximising engagement time and in-game spending. Every design choice that increases session length or spending pressure is therefore rational from a business perspective, even when it conflicts with healthy development. This is a structural conflict of interest, not a matter of a few bad actors. Self-regulation and voluntary codes have repeatedly proven insufficient because they are written and policed by the same commercial interests. Independent age-rating systems, mandatory design restrictions for products aimed at minors, and enforcement powers for consumer-protection agencies are required to rebalance the relationship. Just as food companies are not left solely responsible for preventing childhood obesity, and tobacco companies are not trusted to set their own advertising rules, the games industry cannot be the primary guardian of the young people who constitute a major part of its market. External regulation is the appropriate response to a clear misalignment of incentives."
+      },
+      {
+        "claim": "Parents and schools lack the information, tools and leverage to counter sophisticated commercial design without regulatory support.",
+        "explanation": "Modern games are complex, frequently updated, and deliberately opaque about their psychological mechanics and spending systems. Many parents do not play themselves and cannot easily evaluate content or compulsion risk. Platform-level parental controls are often cumbersome, easy for children to circumvent, or simply unknown. Schools see the downstream effects in attention and behaviour but have limited authority over home leisure. Expecting every family to become expert in behavioural design and to enforce strict limits against powerful social and commercial pressure is unrealistic. Effective protection requires system-level rules: clear, enforceable age ratings; default safe settings; spending and time limits that cannot be easily overridden by a child; and transparent information about design features. Regulation does not replace parental responsibility; it makes parental responsibility feasible in the face of an industry that has far greater resources and psychological sophistication."
+      },
+      {
+        "claim": "The normalisation of extreme and prolonged gaming is reshaping social expectations around attention, effort and offline life in damaging ways.",
+        "explanation": "When large numbers of young people treat multi-hour daily gaming sessions as normal, the baseline for what counts as ordinary leisure shifts. Sustained concentration on non-digital tasks begins to feel unusually difficult. Offline socialising can appear less stimulating by comparison. Academic and work demands that require delayed gratification compete with entertainment engineered for immediate and continuous reward. Cultural norms matter; they shape what individuals experience as reasonable or excessive. An unregulated market that pushes ever more immersive and compulsive products accelerates this normative shift. Societies have previously regulated other powerful cultural forms — film classification, advertising to children, alcohol and gambling marketing — precisely because cultural environments influence individual behaviour at scale. Computer games have become one of the dominant cultural environments for many young people. Leaving their design and intensity entirely to commercial forces is a choice to accept whatever social norms the most successful engagement metrics produce."
+      },
+      {
+        "claim": "Evidence of harm is now sufficient to justify precautionary regulation rather than waiting for perfect causal proof.",
+        "explanation": "Demanding absolute scientific certainty before any regulatory action is a standard that is not applied to other domains involving children’s health and development. We regulate food additives, playground safety and online privacy on the basis of plausible risk and accumulating evidence, not on the requirement that every mechanism be fully mapped. For computer games the evidence base includes clinical case series of addiction, experimental studies of aggression and attention, large-scale correlational data on sleep and academic outcomes, and documented financial harms from monetisation systems. The precautionary principle is particularly appropriate when the exposed population is still developing and when commercial incentives push toward greater rather than lesser intensity. Waiting until the social costs are overwhelming and irreversible is not responsible governance. Proportionate, evidence-informed limits can be adjusted as better data emerge; the absence of perfect proof is not a reason for indefinite inaction."
+      },
+      {
+        "claim": "Other jurisdictions have already demonstrated that meaningful regulation of gaming is both feasible and compatible with a continuing industry.",
+        "explanation": "China has imposed strict playtime limits for minors and curbs on certain monetisation practices. South Korea has long operated fatigue systems and shutdown laws for younger players. Several European countries and the European Union are moving toward stricter classification of loot boxes and enhanced age-verification requirements. In none of these cases has the games industry collapsed; it has adapted. Companies continue to innovate and generate substantial revenue under clearer rules. The claim that any serious regulation will destroy a valuable creative sector is contradicted by experience. What changes is the distribution of design effort: less toward pure compulsion and unregulated spending extraction from minors, more toward sustainable engagement within defined boundaries. International examples show that protecting children and preserving a commercially viable industry are not mutually exclusive goals. They simply require governments to set boundaries rather than leaving every design decision to the metric of maximum engagement."
+      }
+    ]
+  },
+  "against": {
+    "vocab": [
+      {
+        "term": "cognitive enrichment",
+        "definition": "The improvement of mental skills such as problem-solving, spatial reasoning and strategic thinking through challenging activity.",
+        "example": "Well-designed strategy and puzzle games provide genuine cognitive enrichment that transfers to other domains."
+      },
+      {
+        "term": "social connectivity",
+        "definition": "The formation and maintenance of relationships and communities through shared online activity.",
+        "example": "Multiplayer games create social connectivity for players who might otherwise struggle to find peer groups."
+      },
+      {
+        "term": "moral panic",
+        "definition": "A widespread, exaggerated fear that a particular cultural form is causing severe social harm, often out of proportion to evidence.",
+        "example": "Previous generations experienced moral panic over novels, comics, television and rock music; computer games are the latest target."
+      },
+      {
+        "term": "media literacy",
+        "definition": "The capacity to understand, evaluate and critically engage with different forms of media content.",
+        "example": "Teaching media literacy is a more constructive response than attempting to ban or heavily restrict games."
+      },
+      {
+        "term": "creative expression",
+        "definition": "The use of a medium to communicate ideas, tell stories or build imaginative worlds.",
+        "example": "Independent and mainstream games alike have become significant vehicles for creative expression and artistic experimentation."
+      },
+      {
+        "term": "voluntary engagement",
+        "definition": "Activity that individuals freely choose and can freely leave, as opposed to coerced or addictive behaviour.",
+        "example": "The vast majority of play remains voluntary engagement rather than clinical addiction."
+      },
+      {
+        "term": "intergenerational continuity",
+        "definition": "The healthy transmission of cultural practices and shared interests across age groups.",
+        "example": "Gaming has created new forms of intergenerational continuity as parents and children play together."
+      },
+      {
+        "term": "economic contribution",
+        "definition": "The measurable value added to national income, employment and export earnings by an industry.",
+        "example": "The games industry’s economic contribution now rivals or exceeds that of film and music in many countries."
+      },
+      {
+        "term": "skill transfer",
+        "definition": "The application of abilities developed in one context to useful performance in another.",
+        "example": "Research shows positive skill transfer from certain games into surgery, aviation and complex problem-solving."
+      },
+      {
+        "term": "proportional response",
+        "definition": "A policy reaction that matches the scale and severity of the actual problem rather than overreaching.",
+        "example": "Blanket playtime limits for all minors are not a proportional response to the minority who experience genuine harm."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "Most players engage moderately and benefit; policy should not be written as if everyone is an addict.",
+        "examples": [
+          "Most players engage moderately and benefit; policy should not be written as if everyone is an addict.",
+          "The data show that most players engage moderately and benefit; policy should not be written as if everyone is an addict.",
+          "We must remember that most players engage moderately and benefit; policy should not be written as if everyone is an addict."
+        ]
+      },
+      {
+        "phrase": "Cultural forms that previous generations feared have repeatedly become accepted parts of a healthy society.",
+        "examples": [
+          "Cultural forms that previous generations feared have repeatedly become accepted parts of a healthy society, and games are following the same path.",
+          "History teaches that cultural forms that previous generations feared have repeatedly become accepted parts of a healthy society.",
+          "Novels, cinema and television were all attacked in their time; cultural forms that previous generations feared have repeatedly become accepted parts of a healthy society."
+        ]
+      },
+      {
+        "phrase": "The solution to potential harm is education and parental involvement, not state control of private leisure.",
+        "examples": [
+          "The solution to potential harm is education and parental involvement, not state control of private leisure.",
+          "Democratic societies should prefer the solution to potential harm is education and parental involvement, not state control of private leisure.",
+          "Evidence suggests that the solution to potential harm is education and parental involvement, not state control of private leisure."
+        ]
+      },
+      {
+        "phrase": "Games are a major contemporary art form and economic sector that deserve the same respect as film or literature.",
+        "examples": [
+          "Games are a major contemporary art form and economic sector that deserve the same respect as film or literature.",
+          "Treating an entire medium as inherently dangerous ignores that games are a major contemporary art form and economic sector that deserve the same respect as film or literature.",
+          "Policy makers should recognise that games are a major contemporary art form and economic sector that deserve the same respect as film or literature."
+        ]
+      },
+      {
+        "phrase": "Targeted support for the minority who struggle is better than broad restrictions that punish the responsible majority.",
+        "examples": [
+          "Targeted support for the minority who struggle is better than broad restrictions that punish the responsible majority.",
+          "Good policy focuses on targeted support for the minority who struggle is better than broad restrictions that punish the responsible majority.",
+          "We should choose targeted support for the minority who struggle is better than broad restrictions that punish the responsible majority."
+        ]
+      },
+      {
+        "phrase": "Innovation and creative freedom in interactive media will be damaged by heavy-handed pre-emptive rules.",
+        "examples": [
+          "Innovation and creative freedom in interactive media will be damaged by heavy-handed pre-emptive rules.",
+          "History of media regulation shows that innovation and creative freedom in interactive media will be damaged by heavy-handed pre-emptive rules.",
+          "A thriving games sector requires that innovation and creative freedom in interactive media will be damaged by heavy-handed pre-emptive rules be avoided."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "throw the baby out with the bathwater",
+        "definition": "To discard something valuable while trying to eliminate something unwanted.",
+        "examples": [
+          "Banning or heavily restricting an entire medium because of a minority of problem users is throwing the baby out with the bathwater.",
+          "We can address addiction risks without throwing the baby out with the bathwater of creative and social benefits.",
+          "Blanket playtime laws risk throwing the baby out with the bathwater."
+        ]
+      },
+      {
+        "idiom": "a storm in a teacup",
+        "definition": "A situation that has been exaggerated far beyond its real importance.",
+        "examples": [
+          "Much of the public anxiety about games is a storm in a teacup compared with other genuine threats to young people.",
+          "Media coverage often turns ordinary teenage leisure into a storm in a teacup.",
+          "Regulators should avoid turning a storm in a teacup into sweeping legislation."
+        ]
+      },
+      {
+        "idiom": "the exception proves the rule",
+        "definition": "The existence of a few contrary cases highlights that the general pattern is the opposite.",
+        "examples": [
+          "Tragic cases of extreme addiction are real, but the exception proves the rule that most play remains moderate and beneficial.",
+          "Isolated links to violence do not overturn the broader finding; the exception proves the rule of limited real-world impact.",
+          "We should not let the exception prove the rule in reverse by designing all policy around the most severe outliers."
+        ]
+      },
+      {
+        "idiom": "live and let live",
+        "definition": "To accept that others may make different choices about their private lives and leisure.",
+        "examples": [
+          "In a free society the default should be live and let live rather than state-mandated limits on adult and teenage recreation.",
+          "Parents who dislike games are free to restrict them at home; the wider principle remains live and let live.",
+          "Policy that respects diversity of leisure preferences is closer to live and let live than to central control."
+        ]
+      },
+      {
+        "idiom": "miss the forest for the trees",
+        "definition": "To focus so much on small details that the larger picture is overlooked.",
+        "examples": [
+          "Focusing only on addiction statistics causes us to miss the forest for the trees of widespread cognitive and social benefits.",
+          "Regulators who see only risks miss the forest for the trees of an industry that employs hundreds of thousands and entertains billions.",
+          "We should not miss the forest for the trees by treating every hour of play as potential harm."
+        ]
+      },
+      {
+        "idiom": "let sleeping dogs lie",
+        "definition": "To avoid interfering in a situation that is currently stable or not causing major problems.",
+        "examples": [
+          "Where the large majority of players experience no significant harm, the wiser course is often to let sleeping dogs lie.",
+          "Constant legislative interference when evidence of population-level damage is weak is a failure to let sleeping dogs lie.",
+          "Sometimes the best policy is to let sleeping dogs lie and focus resources on clear and present harms."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "The great majority of computer-game players show no signs of addiction or serious harm; policy must not treat the minority of problem cases as the norm.",
+        "explanation": "Large-scale surveys in Europe, North America and Asia consistently find that while a small percentage of players meet clinical criteria for gaming disorder, the overwhelming majority play in moderation and report positive experiences. Prevalence estimates for disordered gaming among adolescents typically fall in the low single digits, comparable to or lower than rates for other behavioural issues. Most young people integrate gaming into a balanced life that also includes school, sport and offline friendships. Designing national policy around the most severe tail of the distribution is a classic error of proportion. Targeted clinical support, parental tools and education for the minority who struggle are more precise and less costly than broad restrictions that constrain everyone’s leisure. The same principle is applied to alcohol, sport and other activities that carry risks for a minority: society regulates the extremes without criminalising or heavily constraining ordinary participation."
+      },
+      {
+        "claim": "Computer games deliver measurable cognitive, educational and professional benefits that restrictive policy would reduce.",
+        "explanation": "A substantial body of research demonstrates positive effects of certain games on spatial reasoning, problem-solving, multitasking, persistence and even surgical performance. Action games have been shown to improve visual attention and processing speed. Strategy and simulation games develop planning and resource-management skills. Educational games and gamified learning platforms increase engagement and retention in formal education. Beyond laboratory findings, the games industry itself has become a major employer of artists, programmers, writers, designers and managers, offering skilled careers that did not exist a generation ago. Heavy-handed restrictions on content, playtime or design freedom would shrink the space for these beneficial applications and career pathways. Policy should therefore distinguish between problematic design features and the medium as a whole, protecting the capacity of games to train useful skills and create high-value employment rather than treating the entire category as a social toxin."
+      },
+      {
+        "claim": "Multiplayer and online games provide genuine social connection, community and belonging for many players who might otherwise be isolated.",
+        "explanation": "For introverted young people, those with social anxiety, disabled players, or individuals in geographically remote areas, online games often serve as a primary route to friendship and collaborative activity. Shared goals, guilds, clans and persistent worlds create ongoing social structures that many participants describe as deeply meaningful. During the COVID-19 lockdowns, gaming platforms became critical social infrastructure for millions of people cut off from physical contact. Research on online communities shows that these relationships can supply emotional support, reduce loneliness and foster teamwork skills. While toxic behaviour exists and requires moderation, the existence of harm in some interactions does not negate the positive social function for many others. Restrictive playtime caps or broad content controls risk severing these support networks. A better approach is improved community management, tools for players to control their own exposure, and education about healthy online behaviour rather than reducing the opportunity for connection itself."
+      },
+      {
+        "claim": "Moral panics about new media have a long and repeated history of overstatement; computer games are the latest in a series that includes novels, comics, television and rock music.",
+        "explanation": "In the eighteenth and nineteenth centuries, novels were accused of corrupting youth and promoting idleness. In the mid-twentieth century, comic books were blamed for juvenile delinquency and subjected to heavy self-censorship. Television was predicted to destroy reading, family conversation and outdoor play. Each wave of anxiety produced calls for restriction that later looked excessive once the medium became normalised and its actual effects better understood. Computer games are following the identical cultural pattern: a new, youth-oriented, commercially successful form that older generations find alien and therefore threatening. The empirical claims made against games often recycle the same tropes of addiction, violence and social decay that were deployed against earlier media. While genuine risks should be studied and mitigated, the historical record counsels humility. Societies that treated every new popular medium as an existential threat repeatedly misallocated attention and constrained cultural freedom without delivering the promised social benefits."
+      },
+      {
+        "claim": "Parental responsibility and improved tools, not state-mandated limits, are the appropriate primary response in a free society.",
+        "explanation": "Parents already possess the legal and practical authority to control what their children play, for how long, and on which devices. Platform holders have developed increasingly sophisticated parental-control systems, spending limits, and activity reports. Schools can educate about balance and digital citizenship. The minority of households that cannot or will not exercise this responsibility are better helped by targeted support services than by imposing uniform legal restrictions on every family. State-enforced playtime caps or content bans treat all parents as incompetent and all children as identical in vulnerability. They also create enforcement problems, black markets for unrestricted access, and resentment that undermines respect for law. Democratic societies generally prefer to equip citizens to make their own judgements about private leisure rather than to prescribe the details of daily life from the centre. Strengthening parental capacity and media literacy is both more liberal and more practical than attempting to micro-manage millions of private gaming sessions."
+      },
+      {
+        "claim": "The games industry is a significant economic and cultural asset whose creative freedom should not be sacrificed to speculative or minority harms.",
+        "explanation": "In multiple countries the video-game sector now generates more revenue than the film box office and supports hundreds of thousands of skilled jobs in programming, art, design, writing, marketing and related services. It is a major export industry and a source of soft power. Independent developers and major studios alike produce works of genuine artistic ambition that explore narrative, ethics, history and emotion in interactive form. Heavy pre-emptive regulation of content, mechanics or business models risks chilling this creativity, raising barriers to entry for smaller studios, and shifting investment to less regulated jurisdictions. The economic and cultural contribution is concrete and large; many of the alleged population-level harms remain contested or confined to a minority. Proportional policy weighs both sides. Protecting an innovative sector that employs people, entertains hundreds of millions and pushes artistic boundaries is a legitimate public interest that argues against sweeping restrictions based on incomplete evidence."
+      },
+      {
+        "claim": "Correlations between gaming and negative outcomes are frequently confounded by pre-existing difficulties; games are often a symptom or coping mechanism rather than the root cause.",
+        "explanation": "Young people who are already struggling with anxiety, depression, ADHD, social difficulties or family problems are more likely both to play heavily and to experience poorer life outcomes. When studies fail to control adequately for these prior conditions, they can attribute to games effects that actually originate elsewhere. Clinical experience often shows that excessive gaming is a way of escaping or self-medicating problems that exist independently. Removing or heavily restricting the coping mechanism without addressing the underlying issues can leave the young person worse off. Effective responses therefore focus on mental-health support, family functioning and alternative sources of competence and belonging, rather than on eliminating the medium that some vulnerable individuals have found temporarily helpful. Treating games as the primary causal agent simplifies a complex picture and risks misdirecting limited therapeutic and policy resources."
+      },
+      {
+        "claim": "Strict age and playtime regulations are difficult to enforce fairly and often produce unintended consequences such as reduced transparency and black-market access.",
+        "explanation": "Age-verification systems can be circumvented with borrowed accounts or false information. Playtime limits push some players toward unregulated foreign servers or pirated versions that lack any consumer protection. In jurisdictions that have imposed hard shutdowns for minors, reports have emerged of children simply migrating to platforms outside official oversight. Overly rigid rules also incentivise developers to avoid age ratings that would limit their market, potentially reducing the availability of milder content or forcing creative compromises. Enforcement resources are finite; every hour spent policing private leisure is an hour not spent on more clear-cut harms such as online exploitation or fraud. Practical policy prefers tools that empower users and parents, transparent rating systems, and focused action against genuinely deceptive or illegal practices, rather than ambitious but porous legal limits that invite evasion and reduce the visibility of what young people are actually doing."
+      },
+      {
+        "claim": "Many of the most cited harms are better addressed by improving game design incentives and platform governance than by restricting access to the medium itself.",
+        "explanation": "Predatory monetisation, toxic community behaviour and excessive session-length design are real problems, but they are problems of specific design choices and platform rules, not of computer games as such. Regulators can require clear disclosure of probabilities in randomised rewards, ban certain dark-pattern interfaces for minors, mandate robust reporting and moderation tools, and impose duties of care on large platforms. These measures target the objectionable features while leaving the broader medium intact. Analogously, we regulate food labelling and advertising to children without banning food; we regulate gambling advertising without prohibiting all games of chance for adults. A design-and-governance approach is more precise, more adaptable to new technologies, and less damaging to legitimate creative and social uses. It also places responsibility on the companies that profit from engagement rather than on every player or family."
+      },
+      {
+        "claim": "In a pluralistic society, adults and older adolescents are entitled to choose their own forms of recreation, including those that others find unappealing or wasteful.",
+        "explanation": "Liberal democracies rest on the principle that individuals should be free to pursue their own conception of a good life provided they do not harm others. Computer games, even when immersive or violent, are a voluntary recreational activity. For adults and older teenagers the presumption should be liberty unless clear and serious harm to third parties is demonstrated. Many citizens spend comparable time on sport, television, social media or hobbies that produce no lasting “productive” output; we do not therefore subject those activities to state-mandated time limits. The fact that some observers regard gaming as a lower form of culture does not confer a right to restrict it. Policy that begins with the assumption that certain popular leisure activities are illegitimate quickly slides into cultural paternalism. Respect for pluralism requires tolerance of recreational choices that differ from one’s own, coupled with targeted intervention only where genuine externalities or the protection of young children clearly justify it."
+      }
+    ]
+  }
+}

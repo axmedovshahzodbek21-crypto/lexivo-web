@@ -70,6 +70,7 @@ export const HUB_CATEGORIES: HubCategory[] = [
       { key: 'achievements', href: '/achievements', icon: '🏅', gradient: 'linear-gradient(135deg, #d97706, #fbbf24)', edge: '#92400e', glow: 'rgba(217,119,6,0.4)' },
       { key: 'leaderboard',  href: '/leaderboard',  icon: '🏆', gradient: 'linear-gradient(135deg, #b45309, #fcd34d)', edge: '#78350f', glow: 'rgba(180,83,9,0.4)' },
       { key: 'grammar',      href: '/grammar-tips', icon: '📚', gradient: 'linear-gradient(135deg, #1a9a50, #2ECC71)', edge: '#0f6634', glow: 'rgba(46,204,113,0.4)' },
+      { key: 'structures',   href: '/structures',   icon: '🧩', gradient: 'linear-gradient(135deg, #7c2d92, #c026d3)', edge: '#581c62', glow: 'rgba(192,38,211,0.4)' },
       { key: 'xp_history',   href: '#xp-history',   icon: '📅', gradient: 'linear-gradient(135deg, #4c1d95, #6c63ff)', edge: '#2e1065', glow: 'rgba(108,99,255,0.4)' },
     ],
   },

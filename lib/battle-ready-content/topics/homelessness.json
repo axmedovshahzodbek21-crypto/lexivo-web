@@ -1,0 +1,407 @@
+{
+  "motion": "This House believes that homelessness is primarily a systemic failure requiring comprehensive state intervention",
+  "for": {
+    "vocab": [
+      {
+        "term": "destitution",
+        "definition": "Extreme poverty marked by the lack of even the most basic necessities of life",
+        "example": "Destitution on the streets of wealthy cities is a moral indictment of the systems that allow it to persist."
+      },
+      {
+        "term": "systemic failure",
+        "definition": "A deep structural breakdown of institutions and policies rather than isolated individual shortcomings",
+        "example": "Rising homelessness amid economic growth points to systemic failure in housing, wages and social protection."
+      },
+      {
+        "term": "housing insecurity",
+        "definition": "The chronic risk of losing one’s home due to cost, eviction or inadequate supply",
+        "example": "Millions live in housing insecurity long before they appear in official homelessness statistics."
+      },
+      {
+        "term": "structural inequality",
+        "definition": "Deep-rooted disparities in power, resources and opportunity built into economic and social systems",
+        "example": "Structural inequality in the housing market ensures that the poorest are permanently vulnerable to displacement."
+      },
+      {
+        "term": "social exclusion",
+        "definition": "The process by which people are shut out from the rights, resources and relationships that constitute full membership of society",
+        "example": "Homelessness is both a cause and a consequence of profound social exclusion."
+      },
+      {
+        "term": "affordable housing deficit",
+        "definition": "The chronic shortfall of homes that low-income households can realistically pay for",
+        "example": "No amount of individual effort can overcome a national affordable housing deficit of this scale."
+      },
+      {
+        "term": "policy neglect",
+        "definition": "The prolonged failure of governments to address a known and solvable social problem",
+        "example": "Decades of policy neglect in social housing construction have produced the current crisis."
+      },
+      {
+        "term": "human dignity",
+        "definition": "The intrinsic worth of every person that demands minimum conditions of security and respect",
+        "example": "Allowing people to sleep in doorways is a direct assault on human dignity."
+      },
+      {
+        "term": "preventative intervention",
+        "definition": "Action taken early to stop a problem from escalating into crisis",
+        "example": "Preventative intervention in the form of rent support and tenancy protection is far cheaper than managing street homelessness."
+      },
+      {
+        "term": "collective responsibility",
+        "definition": "The shared duty of a society to ensure that none of its members falls below a basic threshold of welfare",
+        "example": "Homelessness is a test of collective responsibility that too many societies are currently failing."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "Housing is not a privilege — it is a basic human right.",
+        "examples": [
+          "Housing is not a privilege — it is a basic human right that no civilised society can deny.",
+          "When people sleep on the streets we must remember that housing is not a privilege — it is a basic human right.",
+          "The starting point of any serious policy is the recognition that housing is not a privilege — it is a basic human right."
+        ]
+      },
+      {
+        "phrase": "No society can call itself civilised while people sleep on its streets.",
+        "examples": [
+          "No society can call itself civilised while people sleep on its streets.",
+          "Wealth and technology mean nothing if no society can call itself civilised while people sleep on its streets.",
+          "The continued presence of rough sleeping proves that no society can call itself civilised while people sleep on its streets."
+        ]
+      },
+      {
+        "phrase": "Individual responsibility cannot solve a problem created by collective policy choices.",
+        "examples": [
+          "Individual responsibility cannot solve a problem created by collective policy choices.",
+          "Blaming the homeless ignores the fact that individual responsibility cannot solve a problem created by collective policy choices.",
+          "When housing supply and wages are structurally inadequate, individual responsibility cannot solve a problem created by collective policy choices."
+        ]
+      },
+      {
+        "phrase": "The market has failed to house the poorest; the state must step in.",
+        "examples": [
+          "The market has failed to house the poorest; the state must step in.",
+          "Decades of evidence show that the market has failed to house the poorest; the state must step in.",
+          "Leaving homelessness to market forces has been tried and found wanting; the market has failed to house the poorest; the state must step in."
+        ]
+      },
+      {
+        "phrase": "Rough sleeping is the visible symptom of deeper failures in housing, health and social policy.",
+        "examples": [
+          "Rough sleeping is the visible symptom of deeper failures in housing, health and social policy.",
+          "Focusing only on the individual misses that rough sleeping is the visible symptom of deeper failures in housing, health and social policy.",
+          "Any effective strategy must address the fact that rough sleeping is the visible symptom of deeper failures in housing, health and social policy."
+        ]
+      },
+      {
+        "phrase": "A wealthy society that tolerates mass homelessness has made a political choice, not an economic necessity.",
+        "examples": [
+          "A wealthy society that tolerates mass homelessness has made a political choice, not an economic necessity.",
+          "The resources exist; a wealthy society that tolerates mass homelessness has made a political choice, not an economic necessity.",
+          "We should be honest: a wealthy society that tolerates mass homelessness has made a political choice, not an economic necessity."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "to fall through the cracks",
+        "definition": "To be missed by the systems that are supposed to provide support",
+        "examples": [
+          "Thousands of people fall through the cracks of inadequate housing benefit and overstretched services every year.",
+          "When prevention is weak, vulnerable tenants inevitably fall through the cracks into homelessness.",
+          "A civilised system does not allow people to fall through the cracks into destitution."
+        ]
+      },
+      {
+        "idiom": "the tip of the iceberg",
+        "definition": "A small visible part of a much larger problem",
+        "examples": [
+          "Street homelessness is only the tip of the iceberg; far more people live in temporary or severely overcrowded accommodation.",
+          "Rough sleeping statistics capture the tip of the iceberg of housing failure.",
+          "Focusing solely on visible rough sleepers misses the tip of the iceberg of hidden homelessness."
+        ]
+      },
+      {
+        "idiom": "a roof over one’s head",
+        "definition": "Basic secure housing",
+        "examples": [
+          "Every person deserves a roof over their head as a minimum condition of membership in society.",
+          "Policy should start from the principle that no one should lack a roof over their head.",
+          "The first duty of a housing system is to ensure a roof over one’s head for all."
+        ]
+      },
+      {
+        "idiom": "to slip through the net",
+        "definition": "To escape the intended protection of a support system",
+        "examples": [
+          "Too many people leaving care or prison slip through the net and end up on the streets.",
+          "When services are fragmented, vulnerable individuals inevitably slip through the net.",
+          "Effective intervention means ensuring that no one is allowed to slip through the net."
+        ]
+      },
+      {
+        "idiom": "out of sight, out of mind",
+        "definition": "Ignoring a problem because it is not immediately visible",
+        "examples": [
+          "Dispersing rough sleepers without offering housing is a policy of out of sight, out of mind.",
+          "Wealthy districts often prefer solutions that keep homelessness out of sight, out of mind.",
+          "Moral seriousness requires rejecting the approach of out of sight, out of mind."
+        ]
+      },
+      {
+        "idiom": "to paper over the cracks",
+        "definition": "To apply superficial fixes that leave the underlying problem intact",
+        "examples": [
+          "Emergency shelters alone paper over the cracks of a housing system that produces homelessness faster than it can house people.",
+          "Short-term funding announcements often paper over the cracks rather than solving the structural shortage.",
+          "Real progress requires more than measures that merely paper over the cracks."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "The scale and persistence of homelessness in wealthy societies demonstrate structural failure, not a sudden collapse in personal virtue.",
+        "explanation": "Homelessness has risen sharply in many high-income countries even during periods of economic growth and low unemployment. This pattern is incompatible with explanations that locate the primary cause in individual failings. When the number of people without homes tracks the decline in social housing stock, the rise in private rents relative to wages, and the weakening of welfare protections, the causal arrow points toward policy and market structures. Countries and cities that have reduced homelessness significantly have done so through systematic changes in housing supply, prevention duties and support services, not through moral exhortation. Treating a problem that moves with structural variables as primarily a matter of personal responsibility is a category error. Comprehensive state intervention is required because the drivers themselves are systemic."
+      },
+      {
+        "claim": "Housing markets left to themselves systematically under-provide for low-income households.",
+        "explanation": "Private developers respond to effective demand, not to need. Building for the poorest households yields lower returns than building for higher-income buyers or renters. Without substantial public investment or binding requirements, the market produces a chronic shortage of genuinely affordable homes. Decades of residualisation of social housing and reliance on the private rented sector have confirmed this structural tendency. Rent controls, housing benefit and planning obligations can mitigate the failure, but they have not eliminated it. The result is a permanent pool of households one shock away from homelessness. Only large-scale public provision or heavily subsidised social housing has historically closed the gap. Waiting for the market to solve a problem it has no incentive to solve is not realism; it is abdication."
+      },
+      {
+        "claim": "Most people who become homeless do so after a cascade of structural and personal shocks that adequate systems should intercept.",
+        "explanation": "Research consistently shows that the pathway into homelessness usually involves the interaction of high housing costs, low or unstable income, relationship breakdown, health problems and gaps in support. Any one of these factors is more dangerous when the others are present. Effective prevention systems — early rent arrears intervention, hospital and prison discharge protocols, family mediation, and rapid rehousing — can break the cascade. Where such systems are weak or absent, preventable cases become street cases. The existence of personal vulnerabilities does not convert a systemic failure of prevention into a story of pure individual desert. A society that allows known risk factors to culminate in destitution has chosen not to build the interceptive capacity that the problem requires."
+      },
+      {
+        "claim": "The fiscal cost of managing homelessness far exceeds the cost of preventing and ending it through housing-led approaches.",
+        "explanation": "Multiple cost-benefit studies in the United Kingdom, United States, Canada and Australia have shown that the public expenditure associated with a person remaining homeless — emergency healthcare, criminal justice, temporary accommodation and crisis services — is substantially higher than the cost of providing stable housing with support. Housing First and similar models that prioritise rapid access to permanent housing have demonstrated both higher rates of tenancy sustainment and lower overall public cost. Continuing to fund the consequences of homelessness while under-funding its solution is therefore not only morally questionable but economically irrational. Comprehensive state intervention is justified on narrow fiscal grounds as well as on grounds of justice."
+      },
+      {
+        "claim": "Children and young people who experience homelessness suffer developmental harms that no amount of later individual effort can fully reverse.",
+        "explanation": "Homelessness during childhood and adolescence is associated with disrupted education, higher rates of mental and physical health problems, and elevated risk of future homelessness. These outcomes are not simply the result of parental character; they are the predictable consequence of growing up without stable shelter in a society that possesses the resources to prevent it. The state already accepts extensive duties toward children in other domains. Allowing the housing system to inflict avoidable developmental damage is a failure of those duties. Intervention that secures stable housing for families and care leavers is therefore a direct investment in future capability and a reduction in future social costs. Treating child homelessness as an unfortunate by-product of parental failure abandons the state’s protective responsibility at the precise point where it is most needed."
+      },
+      {
+        "claim": "Visible street homelessness is only the most extreme expression of a much larger crisis of housing affordability and insecurity.",
+        "explanation": "For every person sleeping rough there are many more in temporary accommodation, sofa-surfing, or living in overcrowded and unsafe conditions. Official rough-sleeping counts therefore capture only the tip of a much larger problem of housing failure. Policies that focus narrowly on moving people off the streets without expanding the supply of affordable homes simply redistribute the pressure into other forms of insecurity. A systemic response must address the continuum of housing need, from prevention of eviction through to permanent rehousing. Incremental, street-focused measures that leave the underlying shortage intact will always be overwhelmed by the flow of new cases. Comprehensive intervention means treating the housing system as a whole rather than managing its most visible symptoms."
+      },
+      {
+        "claim": "The geographic concentration of homelessness tracks the geographic concentration of housing unaffordability, not of moral character.",
+        "explanation": "Homelessness rates vary dramatically between cities and regions in ways that mirror differences in rent levels, vacancy rates and social housing stock. Areas with high demand and constrained supply generate far more homelessness than areas with looser housing markets, even when demographic and labour-market profiles are similar. If personal failings were the dominant cause, we would not expect such tight correlation with local housing conditions. The pattern indicates that the same individuals who remain housed in lower-pressure markets become homeless in higher-pressure ones. Policy that ignores this spatial evidence and continues to emphasise individual reform over housing supply is flying in the face of the data. Systemic intervention targeted at the housing market itself is the evidence-based response."
+      },
+      {
+        "claim": "People exiting institutions — care, hospital, prison — face predictably elevated risk that only coordinated state systems can manage.",
+        "explanation": "A disproportionate share of homeless adults have recently left local authority care, psychiatric wards or criminal justice settings. In each case the institution has exercised intensive control and then released the person into a housing market for which they are often unprepared and unsupported. The absence of mandatory, resourced pathways into stable accommodation converts institutional discharge into a production line for homelessness. This is not an inevitable feature of the human condition; it is a design failure. Jurisdictions that have imposed clear duties on public bodies to secure accommodation before release have reduced the flow. Leaving the problem to the individual’s ability to navigate complex systems immediately after institutionalisation is a form of organised abandonment. Comprehensive intervention requires closing these predictable institutional exits into homelessness."
+      },
+      {
+        "claim": "Public opinion in most societies supports the principle that no one should be forced to live without shelter, creating democratic legitimacy for strong state action.",
+        "explanation": "Surveys repeatedly show majority support for the view that government has a responsibility to ensure basic housing. The political difficulty lies less in public hostility to the goal than in the concentration of costs and the diffusion of benefits, together with ideological resistance to public provision. When the issue is framed as the prevention of destitution rather than as an abstract expansion of the state, support broadens. Democratic legitimacy therefore exists for comprehensive intervention; what is often lacking is political will to confront the interests that benefit from the status quo in land and housing. Leaders who treat homelessness as a technical or residual problem underestimate both the moral consensus against street destitution and the electoral appeal of visible progress in reducing it."
+      },
+      {
+        "claim": "International evidence shows that rapid, large-scale reductions in homelessness are possible when governments treat it as a solvable housing problem.",
+        "explanation": "Finland’s sustained application of a Housing First approach, combined with investment in social housing, has made it the only European country where homelessness has fallen significantly in recent decades. Similar results have been achieved in specific cities and regions that adopted clear targets, prevention duties and housing-led strategies. These successes did not require the prior elimination of personal vulnerabilities; they required the prioritisation of housing access and the coordination of support around it. The claim that homelessness is too complex or too rooted in individual pathology to be substantially reduced is contradicted by the jurisdictions that have reduced it. The barrier is not technical knowledge but the willingness to treat adequate housing as a non-negotiable foundation rather than as a distant aspiration. Comprehensive state intervention works when it is genuinely comprehensive and genuinely prioritised."
+      }
+    ]
+  },
+  "against": {
+    "vocab": [
+      {
+        "term": "personal agency",
+        "definition": "The capacity of individuals to make choices and exercise control over their own lives",
+        "example": "Any sustainable solution must respect and rebuild personal agency rather than treat people as passive victims of systems."
+      },
+      {
+        "term": "dependency culture",
+        "definition": "A pattern of reliance on state provision that weakens self-reliance and mutual obligation",
+        "example": "Unconditional housing without expectations can reinforce a dependency culture that traps people in long-term exclusion."
+      },
+      {
+        "term": "moral hazard",
+        "definition": "The risk that protection from consequences encourages the very behaviour that produces the problem",
+        "example": "Guaranteeing housing regardless of conduct creates a moral hazard that can increase the flow into homelessness."
+      },
+      {
+        "term": "taxpayer burden",
+        "definition": "The financial load placed on citizens to fund public programmes",
+        "example": "Open-ended commitments to house all comers impose a growing taxpayer burden without guaranteed results."
+      },
+      {
+        "term": "behavioural factors",
+        "definition": "Individual patterns of decision-making, addiction, mental health management and social conduct that influence outcomes",
+        "example": "Ignoring behavioural factors in favour of purely structural explanations leads to interventions that fail in practice."
+      },
+      {
+        "term": "perverse incentives",
+        "definition": "Rewards or protections that unintentionally encourage undesirable outcomes",
+        "example": "Systems that prioritise the most chaotic cases can create perverse incentives for people to remain in crisis."
+      },
+      {
+        "term": "social pathology",
+        "definition": "Deep-seated patterns of addiction, family breakdown and disaffiliation that generate chronic need",
+        "example": "A significant share of long-term homelessness is driven by social pathology that housing alone does not resolve."
+      },
+      {
+        "term": "conditionality",
+        "definition": "The attachment of expectations and requirements to the receipt of public support",
+        "example": "Effective welfare systems use conditionality to reinforce personal responsibility alongside assistance."
+      },
+      {
+        "term": "street culture",
+        "definition": "The norms, networks and survival strategies that develop among people living long-term without settled housing",
+        "example": "Entrenchment in street culture can make the transition to conventional housing extremely difficult without intensive support and expectations."
+      },
+      {
+        "term": "fiscal realism",
+        "definition": "Recognition of the practical limits on public spending and the need to prioritise among competing claims",
+        "example": "Fiscal realism requires acknowledging that not every desirable housing intervention can be funded simultaneously."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "Free housing alone is a simplistic solution to a complex problem.",
+        "examples": [
+          "Free housing alone is a simplistic solution to a complex problem that involves addiction, trauma and social disconnection.",
+          "Those who promise that supply will solve everything forget that free housing alone is a simplistic solution to a complex problem.",
+          "Evidence from multiple cities shows that free housing alone is a simplistic solution to a complex problem."
+        ]
+      },
+      {
+        "phrase": "A system that removes all consequences also removes the incentive to change.",
+        "examples": [
+          "A system that removes all consequences also removes the incentive to change.",
+          "Unconditional provision risks creating a system that removes all consequences also removes the incentive to change.",
+          "Sustainable recovery requires that a system that removes all consequences also removes the incentive to change is avoided."
+        ]
+      },
+      {
+        "phrase": "Compassion without realism ends up helping fewer people in the long run.",
+        "examples": [
+          "Compassion without realism ends up helping fewer people in the long run.",
+          "Policies driven only by immediate sympathy illustrate how compassion without realism ends up helping fewer people in the long run.",
+          "Effective reform balances kindness with evidence; compassion without realism ends up helping fewer people in the long run."
+        ]
+      },
+      {
+        "phrase": "Most people in temporary hardship find their own way back; policy should focus on those who do not.",
+        "examples": [
+          "Most people in temporary hardship find their own way back; policy should focus on those who do not.",
+          "Blanket approaches ignore the fact that most people in temporary hardship find their own way back; policy should focus on those who do not.",
+          "Targeting is essential because most people in temporary hardship find their own way back; policy should focus on those who do not."
+        ]
+      },
+      {
+        "phrase": "Housing is necessary but not sufficient; behaviour and support networks matter decisively.",
+        "examples": [
+          "Housing is necessary but not sufficient; behaviour and support networks matter decisively.",
+          "The repeated failure of housing-only models shows that housing is necessary but not sufficient; behaviour and support networks matter decisively.",
+          "Any honest strategy must accept that housing is necessary but not sufficient; behaviour and support networks matter decisively."
+        ]
+      },
+      {
+        "phrase": "Unlimited state responsibility weakens the informal networks that have always prevented most homelessness.",
+        "examples": [
+          "Unlimited state responsibility weakens the informal networks that have always prevented most homelessness.",
+          "Family, friends and local obligation still do most of the work; unlimited state responsibility weakens the informal networks that have always prevented most homelessness.",
+          "Crowding out private support means unlimited state responsibility weakens the informal networks that have always prevented most homelessness."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "to throw money at the problem",
+        "definition": "To attempt to solve a complex issue simply by increasing expenditure",
+        "examples": [
+          "Simply promising more housing units is another attempt to throw money at the problem without addressing behaviour.",
+          "Decades of rising spending with limited results suggest we cannot merely throw money at the problem.",
+          "Effective policy requires more than the political urge to throw money at the problem."
+        ]
+      },
+      {
+        "idiom": "a hand up, not a handout",
+        "definition": "Assistance designed to restore independence rather than create permanent reliance",
+        "examples": [
+          "The goal should be a hand up, not a handout that leaves people in long-term dependency.",
+          "Programmes that emphasise recovery and contribution offer a hand up, not a handout.",
+          "Public support is most legitimate when it functions as a hand up, not a handout."
+        ]
+      },
+      {
+        "idiom": "to paper over the cracks",
+        "definition": "To apply superficial fixes that leave deeper problems untouched",
+        "examples": [
+          "Emergency accommodation without requirements merely papers over the cracks of addiction and mental-health failure.",
+          "Housing supply measures that ignore personal factors paper over the cracks.",
+          "Real progress means refusing to paper over the cracks with temporary fixes."
+        ]
+      },
+      {
+        "idiom": "the road to hell is paved with good intentions",
+        "definition": "Well-meaning policies can produce harmful unintended consequences",
+        "examples": [
+          "Unconditional housing policies risk illustrating that the road to hell is paved with good intentions.",
+          "Removing all expectations in the name of compassion shows how the road to hell is paved with good intentions.",
+          "We must design against the reality that the road to hell is paved with good intentions."
+        ]
+      },
+      {
+        "idiom": "to let someone off the hook",
+        "definition": "To release a person from responsibility or consequences",
+        "examples": [
+          "Systems that impose no expectations effectively let people off the hook for destructive choices.",
+          "Compassion does not require us to let someone off the hook entirely.",
+          "Recovery is harder when policy systematically lets people off the hook."
+        ]
+      },
+      {
+        "idiom": "tough love",
+        "definition": "A form of support that combines care with firm expectations and boundaries",
+        "examples": [
+          "Many successful recovery programmes operate on the principle of tough love rather than unconditional acceptance.",
+          "Street outreach that practices tough love often achieves better long-term results than pure permissiveness.",
+          "There is a place for tough love in any system that aims at genuine reintegration."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "A significant proportion of chronic homelessness is driven by addiction, severe mental illness and behavioural patterns that housing alone does not resolve.",
+        "explanation": "Research on long-term rough sleepers consistently finds very high rates of substance dependence, untreated psychiatric conditions and histories of trauma that impair the ability to maintain tenancies. Providing a flat without addressing these issues frequently results in abandoned tenancies, neighbour complaints, property damage and return to the street. Housing First models that report success usually include substantial, well-resourced support services; pure housing provision without concurrent treatment and behavioural expectations has a much weaker record. Treating the problem as primarily a shortage of units therefore misdiagnoses the dominant drivers for the most visible and expensive cohort. Effective intervention must prioritise engagement with the underlying conditions rather than assuming that the key is simply more bricks and mortar. Ignoring behavioural and clinical realities produces revolving-door outcomes and wastes scarce public resources."
+      },
+      {
+        "claim": "Unconditional entitlements create moral hazard and can increase the inflow into homelessness.",
+        "explanation": "When the consequences of eviction, relationship breakdown or refusal of available support are softened by the guarantee of alternative housing, the deterrent effect of those consequences weakens. Some individuals and households make riskier decisions or delay resolving problems because a public safety net is assumed to exist. Evidence from jurisdictions that have expanded rights to temporary accommodation shows rising demand that outpaces supply, longer stays in temporary housing, and in some cases increased presentations. Moral hazard does not explain every case, but it is a predictable systemic effect of removing downside risk. Sustainable policy must therefore retain some element of conditionality and prioritisation rather than creating an open-ended right that the system cannot fulfil and that alters behaviour in counterproductive ways."
+      },
+      {
+        "claim": "Most episodes of housing insecurity are temporary and resolved without state housing provision; policy should target the minority who become stuck.",
+        "explanation": "Longitudinal studies show that the majority of people who experience a housing crisis return to settled accommodation relatively quickly through their own efforts, family support or the ordinary private market. Only a minority become entrenched. Blanket approaches that treat every presentation as requiring permanent public housing misallocate resources toward people who would have recovered anyway and away from the harder cases that need intensive help. Efficient systems triage: rapid prevention and light-touch assistance for the majority, focused and conditional support for those with complex needs. Treating homelessness as a uniform systemic failure requiring uniform state housing for all comers ignores this heterogeneity and produces both waste and queues. Precision, not comprehensiveness for its own sake, should guide intervention."
+      },
+      {
+        "claim": "Strong family and informal networks have always been the primary defence against homelessness; expansive state provision can crowd them out.",
+        "explanation": "Across societies and history, most people who face income shocks or relationship breakdown are absorbed by relatives and friends. These informal systems are flexible, low-cost and often more effective at restoring stability than bureaucratic services. When the state assumes primary responsibility and provides housing as of right, the perceived obligation of families and communities weakens. People who might previously have offered a sofa or temporary help may conclude that the problem is now the government’s. The result can be a net reduction in total support even as public expenditure rises. Policy should therefore reinforce rather than replace informal networks — for example through mediation, targeted assistance that keeps people within family settings, and clear expectations that public housing is a last resort rather than a first response."
+      },
+      {
+        "claim": "Fiscal resources are finite; prioritising unrestricted housing rights necessarily means fewer resources for other forms of assistance and for prevention.",
+        "explanation": "Every pound spent on temporary accommodation or on housing people with low needs is a pound not spent on addiction treatment, mental-health services, prevention of eviction, or support for care leavers and prison leavers. In practice, the political visibility of street homelessness often drives funding toward the most immediate and expensive responses rather than toward higher-return earlier interventions. An open-ended commitment to house all who present also creates legal and financial liabilities that are difficult to control. Fiscal realism requires prioritisation and conditionality so that limited resources achieve the greatest reduction in entrenched homelessness rather than the widest possible distribution of subsidy. Comprehensive state intervention sounds attractive until the opportunity costs are confronted."
+      },
+      {
+        "claim": "Some individuals actively reject the constraints of conventional housing and services; policy that ignores this reality sets itself up to fail.",
+        "explanation": "A subset of the street population prefers the relative freedom of rough sleeping or makeshift arrangements to the rules, neighbours and expectations that come with tenancies. Outreach teams regularly encounter people who refuse offers of accommodation or abandon placements after short periods. Treating every refusal as evidence of inadequate offer or systemic failure overlooks genuine preference and the limits of what compulsion or inducement can achieve in a free society. Effective approaches combine persistent engagement with realistic acceptance that not every person will accept or sustain housing on the terms society can offer. Designing systems on the assumption that supply and support alone will eliminate visible homelessness collides with the existence of this group and produces repeated disappointment."
+      },
+      {
+        "claim": "International comparisons show that high public spending and strong social rights do not automatically produce low homelessness.",
+        "explanation": "Several European countries with extensive welfare states and legal rights to housing still experience significant rough sleeping and temporary-accommodation pressures. Conversely, some lower-spending jurisdictions maintain lower visible homelessness through different combinations of enforcement, family structure, labour-market conditions and cultural expectations. The relationship between state intervention and homelessness outcomes is therefore not linear. What appears to matter more is the interaction of housing supply, the management of hard-to-house individuals, the strength of informal support, and the presence or absence of perverse incentives. Simply scaling up comprehensive state provision on the Nordic or rights-based model does not guarantee success and can import new problems of dependency and cost. Evidence-based policy must look at what actually reduces entrenched homelessness rather than assuming that more intervention is always better."
+      },
+      {
+        "claim": "Emphasising systemic causes can become a form of soft bigotry that denies the capacity of individuals to improve their situation.",
+        "explanation": "When every adverse outcome is attributed to structures, the implicit message is that the people affected have little power to change their lives. This can reduce both external expectations and internal motivation. Recovery from addiction, stabilisation of mental health, and the rebuilding of routines and relationships all require active agency. Programmes that combine practical help with clear expectations and a belief in the possibility of change consistently outperform those that treat service users as passive products of systems. A narrative that places almost all causal weight on systemic failure risks discouraging the very personal effort that successful exits from homelessness require. Respect for human dignity includes respect for the capacity to exercise responsibility when conditions make it possible."
+      },
+      {
+        "claim": "Concentrating visible homelessness in certain urban areas is partly a product of service location and policy signals, not only of housing markets.",
+        "explanation": "Cities that provide the most extensive street services and the most accessible temporary accommodation often attract people from wider regions, including those who were previously housed elsewhere. This migration effect can create the appearance of a uniquely severe local systemic failure when part of what is being observed is the concentration of a mobile population around the most permissive services. Some jurisdictions have reduced street numbers partly by altering the availability and conditions of services rather than solely by expanding housing supply. Policy that ignores these behavioural and locational responses will misread the scale of local housing failure and design interventions that simply redistribute rather than reduce the problem. A complete account must include the ways in which the service system itself shapes the distribution and visibility of homelessness."
+      },
+      {
+        "claim": "Sustainable reductions in homelessness have usually combined housing access with expectations, enforcement of norms, and attention to the hardest-to-help.",
+        "explanation": "Jurisdictions that have achieved lasting falls in rough sleeping have typically used a mix of tools: increased housing options, assertive outreach, requirements around treatment or behaviour in some programmes, and, where necessary, enforcement against street camping or associated anti-social behaviour. Purely rights-based or housing-supply approaches that reject any element of conditionality or enforcement have weaker and less durable records. The most difficult cohort often requires a degree of constructive pressure alongside support. Comprehensive state intervention that rejects these elements in the name of non-judgmentalism tends to manage rather than solve the problem. Realism about human motivation and the limits of pure entitlement is not the enemy of compassion; it is a condition of making compassion effective over the long term."
+      }
+    ]
+  }
+}

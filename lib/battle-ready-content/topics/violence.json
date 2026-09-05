@@ -1,0 +1,407 @@
+{
+  "motion": "This House believes that violence is never morally justified",
+  "for": {
+    "vocab": [
+      {
+        "term": "absolute non-violence",
+        "definition": "The ethical position that the deliberate infliction of physical harm is wrong in every circumstance",
+        "example": "Absolute non-violence rejects even defensive force as a moral contradiction."
+      },
+      {
+        "term": "cycle of retaliation",
+        "definition": "The self-perpetuating pattern in which each act of violence provokes further violence in response",
+        "example": "History shows that the cycle of retaliation rarely ends with the side that claims justice."
+      },
+      {
+        "term": "moral consistency",
+        "definition": "The requirement that an ethical principle be applied without convenient exceptions that undermine it",
+        "example": "Moral consistency demands that we refuse violence even when it appears expedient."
+      },
+      {
+        "term": "human dignity",
+        "definition": "The intrinsic worth of every person that is violated when they are treated as a legitimate target of harm",
+        "example": "Violence, even in a supposedly just cause, still assaults the human dignity of the person harmed."
+      },
+      {
+        "term": "escalatory logic",
+        "definition": "The tendency of violent acts to expand in scale and intensity beyond the original intention",
+        "example": "Once escalatory logic takes hold, limited force rapidly becomes disproportionate destruction."
+      },
+      {
+        "term": "ethical contamination",
+        "definition": "The corruption of a person’s or society’s moral character through the practice of violence",
+        "example": "Even ‘necessary’ violence carries a risk of ethical contamination that outlasts the conflict."
+      },
+      {
+        "term": "non-violent resistance",
+        "definition": "Organised methods of opposing injustice that deliberately refuse physical harm to opponents",
+        "example": "Non-violent resistance has repeatedly achieved political change without the moral costs of armed struggle."
+      },
+      {
+        "term": "dehumanisation",
+        "definition": "The psychological process of stripping others of full human status in order to make harming them easier",
+        "example": "Every sustained campaign of violence requires some degree of dehumanisation of the target group."
+      },
+      {
+        "term": "principled restraint",
+        "definition": "The deliberate refusal to use available force because of ethical commitment rather than weakness",
+        "example": "Principled restraint is often misread as cowardice by those who cannot imagine power without violence."
+      },
+      {
+        "term": "moral injury",
+        "definition": "The lasting psychological damage caused by participating in or witnessing acts that violate one’s ethical core",
+        "example": "Combatants frequently suffer moral injury even when their cause is widely regarded as just."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "Once we grant that violence can be justified, we hand every actor a licence to redefine necessity in their own favour.",
+        "examples": [
+          "Once we grant that violence can be justified, we hand every actor a licence to redefine necessity in their own favour.",
+          "The historical record shows that once we grant that violence can be justified, we hand every actor a licence to redefine necessity in their own favour.",
+          "A coherent ethic must refuse the opening: once we grant that violence can be justified, we hand every actor a licence to redefine necessity in their own favour."
+        ]
+      },
+      {
+        "phrase": "There is no clean violence; every act of harm leaves a residue on the person who commits it and on the society that approves it.",
+        "examples": [
+          "There is no clean violence; every act of harm leaves a residue on the person who commits it and on the society that approves it.",
+          "We should stop searching for pure cases: there is no clean violence; every act of harm leaves a residue on the person who commits it and on the society that approves it.",
+          "Moral seriousness begins with the recognition that there is no clean violence; every act of harm leaves a residue on the person who commits it and on the society that approves it."
+        ]
+      },
+      {
+        "phrase": "The claim of last resort is almost always made by those who have not exhausted the non-violent alternatives.",
+        "examples": [
+          "The claim of last resort is almost always made by those who have not exhausted the non-violent alternatives.",
+          "In retrospect, the claim of last resort is almost always made by those who have not exhausted the non-violent alternatives.",
+          "We should treat with suspicion the assertion that the claim of last resort is almost always made by those who have not exhausted the non-violent alternatives."
+        ]
+      },
+      {
+        "phrase": "Violence does not resolve the underlying conflict; it merely rearranges the distribution of suffering.",
+        "examples": [
+          "Violence does not resolve the underlying conflict; it merely rearranges the distribution of suffering.",
+          "Short-term victories obscure the truth that violence does not resolve the underlying conflict; it merely rearranges the distribution of suffering.",
+          "A longer view reveals that violence does not resolve the underlying conflict; it merely rearranges the distribution of suffering."
+        ]
+      },
+      {
+        "phrase": "To meet violence with violence is to accept the moral framework of the aggressor.",
+        "examples": [
+          "To meet violence with violence is to accept the moral framework of the aggressor and to reproduce it.",
+          "Non-violent discipline refuses the premise that to meet violence with violence is to accept the moral framework of the aggressor.",
+          "The deeper resistance is the refusal to accept that to meet violence with violence is to accept the moral framework of the aggressor."
+        ]
+      },
+      {
+        "phrase": "Every justification of violence has been used by both the oppressors and the oppressed; the principle itself is not self-limiting.",
+        "examples": [
+          "Every justification of violence has been used by both the oppressors and the oppressed; the principle itself is not self-limiting.",
+          "History demonstrates that every justification of violence has been used by both the oppressors and the oppressed; the principle itself is not self-limiting.",
+          "We cannot control the principle once released: every justification of violence has been used by both the oppressors and the oppressed; the principle itself is not self-limiting."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "an eye for an eye",
+        "definition": "The principle of reciprocal harm that historically leads to escalating cycles of revenge",
+        "examples": [
+          "An eye for an eye leaves everyone blind; the old warning still applies to modern conflicts.",
+          "Those who defend limited retaliation rarely control the logic of an eye for an eye once it is set in motion.",
+          "Non-violence is the deliberate rejection of the entire framework of an eye for an eye."
+        ]
+      },
+      {
+        "idiom": "fight fire with fire",
+        "definition": "To respond to an attack with the same destructive methods",
+        "examples": [
+          "The advice to fight fire with fire has burned more societies than it has saved.",
+          "Non-violent movements succeed by refusing to fight fire with fire and thereby changing the terms of the struggle.",
+          "When both sides decide to fight fire with fire, the only guaranteed outcome is a larger conflagration."
+        ]
+      },
+      {
+        "idiom": "the ends justify the means",
+        "definition": "The claim that a sufficiently good goal can make harmful methods acceptable",
+        "examples": [
+          "Once the ends justify the means is accepted, almost any atrocity can be reframed as necessary.",
+          "Non-violence rejects the doctrine that the ends justify the means because the means shape the ends that actually result.",
+          "Every violent movement eventually discovers that the ends justify the means has no natural stopping point."
+        ]
+      },
+      {
+        "idiom": "descend to their level",
+        "definition": "To adopt the same immoral methods as one’s opponent",
+        "examples": [
+          "The moral danger of violence is precisely the pressure to descend to their level in order to win.",
+          "Maintaining non-violence is the refusal to descend to their level even under extreme provocation.",
+          "History is full of movements that began with high ideals and then chose to descend to their level."
+        ]
+      },
+      {
+        "idiom": "break the cycle",
+        "definition": "To interrupt a repeating pattern of harm by refusing to continue it",
+        "examples": [
+          "Someone has to break the cycle; otherwise retaliation simply becomes the new normal.",
+          "Non-violent discipline is one of the few proven ways to break the cycle of political violence.",
+          "The courage required is the courage to break the cycle when every emotion demands continuation."
+        ]
+      },
+      {
+        "idiom": "two wrongs do not make a right",
+        "definition": "The principle that a second immoral act does not correct the first",
+        "examples": [
+          "Responding to aggression with counter-aggression still collides with the truth that two wrongs do not make a right.",
+          "Just-war arguments attempt to escape the force of two wrongs do not make a right, but never quite succeed.",
+          "A consistent ethic holds that two wrongs do not make a right even when the first wrong is horrific."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "Any ethical permission for violence is inherently unstable and will be expanded by those who hold power.",
+        "explanation": "Once a society accepts that violence can be justified under certain conditions, the definition of those conditions becomes a site of political contest. What begins as self-defence is gradually stretched to include pre-emptive action, collective punishment, or the defence of abstract interests. Historical examples are abundant: emergency powers become permanent, limited wars expand, and the language of necessity is applied to ever-wider targets. Because those who decide when violence is ‘justified’ are usually the same actors who command the means of violence, the restraint is structural rather than genuine. Absolute prohibition removes the interpretive loophole. It forces every claim of necessity to confront a bright-line rule rather than a flexible standard that power can rewrite. The record of limited justifications suggests that the line never holds where it is first drawn."
+      },
+      {
+        "claim": "Violence, even when successful in the short term, rarely produces stable or legitimate political outcomes.",
+        "explanation": "Military victories and revolutionary seizures of power frequently generate new cycles of repression, revenge, and institutionalised force. The new order is often shaped by the methods used to achieve it: organisations skilled in violence tend to govern through violence. Comparative studies of transitions show that negotiated and non-violent paths more often produce durable democratic institutions, while violent paths more often produce authoritarianism or renewed conflict. The human and social costs of the violent route are also systematically higher and longer-lasting. Claims that ‘this time’ violence will be limited and clean are repeatedly falsified by the subsequent record. A strategy that rejects violence on principle is therefore not only morally coherent but empirically better aligned with the goal of lasting and legitimate peace."
+      },
+      {
+        "claim": "Non-violent resistance has a documented record of success against even highly repressive regimes.",
+        "explanation": "Research on civil resistance campaigns demonstrates that non-violent movements have succeeded more frequently than violent ones in achieving major political goals over the last century. Cases include independence movements, the overthrow of dictatorships, and the expansion of civil rights. These movements succeed by withdrawing cooperation, creating parallel institutions, and imposing political and economic costs that regimes cannot sustain without further alienating their own support bases. Violence, by contrast, often unifies the opponent and legitimises harsher repression. The empirical pattern undermines the claim that violence is a necessary last resort. In many situations it is simply the more familiar and emotionally satisfying option, not the more effective one. Commitment to non-violence is therefore compatible with serious strategic thinking about how change actually occurs."
+      },
+      {
+        "claim": "Participation in violence damages the moral and psychological integrity of those who carry it out.",
+        "explanation": "Combatants, police officers, and revolutionaries frequently report lasting moral injury: the sense of having violated core ethical commitments even when acting under orders or in a widely supported cause. Rates of post-traumatic stress, depression, substance abuse, and suicide are elevated among those exposed to killing. The damage is not limited to unjust wars; it appears across contexts in which people are required to harm others. This cost is rarely included in justifications that focus only on the justice of the goal. A complete moral accounting must weigh the harm done to the agent as well as to the target. Absolute non-violence protects the moral personality of the agent by refusing to place them in situations that require the intentional destruction of other human beings. That protection is itself a significant ethical good."
+      },
+      {
+        "claim": "The distinction between legitimate and illegitimate violence is routinely manipulated by every party to a conflict.",
+        "explanation": "Each side in a violent conflict constructs a narrative in which its own force is defensive, proportionate, and forced upon it, while the opponent’s force is aggressive, excessive, and chosen. These narratives are rarely symmetrical; each population is socialised into its own version. Outside observers, distant in time or space, often see the symmetry that participants cannot. The ease with which the same act can be described as terrorism or freedom-fighting, as atrocity or necessity, reveals the instability of the distinction. An ethic that depends on correctly applying that distinction in real time, under conditions of fear and propaganda, asks more of human judgment than it can reliably deliver. A rule that simply prohibits intentional harm removes the need for these contested and usually self-serving classifications."
+      },
+      {
+        "claim": "Violence against the ‘guilty’ still requires a level of certainty about guilt and proportionality that humans rarely possess in the moment of action.",
+        "explanation": "Justifications of violence typically assume that the target is responsible for serious wrongdoing and that the harm inflicted is no greater than required. In practice, information is incomplete, fear distorts judgment, and institutional pressures favour decisive action over careful discrimination. Civilian casualties, mistaken identity, and excessive force are not rare aberrations; they are recurrent features of violent practice. Even legal systems with high procedural safeguards produce wrongful convictions; the conditions of combat or emergency policing are far less favourable to accuracy. An ethic that permits violence only under conditions of near-certainty about guilt and proportion is, in effect, an ethic that almost never permits it. Absolute prohibition simply makes explicit what the epistemic limitations already imply."
+      },
+      {
+        "claim": "The normalisation of any violence lowers the threshold for future violence within the same society.",
+        "explanation": "Social and psychological research indicates that exposure to justified violence increases the acceptance of violence in subsequent situations. Institutions that regularly employ force develop cultures, training methods, and career incentives organised around its use. What begins as exceptional becomes routine. Societies that have undergone periods of intense internal or external violence often display elevated rates of interpersonal violence, domestic abuse, and political intimidation long after the original conflict ends. The causal pathways include both cultural shifts and the presence of individuals habituated to force. A strict prohibition acts as a firebreak against this normalisation. By treating every resort to violence as a profound moral failure rather than a policy option, a society makes the slide into routine force more difficult."
+      },
+      {
+        "claim": "Self-defence arguments collapse when extended from the individual to the collective or the state.",
+        "explanation": "The intuition that a person may use force against an immediate, unlawful attacker is psychologically powerful. Yet the same intuition is routinely stretched to cover pre-emptive wars, collective punishments, and the defence of strategic interests far removed from any direct threat to life. Once the individual right is granted, political actors appropriate its moral force while discarding its narrow conditions. The result is that the most destructive forms of violence—industrial warfare, aerial bombing, mass internment—travel under the banner of self-defence. An ethic that wishes to preserve a narrow right of personal self-defence while prohibiting organised political violence faces a severe problem of containment. Absolute non-violence avoids the problem by refusing the initial permission that is later expanded beyond recognition."
+      },
+      {
+        "claim": "Technological change has made the consequences of justified violence so destructive that older moral frameworks are no longer adequate.",
+        "explanation": "Traditional just-war criteria were developed in eras of limited weaponry and relatively clear battlefields. Modern capabilities—nuclear weapons, strategic bombing, autonomous systems, cyber operations that can cripple civilian infrastructure—produce harm on a scale and with a lack of discrimination that earlier theorists could not fully anticipate. The gap between the intention of ‘limited’ force and the foreseeable consequences has widened dramatically. Under these conditions, the claim that violence can be kept proportionate and discriminate becomes increasingly difficult to sustain. A moral stance that simply refuses the instrument is better matched to the destructive potential now available. Continuing to apply frameworks designed for swords and muskets to thermonuclear and algorithmic warfare is a form of ethical anachronism."
+      },
+      {
+        "claim": "A consistent commitment to human equality cannot survive the practice of intentional killing.",
+        "explanation": "Most modern ethical systems affirm that every human life has equal intrinsic worth. Violence, especially lethal violence, requires the agent to treat the target’s life as forfeit in a way that the agent’s own life is not. This asymmetry is sometimes defended by reference to the target’s actions, yet the judgment of those actions is made by the party that holds the power to kill. The practical result is that some lives are systematically treated as more expendable than others. Non-violence is one of the few positions that maintains strict equality of worth at the point of action: no one’s life is treated as a legitimate means to an end. Other ethical systems affirm equality in theory while permitting its suspension in practice. Absolute non-violence refuses the suspension."
+      }
+    ]
+  },
+  "against": {
+    "vocab": [
+      {
+        "term": "just cause",
+        "definition": "A sufficiently serious wrong, such as aggression or mass atrocity, that can morally permit the use of force in response",
+        "example": "Self-defence against an ongoing lethal attack is the clearest case of just cause."
+      },
+      {
+        "term": "proportionality",
+        "definition": "The requirement that the harm inflicted by force must not exceed the harm it prevents or the good it secures",
+        "example": "Proportionality forbids the destruction of a city to neutralise a single sniper."
+      },
+      {
+        "term": "last resort",
+        "definition": "The condition that force may be used only after all reasonable non-violent alternatives have been tried or clearly will fail",
+        "example": "Genuine last resort requires demonstrated effort at negotiation, sanctions, or other pressure before violence is chosen."
+      },
+      {
+        "term": "legitimate authority",
+        "definition": "The requirement that the decision to use organised force be made by those properly empowered to act for the political community",
+        "example": "Legitimate authority distinguishes the violence of a recognised state from that of a private militia."
+      },
+      {
+        "term": "right intention",
+        "definition": "The stipulation that force must be aimed at the just goal itself rather than at revenge, conquest, or domination",
+        "example": "Right intention is violated when a defensive war is used as cover for territorial expansion."
+      },
+      {
+        "term": "necessity defence",
+        "definition": "The legal and moral claim that otherwise wrongful force is permissible when required to prevent a greater and imminent harm",
+        "example": "The necessity defence covers the use of force to stop an ongoing massacre when no other means exist."
+      },
+      {
+        "term": "responsible agency",
+        "definition": "The capacity of a person or institution to be held accountable for choosing violence or restraint",
+        "example": "Responsible agency implies that those who can stop grave harm but refuse to use necessary force also bear moral weight."
+      },
+      {
+        "term": "pacifist absolutism",
+        "definition": "The position that no amount of suffering or injustice can ever justify the use of physical force",
+        "example": "Pacifist absolutism would forbid intervening to halt a genocide in progress."
+      },
+      {
+        "term": "defensive force",
+        "definition": "Violence used solely to protect life, bodily integrity, or fundamental rights against unjust attack",
+        "example": "Defensive force is morally distinct from aggression because it responds to a prior violation."
+      },
+      {
+        "term": "moral tragedy",
+        "definition": "A situation in which every available option involves serious wrongdoing and the agent must still choose the lesser evil",
+        "example": "Some conflicts present a moral tragedy in which refusing violence allows greater violence to continue unchecked."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "A moral theory that forbids all violence also forbids the protection of the innocent when protection requires force.",
+        "examples": [
+          "A moral theory that forbids all violence also forbids the protection of the innocent when protection requires force.",
+          "The cost of absolute non-violence is stark: a moral theory that forbids all violence also forbids the protection of the innocent when protection requires force.",
+          "We should reject any view in which a moral theory that forbids all violence also forbids the protection of the innocent when protection requires force."
+        ]
+      },
+      {
+        "phrase": "There is a decisive moral difference between the aggressor who initiates unjust harm and the defender who uses force to stop it.",
+        "examples": [
+          "There is a decisive moral difference between the aggressor who initiates unjust harm and the defender who uses force to stop it.",
+          "Flattening that distinction erases the fact that there is a decisive moral difference between the aggressor who initiates unjust harm and the defender who uses force to stop it.",
+          "Justice requires us to maintain that there is a decisive moral difference between the aggressor who initiates unjust harm and the defender who uses force to stop it."
+        ]
+      },
+      {
+        "phrase": "Refusing to use necessary force does not keep one’s hands clean; it makes one complicit in the harm one could have prevented.",
+        "examples": [
+          "Refusing to use necessary force does not keep one’s hands clean; it makes one complicit in the harm one could have prevented.",
+          "In the face of ongoing atrocity, refusing to use necessary force does not keep one’s hands clean; it makes one complicit in the harm one could have prevented.",
+          "Moral responsibility includes the recognition that refusing to use necessary force does not keep one’s hands clean; it makes one complicit in the harm one could have prevented."
+        ]
+      },
+      {
+        "phrase": "The burden of justification lies on those who would allow grave injustice to continue rather than on those who use limited force to stop it.",
+        "examples": [
+          "The burden of justification lies on those who would allow grave injustice to continue rather than on those who use limited force to stop it.",
+          "In cases of genocide or mass enslavement, the burden of justification lies on those who would allow grave injustice to continue rather than on those who use limited force to stop it.",
+          "Absolute pacifism reverses the proper order: the burden of justification lies on those who would allow grave injustice to continue rather than on those who use limited force to stop it."
+        ]
+      },
+      {
+        "phrase": "Moral seriousness requires facing the tragic reality that sometimes the only available means of preventing greater evil is itself a form of harm.",
+        "examples": [
+          "Moral seriousness requires facing the tragic reality that sometimes the only available means of preventing greater evil is itself a form of harm.",
+          "We do not escape tragedy by denying it: moral seriousness requires facing the tragic reality that sometimes the only available means of preventing greater evil is itself a form of harm.",
+          "An adult ethic accepts that moral seriousness requires facing the tragic reality that sometimes the only available means of preventing greater evil is itself a form of harm."
+        ]
+      },
+      {
+        "phrase": "Rights of self-defence and defence of others are recognised across independent moral and legal traditions for good reason.",
+        "examples": [
+          "Rights of self-defence and defence of others are recognised across independent moral and legal traditions for good reason.",
+          "The convergence of systems suggests that rights of self-defence and defence of others are recognised across independent moral and legal traditions for good reason.",
+          "Dismissing those rights requires explaining why rights of self-defence and defence of others are recognised across independent moral and legal traditions for good reason."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "turn the other cheek",
+        "definition": "To respond to injury with non-resistance; sometimes criticised as inadequate against systemic violence",
+        "examples": [
+          "Turning the other cheek may be admirable in personal insult but becomes morally questionable when third parties are being slaughtered.",
+          "Absolute non-violence often reduces to a political version of turn the other cheek regardless of consequences.",
+          "There are situations in which to turn the other cheek is to abandon those who cannot defend themselves."
+        ]
+      },
+      {
+        "idiom": "the lesser of two evils",
+        "definition": "The choice of the less harmful option when every available path involves wrongdoing",
+        "examples": [
+          "In genuine moral tragedies we are forced to choose the lesser of two evils rather than pretend a pure option exists.",
+          "Justified force is often the lesser of two evils when the alternative is unchecked massacre.",
+          "Refusing to choose the lesser of two evils is itself a choice with victims."
+        ]
+      },
+      {
+        "idiom": "stand idly by",
+        "definition": "To refuse to intervene when serious harm is occurring",
+        "examples": [
+          "A morality that requires us to stand idly by while innocents are killed has lost sight of basic responsibility.",
+          "Historical condemnations fall on those who chose to stand idly by when they possessed the means to stop atrocity.",
+          "Non-violence that amounts to standing idly by is not a higher ethic but a refusal of agency."
+        ]
+      },
+      {
+        "idiom": "fight fire with fire",
+        "definition": "To use matching methods against a destructive force; sometimes the only effective response",
+        "examples": [
+          "When facing an opponent who respects only force, it may be necessary to fight fire with fire within strict limits.",
+          "The proverb to fight fire with fire captures the tragic necessity that pure refusal can be futile against certain threats.",
+          "Controlled defensive force is a disciplined form of fighting fire with fire rather than an uncontrolled escalation."
+        ]
+      },
+      {
+        "idiom": "all that is necessary for evil to triumph is that good people do nothing",
+        "definition": "The warning that inaction in the face of wrongdoing enables its success",
+        "examples": [
+          "All that is necessary for evil to triumph is that good people do nothing; absolute non-violence can become a form of doing nothing.",
+          "The famous warning that all that is necessary for evil to triumph is that good people do nothing applies with special force to refusals of defensive force.",
+          "When the capacity to stop harm exists, all that is necessary for evil to triumph is that good people do nothing remains a live indictment."
+        ]
+      },
+      {
+        "idiom": "draw a line in the sand",
+        "definition": "To establish a clear limit beyond which force will be used to prevent further violation",
+        "examples": [
+          "Sometimes justice requires the willingness to draw a line in the sand and back it with necessary force.",
+          "Without the capacity to draw a line in the sand, moral prohibitions become empty requests.",
+          "Legitimate authority exists in part to draw a line in the sand against aggression and atrocity."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "The right of individual self-defence against lethal attack is recognised across virtually every moral and legal system for compelling reasons.",
+        "explanation": "When a person faces an immediate, unlawful threat to life or grave bodily harm, the use of necessary and proportionate force is almost universally regarded as permissible. The alternative—requiring the victim to submit to death or maiming—places the entire moral cost of the aggressor’s choice onto the innocent party. This is not a minor intuition; it is embedded in criminal law, human-rights instruments, and ordinary moral judgment across cultures. Absolute non-violence must either deny this right or redefine the defensive act as non-violent, both of which strain credibility. Once the individual right is conceded, the moral framework has already accepted that violence can be justified under specified conditions. The debate then shifts from whether violence can ever be justified to which further conditions, if any, can extend that justification to the defence of others or to collective self-defence."
+      },
+      {
+        "claim": "Refusal to use force against ongoing mass atrocity makes the refuser morally complicit in the continuation of that atrocity.",
+        "explanation": "When a genocide, campaign of mass rape, or systematic enslavement is in progress, and when the only available means of stopping it involves military force, the decision to withhold that force has foreseeable victims. Those victims are not abstract; they are specific people who will be killed or brutalised because capable agents chose not to intervene. Moral responsibility is not limited to the harms one directly causes; it includes the harms one could prevent at reasonable cost and chooses not to. Absolute non-violence prioritises the moral purity of the agent over the lives of the victims. This inversion is difficult to defend once the concrete reality of the atrocity is faced. Historical cases in which outside powers possessed the capacity to stop mass killing and declined to do so are now widely regarded as moral failures, not as triumphs of principle."
+      },
+      {
+        "claim": "Just-war criteria, while imperfect, provide a disciplined framework that has constrained rather than licensed violence in many historical cases.",
+        "explanation": "The requirements of just cause, legitimate authority, right intention, last resort, proportionality, and reasonable prospect of success function as filters that rule out most proposed uses of force. Wars of pure conquest, revenge, or economic domination fail these tests. The framework has been used by churches, lawyers, and political actors to criticise and sometimes prevent unjust campaigns. It is not a perfect barrier—power still finds ways to manipulate the language—but it is a more realistic constraint than an absolute prohibition that political actors simply ignore when interests are strong. By remaining engaged with the actual practice of state force, just-war thinking retains critical leverage. Absolute non-violence, by declaring the entire domain illegitimate, often forfeits the ability to discriminate between better and worse uses of force and thereby loses practical influence over those who will use force regardless."
+      },
+      {
+        "claim": "Non-violent methods, while valuable, have clear limits against opponents who are willing to destroy the non-violent movement itself.",
+        "explanation": "Civil resistance succeeds when the opponent is sensitive to legitimacy, economic pressure, or the loyalty of its own security forces. Against regimes or groups that are prepared to exterminate opposition without regard for international opinion or internal consent, non-violence can be simply annihilated. Historical examples exist in which non-violent campaigns were crushed by overwhelming and ruthless force before they could generate the political costs that make the method effective. In such cases, the insistence on pure non-violence amounts to a demand that victims accept destruction rather than resist with matching means. A complete ethic must therefore retain space for defensive force when non-violent strategies have been tried or are clearly unavailing against an opponent who respects only power."
+      },
+      {
+        "claim": "The state’s monopoly on legitimate violence is a civilising achievement that protects individuals from private predation.",
+        "explanation": "In the absence of an effective public authority capable of using force, individuals and groups resort to self-help, leading to feuds, warlordism, and the domination of the weak by the strong. The modern state’s claim to monopolise legitimate force, while dangerous if unchecked, has historically reduced the overall level of private violence and created the conditions for legal order. Absolute non-violence applied to the state would dissolve this monopoly and return society to conditions in which the strongest private actors impose their will. The moral task is therefore not to eliminate all capacity for force but to subject it to law, accountability, and the narrow justifications of defence and public order. Rejecting all violence leaves the field open to those who have no such scruples."
+      },
+      {
+        "claim": "Proportional defensive force can be a form of respect for the aggressor’s agency rather than a denial of their dignity.",
+        "explanation": "When a person chooses to attack, they create a situation in which their victim must either submit or resist. Using necessary force to stop the attack treats the aggressor as a responsible agent whose choices have consequences, rather than as a force of nature that must simply be endured. In this sense, defensive violence can be continuous with the recognition of moral agency. Absolute non-violence, by requiring the victim to absorb the cost of the aggressor’s choice, can itself fail to take the aggressor’s responsibility seriously. The moral relationship is asymmetric: the aggressor has already violated the victim’s basic rights. Restoring the situation through proportionate force is not an equivalent violation but a response to one. This distinction is central to ordinary moral and legal reasoning and cannot be erased without collapsing the difference between attack and defence."
+      },
+      {
+        "claim": "Absolute non-violence is almost never practised consistently by those who advocate it when their own core interests or kin are directly threatened.",
+        "explanation": "In personal and political life, even committed pacifists frequently accept or call for police or military force when faced with immediate threats to themselves, their families, or their communities. This practical inconsistency suggests that the absolute position is maintained more easily in abstract discussion than in concrete situations of vulnerability. The gap between professed principle and actual judgment under pressure indicates that the intuition favouring defensive force is deeper than the theoretical rejection of all violence. An ethic that cannot be lived by its own advocates without constant exception loses normative force. A more credible approach acknowledges the tragic necessity of force in extremis and concentrates on constraining it through clear criteria rather than denying the necessity altogether."
+      },
+      {
+        "claim": "International law and human-rights practice already recognise limited justifications for force, reflecting a hard-won consensus rather than a moral failure.",
+        "explanation": "The UN Charter, the Genocide Convention, and customary international law all contain provisions that permit force in self-defence and, under certain conditions, in collective responses to mass atrocity. These instruments were written by generations that had experienced industrialised slaughter and were determined to limit rather than eliminate the instrument of force. The resulting framework is imperfect and often poorly enforced, yet it represents an attempt to subject violence to rules rather than to wish it out of existence. Absolute non-violence would require the dismantling of these provisions and the acceptance that no lawful force can ever be used to stop aggression or genocide. That position has never commanded the support of the states or populations that must live with the consequences. The existing legal consensus, for all its flaws, tracks moral reality more closely than the absolute prohibition."
+      },
+      {
+        "claim": "Moral responsibility includes positive duties to protect; these duties sometimes require the capacity and willingness to use force.",
+        "explanation": "Ethical systems that recognise only negative duties—do not harm—leave unexplained our obligations to rescue or defend. Most people accept that a bystander who can easily save a drowning child has a duty to do so. When the threat is a human attacker rather than water, the parallel duty can require physical intervention, including force. Scaling the same logic to group threats yields limited justifications for police and military action. Absolute non-violence severs this connection between the duty to protect and the means of protection. It preserves the agent from the moral risks of force while transferring the entire risk onto the potential victims. A balanced ethic accepts that the duty to protect can, under strict conditions, generate permission for necessary force. Denying that permission empties the duty of practical content in the most serious cases."
+      },
+      {
+        "claim": "The historical record of successful defence against aggression and tyranny includes necessary violence; denying its moral possibility requires rewriting that record as a series of tragedies without justification.",
+        "explanation": "Allied resistance to Axis conquest, the defeat of genocidal regimes, and the liberation of populations under totalitarian rule involved large-scale organised violence. While those campaigns contained their own atrocities and moral failures, the alternative of non-resistance would have left aggressive and exterminatory projects undefeated. Absolute non-violence must either condemn these efforts as themselves immoral or redefine them in ways that strip them of their violent character. Neither option is satisfactory. A more realistic moral history accepts that some uses of force prevented still greater evils and that the agents who undertook them can be justified even while remaining open to criticism for particular excesses. This tragic but truthful accounting is preferable to a purity that would have left the victims of aggression without recourse."
+      }
+    ]
+  }
+}

@@ -1,0 +1,407 @@
+{
+  "motion": "This House believes that genuine and lasting happiness depends more on internal factors and personal agency than on external circumstances.",
+  "for": {
+    "vocab": [
+      {
+        "term": "inner contentment",
+        "definition": "A stable sense of peace and satisfaction that arises from within rather than from changing external conditions.",
+        "example": "People who cultivate inner contentment remain steady even when status or possessions fluctuate."
+      },
+      {
+        "term": "emotional resilience",
+        "definition": "The capacity to recover from setbacks and maintain psychological balance despite difficulty.",
+        "example": "Emotional resilience allows individuals to experience loss without collapsing into prolonged despair."
+      },
+      {
+        "term": "hedonic adaptation",
+        "definition": "The tendency of people to return to a relatively stable level of happiness despite major positive or negative life changes.",
+        "example": "Hedonic adaptation explains why lottery winners and accident survivors often report similar long-term happiness levels."
+      },
+      {
+        "term": "gratitude practice",
+        "definition": "The deliberate habit of noticing and appreciating what is already present rather than focusing on what is missing.",
+        "example": "Regular gratitude practice has been shown to shift attention away from chronic dissatisfaction."
+      },
+      {
+        "term": "self-determination",
+        "definition": "The ability to make autonomous choices aligned with one’s own values rather than being driven solely by external pressures.",
+        "example": "Self-determination in daily decisions strengthens the sense that life is authored rather than merely endured."
+      },
+      {
+        "term": "cognitive reframing",
+        "definition": "The skill of interpreting events in ways that reduce unnecessary suffering and highlight possible meaning or growth.",
+        "example": "Cognitive reframing turns a career setback into information rather than a final verdict on personal worth."
+      },
+      {
+        "term": "eudaimonic well-being",
+        "definition": "A form of flourishing that comes from living with purpose, virtue, and the realisation of one’s potential rather than from momentary pleasure.",
+        "example": "Eudaimonic well-being sustains people through hardship because it is anchored in meaning rather than comfort."
+      },
+      {
+        "term": "attentional control",
+        "definition": "The capacity to direct and sustain focus on chosen objects of awareness instead of being pulled by every stimulus or worry.",
+        "example": "Attentional control allows a person to savour ordinary moments instead of constantly scanning for problems."
+      },
+      {
+        "term": "intrinsic motivation",
+        "definition": "The drive to act for the inherent satisfaction of the activity itself rather than for external rewards or approval.",
+        "example": "Intrinsic motivation in work or hobbies produces deeper satisfaction than status or income alone."
+      },
+      {
+        "term": "psychological ownership",
+        "definition": "The feeling that one’s life, choices, and responses are genuinely one’s own rather than the product of forces beyond influence.",
+        "example": "Psychological ownership reduces helplessness and increases the willingness to shape daily experience."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "External conditions influence mood, yet they do not determine the deeper quality of a person’s inner life.",
+        "examples": [
+          "External conditions influence mood, yet they do not determine the deeper quality of a person’s inner life once habits of mind are taken into account.",
+          "Wealth and status can change, but external conditions influence mood, yet they do not determine the deeper quality of a person’s inner life.",
+          "Research on resilience shows that external conditions influence mood, yet they do not determine the deeper quality of a person’s inner life."
+        ]
+      },
+      {
+        "phrase": "Happiness that depends entirely on circumstances is fragile by definition.",
+        "examples": [
+          "Happiness that depends entirely on circumstances is fragile by definition and collapses when those circumstances shift.",
+          "People who build their well-being only on success discover that happiness that depends entirely on circumstances is fragile by definition.",
+          "A more stable foundation is required because happiness that depends entirely on circumstances is fragile by definition."
+        ]
+      },
+      {
+        "phrase": "The same objective situation produces widely different levels of reported well-being depending on interpretation and response.",
+        "examples": [
+          "The same objective situation produces widely different levels of reported well-being depending on interpretation and response, which is why mindset matters so much.",
+          "Identical medical diagnoses or financial setbacks show that the same objective situation produces widely different levels of reported well-being depending on interpretation and response.",
+          "Longitudinal studies confirm that the same objective situation produces widely different levels of reported well-being depending on interpretation and response."
+        ]
+      },
+      {
+        "phrase": "Personal agency is not the denial of hardship; it is the refusal to surrender the quality of one’s inner experience to that hardship.",
+        "examples": [
+          "Personal agency is not the denial of hardship; it is the refusal to surrender the quality of one’s inner experience to that hardship.",
+          "Even in constrained lives, personal agency is not the denial of hardship; it is the refusal to surrender the quality of one’s inner experience to that hardship.",
+          "The most resilient people demonstrate that personal agency is not the denial of hardship; it is the refusal to surrender the quality of one’s inner experience to that hardship."
+        ]
+      },
+      {
+        "phrase": "Cultivating inner resources yields returns that no external acquisition can reliably match.",
+        "examples": [
+          "Cultivating inner resources yields returns that no external acquisition can reliably match, because those resources travel with the person.",
+          "In times of loss, cultivating inner resources yields returns that no external acquisition can reliably match.",
+          "A lifetime of evidence shows that cultivating inner resources yields returns that no external acquisition can reliably match."
+        ]
+      },
+      {
+        "phrase": "Lasting satisfaction arises more from how we relate to life than from what life delivers.",
+        "examples": [
+          "Lasting satisfaction arises more from how we relate to life than from what life delivers, which is why attitude and practice matter.",
+          "Across cultures and income levels, lasting satisfaction arises more from how we relate to life than from what life delivers.",
+          "Philosophical and psychological traditions converge on the insight that lasting satisfaction arises more from how we relate to life than from what life delivers."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "count one's blessings",
+        "definition": "To deliberately notice and appreciate the good things already present in one’s life.",
+        "examples": [
+          "People who regularly count their blessings report higher baseline contentment even when facing real difficulties.",
+          "In moments of comparison or envy, the simple act of counting one’s blessings restores perspective.",
+          "Gratitude journals are a modern way to count one’s blessings and shift habitual attention."
+        ]
+      },
+      {
+        "idiom": "make the best of a bad situation",
+        "definition": "To respond constructively and extract whatever value or dignity is still possible under difficult conditions.",
+        "examples": [
+          "Emotional resilience is largely the capacity to make the best of a bad situation without denying its pain.",
+          "Individuals who make the best of a bad situation often emerge with deeper self-knowledge and stronger relationships.",
+          "The difference between despair and endurance frequently lies in the willingness to make the best of a bad situation."
+        ]
+      },
+      {
+        "idiom": "take something in one's stride",
+        "definition": "To deal with difficulty calmly and without being thrown off balance.",
+        "examples": [
+          "People with strong inner resources take setbacks in their stride rather than treating every obstacle as a catastrophe.",
+          "Learning to take criticism in one’s stride protects self-worth from external verdicts.",
+          "Emotional maturity includes the ability to take life’s inevitable frustrations in one’s stride."
+        ]
+      },
+      {
+        "idiom": "a matter of perspective",
+        "definition": "Something whose significance or emotional impact depends heavily on how it is viewed.",
+        "examples": [
+          "Whether a modest lifestyle feels constraining or liberating is often a matter of perspective.",
+          "Many sources of daily irritation shrink when recognised as a matter of perspective rather than absolute harm.",
+          "Happiness research repeatedly shows that well-being is partly a matter of perspective."
+        ]
+      },
+      {
+        "idiom": "find one's own way",
+        "definition": "To determine a personal path and set of values rather than simply following external expectations.",
+        "examples": [
+          "Lasting contentment increases when people find their own way instead of measuring themselves only against social scripts.",
+          "Self-determination begins with the courage to find one’s own way in work, relationships, and daily priorities.",
+          "Those who find their own way report greater authenticity and lower chronic dissatisfaction."
+        ]
+      },
+      {
+        "idiom": "peace of mind",
+        "definition": "A state of inner calm and freedom from excessive worry or internal conflict.",
+        "examples": [
+          "Many people eventually value peace of mind more highly than additional status or possessions.",
+          "Practices that strengthen attention and reduce rumination protect peace of mind.",
+          "External success without peace of mind often feels hollow."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "Extensive research on hedonic adaptation shows that people return to a relatively stable happiness baseline after both major gains and major losses.",
+        "explanation": "Studies of lottery winners, people who acquire significant wealth, and individuals who suffer serious physical injuries repeatedly find that long-term reported well-being converges toward pre-event levels. The initial emotional surge or drop fades as people adapt to the new reality. This pattern indicates that external circumstances, while influential in the short term, do not permanently rewrite the set-point of happiness for most individuals. What differs more reliably is the set of habits, interpretations, and relational patterns that people carry with them. Those who practise gratitude, maintain close relationships, and exercise some control over their attention tend to recover baseline well-being more effectively. The implication is not that circumstances are irrelevant, but that their long-term power is limited compared with internal processes. Policy and personal effort that ignore this adaptive tendency overestimate the lasting returns of purely external improvement."
+      },
+      {
+        "claim": "Identical objective conditions produce widely varying levels of subjective well-being, demonstrating the decisive role of interpretation and response.",
+        "explanation": "Within the same income bracket, neighbourhood, or health status, individuals report markedly different degrees of life satisfaction. Twin studies and longitudinal research further show that genetic predispositions and learned cognitive styles account for substantial variance in happiness even when environments are similar. Two people can experience the same job loss, medical diagnosis, or relationship ending and diverge sharply in subsequent emotional trajectory. The difference lies in narrative framing, perceived agency, social support mobilisation, and the capacity to extract meaning. These internal and relational factors are not fixed; they can be strengthened through deliberate practice. The wide dispersion of well-being under comparable external conditions is therefore strong evidence that personal agency and mindset are not secondary but primary determinants of lasting happiness."
+      },
+      {
+        "claim": "Practices that train attention, gratitude, and cognitive reframing produce measurable and sustained increases in well-being across diverse populations.",
+        "explanation": "Controlled trials of gratitude exercises, mindfulness training, and cognitive-behavioural techniques consistently show moderate but reliable gains in life satisfaction and reductions in depressive symptoms. These interventions require no change in income, status, or physical environment; they operate by altering how people relate to whatever circumstances they already inhabit. Effects are found among students, working adults, clinical populations, and older adults. The fact that relatively simple internal practices can shift reported happiness indicates that a significant portion of well-being is accessible through personal agency. While such practices are not a cure for severe material deprivation or clinical disorder, they demonstrate that the internal domain is far from powerless. Societies and individuals that neglect this domain leave an important source of flourishing under-used."
+      },
+      {
+        "claim": "Purpose, contribution, and close relationships — all heavily influenced by personal choices — predict lasting happiness more strongly than income or status beyond basic thresholds.",
+        "explanation": "Large-scale surveys and longitudinal studies repeatedly identify quality of relationships, sense of purpose, and engagement in meaningful activity as among the strongest correlates of sustained well-being. Once basic material needs are met, additional income yields diminishing returns, whereas the presence of trusted relationships and a feeling that one’s life matters continue to differentiate happier from less happy individuals. These factors are not purely external gifts; they are shaped by how people invest time, attention, and commitment. Choosing to prioritise depth of connection over breadth of acquaintance, or service over pure self-advancement, alters the conditions that most reliably support happiness. The data therefore support the claim that agency exercised in the domains of relationship and meaning has greater long-term leverage than further accumulation of external markers."
+      },
+      {
+        "claim": "People who locate the centre of their well-being in external validation remain chronically vulnerable to forces they cannot control.",
+        "explanation": "When self-worth and emotional stability are tied primarily to achievement, appearance, popularity, or material success, every fluctuation in those domains becomes a threat. Careers stall, bodies age, social media metrics shift, and economic conditions change. Individuals organised around external validation experience these normal variations as personal crises. By contrast, those who develop a more internal locus — grounded in values, character, and chosen commitments — retain a stabilising core. This difference is visible in how people respond to public failure, retirement, or loss of status. The external strategy is inherently fragile because it outsources emotional regulation to environments that are unpredictable. Building internal resources is therefore not optional self-help; it is a rational response to the structural insecurity of purely external foundations."
+      },
+      {
+        "claim": "Cross-cultural and historical evidence shows that high levels of reported contentment have existed under material conditions far more constrained than those of contemporary affluent societies.",
+        "explanation": "Anthropological accounts and historical records describe communities living with minimal material surplus yet displaying social cohesion, ritual richness, and individual equanimity. Contemporary surveys in some lower-income countries occasionally report life-satisfaction levels comparable to those in wealthier nations once basic security is present. These patterns do not romanticise poverty; they demonstrate that human beings are capable of constructing meaningful and satisfying lives without the consumption levels now treated as prerequisites. The rapid rise in anxiety and depressive symptoms in some high-income societies further suggests that external abundance does not automatically translate into inner well-being. The capacity for contentment is therefore not a recent luxury good but a human potential that can be cultivated or neglected under a wide range of material conditions."
+      },
+      {
+        "claim": "Personal agency in the form of habit formation, boundary setting, and selective attention is available to most people even within constrained circumstances.",
+        "explanation": "While severe poverty, violence, or illness limit options, the majority of individuals still retain meaningful scope for choice in daily routines, relationships, and mental focus. Deciding what to consume media-wise, how to speak to family members, whether to practise brief reflection, or how to interpret a disappointment are acts of agency that accumulate. Learned helplessness arises in part from underestimating this remaining scope. Programmes that teach concrete skills of emotional regulation and behavioural activation produce benefits precisely because they restore a sense of efficacy. Emphasising internal factors does not deny structural injustice; it refuses to treat people as passive products of their conditions. Agency is both a psychological reality and a practical resource that can be strengthened."
+      },
+      {
+        "claim": "The most reliable predictors of long-term well-being are patterns of thought and relationship that individuals can influence, not one-time external windfalls.",
+        "explanation": "Decades of research in positive psychology and behavioural genetics converge on the finding that intentional activities and social connections account for a large share of the variance in happiness that is not explained by temperament or circumstances. People who regularly invest in close relationships, engage in absorbing activities, practise kindness, and maintain physical movement show elevated well-being that persists. These are not passive traits; they are behavioural patterns open to cultivation. External events such as promotions or acquisitions produce spikes that typically decay. The contrast supports the conclusion that the ongoing architecture of a person’s inner and relational life exerts more enduring influence than the succession of external peaks and troughs. Effort directed at that architecture is therefore high-leverage."
+      },
+      {
+        "claim": "Framing happiness as primarily external encourages passive waiting and perpetual dissatisfaction; framing it as internal encourages active cultivation.",
+        "explanation": "When people believe that sufficient happiness will arrive once the next goal is reached — the right job, partner, house, or level of recognition — they remain in a state of deferral. Each achievement is quickly normalised and the goalposts move. This external framing sustains a background sense of incompleteness. An internal framing, by contrast, directs attention toward practices and relationships available in the present. It treats well-being as something that can be strengthened today rather than postponed until conditions are perfect. The psychological difference is substantial: one orientation breeds chronic striving and comparison, the other builds capacity and appreciation. Cultural messages that over-emphasise external determinants inadvertently reinforce the less effective frame. Recovering the internal dimension restores both realism and practical hope."
+      },
+      {
+        "claim": "Acknowledging the power of internal factors does not excuse injustice; it prevents the additional harm of convincing people they are powerless until the world is perfected.",
+        "explanation": "Structural improvements in health, safety, and opportunity remain urgent and morally required. Yet telling individuals that their emotional lives are almost entirely determined by those structures risks deepening demoralisation. People living under difficulty still benefit from tools that reduce unnecessary secondary suffering — rumination, self-blame, isolation, and catastrophic interpretation. Providing those tools is not a substitute for justice; it is a parallel form of respect for human agency. Historical movements for social change have often drawn strength from individuals who maintained inner clarity and solidarity despite harsh conditions. Reducing happiness exclusively to external variables underestimates both the suffering that mindset can amplify and the dignity that agency can preserve. A complete account therefore holds structural and internal responsibilities together rather than collapsing one into the other."
+      }
+    ]
+  },
+  "against": {
+    "vocab": [
+      {
+        "term": "material security",
+        "definition": "Reliable access to food, shelter, healthcare, and basic financial stability that forms the necessary foundation for other forms of well-being.",
+        "example": "Without material security, appeals to mindset often sound hollow to people facing eviction or untreated illness."
+      },
+      {
+        "term": "structural constraint",
+        "definition": "Limitations imposed by economic systems, institutions, discrimination, or physical environment that restrict individual options regardless of attitude.",
+        "example": "Long working hours for low pay constitute a structural constraint that no amount of positive thinking fully overcomes."
+      },
+      {
+        "term": "social determinant",
+        "definition": "A condition of daily life — such as income, education, housing, or social status — that systematically shapes health and well-being outcomes.",
+        "example": "Income inequality functions as a powerful social determinant of both physical health and reported life satisfaction."
+      },
+      {
+        "term": "chronic stress load",
+        "definition": "The cumulative physiological and psychological burden created by persistent external pressures such as poverty, discrimination, or unsafe environments.",
+        "example": "Chronic stress load from financial insecurity measurably impairs concentration, sleep, and emotional regulation."
+      },
+      {
+        "term": "positional competition",
+        "definition": "The struggle for relative status in which one person’s gain in standing necessarily involves another’s loss, generating ongoing anxiety.",
+        "example": "Positional competition in education and careers keeps many people on a treadmill even after absolute living standards rise."
+      },
+      {
+        "term": "environmental affordance",
+        "definition": "Features of the physical and social surroundings that make certain behaviours and states of mind easier or harder to sustain.",
+        "example": "Safe public spaces and accessible green areas are environmental affordances that support mental restoration."
+      },
+      {
+        "term": "systemic disadvantage",
+        "definition": "Patterns of unequal access and treatment embedded in institutions that accumulate across a lifetime and across generations.",
+        "example": "Systemic disadvantage in schooling and employment shapes life chances long before individual mindset becomes relevant."
+      },
+      {
+        "term": "baseline deprivation",
+        "definition": "A level of unmet basic need so severe that higher psychological functions are chronically impaired.",
+        "example": "Baseline deprivation of sleep, nutrition, or safety makes sustained contentment physiologically difficult."
+      },
+      {
+        "term": "collective efficacy",
+        "definition": "The shared capacity of a community to organise and improve its conditions, which in turn supports individual well-being.",
+        "example": "Neighbourhoods with high collective efficacy show lower rates of isolation and higher average life satisfaction."
+      },
+      {
+        "term": "opportunity structure",
+        "definition": "The set of realistic pathways available to a person given their social position, resources, and the rules of the surrounding system.",
+        "example": "A narrow opportunity structure can make even strong personal agency feel ineffective."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "Mindset matters, but it operates within limits set by material conditions and social structures.",
+        "examples": [
+          "Mindset matters, but it operates within limits set by material conditions and social structures that no individual can simply think away.",
+          "Telling people to adjust their attitude ignores that mindset matters, but it operates within limits set by material conditions and social structures.",
+          "A complete account recognises that mindset matters, but it operates within limits set by material conditions and social structures."
+        ]
+      },
+      {
+        "phrase": "Severe external hardship produces predictable damage to well-being that internal practices can only partially mitigate.",
+        "examples": [
+          "Severe external hardship produces predictable damage to well-being that internal practices can only partially mitigate.",
+          "Data on poverty, violence, and chronic illness show that severe external hardship produces predictable damage to well-being that internal practices can only partially mitigate.",
+          "It is unrealistic to claim that severe external hardship produces predictable damage to well-being that internal practices can only partially mitigate is somehow optional."
+        ]
+      },
+      {
+        "phrase": "Treating happiness as primarily an individual responsibility risks blaming people for the effects of unjust or inadequate systems.",
+        "examples": [
+          "Treating happiness as primarily an individual responsibility risks blaming people for the effects of unjust or inadequate systems.",
+          "When public services fail, treating happiness as primarily an individual responsibility risks blaming people for the effects of unjust or inadequate systems.",
+          "A political culture that focuses only on mindset ends up treating happiness as primarily an individual responsibility risks blaming people for the effects of unjust or inadequate systems."
+        ]
+      },
+      {
+        "phrase": "The strongest gains in population well-being have historically come from improvements in external conditions, not from mass training in positive thinking.",
+        "examples": [
+          "The strongest gains in population well-being have historically come from improvements in external conditions, not from mass training in positive thinking.",
+          "Public health, labour rights, and social insurance demonstrate that the strongest gains in population well-being have historically come from improvements in external conditions, not from mass training in positive thinking.",
+          "Ignoring this record leads to the false conclusion that the strongest gains in population well-being have historically come from improvements in external conditions, not from mass training in positive thinking can be replaced by internal work alone."
+        ]
+      },
+      {
+        "phrase": "Agency is real, yet the range of meaningful choices is itself shaped by resources, health, and social position.",
+        "examples": [
+          "Agency is real, yet the range of meaningful choices is itself shaped by resources, health, and social position.",
+          "For many people agency is real, yet the range of meaningful choices is itself shaped by resources, health, and social position in ways that constrain what mindset can achieve.",
+          "A realistic view holds that agency is real, yet the range of meaningful choices is itself shaped by resources, health, and social position."
+        ]
+      },
+      {
+        "phrase": "Focusing exclusively on internal factors leaves the major drivers of suffering — poverty, discrimination, insecurity — unaddressed.",
+        "examples": [
+          "Focusing exclusively on internal factors leaves the major drivers of suffering — poverty, discrimination, insecurity — unaddressed.",
+          "Policy that concentrates only on resilience training ends up focusing exclusively on internal factors leaves the major drivers of suffering — poverty, discrimination, insecurity — unaddressed.",
+          "Moral seriousness requires that we refuse focusing exclusively on internal factors leaves the major drivers of suffering — poverty, discrimination, insecurity — unaddressed."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "easier said than done",
+        "definition": "Something that sounds straightforward in theory but is difficult to achieve in practice, especially under constraint.",
+        "examples": [
+          "Telling someone under chronic financial pressure to simply reframe their thoughts is easier said than done.",
+          "Maintaining inner peace while working three jobs is easier said than done.",
+          "Many popular prescriptions for happiness are easier said than done for people facing structural barriers."
+        ]
+      },
+      {
+        "idiom": "the tip of the iceberg",
+        "definition": "A small visible part of a much larger underlying problem.",
+        "examples": [
+          "Individual unhappiness is often only the tip of the iceberg of inadequate housing, insecure work, or social exclusion.",
+          "Focusing on personal attitude addresses the tip of the iceberg while leaving systemic drivers intact.",
+          "Mental-health statistics that ignore social determinants capture only the tip of the iceberg."
+        ]
+      },
+      {
+        "idiom": "swim against the tide",
+        "definition": "To struggle against powerful prevailing forces or conditions.",
+        "examples": [
+          "Expecting individuals to maintain high well-being in toxic workplaces or unsafe neighbourhoods is asking them to swim against the tide.",
+          "Personal resilience has limits when people must constantly swim against the tide of discrimination or poverty.",
+          "Structural reform reduces the need for everyone to swim against the tide merely to stay afloat."
+        ]
+      },
+      {
+        "idiom": "a level playing field",
+        "definition": "Conditions of roughly equal opportunity in which individual effort can make a fair difference.",
+        "examples": [
+          "Happiness advice assumes a level playing field that many people simply do not have.",
+          "Without a level playing field in health, education, and safety, internal strategies yield unequal results.",
+          "Creating a more level playing field multiplies the effectiveness of whatever personal agency people possess."
+        ]
+      },
+      {
+        "idiom": "fall on deaf ears",
+        "definition": "To be ignored or to have no effect on the intended audience.",
+        "examples": [
+          "Appeals to gratitude and mindset often fall on deaf ears when basic needs remain unmet.",
+          "Messages about personal responsibility fall on deaf ears among communities that have experienced repeated systemic failure.",
+          "Well-being interventions that ignore context tend to fall on deaf ears."
+        ]
+      },
+      {
+        "idiom": "the straw that breaks the camel's back",
+        "definition": "A final small burden that causes collapse after many others have already accumulated.",
+        "examples": [
+          "For someone already carrying chronic stress, a minor setback can be the straw that breaks the camel’s back.",
+          "Internal coping resources are finite; external pressures can accumulate until one more demand becomes the straw that breaks the camel’s back.",
+          "Policy that piles expectations onto individuals without reducing load risks creating the straw that breaks the camel’s back."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "Large-scale improvements in population happiness have historically tracked gains in material security, health, and basic rights far more closely than changes in collective mindset.",
+        "explanation": "The most dramatic rises in average life satisfaction and reductions in misery have accompanied the spread of clean water, sanitation, vaccination, labour protections, social insurance, and reductions in extreme poverty. Countries that moved from widespread material insecurity to relative stability saw corresponding shifts in reported well-being. These changes were external and institutional. While individual attitudes always played some role, the primary driver was the alteration of living conditions. Contemporary data continue to show strong gradients of well-being by income, housing quality, and access to healthcare, especially at lower levels. Treating internal factors as primary risks reversing the historical lesson: the biggest levers for widespread happiness have been structural. Mindset interventions are useful supplements; they have never been the main engine of population-level progress."
+      },
+      {
+        "claim": "Chronic external stressors produce measurable physiological and psychological damage that cannot be neutralised by attitude alone.",
+        "explanation": "Prolonged exposure to financial insecurity, unsafe environments, discrimination, or excessive working hours elevates stress hormones, disrupts sleep, impairs executive function, and increases risk of anxiety and depression. These effects are documented in both laboratory and real-world studies. Telling people under such loads to reframe their thoughts or practise gratitude may provide marginal relief, yet it does not remove the underlying load. The body and brain register persistent threat and scarcity. Expecting internal practices to fully compensate for toxic external conditions is biologically unrealistic. Effective responses must therefore reduce the stressors themselves — through better wages, housing, working-time regulation, and protection from violence — rather than placing the primary burden of adaptation on the already stressed individual."
+      },
+      {
+        "claim": "Severe inequality and positional competition systematically undermine well-being even when absolute living standards rise.",
+        "explanation": "Research on relative income and status shows that people evaluate their situation partly by comparison with others. In highly unequal societies, the psychological costs of lower rank persist even as overall wealth grows. Status anxiety, longer working hours driven by competition, and the erosion of community trust all reduce average happiness. These dynamics are structural features of particular economic and social arrangements, not failures of individual mindset. Countries and regions with lower inequality and stronger social safety nets often report higher average life satisfaction at comparable or even lower average incomes. Addressing the architecture of competition and security therefore offers leverage that purely internal approaches cannot match. Ignoring these positional and distributional effects leaves a major source of modern unhappiness untouched."
+      },
+      {
+        "claim": "The capacity to exercise personal agency itself depends on prior external conditions of health, education, safety, and basic resources.",
+        "explanation": "Agency is not equally distributed. A person who is chronically sleep-deprived, in pain, poorly nourished, or constantly afraid has reduced cognitive and emotional bandwidth for constructive choice. Education and early security shape the skills and confidence required for effective self-direction. When these foundations are weak, appeals to personal responsibility become less realistic. Longitudinal studies show that early disadvantage predicts later difficulties in self-regulation and planning. Strengthening the external conditions that enable agency is therefore a prerequisite for the internal strategies that the opposing side emphasises. Treating agency as a free-standing internal resource overlooks the extent to which it is itself an outcome of prior social investment and protection."
+      },
+      {
+        "claim": "Framing happiness as mainly internal risks legitimising political inaction on the external drivers of suffering.",
+        "explanation": "If well-being is presented primarily as a matter of attitude and personal practice, governments and institutions face reduced pressure to improve housing, labour markets, healthcare access, and environmental quality. The message shifts responsibility onto individuals and away from collective arrangements. Historical examples show that progress on public health, workplace safety, and social protection required organised pressure and institutional change, not simply better individual coping. An exclusive focus on internal factors can function as a quiet form of quietism, encouraging people to adjust themselves to conditions that could and should be altered. A balanced view keeps both levels in view; an internal-only view tends to freeze unjust or harmful structures in place by rendering them psychologically irrelevant."
+      },
+      {
+        "claim": "Many of the strongest correlates of low well-being — unemployment, insecure housing, chronic illness, social isolation caused by disability or discrimination — are external and require external remedies.",
+        "explanation": "Unemployment produces not only income loss but loss of structure, identity, and social contact. Homelessness and housing insecurity generate constant stress and practical chaos. Untreated or poorly managed illness imposes pain and limitation that positive thinking cannot erase. Discrimination and stigma restrict opportunity and inflict repeated psychological injury. In each case the primary causal pathway runs from external condition to inner state. Interventions that change the condition — job creation, housing support, accessible healthcare, anti-discrimination enforcement — produce larger and more reliable gains than mindset training alone. Acknowledging this does not deny that people can respond with greater or lesser resilience; it insists that the first and most powerful lever is often the alteration of the damaging circumstance itself."
+      },
+      {
+        "claim": "Cross-national and within-country data continue to show substantial well-being gradients by income, education, and social status, especially below comfortable thresholds.",
+        "explanation": "While the relationship between income and happiness flattens at higher levels, it remains steep at lower levels. People struggling to meet basic needs, facing medical debt, or living in degraded environments report systematically lower life satisfaction. Education and occupational status also track well-being, partly through the security and respect they confer. These gradients are not artefacts of measurement; they appear across multiple surveys and cultures. They indicate that external resources and social position still matter a great deal for large segments of the population. Claims that internal factors dominate are more plausible for people already above a threshold of security; they are less persuasive as a general theory. Policy that ignores the gradient leaves those below the threshold with advice instead of relief."
+      },
+      {
+        "claim": "Social connection, one of the strongest predictors of happiness, is itself heavily shaped by urban design, work patterns, and institutional arrangements.",
+        "explanation": "Loneliness and weak social ties are major risk factors for low well-being and poor health. Yet the opportunity to form and maintain relationships depends on time, proximity, safety, and shared spaces. Long commuting times, precarious work schedules, car-dependent suburbs, and the decline of local institutions all reduce the practical possibility of regular contact. These are design and policy outcomes, not purely personal choices. Individuals can make efforts to connect, but the environment either supports or frustrates those efforts. Improving the external conditions for sociability — through housing policy, working-time regulation, public space, and community infrastructure — therefore constitutes a direct intervention in one of the most important determinants of happiness. Treating connection as solely an internal or private responsibility underestimates its structural supports."
+      },
+      {
+        "claim": "Internal practices are valuable, yet they function best as complements to, not substitutes for, decent external conditions.",
+        "explanation": "Gratitude, reframing, and attention training can help people navigate difficulty and savour what is available. Their effectiveness, however, is greater when basic security is present and when the external environment is not actively toxic. Asking practices developed in relatively stable settings to carry the full weight of well-being under conditions of deprivation or threat overextends them. The most humane and effective approach combines both: reduce unnecessary external burdens while also equipping people with psychological tools. Elevating the internal to primacy tends to reverse this order and to under-invest in the conditions that make psychological tools most usable. A dual strategy respects both the reality of human agency and the reality of human dependence on a supportive world."
+      },
+      {
+        "claim": "A responsible public ethic holds institutions accountable for the conditions that enable or disable flourishing, rather than relocating that responsibility almost entirely onto individuals.",
+        "explanation": "Democratic societies have long recognised that certain prerequisites of a decent life — safety, education, basic health, protection from destitution — are collective responsibilities. Happiness and mental well-being belong in the same category of outcomes that institutions can substantially influence. When the dominant message becomes that people must simply adjust their attitudes, the political conversation shifts away from those institutional duties. The result is a thinner public sphere and a heavier private burden. Retaining a strong emphasis on external conditions keeps the focus on what can be organised and improved at scale. Personal agency remains important, yet it flourishes most reliably when the surrounding systems are designed to support rather than undermine it. That design is a matter of collective choice and political priority, not merely of individual enlightenment."
+      }
+    ]
+  }
+}

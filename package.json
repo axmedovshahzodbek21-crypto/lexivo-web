@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "gen:reading-data": "node scripts/ts-to-dart.js",
-    "check:reading-data": "node scripts/ts-to-dart.js --check"
+    "check:reading-data": "node scripts/ts-to-dart.js --check",
+    "topics:fix": "node scripts/fix-battle-ready-topics.js",
+    "topics:audit": "node scripts/audit-battle-ready-topics.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.115.0",

@@ -1,0 +1,407 @@
+{
+  "motion": "This House believes that economic globalization has been net beneficial for humanity",
+  "for": {
+    "vocab": [
+      {
+        "term": "absolute poverty reduction",
+        "definition": "The large-scale decline in the number of people living below extreme poverty thresholds",
+        "example": "Globalization has been a major driver of absolute poverty reduction across East and South Asia."
+      },
+      {
+        "term": "comparative advantage",
+        "definition": "The economic principle that countries gain by specialising in what they produce relatively most efficiently",
+        "example": "Comparative advantage explains why open trade raises total global output and living standards."
+      },
+      {
+        "term": "technology diffusion",
+        "definition": "The rapid spread of knowledge, tools and production methods across borders",
+        "example": "Technology diffusion through trade and investment has accelerated development in previously isolated economies."
+      },
+      {
+        "term": "global value chains",
+        "definition": "The international networks that break production into stages located in different countries",
+        "example": "Participation in global value chains has allowed poorer countries to industrialise faster than earlier generations."
+      },
+      {
+        "term": "consumer surplus",
+        "definition": "The gain to buyers when goods become cheaper and more varied through international competition",
+        "example": "Ordinary households capture large consumer surplus from the lower prices made possible by global trade."
+      },
+      {
+        "term": "convergence of living standards",
+        "definition": "The process by which poorer countries raise incomes toward levels previously enjoyed only by rich ones",
+        "example": "The last four decades have produced the fastest convergence of living standards in recorded history."
+      },
+      {
+        "term": "institutional learning",
+        "definition": "The adoption of better governance, legal and regulatory practices through exposure to international norms",
+        "example": "Open economies often undergo institutional learning that improves the business environment and rule of law."
+      },
+      {
+        "term": "scale economies",
+        "definition": "Cost reductions achieved when production expands to serve larger international markets",
+        "example": "Scale economies in manufacturing and services become available only when firms can sell beyond national borders."
+      },
+      {
+        "term": "human capital mobility",
+        "definition": "The movement of skilled people and ideas that raises productivity in both sending and receiving places",
+        "example": "Human capital mobility has spread medical, engineering and managerial knowledge worldwide."
+      },
+      {
+        "term": "positive-sum exchange",
+        "definition": "Trade and investment relationships in which both sides can become better off simultaneously",
+        "example": "Unlike conquest or extraction, modern globalization is largely a system of positive-sum exchange."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "The greatest reduction in extreme poverty in human history occurred during the era of accelerated globalization.",
+        "examples": [
+          "The greatest reduction in extreme poverty in human history occurred during the era of accelerated globalization, lifting more than a billion people above subsistence.",
+          "Critics who ignore data must still confront the fact that the greatest reduction in extreme poverty in human history occurred during the era of accelerated globalization.",
+          "Any honest assessment begins with the evidence that the greatest reduction in extreme poverty in human history occurred during the era of accelerated globalization."
+        ]
+      },
+      {
+        "phrase": "Closed economies have not outperformed open ones; the opposite pattern is clear and repeated.",
+        "examples": [
+          "Closed economies have not outperformed open ones; the opposite pattern is clear and repeated across East Asia, Eastern Europe and parts of Latin America.",
+          "Historical comparison shows that closed economies have not outperformed open ones; the opposite pattern is clear and repeated.",
+          "Policy makers who romanticise autarky should note that closed economies have not outperformed open ones; the opposite pattern is clear and repeated."
+        ]
+      },
+      {
+        "phrase": "Ordinary consumers in both rich and poor countries gain daily from lower prices and greater choice.",
+        "examples": [
+          "Ordinary consumers in both rich and poor countries gain daily from lower prices and greater choice made possible by global supply chains.",
+          "The quiet benefits are easy to overlook, yet ordinary consumers in both rich and poor countries gain daily from lower prices and greater choice.",
+          "Political debates often ignore that ordinary consumers in both rich and poor countries gain daily from lower prices and greater choice."
+        ]
+      },
+      {
+        "phrase": "No country has developed successfully in the modern era by remaining isolated from international trade and investment.",
+        "examples": [
+          "No country has developed successfully in the modern era by remaining isolated from international trade and investment.",
+          "The development record is unambiguous: no country has developed successfully in the modern era by remaining isolated from international trade and investment.",
+          "Advocates of withdrawal must explain how no country has developed successfully in the modern era by remaining isolated from international trade and investment yet their preferred path would work."
+        ]
+      },
+      {
+        "phrase": "Globalization is not a zero-sum contest between nations; it is a system that expands the total pool of wealth.",
+        "examples": [
+          "Globalization is not a zero-sum contest between nations; it is a system that expands the total pool of wealth from which all can draw.",
+          "The mercantilist mindset fails because globalization is not a zero-sum contest between nations; it is a system that expands the total pool of wealth.",
+          "Evidence of mutual gains confirms that globalization is not a zero-sum contest between nations; it is a system that expands the total pool of wealth."
+        ]
+      },
+      {
+        "phrase": "The alternative to imperfect global rules is not fairness; it is the return of power politics and poverty traps.",
+        "examples": [
+          "The alternative to imperfect global rules is not fairness; it is the return of power politics and poverty traps that open trade has helped many escape.",
+          "Those who dismantle multilateral systems should recall that the alternative to imperfect global rules is not fairness; it is the return of power politics and poverty traps.",
+          "History warns that the alternative to imperfect global rules is not fairness; it is the return of power politics and poverty traps."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "a rising tide lifts all boats",
+        "definition": "Broad economic growth improves conditions even for those who start further behind",
+        "examples": [
+          "Globalization has functioned as a rising tide that lifts all boats, raising absolute living standards across most of the world.",
+          "While relative gaps remain, a rising tide lifts all boats and absolute poverty has fallen dramatically.",
+          "Policy should aim to keep the tide rising rather than freeze the current distribution of boats."
+        ]
+      },
+      {
+        "idiom": "the proof of the pudding is in the eating",
+        "definition": "Real-world results matter more than theoretical objections",
+        "examples": [
+          "The proof of the pudding is in the eating: countries that opened their economies grew faster and reduced poverty more rapidly.",
+          "Ideological critiques must still face the proof of the pudding is in the eating in the form of higher life expectancy and literacy.",
+          "We should judge globalization by the proof of the pudding is in the eating, not by isolated cases of disruption."
+        ]
+      },
+      {
+        "idiom": "don’t throw the baby out with the bathwater",
+        "definition": "Do not discard the valuable whole because of real but manageable problems",
+        "examples": [
+          "Problems of inequality and adjustment are real, yet we should not throw the baby out with the bathwater by rejecting open trade itself.",
+          "Reform is needed, but those who demand total reversal risk throwing the baby out with the bathwater.",
+          "The gains in poverty reduction and consumer welfare are the baby; we must not throw the baby out with the bathwater."
+        ]
+      },
+      {
+        "idiom": "a tide in the affairs of men",
+        "definition": "A favourable historical moment that must be seized",
+        "examples": [
+          "The post-1980 wave of globalization was a tide in the affairs of men that many developing countries successfully rode.",
+          "Countries that missed the tide in the affairs of men paid a heavy price in slower growth and persistent poverty.",
+          "Future opportunities will also appear as a tide in the affairs of men; remaining open preserves the chance to catch them."
+        ]
+      },
+      {
+        "idiom": "make hay while the sun shines",
+        "definition": "Take advantage of favourable conditions while they last",
+        "examples": [
+          "Export-oriented economies made hay while the sun shines and converted temporary openings into permanent development gains.",
+          "Nations that hesitated failed to make hay while the sun shines and fell behind more agile competitors.",
+          "Openness allows countries to make hay while the sun shines whenever global demand and technology shift."
+        ]
+      },
+      {
+        "idiom": "the genie is out of the bottle",
+        "definition": "A transformative process that cannot realistically be reversed",
+        "examples": [
+          "Technology, supply chains and consumer expectations mean the genie is out of the bottle on economic integration.",
+          "Attempts to restore pure national self-sufficiency ignore that the genie is out of the bottle.",
+          "Policy must manage globalization because the genie is out of the bottle and cannot be forced back."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "Extreme poverty has fallen at the fastest rate in recorded history during the period of intensified globalization.",
+        "explanation": "Between the early 1980s and the late 2010s the number of people living in extreme poverty declined by more than a billion, even as world population grew. The bulk of this reduction occurred in countries that opened their economies to trade, foreign investment and global production networks—most notably China, India, Vietnam and other parts of East and South Asia. Household survey data, national accounts and international poverty lines all point in the same direction. No previous development strategy—import substitution, central planning or heavy protectionism—produced comparable absolute gains for the poorest. While inequality within some countries rose, the global distribution of income became more equal as large poor populations moved upward. The timing and geography of poverty reduction align closely with the expansion of global market access. Claims that globalization merely enriched elites are incompatible with the scale of the exit from extreme deprivation. The empirical record therefore supports the conclusion that economic openness has been a powerful engine of mass welfare improvement."
+      },
+      {
+        "claim": "Open trade raises real incomes for the majority through lower prices and greater variety of goods.",
+        "explanation": "Consumers in both rich and poor countries benefit from the competition and specialisation that international trade enables. Clothing, electronics, household appliances and many foodstuffs are substantially cheaper in real terms than they would be under high-protection regimes. The gain is largest for lower-income households that spend a higher share of their budget on tradable goods. Studies of the consumer benefits of trade routinely find that the real-income boost for the bottom half of the distribution is significant. At the same time, access to intermediate inputs and capital goods raises productivity in domestic industries. These gains are diffuse and therefore politically under-weighted, yet they are continuous and large. Protectionist policies that raise the domestic price of imports transfer resources from the many to the protected few. The cumulative effect of decades of tariff reduction and supply-chain integration has been a quiet but substantial improvement in material living standards for ordinary people across much of the world."
+      },
+      {
+        "claim": "No sustained modern development success has occurred in economies that remained closed to international trade and investment.",
+        "explanation": "Post-war history supplies a clear comparative test. Economies that pursued prolonged autarky or extreme import substitution—North Korea, Maoist China before 1978, Burma under military isolation, Albania under Hoxha—experienced stagnation or decline. By contrast, the high-growth East Asian economies, later reformers in India and Vietnam, and the more open Latin American and Eastern European cases all combined domestic reform with deep integration into global markets. Even resource-rich countries that grew did so in part by exporting into world markets. The pattern is robust across regions and starting conditions. Claims that development can be achieved by walling off the domestic economy run against this repeated evidence. Globalization is not a sufficient condition for success—institutions and education matter—but it has been a near-necessary condition for rapid catch-up growth in the modern era. Policy advice that recommends withdrawal therefore asks countries to ignore the only strategy that has actually delivered large-scale convergence."
+      },
+      {
+        "claim": "Technology and knowledge spread faster under open economic conditions, raising productivity worldwide.",
+        "explanation": "Ideas, production techniques and organisational methods travel with trade, investment and the movement of people. Multinational firms bring managerial practices and quality standards; imported machinery embodies the latest engineering; returning migrants and international students carry tacit knowledge. The result is faster productivity growth than would occur in closed systems that must reinvent every improvement domestically. Historical examples include the rapid diffusion of manufacturing techniques across East Asia and the spread of green-revolution agricultural methods. Digital technologies and services trade now accelerate the process further. Closed economies can protect infant industries for a time, yet they systematically lag in the adoption of best-practice methods. The global stock of knowledge is a non-rival good; openness allows more countries to draw from it simultaneously. This diffusion effect is one of the least visible but most powerful channels through which globalization raises long-run living standards."
+      },
+      {
+        "claim": "Global supply chains have enabled late-developing countries to industrialise at unprecedented speed.",
+        "explanation": "Earlier industrialisers had to build entire vertically integrated industries. Contemporary developing economies can specialise in particular stages of production—assembly, components, business-process services—and plug into existing international networks. This modular path lowers the capital and organisational barriers to entry. Vietnam’s electronics exports, Bangladesh’s garments, and India’s IT services all illustrate the pattern. Employment, foreign exchange and technological learning follow. The alternative of attempting to create complete domestic supply chains from scratch has repeatedly proven slower and more costly. While dependence on external demand creates vulnerability, the historical record shows that the countries that used global value chains as a ladder climbed faster than those that refused the ladder. Managing the risks of specialisation is a legitimate policy task; rejecting the opportunity itself has been a route to continued low productivity."
+      },
+      {
+        "claim": "International economic integration has been associated with improvements in health, education and life expectancy in participating countries.",
+        "explanation": "Rising incomes from trade and investment translate into better nutrition, sanitation, housing and public services. Cross-country data show strong correlations between trade openness, income growth and gains in life expectancy and child survival. Knowledge about vaccines, oral rehydration, and agricultural techniques also moves more freely in open environments. Educational attainment has risen in parallel with the growth of export-oriented employment that raises the returns to schooling. These human-development gains are not automatic, yet they have been far more pronounced in economies that engaged with global markets than in those that remained isolated. The improvement in global health metrics over the last four decades is therefore partly a globalization story. Critics who focus solely on adjustment costs in rich-country manufacturing often omit the simultaneous and larger gains in longevity and literacy among the world’s poorer majority."
+      },
+      {
+        "claim": "Multilateral rules, however imperfect, constrain pure power politics and create predictable conditions for investment.",
+        "explanation": "The post-war trading system replaced bilateral bullying and imperial preference with a framework of non-discrimination, bound tariffs and dispute settlement. Smaller and poorer countries gained the ability to challenge larger ones under shared rules rather than relying solely on relative power. Foreign investors gained greater confidence that contracts and property would be respected. The result has been higher volumes of long-term capital flowing into developing economies. Regional and bilateral deals are second-best alternatives that often reintroduce power asymmetries. While the current system has gaps and enforcement problems, the alternative of unconstrained economic nationalism historically produced higher barriers, more frequent trade wars and less reliable access for weaker players. Preserving and improving the rules-based order is therefore in the interest of most countries, not merely the largest ones."
+      },
+      {
+        "claim": "Adjustment costs in advanced economies are real but have been outweighed by aggregate gains and can be managed by domestic policy.",
+        "explanation": "Import competition and offshoring have reduced employment in specific manufacturing sectors and regions in high-income countries. These losses are concentrated and painful, and political systems have often failed to provide adequate compensation or retraining. Yet the same economies have experienced large consumer gains, expanding service-sector employment, and overall income growth. The correct response is not to reverse openness but to strengthen domestic safety nets, education and place-based policies that help workers move into new activities. Countries that combined openness with active labour-market policies have managed adjustment more successfully than those that simply protected declining industries. The existence of losers does not establish that the process is net harmful; it establishes that the distribution of gains requires deliberate domestic attention. Blaming globalization for every regional decline ignores the larger roles of technology, automation and education systems."
+      },
+      {
+        "claim": "Autarkic or heavily protectionist experiments have repeatedly produced stagnation, shortages and lost decades of development.",
+        "explanation": "Twentieth-century history supplies multiple controlled comparisons. India’s Licence Raj, Latin American import-substitution regimes after the 1950s, and various socialist closed economies all generated periods of slow growth, balance-of-payments crises and technological lag. When these same countries later liberalised trade and investment, growth accelerations frequently followed. The pattern is not universal—complementary reforms matter—but the association between prolonged closure and underperformance is strong. Contemporary calls for widespread reshoring or decoupling risk recreating the same inefficiencies on a larger scale. Supply-chain resilience can be improved by diversification and stockpiles without abandoning the productivity advantages of international specialisation. The burden of proof lies with those who claim that a return to high barriers would raise rather than lower global and national welfare."
+      },
+      {
+        "claim": "Globalization has expanded the practical freedom of individuals to choose goods, careers, ideas and places of residence.",
+        "explanation": "Beyond aggregate income statistics, openness increases the option set available to ordinary people. Consumers face wider product variety; workers can seek employment in export industries or abroad; students and professionals can access international education and networks; citizens encounter a broader range of cultural and political ideas. These expansions of choice are themselves components of human development. Closed systems restrict options by design—through import controls, exit visas, or information barriers. While mobility remains unequal and regulated, the direction of change under globalization has been toward greater rather than lesser individual possibility. The ability of a Vietnamese worker to earn higher wages in an export factory, or of a Kenyan entrepreneur to sell online to foreign customers, represents a concrete increase in agency. Evaluations that ignore this dimension of freedom understate the human significance of economic integration."
+      }
+    ]
+  },
+  "against": {
+    "vocab": [
+      {
+        "term": "race to the bottom",
+        "definition": "The competitive pressure that leads countries to weaken labour, environmental or tax standards to attract investment",
+        "example": "Globalization has intensified the race to the bottom in regulatory standards across many jurisdictions."
+      },
+      {
+        "term": "premature deindustrialisation",
+        "definition": "The decline of manufacturing employment in developing countries before they reach high income levels",
+        "example": "Premature deindustrialisation has left many economies without the job-rich growth path that earlier industrialisers enjoyed."
+      },
+      {
+        "term": "footloose capital",
+        "definition": "Investment that can relocate rapidly in search of lower costs, reducing the bargaining power of workers and governments",
+        "example": "Footloose capital forces communities to accept lower wages and weaker protections or lose employment altogether."
+      },
+      {
+        "term": "global inequality",
+        "definition": "The persistent and in some dimensions widening gaps in income, power and opportunity between and within countries",
+        "example": "While absolute poverty fell, global inequality in wealth and political influence remains extreme."
+      },
+      {
+        "term": "supply-chain vulnerability",
+        "definition": "The exposure of economies to disruption when critical production is concentrated in distant or unstable locations",
+        "example": "Recent crises revealed the supply-chain vulnerability created by hyper-specialised global production."
+      },
+      {
+        "term": "cultural homogenisation",
+        "definition": "The erosion of local traditions, languages and ways of life under the pressure of dominant global commercial culture",
+        "example": "Cultural homogenisation reduces the diversity of human expression even as material goods become more uniform."
+      },
+      {
+        "term": "regulatory arbitrage",
+        "definition": "The practice of shifting activity to jurisdictions with the weakest rules in order to minimise costs",
+        "example": "Multinational firms engage in regulatory arbitrage that undermines democratic control over economic standards."
+      },
+      {
+        "term": "job polarisation",
+        "definition": "The simultaneous growth of high-skill and low-skill employment at the expense of middle-skill, middle-wage work",
+        "example": "Globalization and technology together have accelerated job polarisation in advanced economies."
+      },
+      {
+        "term": "democratic deficit",
+        "definition": "The gap between the scale of global economic forces and the still-national scope of political accountability",
+        "example": "Citizens experience a democratic deficit when major decisions affecting their livelihoods are made in distant boardrooms or treaty bodies."
+      },
+      {
+        "term": "extractive integration",
+        "definition": "Forms of global economic linkage that transfer resources and value outward while leaving local economies dependent and underdeveloped",
+        "example": "Some commodity-exporting regions have experienced extractive integration rather than genuine development."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "The gains of globalization have been real for some, but they have been accompanied by concentrated losses and systemic risks that defenders systematically understate.",
+        "examples": [
+          "The gains of globalization have been real for some, but they have been accompanied by concentrated losses and systemic risks that defenders systematically understate.",
+          "Any balanced account must recognise that the gains of globalization have been real for some, but they have been accompanied by concentrated losses and systemic risks that defenders systematically understate.",
+          "Political backlash is intelligible once we accept that the gains of globalization have been real for some, but they have been accompanied by concentrated losses and systemic risks that defenders systematically understate."
+        ]
+      },
+      {
+        "phrase": "Efficiency for capital has often meant insecurity for labour and communities.",
+        "examples": [
+          "Efficiency for capital has often meant insecurity for labour and communities that cannot relocate as easily as investment can.",
+          "The celebration of flexibility ignores that efficiency for capital has often meant insecurity for labour and communities.",
+          "A human evaluation of globalization must weigh the fact that efficiency for capital has often meant insecurity for labour and communities."
+        ]
+      },
+      {
+        "phrase": "National democracies are left managing the social consequences of decisions they no longer fully control.",
+        "examples": [
+          "National democracies are left managing the social consequences of decisions they no longer fully control once production and finance operate globally.",
+          "The resulting frustration is predictable: national democracies are left managing the social consequences of decisions they no longer fully control.",
+          "Accountability suffers when national democracies are left managing the social consequences of decisions they no longer fully control."
+        ]
+      },
+      {
+        "phrase": "Falling absolute poverty in some regions does not cancel rising insecurity and inequality in others.",
+        "examples": [
+          "Falling absolute poverty in some regions does not cancel rising insecurity and inequality in others, nor does it erase the political consequences.",
+          "Global averages conceal that falling absolute poverty in some regions does not cancel rising insecurity and inequality in others.",
+          "A complete moral ledger must record that falling absolute poverty in some regions does not cancel rising insecurity and inequality in others."
+        ]
+      },
+      {
+        "phrase": "Resilience has been sacrificed for hyper-efficiency, and the costs become visible only in crisis.",
+        "examples": [
+          "Resilience has been sacrificed for hyper-efficiency, and the costs become visible only in crisis when shortages appear overnight.",
+          "The pandemic and geopolitical shocks showed that resilience has been sacrificed for hyper-efficiency, and the costs become visible only in crisis.",
+          "Sustainable systems require that resilience has been sacrificed for hyper-efficiency, and the costs become visible only in crisis is no longer an acceptable trade-off."
+        ]
+      },
+      {
+        "phrase": "The promise that displaced workers would be compensated or retrained has been repeatedly broken in practice.",
+        "examples": [
+          "The promise that displaced workers would be compensated or retrained has been repeatedly broken in practice across multiple countries and decades.",
+          "Political support for openness collapses when the promise that displaced workers would be compensated or retrained has been repeatedly broken in practice.",
+          "Trust cannot be rebuilt while the promise that displaced workers would be compensated or retrained has been repeatedly broken in practice."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "race to the bottom",
+        "definition": "Competitive deregulation that lowers standards for everyone",
+        "examples": [
+          "Labour and environmental protections have been caught in a race to the bottom driven by mobile capital.",
+          "Tax competition among countries is another form of the race to the bottom that erodes public revenue.",
+          "Without coordinated rules, globalization institutionalises a race to the bottom rather than a race to the top."
+        ]
+      },
+      {
+        "idiom": "the rich get richer",
+        "definition": "A process that amplifies existing advantages",
+        "examples": [
+          "In many open economies the rich get richer while median wages stagnate and communities decline.",
+          "Global financial integration has helped the rich get richer through asset appreciation far beyond wage growth.",
+          "The slogan that a rising tide lifts all boats is hard to sustain when in practice the rich get richer at a visibly faster rate."
+        ]
+      },
+      {
+        "idiom": "left behind",
+        "definition": "People and places that experience the costs of change without sharing the benefits",
+        "examples": [
+          "Entire regions have been left behind by the offshoring of industry and the concentration of new jobs elsewhere.",
+          "Political revolts are fuelled by populations who feel left behind by the dominant economic model.",
+          "A system that systematically leaves people behind will eventually face legitimacy crises."
+        ]
+      },
+      {
+        "idiom": "put all your eggs in one basket",
+        "definition": "To concentrate risk by relying on a single source or system",
+        "examples": [
+          "Hyper-specialised supply chains put all your eggs in one basket and then act surprised when the basket breaks.",
+          "Countries that allowed critical medicines or semiconductors to be produced in one location put all their eggs in one basket.",
+          "Resilience requires refusing to put all your eggs in one basket even if short-term costs are higher."
+        ]
+      },
+      {
+        "idiom": "the tail wagging the dog",
+        "definition": "A situation in which a secondary actor controls the primary one",
+        "examples": [
+          "Financial markets and multinational firms have become the tail wagging the dog of national economic policy.",
+          "When rating agencies or distant investors dictate fiscal choices, we are watching the tail wagging the dog.",
+          "Democratic sovereignty is hollow if the tail is permanently wagging the dog of domestic priorities."
+        ]
+      },
+      {
+        "idiom": "sell the family silver",
+        "definition": "To dispose of valuable long-term assets for short-term gain",
+        "examples": [
+          "Some privatisation and liberalisation programmes amounted to selling the family silver to foreign buyers at discounted prices.",
+          "Communities that lose control of land, water or strategic industries are effectively selling the family silver.",
+          "Short-term capital inflows can mask the longer-term cost of selling the family silver."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "The benefits of globalization have been highly uneven, leaving large populations and regions with stagnant or declining prospects.",
+        "explanation": "While aggregate global poverty has fallen, the gains have been concentrated in particular countries and within those countries in particular coastal or urban zones. Interior regions of many developing countries, former industrial heartlands in rich countries, and commodity-dependent economies have seen far smaller improvements or outright relative decline. Wage growth for less-educated workers in advanced economies has been weak for decades in the face of import competition and offshoring. The political consequence is visible in the rise of anti-system parties and demands for protection. A process that generates large average gains while imposing persistent losses on identifiable groups cannot be described as an unambiguous success. Compensation mechanisms have been too weak, too late or non-existent in most jurisdictions. The distributional failure is therefore not a minor side-effect; it is a central feature of the actual historical experience of globalization."
+      },
+      {
+        "claim": "Footloose capital has systematically weakened the bargaining power of labour and the capacity of states to regulate.",
+        "explanation": "When firms can credibly threaten to move production to lower-cost or lower-regulation jurisdictions, workers and governments face a structural disadvantage. Union density and labour’s share of national income have declined in many open economies. Corporate tax rates have fallen as countries compete to attract or retain investment. Environmental and safety standards come under pressure for the same reason. The result is a form of regulatory chill: even when citizens prefer stronger protections, the fear of capital flight constrains what is politically feasible. This dynamic is not an accidental by-product; it is built into a system that prioritises the free movement of capital over the stabilisation of social standards. International framework agreements have been too weak to reverse the pressure. The democratic claim that people should be able to choose their preferred mix of economic security and regulation is therefore partially nullified by the mobility of capital."
+      },
+      {
+        "claim": "Hyper-efficient global supply chains have created systemic fragility that becomes catastrophic in crises.",
+        "explanation": "Just-in-time production and extreme geographic specialisation reduce costs in normal times and maximise disruption when shocks occur. The COVID-19 pandemic exposed critical shortages of medical goods, semiconductors and other essentials whose production had been concentrated for efficiency reasons. Geopolitical tensions have further revealed the risks of dependence on single countries or chokepoints. The economic and human costs of these disruptions are large and recurring. Resilience requires redundancy, diversified sourcing and sometimes higher domestic or regional capacity—precisely the features that pure efficiency logic discards. The celebration of global value chains rarely priced in the tail risks that have now materialised repeatedly. A system optimised only for cost minimisation under stable conditions is brittle. The net benefit calculation must therefore include the expected value of occasional but severe breakdowns, not merely the gains during tranquil periods."
+      },
+      {
+        "claim": "Premature deindustrialisation has closed off a historically proven path of development for many poorer countries.",
+        "explanation": "Earlier industrialisers used manufacturing as a high-productivity, job-rich escalator that absorbed rural labour and generated rising wages. Many contemporary developing economies are seeing manufacturing employment peak at lower income levels and then decline, partly under pressure from import competition and the capital intensity of modern industry. Service-led growth has not reliably produced the same breadth of formal employment or technological upgrading. The result is a development trap in which countries struggle to generate enough decent jobs for expanding workforces. Global trade rules and the competitive strength of established manufacturing powers make it harder to replicate the protection and learning periods that earlier developers used. The promise that openness would automatically deliver industrialisation has therefore not been fulfilled for large parts of the developing world. Alternative strategies are constrained by the same global market pressures that produced the problem."
+      },
+      {
+        "claim": "Cultural and social cohesion have been strained by the pace and form of economic integration.",
+        "explanation": "Rapid changes in the composition of local economies, the arrival of new consumer cultures, and the perception that distant forces control local destinies have weakened the sense of shared community in many places. Traditional industries that once organised social life around stable employment have disappeared. Migration, both internal and international, linked to global economic shifts has altered the demographic character of communities faster than social adaptation can occur. The resulting cultural anxiety is often dismissed as prejudice, yet it reflects real losses of continuity and status. Economic models that treat labour as a mobile factor of production undervalue the human need for stable belonging. When those needs are ignored, political reactions become more extreme and less manageable. A complete evaluation of globalization must therefore include its effects on the informal institutions of trust and mutual recognition that make collective life possible."
+      },
+      {
+        "claim": "Global financial integration has amplified instability and transferred risks onto the most vulnerable.",
+        "explanation": "Open capital accounts and complex cross-border financial instruments have produced repeated crises—Mexico 1994, East Asia 1997, the global financial crisis of 2008, and subsequent emerging-market episodes. In each case, the costs of adjustment fell heavily on workers, small firms and public budgets in the affected countries, while many of the originators of the risk were protected. Developing economies that liberalised capital flows prematurely experienced boom-bust cycles that reversed years of social progress. Even in advanced economies, the crisis aftermath included long periods of austerity and scarring unemployment. The theoretical gains from efficient capital allocation have been accompanied by large, recurrent welfare losses from volatility. Regulatory responses have been partial and constantly arbitraged. The claim that financial globalization is net beneficial therefore requires a higher burden of proof than is usually supplied by its defenders."
+      },
+      {
+        "claim": "The political accountability gap between global markets and national democracies has fuelled legitimate discontent.",
+        "explanation": "Citizens still vote in national elections, yet many of the forces shaping wages, job security and public finances operate across borders. Trade agreements, investment treaties and the decisions of multinational firms constrain the policy space available to elected governments. When voters demand protection or redistribution and are told that global rules or competitiveness requirements forbid it, trust in democratic institutions erodes. The resulting sense of powerlessness is a rational response to a real structural mismatch, not merely a failure of communication. Elites who benefit from openness have often responded with technocratic dismissal rather than institutional redesign. Until governance mechanisms are developed that restore a credible link between public preferences and economic outcomes, the legitimacy of the global economic order will remain fragile. The net-benefit claim cannot ignore the political sustainability of the system that produces the benefits."
+      },
+      {
+        "claim": "Environmental costs have been externalised onto future generations and poorer regions.",
+        "explanation": "The expansion of global production and consumption has accelerated resource extraction, greenhouse-gas emissions and biodiversity loss. Carbon-intensive manufacturing was offshored rather than reduced, allowing rich-country consumption to continue while emissions appeared on other nations’ books. Commodity frontiers expanded into forests and oceans to feed global demand. Although some efficiency gains occurred, the scale effect of rising global throughput has dominated. International environmental agreements have lagged behind the speed of economic integration. The result is a form of temporal and spatial injustice: the benefits of cheap goods are enjoyed now by consumers, while the climate and ecological costs are deferred and disproportionately borne by vulnerable populations. A process that systematically under-prices environmental damage cannot be judged net beneficial once those damages are properly counted."
+      },
+      {
+        "claim": "The compensation and adjustment mechanisms promised by globalization advocates have largely failed in practice.",
+        "explanation": "From the beginning, mainstream economists acknowledged that trade creates losers and argued that the winners could compensate them while remaining better off. In reality, trade-adjustment programmes have been small, temporary and poorly targeted in most countries. Retraining has often failed to restore previous earnings. Place-based decline has been met with inadequate investment. The political bargain that was supposed to make openness sustainable—gains shared through the welfare state—has been weakened by the same competitive pressures that openness intensifies. As a result, the theoretical Pareto improvement never materialised for large groups of citizens. The repeated failure of compensation is not an implementation detail; it is evidence that the political economy of globalization systematically under-delivers on its own distributional promises. Without credible and durable mechanisms for sharing gains, the net-benefit argument remains incomplete."
+      },
+      {
+        "claim": "Alternative development paths that retained greater national policy space have in some cases produced more inclusive and stable outcomes.",
+        "explanation": "Countries that sequenced liberalization carefully, maintained strategic industrial policies, or limited certain forms of capital mobility have in several instances achieved growth with less social disruption. Examples include aspects of the East Asian developmental state model, the more gradual Chinese approach to capital-account opening, and resource-management strategies in some smaller economies. These cases suggest that the particular form of globalization promoted since the 1980s—rapid, finance-led, and rule-constrained—was not the only or necessarily the best available. The claim that there is no alternative collapses once successful deviations are examined. A more selective, state-guided engagement with global markets may deliver the technological and market-access benefits while preserving greater capacity to protect labour standards, manage adjustment and direct investment toward national priorities. The historical record therefore supports reforming the terms of integration rather than treating the current model as an unalloyed or inevitable success."
+      }
+    ]
+  }
+}

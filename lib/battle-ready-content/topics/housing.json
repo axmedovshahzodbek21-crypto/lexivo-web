@@ -1,0 +1,407 @@
+{
+  "motion": "This House believes that adequate housing is a fundamental human right that the state must guarantee for every citizen.",
+  "for": {
+    "vocab": [
+      {
+        "term": "housing insecurity",
+        "definition": "The constant risk of losing one’s home or of living in conditions that undermine health, safety and dignity.",
+        "example": "Housing insecurity forces families to choose between rent and food and destroys any sense of stability."
+      },
+      {
+        "term": "market failure",
+        "definition": "A situation in which the free market alone cannot deliver socially necessary goods at a fair price or in sufficient quantity.",
+        "example": "The chronic shortage of affordable homes is a clear market failure that only public action can correct."
+      },
+      {
+        "term": "spatial injustice",
+        "definition": "The unfair distribution of living conditions and opportunities across different neighbourhoods and social groups.",
+        "example": "Spatial injustice concentrates poverty and poor housing in the same areas generation after generation."
+      },
+      {
+        "term": "intergenerational exclusion",
+        "definition": "The process by which younger people are locked out of secure housing by prices and policies shaped by earlier generations.",
+        "example": "Intergenerational exclusion is visible when young adults cannot form independent households despite full-time work."
+      },
+      {
+        "term": "residential precarity",
+        "definition": "A state of ongoing instability in which people lack control over the basic conditions of their shelter.",
+        "example": "Residential precarity makes long-term planning, education and community life almost impossible."
+      },
+      {
+        "term": "public provision",
+        "definition": "The direct supply of housing by the state or by non-profit bodies acting under public mandate.",
+        "example": "Public provision has delivered high-quality, affordable homes at scale in cities that treat housing as a right."
+      },
+      {
+        "term": "social infrastructure",
+        "definition": "The physical and institutional systems that enable people to live secure, healthy and productive lives.",
+        "example": "Housing is social infrastructure as essential as schools, hospitals and transport."
+      },
+      {
+        "term": "displacement pressure",
+        "definition": "The economic and social forces that push lower-income residents out of neighbourhoods as prices rise.",
+        "example": "Displacement pressure destroys established communities and severs social networks."
+      },
+      {
+        "term": "dignity of place",
+        "definition": "The basic human need for a secure, private and respectable space in which to live and raise a family.",
+        "example": "Without the dignity of place, other rights to health, education and privacy remain incomplete."
+      },
+      {
+        "term": "collective responsibility",
+        "definition": "The shared duty of a society to ensure that no member is left without the material conditions of a decent life.",
+        "example": "Collective responsibility requires that the state act when the market leaves people without adequate housing."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "A society that tolerates widespread homelessness has abandoned the idea of shared citizenship.",
+        "examples": [
+          "A society that tolerates widespread homelessness has abandoned the idea of shared citizenship and basic solidarity.",
+          "We cannot claim to value equality while a society that tolerates widespread homelessness has abandoned the idea of shared citizenship.",
+          "The motion rests on the truth that a society that tolerates widespread homelessness has abandoned the idea of shared citizenship."
+        ]
+      },
+      {
+        "phrase": "Housing is not a luxury commodity; it is the foundation of every other right.",
+        "examples": [
+          "Housing is not a luxury commodity; it is the foundation of every other right to health, education and family life.",
+          "When we treat housing as a speculative asset we forget that housing is not a luxury commodity; it is the foundation of every other right.",
+          "The central claim is simple: housing is not a luxury commodity; it is the foundation of every other right."
+        ]
+      },
+      {
+        "phrase": "The market alone has never housed the poorest at a standard consistent with human dignity.",
+        "examples": [
+          "The market alone has never housed the poorest at a standard consistent with human dignity, which is why public action is required.",
+          "History shows that the market alone has never housed the poorest at a standard consistent with human dignity.",
+          "We must accept that the market alone has never housed the poorest at a standard consistent with human dignity."
+        ]
+      },
+      {
+        "phrase": "Secure housing is the platform on which people build stable lives.",
+        "examples": [
+          "Secure housing is the platform on which people build stable lives, raise children and contribute to their communities.",
+          "Without secure housing is the platform on which people build stable lives, other social investments yield far less.",
+          "Policy must start from the recognition that secure housing is the platform on which people build stable lives."
+        ]
+      },
+      {
+        "phrase": "Leaving housing to pure market forces concentrates wealth and spreads insecurity.",
+        "examples": [
+          "Leaving housing to pure market forces concentrates wealth and spreads insecurity across entire generations.",
+          "The evidence is clear that leaving housing to pure market forces concentrates wealth and spreads insecurity.",
+          "We reject an approach in which leaving housing to pure market forces concentrates wealth and spreads insecurity."
+        ]
+      },
+      {
+        "phrase": "The right to housing is the right to a place in the common life of society.",
+        "examples": [
+          "The right to housing is the right to a place in the common life of society, not merely a roof against the rain.",
+          "When people are priced out of entire cities, the right to housing is the right to a place in the common life of society is denied.",
+          "We defend the principle that the right to housing is the right to a place in the common life of society."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "a roof over one’s head",
+        "definition": "The basic security of having somewhere safe and permanent to live.",
+        "examples": [
+          "No one should have to struggle for a roof over their head in a wealthy society.",
+          "The most fundamental duty of government is to ensure a roof over one’s head for every citizen.",
+          "We measure civilisation partly by whether everyone has a roof over their head."
+        ]
+      },
+      {
+        "idiom": "fall through the cracks",
+        "definition": "To be left without support by systems that are supposed to protect people.",
+        "examples": [
+          "When housing is treated only as a market good, the most vulnerable fall through the cracks.",
+          "Public guarantee exists precisely so that no one falls through the cracks.",
+          "We cannot accept a system in which families with children fall through the cracks."
+        ]
+      },
+      {
+        "idiom": "price out of the market",
+        "definition": "To make something so expensive that ordinary people can no longer obtain it.",
+        "examples": [
+          "Speculation and under-supply have priced entire generations out of the market for secure homes.",
+          "A right to housing means that people cannot simply be priced out of the market.",
+          "Cities become exclusive clubs when working people are priced out of the market."
+        ]
+      },
+      {
+        "idiom": "the tip of the iceberg",
+        "definition": "A small visible part of a much larger hidden problem.",
+        "examples": [
+          "Street homelessness is only the tip of the iceberg; millions more live in overcrowded or insecure conditions.",
+          "Official waiting lists are the tip of the iceberg of housing need.",
+          "We must look beyond the tip of the iceberg to the full scale of housing failure."
+        ]
+      },
+      {
+        "idiom": "rob Peter to pay Paul",
+        "definition": "To solve one problem by creating another equally serious one.",
+        "examples": [
+          "Relying solely on private supply without public investment is often to rob Peter to pay Paul within the same housing system.",
+          "Cutting social housing to fund other priorities is to rob Peter to pay Paul.",
+          "A coherent policy refuses to rob Peter to pay Paul in the name of short-term budgets."
+        ]
+      },
+      {
+        "idiom": "live hand to mouth",
+        "definition": "To have only enough resources for immediate survival, with no security or margin.",
+        "examples": [
+          "High rents force many working families to live hand to mouth even when both adults are employed.",
+          "Housing policy should free people from the need to live hand to mouth.",
+          "A society that leaves its workers living hand to mouth has failed a basic test of justice."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "Adequate housing is a precondition for the exercise of almost every other human right.",
+        "explanation": "Without a secure and decent place to live, rights to health, education, privacy, family life and political participation are severely compromised. Children in unstable or overcrowded housing perform worse at school; adults in temporary accommodation struggle to maintain employment; people sleeping rough face catastrophic health risks. International human-rights law already recognises the right to adequate housing as part of the right to an adequate standard of living. Treating housing merely as a market commodity ignores this foundational role. When the market leaves significant numbers of people without adequate shelter, the state has a positive duty to step in, just as it does with emergency healthcare or basic education. Guaranteeing housing is therefore not an optional social policy; it is the material basis on which other rights become real."
+      },
+      {
+        "claim": "Unregulated housing markets systematically fail to meet the needs of lower- and middle-income households.",
+        "explanation": "In cities across the world, private developers maximise returns by building for the top of the market. The result is a persistent shortage of homes that ordinary workers can afford. Land-price inflation, financial speculation and the conversion of housing into an investment asset further detach prices from local incomes. Decades of evidence from major metropolitan areas show that waiting for the market to ‘filter’ supply downward does not produce adequate affordable housing at the required scale or speed. Public intervention—through social housing, subsidies, land-use rules and direct provision—has been necessary wherever societies have achieved broad housing security. The claim that the market alone will solve the problem is contradicted by the long record of failure in the most market-oriented systems."
+      },
+      {
+        "claim": "Housing insecurity produces large and measurable social costs that ultimately fall on the public.",
+        "explanation": "Homelessness and severe overcrowding generate higher spending on emergency healthcare, policing, temporary accommodation and lost productivity. Children who move repeatedly between unstable homes suffer educational disruption that reduces lifetime earnings and increases future welfare dependence. Mental-health services absorb the consequences of chronic housing stress. These costs are not avoided by leaving housing to the market; they are merely shifted from private rent payments onto public budgets and private suffering. Investing in secure, affordable housing is therefore fiscally prudent as well as morally required. Societies that treat housing as a right reduce these downstream costs and free resources for other purposes."
+      },
+      {
+        "claim": "Successful examples demonstrate that public guarantee of housing is practical and scalable.",
+        "explanation": "Vienna’s long-term social-housing programme, Singapore’s public housing system, and large-scale post-war public building in several European countries have housed large majorities of the population at high standards and manageable cost. These systems combine public land ownership, non-profit or limited-profit provision, and long-term planning. They show that the state does not need to build every home itself, but it must set the rules, supply land or finance, and ensure that a substantial share of housing remains permanently affordable. The existence of these working models refutes the claim that public guarantee is utopian or unaffordable. What is lacking in failing cities is not technical knowledge but political commitment to treat housing as a right rather than a speculative asset."
+      },
+      {
+        "claim": "Home ownership as the dominant model excludes growing numbers of people and entrenches inequality.",
+        "explanation": "When policy and culture treat private ownership as the only respectable form of housing, those who cannot buy are left in an increasingly expensive and insecure rental sector. Rising house prices transfer wealth to existing owners and make entry harder for each successive cohort. The result is a widening wealth gap between those who inherited or bought early and those who did not. A rights-based approach recognises that secure, affordable rental housing and non-profit ownership models are legitimate and necessary alternatives. Guaranteeing the right to housing does not abolish private ownership; it ensures that ownership is not the only route to stability and that those outside the ownership market are not abandoned."
+      },
+      {
+        "claim": "Leaving housing to the market intensifies spatial segregation and concentrates disadvantage.",
+        "explanation": "In pure market systems, higher-income households bid up prices in desirable areas while lower-income households are pushed into poorer neighbourhoods with weaker services and fewer opportunities. This sorting is self-reinforcing: schools, safety and local amenities diverge, and social mobility declines. Public housing and inclusionary policies can interrupt this cycle by ensuring mixed communities and by locating affordable homes near jobs and transport. The right to housing therefore includes the right not to be confined to the least resourced parts of the city. Market allocation alone has no mechanism for achieving that distributive outcome."
+      },
+      {
+        "claim": "Climate and demographic pressures make public planning of housing more necessary, not less.",
+        "explanation": "Rising populations in cities, the need for energy-efficient buildings, and the requirement to locate homes near public transport all demand coordinated planning that pure market incentives do not supply. Private developers respond to immediate profit signals, not to long-term carbon budgets or the needs of ageing populations. A state that guarantees the right to housing must also steer the location, quality and environmental performance of the housing stock. Treating housing solely as a private good leaves these collective challenges unaddressed. Public responsibility is the only framework that can align housing supply with climate and demographic realities."
+      },
+      {
+        "claim": "The dignity of citizens is incompatible with treating basic shelter as a speculative commodity.",
+        "explanation": "When housing is primarily an investment vehicle, its exchange value regularly overrides its use value as a home. Empty investment properties, short-term holiday lets, and rapid rent increases for existing tenants all follow from this logic. People become tenants at will in their own cities. A rights-based framework reasserts that the primary purpose of housing is to provide secure and decent living conditions for residents. Speculation may still occur at the margins, but it cannot be allowed to determine whether families have stable homes. The moral claim is straightforward: a civilised society does not permit the basic conditions of life to be allocated solely by the highest bidder."
+      },
+      {
+        "claim": "Younger generations are already experiencing the consequences of treating housing as an asset rather than a right.",
+        "explanation": "In many countries the ratio of house prices to incomes has reached levels that exclude large cohorts from ownership and force them into long-term private renting with little security. Delayed family formation, reduced geographic mobility, and rising intergenerational tension are among the results. These outcomes are not natural or inevitable; they are the product of policy choices that privileged existing owners and financial investors over new households. Recognising a right to housing requires reversing those priorities through increased supply of affordable homes, stronger tenant protections, and limits on pure speculation. The alternative is a permanent dual society of housing haves and have-nots."
+      },
+      {
+        "claim": "International human-rights standards already establish the state’s duty to realise the right to adequate housing.",
+        "explanation": "The International Covenant on Economic, Social and Cultural Rights, together with authoritative interpretations by the United Nations, places a clear obligation on states to take steps toward the progressive realisation of the right to adequate housing. This includes obligations to prevent forced evictions, to address homelessness, and to ensure that housing is affordable, habitable and accessible. Many constitutions and national laws already incorporate similar principles. The motion simply asks that these existing commitments be treated as genuine duties rather than aspirational language. A state that ratifies human-rights instruments yet leaves large numbers of its people in inadequate housing is failing a standard it has already accepted. Guaranteeing the right is therefore a matter of legal and moral consistency as well as practical necessity."
+      }
+    ]
+  },
+  "against": {
+    "vocab": [
+      {
+        "term": "fiscal overreach",
+        "definition": "The expansion of government spending and commitment beyond what can be sustained without damaging other essential services or the wider economy.",
+        "example": "An open-ended right to housing risks fiscal overreach that future taxpayers cannot support."
+      },
+      {
+        "term": "supply constraint",
+        "definition": "The legal, regulatory and physical limits that prevent enough new homes from being built where they are needed.",
+        "example": "The real driver of high prices is supply constraint, not the absence of a formal right."
+      },
+      {
+        "term": "incentive distortion",
+        "definition": "The unintended change in behaviour caused by policies that alter the costs and benefits facing builders, owners and tenants.",
+        "example": "Rent controls and poorly designed subsidies create incentive distortion that reduces long-term supply."
+      },
+      {
+        "term": "property rights",
+        "definition": "The legal and moral claims that individuals hold over assets they have acquired through legitimate means.",
+        "example": "Strong property rights are the foundation of investment, maintenance and orderly housing markets."
+      },
+      {
+        "term": "dependency risk",
+        "definition": "The danger that long-term public provision reduces personal responsibility and creates permanent reliance on the state.",
+        "example": "An unconditional housing guarantee carries a clear dependency risk if it is not carefully designed."
+      },
+      {
+        "term": "allocation inefficiency",
+        "definition": "The mis-matching of people to homes that occurs when political or bureaucratic criteria replace price signals.",
+        "example": "Allocation inefficiency leaves some public homes under-occupied while others face long waiting lists."
+      },
+      {
+        "term": "crowding out",
+        "definition": "The reduction in private activity that occurs when government expands into a sector and absorbs resources or demand.",
+        "example": "Large-scale public building can crowd out private investment that would otherwise increase total supply."
+      },
+      {
+        "term": "unintended consequence",
+        "definition": "A negative result that appears when a policy interacts with real-world behaviour in ways its designers did not anticipate.",
+        "example": "Many well-intentioned housing interventions produce unintended consequences that harm the very groups they aimed to help."
+      },
+      {
+        "term": "market discipline",
+        "definition": "The pressure that competition and consumer choice exert on providers to improve quality and control costs.",
+        "example": "Market discipline is weakened when the state becomes both the main supplier and the guarantor of housing."
+      },
+      {
+        "term": "opportunity cost",
+        "definition": "The value of the next-best use of resources that must be forgone when money and capacity are committed to one purpose.",
+        "example": "The opportunity cost of an open housing guarantee may be lower investment in education, healthcare or infrastructure."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "Declaring a right does not create the homes that people need.",
+        "examples": [
+          "Declaring a right does not create the homes that people need; only increased supply and better incentives can do that.",
+          "The motion confuses legal language with physical reality: declaring a right does not create the homes that people need.",
+          "We must remember that declaring a right does not create the homes that people need."
+        ]
+      },
+      {
+        "phrase": "The core problem is under-supply, not the absence of a formal guarantee.",
+        "examples": [
+          "The core problem is under-supply, not the absence of a formal guarantee, and policy should focus there.",
+          "Evidence from high-cost cities shows that the core problem is under-supply, not the absence of a formal guarantee.",
+          "We will make faster progress when we accept that the core problem is under-supply, not the absence of a formal guarantee."
+        ]
+      },
+      {
+        "phrase": "Good intentions in housing policy have repeatedly produced harmful side-effects.",
+        "examples": [
+          "Good intentions in housing policy have repeatedly produced harmful side-effects, from reduced maintenance to black markets.",
+          "History warns that good intentions in housing policy have repeatedly produced harmful side-effects.",
+          "A responsible approach learns from the fact that good intentions in housing policy have repeatedly produced harmful side-effects."
+        ]
+      },
+      {
+        "phrase": "Sustainable housing solutions must respect economic reality and fiscal limits.",
+        "examples": [
+          "Sustainable housing solutions must respect economic reality and fiscal limits rather than promise what cannot be delivered.",
+          "The motion fails because sustainable housing solutions must respect economic reality and fiscal limits.",
+          "We insist that sustainable housing solutions must respect economic reality and fiscal limits."
+        ]
+      },
+      {
+        "phrase": "Private investment and ownership remain essential engines of housing supply and quality.",
+        "examples": [
+          "Private investment and ownership remain essential engines of housing supply and quality in every successful system.",
+          "Undermining private investment and ownership remain essential engines of housing supply and quality is a dangerous path.",
+          "Any serious strategy recognises that private investment and ownership remain essential engines of housing supply and quality."
+        ]
+      },
+      {
+        "phrase": "An open-ended state guarantee risks becoming an unsustainable entitlement.",
+        "examples": [
+          "An open-ended state guarantee risks becoming an unsustainable entitlement that future budgets cannot support.",
+          "We should design carefully so that an open-ended state guarantee risks becoming an unsustainable entitlement does not materialise.",
+          "Fiscal realism requires us to acknowledge that an open-ended state guarantee risks becoming an unsustainable entitlement."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "throw money at the problem",
+        "definition": "To respond to a difficulty mainly by increasing spending without addressing underlying causes.",
+        "examples": [
+          "Simply declaring a right and throwing money at the problem will not fix chronic under-supply.",
+          "Effective policy requires more than the urge to throw money at the problem.",
+          "We have seen repeated failures when governments only throw money at the problem."
+        ]
+      },
+      {
+        "idiom": "the law of unintended consequences",
+        "definition": "The principle that actions, especially large-scale interventions, often produce effects that were not foreseen or desired.",
+        "examples": [
+          "Housing policy is a classic field for the law of unintended consequences.",
+          "Rent controls illustrate the law of unintended consequences in action.",
+          "Wise design tries to anticipate the law of unintended consequences rather than ignore it."
+        ]
+      },
+      {
+        "idiom": "kill the goose that lays the golden eggs",
+        "definition": "To destroy a valuable source of benefit through excessive demands or interference.",
+        "examples": [
+          "Heavy-handed regulation can kill the goose that lays the golden eggs of private housing investment.",
+          "We must not kill the goose that lays the golden eggs in the name of short-term affordability.",
+          "Sustainable policy avoids killing the goose that lays the golden eggs."
+        ]
+      },
+      {
+        "idiom": "robbing Peter to pay Paul",
+        "definition": "To transfer resources from one group or purpose to another without creating net improvement.",
+        "examples": [
+          "Large housing subsidies financed by general taxation can become a form of robbing Peter to pay Paul.",
+          "Policy should create new supply rather than merely robbing Peter to pay Paul within the existing stock.",
+          "We reject approaches that only succeed by robbing Peter to pay Paul."
+        ]
+      },
+      {
+        "idiom": "a blank cheque",
+        "definition": "An open-ended commitment whose final cost is unknown and potentially unlimited.",
+        "examples": [
+          "An unconditional right to housing risks becoming a blank cheque on the public finances.",
+          "Taxpayers are entitled to resist a blank cheque for housing or any other purpose.",
+          "Responsible government does not issue a blank cheque without clear limits and priorities."
+        ]
+      },
+      {
+        "idiom": "get the incentives right",
+        "definition": "To design rules so that individuals and organisations find it in their interest to act in socially useful ways.",
+        "examples": [
+          "The priority is to get the incentives right for builders, landowners and tenants.",
+          "Many housing failures stem from the refusal to get the incentives right.",
+          "Lasting progress depends on the willingness to get the incentives right rather than rely on declaration alone."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "The fundamental constraint on housing is physical and regulatory supply, not the absence of a legal right.",
+        "explanation": "In high-demand cities the number of homes is limited by land availability, planning rules, construction capacity and local opposition to new building. Declaring housing a right does not add a single dwelling. Jurisdictions that have expanded supply through zoning reform, faster permitting and infrastructure investment have seen more improvement in affordability than those that have mainly expanded entitlements or subsidies. The right-based approach risks directing political energy toward legal and fiscal commitments while leaving the binding constraints untouched. A realistic strategy focuses first on removing the barriers that prevent homes from being built where people want to live. Without that focus, the right remains an unfulfilled promise."
+      },
+      {
+        "claim": "Open-ended public guarantees create fiscal risks that can undermine other essential services.",
+        "explanation": "Housing is expensive. An unqualified duty to guarantee adequate housing for every citizen implies potentially unlimited capital and ongoing subsidy costs. In ageing societies with rising healthcare and pension commitments, adding another large open-ended entitlement strains public finances. Countries that have expanded social housing successfully have usually done so within clear fiscal rules and with significant contributions from residents. An absolute rights framework makes such discipline harder because any limit can be portrayed as a rights violation. The result can be either unsustainable borrowing or the crowding-out of spending on education, infrastructure and health. Fiscal sustainability is itself a condition of long-term social protection."
+      },
+      {
+        "claim": "Poorly designed interventions frequently reduce the quantity and quality of housing over time.",
+        "explanation": "Rent controls, if set too rigidly, discourage maintenance and new rental construction. Heavy public provision without market discipline can produce bureaucratic allocation, under-occupation and physical decline. Large demand-side subsidies without matching supply increase prices rather than access. These patterns have been documented across multiple countries and decades. The intention to help is genuine; the outcomes are often the opposite of what was intended. A rights-based politics that treats any criticism of specific instruments as opposition to the right itself makes it harder to correct these failures. Effective housing policy requires continuous evaluation and adjustment, not the elevation of any single approach to the status of fundamental right."
+      },
+      {
+        "claim": "Strong private property rights and market signals remain indispensable for investment and maintenance.",
+        "explanation": "Most of the world’s housing stock is privately owned and maintained. Owners invest in upkeep and improvement when they can capture the returns and when the legal framework is predictable. Weakening those rights through extensive controls, expropriation risks or permanent price suppression reduces the incentive to supply and care for housing. Even systems with large social-housing sectors rely on private construction capacity and private ownership for the majority of homes. A policy framework that treats private ownership primarily as a problem to be constrained rather than as a necessary engine of supply will ultimately reduce the total number of decent homes available. The right to housing cannot be realised by undermining the institutions that produce housing."
+      },
+      {
+        "claim": "Allocation by bureaucratic or political criteria often matches people to homes less effectively than price and choice.",
+        "explanation": "When the state becomes the main allocator of housing, decisions turn on administrative rules, waiting-list points, or political influence. These systems struggle to reflect the diverse and changing preferences of households regarding location, size, and trade-offs between cost and quality. Vacancies and mismatches appear alongside long queues. Market allocation, for all its inequalities, continuously adjusts to revealed demand. Hybrid systems that preserve significant choice and mobility while targeting assistance to those in greatest need have generally performed better than pure administrative allocation. An absolute right that implies administrative guarantee risks recreating the rigidities that earlier generations of public housing sometimes produced."
+      },
+      {
+        "claim": "Personal responsibility and gradual mobility have been important routes into secure housing for previous generations.",
+        "explanation": "Many households historically improved their housing conditions through saving, geographic moves, skill development and staged progression from rental to ownership. While structural barriers today are real, a framework that treats housing solely as a state entitlement can weaken the expectation and the practical pathways of self-provision. Cultures of dependency are not inevitable, but they are more likely when the dominant message is that secure housing is something the government owes rather than something citizens also work toward. Policy should support mobility and opportunity—through skills, transport, and targeted help—rather than replace them with an unconditional guarantee that may prove impossible to honour for everyone at the desired standard."
+      },
+      {
+        "claim": "International comparisons show that the best outcomes combine market supply with targeted support, not pure rights rhetoric.",
+        "explanation": "Countries and cities with relatively good housing outcomes typically maintain strong private development sectors, flexible land-use rules, and then layer means-tested assistance or social housing for those who cannot manage at market prices. Places that have relied mainly on declaration of rights without corresponding supply reform continue to struggle with shortages and high costs. The empirical pattern suggests that the decisive variables are supply elasticity, construction productivity, and the precision of subsidies—not the formal legal status of housing as a right. Elevating the rights language above these practical determinants risks substituting symbolism for the harder work of institutional reform."
+      },
+      {
+        "claim": "An absolute right creates permanent political pressure for measures that may harm long-term affordability.",
+        "explanation": "Once housing is framed as a justiciable right, courts and campaigners can demand immediate relief—rent freezes, eviction bans, or expanded subsidies—regardless of supply conditions. These measures provide short-term protection for current occupants but often reduce the incentive to build or to maintain rental stock. Over time the cumulative effect can be a smaller and lower-quality supply of homes, making the underlying problem worse. A more sustainable politics treats housing as a high social priority that must be advanced through policies whose long-term supply effects are carefully assessed. Absolute rights language makes that assessment secondary to the assertion of entitlement."
+      },
+      {
+        "claim": "Different households have different housing needs and preferences; a uniform state guarantee struggles to respect that diversity.",
+        "explanation": "Some people prioritise urban location, others space, others ownership, others low immediate cost. A rights framework tends toward standardised definitions of ‘adequate’ housing and standardised delivery mechanisms. Markets, for all their faults, allow a wider range of trade-offs and innovations. Public systems that have succeeded have usually preserved significant diversity of tenure and provider. An unqualified state duty risks pressure toward uniformity and centralisation that fits poorly with the variety of real household circumstances. Policy should expand the range of secure options rather than converge on a single publicly guaranteed model."
+      },
+      {
+        "claim": "The most effective path to broad housing security is to increase overall supply and target assistance, not to elevate housing to an absolute right.",
+        "explanation": "The historical record of societies that have housed their populations well points to high rates of construction, responsive land-use policy, stable macroeconomic conditions, and then residual public support for those who remain excluded. Framing the issue as a fundamental right shifts attention toward legal claims, fiscal entitlements and political mobilisation around scarcity. While mobilisation can be useful, it does not substitute for the physical act of building. A pragmatic agenda that removes barriers to supply, improves construction productivity, and focuses subsidies on the households in greatest need has a better chance of delivering actual roofs over heads. The motion’s elevation of rights language, however morally appealing, risks becoming a distraction from that practical agenda."
+      }
+    ]
+  }
+}

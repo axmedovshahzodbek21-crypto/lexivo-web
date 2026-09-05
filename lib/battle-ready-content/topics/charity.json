@@ -1,0 +1,407 @@
+{
+  "motion": "This house believes that charity does more harm than good",
+  "for": {
+    "vocab": [
+      {
+        "term": "dependency culture",
+        "definition": "A social pattern in which ongoing charitable aid reduces personal motivation and self-reliance among recipients.",
+        "example": "Critics argue that long-term food aid has fostered a dependency culture in some communities, making sustainable recovery harder."
+      },
+      {
+        "term": "moral hazard",
+        "definition": "The risk that people or institutions take less responsibility for their own problems because they expect external help to arrive.",
+        "example": "Generous disaster relief can create moral hazard if local governments underinvest in preparedness, knowing donors will step in."
+      },
+      {
+        "term": "paternalism",
+        "definition": "The practice of treating recipients as incapable of managing their own lives, often imposing the donor’s values and priorities.",
+        "example": "Many development projects fail because of paternalism that ignores local knowledge and imposes outside solutions."
+      },
+      {
+        "term": "virtue signalling",
+        "definition": "Public displays of generosity that primarily serve the donor’s reputation rather than the genuine needs of recipients.",
+        "example": "High-profile celebrity donations sometimes amount to little more than virtue signalling with limited lasting impact."
+      },
+      {
+        "term": "band-aid solution",
+        "definition": "A temporary measure that treats symptoms while leaving the underlying structural causes untouched.",
+        "example": "Handing out blankets every winter is a classic band-aid solution that does nothing to address housing shortages."
+      },
+      {
+        "term": "inefficient allocation",
+        "definition": "The wasteful distribution of resources that occurs when aid is guided by donor preferences rather than evidence of need or effectiveness.",
+        "example": "Inefficient allocation is common when charities compete for media attention instead of coordinating to cover the greatest needs."
+      },
+      {
+        "term": "donor capture",
+        "definition": "The process by which charities shape their programmes around the interests and publicity needs of large funders rather than recipients.",
+        "example": "Donor capture can distort priorities, turning a grassroots organisation into a vehicle for the funder’s brand."
+      },
+      {
+        "term": "structural neglect",
+        "definition": "The tendency of charity to distract attention and political energy from the deeper reforms required to fix systemic problems.",
+        "example": "Relying on food banks encourages structural neglect of the wages and housing policies that create hunger in the first place."
+      },
+      {
+        "term": "aid dependency",
+        "definition": "A long-term reliance on external charitable flows that weakens local institutions and economic self-sufficiency.",
+        "example": "Some post-disaster regions have slipped into aid dependency, with local markets and government capacity eroded by continuous external supply."
+      },
+      {
+        "term": "compassion fatigue",
+        "definition": "The gradual decline in public willingness to give caused by repeated appeals and the sense that problems never improve.",
+        "example": "Endless emergency campaigns eventually produce compassion fatigue, reducing support even for well-run organisations."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "Charity treats the symptoms while leaving the disease untouched.",
+        "examples": [
+          "Charity treats the symptoms while leaving the disease untouched when food parcels replace demands for living wages.",
+          "Charity treats the symptoms while leaving the disease untouched if emergency shelters become a permanent substitute for affordable housing policy.",
+          "Charity treats the symptoms while leaving the disease untouched, allowing political leaders to avoid the harder work of structural reform."
+        ]
+      },
+      {
+        "phrase": "Good intentions are not the same as good outcomes.",
+        "examples": [
+          "Good intentions are not the same as good outcomes, and many well-funded projects have left communities worse off.",
+          "Good intentions are not the same as good outcomes when aid is delivered without rigorous evidence of what actually works.",
+          "Good intentions are not the same as good outcomes; the history of development is filled with sincere efforts that produced dependency instead of progress."
+        ]
+      },
+      {
+        "phrase": "Private generosity cannot replace public justice.",
+        "examples": [
+          "Private generosity cannot replace public justice when the root causes of poverty lie in tax, labour, and housing policy.",
+          "Private generosity cannot replace public justice, and treating charity as a sufficient response lets governments off the hook.",
+          "Private generosity cannot replace public justice; a decent society builds fair systems rather than relying on the kindness of strangers."
+        ]
+      },
+      {
+        "phrase": "Aid that creates dependency is not compassion—it is a longer form of harm.",
+        "examples": [
+          "Aid that creates dependency is not compassion—it is a longer form of harm that undermines the very people it claims to help.",
+          "Aid that creates dependency is not compassion—it is a longer form of harm visible in communities that have received continuous relief for decades.",
+          "Aid that creates dependency is not compassion—it is a longer form of harm because it replaces local agency with external control."
+        ]
+      },
+      {
+        "phrase": "The most visible form of help is often the least effective.",
+        "examples": [
+          "The most visible form of help is often the least effective, which is why media-friendly distributions can crowd out quieter, better programmes.",
+          "The most visible form of help is often the least effective when donors prefer photo opportunities over long-term capacity building.",
+          "The most visible form of help is often the least effective, and serious evaluators have repeatedly shown that high-profile interventions underperform."
+        ]
+      },
+      {
+        "phrase": "Charity allows the comfortable to feel virtuous without changing the systems that keep others poor.",
+        "examples": [
+          "Charity allows the comfortable to feel virtuous without changing the systems that keep others poor, which is why it can become a substitute for political action.",
+          "Charity allows the comfortable to feel virtuous without changing the systems that keep others poor; writing a cheque is easier than reforming the tax code.",
+          "Charity allows the comfortable to feel virtuous without changing the systems that keep others poor, and that emotional satisfaction can delay real progress."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "a drop in the ocean",
+        "definition": "An action so small relative to the scale of the problem that it makes no meaningful difference.",
+        "examples": [
+          "Individual acts of charity, however well meant, are often a drop in the ocean compared with the structural drivers of poverty.",
+          "Handing out meals in a city with tens of thousands of hungry people is a drop in the ocean unless wages and housing costs are addressed.",
+          "Treating each crisis with emergency appeals leaves us permanently managing drops in the ocean instead of turning off the tap."
+        ]
+      },
+      {
+        "idiom": "robbing Peter to pay Paul",
+        "definition": "Solving one problem by creating or worsening another, often by diverting limited resources.",
+        "examples": [
+          "When charities compete for the same donor pool, success for one organisation can mean robbing Peter to pay Paul.",
+          "Focusing public attention and money on photogenic causes sometimes means robbing Peter to pay Paul for less visible but more urgent needs.",
+          "Emergency appeals that drain funding from long-term development programmes are a clear case of robbing Peter to pay Paul."
+        ]
+      },
+      {
+        "idiom": "papering over the cracks",
+        "definition": "Using temporary measures to hide deeper problems without repairing them.",
+        "examples": [
+          "Food banks have become a way of papering over the cracks in a labour market that does not pay living wages.",
+          "Seasonal coat drives are papering over the cracks when the real issue is inadequate housing and heating support.",
+          "Relying on charity to fill gaps left by retreating public services is simply papering over the cracks in the social contract."
+        ]
+      },
+      {
+        "idiom": "the road to hell is paved with good intentions",
+        "definition": "Well-meaning actions can produce damaging results when they are poorly designed or fail to consider consequences.",
+        "examples": [
+          "The history of foreign aid shows that the road to hell is paved with good intentions when projects ignore local realities.",
+          "Many failed development schemes prove that the road to hell is paved with good intentions and insufficient evidence.",
+          "We should remember that the road to hell is paved with good intentions every time a new charity programme is launched without rigorous testing."
+        ]
+      },
+      {
+        "idiom": "feeding the hand that bites you",
+        "definition": "Supporting systems or behaviours that ultimately undermine the intended goal or the recipient’s independence.",
+        "examples": [
+          "Continuous unconditional aid can end up feeding the hand that bites you if it weakens local institutions and markets.",
+          "When charity displaces government responsibility, society may be feeding the hand that bites you by eroding public capacity.",
+          "Some critics argue that poorly targeted relief is feeding the hand that bites you by reinforcing the very dependencies it claims to reduce."
+        ]
+      },
+      {
+        "idiom": "a sticking plaster on a broken bone",
+        "definition": "A superficial remedy applied to a serious structural problem that requires much deeper intervention.",
+        "examples": [
+          "Emergency cash transfers without job creation are a sticking plaster on a broken bone.",
+          "Building another shelter while ignoring the housing shortage is a sticking plaster on a broken bone.",
+          "Most charitable responses to inequality remain a sticking plaster on a broken bone unless they are paired with political reform."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "Charity often creates and reinforces dependency rather than building lasting self-reliance.",
+        "explanation": "When aid is provided repeatedly without clear pathways to independence, recipients can adapt their behaviour around the expectation of continued support. Local initiative declines, informal markets are undercut, and the skills needed for self-sufficiency atrophy. This pattern has been documented in prolonged refugee camps and in communities that receive continuous food or cash distributions for years. In parts of sub-Saharan Africa, long-running food aid programmes have at times discouraged local agricultural production because free or subsidised imports made farming less viable. Similar dynamics appear in rich countries where food banks and crisis payments become semi-permanent features of life for some households. The short-term relief is real, but the long-term effect can be a population less able to stand on its own feet. Effective support must therefore include clear exit strategies, skills training, and the restoration of local economic activity. Without those elements, charity risks becoming a permanent substitute for development rather than a bridge toward it."
+      },
+      {
+        "claim": "Charitable giving is frequently driven by donor preferences and publicity rather than evidence of greatest need or impact.",
+        "explanation": "Donors, especially large foundations and the general public responding to media appeals, tend to favour causes that are emotionally vivid, geographically close, or aligned with their own identities. As a result, funding flows toward photogenic disasters, diseases that affect the wealthy, or organisations with strong branding, while quieter but more deadly problems receive far less attention. Research on global health financing has repeatedly shown that resources are not allocated in proportion to the burden of disease. Malaria and neglected tropical diseases, which kill and disable millions, attract less money than conditions that generate more media coverage. The same distortion appears domestically: animal shelters and certain high-profile medical charities often raise more than programmes addressing deep poverty or mental health. When allocation is guided by emotion and marketing rather than rigorous evidence, the overall social return on charitable spending falls. A system that claims to help the most vulnerable cannot be considered successful if it systematically under-serves them."
+      },
+      {
+        "claim": "Charity can crowd out government responsibility and delay necessary structural reforms.",
+        "explanation": "When private organisations step in to provide services that belong in the public realm, political pressure for proper policy solutions weakens. Voters and politicians can point to the existence of food banks, homeless shelters, or scholarship funds as evidence that the problem is being handled, even when the scale of need continues to grow. This dynamic has been observed in several countries where the expansion of charitable food provision has coincided with stagnant or falling real wages and reduced social security. The visible activity of charity creates the impression of action while the underlying drivers—low pay, insecure work, inadequate housing—remain unaddressed. Over time, the state may reduce its own commitments, knowing that civil society will attempt to fill the gap. The result is a fragmented, underfunded patchwork that leaves many people still in need while shielding decision-makers from accountability. Charity then becomes an enabler of political complacency rather than a force for lasting change."
+      },
+      {
+        "claim": "Many charitable interventions lack rigorous evaluation and continue despite weak or negative evidence of effectiveness.",
+        "explanation": "Unlike pharmaceutical products or public infrastructure, most charitable programmes are not subjected to careful testing before or during implementation. Organisations face strong incentives to report success and weak incentives to publish failures. As a result, ineffective or even harmful approaches can persist for years. Randomised evaluations in development economics have shown that popular interventions—such as certain forms of microcredit, textbook distribution without complementary teaching reforms, or some awareness campaigns—often produce far smaller benefits than claimed, and occasionally none at all. In domestic settings, programmes that feel intuitively good, such as one-off gift distributions or poorly designed mentoring schemes, frequently fail to improve long-term outcomes. Scarce resources are thereby locked into activities that do not work, while more promising approaches remain underfunded. A serious commitment to helping people requires the same standard of evidence we demand in medicine; without it, charity risks becoming an industry that prioritises activity and donor satisfaction over actual results."
+      },
+      {
+        "claim": "Large-scale charity can distort local economies and undermine local producers.",
+        "explanation": "When free or heavily subsidised goods flood a market, local businesses and farmers who cannot compete with zero-priced alternatives lose income and may exit production entirely. This effect has been documented after major food-aid operations in which imported grain depressed prices for local growers, reducing future planting and increasing longer-term food insecurity. Similar problems arise with clothing donations that undercut local textile markets, or with free medical supplies that discourage the development of domestic pharmaceutical distribution. Even cash transfers, if poorly timed or targeted, can create inflation in local markets for essential goods. The short-term benefit to recipients is clear, but the medium-term damage to the productive base of the community can outweigh those gains. Responsible aid must therefore be designed with careful attention to market effects, preferably by purchasing locally where possible and by supporting rather than replacing existing economic activity. Ignoring these dynamics turns temporary relief into a source of lasting economic harm."
+      },
+      {
+        "claim": "Charity frequently imposes the values and priorities of donors on recipients, limiting local agency.",
+        "explanation": "Funding comes with explicit or implicit conditions. Donors decide which problems are worth solving, which methods are acceptable, and which outcomes count as success. Local organisations and communities often have to reshape their work to fit these external preferences if they want resources. This dynamic reduces the space for locally generated solutions and can import cultural or ideological assumptions that do not fit the context. In international development, critics have long pointed to projects that prioritised donor-country expertise and materials over cheaper, more appropriate local alternatives. Domestically, foundation-funded initiatives sometimes push particular social or educational models that communities did not choose. When the people closest to the problem have the least power over the response, the resulting programmes are less likely to be relevant, trusted, or sustainable. Genuine help requires shifting decision-making power toward recipients rather than treating them as passive beneficiaries of someone else’s vision."
+      },
+      {
+        "claim": "The emotional satisfaction of giving can reduce pressure for more effective collective action.",
+        "explanation": "Writing a cheque or volunteering produces a warm feeling of having done something. That psychological reward can substitute for the harder, slower work of political organising, policy advocacy, or systemic reform. People who have already “helped” through charity may feel less urgency to demand changes in taxation, labour law, or public investment. Politicians, in turn, can point to private generosity as evidence that society is compassionate, even while public systems remain inadequate. Research in psychology and political science suggests that certain forms of charitable engagement can crowd out political engagement rather than complement it. The net effect is a society that feels good about its compassion while tolerating levels of poverty and inequality that more structural solutions could reduce. Charity then functions as a pressure valve that releases moral concern without converting it into lasting institutional change."
+      },
+      {
+        "claim": "Competition among charities wastes resources on fundraising and branding rather than programmes.",
+        "explanation": "In a crowded field, organisations must spend heavily to attract and retain donors. Advertising, gala events, celebrity endorsements, and sophisticated marketing campaigns consume a significant share of incoming funds. Smaller or less polished groups that may deliver better results struggle to compete for attention. The overall sector therefore channels a non-trivial portion of public generosity into the business of asking for money rather than the work of helping people. Studies of charity efficiency routinely find wide variation in the proportion of income that reaches frontline activities, with some organisations spending heavily on overhead and promotion. While some administrative cost is necessary, the arms race for visibility drives expenditure beyond what is required for effective operation. A more coordinated or evidence-driven system could reduce this waste and direct a higher share of every donated unit toward actual impact."
+      },
+      {
+        "claim": "Charity can legitimise and stabilise unjust arrangements by making them more bearable.",
+        "explanation": "When the worst effects of poverty, low wages, or inadequate public services are softened by private aid, the urgency of reform declines. Employers may feel less pressure to raise pay if food banks and hardship funds are available to their workers. Governments may postpone investment in housing or social security if charities are visibly filling the gaps. In this way, charity can become part of the mechanism that maintains the status quo. Historical examples include company towns where employer-sponsored welfare reduced labour unrest without altering underlying power imbalances, and contemporary settings where corporate philanthropy accompanies aggressive tax avoidance or anti-union practices. By making exploitation or neglect more tolerable, charity can inadvertently protect the interests of those who benefit from existing arrangements. A response that leaves power and resource distribution unchanged, while merely reducing the visible suffering those arrangements produce, cannot be regarded as a full solution."
+      },
+      {
+        "claim": "The scale of modern social problems exceeds what voluntary charity can realistically address.",
+        "explanation": "Poverty, inequality, homelessness, and preventable disease operate at a magnitude that dwarfs even the largest private foundations and the combined giving of ordinary citizens. In high-income countries, the resources required to guarantee decent housing, healthcare, and income support run into the hundreds of billions annually—far beyond the capacity of the charitable sector. In low-income countries, the financing gap for basic development goals is similarly vast. Charity can and does help individuals, but it cannot substitute for the taxing, spending, and regulatory powers of the state. Treating private giving as the primary response therefore sets an impossible expectation and distracts from the only institutions capable of operating at the necessary scale. The honest position is that charity is a limited, supplementary tool. When it is presented as a sufficient answer, it encourages under-investment in the public systems that alone can match the size of the challenge."
+      }
+    ]
+  },
+  "against": {
+    "vocab": [
+      {
+        "term": "immediate relief",
+        "definition": "The rapid provision of essential goods or support that prevents acute suffering while longer-term solutions are developed.",
+        "example": "In the aftermath of a natural disaster, immediate relief saves lives that structural reform cannot reach in time."
+      },
+      {
+        "term": "catalytic giving",
+        "definition": "Strategic charity that unlocks larger resources, inspires policy change, or builds permanent local capacity.",
+        "example": "Catalytic giving by early donors helped establish institutions that later attracted government and private investment at far greater scale."
+      },
+      {
+        "term": "civil society vitality",
+        "definition": "The strength and independence of non-governmental organisations and voluntary associations that enrich democratic life.",
+        "example": "A healthy democracy depends on civil society vitality, and charity is one of the main ways citizens organise to solve shared problems."
+      },
+      {
+        "term": "targeted compassion",
+        "definition": "The ability of well-designed charity to reach specific individuals and communities that large public systems often miss.",
+        "example": "Targeted compassion allows specialist charities to support rare diseases or marginalised groups that fall through the cracks of universal programmes."
+      },
+      {
+        "term": "social innovation",
+        "definition": "New approaches to social problems that are frequently pioneered by charitable organisations before being adopted more widely.",
+        "example": "Many of today’s mainstream social policies began as experiments in social innovation funded by private philanthropy."
+      },
+      {
+        "term": "voluntary solidarity",
+        "definition": "The free choice of individuals to share resources and effort with others, strengthening social bonds beyond legal obligation.",
+        "example": "Voluntary solidarity expressed through charity builds trust and mutual responsibility that compulsory taxation alone cannot create."
+      },
+      {
+        "term": "leveraged impact",
+        "definition": "The multiplying effect achieved when charitable funds attract additional public or private resources and change wider systems.",
+        "example": "A relatively small grant can produce leveraged impact if it demonstrates a model that governments later scale up nationally."
+      },
+      {
+        "term": "human dignity response",
+        "definition": "Aid that treats recipients as people deserving of respect and choice rather than as passive objects of pity.",
+        "example": "Cash transfers often represent a human dignity response because they allow recipients to decide their own priorities."
+      },
+      {
+        "term": "gap-filling function",
+        "definition": "The practical role of charity in addressing needs that existing public services do not yet cover or cannot reach.",
+        "example": "While we work toward better public provision, the gap-filling function of charity remains essential for people in immediate crisis."
+      },
+      {
+        "term": "philanthropic risk capital",
+        "definition": "The willingness of donors to fund uncertain or experimental approaches that governments and markets are reluctant to try.",
+        "example": "Philanthropic risk capital has financed early research and pilot programmes that later transformed entire fields of social policy."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "Charity is often the only help available when systems fail or move too slowly.",
+        "examples": [
+          "Charity is often the only help available when systems fail or move too slowly, especially in the critical hours after a disaster.",
+          "Charity is often the only help available when systems fail or move too slowly for people who cannot wait for legislation or budget cycles.",
+          "Charity is often the only help available when systems fail or move too slowly, and dismissing it leaves the most vulnerable with nothing."
+        ]
+      },
+      {
+        "phrase": "Private initiative has repeatedly pioneered solutions that governments later adopted at scale.",
+        "examples": [
+          "Private initiative has repeatedly pioneered solutions that governments later adopted at scale, from public libraries to early childhood education models.",
+          "Private initiative has repeatedly pioneered solutions that governments later adopted at scale; many social innovations begin outside the state.",
+          "Private initiative has repeatedly pioneered solutions that governments later adopted at scale, proving that charity can be a laboratory for better policy."
+        ]
+      },
+      {
+        "phrase": "The choice is not between charity and justice; both are necessary.",
+        "examples": [
+          "The choice is not between charity and justice; both are necessary if we are to meet immediate needs while reforming systems.",
+          "The choice is not between charity and justice; both are necessary, and attacking one does not automatically strengthen the other.",
+          "The choice is not between charity and justice; both are necessary in any society that takes human suffering seriously."
+        ]
+      },
+      {
+        "phrase": "Well-designed giving empowers recipients rather than diminishing them.",
+        "examples": [
+          "Well-designed giving empowers recipients rather than diminishing them, especially when it takes the form of cash, skills, or genuine partnership.",
+          "Well-designed giving empowers recipients rather than diminishing them; the problem is poor design, not the act of giving itself.",
+          "Well-designed giving empowers recipients rather than diminishing them, which is why evidence-based approaches focus on agency and choice."
+        ]
+      },
+      {
+        "phrase": "A society that refuses to help the person in front of it in the name of pure systemic purity has lost its moral bearings.",
+        "examples": [
+          "A society that refuses to help the person in front of it in the name of pure systemic purity has lost its moral bearings.",
+          "A society that refuses to help the person in front of it in the name of pure systemic purity has lost its moral bearings and will struggle to sustain political support for reform.",
+          "A society that refuses to help the person in front of it in the name of pure systemic purity has lost its moral bearings; compassion and justice are not enemies."
+        ]
+      },
+      {
+        "phrase": "Charity channels the moral energy of citizens into practical action that politics alone cannot always deliver.",
+        "examples": [
+          "Charity channels the moral energy of citizens into practical action that politics alone cannot always deliver, especially across borders or in neglected niches.",
+          "Charity channels the moral energy of citizens into practical action that politics alone cannot always deliver, creating a plural and responsive web of support.",
+          "Charity channels the moral energy of citizens into practical action that politics alone cannot always deliver, and that independent capacity is a democratic strength."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "lighting a candle rather than cursing the darkness",
+        "definition": "Taking practical positive action instead of merely complaining about problems.",
+        "examples": [
+          "Charity at its best is lighting a candle rather than cursing the darkness while waiting for perfect systemic solutions.",
+          "When someone is hungry tonight, lighting a candle rather than cursing the darkness means providing food while also advocating for better policy.",
+          "A healthy civic culture encourages lighting a candle rather than cursing the darkness, combining immediate help with longer-term reform."
+        ]
+      },
+      {
+        "idiom": "from the ground up",
+        "definition": "Building solutions through local knowledge, relationships, and initiative rather than top-down imposition.",
+        "examples": [
+          "The most effective charities work from the ground up, learning from the communities they serve instead of imposing external blueprints.",
+          "Sustainable change usually grows from the ground up, which is why locally rooted organisations often outperform distant bureaucracies.",
+          "Supporting charities that operate from the ground up respects the agency of people closest to the problems."
+        ]
+      },
+      {
+        "idiom": "a hand up, not a handout",
+        "definition": "Assistance designed to restore independence and capability rather than create ongoing reliance.",
+        "examples": [
+          "The best programmes aim to offer a hand up, not a handout, by combining material support with skills and opportunity.",
+          "Critics who attack all charity as creating dependency ignore the many models that deliberately provide a hand up, not a handout.",
+          "Designing aid as a hand up, not a handout, requires attention to dignity, time limits, and pathways into work or education."
+        ]
+      },
+      {
+        "idiom": "the soft power of generosity",
+        "definition": "The influence and goodwill generated by voluntary giving that can open doors and change relationships.",
+        "examples": [
+          "Nations and organisations that practise the soft power of generosity often find cooperation easier in other domains.",
+          "At community level, the soft power of generosity builds trust that makes collective problem-solving more possible.",
+          "Dismissing charity overlooks the soft power of generosity that strengthens social fabric beyond measurable outputs."
+        ]
+      },
+      {
+        "idiom": "seeds that grow into forests",
+        "definition": "Small initial interventions that, under the right conditions, expand into large and lasting change.",
+        "examples": [
+          "Many major social institutions began as seeds that grow into forests—modest charitable experiments that later spread widely.",
+          "Early childhood programmes, microfinance pilots, and community health worker models were once seeds that grow into forests.",
+          "Strategic philanthropy looks for seeds that grow into forests rather than only funding permanent large-scale operations."
+        ]
+      },
+      {
+        "idiom": "meeting people where they are",
+        "definition": "Providing help that starts from the actual situation and capabilities of recipients rather than from an idealised plan.",
+        "examples": [
+          "Effective charity means meeting people where they are, whether that is a street corner, a remote village, or a hospital ward.",
+          "Public systems sometimes struggle with meeting people where they are; agile charities can fill that gap.",
+          "Meeting people where they are requires humility and flexibility, qualities that the best charitable organisations cultivate."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "Charity provides essential immediate relief that bureaucratic systems cannot deliver quickly enough.",
+        "explanation": "When disaster strikes or a family faces sudden crisis, the speed of response can determine whether people live or die, keep their home, or fall into long-term destitution. Government programmes, however well designed, operate under rules, budgets, and approval processes that take time. Charitable organisations and individual donors can often mobilise resources within hours. After earthquakes, floods, and conflicts, the first food, water, shelter, and medical care frequently come from voluntary sources. In everyday poverty, a food bank or emergency grant can prevent a cascade of further harm—eviction, school absence, health deterioration—while slower public systems process applications. Dismissing this function as merely symptomatic ignores the reality that suffering is experienced in the present. A society that waits for perfect structural solutions before offering help abandons people to preventable pain. Charity and systemic reform are not alternatives; the former buys time and reduces damage while the latter is pursued."
+      },
+      {
+        "claim": "Many of the most important social innovations of the past two centuries began as charitable experiments.",
+        "explanation": "Public libraries, modern hospitals, kindergartens, hospices, microfinance, and numerous public-health interventions were first developed and tested by philanthropic or voluntary organisations. Governments later adopted and scaled the successful models. This pattern continues today. Charitable funders have supported early trials of conditional cash transfers, new approaches to prisoner rehabilitation, and community-based mental health care that subsequently influenced national policy. Because they are smaller and less constrained by political cycles, charities can take risks and iterate quickly. They function as a research and development arm for the social sector. Without that experimental space, societies would be slower to discover what works. Attacking charity as inherently inferior to state action overlooks this historical and ongoing role as a source of innovation that ultimately strengthens public systems."
+      },
+      {
+        "claim": "Charity reaches people and problems that large public systems systematically miss.",
+        "explanation": "Universal programmes are designed for average cases and common conditions. They struggle with rare diseases, highly marginalised groups, newly emerging needs, or individuals who distrust official institutions. Specialist charities fill these gaps. Organisations focused on particular disabilities, refugee subgroups, or stigmatised conditions often provide the only tailored support available. In addition, some people will accept help from a voluntary group when they will not approach a government office. Street outreach teams, peer-led services, and culturally specific organisations demonstrate this reach repeatedly. A pure state-centric model would leave these gaps unaddressed until the numbers became large enough to force political attention—by which time much avoidable harm would already have occurred. Plural provision, with charity as one component, produces broader coverage than monopoly public systems alone."
+      },
+      {
+        "claim": "Voluntary giving strengthens civic skills, social trust, and democratic culture.",
+        "explanation": "When citizens organise to address shared problems, they practise cooperation, negotiation, and responsibility. These habits spill over into other areas of public life. Research on social capital has consistently linked dense networks of voluntary association with higher trust, lower corruption, and more effective governance. Charity is one of the main ways people form and sustain such associations. It also allows moral concern to be expressed across lines of class, ethnicity, and nationality in ways that pure political processes sometimes cannot. A society that channels all compassion through the state risks thinning the intermediate institutions that make democracy resilient. Supporting the right to give and to organise is therefore not merely about service delivery; it is about maintaining the civic muscle that underpins free societies."
+      },
+      {
+        "claim": "Evidence-based charity can achieve high impact per dollar and often outperforms less targeted public spending.",
+        "explanation": "Not all charity is equal. A growing movement insists on rigorous evaluation, cost-effectiveness analysis, and transparent reporting. Organisations that adopt these standards have demonstrated that certain interventions—such as specific health treatments, cash transfers, or educational programmes—can produce very large benefits relative to their cost. In global health, for example, philanthropic and charitable funding has driven dramatic reductions in deaths from malaria, measles, and other diseases at a fraction of the cost of many domestic public programmes in rich countries. Effective altruism and similar approaches explicitly prioritise the highest-impact opportunities. While the average charity may be imperfect, the best ones set a benchmark for efficiency that public systems can learn from. The appropriate response to variable quality is better information and higher standards, not the wholesale rejection of voluntary action."
+      },
+      {
+        "claim": "Charity respects individual moral agency and the diversity of human motivation.",
+        "explanation": "People give for many reasons: religious duty, personal experience of suffering, local attachment, or universal humanitarian concern. A system that treats all redistribution as a matter of compulsory taxation alone flattens these motivations and reduces the space for personal ethical expression. Charity allows individuals to direct resources according to their own considered priorities and to form direct relationships with causes and communities. This plurality is valuable in itself. It also produces a more resilient support ecosystem: when one source of funding falters, others can continue. Moreover, the experience of choosing to help and seeing the results can deepen a person’s long-term commitment to social improvement. Reducing all assistance to state mechanisms risks creating a thinner, less personally meaningful form of solidarity."
+      },
+      {
+        "claim": "In weak or corrupt states, charity is frequently the most reliable channel for assistance.",
+        "explanation": "Not every government has the capacity or integrity to deliver services effectively. In fragile states, conflict zones, or highly corrupt environments, public systems may be absent, predatory, or captured by elites. In such contexts, international and local charities often provide the bulk of basic healthcare, education, and emergency relief. Withdrawing or disparaging that assistance on the grounds that only the state should act would leave populations without alternatives. Even in more functional countries, local voluntary groups can operate in spaces where official presence is thin. The existence of flawed governance is not an argument against charity; it is often the strongest argument for maintaining independent channels of support. The long-term goal remains stronger public institutions, but the short- and medium-term reality requires pragmatic use of every effective tool available."
+      },
+      {
+        "claim": "Charitable organisations can maintain focus and continuity that electoral politics often cannot.",
+        "explanation": "Democratic governments face short electoral cycles, shifting coalitions, and competing priorities. Programmes that serve unpopular or low-visibility groups can be cut or neglected when political attention moves elsewhere. Independent charities, by contrast, can sustain commitment to a particular cause for decades. Hospice care, support for orphans, conservation of specific ecosystems, and advocacy for neglected diseases have all benefited from this organisational persistence. Endowments and loyal donor bases allow work to continue through changes of government. This continuity is a form of institutional memory and moral consistency that complements the more volatile energy of politics. A healthy social architecture includes both responsive public authority and independent organisations capable of long-haul dedication."
+      },
+      {
+        "claim": "Rejecting charity in favour of pure systemic reform ignores the timeline of human need.",
+        "explanation": "Structural change—raising wages, reforming housing markets, building universal services—takes years or decades. People who are hungry, homeless, or sick today cannot suspend their needs until those reforms are complete. Charity operates on a different clock. It can respond to the person in front of us while the slower work of politics continues. Presenting the two as mutually exclusive forces a false choice. In practice, most societies that have reduced poverty substantially have used both tools: improved public systems and a vigorous voluntary sector. The historical record does not show that countries advanced by first abolishing charity and then perfecting the state. They advanced by expanding both the capacity of government and the willingness of citizens to act. Moral seriousness requires attending to both the urgent and the structural, not sacrificing one to an idealised vision of the other."
+      },
+      {
+        "claim": "A culture that values charity cultivates habits of attention, responsibility, and care that benefit society beyond measured outputs.",
+        "explanation": "The practice of noticing need and responding to it shapes character and community norms. Children who grow up seeing parents give time or money learn that the suffering of others is their concern. Neighbours who organise mutual aid build relationships that later support them in their own crises. These cultural effects are difficult to quantify but appear in higher levels of trust, lower social isolation, and greater readiness to cooperate. Societies that treat all assistance as a purely technical function of the state risk thinning these informal moral resources. Charity, at its best, keeps the reality of other people’s lives visible and actionable for ordinary citizens. That visibility and the habits it forms are themselves a public good. Dismantling or disparaging the charitable impulse therefore carries cultural costs that a narrow focus on efficiency and systems can easily overlook."
+      }
+    ]
+  }
+}

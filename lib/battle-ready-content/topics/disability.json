@@ -1,0 +1,407 @@
+{
+  "motion": "Disability is primarily caused by social barriers rather than by individual impairments.",
+  "for": {
+    "vocab": [
+      {
+        "term": "social barriers",
+        "definition": "The physical, attitudinal and institutional obstacles that prevent people with impairments from participating fully in society.",
+        "example": "Inaccessible buildings and discriminatory hiring practices are social barriers that turn impairment into disability."
+      },
+      {
+        "term": "ableism",
+        "definition": "Prejudice and discrimination that devalue people with disabilities and assume non-disabled bodies and minds as the only normal standard.",
+        "example": "Ableism appears when workplaces design jobs exclusively around non-disabled employees and then call the result neutral."
+      },
+      {
+        "term": "inclusive design",
+        "definition": "The deliberate creation of products, environments and systems that can be used by the widest possible range of people without special adaptation.",
+        "example": "Inclusive design turns a ramp or captioned video into a benefit for everyone rather than a special concession."
+      },
+      {
+        "term": "systemic exclusion",
+        "definition": "The organised and repeated ways in which institutions shut people with disabilities out of education, work and public life.",
+        "example": "Systemic exclusion is visible when public transport, websites and job interviews remain inaccessible by default."
+      },
+      {
+        "term": "lived experience",
+        "definition": "The direct, personal knowledge that people with disabilities possess about their own lives and the barriers they face.",
+        "example": "Policy made without lived experience repeatedly produces solutions that look good on paper but fail in practice."
+      },
+      {
+        "term": "universal access",
+        "definition": "The principle that every public space, service and opportunity should be usable by people with a full range of physical and mental abilities.",
+        "example": "Universal access is not an optional extra; it is the basic condition of equal citizenship."
+      },
+      {
+        "term": "empowerment",
+        "definition": "The process of giving people with disabilities real control over their own lives, decisions and representation.",
+        "example": "True empowerment means disabled people lead the organisations and policies that affect them rather than being spoken for."
+      },
+      {
+        "term": "attitudinal barriers",
+        "definition": "Negative assumptions, pity, fear or low expectations that limit opportunities more powerfully than physical obstacles.",
+        "example": "Attitudinal barriers often prevent qualified candidates from being hired long before any physical workplace issue arises."
+      },
+      {
+        "term": "reasonable adjustment",
+        "definition": "A practical change to a job, service or environment that removes a disadvantage without imposing disproportionate burden.",
+        "example": "Providing flexible hours or screen-reading software is a reasonable adjustment that enables equal participation."
+      },
+      {
+        "term": "disability rights",
+        "definition": "The recognition that people with disabilities hold the same civil and human rights as everyone else and must be able to exercise them.",
+        "example": "Disability rights demand that accessibility is treated as a legal entitlement, not a charitable favour."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "Impairment is a bodily fact; disability is what society chooses to make of it.",
+        "examples": [
+          "A person may have limited mobility, yet impairment is a bodily fact; disability is what society chooses to make of it when buildings have no ramps.",
+          "We must stop confusing the two: impairment is a bodily fact; disability is what society chooses to make of it through exclusionary design.",
+          "Medical conditions exist, but impairment is a bodily fact; disability is what society chooses to make of it by refusing to adapt."
+        ]
+      },
+      {
+        "phrase": "The problem is not the wheelchair; the problem is the staircase.",
+        "examples": [
+          "When a student cannot enter a lecture hall, the problem is not the wheelchair; the problem is the staircase.",
+          "Employers who focus only on the body miss the point: the problem is not the wheelchair; the problem is the staircase – and the attitude behind it.",
+          "Public policy still treats the individual as broken; we should remember that the problem is not the wheelchair; the problem is the staircase."
+        ]
+      },
+      {
+        "phrase": "Exclusion is a political choice, not an inevitable consequence of impairment.",
+        "examples": [
+          "Inaccessible websites and transport systems prove that exclusion is a political choice, not an inevitable consequence of impairment.",
+          "History shows periods of greater and lesser inclusion; exclusion is a political choice, not an inevitable consequence of impairment.",
+          "When resources exist for stadiums and highways but not for access, exclusion is a political choice, not an inevitable consequence of impairment."
+        ]
+      },
+      {
+        "phrase": "Nothing about us without us.",
+        "examples": [
+          "Disability policy must follow the principle nothing about us without us; otherwise it reproduces the very exclusion it claims to solve.",
+          "Committees that decide on access without disabled members violate the basic rule: nothing about us without us.",
+          "Research, design and law-making all fail when they ignore the demand nothing about us without us."
+        ]
+      },
+      {
+        "phrase": "Accessibility is not a special favour; it is the foundation of equal citizenship.",
+        "examples": [
+          "Ramps, captions and flexible working are not charity; accessibility is not a special favour; it is the foundation of equal citizenship.",
+          "When governments treat access as optional, they forget that accessibility is not a special favour; it is the foundation of equal citizenship.",
+          "A society that withholds access while claiming equality has not understood that accessibility is not a special favour; it is the foundation of equal citizenship."
+        ]
+      },
+      {
+        "phrase": "Society disables people more effectively than any impairment.",
+        "examples": [
+          "Low expectations, inaccessible environments and discriminatory attitudes mean that society disables people more effectively than any impairment.",
+          "A talented person refused interviews because of assumptions shows that society disables people more effectively than any impairment.",
+          "We spend billions treating bodies while leaving barriers untouched; in that sense society disables people more effectively than any impairment."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "level the playing field",
+        "definition": "To remove unfair disadvantages so that everyone has a genuine chance to compete and participate.",
+        "examples": [
+          "Reasonable adjustments exist to level the playing field, not to give anyone an unfair advantage.",
+          "Inclusive education aims to level the playing field so that disabled students are judged on ability rather than barriers.",
+          "Until we level the playing field in employment, claims of equal opportunity remain empty."
+        ]
+      },
+      {
+        "idiom": "open doors",
+        "definition": "To create real opportunities for participation that were previously closed.",
+        "examples": [
+          "Anti-discrimination law and accessible design open doors that pity and charity never could.",
+          "When public transport becomes usable, it opens doors to work, education and social life.",
+          "The goal of disability rights is to open doors rather than to manage exclusion more politely."
+        ]
+      },
+      {
+        "idiom": "break down barriers",
+        "definition": "To remove the obstacles that prevent full participation.",
+        "examples": [
+          "Activists work to break down barriers in architecture, employment and public attitudes.",
+          "Technology can help break down barriers, but only if it is designed with disabled users from the start.",
+          "Legal rights mean little unless we also break down barriers in everyday practice."
+        ]
+      },
+      {
+        "idiom": "nothing about us without us",
+        "definition": "The demand that disabled people must be central to decisions that affect their lives.",
+        "examples": [
+          "The slogan nothing about us without us rejects policies designed by non-disabled experts alone.",
+          "Research that ignores the principle nothing about us without us often produces irrelevant or harmful results.",
+          "True inclusion begins when organisations adopt nothing about us without us as standard practice."
+        ]
+      },
+      {
+        "idiom": "a seat at the table",
+        "definition": "Meaningful participation in decision-making rather than token presence.",
+        "examples": [
+          "Disabled people need a seat at the table when transport, education and healthcare are planned.",
+          "Token representation is not enough; a real seat at the table means power to shape outcomes.",
+          "Without a seat at the table, accessibility remains an afterthought rather than a starting point."
+        ]
+      },
+      {
+        "idiom": "the social model",
+        "definition": "The understanding that disability is created by society’s failure to accommodate impairment.",
+        "examples": [
+          "The social model shifts attention from curing individuals to changing environments and attitudes.",
+          "Policy guided by the social model invests in access rather than only in medical treatment.",
+          "Critics of the social model often misrepresent it as denying the reality of impairment."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "Most of the restrictions disabled people face are created by human decisions, not by their bodies.",
+        "explanation": "A person who uses a wheelchair is not prevented from entering a building by their legs; they are prevented by the decision to install stairs instead of a ramp or lift. A deaf person is not excluded from a meeting by their ears; they are excluded by the failure to provide interpreters or captions. These are design and policy choices. Across education, employment, transport and public services, the pattern repeats: environments and systems are built for a narrow range of bodies and minds, and then the resulting exclusion is blamed on the individual. Historical evidence supports this view. When societies have chosen to invest in access – through legislation such as the Americans with Disabilities Act or the UK Equality Act – participation rates rise sharply without any change in the underlying impairments. The impairment remains; the disability shrinks. This demonstrates that the primary cause of limited participation is the barrier, not the body. Treating disability as an individual medical tragedy therefore misdiagnoses the problem and directs resources away from the changes that actually expand freedom."
+      },
+      {
+        "claim": "The social model has produced concrete improvements in rights and daily life that the medical model alone never achieved.",
+        "explanation": "For most of modern history disability was framed almost exclusively as a medical problem to be cured, managed or hidden. That approach produced asylums, segregated schools and a culture of pity, but it did not produce equal citizenship. The shift toward a social understanding – driven by disabled activists – led to anti-discrimination laws, accessible design standards, independent living movements and the demand for mainstream participation. In countries that adopted strong rights frameworks, employment rates, educational attainment and public visibility of disabled people increased. Curb cuts, originally demanded by wheelchair users, now benefit parents with pushchairs, delivery workers and travellers with luggage. Captioning serves deaf people and also anyone in a noisy environment. These gains came from treating barriers as the target, not from waiting for medical cures that may never arrive for many conditions. The medical model remains essential for healthcare, but it is insufficient as a complete account of disability. The social model supplied the missing political analysis that turned private misfortune into a public justice issue."
+      },
+      {
+        "claim": "Attitudinal barriers often restrict opportunity more powerfully than physical impairments.",
+        "explanation": "Research and countless personal accounts show that low expectations, stereotypes and discomfort among non-disabled people frequently close doors before any physical obstacle appears. Employers may assume a candidate with a visible impairment cannot perform, even when the job is entirely suitable. Teachers may steer disabled students away from ambitious subjects. Strangers may speak to a companion instead of the disabled person. These attitudes produce real economic and social harm. Studies of hiring discrimination reveal that identical CVs receive fewer callbacks when disability is disclosed. The impairment itself has not changed; the social response has created the disadvantage. Changing attitudes through education, contact and strong legal standards therefore removes a major source of disability. Focusing solely on medical treatment leaves this powerful mechanism untouched. A society that continues to view disabled people through a lens of tragedy or inspiration will keep reproducing exclusion even after buildings are made accessible."
+      },
+      {
+        "claim": "Inclusive design and reasonable adjustments are efficient and benefit far more people than their original target group.",
+        "explanation": "Opponents sometimes claim that accessibility is an expensive special measure for a small minority. Evidence shows the opposite. Features introduced for disabled users – step-free access, clear signage, adjustable interfaces, flexible working – routinely improve usability for older people, temporary injury sufferers, parents, and anyone navigating complex environments. The economic case is also strong: enabling disabled people to work, study and consume expands the tax base and reduces long-term dependency costs. Companies that adopt inclusive design often discover wider markets. Public investment in access therefore functions as infrastructure rather than charity. The alternative – maintaining exclusionary systems and then funding segregated services – is frequently more expensive and less effective. When the built environment and digital systems are designed from the start for the full range of human variation, the marginal cost of inclusion falls dramatically. Treating accessibility as an optional extra is both unjust and economically short-sighted."
+      },
+      {
+        "claim": "Segregated provision, however well-intentioned, reinforces the idea that disabled people do not belong in ordinary society.",
+        "explanation": "Special schools, sheltered workshops and separate transport systems can provide important short-term support, yet they also communicate that disabled people are fundamentally different and cannot share mainstream spaces. Children educated entirely apart from their non-disabled peers often leave school with weaker social networks and lower expectations of ordinary adult life. Adults confined to segregated employment earn less and have fewer pathways into open labour markets. The social model does not deny that some individuals need intensive support; it insists that the default should be inclusion with adjustments, not separation. Countries and districts that have moved toward inclusive education with proper resourcing have demonstrated that most disabled students can learn alongside their peers when barriers are addressed. The goal is not to pretend impairments do not exist, but to refuse the assumption that impairment automatically requires removal from ordinary community life. Segregation may feel safer to some administrators, yet it perpetuates the very isolation that the disability rights movement set out to end."
+      },
+      {
+        "claim": "Disabled people are the experts on their own lives; policy made without them repeatedly fails.",
+        "explanation": "For decades non-disabled professionals designed services, buildings and laws for disabled people with limited consultation. The results were frequently impractical or actively harmful: institutions that prioritised administrative convenience over dignity, technologies that ignored real user needs, and programmes that treated disabled people as passive recipients rather than citizens. The demand “nothing about us without us” arose from this repeated failure. When disabled people lead or co-design policy, the outcomes improve because the analysis starts from actual barriers rather than assumed deficits. User-led organisations have driven advances in independent living, personal budgets and accessible technology precisely because they possess knowledge that external experts lack. Ignoring lived experience is not neutral; it is a form of epistemic injustice that keeps ineffective systems in place. Genuine progress requires that disabled people hold decision-making power over the issues that shape their daily existence."
+      },
+      {
+        "claim": "Framing disability as individual tragedy justifies lower expectations and reduced investment in equality.",
+        "explanation": "When disability is understood primarily as personal misfortune, society feels pity rather than obligation. Pity produces charity, segregated care and the idea that ordinary rights are somehow optional. The social model replaces pity with justice. It asserts that disabled people are entitled to the same opportunities as others and that barriers preventing those opportunities are a collective responsibility. This shift changes political priorities: instead of asking how much help the disabled need, it asks how much exclusion society is prepared to tolerate. Countries that have adopted rights-based approaches show higher participation and stronger legal protections. The tragedy model, by contrast, tends to naturalise disadvantage and to treat any improvement as generous rather than required. Changing the frame is therefore not semantic; it determines whether accessibility is treated as a core public good or as a discretionary expense."
+      },
+      {
+        "claim": "Many impairments are permanent or progressive; waiting for medical cures abandons people to unnecessary restriction.",
+        "explanation": "Significant numbers of disabled people live with conditions that current medicine cannot eliminate – certain forms of paralysis, sensory loss, neurodivergence, chronic illness. A purely medical approach offers them management at best and leaves the social consequences unaddressed. Meanwhile the barriers that convert those impairments into full disability – inaccessible housing, discriminatory employers, exclusionary education – can be reduced or removed with existing knowledge and resources. Prioritising cure over access means that people spend years or decades excluded while research continues. The social model does not oppose medical research; it refuses to make equal participation conditional on future scientific breakthroughs. Immediate improvements in design, law and attitude deliver freedom now. A just society does not ask its disabled citizens to wait indefinitely for their bodies to become acceptable before it will admit them to ordinary life."
+      },
+      {
+        "claim": "Intersection with poverty, gender and race shows that disability is amplified by other social structures.",
+        "explanation": "Disabled people are disproportionately poor, and poverty itself creates and worsens impairment through poor nutrition, dangerous work and limited healthcare. Women with disabilities face higher rates of violence and lower employment. Racialised disabled people encounter compounded discrimination. These patterns reveal that disability cannot be isolated as a purely biological fact; it interacts with economic and social hierarchies. Addressing only the individual body leaves the amplifying structures intact. Anti-poverty measures, accessible public services and anti-discrimination enforcement therefore form part of disability policy. The social model makes these connections visible, whereas a narrow medical focus tends to treat each case as an isolated personal problem. Understanding disability as socially produced opens the way to broader structural reforms that reduce both impairment and the disadvantage attached to it."
+      },
+      {
+        "claim": "A society judged by how it treats its disabled members cannot claim equality while maintaining systematic barriers.",
+        "explanation": "Legal equality and human rights commitments are empty if large numbers of citizens are excluded from transport, education, work and public space by design. The continued existence of widespread barriers demonstrates that disability remains a site of second-class status. Removing those barriers is not an act of kindness toward a minority; it is the fulfilment of the promise of equal citizenship. Cities, workplaces and digital platforms that remain inaccessible send a clear message about who is considered a full member of the community. The social model provides the intellectual foundation for treating that message as unacceptable. It insists that the measure of a society is not how much charity it offers the disabled, but how completely it enables them to participate without having to ask permission. Until barriers fall, claims of justice remain incomplete."
+      }
+    ]
+  },
+  "against": {
+    "vocab": [
+      {
+        "term": "inherent impairment",
+        "definition": "A real, objective limitation in body or mind that exists independently of social arrangements.",
+        "example": "No amount of inclusive design can eliminate the inherent impairment of total blindness or profound intellectual disability."
+      },
+      {
+        "term": "biological reality",
+        "definition": "The factual constraints imposed by physiology, neurology or genetics that no social change can fully erase.",
+        "example": "Policy must respect biological reality rather than pretend that every limitation is merely a removable barrier."
+      },
+      {
+        "term": "medical necessity",
+        "definition": "The genuine need for diagnosis, treatment, therapy or specialised care that addresses the impairment itself.",
+        "example": "Focusing only on social barriers risks neglecting medical necessity and leaving treatable conditions unmanaged."
+      },
+      {
+        "term": "realistic limitations",
+        "definition": "The practical boundaries on activity that remain even after reasonable adjustments have been made.",
+        "example": "Acknowledging realistic limitations is not prejudice; it is the basis for honest planning and appropriate support."
+      },
+      {
+        "term": "specialised support",
+        "definition": "Targeted services, equipment or environments designed for particular impairments that mainstream settings cannot adequately provide.",
+        "example": "Some students require specialised support in smaller settings if they are to make genuine educational progress."
+      },
+      {
+        "term": "resource allocation",
+        "definition": "The necessary prioritisation of limited public funds among competing needs, including intensive disability services.",
+        "example": "Claims of unlimited access ignore the hard problem of resource allocation in healthcare and education budgets."
+      },
+      {
+        "term": "individual variation",
+        "definition": "The wide differences in type and severity of impairment that make uniform social solutions insufficient.",
+        "example": "Individual variation means that what works for one disabled person may be irrelevant or harmful for another."
+      },
+      {
+        "term": "clinical evidence",
+        "definition": "Knowledge derived from medical research and practice about the nature, progression and management of impairments.",
+        "example": "Ignoring clinical evidence in favour of pure social theory can lead to policies that fail the people they claim to help."
+      },
+      {
+        "term": "dependency needs",
+        "definition": "The ongoing requirement for personal assistance or supervision that some impairments create regardless of environmental design.",
+        "example": "Severe cognitive or physical impairments produce dependency needs that social change alone cannot remove."
+      },
+      {
+        "term": "therapeutic intervention",
+        "definition": "Medical, surgical, pharmaceutical or rehabilitative action aimed at reducing the impairment or its effects.",
+        "example": "For many conditions, timely therapeutic intervention remains the most direct route to greater independence."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "Impairment is not a social construct; it is a biological and medical fact.",
+        "examples": [
+          "No redesign of society will restore sight to the blind or mobility to the paralysed; impairment is not a social construct; it is a biological and medical fact.",
+          "We can and should remove barriers, yet impairment is not a social construct; it is a biological and medical fact that demands honest recognition.",
+          "Pretending otherwise leads to policy failure: impairment is not a social construct; it is a biological and medical fact."
+        ]
+      },
+      {
+        "phrase": "Some limitations cannot be designed away.",
+        "examples": [
+          "A person with profound intellectual disability will still need lifelong support; some limitations cannot be designed away.",
+          "Inclusive rhetoric is valuable, but some limitations cannot be designed away and must be met with specialised provision.",
+          "Honesty requires us to admit that some limitations cannot be designed away no matter how progressive our attitudes become."
+        ]
+      },
+      {
+        "phrase": "The medical model remains essential because many impairments require treatment, not just access.",
+        "examples": [
+          "Pain, progressive disease and treatable conditions show that the medical model remains essential because many impairments require treatment, not just access.",
+          "Ignoring clinical care in the name of social theory is dangerous; the medical model remains essential because many impairments require treatment, not just access.",
+          "Rights and ramps matter, yet the medical model remains essential because many impairments require treatment, not just access."
+        ]
+      },
+      {
+        "phrase": "Equal opportunity does not mean identical outcomes when abilities differ.",
+        "examples": [
+          "We should remove unfair barriers, but equal opportunity does not mean identical outcomes when abilities differ.",
+          "Expecting every workplace to accommodate every possible impairment equally misunderstands that equal opportunity does not mean identical outcomes when abilities differ.",
+          "Justice requires fairness, not the denial of difference: equal opportunity does not mean identical outcomes when abilities differ."
+        ]
+      },
+      {
+        "phrase": "Specialised provision is sometimes the most respectful and effective response.",
+        "examples": [
+          "For certain severe impairments, specialised provision is sometimes the most respectful and effective response rather than forced inclusion.",
+          "Parents and clinicians often know that specialised provision is sometimes the most respectful and effective response for their child.",
+          "Ideology should not override evidence that specialised provision is sometimes the most respectful and effective response."
+        ]
+      },
+      {
+        "phrase": "Denying the reality of impairment helps no one and harms those who need targeted help.",
+        "examples": [
+          "When policy refuses to name real limitations, denying the reality of impairment helps no one and harms those who need targeted help.",
+          "Resources are misdirected when we pretend every problem is social; denying the reality of impairment helps no one and harms those who need targeted help.",
+          "Compassion begins with truth: denying the reality of impairment helps no one and harms those who need targeted help."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "face the facts",
+        "definition": "To accept uncomfortable realities rather than wish them away.",
+        "examples": [
+          "Effective disability policy must face the facts about the range and severity of impairments.",
+          "Idealistic models that ignore clinical reality refuse to face the facts that families and doctors confront daily.",
+          "Progress requires us to face the facts instead of redesigning language while leaving needs unmet."
+        ]
+      },
+      {
+        "idiom": "one size does not fit all",
+        "definition": "A single solution cannot meet the needs of every individual when differences are large.",
+        "examples": [
+          "Inclusive mainstreaming sounds fair, yet one size does not fit all when impairments vary enormously.",
+          "What helps a person with mild dyslexia may be useless for someone with advanced motor neurone disease; one size does not fit all.",
+          "Policy that insists on uniform inclusion forgets that one size does not fit all."
+        ]
+      },
+      {
+        "idiom": "the elephant in the room",
+        "definition": "An obvious problem that people prefer not to discuss.",
+        "examples": [
+          "The severity of some impairments is the elephant in the room that pure social-model rhetoric avoids.",
+          "Discussions of disability rights sometimes leave the elephant in the room – the existence of profound, permanent limitation – unaddressed.",
+          "Honest debate requires naming the elephant in the room rather than redesigning society around an incomplete picture."
+        ]
+      },
+      {
+        "idiom": "throw the baby out with the bathwater",
+        "definition": "To reject something valuable while discarding what is unwanted.",
+        "examples": [
+          "Rejecting all medical approaches in favour of pure social theory risks throwing the baby out with the bathwater.",
+          "Specialised schools have flaws, but abolishing them entirely may throw the baby out with the bathwater for students who thrive there.",
+          "We can criticise over-medicalisation without throwing the baby out with the bathwater of clinical knowledge."
+        ]
+      },
+      {
+        "idiom": "in the real world",
+        "definition": "In practical, everyday conditions rather than in ideal theory.",
+        "examples": [
+          "In the real world, some jobs cannot be performed by people with certain impairments no matter how many adjustments are made.",
+          "Theoretical inclusion collides with resource limits in the real world of public budgets.",
+          "Families dealing with severe disability live in the real world, not in abstract models of barrier-free society."
+        ]
+      },
+      {
+        "idiom": "a matter of degree",
+        "definition": "Something that varies in intensity and cannot be treated as an all-or-nothing category.",
+        "examples": [
+          "Disability is a matter of degree; mild and profound impairments raise entirely different practical questions.",
+          "Treating every impairment as equally social ignores that severity is a matter of degree.",
+          "Policy must recognise that support needs are a matter of degree rather than a uniform social status."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "Many impairments impose objective functional limits that no social arrangement can eliminate.",
+        "explanation": "A person with complete tetraplegia cannot walk, regardless of ramps or attitudes. A person with profound intellectual disability cannot master complex academic material or live without continuous supervision, no matter how inclusive the environment. These are not failures of society; they are consequences of biology and neurology. The social model correctly identifies removable barriers, yet it overreaches when it implies that disability is only or primarily social. For a significant minority of disabled people the impairment itself is the dominant source of restriction. Denying this reality leads to policies that promise inclusion while leaving intense support needs unmet. Honest assessment requires holding two truths together: many barriers are unjust and should be removed, and some limitations are inherent and must be met with appropriate specialised care rather than with the claim that society alone created the problem."
+      },
+      {
+        "claim": "The medical model remains indispensable for diagnosis, treatment and the reduction of impairment itself.",
+        "explanation": "Conditions such as epilepsy, diabetes, rheumatoid arthritis, certain mental illnesses and progressive neurological diseases respond to medical intervention. Early diagnosis, medication, surgery and rehabilitation can dramatically reduce the level of impairment and the disability that follows. A purely social approach that treats the body as secondary risks delaying or neglecting these interventions. Historical advances in disability outcomes – the near-elimination of polio paralysis in many countries, improved survival and function after spinal injury, better management of chronic conditions – came primarily from medical progress, not from social redesign alone. Social change and medical care are complementary. Elevating the social model to the exclusion of clinical knowledge abandons people who could benefit from treatment and research. A complete response to disability must retain a strong medical component alongside efforts to remove unjust barriers."
+      },
+      {
+        "claim": "Severe impairments create genuine dependency needs that inclusive rhetoric cannot dissolve.",
+        "explanation": "Some individuals require continuous personal care, specialised equipment, or protected environments for safety and dignity. These needs arise from the impairment, not from social failure. Personal assistants, residential support and highly adapted settings are expensive and labour-intensive. Pretending that better attitudes or universal design will make such provision unnecessary misleads families and policymakers. Resource decisions must recognise that a minority of disabled people will always need intensive, individualised support. Framing every unmet need as evidence of social oppression can produce guilt and unrealistic expectations rather than practical solutions. Compassion requires accurate assessment of dependency. Society should fund high-quality support; it should not claim that the need for that support is itself a removable social construct."
+      },
+      {
+        "claim": "Forced inclusion without adequate resources can harm the very people it claims to help.",
+        "explanation": "Inclusive education and mainstream employment are valuable goals when properly resourced. When they are implemented as ideology without sufficient staffing, training or specialist input, disabled students and workers can experience isolation, academic failure, bullying or unsafe conditions. Evidence from several education systems shows that poorly supported mainstreaming leads some pupils to lose the targeted teaching they previously received in specialised settings. Parents of children with complex needs frequently report that their children thrived in smaller, expert environments and struggled when those were closed in the name of inclusion. The same pattern appears in employment: placing someone in an unsuitable role without real adjustment produces frustration and exit rather than empowerment. Inclusion is not automatically beneficial; it is beneficial when the necessary support travels with the person. Policy that prioritises the symbol of inclusion over the substance of effective provision fails its intended beneficiaries."
+      },
+      {
+        "claim": "Individual variation in impairment is so great that uniform social solutions are insufficient.",
+        "explanation": "Disability is not a single condition. It ranges from mild dyslexia to locked-in syndrome, from corrected vision impairment to profound multiple disabilities. What constitutes a barrier, a reasonable adjustment, or an appropriate environment differs radically across this spectrum. A policy designed around wheelchair access does little for a person with severe autism and sensory processing differences. A workplace adjustment that helps one employee may be irrelevant or disruptive for another. The social model’s emphasis on common barriers is useful for visible physical access, yet it understates the diversity of need. Effective responses must remain highly individualised. Over-generalising from the experience of one group of disabled people to all others produces both under-provision for some and inappropriate pressure on others. Recognition of individual variation is not a retreat from rights; it is a requirement of competent support."
+      },
+      {
+        "claim": "Public resources are finite; prioritising unlimited access claims can divert funds from intensive clinical and support services.",
+        "explanation": "Every society faces budget constraints in healthcare, education and social care. Demands for comprehensive accessibility across all buildings, digital systems and services compete with the funding required for specialised therapies, residential care, medical research and personal assistance. Both are legitimate. Treating accessibility as an absolute right with no cost consideration can squeeze the specialised services that the most severely impaired people rely upon. Trade-offs are unavoidable. Transparent discussion of resource allocation is more honest than the assertion that all barriers can be removed without limit. A balanced approach invests in both barrier removal and high-quality targeted support, recognising that the latter remains essential for those whose impairments create ongoing high needs. Ignoring scarcity does not make scarcity disappear; it simply shifts the burden onto the most dependent."
+      },
+      {
+        "claim": "Some occupations and activities have genuine, non-negotiable requirements that certain impairments prevent.",
+        "explanation": "Not every job can be performed by every body or mind. Pilots require specific visual and cognitive capacities; firefighters need physical strength and speed; surgeons need fine motor control and sustained concentration. Reasonable adjustments have limits. Declaring that all exclusion is purely social ignores these functional realities and can endanger both the individual and the public. Anti-discrimination law already recognises genuine occupational requirements. Expanding the claim that disability is only social pressure risks eroding that necessary distinction. Society can and should open every role that can be performed with adjustment; it cannot abolish the underlying requirements of safety-critical or highly skilled work. Acknowledging this boundary is not prejudice; it is realism that protects standards and prevents tokenistic placements that serve neither the disabled person nor the role."
+      },
+      {
+        "claim": "Over-emphasis on the social model can stigmatise medical treatment and specialised care as forms of oppression.",
+        "explanation": "Some activists treat any medical intervention or specialised setting as an expression of ableism. This stance can discourage people from seeking beneficial treatment or place ideological pressure on families who choose specialised education or residential support. Parents of children with severe autism or complex medical needs often report feeling judged for not pursuing full mainstream inclusion. Clinicians may hesitate to recommend interventions that are medically indicated but politically sensitive. The result is a narrowing of legitimate options. Medical care and specialised environments are not inherently oppressive; they become so only when imposed without consent or when they replace rather than complement rights to participation. A mature approach retains the full range of responses – medical, social and specialised – and allows individuals and families to choose according to their circumstances rather than according to a single theoretical model."
+      },
+      {
+        "claim": "Lived experience is valuable but not infallible; clinical and empirical evidence must also guide policy.",
+        "explanation": "Personal testimony reveals barriers and preferences that outsiders miss. It is indispensable. Yet individual experience is partial and can conflict with broader data. What one person finds empowering another finds isolating. Population-level research on educational outcomes, employment trajectories and health results provides information that no single narrative can supply. Policy that elevates lived experience to the exclusion of clinical evidence and systematic evaluation risks capturing only the most articulate or ideologically aligned voices. The most severely impaired people are often least able to participate in activist discourse; their needs can be under-represented. Good decision-making combines the insights of lived experience with medical knowledge, economic analysis and outcome data. Treating any one source as uniquely authoritative produces incomplete and sometimes harmful policy."
+      },
+      {
+        "claim": "A complete account of disability must hold both social barriers and biological impairment in view at the same time.",
+        "explanation": "The strongest versions of the social model risk becoming a new orthodoxy that denies inconvenient biological facts. The strongest versions of the medical model risk reducing people to their diagnoses and ignoring unjust exclusion. Neither extreme serves disabled people well. Impairment is real; many barriers are also real and unjust. Effective policy removes the barriers that can be removed, provides high-quality medical and supportive care for the impairments that remain, and respects individual variation in needs and preferences. Societies that achieve the best outcomes tend to do both: strong anti-discrimination and access measures alongside robust clinical services and specialised options. The debate is not resolved by declaring one model the winner. It is resolved by refusing the false choice and building systems that address the full complexity of disability – body, environment and individual life."
+      }
+    ]
+  }
+}

@@ -45,6 +45,59 @@ export interface DueSRSWord extends SRSWord {
   dueInterval: number; // which interval is being reviewed today (1|3|7|14|30)
 }
 
+// IELTS sentence structures / discourse phrases — a distinct content type
+// from vocabulary words (a pattern + gloss, not a word + translation), with
+// its own SRS bucket (see getStructuresSRS/addStructureToSRS in storage.ts)
+// so it doesn't mix into word-learning stats.
+
+// The 4 units structures are taught/practiced in — matches actual IELTS test
+// sections. Distinct from `ieltsUse` below: `ieltsUse` is a display-only list
+// of every section a structure COULD fit ("Speaking Part 1 & 3", etc.), while
+// `unit` is exactly one primary section, chosen so Learn/Flashcards/Translate
+// can be organized by unit without a structure appearing in more than one.
+export type StructureUnit = 'Speaking Part 1' | 'Speaking Part 2' | 'Speaking Part 3' | 'Writing Task 2';
+
+export interface StructureItem {
+  id: string;              // "struct-01".."struct-80", "phrase-01".."phrase-76"
+  unit: StructureUnit;     // primary unit for Learn/Flashcards/Translate grouping
+  dayNumber: number;       // 1-based sub-unit within `unit` (~5 structures per day, mirrors WordDay.dayNumber) — Learn is organized by day, Flashcards/Review stay cumulative
+  pattern: string;         // e.g. "So + adjective/adverb + that + subject + verb"
+  definition: string;      // English definition
+  scenario: string;        // A realistic IELTS-style prompt/situation this structure answers — bridges the abstract definition to actual use
+  uzTranslation: string;   // Uzbek gloss of the pattern itself
+  uzDefinition: string;    // Uzbek explanation of when/why to use it (translates `definition`, not `pattern`)
+  ieltsUse: string[];      // e.g. ["Writing Task 2", "Speaking Part 3"] — display tags, see note above
+  examples: string[];      // 1-2 example sentences
+  exampleTranslations: string[]; // Uzbek translation for each entry in `examples`, same order/length
+}
+
+// A pre-written Uzbek sentence the learner translates into English themselves
+// (in a plain textarea, never sent anywhere) and then self-checks against
+// `en` — the app does not grade these. Served a few at a time per unit via
+// getNextSentenceBatch in storage.ts, continuing where the learner left off.
+export interface TranslationSentence {
+  id: string;
+  unit: StructureUnit;
+  uz: string;
+  en: string;             // model answer, reveal-only
+  structureId?: string;   // STRUCTURES id this sentence is built to practice, for an optional "uses: <pattern>" hint after reveal
+}
+
+// Adaptive (SM-2-style) scheduling — deliberately NOT the fixed
+// 1/3/7/14/30-day ladder word SRS uses (see SRS_INTERVALS below). Research on
+// SM-2 vs. fixed schedules (and its successor FSRS) shows ease-adjusted
+// per-item intervals need ~20-30% fewer reviews for the same retention,
+// because a structure you keep nailing should space out faster than one you
+// keep missing — a shared fixed ladder can't do that per-item adaptation.
+export interface SRSStructure extends StructureItem {
+  learnedAt: string;    // "YYYY-MM-DD" — when first marked Learned
+  ease: number;         // multiplier applied to interval on a correct recall (starts 2.5, drifts 1.3-3.0)
+  interval: number;     // current interval in days
+  reps: number;         // consecutive correct recalls (resets to 0 on a miss)
+  dueDate: string;      // "YYYY-MM-DD" — next review date
+  deletedAt?: number;   // tombstone, mirrors SRSWord.deletedAt
+}
+
 export interface LearnedWord {
   word: string;
   translation: string;

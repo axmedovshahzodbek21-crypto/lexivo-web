@@ -1,0 +1,407 @@
+{
+  "motion": "This house believes that the world must prioritise a rapid transition to renewable energy over continued reliance on fossil fuels",
+  "for": {
+    "vocab": [
+      {
+        "term": "climate imperative",
+        "definition": "The urgent moral and scientific necessity to cut greenhouse gas emissions in order to avoid catastrophic global heating.",
+        "example": "The climate imperative leaves no room for further delay in replacing fossil fuels with clean alternatives."
+      },
+      {
+        "term": "carbon lock-in",
+        "definition": "The long-term commitment to high emissions created by investing in new fossil-fuel infrastructure that will operate for decades.",
+        "example": "Building new gas plants creates carbon lock-in that makes the Paris targets almost impossible to reach."
+      },
+      {
+        "term": "stranded assets",
+        "definition": "Fossil-fuel reserves and infrastructure that will lose most of their economic value as the world shifts to cleaner energy.",
+        "example": "Oil companies face trillions in stranded assets if governments finally enforce serious climate policy."
+      },
+      {
+        "term": "energy justice",
+        "definition": "The principle that the benefits of clean energy and the burdens of the transition should be shared fairly, especially with vulnerable communities.",
+        "example": "Energy justice requires that coal-dependent regions receive real support rather than being abandoned in the transition."
+      },
+      {
+        "term": "technological tipping point",
+        "definition": "The moment when clean technologies become cheaper and more attractive than fossil alternatives, triggering rapid self-sustaining change.",
+        "example": "Solar and batteries have already passed the technological tipping point in many markets, making further fossil investment irrational."
+      },
+      {
+        "term": "existential risk",
+        "definition": "A threat capable of causing permanent and catastrophic harm to human civilisation, in this case from unchecked climate change.",
+        "example": "Continued reliance on fossil fuels elevates the existential risk of irreversible ice-sheet collapse and multi-metre sea-level rise."
+      },
+      {
+        "term": "decarbonisation pathway",
+        "definition": "A concrete, time-bound plan for eliminating carbon emissions from the energy system through clean technologies and efficiency.",
+        "example": "Every serious decarbonisation pathway shows that renewables, storage and electrification must scale at unprecedented speed."
+      },
+      {
+        "term": "intergenerational equity",
+        "definition": "The moral obligation to leave future generations a stable climate and livable planet rather than a degraded and dangerous one.",
+        "example": "Burning the remaining fossil reserves violates intergenerational equity by imposing massive costs on people not yet born."
+      },
+      {
+        "term": "clean energy abundance",
+        "definition": "The long-term prospect of plentiful, low-cost electricity and fuels once renewable systems and storage reach full scale.",
+        "example": "Countries that move first will enjoy clean energy abundance while others remain trapped in volatile fossil markets."
+      },
+      {
+        "term": "systemic transformation",
+        "definition": "Deep, structural change across energy production, transport, industry and buildings rather than marginal improvements.",
+        "example": "Incremental efficiency gains are no longer enough; only systemic transformation can deliver the required emissions cuts."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "Every year of delay locks in more irreversible damage.",
+        "examples": [
+          "Every year of delay locks in more irreversible damage to ice sheets, forests and coral reefs that no future technology can restore.",
+          "Every year of delay locks in more irreversible damage and raises the ultimate cost of the transition we know we must make.",
+          "Every year of delay locks in more irreversible damage; the science is unequivocal that the window is closing."
+        ]
+      },
+      {
+        "phrase": "Fossil fuels are a 19th-century solution to a 21st-century crisis.",
+        "examples": [
+          "Fossil fuels are a 19th-century solution to a 21st-century crisis and cannot form the foundation of a stable future.",
+          "Fossil fuels are a 19th-century solution to a 21st-century crisis; clinging to them is technological and moral nostalgia.",
+          "Fossil fuels are a 19th-century solution to a 21st-century crisis that smarter societies are already leaving behind."
+        ]
+      },
+      {
+        "phrase": "The cost of inaction far exceeds the cost of transition.",
+        "examples": [
+          "The cost of inaction far exceeds the cost of transition when measured in lives, livelihoods and permanent loss of natural capital.",
+          "The cost of inaction far exceeds the cost of transition; every major economic analysis now reaches the same conclusion.",
+          "The cost of inaction far exceeds the cost of transition, yet political short-termism continues to ignore the arithmetic."
+        ]
+      },
+      {
+        "phrase": "Renewables are no longer the alternative; they are the new baseline.",
+        "examples": [
+          "Renewables are no longer the alternative; they are the new baseline against which every other energy choice must be judged.",
+          "Renewables are no longer the alternative; they are the new baseline in a growing number of markets where they undercut fossil generation.",
+          "Renewables are no longer the alternative; they are the new baseline, and policy should accelerate rather than slow that reality."
+        ]
+      },
+      {
+        "phrase": "We do not have the luxury of a gradual transition on a finite planet.",
+        "examples": [
+          "We do not have the luxury of a gradual transition on a finite planet whose carbon budget is already almost exhausted.",
+          "We do not have the luxury of a gradual transition on a finite planet; the physics of the climate system is not negotiable.",
+          "We do not have the luxury of a gradual transition on a finite planet, and pretending otherwise is the most dangerous form of complacency."
+        ]
+      },
+      {
+        "phrase": "Energy security in the 21st century means security from fossil volatility and climate chaos.",
+        "examples": [
+          "Energy security in the 21st century means security from fossil volatility and climate chaos, not dependence on petro-states.",
+          "Energy security in the 21st century means security from fossil volatility and climate chaos; renewables deliver both.",
+          "Energy security in the 21st century means security from fossil volatility and climate chaos, which is why the old definition is obsolete."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "rearranging deckchairs on the Titanic",
+        "definition": "Making trivial adjustments while ignoring an approaching catastrophe.",
+        "examples": [
+          "Expanding gas as a ‘bridge’ while the climate crisis accelerates is rearranging deckchairs on the Titanic.",
+          "Minor efficiency improvements without rapid fossil phase-out amount to rearranging deckchairs on the Titanic.",
+          "Political debates that focus only on short-term prices while emissions keep rising are rearranging deckchairs on the Titanic."
+        ]
+      },
+      {
+        "idiom": "burning the furniture to heat the house",
+        "definition": "Using up irreplaceable long-term assets for short-term comfort.",
+        "examples": [
+          "Continuing to burn remaining fossil reserves is burning the furniture to heat the house at the expense of future generations.",
+          "Societies that prioritise cheap fossil energy today are burning the furniture to heat the house and will face the consequences tomorrow.",
+          "Treating the atmosphere as an open sewer is the ultimate form of burning the furniture to heat the house."
+        ]
+      },
+      {
+        "idiom": "a one-way ticket",
+        "definition": "A course of action that leads to irreversible consequences with no practical return path.",
+        "examples": [
+          "Crossing major climate tipping points is a one-way ticket to a permanently altered planet.",
+          "New long-lived fossil infrastructure is a one-way ticket to either stranded assets or catastrophic emissions.",
+          "We are still selling ourselves a one-way ticket to dangerous warming by delaying the renewable transition."
+        ]
+      },
+      {
+        "idiom": "the window is closing",
+        "definition": "The rapidly shrinking period during which effective action is still possible.",
+        "examples": [
+          "Scientists have been clear for years that the window is closing on the chance to limit warming to 1.5 degrees.",
+          "Every major report repeats the same warning: the window is closing and incrementalism will not be enough.",
+          "Acting as if we have decades when the window is closing is the definition of political failure."
+        ]
+      },
+      {
+        "idiom": "putting out the fire while the house is still burning",
+        "definition": "Taking partial measures that do not match the scale or urgency of the crisis.",
+        "examples": [
+          "Pledges without rapid fossil phase-out are putting out the fire while the house is still burning.",
+          "Celebrating small renewable targets while approving new oil and gas fields is putting out the fire while the house is still burning.",
+          "True leadership means matching the response to the scale of the blaze, not putting out the fire while the house is still burning."
+        ]
+      },
+      {
+        "idiom": "the genie is out of the bottle",
+        "definition": "A process that has already begun and cannot be easily reversed or contained.",
+        "examples": [
+          "Once major ice sheets pass their tipping points, the genie is out of the bottle on multi-metre sea-level rise.",
+          "The cost declines in solar and batteries mean the clean-energy genie is out of the bottle; the only question is speed.",
+          "We must act before the most dangerous climate feedbacks mean the genie is out of the bottle permanently."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "The scientific evidence shows that only a rapid exit from fossil fuels can keep global heating within survivable limits.",
+        "explanation": "The Intergovernmental Panel on Climate Change and every major scientific academy agree that limiting warming to 1.5 or even 2 degrees requires immediate, deep and sustained cuts in fossil-fuel emissions. The remaining carbon budget for 1.5 degrees is extremely small and is being consumed at a rate that will exhaust it within this decade at current levels. New fossil infrastructure built today will still be operating in 2050, locking in emissions that the budget cannot accommodate. Historical emissions have already raised temperatures by approximately 1.2 degrees, and the impacts—extreme heat, stronger storms, disrupted agriculture—are no longer theoretical. Continuing to expand oil, gas and coal is therefore incompatible with the stated goals of virtually every government on Earth. The physics of the climate system does not negotiate and does not care about short-term economic convenience. A rapid transition is not an ideological preference; it is the minimum response consistent with the evidence."
+      },
+      {
+        "claim": "Renewable energy has already become the cheapest source of new electricity in most of the world.",
+        "explanation": "The cost of solar photovoltaic modules has fallen by more than 80 percent in the last decade; onshore and offshore wind have seen similar dramatic declines. In the majority of countries, new renewable generation is now cheaper than new coal or gas plants even without subsidies. Battery storage costs have also plunged, solving much of the intermittency problem at grid scale. Countries and companies that continue to invest heavily in new fossil capacity are therefore choosing the more expensive option. The International Energy Agency and BloombergNEF data confirm that renewables dominate new power investment precisely because the economics have flipped. Claims that the transition is unaffordable invert the current reality: the expensive path is the one that clings to fossil fuels while cleaner alternatives undercut them on price. Accelerating the shift is now the economically rational as well as the climatically necessary choice."
+      },
+      {
+        "claim": "Continued fossil dependence exposes societies to extreme price volatility and geopolitical blackmail.",
+        "explanation": "Oil and gas markets are inherently unstable because supply is concentrated in a small number of countries and can be disrupted by conflict, embargoes or deliberate manipulation. The 2022 energy crisis triggered by the war in Ukraine demonstrated how quickly prices can multiply, driving inflation, industrial shutdowns and household hardship across Europe and beyond. Renewable energy, by contrast, has zero fuel cost once built; the resource—sun and wind—cannot be embargoed. Nations that build domestic renewable capacity increase their energy independence and protect citizens from external shocks. The historical record is clear: every major oil-price spike has damaged global growth. A system based on continuously imported fossil fuels is structurally more fragile than one based on indigenous clean resources. Energy security in the modern era is therefore served by rapid electrification and renewable expansion, not by prolonging fossil dependence."
+      },
+      {
+        "claim": "Delaying the transition will make the eventual adjustment far more abrupt and costly.",
+        "explanation": "Economic models consistently show that early, steady action is cheaper than prolonged delay followed by panic. When societies postpone the build-out of clean infrastructure, they must later retire fossil assets more suddenly, retrain workers more rapidly, and absorb higher cumulative climate damages. The concept of stranded assets becomes more painful the longer investment continues in the wrong direction. Countries that have already begun serious transitions—Denmark with wind, Costa Rica with renewables, parts of China with solar and electric vehicles—are developing industrial advantages and institutional experience. Those that wait will face both higher physical climate costs and the competitive disadvantage of having to import the technologies and expertise that early movers already possess. The choice is not between cost and no cost; it is between manageable, planned costs now and much larger, chaotic costs later."
+      },
+      {
+        "claim": "Fossil-fuel air pollution already kills millions of people every year, creating a public-health case for rapid phase-out independent of climate.",
+        "explanation": "Combustion of coal, oil and gas produces fine particulate matter, nitrogen oxides and other pollutants that cause respiratory and cardiovascular disease. The World Health Organization and independent research attribute several million premature deaths annually to this pollution, with the heaviest burden falling on children and the elderly in polluted cities. These health costs are rarely fully reflected in the market price of fossil energy. A rapid shift to renewables and electrification delivers immediate local air-quality benefits in addition to long-term climate protection. Cities that have reduced coal use or restricted high-emission vehicles have recorded measurable improvements in public health within years. Treating fossil fuels as indispensable ignores the ongoing human toll that cleaner alternatives can largely eliminate. The public-health dividend alone justifies accelerating the transition even before climate damages are considered."
+      },
+      {
+        "claim": "Technological solutions for high-renewable systems already exist and are being deployed at scale.",
+        "explanation": "Critics often claim that renewables cannot power a modern economy because of intermittency. This argument has been overtaken by engineering reality. Grid-scale batteries, demand response, interconnection across wide areas, green hydrogen for longer storage, and advanced forecasting already allow systems with very high renewable shares to operate reliably. South Australia, Denmark, Uruguay and parts of the United States have demonstrated that grids can run for extended periods on predominantly renewable electricity. The remaining challenges are primarily those of deployment speed, regulation and investment—not fundamental technical barriers. Continuing to expand fossil capacity on the grounds that clean systems are impossible is therefore an argument from outdated assumptions. The constraint is political and institutional will, not physics or engineering."
+      },
+      {
+        "claim": "The fossil industry has spent decades delaying action through organised doubt and political influence.",
+        "explanation": "Internal documents and investigative reporting have shown that major oil and gas companies understood the climate risks of their products as early as the 1970s and 1980s, yet funded campaigns to exaggerate uncertainty and slow policy responses. This history of obstruction has already cost the world precious time. Present-day arguments for a slow transition or for indefinite fossil use often originate from the same economic interests. A rational public debate must discount claims that serve to prolong the profitability of assets that the climate science says must be left in the ground. The rapid transition is opposed not because it is technically unfeasible, but because it threatens powerful incumbent revenues. Recognising this political economy is essential to understanding why delay continues despite the evidence."
+      },
+      {
+        "claim": "Developing countries can leapfrog fossil infrastructure just as they leapfrogged landline telephony.",
+        "explanation": "Many poorer nations still lack universal energy access and are deciding what systems to build. The old development model assumed a long period of coal and gas before cleaner options became affordable. That assumption is now false. Solar, wind and batteries are often the cheapest and fastest way to deliver new electricity, especially in off-grid and mini-grid contexts. Countries that lock themselves into new fossil infrastructure will face both higher long-term costs and the risk of stranded assets as carbon constraints tighten. International finance and technology cooperation can enable a direct path to clean systems. The claim that developing countries ‘need’ fossil fuels for development ignores the fact that the relative prices have already changed and that cleaner paths are available. Justice requires supporting the leapfrog, not financing a new generation of carbon-intensive assets."
+      },
+      {
+        "claim": "A rapid transition creates major industrial and employment opportunities in the industries of the future.",
+        "explanation": "The global market for solar, wind, batteries, electric vehicles, heat pumps and related technologies is expanding at double-digit rates. Countries and regions that build strong positions in these supply chains capture high-value manufacturing, engineering and service jobs. Those that remain specialised in declining fossil technologies face gradual erosion of their industrial base. China has already demonstrated the scale of advantage that comes from early and massive investment in clean-tech manufacturing. Europe and North America are now attempting to regain ground through industrial policy precisely because they recognise the strategic stakes. Framing the transition solely as a cost ignores the parallel reality that it is also the largest reallocation of capital and labour in the energy sector for a century. Societies that move decisively position their workers and firms on the growing side of that reallocation."
+      },
+      {
+        "claim": "Moral responsibility to future generations requires that we stop treating the atmosphere as an open sewer.",
+        "explanation": "Every tonne of carbon dioxide emitted today will continue to warm the planet for centuries. The people who will live with the full consequences—more extreme weather, rising seas, disrupted food systems, larger climate-driven migration—have no voice in current decisions. Continuing to expand fossil fuels when alternatives exist is a choice to impose severe risks on those future people for the sake of present convenience and incumbent profits. Intergenerational ethics demands that we internalise those long-term costs rather than discount them to zero. The rapid transition is the practical expression of that responsibility. Anything less amounts to a decision that our short-term interests outweigh the basic livability of the planet for those who come after us. That is not a position that can be defended once the scientific and technological facts are acknowledged."
+      }
+    ]
+  },
+  "against": {
+    "vocab": [
+      {
+        "term": "energy realism",
+        "definition": "An approach that prioritises reliable, affordable and secure energy supply based on current technological and economic constraints rather than aspirational targets.",
+        "example": "Energy realism requires acknowledging that intermittent renewables still need firm backup for a long time to come."
+      },
+      {
+        "term": "intermittency challenge",
+        "definition": "The fundamental problem that solar and wind output varies with weather and time of day and cannot be dispatched on demand.",
+        "example": "The intermittency challenge means that high renewable penetration requires vast storage or backup that is still expensive and incomplete."
+      },
+      {
+        "term": "baseload requirement",
+        "definition": "The continuous, reliable minimum level of electricity demand that must be met at all times by firm generating capacity.",
+        "example": "No modern economy can function without addressing the baseload requirement; wishful thinking about batteries does not yet solve it at scale."
+      },
+      {
+        "term": "transition risk",
+        "definition": "The economic, social and political dangers created by attempting to change the energy system faster than technology, infrastructure and society can adapt.",
+        "example": "Poorly managed transition risk has already produced industrial flight and energy poverty in several European countries."
+      },
+      {
+        "term": "energy density advantage",
+        "definition": "The superior amount of usable energy stored in a given mass or volume of fossil fuels compared with most renewable alternatives and their storage media.",
+        "example": "The energy density advantage of oil remains decisive for aviation, shipping and heavy transport where batteries are still impractical."
+      },
+      {
+        "term": "system costs",
+        "definition": "The full expenses of integrating variable renewables, including backup generation, grid expansion, storage and curtailment, beyond the simple cost of the renewable generators themselves.",
+        "example": "Headline renewable prices ignore system costs that rise sharply as the share of intermittent generation increases."
+      },
+      {
+        "term": "development priority",
+        "definition": "The legitimate right and necessity of poorer countries to expand energy access and industrial capacity using the most practical available resources.",
+        "example": "For nations still lacking universal electricity, the development priority outweighs distant climate targets set by already-rich countries."
+      },
+      {
+        "term": "technological maturity gap",
+        "definition": "The remaining distance between current clean-energy technologies and the performance, cost and scale required to fully replace fossil fuels across all sectors.",
+        "example": "The technological maturity gap in long-duration storage, green hydrogen and aviation fuels is still substantial."
+      },
+      {
+        "term": "policy-induced scarcity",
+        "definition": "Artificial shortages and price spikes created by restricting fossil supply before adequate clean alternatives are ready.",
+        "example": "Premature closure of reliable plants has produced policy-induced scarcity and record electricity prices in several markets."
+      },
+      {
+        "term": "adaptive capacity",
+        "definition": "The ability of societies to adjust to climate impacts through engineering, agriculture, medicine and economic development rather than solely through emissions cuts.",
+        "example": "Investing in adaptive capacity can protect lives more immediately and certainly than distant mitigation targets."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "An energy system that does not keep the lights on is not a serious proposal.",
+        "examples": [
+          "An energy system that does not keep the lights on is not a serious proposal, however impressive its carbon statistics look on paper.",
+          "An energy system that does not keep the lights on is not a serious proposal; reliability is the first requirement of any modern grid.",
+          "An energy system that does not keep the lights on is not a serious proposal, and intermittency without sufficient backup fails that test."
+        ]
+      },
+      {
+        "phrase": "We must not sacrifice the present generation to uncertain benefits for the future.",
+        "examples": [
+          "We must not sacrifice the present generation to uncertain benefits for the future by driving energy costs to levels that destroy jobs and living standards.",
+          "We must not sacrifice the present generation to uncertain benefits for the future; climate policy that creates energy poverty is self-defeating.",
+          "We must not sacrifice the present generation to uncertain benefits for the future when practical low-carbon options still fall short in key sectors."
+        ]
+      },
+      {
+        "phrase": "Physics and engineering, not political slogans, determine what an energy system can deliver.",
+        "examples": [
+          "Physics and engineering, not political slogans, determine what an energy system can deliver, and they still favour dense, dispatchable sources for many uses.",
+          "Physics and engineering, not political slogans, determine what an energy system can deliver; ignoring energy density and intermittency is not progressive.",
+          "Physics and engineering, not political slogans, determine what an energy system can deliver, which is why pure renewable scenarios remain incomplete."
+        ]
+      },
+      {
+        "phrase": "The poorest people in the world need energy access more urgently than they need net-zero timelines written in rich capitals.",
+        "examples": [
+          "The poorest people in the world need energy access more urgently than they need net-zero timelines written in rich capitals.",
+          "The poorest people in the world need energy access more urgently than they need net-zero timelines written in rich capitals; denying them practical fuels is a form of green colonialism.",
+          "The poorest people in the world need energy access more urgently than they need net-zero timelines written in rich capitals, and that reality must shape global policy."
+        ]
+      },
+      {
+        "phrase": "A transition that prices households and industry out of energy is not sustainable in any democracy.",
+        "examples": [
+          "A transition that prices households and industry out of energy is not sustainable in any democracy; voters will eventually reject it.",
+          "A transition that prices households and industry out of energy is not sustainable in any democracy and will provoke political backlash.",
+          "A transition that prices households and industry out of energy is not sustainable in any democracy; cost and reliability are not optional extras."
+        ]
+      },
+      {
+        "phrase": "All-of-the-above energy strategies remain more robust than pure renewable orthodoxy.",
+        "examples": [
+          "All-of-the-above energy strategies remain more robust than pure renewable orthodoxy because they hedge against technological and geopolitical uncertainty.",
+          "All-of-the-above energy strategies remain more robust than pure renewable orthodoxy and allow nuclear, gas and other firm sources to play their roles.",
+          "All-of-the-above energy strategies remain more robust than pure renewable orthodoxy; ideological exclusion of workable options is a luxury we cannot afford."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "putting the cart before the horse",
+        "definition": "Attempting to force the end result before the necessary enabling conditions and technologies are in place.",
+        "examples": [
+          "Shutting down reliable fossil plants before adequate storage and backup exist is putting the cart before the horse.",
+          "Setting binding phase-out dates without proven replacements at scale is putting the cart before the horse.",
+          "Energy policy that ignores current system constraints is repeatedly putting the cart before the horse."
+        ]
+      },
+      {
+        "idiom": "biting the hand that feeds you",
+        "definition": "Attacking or dismantling the very energy sources that currently sustain modern living standards and industrial capacity.",
+        "examples": [
+          "Demonising all fossil fuels while they still supply most of the world’s energy is biting the hand that feeds you.",
+          "Economies that prematurely abandon their most reliable energy sources risk biting the hand that feeds you.",
+          "A responsible transition does not begin by biting the hand that feeds you before alternatives are ready."
+        ]
+      },
+      {
+        "idiom": "a bridge too far",
+        "definition": "An objective that exceeds current practical capabilities and therefore risks failure or severe unintended consequences.",
+        "examples": [
+          "Attempting a complete fossil phase-out within a single generation may prove a bridge too far for many critical sectors.",
+          "Promising both rapid decarbonisation and falling energy prices simultaneously has been a bridge too far in several countries.",
+          "Policy that treats engineering limits as mere talking points is setting itself up for a bridge too far."
+        ]
+      },
+      {
+        "idiom": "robbing Peter to pay Paul",
+        "definition": "Solving one problem by creating or worsening another, especially by shifting costs onto vulnerable groups.",
+        "examples": [
+          "Raising energy costs sharply to accelerate the transition can become robbing Peter to pay Paul when poorer households bear the burden.",
+          "Closing domestic fossil production only to import higher-emission fuels from elsewhere is robbing Peter to pay Paul.",
+          "Climate policy that damages industrial competitiveness without global coordination is often just robbing Peter to pay Paul."
+        ]
+      },
+      {
+        "idiom": "the best is the enemy of the good",
+        "definition": "Insisting on a perfect pure-renewable solution prevents the adoption of workable lower-carbon options available today.",
+        "examples": [
+          "Rejecting natural gas and nuclear as transition fuels because they are imperfect means the best is the enemy of the good.",
+          "In energy policy, the best is the enemy of the good when ideological purity blocks pragmatic emissions reductions.",
+          "Countries that have cut emissions fastest have usually ignored the idea that the best is the enemy of the good and used every available tool."
+        ]
+      },
+      {
+        "idiom": "running before we can walk",
+        "definition": "Attempting advanced or complete system change before mastering the basic requirements of reliability and affordability.",
+        "examples": [
+          "High renewable targets without solved storage and grid issues amount to running before we can walk.",
+          "Energy policy that prioritises symbolic dates over engineering readiness is running before we can walk.",
+          "A durable transition requires learning to walk with mixed systems before running toward pure renewable ideals."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "Current renewable technologies cannot yet provide reliable, affordable energy across all sectors at the scale modern civilisation requires.",
+        "explanation": "Electricity is only part of the energy system. Aviation, shipping, high-temperature industrial heat, and many chemical processes still lack cost-effective low-carbon substitutes that can operate at global scale. Even within electricity, the intermittency of solar and wind requires either vast overbuilding, long-duration storage that remains expensive, or firm backup—usually gas or nuclear. No large, advanced economy has yet demonstrated a fully renewable system that maintains current reliability and living standards without substantial residual fossil or nuclear capacity. Claims that the transition is purely a matter of political will ignore these engineering constraints. A responsible policy must expand clean options as fast as they become practical while continuing to use the dense, dispatchable sources that keep societies functioning. Premature forced exit from fossils risks blackouts, deindustrialisation and public rejection of climate policy itself."
+      },
+      {
+        "claim": "Rapid forced transitions have already produced severe energy-price spikes and industrial damage in several countries.",
+        "explanation": "Germany’s Energiewende, California’s renewable push, and parts of the UK’s phase-out of coal and nuclear have been accompanied by periods of extremely high electricity prices, increased reliance on imported fuels, and the relocation of energy-intensive industry. When reliable capacity is retired faster than clean firm replacements are built, the result is scarcity pricing and volatility. Households on low and middle incomes suffer most, and political support for further climate measures erodes. These are not abstract modelling risks; they are observed outcomes. A transition that repeatedly generates energy poverty and manufacturing decline will not be sustained in democratic societies. Pace must be governed by the actual readiness of alternatives, not by targets set without sufficient regard for system stability and cost."
+      },
+      {
+        "claim": "Fossil fuels still supply more than 80 percent of global primary energy; replacing that share in a few decades is historically unprecedented and extremely demanding.",
+        "explanation": "Energy transitions of the past—from wood to coal, coal to oil—took many decades even when the new source offered clear advantages in density and convenience. The current proposal requires replacing the majority of the world’s energy supply with sources that are more diffuse and intermittent, while simultaneously expanding total energy use to meet development needs. The scale of material extraction, manufacturing, grid expansion and land use implied by rapid pure-renewable scenarios is enormous and faces its own environmental and social constraints. Historical experience suggests that energy systems change through addition and gradual substitution more than through sudden forced replacement. Policies that assume the world can simply switch off the dominant energy sources on a politically chosen timetable underestimate the inertia and complexity of the existing system."
+      },
+      {
+        "claim": "Poorer countries have a legitimate right to use the most practical energy sources available to lift their populations out of poverty.",
+        "explanation": "Roughly three-quarters of a billion people still lack electricity, and many more suffer from unreliable or dirty energy that damages health and limits opportunity. For these populations, the immediate priority is access to affordable and reliable power and fuels. Restricting their use of coal, gas or oil in the name of global emissions targets—targets driven overwhelmingly by historical and current emissions of richer nations—raises profound questions of justice. Development that raises incomes also increases societies’ capacity to adapt to climate impacts and eventually to adopt cleaner technologies. Imposing rich-world timelines on nations still building basic infrastructure is neither equitable nor likely to succeed. Global climate policy must accommodate differentiated responsibilities and the overriding human need for energy access."
+      },
+      {
+        "claim": "Nuclear power and, where necessary, natural gas remain essential firm low-carbon or lower-carbon options that pure-renewable strategies often undervalue.",
+        "explanation": "Nuclear energy provides large-scale, low-carbon, dispatchable electricity with a far smaller land and materials footprint than most renewables. Countries that have maintained or expanded nuclear fleets have generally achieved deeper emissions cuts in their power sectors than those that rejected it. Natural gas, while not zero-carbon, produces significantly lower emissions than coal and can serve as flexible backup that enables higher renewable penetration. Ideological exclusion of these options narrows the available toolkit and makes the overall transition harder and more expensive. An all-of-the-above approach that includes nuclear, gas with eventual carbon capture where feasible, and renewables is more robust than strategies that treat anything non-renewable as illegitimate. Energy policy should be guided by emissions outcomes and system reliability, not by technological purity tests."
+      },
+      {
+        "claim": "Adaptation to climate impacts can protect lives and livelihoods more directly and certainly than mitigation alone, especially in the near term.",
+        "explanation": "Even under optimistic emissions scenarios, further warming and climate impacts are already locked in by past and near-term emissions. Investments in flood defences, drought-resistant agriculture, cooling infrastructure, early-warning systems and public health all reduce harm with high confidence and relatively short lead times. Mitigation is essential for the long term, but it does not replace the need for adaptation. Over-emphasising rapid fossil phase-out at the expense of adaptive capacity leaves populations more exposed to the changes that cannot now be avoided. A balanced strategy funds both deep emissions reductions where they are most cost-effective and robust adaptation everywhere. Treating mitigation as the only legitimate response risks neglecting measures that save lives in the coming decades."
+      },
+      {
+        "claim": "The full system costs of high renewable penetration are still poorly reflected in simple levelised-cost comparisons.",
+        "explanation": "The frequently cited low cost of new solar and wind refers to the cost of the generators themselves under favourable conditions. It does not include the cost of the extra grid capacity, storage, backup plants, and curtailment required to turn variable output into reliable supply. As the share of intermittent generation rises, these integration costs increase non-linearly. Studies that examine whole-system costs find that the advantage of renewables shrinks or disappears at very high penetration levels with current technology. Policy that ignores these system costs produces unpleasant surprises in the form of rising consumer bills and reliability problems. Honest accounting requires comparing complete systems, not isolated generation technologies. Until long-duration storage and other flexibility solutions become far cheaper, residual firm capacity remains economically and technically necessary."
+      },
+      {
+        "claim": "Innovation is more likely to deliver breakthrough solutions if energy remains affordable and economies remain strong.",
+        "explanation": "Historically, major energy innovations have emerged from prosperous societies with the resources to fund research, absorb early high costs, and scale new industries. Policies that deliberately raise energy costs or constrain economic growth in the name of rapid transition risk reducing the very innovative capacity needed for deeper decarbonisation. Carbon capture, advanced nuclear, long-duration storage, and low-carbon fuels for hard-to-abate sectors all require sustained investment and learning-by-doing. An approach that keeps energy relatively affordable while steadily tightening emissions constraints through technology-neutral mechanisms is more likely to generate the necessary breakthroughs than one that imposes early scarcity. Prosperity and innovation are not obstacles to climate progress; they are preconditions for it at global scale."
+      },
+      {
+        "claim": "Public support for climate action collapses when it is associated with energy shortages and sharp rises in living costs.",
+        "explanation": "Democratic consent is a practical constraint on policy. When households experience blackouts, extreme price spikes, or the loss of industrial jobs attributed to energy policy, support for further measures falls and populist backlash grows. Several European countries have already seen political shifts driven in part by energy costs. A transition strategy that repeatedly generates such outcomes will eventually be reversed or diluted, wasting time and capital. The more durable path is one that maintains reliability and reasonable prices while steadily increasing the share of clean energy as technologies mature. Climate policy that ignores public tolerance is not more ambitious; it is less effective because it cannot be sustained. Legitimacy and durability matter as much as the ambition of targets on paper."
+      },
+      {
+        "claim": "A pragmatic, technology-inclusive strategy will reduce emissions faster than a narrow, accelerated renewable-only orthodoxy.",
+        "explanation": "Countries that have achieved the largest historical reductions in power-sector emissions have generally done so by deploying multiple low-carbon sources—nuclear, gas switching from coal, and renewables—rather than by pursuing pure renewable targets alone. Technology-neutral policies that reward emissions reduction wherever it occurs tend to discover lower-cost abatement opportunities than policies that prescribe particular technologies. Premature exclusion of nuclear, gas, or carbon capture narrows the solution space and raises overall costs, slowing the pace of actual emissions decline. The goal is lower atmospheric concentrations of greenhouse gases, not the maximisation of any single generation technology. Strategies that remain open to every scalable, lower-carbon option will outperform those that treat the energy transition as a moral purity test rather than an engineering and economic optimisation problem."
+      }
+    ]
+  }
+}

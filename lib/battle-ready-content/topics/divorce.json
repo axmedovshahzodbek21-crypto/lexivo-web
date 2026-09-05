@@ -1,0 +1,407 @@
+{
+  "motion": "This House believes that governments should make divorce more difficult through stricter legal requirements, longer waiting periods and stronger counselling obligations in order to protect children, family stability and social cohesion.",
+  "for": {
+    "vocab": [
+      {
+        "term": "familial disintegration",
+        "definition": "The progressive breakdown of the family unit as a stable source of care, identity and support.",
+        "example": "Easy divorce has accelerated familial disintegration in many communities, leaving children without consistent parental presence."
+      },
+      {
+        "term": "intergenerational trauma",
+        "definition": "Emotional and behavioural wounds that are passed from one generation to the next through disrupted family relationships.",
+        "example": "Children of high-conflict divorces often carry intergenerational trauma into their own adult relationships."
+      },
+      {
+        "term": "commitment erosion",
+        "definition": "The gradual weakening of the social and personal expectation that marriage is a lasting bond.",
+        "example": "When exit is always simple, commitment erosion becomes the cultural default rather than the exception."
+      },
+      {
+        "term": "developmental disruption",
+        "definition": "Interference with the normal emotional, social and cognitive growth of children caused by family instability.",
+        "example": "Repeated changes of home and routine after divorce produce developmental disruption that can last for years."
+      },
+      {
+        "term": "social atomisation",
+        "definition": "The fragmentation of society into isolated individuals with weaker ties of mutual obligation.",
+        "example": "High divorce rates contribute to social atomisation by reducing the density of stable family networks."
+      },
+      {
+        "term": "custodial instability",
+        "definition": "Frequent or unpredictable changes in where and with whom a child lives after parental separation.",
+        "example": "Custodial instability is one of the clearest predictors of poorer outcomes for children of divorce."
+      },
+      {
+        "term": "moral hazard in marriage",
+        "definition": "The reduced incentive to invest in relationship repair when exit is cheap and easy.",
+        "example": "No-fault systems create a moral hazard in marriage by lowering the cost of abandoning difficult but salvageable unions."
+      },
+      {
+        "term": "economic vulnerability",
+        "definition": "Heightened financial risk, especially for women and children, following the end of a marriage.",
+        "example": "Divorce frequently produces economic vulnerability that state benefits only partially offset."
+      },
+      {
+        "term": "relational literacy",
+        "definition": "The practical skills and habits needed to sustain long-term intimate partnerships.",
+        "example": "A culture of easy exit reduces the social pressure to develop relational literacy."
+      },
+      {
+        "term": "institutional weakening",
+        "definition": "The decline in the authority and effectiveness of marriage as a social institution.",
+        "example": "When divorce becomes routine, institutional weakening follows and fewer people treat marriage as a serious lifelong project."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "The easiest exit is not always the kindest outcome for the most vulnerable parties.",
+        "examples": [
+          "The easiest exit is not always the kindest outcome for the most vulnerable parties, especially young children.",
+          "When we prioritise adult convenience, we forget that the easiest exit is not always the kindest outcome for the most vulnerable parties.",
+          "Policy must recognise that the easiest exit is not always the kindest outcome for the most vulnerable parties."
+        ]
+      },
+      {
+        "phrase": "Marriage is not merely a private contract; it is a social institution that shapes the next generation.",
+        "examples": [
+          "Marriage is not merely a private contract; it is a social institution that shapes the next generation.",
+          "Treating divorce as a simple administrative matter ignores that marriage is not merely a private contract; it is a social institution that shapes the next generation.",
+          "We should remember that marriage is not merely a private contract; it is a social institution that shapes the next generation."
+        ]
+      },
+      {
+        "phrase": "Children pay the highest price for adult decisions they had no voice in making.",
+        "examples": [
+          "Children pay the highest price for adult decisions they had no voice in making, and the law should reflect that reality.",
+          "In every high-conflict divorce, children pay the highest price for adult decisions they had no voice in making.",
+          "A just society does not allow children to pay the highest price for adult decisions they had no voice in making without serious safeguards."
+        ]
+      },
+      {
+        "phrase": "Removing friction from exit also removes pressure to repair.",
+        "examples": [
+          "Removing friction from exit also removes pressure to repair relationships that could still be saved.",
+          "No-fault systems demonstrate that removing friction from exit also removes pressure to repair.",
+          "We should not be surprised that removing friction from exit also removes pressure to repair."
+        ]
+      },
+      {
+        "phrase": "Cultural norms of permanence once protected the weak; their disappearance has left many more exposed.",
+        "examples": [
+          "Cultural norms of permanence once protected the weak; their disappearance has left many more exposed.",
+          "When marriage was harder to leave, cultural norms of permanence once protected the weak; their disappearance has left many more exposed.",
+          "History shows that cultural norms of permanence once protected the weak; their disappearance has left many more exposed."
+        ]
+      },
+      {
+        "phrase": "A society that treats family breakdown as routine will eventually pay in social trust and public cost.",
+        "examples": [
+          "A society that treats family breakdown as routine will eventually pay in social trust and public cost.",
+          "Rising welfare and mental-health expenditure show that a society that treats family breakdown as routine will eventually pay in social trust and public cost.",
+          "We cannot pretend that a society that treats family breakdown as routine will eventually pay in social trust and public cost is someone else’s problem."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "throw the baby out with the bathwater",
+        "definition": "To discard something valuable while trying to eliminate something unwanted.",
+        "examples": [
+          "Making divorce extremely easy in order to help those in abusive marriages risks throwing the baby out with the bathwater of family stability.",
+          "We can protect victims of violence without throwing the baby out with the bathwater of the institution of marriage.",
+          "Blanket liberalisation has in some ways thrown the baby out with the bathwater."
+        ]
+      },
+      {
+        "idiom": "the thin end of the wedge",
+        "definition": "A small change that opens the way for much larger and more damaging shifts.",
+        "examples": [
+          "No-fault divorce was presented as a modest reform, but it proved to be the thin end of the wedge for a culture of disposable marriage.",
+          "Treating every marital difficulty as grounds for exit is the thin end of the wedge toward the collapse of lasting commitment.",
+          "Once permanence is no longer the expectation, further erosion becomes the thin end of the wedge."
+        ]
+      },
+      {
+        "idiom": "pay the price",
+        "definition": "To suffer the negative consequences of earlier choices or policies.",
+        "examples": [
+          "Children of unstable homes continue to pay the price long after the legal process is finished.",
+          "Society will pay the price in higher social costs if family breakdown remains frictionless.",
+          "Adults who choose easy exit often discover that their children pay the price in emotional security."
+        ]
+      },
+      {
+        "idiom": "a house divided against itself",
+        "definition": "A family or group that is internally split and therefore weakened.",
+        "examples": [
+          "After divorce, many children live in a house divided against itself, moving between conflicting parental worlds.",
+          "High-conflict separations leave a house divided against itself for years.",
+          "The proverb warns that a house divided against itself cannot stand; family policy should take that seriously."
+        ]
+      },
+      {
+        "idiom": "burn one's bridges",
+        "definition": "To destroy the possibility of return or reconciliation.",
+        "examples": [
+          "Easy divorce encourages couples to burn their bridges rather than work through temporary crises.",
+          "Once legal and social bridges are burned, reconciliation becomes far harder.",
+          "A waiting period exists precisely so that people do not burn their bridges in a moment of anger."
+        ]
+      },
+      {
+        "idiom": "hold the line",
+        "definition": "To maintain firm standards against pressure to weaken them.",
+        "examples": [
+          "Family policy must hold the line on the seriousness of the marital commitment.",
+          "Courts and legislators should hold the line rather than treat every request for dissolution as automatic.",
+          "Cultural leaders need to hold the line on the expectation that marriage is for life."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "Children of divorce, on average, experience measurable and lasting disadvantages in emotional health, educational attainment and future relationship stability.",
+        "explanation": "Large-scale longitudinal studies in the United States, Britain and elsewhere consistently find that children whose parents divorce show higher rates of anxiety, depression, behavioural problems and lower educational performance compared with peers from intact families. These differences remain even after controlling for income and pre-divorce conflict. The disruption of daily routines, the loss of daily contact with one parent, exposure to parental conflict during and after separation, and the economic drop that often follows all contribute. Adult children of divorce also report higher rates of their own relationship breakdown, suggesting an intergenerational transmission of instability. While many children are resilient and some high-conflict homes improve after separation, the average effect is negative and significant. A legal system that treats divorce as a routine administrative step rather than a serious intervention in a child’s life fails to weigh this evidence properly. Longer waiting periods, mandatory information about child impacts, and stronger requirements for parenting plans are modest ways of ensuring that the interests of those who cannot consent are given real weight."
+      },
+      {
+        "claim": "Easy divorce creates a moral hazard that reduces the incentive for couples to invest in repairing salvageable marriages.",
+        "explanation": "When the legal and social cost of exit is low, the relative attractiveness of staying and working through difficulty also falls. Temporary crises — financial stress, illness, the arrival of children, mid-life dissatisfaction — become more likely to end in permanent separation simply because the exit door is wide open. Research on the introduction of no-fault divorce in various jurisdictions found subsequent rises in divorce rates that cannot be explained solely by the release of previously trapped unhappy couples. Some portion of the increase reflects marriages that would have recovered under a higher-friction regime. Relationship counselling and skill-building are more likely to be attempted when both parties know that walking away is not immediate or costless. By removing almost all legal friction, modern systems have unintentionally signalled that persistence is optional. Restoring modest procedural hurdles does not trap people in dangerous marriages; it simply restores an incentive structure that treats the marital bond as worth serious effort before it is dissolved."
+      },
+      {
+        "claim": "The economic and psychological costs of divorce fall disproportionately on women and children, creating new forms of vulnerability.",
+        "explanation": "Despite formal equality, the practical consequences of divorce remain uneven. Women still perform the majority of childcare and are more likely to take career breaks, so their post-divorce earning capacity is often lower. Child-support systems are imperfectly enforced, and many single-parent households experience sharp drops in living standards. Housing instability, school moves and reduced access to enrichment activities follow. Psychological costs are also unevenly distributed; mothers frequently carry the dual burden of primary caregiving and financial pressure. These patterns appear across very different welfare regimes, suggesting they are not solely the product of inadequate state support. A legal framework that makes exit frictionless therefore transfers risk onto the parties least able to bear it. Stronger financial disclosure requirements, longer consideration periods, and clearer obligations around housing and schooling stability are ways of mitigating this predictable harm without denying divorce to those who genuinely need it."
+      },
+      {
+        "claim": "High rates of family breakdown weaken the broader social fabric by reducing trust, mutual support and civic engagement.",
+        "explanation": "Stable families are one of the primary sites in which children learn cooperation, delayed gratification and obligation to others. When a large proportion of children experience the rupture of that primary bond, the cumulative effect is visible in higher rates of loneliness, lower social trust and weaker community participation among adults. Ecological studies find that neighbourhoods and regions with higher family instability also tend to show elevated rates of other social problems. The family is not the only source of social capital, but it is a foundational one. Treating marriage as a purely private and easily dissolved contract ignores these wider externalities. Just as environmental policy recognises that private decisions can impose public costs, family policy can recognise that the ease of dissolution has collective consequences. Modest legal friction is one instrument for internalising those consequences and signalling that the institution still carries public weight."
+      },
+      {
+        "claim": "No-fault divorce was sold as a compassionate reform for the trapped, but it has normalised exit even in low-conflict marriages that could have been preserved.",
+        "explanation": "The original justification for removing fault requirements was to spare people the indignity and cost of proving cruelty or adultery when a marriage had already failed. In practice, the reform also removed a cultural and legal marker that marriage was a serious, lasting commitment. Divorce rates rose sharply after introduction in many countries and have remained elevated. Survey evidence shows that a non-trivial share of divorcing couples report relatively low levels of conflict and cite reasons such as “grew apart” or “not happy enough.” These are real feelings, yet they are also the kinds of temporary or surmountable difficulties that earlier generations more often weathered. The legal system cannot force love, but it can shape expectations about what counts as sufficient reason to end a family. By making the process administratively simple and morally neutral, no-fault regimes have shifted the cultural default. Restoring a period of reflection, mandatory information sessions on consequences, and a clearer distinction between high-conflict and low-conflict cases would better match the original compassionate intent without the current level of collateral damage."
+      },
+      {
+        "claim": "Children require stability of care and routine; repeated post-divorce changes of residence, school and parental availability undermine that foundation.",
+        "explanation": "Developmental psychology emphasises the importance of predictable caregiving and stable environments for healthy attachment and emotional regulation. Divorce frequently introduces the opposite: alternating households, new partners, moves to different neighbourhoods, and changes of school. Even when both parents remain involved and conflict is managed, the logistical complexity of shared care can leave children feeling permanently in transit. Studies tracking residential mobility after separation find associations with poorer academic and behavioural outcomes. The legal process currently focuses heavily on the rights and preferences of adults and only secondarily on minimising disruption for children. Stronger requirements for detailed parenting plans, presumptions against unnecessary moves in the early years after separation, and court scrutiny of arrangements that create high instability would re-centre the child’s need for continuity. Making the overall process of divorce more deliberate creates space for these child-centred considerations to be taken seriously rather than treated as afterthoughts."
+      },
+      {
+        "claim": "A culture of disposable marriage reduces the social pressure and personal motivation to acquire the skills of lasting partnership.",
+        "explanation": "Long-term relationships require skills — conflict resolution, emotional regulation, mutual accommodation, forgiveness — that are learned through practice and social expectation. When the surrounding culture treats exit as normal and low-cost, the incentive to develop those skills declines. Younger cohorts report higher levels of relationship anxiety and lower confidence in the possibility of lasting marriage, in part because they have grown up surrounded by examples of impermanence. Relationship education programmes exist, but they struggle against a legal and cultural environment that signals the opposite message. Just as educational standards shape what students strive to learn, marital norms shape what couples strive to practise. Restoring a clearer legal and social expectation of permanence does not guarantee success, but it re-creates the conditions under which the relevant virtues are more likely to be cultivated. A society that wants durable families must be willing to treat durability as the default rather than the surprising exception."
+      },
+      {
+        "claim": "The state already intervenes extensively in family life through welfare, education and child-protection systems; it is inconsistent to treat the formation and dissolution of families as purely private.",
+        "explanation": "Modern governments spend large sums supporting single-parent households, providing counselling and mental-health services linked to family breakdown, and intervening when children suffer. These are public costs generated in part by private decisions about marriage and divorce. It is therefore coherent for the same state to shape the legal conditions under which those decisions are made. The claim that divorce is a purely private matter sits uneasily with the extensive public consequences that follow. Environmental policy, consumer protection and financial regulation all recognise that private choices can generate externalities that justify rules. Family formation and dissolution are no different in principle. Modest procedural requirements — waiting periods, mandatory disclosure of consequences for children, counselling offers — are light-touch ways of acknowledging the public dimension without returning to a punitive fault system. Consistency of principle supports treating the legal exit from marriage with the seriousness its social effects warrant."
+      },
+      {
+        "claim": "International comparisons show that jurisdictions with higher legal and social barriers to divorce tend to have lower rates of family breakdown and better average child outcomes.",
+        "explanation": "While culture, religion and economics all play roles, legal regime remains a relevant variable. Countries and U.S. states that retained more restrictive divorce laws for longer periods generally experienced slower rises in divorce rates. Some nations that have re-introduced waiting periods or mandatory mediation have seen stabilisation or modest declines. Cross-national data on child well-being frequently show better average outcomes on measures of emotional health and educational attainment in societies where two-parent families remain the clear statistical norm. Correlation is not simple causation, yet the pattern is consistent enough to challenge the assumption that liberalisation is costless. Policy makers in high-divorce societies can learn from the institutional design of lower-divorce ones without importing every cultural feature. The evidence does not support the claim that making divorce procedurally easier is an unalloyed social good; it suggests trade-offs that current liberal regimes have under-weighted."
+      },
+      {
+        "claim": "Protecting the possibility of exit from genuinely dangerous or irreparably broken marriages does not require making exit frictionless for every temporary dissatisfaction.",
+        "explanation": "Critics of tighter divorce rules often present a false choice: either the current easy system or a return to trapping people in violent or hopeless unions. In reality, a well-designed system can maintain clear, accelerated pathways for cases involving proven abuse, addiction or abandonment while restoring deliberation for the much larger number of low- and medium-conflict separations. Special procedures, protected hearings and rapid interim orders already exist in many jurisdictions for domestic-violence cases; these can be strengthened rather than used as a reason to keep the ordinary process frictionless. The majority of divorces do not involve violence. For those cases, a period of reflection, information about consequences, and encouragement to attempt repair impose little hardship on adults while offering meaningful protection to children and to the social institution of marriage. Compassion for the genuinely trapped and seriousness about family stability are not mutually exclusive; they simply require a more discriminating legal framework than the one currently dominant in many countries."
+      }
+    ]
+  },
+  "against": {
+    "vocab": [
+      {
+        "term": "personal autonomy",
+        "definition": "The right of adults to make fundamental life decisions, including whether to remain in a marriage, without excessive state interference.",
+        "example": "Strict divorce barriers infringe personal autonomy by forcing people to remain in relationships they have rationally decided to leave."
+      },
+      {
+        "term": "marital captivity",
+        "definition": "A situation in which one or both spouses are effectively trapped in an unwanted or harmful marriage by legal or social obstacles.",
+        "example": "Before no-fault reform, many women experienced marital captivity with little realistic hope of escape."
+      },
+      {
+        "term": "psychological safety",
+        "definition": "The condition of being free from chronic fear, humiliation or emotional harm within an intimate relationship.",
+        "example": "For some adults and children, divorce is the only route to psychological safety after years of destructive conflict."
+      },
+      {
+        "term": "reproductive freedom",
+        "definition": "The capacity of individuals, especially women, to control the central conditions of their family and intimate lives.",
+        "example": "The ability to leave a marriage is a core element of reproductive freedom and gender equality."
+      },
+      {
+        "term": "adaptive dissolution",
+        "definition": "The ending of a marriage that has become more harmful than beneficial to the parties and any children involved.",
+        "example": "In high-conflict homes, adaptive dissolution can improve rather than worsen children’s long-term outcomes."
+      },
+      {
+        "term": "stigma amplification",
+        "definition": "The intensification of social shame and exclusion around a particular status or decision.",
+        "example": "Making divorce procedurally difficult often produces stigma amplification that harms those who most need to leave."
+      },
+      {
+        "term": "second-order harm",
+        "definition": "Additional damage caused not by the original problem but by the legal or social response to it.",
+        "example": "Forced waiting periods can create second-order harm by prolonging exposure to conflict or abuse."
+      },
+      {
+        "term": "relational self-determination",
+        "definition": "The capacity of adults to define the terms and duration of their own intimate partnerships.",
+        "example": "Modern family law increasingly recognises relational self-determination as a basic adult right."
+      },
+      {
+        "term": "evidence-based compassion",
+        "definition": "Policy guided by empirical findings about what actually reduces harm rather than by traditional moral ideals.",
+        "example": "Evidence-based compassion supports accessible divorce when data show that forced continuation increases injury."
+      },
+      {
+        "term": "pluralistic family forms",
+        "definition": "The reality that stable and nurturing care for children can occur in many different household structures.",
+        "example": "Policy should support pluralistic family forms rather than privileging only lifelong first marriages."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "Forcing people to remain in destructive marriages does not create healthy families; it creates hidden suffering.",
+        "examples": [
+          "Forcing people to remain in destructive marriages does not create healthy families; it creates hidden suffering.",
+          "History shows that forcing people to remain in destructive marriages does not create healthy families; it creates hidden suffering.",
+          "We should reject the idea that forcing people to remain in destructive marriages does not create healthy families; it creates hidden suffering."
+        ]
+      },
+      {
+        "phrase": "Adults who are miserable and conflict-ridden do not become better parents simply because exit is blocked.",
+        "examples": [
+          "Adults who are miserable and conflict-ridden do not become better parents simply because exit is blocked.",
+          "The evidence is clear that adults who are miserable and conflict-ridden do not become better parents simply because exit is blocked.",
+          "Policy that ignores this reality pretends that adults who are miserable and conflict-ridden do not become better parents simply because exit is blocked."
+        ]
+      },
+      {
+        "phrase": "The right to leave an intimate relationship is a fundamental aspect of personal liberty in a free society.",
+        "examples": [
+          "The right to leave an intimate relationship is a fundamental aspect of personal liberty in a free society.",
+          "Democratic societies recognise that the right to leave an intimate relationship is a fundamental aspect of personal liberty in a free society.",
+          "Restrictive divorce laws undermine the principle that the right to leave an intimate relationship is a fundamental aspect of personal liberty in a free society."
+        ]
+      },
+      {
+        "phrase": "Children are not protected by trapping their parents in chronic hostility; they are protected by reducing that hostility.",
+        "examples": [
+          "Children are not protected by trapping their parents in chronic hostility; they are protected by reducing that hostility.",
+          "Research indicates that children are not protected by trapping their parents in chronic hostility; they are protected by reducing that hostility.",
+          "A child-centred policy accepts that children are not protected by trapping their parents in chronic hostility; they are protected by reducing that hostility."
+        ]
+      },
+      {
+        "phrase": "Legal barriers that once trapped women in unequal marriages should not be rebuilt under the banner of family stability.",
+        "examples": [
+          "Legal barriers that once trapped women in unequal marriages should not be rebuilt under the banner of family stability.",
+          "Feminist history reminds us that legal barriers that once trapped women in unequal marriages should not be rebuilt under the banner of family stability.",
+          "We must ensure that legal barriers that once trapped women in unequal marriages should not be rebuilt under the banner of family stability."
+        ]
+      },
+      {
+        "phrase": "Compassion requires an exit route for those for whom marriage has become a source of harm rather than support.",
+        "examples": [
+          "Compassion requires an exit route for those for whom marriage has become a source of harm rather than support.",
+          "Any humane system accepts that compassion requires an exit route for those for whom marriage has become a source of harm rather than support.",
+          "Policy debate should start from the premise that compassion requires an exit route for those for whom marriage has become a source of harm rather than support."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "out of the frying pan into the fire",
+        "definition": "To move from a bad situation into one that is even worse.",
+        "examples": [
+          "For someone in an abusive marriage, being forced to stay can be out of the frying pan into the fire of prolonged danger.",
+          "Children in high-conflict homes may experience the marriage itself as out of the frying pan into the fire compared with a calmer post-divorce life.",
+          "Restrictive laws risk pushing vulnerable people out of the frying pan into the fire."
+        ]
+      },
+      {
+        "idiom": "a prison of one's own making",
+        "definition": "A situation of confinement that is maintained by rules or choices rather than external force alone.",
+        "examples": [
+          "When the law makes exit almost impossible, marriage can become a prison of one's own making for the unhappy spouse.",
+          "No one should be required to live in a prison of one's own making simply to satisfy traditional ideals.",
+          "Easy divorce exists precisely so that adults are not condemned to a prison of one's own making."
+        ]
+      },
+      {
+        "idiom": "cut one's losses",
+        "definition": "To stop investing in a failing situation in order to limit further damage.",
+        "examples": [
+          "Sometimes the healthiest decision for everyone involved is to cut one's losses and end the marriage.",
+          "Adults should retain the freedom to cut one's losses when a relationship has become destructive.",
+          "Policy that prevents people from cutting one's losses prolongs harm."
+        ]
+      },
+      {
+        "idiom": "the lesser of two evils",
+        "definition": "The less harmful of two unwelcome options.",
+        "examples": [
+          "For many families, divorce is simply the lesser of two evils compared with years of open conflict.",
+          "Children often fare better when parents choose the lesser of two evils and separate calmly.",
+          "Recognising divorce as the lesser of two evils in some cases is a mark of realism, not of moral failure."
+        ]
+      },
+      {
+        "idiom": "live and let live",
+        "definition": "To accept that others may make different life choices without interference.",
+        "examples": [
+          "In private family matters the default principle should be live and let live rather than state-enforced permanence.",
+          "Adults who wish to remain married are free to do so; the rest of us should live and let live.",
+          "A pluralistic society practises live and let live on questions of intimate partnership."
+        ]
+      },
+      {
+        "idiom": "open the door",
+        "definition": "To create the possibility of escape or new opportunity.",
+        "examples": [
+          "No-fault divorce opened the door for countless people trapped in loveless or dangerous marriages.",
+          "We should not close the door that previous generations fought to open.",
+          "Accessible divorce continues to open the door to safer and more authentic lives for many adults and children."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "Forcing unhappy or high-conflict couples to remain together does not protect children; it often prolongs their exposure to harmful environments.",
+        "explanation": "Research comparing children in high-conflict intact families with children whose parents divorced shows that the former frequently fare worse on measures of emotional and behavioural health. Chronic parental hostility, contempt and triangulation are toxic to child development. When divorce reduces that daily exposure and is followed by cooperative co-parenting, many children show improvement. The claim that staying together is always better for children therefore fails in the very cases where conflict is severe. Legal barriers that delay or complicate exit in these situations extend the period of harm. A child-centred policy distinguishes between low-conflict drift and high-conflict toxicity; it does not treat all marriages as equally worth preserving. Accessible divorce, combined with strong support for post-separation parenting, is often the route that actually reduces harm to children rather than the route that traps them in ongoing warfare between their parents."
+      },
+      {
+        "claim": "The ability to leave a marriage is a hard-won component of women’s equality and personal freedom that should not be rolled back.",
+        "explanation": "For most of history, marriage law made exit extremely difficult, especially for women. The consequences included economic dependence, exposure to violence with little recourse, and the loss of control over one’s life trajectory. The introduction of no-fault divorce and the removal of gender-biased grounds were major feminist achievements that allowed women to leave unequal or dangerous unions without having to prove fault in humiliating detail. Re-imposing long waiting periods, mandatory counselling, or fault requirements risks recreating practical barriers that fall more heavily on the less powerful spouse, who is still more often the woman. Economic and social dependence has not disappeared; legal friction amplifies it. A free society that values gender equality must preserve realistic exit rights. Protecting women from being trapped is not a secondary consideration; it is a central reason the liberal divorce regime was created and should be maintained."
+      },
+      {
+        "claim": "Adults are the best judges of whether their own marriage remains viable; the state lacks the knowledge and legitimacy to second-guess that judgement at scale.",
+        "explanation": "Intimate relationships involve complex emotional, sexual, practical and historical knowledge that no court or legislature can possess. When two adults decide that their marriage has failed, the presumption in a liberal order should be that they are entitled to act on that judgement. Mandatory waiting periods and counselling requirements treat citizens as incompetent to make one of the most personal decisions of their lives. While the state has a legitimate interest in the welfare of children, that interest is better served by focusing on parenting quality and economic support after separation than by attempting to keep the adult relationship artificially alive. History is full of examples of legal systems that claimed to know better than the parties what their family life should look like; those experiments rarely ended well. Respect for adult agency requires that the decision to end a marriage remain primarily with the people who live inside it."
+      },
+      {
+        "claim": "Many of the negative outcomes associated with divorce are driven by pre-existing conflict, poverty and selection effects rather than by the legal act of separation itself.",
+        "explanation": "Families that divorce are not a random sample of all families. They are more likely to have experienced high conflict, economic stress, mental-health difficulties or incompatible values before the legal process begins. When studies fail to control adequately for these prior conditions, they attribute to divorce effects that actually originate in the troubled marriage. Careful research that compares trajectories before and after separation, or that uses statistical techniques to account for selection, often finds that the pure effect of divorce is smaller than raw comparisons suggest. In some cases children’s outcomes improve once the chronic stress of the intact but hostile home is removed. Policy that treats divorce as the primary causal villain therefore misdirects attention. The constructive response is to reduce the underlying drivers of family distress — poverty, untreated mental illness, lack of relationship skills — and to support healthy post-separation arrangements, rather than to make the legal exit itself more difficult."
+      },
+      {
+        "claim": "Restrictive divorce laws historically trapped people in loveless, unequal and sometimes violent marriages with little benefit to children or society.",
+        "explanation": "Before the no-fault revolution, obtaining a divorce often required proof of adultery, cruelty or desertion. The process was expensive, public and legally technical. Many people, especially women without independent means, simply remained in marriages that had become empty or dangerous. Children in those homes still experienced the emotional absence or hostility of their parents; the legal bond did not magically create a nurturing environment. The social costs of that trapped population — depression, alcoholism, domestic violence endured in silence, and the modelling of dysfunctional relationships — were real even if less visible than today’s divorce statistics. The reform that made exit accessible was a response to documented human suffering, not an ideological attack on the family. Returning to higher barriers would recreate the same hidden injuries while doing little to restore the cultural conditions that once made lifelong marriage more common. The historical record does not support the claim that difficult divorce produced better overall outcomes for the next generation."
+      },
+      {
+        "claim": "Modern economies and longer lifespans make the expectation of a single lifelong marriage less realistic for many people than it was in earlier eras.",
+        "explanation": "People now live decades longer after the child-rearing years, change careers multiple times, and move geographically far more often than previous generations. The social and economic environment in which lifelong marriage was the near-universal pattern has changed. Expecting every couple that marries at twenty-five to remain well-matched and contented at seventy is a heavier demand than it once was. Serial monogamy, while not ideal, is for many a more honest accommodation to these realities than the pretence of permanence enforced by legal friction. Policy should adapt to the society that exists rather than attempt to recreate the demographic and economic conditions of a vanished era. Supporting healthy relationships at every stage, reducing the harms of conflict, and ensuring that children are well cared for regardless of household form are more realistic goals than trying to legislate a return to mid-twentieth-century marital duration."
+      },
+      {
+        "claim": "Stigma and procedural obstacles discourage people from leaving harmful situations and can increase the risk of domestic abuse.",
+        "explanation": "When divorce is culturally shameful or legally cumbersome, victims of emotional, physical or financial abuse face additional barriers to escape. They may fear social judgement, lose access to support networks, or face prolonged legal battles that keep them in contact with an abuser. Research on domestic violence consistently identifies the period of attempted separation as one of heightened danger; adding extra procedural steps can extend that dangerous window. Support services and shelters already struggle to help people leave; legal friction compounds the difficulty. A system that prioritises the preservation of marriage over the safety of the individuals inside it fails a basic test of harm reduction. Clear, accessible exit routes, combined with robust protection orders and support for survivors, are essential components of any family-law regime that claims to value human welfare. Making divorce harder in the name of stability risks making escape harder for those who need it most."
+      },
+      {
+        "claim": "Children can and do thrive in a wide variety of family structures when conflict is low and caregiving is consistent; the two-parent married household is not the only viable model.",
+        "explanation": "Decades of research on single-parent, step-parent and cohabiting families show wide variation in outcomes. The quality of parenting, the level of conflict, economic resources and the presence of supportive extended networks matter more than the precise legal form of the adult relationship. Many children raised by divorced or never-married parents show excellent adjustment; many children in intact but high-conflict marriages show poor adjustment. Policy that treats the preservation of the original marital unit as the overriding goal therefore rests on an oversimplified model of what children need. What children need is predictable, responsive care and protection from chronic hostility. Those goods can be supplied in more than one household form. Family law should focus on securing them after separation rather than on maximising the legal duration of marriages that have already failed to supply them."
+      },
+      {
+        "claim": "Attempts to engineer lower divorce rates through legal barriers have limited effectiveness and often produce unintended consequences.",
+        "explanation": "Several jurisdictions that tightened divorce procedures or re-introduced waiting periods have seen only modest or temporary effects on overall rates. Couples determined to separate find ways around obstacles, move to more permissive jurisdictions, or simply live apart without formal divorce, creating legal and financial limbo. Mandatory counselling is frequently experienced as a bureaucratic hurdle rather than a genuine opportunity for reconciliation, especially when one party has already decided to leave. The administrative burden falls on courts and on the parties, raising costs and delays that harm those with fewer resources. Meanwhile, the underlying cultural and economic drivers of relationship breakdown remain unaddressed. Legal friction is a blunt and relatively weak instrument for producing the deep cultural change that sustained marriage rates would require. Resources spent on procedural barriers might produce more benefit if directed toward relationship education, mental-health support, and poverty reduction — interventions that act on causes rather than on the legal symptom."
+      },
+      {
+        "claim": "A free society accepts that some marriages will fail and focuses on minimising harm rather than on preventing exit.",
+        "explanation": "No legal regime has ever eliminated marital breakdown. Even in eras and cultures with strong religious and social prohibitions, informal separation, abandonment and miserable coexistence occurred. The realistic goal of policy is not zero divorce but the reduction of unnecessary harm to adults and children when relationships end. That goal is better served by accessible legal processes, strong enforcement of child-support and parenting obligations, support services for the transition, and cultural encouragement of cooperative co-parenting than by attempting to keep people legally bound against their will. Accepting the possibility of failure is not the same as celebrating it; it is a recognition of human limitation and of the diversity of life courses. Liberal family law starts from the premise that adults are entitled to end intimate partnerships and then works to make the consequences as constructive as possible. That approach is more consistent with the values of a free and pluralistic society than a regime organised around the prevention of exit."
+      }
+    ]
+  }
+}

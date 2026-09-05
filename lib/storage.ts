@@ -1,4 +1,5 @@
-import type { SRSWord, DueSRSWord, LearnedWord, UnitProgress, MyUnitProgress, UserSettings, Achievement, CustomList, WordItem, WordCollection, ImportedWord, ImportedWordExample, ImportedCollection, ImportedFolder } from './types';
+import type { SRSWord, DueSRSWord, LearnedWord, UnitProgress, MyUnitProgress, UserSettings, Achievement, CustomList, WordItem, WordCollection, ImportedWord, ImportedWordExample, ImportedCollection, ImportedFolder, StructureItem, SRSStructure, StructureUnit, TranslationSentence } from './types';
+import { TRANSLATION_SENTENCES } from './structures-sentences';
 import { SRS_INTERVALS, LEVEL_THRESHOLDS, LEARN_XP_TIERS, STREAK_BONUS_7, STREAK_BONUS_30 } from './types';
 import { supabase } from './supabase';
 
@@ -61,6 +62,10 @@ const KEYS = {
   myUnitProgress:    'lexivo_my_unit_progress',
   focusDays:         'lexivo_focus_days',
   focusUpdatedAt:    'lexivo_focus_updated_at',
+  structuresSrs:            'lexivo_structures_srs',
+  structuresSentenceProgress: 'lexivo_structures_sentence_progress',
+  structuresNewDate:        'lexivo_structures_new_date',
+  structuresNewCount:       'lexivo_structures_new_count',
 };
 
 // The exact set of localStorage keys Reset Progress clears — shared between
@@ -84,6 +89,8 @@ export const PROGRESS_RESET_KEYS = [
   'lexivo_match_xp_units', 'lexivo_focus_days', 'lexivo_focus_updated_at',
   'lexivo_sync_stat_ts', 'lexivo_sync_settings_ts', 'lexivo_sync_lists_ts',
   'lexivo_achievements', 'lexivo_achievement_dates',
+  'lexivo_structures_srs', 'lexivo_structures_new_date', 'lexivo_structures_new_count',
+  'lexivo_structures_sentence_progress',
 ];
 
 export const PROGRESS_RESET_PREFIXES = ['lexivo_unit_progress_'];
@@ -545,6 +552,157 @@ export function getGraduatedCount(): number {
     if (SRS_INTERVALS.every(i => completed.includes(i))) count++;
   }
   return count;
+}
+
+// ─── Structures SRS ─────────────────────────────────────────────────────────
+// A separate bucket from the word SRS above (lexivo_structures_* keys) — an
+// IELTS structure is a pattern+gloss, not a word+translation, and mixing it
+// into word SRS would muddy both sets of stats.
+//
+// Deliberately NOT a copy of the word-SRS math above. Word SRS walks a fixed
+// shared ladder (SRS_INTERVALS = 1/3/7/14/30 days for every word). Structures
+// use an adaptive, SM-2-style per-item schedule instead: each correct recall
+// grows ITS OWN interval by ITS OWN ease factor, and a miss resets it — so a
+// structure you keep nailing fans out fast while one you keep missing stays
+// frequent. Published comparisons of SM-2-family scheduling against fixed
+// ladders show ~20-30% fewer reviews for the same retention, precisely
+// because a shared fixed schedule can't make that per-item distinction.
+const START_EASE = 2.5;
+const MIN_EASE = 1.3;
+const MAX_EASE = 3.0;
+export const GRADUATED_INTERVAL_DAYS = 60; // "Manage deck" label threshold, not a scheduling cutoff
+
+// Distributed practice (a few new items spread across many days) beats
+// massed practice (cramming everything in one sitting) for long-term
+// retention — this caps how many structures Discover will let you mark
+// "Learned" per calendar day, independent of how many you browse/skip.
+export const DISCOVER_DAILY_NEW_CAP = 8;
+
+export function getStructuresSRSRaw(): SRSStructure[] {
+  const raw = get<any[]>(KEYS.structuresSrs, []); // eslint-disable-line @typescript-eslint/no-explicit-any
+  let needsSave = false;
+  const today = localDateStr();
+  const items: SRSStructure[] = raw.map(s => {
+    const learnedAt = s.learnedAt ?? today;
+    // Migrate any entry saved under the old fixed-ladder shape (no ease/interval/dueDate yet).
+    if (s.ease === undefined) needsSave = true;
+    return {
+      ...s,
+      learnedAt,
+      ease: s.ease ?? START_EASE,
+      interval: s.interval ?? 1,
+      reps: s.reps ?? 0,
+      dueDate: s.dueDate ?? addDaysToDateStr(learnedAt, 1),
+    } as SRSStructure;
+  });
+  if (needsSave) set(KEYS.structuresSrs, items);
+  return items;
+}
+
+export function getStructuresSRS(): SRSStructure[] {
+  return getStructuresSRSRaw().filter(s => !s.deletedAt);
+}
+
+export function getStructuresNewToday(): number {
+  const date = get<string>(KEYS.structuresNewDate, '');
+  if (date !== localDateStr()) return 0;
+  return get<number>(KEYS.structuresNewCount, 0);
+}
+
+function recordStructureNewToday() {
+  const today = localDateStr();
+  const count = getStructuresNewToday();
+  set(KEYS.structuresNewDate, today);
+  set(KEYS.structuresNewCount, count + 1);
+}
+
+export function addStructureToSRS(item: StructureItem) {
+  const items = getStructuresSRSRaw();
+  if (!items.find(s => !s.deletedAt && s.id === item.id)) {
+    const today = localDateStr();
+    items.push({
+      ...item,
+      learnedAt: today,
+      ease: START_EASE,
+      interval: 1,
+      reps: 0,
+      dueDate: addDaysToDateStr(today, 1), // first review tomorrow, not same-day
+    });
+    set(KEYS.structuresSrs, items);
+    recordStructureNewToday();
+  }
+}
+
+export function removeStructureFromSRS(id: string) {
+  set(KEYS.structuresSrs, getStructuresSRSRaw().filter(s => s.id !== id));
+}
+
+// The adaptive grading step: a correct recall grows the interval by the
+// item's own ease (which itself nudges up slightly on repeated success); a
+// miss drops straight back to a 1-day interval and nudges ease down, so a
+// consistently-missed structure keeps resurfacing frequently instead of
+// drifting out on a fixed schedule.
+export function gradeStructureSRS(id: string, grade: 'knew' | 'notYet'): SRSStructure | undefined {
+  const items = getStructuresSRSRaw();
+  const idx = items.findIndex(s => s.id === id);
+  if (idx === -1) return undefined;
+  const s = items[idx];
+  const today = localDateStr();
+
+  if (grade === 'knew') {
+    const reps = s.reps + 1;
+    const interval = reps === 1 ? 1 : reps === 2 ? 3 : Math.round(s.interval * s.ease);
+    const ease = Math.min(s.ease + 0.1, MAX_EASE);
+    items[idx] = { ...s, reps, interval, ease, dueDate: addDaysToDateStr(today, interval) };
+  } else {
+    const ease = Math.max(s.ease - 0.2, MIN_EASE);
+    items[idx] = { ...s, reps: 0, interval: 1, ease, dueDate: addDaysToDateStr(today, 1) };
+  }
+
+  set(KEYS.structuresSrs, items);
+  return items[idx];
+}
+
+export function getDueStructures(): SRSStructure[] {
+  const today = localDateStr();
+  return getStructuresSRS().filter(s => s.dueDate <= today);
+}
+
+// XP scales with how hard-earned the review was — a structure due after a
+// long interval (you've proven you know it) is worth more than one still on
+// its first 1-day interval.
+export function structureReviewXP(interval: number): number {
+  return Math.min(2 + Math.floor(interval / 3), 10);
+}
+
+// ─── Structures translation-practice pacing ────────────────────────────────
+// Sentences within a unit are always served in order and never revisited out
+// of sequence, so a single "how many served so far" counter per unit is all
+// the state needed — no per-sentence completion tracking.
+
+function getSentenceProgressMap(): Record<string, number> {
+  return get<Record<string, number>>(KEYS.structuresSentenceProgress, {});
+}
+
+export function getSentenceProgress(unit: StructureUnit): number {
+  return getSentenceProgressMap()[unit] ?? 0;
+}
+
+export function advanceSentenceProgress(unit: StructureUnit, by: number): void {
+  const map = getSentenceProgressMap();
+  const total = TRANSLATION_SENTENCES.filter(s => s.unit === unit).length;
+  map[unit] = Math.min((map[unit] ?? 0) + by, total);
+  set(KEYS.structuresSentenceProgress, map);
+}
+
+export function getSentenceTotal(unit: StructureUnit): number {
+  return TRANSLATION_SENTENCES.filter(s => s.unit === unit).length;
+}
+
+export function getNextSentenceBatch(unit: StructureUnit, batchSize = 3): TranslationSentence[] {
+  const sentences = TRANSLATION_SENTENCES.filter(s => s.unit === unit);
+  const progress = getSentenceProgress(unit);
+  return sentences.slice(progress, progress + batchSize);
 }
 
 // ─── Streak ───────────────────────────────────────────────────────────────────

@@ -1,0 +1,407 @@
+{
+  "motion": "This House believes that free universal access to antiretroviral treatment for HIV/AIDS is a fundamental human right that every government must guarantee.",
+  "for": {
+    "vocab": [
+      {
+        "term": "therapeutic equity",
+        "definition": "The principle that life-saving medical treatment must be available to every person regardless of wealth, nationality or social status.",
+        "example": "Therapeutic equity demands that a farmer in rural Zambia receives the same antiretroviral drugs as a patient in a London clinic."
+      },
+      {
+        "term": "viral suppression",
+        "definition": "The medical achievement of reducing HIV in the body to undetectable levels so the virus can no longer damage the immune system or be transmitted.",
+        "example": "When viral suppression becomes the norm through free treatment, new infections drop dramatically across entire communities."
+      },
+      {
+        "term": "epidemiological urgency",
+        "definition": "The pressing public-health necessity to act immediately because an infectious disease threatens large populations.",
+        "example": "Epidemiological urgency leaves no room for delay: every month without free treatment allows thousands of new infections."
+      },
+      {
+        "term": "stigmatisation",
+        "definition": "The social process of marking people with HIV as shameful or dangerous, which drives them away from testing and care.",
+        "example": "Stigmatisation kills more people than the virus itself when it stops individuals from seeking free treatment."
+      },
+      {
+        "term": "treatment as prevention",
+        "definition": "The proven strategy that giving antiretroviral drugs to people living with HIV stops them from transmitting the virus to others.",
+        "example": "Treatment as prevention turns every treated patient into a barrier against further spread of the epidemic."
+      },
+      {
+        "term": "human dignity",
+        "definition": "The inherent worth of every person that is violated when life-saving medicine is denied because of cost.",
+        "example": "Denying free antiretrovirals strips patients of their human dignity and reduces them to disposable lives."
+      },
+      {
+        "term": "public-health imperative",
+        "definition": "An absolute moral and practical duty of governments to protect the health of the entire population.",
+        "example": "Free universal treatment is a public-health imperative, not a charitable gesture."
+      },
+      {
+        "term": "mortality inequity",
+        "definition": "The unjust difference in death rates caused by unequal access to medical care between rich and poor.",
+        "example": "Mortality inequity is visible every day when patients die simply because they cannot afford the drugs that keep others alive."
+      },
+      {
+        "term": "seroconversion",
+        "definition": "The moment when a person becomes HIV-positive after infection and begins producing antibodies.",
+        "example": "Every preventable seroconversion is a failure of a system that refuses free treatment to those already living with the virus."
+      },
+      {
+        "term": "clinical solidarity",
+        "definition": "The shared responsibility of society to ensure that medical progress benefits the most vulnerable first.",
+        "example": "Clinical solidarity requires that the newest antiretroviral combinations reach public clinics, not only private hospitals."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "No human being should die because of the price of a pill.",
+        "examples": [
+          "No human being should die because of the price of a pill when the science to keep them alive already exists.",
+          "We cannot call ourselves a civilised world while no human being should die because of the price of a pill remains a daily reality.",
+          "The motion rests on one simple truth: no human being should die because of the price of a pill."
+        ]
+      },
+      {
+        "phrase": "Treatment is not a privilege; it is a right.",
+        "examples": [
+          "Treatment is not a privilege; it is a right that flows directly from the right to life itself.",
+          "When governments say treatment is not a privilege; it is a right, they move from charity to justice.",
+          "We must insist that treatment is not a privilege; it is a right for every person living with HIV."
+        ]
+      },
+      {
+        "phrase": "An undetectable viral load is the most powerful prevention tool we possess.",
+        "examples": [
+          "An undetectable viral load is the most powerful prevention tool we possess, yet millions still cannot access the drugs that create it.",
+          "Science has shown that an undetectable viral load is the most powerful prevention tool we possess; policy must now catch up.",
+          "If an undetectable viral load is the most powerful prevention tool we possess, denying free treatment is deliberate negligence."
+        ]
+      },
+      {
+        "phrase": "Leaving people untreated is both a moral failure and a public-health disaster.",
+        "examples": [
+          "Leaving people untreated is both a moral failure and a public-health disaster that fuels new infections every day.",
+          "History will judge us harshly for leaving people untreated is both a moral failure and a public-health disaster.",
+          "We cannot claim progress while leaving people untreated is both a moral failure and a public-health disaster continues."
+        ]
+      },
+      {
+        "phrase": "The cost of inaction is measured in human lives.",
+        "examples": [
+          "The cost of inaction is measured in human lives, not in budget lines.",
+          "Every year of delay proves that the cost of inaction is measured in human lives.",
+          "When opponents speak of expense, we must remind them that the cost of inaction is measured in human lives."
+        ]
+      },
+      {
+        "phrase": "Free treatment turns patients into partners in ending the epidemic.",
+        "examples": [
+          "Free treatment turns patients into partners in ending the epidemic rather than passive victims.",
+          "Only free treatment turns patients into partners in ending the epidemic by making viral suppression achievable for all.",
+          "When free treatment turns patients into partners in ending the epidemic, communities themselves become the strongest defence."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "turn the tide",
+        "definition": "To reverse a negative trend and create lasting positive change.",
+        "examples": [
+          "Free universal treatment is the only way to turn the tide against AIDS in the hardest-hit regions.",
+          "We have the tools to turn the tide; what we lack is the political will to use them.",
+          "History shows that decisive public funding can turn the tide of an epidemic within a single generation."
+        ]
+      },
+      {
+        "idiom": "a matter of life and death",
+        "definition": "An issue so serious that it directly decides whether people live or die.",
+        "examples": [
+          "Access to antiretrovirals is not a policy preference; it is a matter of life and death.",
+          "For a mother with a newborn, free treatment is quite literally a matter of life and death.",
+          "We must treat this debate as a matter of life and death because that is exactly what it is for millions."
+        ]
+      },
+      {
+        "idiom": "leave no one behind",
+        "definition": "To ensure that the most vulnerable and marginalised are included in every solution.",
+        "examples": [
+          "A true response to AIDS must leave no one behind, including sex workers, prisoners and rural communities.",
+          "Universal free treatment is the practical expression of the promise to leave no one behind.",
+          "Any plan that leaves people untreated has already chosen to leave someone behind."
+        ]
+      },
+      {
+        "idiom": "the writing is on the wall",
+        "definition": "Clear evidence that a serious problem will become catastrophic unless action is taken.",
+        "examples": [
+          "The writing is on the wall: without free treatment the epidemic will continue to claim lives for decades.",
+          "Rising infection rates in young people show that the writing is on the wall for any strategy that withholds treatment.",
+          "Scientific data has made the writing on the wall impossible to ignore."
+        ]
+      },
+      {
+        "idiom": "pay the ultimate price",
+        "definition": "To suffer the most severe consequence, usually death, because of a failure or decision.",
+        "examples": [
+          "When governments refuse free treatment, ordinary citizens pay the ultimate price.",
+          "Children orphaned by AIDS pay the ultimate price for decisions made in distant ministries.",
+          "We cannot accept a world in which the poor continue to pay the ultimate price for a treatable virus."
+        ]
+      },
+      {
+        "idiom": "a drop in the ocean",
+        "definition": "Something so small that it makes almost no difference to a large problem.",
+        "examples": [
+          "Charity programmes that reach only a few thousand patients are a drop in the ocean compared with the need.",
+          "Partial subsidies remain a drop in the ocean while millions still lack daily medicine.",
+          "Without universal free access, every new clinic is still only a drop in the ocean."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "Free treatment is the most effective form of prevention available.",
+        "explanation": "When a person living with HIV receives consistent antiretroviral therapy, the amount of virus in their blood falls to undetectable levels. At that point the virus cannot be transmitted sexually. This scientific fact, known as Undetectable Equals Untransmittable, means that treating existing patients is the single strongest way to stop new infections. In countries that have made treatment free and widely available, new infection rates have fallen sharply. Botswana, for example, introduced free antiretrovirals in the early 2000s and saw a dramatic decline in both deaths and new cases. By contrast, places that restrict treatment to those who can pay continue to see ongoing transmission. Therefore free universal treatment is not only a medical intervention for the individual; it is a population-level prevention strategy that protects entire communities. Refusing free treatment is equivalent to choosing higher rates of new infection."
+      },
+      {
+        "claim": "Denying free treatment violates the fundamental right to life and health.",
+        "explanation": "International human-rights law recognises the right to the highest attainable standard of health and the right to life. When a government possesses the medical knowledge and the logistical capacity to keep people alive yet withholds treatment because of cost, it deliberately allows preventable deaths. This is not a resource shortage in the absolute sense; it is a political decision about priorities. South Africa’s early refusal to provide free antiretrovirals in the public sector led to hundreds of thousands of unnecessary deaths and was later condemned by its own courts and by the international community. The moral logic is straightforward: if a life-saving medicine exists and a state can deliver it, the refusal to do so is a violation of basic human rights. Free universal access is therefore not an act of generosity but the fulfilment of a legal and ethical obligation that every government already claims to accept."
+      },
+      {
+        "claim": "The long-term economic cost of untreated AIDS far exceeds the cost of free treatment.",
+        "explanation": "People living with untreated HIV progress to AIDS, become too ill to work, require repeated hospital care, and often leave children orphaned. Each of these outcomes imposes heavy costs on families, health systems and national economies. Studies by the World Bank and UNAIDS have repeatedly shown that the productivity losses and orphan-care expenses of an uncontrolled epidemic outweigh the expense of providing antiretrovirals. In Uganda, early investment in treatment and prevention produced measurable gains in labour force participation and reduced the number of children needing state support. When treatment is free, patients remain productive, children stay in school, and the cycle of poverty is broken. Short-term budget arguments that ignore these broader economic effects are therefore incomplete and ultimately self-defeating. Free treatment is an investment that returns more than it costs."
+      },
+      {
+        "claim": "Free treatment reduces stigma by normalising HIV as a manageable chronic condition.",
+        "explanation": "When antiretroviral drugs are available only to the wealthy or through special programmes, HIV remains associated with poverty, shame and death. Free universal access changes that social meaning. People see their neighbours, colleagues and family members living healthy lives on treatment and the disease loses its power to isolate. In Brazil, the decision to provide free antiretrovirals in the public system helped shift public perception from fear to acceptance and encouraged far higher rates of testing. Stigma drives people away from clinics; free treatment draws them in. The result is earlier diagnosis, better adherence and fewer late-stage AIDS cases. Any serious strategy to end the epidemic must therefore include free treatment as a tool for social as well as medical change."
+      },
+      {
+        "claim": "Pharmaceutical profits cannot take precedence over human survival.",
+        "explanation": "Many of the key antiretroviral drugs were developed with significant public funding, yet private companies still set prices that exclude the majority of people who need them. Compulsory licensing and generic production have already shown that quality medicines can be manufactured at a fraction of the branded cost. India’s generic industry, for example, supplies affordable antiretrovirals to dozens of African countries and has saved millions of lives. When governments insist on free treatment, they create the political pressure that forces price reductions and voluntary licences. The alternative is a system in which patent holders decide who lives and who dies. No ethical framework can accept that outcome. Free universal access is the practical assertion that human life ranks higher than commercial return."
+      },
+      {
+        "claim": "Pregnant women and newborns suffer the most when treatment is not free.",
+        "explanation": "Without antiretroviral drugs, an HIV-positive mother has a high chance of transmitting the virus to her child during pregnancy, birth or breastfeeding. Free treatment almost eliminates that risk. Countries that have made prevention of mother-to-child transmission a free, routine part of antenatal care have reduced paediatric infections to near zero. In contrast, regions where drugs remain expensive continue to see thousands of infants born with HIV each year. These children then face a lifetime of medical need and social disadvantage. The moral urgency is therefore greatest for this group: free treatment protects two generations at once. Any policy that leaves pregnant women without free access is knowingly accepting preventable paediatric infections."
+      },
+      {
+        "claim": "Free treatment strengthens health systems rather than weakening them.",
+        "explanation": "Delivering antiretrovirals at scale requires trained staff, reliable supply chains, laboratory capacity and patient follow-up. These same systems improve care for tuberculosis, maternal health, diabetes and other conditions. Rwanda’s success in expanding free HIV treatment was accompanied by measurable gains in overall primary-care quality and immunisation rates. The investment in HIV programmes therefore functions as a catalyst for broader health-system development. Opponents who claim that free treatment drains resources ignore this multiplier effect. When HIV care is integrated and free, the entire public health infrastructure becomes stronger and more resilient."
+      },
+      {
+        "claim": "Global solidarity demands that wealthier nations support free treatment everywhere.",
+        "explanation": "HIV does not respect borders. An uncontrolled epidemic in one region increases the risk of drug-resistant strains and continued transmission worldwide. Programmes such as the Global Fund and PEPFAR have demonstrated that international financing can deliver free treatment at scale and produce measurable declines in incidence. When high-income countries treat free access as a shared responsibility rather than optional aid, they protect their own populations as well as others. The alternative is a two-tier world in which the virus continues to circulate among the poor and eventually returns in more dangerous forms. Free universal treatment is therefore both an act of solidarity and a matter of enlightened self-interest."
+      },
+      {
+        "claim": "Adherence and resistance are managed more effectively under free universal programmes.",
+        "explanation": "Critics often claim that free drugs will be wasted through poor adherence and will accelerate resistance. Evidence shows the opposite. When treatment is free, predictable and linked to ongoing counselling, patients are more likely to stay on therapy. Programmes in Malawi and Zambia that provide free antiretrovirals together with community support have achieved adherence rates comparable to those in high-income countries. Resistance is minimised by consistent supply and simplified regimens, not by restricting access. Charging for drugs actually increases the risk of interrupted treatment and resistance because patients skip doses when money runs short. Free universal access, properly organised, is therefore the safer medical strategy."
+      },
+      {
+        "claim": "History will judge societies by how they treated the most vulnerable during the AIDS epidemic.",
+        "explanation": "Future generations will look back at the early twenty-first century and ask whether the world used the scientific tools it possessed to save lives or allowed millions to die for lack of political courage. The countries and leaders who chose free universal treatment will be remembered as those who acted on the side of human dignity. Those who hid behind budget excuses or moralising about behaviour will be remembered for the preventable deaths that followed. The choice before this House is therefore not only technical or financial; it is historical. By affirming free access as a right, we place ourselves on the right side of that future judgement."
+      }
+    ]
+  },
+  "against": {
+    "vocab": [
+      {
+        "term": "fiscal sustainability",
+        "definition": "The ability of a government to finance a programme indefinitely without creating dangerous debt or cutting other essential services.",
+        "example": "Fiscal sustainability requires that free treatment commitments be matched by realistic long-term revenue, not temporary donor enthusiasm."
+      },
+      {
+        "term": "opportunity cost",
+        "definition": "The value of the next-best alternative that must be given up when resources are committed to one particular use.",
+        "example": "The opportunity cost of free lifelong antiretrovirals may be fewer nurses, fewer malaria nets or weaker primary schools."
+      },
+      {
+        "term": "moral hazard",
+        "definition": "The risk that people will take greater chances once they know the negative consequences will be removed or reduced.",
+        "example": "Free treatment can create moral hazard if individuals feel less urgency to practise safer behaviour."
+      },
+      {
+        "term": "resource allocation",
+        "definition": "The process of deciding how limited money, staff and facilities should be distributed among competing needs.",
+        "example": "Sound resource allocation must weigh HIV treatment against maternal mortality, childhood vaccination and emergency care."
+      },
+      {
+        "term": "behavioural responsibility",
+        "definition": "The personal duty of individuals to avoid actions that put themselves and others at known risk of infection.",
+        "example": "Any serious strategy must include behavioural responsibility rather than treating infection as an unavoidable fate."
+      },
+      {
+        "term": "donor dependency",
+        "definition": "A situation in which a country’s health programme relies so heavily on external funding that it collapses when that funding ends.",
+        "example": "Donor dependency has already forced several African programmes to ration antiretrovirals when grants were reduced."
+      },
+      {
+        "term": "therapeutic burden",
+        "definition": "The lifelong requirement of daily medication, regular monitoring and clinic visits that free treatment imposes on both patients and health systems.",
+        "example": "The therapeutic burden of lifelong antiretrovirals is sustainable only if systems are already strong enough to deliver it."
+      },
+      {
+        "term": "priority inversion",
+        "definition": "The distortion that occurs when a single disease receives disproportionate attention while other greater killers are neglected.",
+        "example": "Priority inversion is visible when HIV clinics are well stocked while rural health centres lack basic antibiotics."
+      },
+      {
+        "term": "adherence fatigue",
+        "definition": "The gradual loss of motivation to take daily medication over many years, leading to treatment failure and resistance.",
+        "example": "Adherence fatigue becomes a serious threat once free drugs are distributed without strong counselling support."
+      },
+      {
+        "term": "sovereign capacity",
+        "definition": "A government’s actual ability to design, finance and manage a complex health programme with its own institutions and resources.",
+        "example": "Sovereign capacity, not international declarations, ultimately determines whether free treatment can be delivered year after year."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "Unlimited free treatment is fiscally impossible for most governments.",
+        "examples": [
+          "Unlimited free treatment is fiscally impossible for most governments already struggling to pay teachers and maintain roads.",
+          "We must recognise that unlimited free treatment is fiscally impossible for most governments without sacrificing other vital services.",
+          "The motion ignores the simple reality that unlimited free treatment is fiscally impossible for most governments."
+        ]
+      },
+      {
+        "phrase": "Prevention remains more cost-effective than lifelong treatment.",
+        "examples": [
+          "Prevention remains more cost-effective than lifelong treatment and should therefore receive first priority.",
+          "Every serious analysis shows that prevention remains more cost-effective than lifelong treatment.",
+          "We cannot pretend that prevention remains more cost-effective than lifelong treatment is somehow less important than free drugs."
+        ]
+      },
+      {
+        "phrase": "Free drugs without strong behavioural programmes create moral hazard.",
+        "examples": [
+          "Free drugs without strong behavioural programmes create moral hazard by reducing the perceived cost of risky behaviour.",
+          "Evidence from several cities shows that free drugs without strong behavioural programmes create moral hazard.",
+          "A responsible policy must ensure that free drugs without strong behavioural programmes create moral hazard is not the result."
+        ]
+      },
+      {
+        "phrase": "Health systems cannot absorb an open-ended commitment.",
+        "examples": [
+          "Health systems cannot absorb an open-ended commitment while clinics already face staff shortages and stock-outs.",
+          "The claim that health systems cannot absorb an open-ended commitment is not ideology; it is operational reality.",
+          "We must face the fact that health systems cannot absorb an open-ended commitment without collapsing other services."
+        ]
+      },
+      {
+        "phrase": "Sustainability must take precedence over political symbolism.",
+        "examples": [
+          "Sustainability must take precedence over political symbolism if programmes are to last beyond the next election cycle.",
+          "Declaring free treatment a right is empty if sustainability must take precedence over political symbolism is ignored.",
+          "Responsible leadership understands that sustainability must take precedence over political symbolism."
+        ]
+      },
+      {
+        "phrase": "Targeted support for the most vulnerable is more realistic than universal free access.",
+        "examples": [
+          "Targeted support for the most vulnerable is more realistic than universal free access in low-resource settings.",
+          "Evidence shows that targeted support for the most vulnerable is more realistic than universal free access and achieves better adherence.",
+          "We should adopt targeted support for the most vulnerable is more realistic than universal free access rather than an unaffordable promise."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "bite off more than one can chew",
+        "definition": "To attempt a commitment that is larger than available resources or capacity can support.",
+        "examples": [
+          "Promising free lifelong treatment to every citizen is to bite off more than one can chew.",
+          "Many governments have already bitten off more than they can chew with open-ended HIV commitments.",
+          "A responsible motion would avoid forcing countries to bite off more than they can chew."
+        ]
+      },
+      {
+        "idiom": "rob Peter to pay Paul",
+        "definition": "To take resources from one essential area in order to fund another, solving nothing overall.",
+        "examples": [
+          "Expanding free antiretrovirals by cutting malaria programmes is simply to rob Peter to pay Paul.",
+          "We must not rob Peter to pay Paul by starving maternal health in order to fund HIV treatment.",
+          "Any policy that forces ministries to rob Peter to pay Paul is ultimately self-defeating."
+        ]
+      },
+      {
+        "idiom": "a bottomless pit",
+        "definition": "A demand for resources that can never be fully satisfied no matter how much is provided.",
+        "examples": [
+          "Lifelong treatment for a growing patient cohort risks becoming a bottomless pit for national budgets.",
+          "Without strict eligibility and prevention focus, free drugs turn into a bottomless pit.",
+          "Donors themselves are beginning to treat open-ended treatment programmes as a bottomless pit."
+        ]
+      },
+      {
+        "idiom": "put the cart before the horse",
+        "definition": "To do things in the wrong order, focusing on a later step before the necessary foundation is ready.",
+        "examples": [
+          "Demanding free universal treatment before health systems can deliver it is to put the cart before the horse.",
+          "We put the cart before the horse when we promise drugs without first securing reliable supply chains and trained staff.",
+          "A coherent strategy refuses to put the cart before the horse."
+        ]
+      },
+      {
+        "idiom": "live within one’s means",
+        "definition": "To limit spending and commitments to the resources actually available.",
+        "examples": [
+          "Every government must live within its means, even when the cause is as important as HIV.",
+          "The motion asks countries to abandon the principle of living within their means.",
+          "Sustainable progress requires that we live within our means rather than make promises we cannot keep."
+        ]
+      },
+      {
+        "idiom": "the thin end of the wedge",
+        "definition": "A small initial commitment that is likely to expand into a much larger and more expensive obligation.",
+        "examples": [
+          "Free treatment for one group is often the thin end of the wedge leading to unlimited entitlement.",
+          "Opponents rightly fear that today’s limited free programme is the thin end of the wedge.",
+          "We should recognise free universal access as the thin end of the wedge for permanent fiscal pressure."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "Most low- and middle-income governments simply cannot afford lifelong free treatment for every patient.",
+        "explanation": "Antiretroviral therapy is a permanent daily commitment. Once a patient starts, the drugs must continue for decades. In countries where HIV prevalence remains high, the number of people needing treatment grows every year even if new infections fall. The combined cost of drugs, laboratory monitoring, clinic visits and trained personnel quickly exceeds what national budgets can sustain without heavy external support. When donor funding fluctuates, as it has in several African countries, programmes are forced to ration treatment or interrupt supply. This creates exactly the conditions that produce drug resistance and loss of public trust. A policy that ignores these hard fiscal limits is not compassionate; it is reckless. Realistic planning must begin with what governments can actually finance year after year rather than with an unlimited entitlement."
+      },
+      {
+        "claim": "Prevention programmes deliver greater long-term impact per dollar spent.",
+        "explanation": "A single prevented infection avoids a lifetime of treatment costs, clinic visits and potential orphan care. Condom distribution, male circumcision, pre-exposure prophylaxis for high-risk groups, and targeted education have repeatedly been shown to reduce incidence at far lower cost than treating the resulting infections. In Thailand and parts of West Africa, aggressive prevention campaigns produced sharp drops in new cases long before treatment became widely available. When budgets are limited, every dollar spent on free lifelong treatment is a dollar not spent on stopping the next thousand infections. The motion’s insistence on free treatment as the primary right therefore reverses the proper order of priorities. A balanced strategy funds prevention first and treatment for those already infected according to available resources."
+      },
+      {
+        "claim": "Free treatment can weaken individual responsibility and increase risk behaviour.",
+        "explanation": "When the medical consequences of infection are largely removed, some individuals reduce their use of condoms or increase the number of partners. Studies in several high-income cities and in parts of southern Africa have documented rises in sexually transmitted infections and, in some cohorts, in new HIV infections after free treatment became widely available. This is a classic moral-hazard effect. Treatment as prevention works only if patients achieve and maintain viral suppression; it does not work if new infections continue to rise because behaviour has changed. A policy that offers free drugs without equally strong investment in behaviour-change communication and personal responsibility risks creating a revolving door of new patients. Sustainable control of the epidemic requires both medical tools and social norms that discourage transmission."
+      },
+      {
+        "claim": "Open-ended free treatment crowds out other urgent health priorities.",
+        "explanation": "Health ministries operate under fixed budget ceilings. When a large and growing share of that budget is locked into lifelong antiretroviral supply, other services suffer. Rural clinics lose staff who are drawn into HIV programmes, vaccine coverage stagnates, and emergency obstetric care remains underfunded. In several countries the expansion of free HIV treatment coincided with rising maternal mortality and stagnant progress against tuberculosis. These trade-offs are not theoretical; they appear in national health accounts and in mortality statistics. Declaring HIV treatment an absolute right does not create new money; it merely reallocates existing money away from other lives that are equally valuable. A responsible government must weigh all these claims rather than elevate one disease above every other."
+      },
+      {
+        "claim": "Donor-driven free treatment programmes create dangerous dependency.",
+        "explanation": "A large proportion of antiretroviral drugs in low-income countries is still financed by external donors. When those donors change priorities or face their own budget pressures, recipient governments are left with thousands of patients on treatment and no reliable way to continue supply. Interruptions have already occurred in several programmes, leading to resistance and deaths. Building a national health system that depends on the continued goodwill of distant taxpayers is inherently fragile. True sustainability requires that countries develop their own financing mechanisms, even if that means slower expansion and stricter eligibility. The motion’s demand for free universal access accelerates dependency rather than reducing it."
+      },
+      {
+        "claim": "Health systems lack the capacity to deliver free treatment safely at the scale required.",
+        "explanation": "Providing antiretrovirals is not simply a matter of handing out pills. It requires reliable cold-chain or storage systems, regular viral-load testing, trained adherence counsellors, and the ability to manage side-effects and resistance. Many public systems already struggle to keep basic antibiotics in stock. Expanding free treatment without first strengthening these foundations produces stock-outs, poor adherence and the rapid emergence of resistant virus. Resistant HIV is harder and more expensive to treat and can be transmitted to others. A policy that prioritises the political announcement of free access over the practical capacity to deliver it therefore risks making the epidemic more dangerous. Capacity must come first."
+      },
+      {
+        "claim": "Universal free access removes the ability to prioritise the most urgent clinical cases.",
+        "explanation": "In any resource-constrained setting, clinicians must decide who receives limited drugs and laboratory slots first. Patients with advanced AIDS, pregnant women, and those with tuberculosis co-infection have the most immediate need. When treatment is declared free and universal, political pressure and patient demand make it harder to maintain clinical triage. The result can be that healthier patients consume resources while the sickest wait. Targeted programmes that focus free treatment on those with the greatest medical need have produced better survival outcomes with the same budget. An absolute entitlement undermines this necessary medical prioritisation."
+      },
+      {
+        "claim": "Long-term adherence is difficult to maintain without personal financial stake or strong social support.",
+        "explanation": "Taking pills every day for decades is a heavy psychological and practical burden. When drugs are completely free and no personal contribution is required, some patients disengage once they feel better. Programmes that include even modest co-payments or require active community support structures have often recorded higher long-term adherence. Free universal provision without corresponding investment in counselling and social accountability therefore risks higher rates of treatment failure. Failure produces resistance that harms both the individual and the wider community. A more sustainable model combines affordable access with mechanisms that keep patients engaged."
+      },
+      {
+        "claim": "The motion treats a complex social and behavioural epidemic as a purely medical supply problem.",
+        "explanation": "HIV spreads through specific behaviours and social networks. Simply making drugs free does not automatically change those behaviours or the stigma, gender inequality and poverty that drive transmission. Countries that have achieved the greatest reductions in new infections combined treatment with strong prevention, education, and legal reform. The motion’s exclusive focus on free treatment as a human right risks reducing a multi-dimensional challenge to a single pharmaceutical solution. History shows that medical tools alone have never been sufficient to control this epidemic. A balanced approach is required."
+      },
+      {
+        "claim": "Political promises of free universal treatment often collapse into broken trust when funding runs out.",
+        "explanation": "Voters and patients remember the announcement of free treatment far more clearly than the later rationing or stock-outs. When governments cannot keep the promise, public confidence in the entire health system is damaged. People stop testing, stop returning for care, and turn to informal markets where quality is uncertain. The resulting loss of trust is harder to rebuild than the original shortage of drugs. A more honest policy sets clear, affordable eligibility criteria and expands coverage only as domestic and reliable external resources allow. Such an approach may be less dramatic, but it preserves the credibility that every successful health programme ultimately depends upon."
+      }
+    ]
+  }
+}

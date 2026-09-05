@@ -1,0 +1,407 @@
+{
+  "motion": "This House believes that unemployment is primarily a systemic problem requiring comprehensive government intervention",
+  "for": {
+    "vocab": [
+      {
+        "term": "structural unemployment",
+        "definition": "Joblessness caused by deep mismatches between the skills workers possess and the skills the economy demands",
+        "example": "Automation and globalisation have produced structural unemployment that individual effort alone cannot overcome."
+      },
+      {
+        "term": "demand deficiency",
+        "definition": "A shortfall in overall spending in the economy that leaves productive capacity and willing workers idle",
+        "example": "When demand deficiency sets in, even highly skilled workers can find themselves without jobs."
+      },
+      {
+        "term": "labour market exclusion",
+        "definition": "The systematic shutting out of certain groups from stable, decent employment through discrimination, geography or institutional design",
+        "example": "Long-term labour market exclusion scars individuals and communities for decades."
+      },
+      {
+        "term": "hysteresis",
+        "definition": "The process by which temporary unemployment becomes permanent through skill erosion and employer stigma",
+        "example": "Hysteresis turns cyclical downturns into lasting social damage if governments fail to act."
+      },
+      {
+        "term": "job guarantee",
+        "definition": "A public policy that offers employment on demand to anyone ready and willing to work at a living wage",
+        "example": "A carefully designed job guarantee would eliminate involuntary unemployment while stabilising demand."
+      },
+      {
+        "term": "involuntary unemployment",
+        "definition": "The condition of people who are actively seeking work at prevailing wages but cannot find it",
+        "example": "Involuntary unemployment is a market failure, not a lifestyle choice."
+      },
+      {
+        "term": "skill obsolescence",
+        "definition": "The rapid loss of economic value of existing skills due to technological or industrial change",
+        "example": "Skill obsolescence leaves experienced workers stranded even when they have strong work histories."
+      },
+      {
+        "term": "aggregate demand",
+        "definition": "The total spending on goods and services in an economy",
+        "example": "When aggregate demand collapses, unemployment rises regardless of individual motivation."
+      },
+      {
+        "term": "social scarring",
+        "definition": "The long-term damage to health, earnings and social inclusion caused by extended periods without work",
+        "example": "Social scarring from youth unemployment can reduce lifetime earnings by double-digit percentages."
+      },
+      {
+        "term": "full employment",
+        "definition": "A state in which everyone who wants to work at the prevailing wage can find a job within a reasonable time",
+        "example": "Full employment should be treated as a core macroeconomic objective, not a distant aspiration."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "People do not choose mass unemployment; mass unemployment chooses them.",
+        "examples": [
+          "People do not choose mass unemployment; mass unemployment chooses them when demand collapses.",
+          "In a recession the phrase is literal: people do not choose mass unemployment; mass unemployment chooses them.",
+          "Blaming individuals ignores the obvious truth that people do not choose mass unemployment; mass unemployment chooses them."
+        ]
+      },
+      {
+        "phrase": "A society that tolerates high unemployment is wasting its most valuable resource — human potential.",
+        "examples": [
+          "A society that tolerates high unemployment is wasting its most valuable resource — human potential.",
+          "Idle factories are bad; idle people are worse. A society that tolerates high unemployment is wasting its most valuable resource — human potential.",
+          "The economic and moral case is the same: a society that tolerates high unemployment is wasting its most valuable resource — human potential."
+        ]
+      },
+      {
+        "phrase": "Individual effort cannot create jobs that the economy is not generating.",
+        "examples": [
+          "Individual effort cannot create jobs that the economy is not generating.",
+          "Motivation seminars are useless when individual effort cannot create jobs that the economy is not generating.",
+          "The supply of labour is not the problem; individual effort cannot create jobs that the economy is not generating."
+        ]
+      },
+      {
+        "phrase": "Unemployment is a policy choice disguised as an economic inevitability.",
+        "examples": [
+          "Unemployment is a policy choice disguised as an economic inevitability.",
+          "Different countries facing similar shocks achieve very different unemployment rates; unemployment is a policy choice disguised as an economic inevitability.",
+          "We should stop accepting that unemployment is a policy choice disguised as an economic inevitability."
+        ]
+      },
+      {
+        "phrase": "The costs of unemployment are paid by the unemployed but inflicted by systemic failure.",
+        "examples": [
+          "The costs of unemployment are paid by the unemployed but inflicted by systemic failure.",
+          "Health, dignity and future earnings are destroyed: the costs of unemployment are paid by the unemployed but inflicted by systemic failure.",
+          "Justice requires recognising that the costs of unemployment are paid by the unemployed but inflicted by systemic failure."
+        ]
+      },
+      {
+        "phrase": "Leaving unemployment to the market is like leaving a fire to the wind.",
+        "examples": [
+          "Leaving unemployment to the market is like leaving a fire to the wind.",
+          "Markets do not automatically self-correct at full employment; leaving unemployment to the market is like leaving a fire to the wind.",
+          "History shows that leaving unemployment to the market is like leaving a fire to the wind."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "out of work",
+        "definition": "Unemployed; without a paid job",
+        "examples": [
+          "Millions remain out of work through no fault of their own when recessions hit.",
+          "Being out of work for long periods destroys more than income; it destroys confidence and health.",
+          "A decent society does not treat large numbers of people out of work as an acceptable equilibrium."
+        ]
+      },
+      {
+        "idiom": "on the scrapheap",
+        "definition": "Discarded as no longer useful, especially regarding workers",
+        "examples": [
+          "Older workers are too often thrown on the scrapheap when industries restructure.",
+          "A civilised economy does not consign skilled people to the scrapheap.",
+          "Policy should prevent human beings from being treated as if they belong on the scrapheap."
+        ]
+      },
+      {
+        "idiom": "to fall on hard times",
+        "definition": "To experience a period of severe difficulty, especially financial",
+        "examples": [
+          "Entire regions can fall on hard times when major employers close.",
+          "Individuals who fall on hard times deserve systemic support, not moral lectures.",
+          "Preventing people from falling on hard times is cheaper than dealing with the aftermath."
+        ]
+      },
+      {
+        "idiom": "a lost generation",
+        "definition": "A cohort of young people whose life chances are permanently damaged by prolonged unemployment or underemployment",
+        "examples": [
+          "High youth unemployment risks creating a lost generation with lifelong scars.",
+          "We cannot afford another lost generation produced by policy indifference.",
+          "The concept of a lost generation should be a permanent warning against complacency."
+        ]
+      },
+      {
+        "idiom": "to tighten one’s belt",
+        "definition": "To reduce spending and live more frugally because of financial pressure",
+        "examples": [
+          "Telling the unemployed to tighten their belts ignores that they have already cut to the bone.",
+          "National austerity that forces households to tighten their belts deepens demand deficiency.",
+          "There is a limit to how far people can tighten their belts before the social fabric tears."
+        ]
+      },
+      {
+        "idiom": "the dole queue",
+        "definition": "The line of people waiting to claim unemployment benefits; a symbol of joblessness",
+        "examples": [
+          "No one should have to join the dole queue because macroeconomic policy has failed.",
+          "Long dole queues are a visible indictment of inadequate demand management.",
+          "Reducing the dole queue requires jobs, not just stricter benefit conditions."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "Mass unemployment rises and falls with macroeconomic conditions, not with sudden changes in personal virtue.",
+        "explanation": "Historical data show that unemployment rates move in clear cycles that track recessions, financial crises and recoveries. Millions of people do not simultaneously become lazy or unskilled when a financial crisis hits; they lose jobs because firms cut production in response to falling demand. The same individuals who were employed in the boom are unemployed in the bust. This pattern is incompatible with explanations that locate the primary cause in individual character. Countries that use active fiscal and monetary policy to support demand experience shallower rises in unemployment and faster recoveries. Treating a macroeconomic phenomenon as a collection of personal failings is a category error that leads to ineffective and often cruel policy."
+      },
+      {
+        "claim": "Structural changes in technology and trade create unemployment that individuals cannot solve through effort alone.",
+        "explanation": "When entire industries contract because of automation, offshoring or shifting comparative advantage, the affected workers face skill obsolescence and geographic mismatch. Retraining helps some, but the scale and speed of displacement often exceed the capacity of individuals to adapt, especially older workers or those in specialised trades. Historical episodes such as deindustrialisation in manufacturing regions produced persistent joblessness even among people with strong work ethics and prior stable employment. Systemic responses — targeted industrial policy, large-scale reskilling programmes, regional investment, and transitional income support — are required because the shock itself is systemic. Leaving adjustment entirely to the market simply concentrates the costs on those least able to bear them."
+      },
+      {
+        "claim": "Long-term unemployment creates hysteresis that permanently damages both individuals and the productive capacity of the economy.",
+        "explanation": "Extended periods out of work erode skills, destroy confidence, damage physical and mental health, and signal to employers that a candidate is risky. As a result, the probability of re-employment falls the longer a person remains jobless. What begins as cyclical unemployment becomes structural. The economy loses not only current output but future potential output as human capital is destroyed. Preventing hysteresis through rapid re-employment policies, job guarantees, or intensive support is therefore an investment in future productivity as well as an act of social justice. Passive systems that allow long-term unemployment to accumulate impose unnecessary and lasting costs on both the unemployed and society as a whole."
+      },
+      {
+        "claim": "Youth unemployment carries especially severe and long-lasting social costs that justify prioritised intervention.",
+        "explanation": "Young people who enter the labour market during periods of high unemployment suffer scarring effects that reduce their earnings and employment probabilities for decades. They are more likely to experience repeated spells of joblessness, poorer health, and weaker social integration. These individual harms aggregate into broader social problems, including higher crime, lower tax revenues, and reduced social cohesion. Because the lifetime costs are so large, even expensive programmes that successfully insert young people into stable work can be highly cost-effective. Treating youth unemployment as a regrettable but secondary issue is short-sighted. Comprehensive intervention targeted at school-to-work transitions and early career stability is one of the highest-return uses of public resources."
+      },
+      {
+        "claim": "Markets alone do not reliably generate enough jobs at decent wages for everyone willing to work.",
+        "explanation": "Private employers hire when they expect to make a profit, not when there are people who need work. In the aggregate this can leave a residual of involuntary unemployment even in relatively good times, and large pools of joblessness in bad times. The historical record of capitalist economies shows persistent unemployment rates well above frictional levels for long periods. Only when governments have actively targeted full employment — through public works, demand management, or employment guarantees — have societies approached genuine job availability for all. Relying solely on private job creation is therefore a choice to accept ongoing involuntary unemployment as normal. That choice has no strong ethical or economic justification once the tools for reducing it are available."
+      },
+      {
+        "claim": "The social and health costs of unemployment far exceed the budgetary costs of effective intervention.",
+        "explanation": "Unemployment is strongly associated with higher rates of depression, anxiety, cardiovascular disease, substance abuse, and even mortality. Families experience stress, children show worse educational outcomes, and communities suffer from reduced social capital. These costs appear in healthcare budgets, criminal justice systems, and lost productivity. Cost-benefit studies of active labour market programmes and job-creation schemes frequently show that the public savings and social gains outweigh the direct fiscal outlay. Allowing high unemployment to persist in the name of fiscal caution is therefore often fiscally short-sighted. Comprehensive intervention is not merely compassionate; it is the lower-cost path once the full social ledger is examined."
+      },
+      {
+        "claim": "Discrimination and spatial inequality create unemployment that is invisible to purely individualistic explanations.",
+        "explanation": "Ethnic minorities, people with disabilities, older workers, and residents of declining regions face systematically higher unemployment rates even when education and experience are comparable. Employer bias, network exclusion, transport barriers, and the concentration of job destruction in particular places all operate as structural filters. Telling individuals in these groups to try harder or to move ignores the cumulative barriers they face and the fact that not everyone can migrate. Place-based policies, anti-discrimination enforcement, supported employment, and demand-side measures in lagging regions are necessary precisely because the problem is not evenly distributed personal deficiency. Systemic patterns require systemic responses."
+      },
+      {
+        "claim": "A job guarantee or strong public employment capacity can eliminate involuntary unemployment while stabilising the wider economy.",
+        "explanation": "By offering work at a living wage to anyone ready and willing to take it, a job guarantee sets an effective floor under the labour market. It absorbs workers displaced by private-sector fluctuations and releases them when private demand recovers, acting as an automatic stabiliser. Local public employment can address unmet social and environmental needs that the market under-supplies. Trials and historical precedents, from the New Deal to more recent pilot schemes, show that such programmes can be administered without catastrophic inefficiency. The existence of a feasible institutional solution means that ongoing involuntary unemployment is not a technical necessity but a political decision. Societies that reject the tool accept the resulting human waste."
+      },
+      {
+        "claim": "High unemployment weakens workers’ bargaining power and contributes to broader inequality and social resentment.",
+        "explanation": "When jobs are scarce, employers can offer lower wages, worse conditions, and less security. The threat of unemployment disciplines the entire workforce, not only those currently without jobs. Over time this shifts the distribution of income toward capital and high earners and erodes the quality of work for those still employed. The resulting inequality feeds political polarisation and reduces social trust. Full employment, by contrast, tightens the labour market, raises the wage floor, and gives ordinary workers greater voice. The macroeconomic goal of low unemployment is therefore also a distributional and democratic goal. Tolerating high joblessness is not distributionally neutral; it systematically advantages those who already hold economic power."
+      },
+      {
+        "claim": "International evidence shows that countries with stronger commitment to full employment achieve lower unemployment without necessarily sacrificing long-term prosperity.",
+        "explanation": "Nordic and other coordinated market economies have historically maintained lower unemployment rates than more laissez-faire peers through active labour market policies, demand management, and social partnership. These countries have not paid for low unemployment with permanent stagnation; many have combined low joblessness with high productivity and strong innovation. The claim that any attempt to reduce unemployment below some “natural” rate must produce accelerating inflation or inefficiency is not supported by the full range of cross-country experience. Institutional design matters. Comprehensive government intervention, when well designed, can deliver tighter labour markets and acceptable macroeconomic performance simultaneously. The fatalistic view that unemployment is an unavoidable price of prosperity is empirically overstated."
+      }
+    ]
+  },
+  "against": {
+    "vocab": [
+      {
+        "term": "personal agency",
+        "definition": "The capacity of individuals to make choices and take actions that shape their own employment outcomes",
+        "example": "Any effective approach to unemployment must respect and reinforce personal agency rather than treat people as passive victims."
+      },
+      {
+        "term": "labour market flexibility",
+        "definition": "The ability of wages, hiring, and working arrangements to adjust quickly to changing economic conditions",
+        "example": "Labour market flexibility helps economies absorb shocks with less prolonged unemployment."
+      },
+      {
+        "term": "skills mismatch",
+        "definition": "A gap between the abilities workers offer and the abilities employers require",
+        "example": "Persistent skills mismatch explains why vacancies and unemployment can coexist in the same economy."
+      },
+      {
+        "term": "moral hazard",
+        "definition": "The risk that protection from consequences reduces the incentive to avoid the underlying problem",
+        "example": "Overly generous or unconditional support can create moral hazard that prolongs unemployment spells."
+      },
+      {
+        "term": "frictional unemployment",
+        "definition": "Short-term joblessness that occurs while people move between jobs or enter the labour market",
+        "example": "Some frictional unemployment is inevitable and even healthy in a dynamic economy."
+      },
+      {
+        "term": "reservation wage",
+        "definition": "The lowest wage at which a person is willing to accept employment",
+        "example": "When benefits raise the reservation wage above market levels, voluntary unemployment increases."
+      },
+      {
+        "term": "employability",
+        "definition": "The combination of skills, attitudes and behaviours that make a person attractive to employers",
+        "example": "Raising employability through education and work habits is often more effective than creating artificial demand."
+      },
+      {
+        "term": "dependency culture",
+        "definition": "A pattern of reliance on state support that weakens the expectation of self-support through work",
+        "example": "Long-term unemployment programmes risk fostering a dependency culture if they lack strong activation requirements."
+      },
+      {
+        "term": "creative destruction",
+        "definition": "The process by which innovation and competition continuously destroy old jobs while creating new ones",
+        "example": "Attempts to prevent creative destruction in the name of job security ultimately slow the growth of better employment."
+      },
+      {
+        "term": "activation policy",
+        "definition": "Measures that require and enable unemployed people to search for work, train, or accept suitable jobs",
+        "example": "Modern activation policy combines support with clear expectations of effort and availability."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "Jobs are created by customers and employers, not by government decree.",
+        "examples": [
+          "Jobs are created by customers and employers, not by government decree.",
+          "Sustainable employment rests on this reality: jobs are created by customers and employers, not by government decree.",
+          "Public employment schemes cannot permanently override the fact that jobs are created by customers and employers, not by government decree."
+        ]
+      },
+      {
+        "phrase": "Helping people into work is not the same as guaranteeing them a job regardless of contribution.",
+        "examples": [
+          "Helping people into work is not the same as guaranteeing them a job regardless of contribution.",
+          "Effective policy distinguishes support from entitlement: helping people into work is not the same as guaranteeing them a job regardless of contribution.",
+          "The difference matters: helping people into work is not the same as guaranteeing them a job regardless of contribution."
+        ]
+      },
+      {
+        "phrase": "A system that removes the need to seek work will eventually remove the habit of work.",
+        "examples": [
+          "A system that removes the need to seek work will eventually remove the habit of work.",
+          "Long-term passive support risks this outcome: a system that removes the need to seek work will eventually remove the habit of work.",
+          "Activation exists because a system that removes the need to seek work will eventually remove the habit of work."
+        ]
+      },
+      {
+        "phrase": "Most people who want work eventually find it when they search effectively and accept realistic opportunities.",
+        "examples": [
+          "Most people who want work eventually find it when they search effectively and accept realistic opportunities.",
+          "The data on job-finding rates support the view that most people who want work eventually find it when they search effectively and accept realistic opportunities.",
+          "Policy should reinforce rather than undermine the reality that most people who want work eventually find it when they search effectively and accept realistic opportunities."
+        ]
+      },
+      {
+        "phrase": "Protecting existing jobs at all costs freezes the economy and ultimately destroys more employment.",
+        "examples": [
+          "Protecting existing jobs at all costs freezes the economy and ultimately destroys more employment.",
+          "Creative destruction is painful but necessary; protecting existing jobs at all costs freezes the economy and ultimately destroys more employment.",
+          "Historical experience shows that protecting existing jobs at all costs freezes the economy and ultimately destroys more employment."
+        ]
+      },
+      {
+        "phrase": "Unemployment statistics include people who are not genuinely available for or capable of regular work.",
+        "examples": [
+          "Unemployment statistics include people who are not genuinely available for or capable of regular work.",
+          "Policy design must recognise that unemployment statistics include people who are not genuinely available for or capable of regular work.",
+          "Treating every recorded unemployed person as identical ignores that unemployment statistics include people who are not genuinely available for or capable of regular work."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "to stand on one’s own two feet",
+        "definition": "To be self-reliant and independent of external support",
+        "examples": [
+          "The goal of employment policy should be to help people stand on their own two feet.",
+          "Permanent public employment can undermine the capacity to stand on one’s own two feet.",
+          "Most individuals prefer to stand on their own two feet when given realistic pathways."
+        ]
+      },
+      {
+        "idiom": "a hand up, not a handout",
+        "definition": "Assistance designed to restore independence rather than create permanent reliance",
+        "examples": [
+          "Effective labour market policy offers a hand up, not a handout.",
+          "Taxpayers support programmes that provide a hand up, not a handout.",
+          "The distinction between a hand up and a handout is central to sustainable welfare design."
+        ]
+      },
+      {
+        "idiom": "to price oneself out of the market",
+        "definition": "To demand wages or conditions that make one unemployable relative to alternatives",
+        "examples": [
+          "High reservation wages can cause people to price themselves out of the market.",
+          "Benefits systems that are too generous relative to entry-level pay encourage people to price themselves out of the market.",
+          "Realistic wage expectations prevent workers from pricing themselves out of the market."
+        ]
+      },
+      {
+        "idiom": "tough love",
+        "definition": "Support combined with firm expectations and consequences",
+        "examples": [
+          "Activation policies often operate on the principle of tough love.",
+          "Some jobseekers respond better to tough love than to unconditional support.",
+          "Tough love in employment services means caring enough to require effort."
+        ]
+      },
+      {
+        "idiom": "to get back on one’s feet",
+        "definition": "To recover from difficulty and regain stability and independence",
+        "examples": [
+          "Most unemployed people want to get back on their feet as quickly as possible.",
+          "Good policy shortens the time needed to get back on one’s feet.",
+          "Prolonged support without activation can delay the process of getting back on one’s feet."
+        ]
+      },
+      {
+        "idiom": "the world does not owe you a living",
+        "definition": "Individuals are responsible for securing their own livelihood rather than expecting provision as of right",
+        "examples": [
+          "A healthy culture still holds that the world does not owe you a living.",
+          "Entitlement mentalities collide with the reality that the world does not owe you a living.",
+          "Teaching young people that the world does not owe you a living is part of preparing them for adult life."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "A substantial share of measured unemployment reflects frictional movement, skills mismatch, and reservation wages rather than pure demand deficiency.",
+        "explanation": "Even in strong labour markets, people move between jobs, enter the workforce, or hold out for better offers. Vacancies and unemployment coexist because the workers available do not always match the jobs on offer in skills, location, or preferred conditions. Benefit levels and eligibility rules influence how selective jobseekers can afford to be. Treating all unemployment as involuntary demand deficiency therefore overstates the case for pure job-creation programmes. Effective policy must address matching, skills, and incentives as well as aggregate demand. Comprehensive government job guarantees risk subsidising mismatches and reducing the pressure on individuals and training systems to adapt to actual employer needs."
+      },
+      {
+        "claim": "Overly generous or poorly designed support systems can prolong unemployment by reducing the urgency of job search.",
+        "explanation": "Economic research on benefit duration and replacement rates consistently finds that more generous, longer-lasting support is associated with longer average spells of unemployment. This does not mean that all support is harmful, but it does mean that moral hazard is real. When the immediate financial penalty of remaining jobless is low, some individuals search less intensively, reject suitable offers, or delay difficult adjustments such as relocation or retraining. Activation requirements, time limits, and tapered benefits exist to counteract this effect. Systems that prioritise unconditional income support over rapid re-employment often produce higher long-term unemployment rates. Ignoring incentive effects in the name of systemic explanations leads to policies that entrench the very problem they aim to solve."
+      },
+      {
+        "claim": "Sustainable jobs are created by profitable private activity responding to consumer demand, not by permanent public employment schemes.",
+        "explanation": "Public job creation can provide temporary relief and useful public goods, but it does not automatically generate the productivity growth or consumer value that underpins lasting private employment. When governments become the employer of last resort on a large scale, they risk creating a parallel labour market with lower productivity, weaker discipline, and political pressure to maintain roles regardless of need. The fiscal cost is permanent, and the exit path back into private work is often weak. Historical public-works programmes have been most successful when temporary and targeted. Treating a job guarantee as a permanent structural solution confuses stabilisation policy with the fundamental process of wealth-creating employment. Private sector dynamism remains the only scalable source of rising living standards through work."
+      },
+      {
+        "claim": "Many unemployed people face barriers of skills, health, motivation, or behaviour that pure demand stimulus does not remove.",
+        "explanation": "Even when vacancies are plentiful, some individuals remain out of work because of low literacy, substance problems, unreliable attendance, criminal records, or weak soft skills. Employers will not hire candidates who cannot meet basic requirements of the job, regardless of macroeconomic conditions. Programmes that ignore these supply-side barriers and focus only on creating more demand simply shift the queue of who remains unemployed. Effective intervention must include assessment, remediation, and, where necessary, pressure to address personal obstacles. A purely systemic narrative that attributes all joblessness to external forces can leave these individuals without the specific help they need and can foster resentment among employers and taxpayers who observe the mismatch between available work and available workers."
+      },
+      {
+        "claim": "Labour market flexibility allows faster reallocation of workers and reduces the duration of unemployment after shocks.",
+        "explanation": "Economies with rigid employment protection, high minimum wages relative to productivity, and strong barriers to hiring and firing often experience longer unemployment spells and higher structural rates. Flexibility — in wages, contracts, and working arrangements — enables firms to adjust and to take a chance on marginal workers. While flexibility can increase insecurity for some, the alternative of protecting existing jobs at the cost of locking others out produces insider-outsider divides and persistent joblessness among the young and the low-skilled. Cross-country evidence shows that reform packages combining flexibility with activation and support can lower unemployment without sacrificing all security. Comprehensive intervention that ignores the need for adaptable labour markets risks defending structures that keep people out of work."
+      },
+      {
+        "claim": "Creative destruction is the engine of rising productivity and better jobs; attempts to suppress it in the name of employment security ultimately reduce opportunity.",
+        "explanation": "Technological change and competition continuously eliminate some roles while creating others that are usually more productive and better paid. Resisting this process through heavy subsidies to declining industries or permanent public employment in obsolete activities freezes resources in low-value uses. The workers “protected” often remain in stagnant roles with limited prospects, while the wider economy grows more slowly. The kinder and more effective approach is to facilitate transition — through portable benefits, rapid retraining, and income support during adjustment — rather than to pretend that every existing job can or should be preserved. A systemic view that treats all job loss as failure rather than as the necessary counterpart of progress leads to policies that slow the very growth that generates new employment."
+      },
+      {
+        "claim": "Cultural attitudes toward work, punctuality, and personal responsibility still vary and still affect employment outcomes.",
+        "explanation": "Not all differences in unemployment rates between groups or regions are explained by demand or discrimination. Norms around work ethic, time-keeping, residual welfare stigma, and the acceptability of certain jobs influence both labour supply and employer willingness to hire. Societies or subcultures that maintain strong expectations of self-support and reliability tend to have tighter effective labour supply and lower long-term unemployment. Policy that treats all variation as purely structural can undermine these norms by signalling that employment is optional or that any job refusal is justified. Maintaining a culture in which work is expected and valued is itself a form of prevention. Comprehensive government intervention that crowds out these informal disciplines risks long-term cultural damage that no amount of public spending can easily reverse."
+      },
+      {
+        "claim": "Fiscal and administrative limits mean that ambitious job-guarantee schemes often promise more than they can sustainably deliver.",
+        "explanation": "Large-scale public employment programmes require continuous funding, managerial capacity, and political willingness to maintain quality and prevent capture. In practice they face pressure to expand eligibility, raise wages, and retain workers even when private opportunities exist. The result can be ballooning costs, make-work activities of low social value, and difficulty in winding programmes down. International experience with public works and guaranteed employment schemes shows repeated cycles of enthusiasm, expansion, cost overrun, and partial retreat. Designing policy on the assumption that government can permanently and efficiently employ everyone who wants a job underestimates these constraints. More modest, targeted, and time-limited interventions have a better track record of sustainability and effectiveness."
+      },
+      {
+        "claim": "Focusing primarily on systemic explanations can reduce the personal urgency and self-efficacy that help many people exit unemployment.",
+        "explanation": "Beliefs about the causes of unemployment affect behaviour. When individuals are encouraged to see their situation as almost entirely the result of external systems, the perceived return to intensive job search, skill acquisition, and personal adjustment falls. Psychological research on locus of control and self-efficacy shows that people who believe their actions matter persist longer and recover faster from setbacks. A public narrative that relentlessly emphasises systemic failure, even when partially accurate, can therefore weaken the very agency required for successful job-finding. Balanced policy acknowledges structural factors while still communicating that individual effort, adaptability, and persistence remain powerful. Over-systemic messaging risks becoming a self-fulfilling prophecy of passivity."
+      },
+      {
+        "claim": "International comparisons show that countries with strong activation, conditionality, and flexible labour markets often achieve lower unemployment than those relying mainly on demand stimulus or job guarantees.",
+        "explanation": "Several European and other OECD countries have reduced structural unemployment through reforms that tightened benefit conditionality, expanded active labour market programmes with clear obligations, and increased the adaptability of employment contracts. These approaches treat unemployment as a problem that requires both opportunity and pressure. By contrast, systems that prioritise income protection and public job creation without strong activation have in several cases sustained higher long-term unemployment rates. The evidence does not support the view that more comprehensive government intervention in the form of open-ended job guarantees is systematically superior. Hybrid models that combine support with expectations and that keep the private sector as the primary engine of job creation have delivered better results in multiple settings. Policy should follow that comparative record rather than an idealised systemic narrative."
+      }
+    ]
+  }
+}

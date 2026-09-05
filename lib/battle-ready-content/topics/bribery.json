@@ -1,0 +1,407 @@
+{
+  "motion": "This House believes that bribery does more harm than good",
+  "for": {
+    "vocab": [
+      {
+        "term": "institutional decay",
+        "definition": "The gradual collapse of formal rules, standards and public trust inside organisations or governments.",
+        "example": "Widespread bribery accelerates institutional decay by rewarding dishonesty over competence and integrity."
+      },
+      {
+        "term": "moral hazard",
+        "definition": "A situation in which people take greater risks or act unethically because they expect someone else to bear the cost.",
+        "example": "When officials accept bribes with little fear of punishment, a dangerous moral hazard spreads through the entire system."
+      },
+      {
+        "term": "public trust erosion",
+        "definition": "The progressive loss of citizens’ confidence in the fairness and honesty of institutions.",
+        "example": "Every high-profile bribery scandal deepens public trust erosion and makes people cynical about democracy itself."
+      },
+      {
+        "term": "systemic corruption",
+        "definition": "Corruption that is not limited to a few individuals but has become embedded in the normal functioning of an organisation or society.",
+        "example": "In some countries systemic corruption means that ordinary citizens must pay bribes simply to receive basic public services."
+      },
+      {
+        "term": "resource misallocation",
+        "definition": "The inefficient or unfair distribution of money, opportunities and public goods caused by distorted incentives.",
+        "example": "Bribery causes severe resource misallocation because contracts go to the highest bidder rather than the best qualified supplier."
+      },
+      {
+        "term": "impunity culture",
+        "definition": "A social atmosphere in which powerful people expect to break rules without facing meaningful consequences.",
+        "example": "An impunity culture develops when senior officials who accept large bribes are rarely investigated or punished."
+      },
+      {
+        "term": "predatory governance",
+        "definition": "A style of rule in which those in power treat the state as a source of private enrichment rather than public service.",
+        "example": "Bribery is the everyday mechanism that sustains predatory governance and keeps ordinary people trapped in poverty."
+      },
+      {
+        "term": "distorted incentives",
+        "definition": "Rewards and punishments that encourage harmful behaviour instead of productive or ethical behaviour.",
+        "example": "When promotion depends on personal connections and bribes, the system creates distorted incentives that punish honest officials."
+      },
+      {
+        "term": "social fragmentation",
+        "definition": "The breakdown of shared values and mutual trust that holds a community or nation together.",
+        "example": "Long-term exposure to bribery produces social fragmentation because people stop believing that fairness is possible."
+      },
+      {
+        "term": "development trap",
+        "definition": "A self-reinforcing cycle in which corruption prevents the economic and institutional progress needed to escape poverty.",
+        "example": "Many low-income countries remain stuck in a development trap because bribery drains resources that should build infrastructure and education."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "Bribery systematically destroys the foundations of fair competition.",
+        "examples": [
+          "Bribery systematically destroys the foundations of fair competition by awarding contracts to those who pay rather than those who perform.",
+          "In public procurement, bribery systematically destroys the foundations of fair competition and leaves taxpayers with inferior results.",
+          "Once bribery systematically destroys the foundations of fair competition, honest businesses are forced either to leave the market or to join the corruption."
+        ]
+      },
+      {
+        "phrase": "The true victims of bribery are ordinary citizens who never sit at the negotiating table.",
+        "examples": [
+          "The true victims of bribery are ordinary citizens who never sit at the negotiating table yet pay higher prices and receive worse services.",
+          "When hospitals demand unofficial payments, the true victims of bribery are ordinary citizens who cannot afford life-saving treatment.",
+          "Infrastructure projects inflated by kickbacks show that the true victims of bribery are ordinary citizens left with unsafe roads and incomplete schools."
+        ]
+      },
+      {
+        "phrase": "Impunity for the powerful breeds contempt for the law among everyone else.",
+        "examples": [
+          "Impunity for the powerful breeds contempt for the law among everyone else and normalises dishonesty as a survival strategy.",
+          "When senior officials escape punishment, impunity for the powerful breeds contempt for the law among everyone else.",
+          "A society cannot function when impunity for the powerful breeds contempt for the law among everyone else."
+        ]
+      },
+      {
+        "phrase": "Bribery turns public office into a private business opportunity.",
+        "examples": [
+          "Bribery turns public office into a private business opportunity and replaces service with extraction.",
+          "In many systems bribery turns public office into a private business opportunity, attracting the greedy rather than the competent.",
+          "Once bribery turns public office into a private business opportunity, the entire purpose of government is inverted."
+        ]
+      },
+      {
+        "phrase": "Short-term gains from bribery create long-term institutional poison.",
+        "examples": [
+          "Short-term gains from bribery create long-term institutional poison that is extremely difficult to remove.",
+          "Companies that win contracts through payments discover that short-term gains from bribery create long-term institutional poison.",
+          "Even when a single deal seems efficient, short-term gains from bribery create long-term institutional poison across the system."
+        ]
+      },
+      {
+        "phrase": "No society can claim to be just while its institutions run on secret payments.",
+        "examples": [
+          "No society can claim to be just while its institutions run on secret payments instead of transparent rules.",
+          "The principle is simple: no society can claim to be just while its institutions run on secret payments.",
+          "Democracy becomes theatre when no society can claim to be just while its institutions run on secret payments."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "to grease the wheels",
+        "definition": "To make a process move more smoothly by offering money or favours, usually implying corruption.",
+        "examples": [
+          "Officials often claim that small payments simply grease the wheels, yet the practice quickly becomes expected and abusive.",
+          "What begins as an attempt to grease the wheels ends up creating a parallel system of informal taxation.",
+          "Defenders of facilitation payments say they only grease the wheels, but the long-term effect is institutional decay."
+        ]
+      },
+      {
+        "idiom": "to line one's own pockets",
+        "definition": "To enrich oneself dishonestly at the expense of others or of the public interest.",
+        "examples": [
+          "Politicians who demand kickbacks are simply lining their own pockets while public projects collapse.",
+          "When procurement officers inflate contracts, they are lining their own pockets and stealing from taxpayers.",
+          "The entire network exists so that a few people can line their own pockets at the expense of everyone else."
+        ]
+      },
+      {
+        "idiom": "a culture of impunity",
+        "definition": "An environment in which wrongdoers, especially the powerful, face no real consequences for their actions.",
+        "examples": [
+          "A culture of impunity allows bribery to flourish because no one expects serious investigation or punishment.",
+          "Once a culture of impunity takes hold, even mid-level officials feel free to demand payments.",
+          "Breaking a culture of impunity requires consistent enforcement against the highest as well as the lowest offenders."
+        ]
+      },
+      {
+        "idiom": "to rob Peter to pay Paul",
+        "definition": "To take resources from one necessary purpose in order to satisfy another, often creating new problems.",
+        "examples": [
+          "Governments that tolerate bribery are effectively robbing Peter to pay Paul by diverting development funds into private hands.",
+          "When companies budget for bribes, they rob Peter to pay Paul and pass the cost on to consumers or shareholders.",
+          "The practice of robbing Peter to pay Paul through corruption leaves essential services permanently underfunded."
+        ]
+      },
+      {
+        "idiom": "to turn a blind eye",
+        "definition": "To deliberately ignore wrongdoing that one has a duty to notice or prevent.",
+        "examples": [
+          "Senior managers who turn a blind eye to bribery by their staff become complicit in the damage.",
+          "International organisations sometimes turn a blind eye to local corruption in order to keep projects moving.",
+          "A society that continues to turn a blind eye to everyday bribery eventually loses the capacity to enforce any rule."
+        ]
+      },
+      {
+        "idiom": "the tip of the iceberg",
+        "definition": "A small visible part of a much larger and more serious hidden problem.",
+        "examples": [
+          "The few officials who are prosecuted represent only the tip of the iceberg of systemic bribery.",
+          "High-profile scandals are usually the tip of the iceberg; the everyday payments that citizens make remain hidden.",
+          "What the public sees in the newspapers is merely the tip of the iceberg of a much deeper institutional disease."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "Bribery destroys the rule of law by replacing clear rules with personal deals.",
+        "explanation": "The rule of law requires that the same standards apply to everyone and that decisions follow published criteria rather than private negotiations. Bribery inverts this principle. Once payments determine outcomes, citizens and companies can no longer predict how the system will treat them. Contracts, licences, court judgments and even medical treatment become contingent on the ability and willingness to pay. A concrete illustration is the long-running corruption surrounding public construction contracts in several countries: projects that should have been awarded on technical merit went instead to firms that paid the largest kickbacks. The result was delayed infrastructure, inflated costs and, in some cases, collapsed buildings that killed ordinary people. When the basic operating system of society becomes a marketplace for favours, equality before the law ceases to exist and is replaced by a hierarchy of purchasing power."
+      },
+      {
+        "claim": "Bribery systematically misallocates scarce public resources away from those who need them most.",
+        "explanation": "Public budgets are finite. Every currency unit diverted into a private pocket is a currency unit that cannot build a school, equip a hospital or maintain a road. Empirical studies by organisations such as the World Bank and Transparency International consistently show that high levels of bribery correlate with poorer public services, higher costs for the same outputs, and greater inequality in access. In the health sector, for example, patients in some systems must pay unofficial fees to nurses and doctors simply to receive care that is already funded by taxes. The poorest families, who cannot afford these payments, are pushed to the back of the queue or denied treatment altogether. The same pattern appears in education, policing and licensing. Bribery therefore does not merely transfer money from one adult to another; it actively redistributes life chances away from the vulnerable and toward those already positioned to extract rents."
+      },
+      {
+        "claim": "Bribery creates a self-reinforcing cycle that traps countries in underdevelopment.",
+        "explanation": "Economists describe a development trap in which corruption both causes and is caused by weak institutions. Investors avoid environments where contracts are unreliable and officials demand unpredictable payments. Domestic entrepreneurs either join the corrupt networks or leave. Tax revenues fall because both payers and collectors prefer informal arrangements. With lower revenue, the state cannot pay officials adequately or fund oversight bodies, which further increases the incentive to demand bribes. Real-world examples include several resource-rich countries that remain poor despite decades of export income: the resource wealth is captured by elites through bribery and related practices rather than converted into broad-based development. Breaking this cycle requires sustained political will and external pressure, but the cycle itself demonstrates that bribery is not a minor friction; it is a structural barrier to progress."
+      },
+      {
+        "claim": "Bribery corrodes social trust and makes collective action almost impossible.",
+        "explanation": "High-trust societies can organise complex cooperation because people expect others to follow shared rules. Widespread bribery teaches the opposite lesson: that rules are for the naïve and that personal connections and secret payments are the only reliable path. Once this expectation becomes general, citizens stop reporting wrongdoing, officials stop enforcing standards, and businesses stop investing in long-term relationships based on reputation. The result is social fragmentation. Surveys such as the World Values Survey show that countries with high perceived corruption also report lower interpersonal trust and weaker civic engagement. A practical consequence is that public goods which require voluntary cooperation—tax compliance, environmental protection, pandemic response—become far harder to sustain. Bribery therefore damages not only specific transactions but the underlying social capital on which any complex society depends."
+      },
+      {
+        "claim": "Even small-scale facilitation payments normalise larger corruption and expand the problem.",
+        "explanation": "Defenders of so-called facilitation payments often claim they are harmless and necessary to overcome bureaucratic delay. Experience shows the opposite. Once a payment is accepted for a routine service, the official has an incentive to create further delays in order to extract more money. What begins as an occasional tip becomes an expected fee, and the fee escalates over time. Moreover, the same networks and techniques used for small payments are readily adapted to large-scale embezzlement and contract inflation. Countries that have attempted to draw a bright line between petty and grand corruption have repeatedly found the line impossible to maintain. The cultural message is also damaging: if the state itself operates through informal payments, citizens reasonably conclude that honesty is optional. Tolerating the small therefore feeds the large and spreads the disease throughout the system."
+      },
+      {
+        "claim": "Bribery in the private sector distorts markets and punishes honest competitors.",
+        "explanation": "When companies win business by paying decision-makers rather than by offering better value, the market stops selecting for quality, efficiency and innovation. Honest firms face a stark choice: match the bribes and compromise their principles, or lose contracts and eventually exit. Over time the surviving firms are those most skilled at corruption rather than those most skilled at serving customers. Documented cases in construction, defence procurement and natural-resource extraction show repeated patterns of inflated costs, substandard delivery and the exclusion of cleaner competitors. The economic cost is borne by the final users—taxpayers, consumers or citizens—who receive inferior goods at higher prices. Market competition is often praised as a disciplining force; bribery disables that force and replaces it with a contest of illicit payments."
+      },
+      {
+        "claim": "Political bribery undermines democracy by making elected office a vehicle for private enrichment.",
+        "explanation": "In a functioning democracy, politicians compete for public support on the basis of policy and performance. When large-scale bribery enters the picture—whether through campaign financing, post-election kickbacks or the sale of appointments—the competition shifts toward those who can raise and distribute the most illicit money. Voters lose the ability to hold leaders accountable because the real decision-makers are the hidden payers. Historical examples range from vote-buying in local elections to the capture of entire legislative agendas by industries willing to pay. The result is policy that systematically favours concentrated private interests over diffuse public ones. Democracy is reduced to a formal ritual while the actual allocation of power and resources is decided in secret. This is not a minor flaw; it is a direct attack on the legitimacy of representative government."
+      },
+      {
+        "claim": "Bribery imposes heavy hidden costs that are rarely visible in official statistics.",
+        "explanation": "The direct cost of a bribe is only the beginning. Companies build the expected payments into their pricing, so consumers and taxpayers pay more. Projects are designed to maximise opportunities for kickbacks rather than to maximise public benefit, leading to white-elephant infrastructure. Officials spend time creating artificial bottlenecks instead of solving real problems. Talented people are diverted from productive work into the business of arranging and concealing payments. International investors demand higher returns to compensate for corruption risk, raising the cost of capital for the whole economy. These second-order effects are difficult to measure precisely, yet cross-country research consistently finds that higher corruption is associated with slower growth, lower investment and weaker human-development outcomes. The apparent efficiency of a single greased transaction is therefore an illusion that ignores the much larger systemic waste."
+      },
+      {
+        "claim": "Cultural relativism is a weak defence of bribery and often serves the interests of the powerful.",
+        "explanation": "Some argue that what outsiders call bribery is simply local custom or gift-giving. This claim rarely survives contact with the actual victims. Citizens in high-corruption environments consistently express anger at having to pay for services that should be free or fairly priced; they do not celebrate the practice as cultural heritage. Moreover, the largest bribes are typically paid by foreign companies and domestic elites, not by ordinary people exchanging traditional gifts. International anti-corruption instruments such as the OECD Anti-Bribery Convention and the UN Convention against Corruption reflect a broad consensus that certain practices are harmful regardless of local tradition. Accepting relativism in this domain would also make it impossible to criticise any abusive practice that a local elite chooses to label as culture. The better approach is to distinguish genuine hospitality from the coercive extraction of payments under colour of official authority."
+      },
+      {
+        "claim": "The long-term damage to human capital and ethical standards outweighs any short-term transactional benefits.",
+        "explanation": "Societies that normalise bribery teach successive generations that success depends on connections and payments rather than on effort and competence. Young people learn to invest in relationships with officials rather than in skills and knowledge. Civil servants learn that integrity is a career disadvantage. Over decades this produces a workforce and an administrative class whose habits are adapted to extraction rather than to creation. Reversing such cultural damage is far harder than passing new laws. Countries that have made serious progress against bribery—Singapore after independence, or Estonia after the 1990s—did so by combining strict enforcement with a sustained public campaign to redefine what counted as normal and acceptable behaviour. The lesson is that the ethical and human-capital costs of bribery compound over time and eventually dominate any temporary gains that individual actors may obtain from a corrupt transaction."
+      }
+    ]
+  },
+  "against": {
+    "vocab": [
+      {
+        "term": "facilitation payment",
+        "definition": "A small payment made to speed up a routine administrative process that should have occurred without delay.",
+        "example": "In some bureaucratic systems a facilitation payment is the only practical way to obtain a licence within a reasonable time."
+      },
+      {
+        "term": "pragmatic necessity",
+        "definition": "An action taken not because it is ideal but because the realistic alternatives are worse or impossible.",
+        "example": "In environments of extreme red tape, some businesses treat limited payments as a pragmatic necessity rather than a moral choice."
+      },
+      {
+        "term": "institutional weakness",
+        "definition": "The absence of reliable, efficient and predictable formal systems for delivering public services or enforcing rules.",
+        "example": "Bribery often flourishes where institutional weakness makes official channels too slow or too arbitrary to be usable."
+      },
+      {
+        "term": "informal governance",
+        "definition": "The set of unwritten practices and personal networks that actually determine outcomes when formal institutions fail.",
+        "example": "In many places informal governance, including selective payments, fills the gap left by non-functioning official procedures."
+      },
+      {
+        "term": "transaction cost",
+        "definition": "The time, effort and expense required to complete an exchange or obtain a service beyond the nominal price.",
+        "example": "When official procedures impose enormous transaction costs, a discreet payment can be the rational way to reduce them."
+      },
+      {
+        "term": "cultural embeddedness",
+        "definition": "The deep integration of certain practices into the everyday expectations and social norms of a community.",
+        "example": "What outsiders label as bribery may reflect cultural embeddedness of reciprocal gift-giving and personal obligation."
+      },
+      {
+        "term": "selective enforcement",
+        "definition": "The practice of applying rules strictly against some people while ignoring identical behaviour by others.",
+        "example": "Aggressive anti-bribery campaigns sometimes become selective enforcement that targets political opponents rather than systemic problems."
+      },
+      {
+        "term": "economic friction",
+        "definition": "Obstacles and inefficiencies that slow down productive activity and raise the cost of doing business.",
+        "example": "In highly regulated environments, limited payments can reduce economic friction that would otherwise paralyse investment."
+      },
+      {
+        "term": "survival strategy",
+        "definition": "Behaviour adopted not out of preference but because it is the only realistic way to protect one’s livelihood or family.",
+        "example": "For low-level officials paid below a living wage, accepting small gifts can become a survival strategy rather than greed."
+      },
+      {
+        "term": "regulatory overreach",
+        "definition": "The excessive or poorly designed expansion of rules that creates more problems than it solves.",
+        "example": "Zero-tolerance policies that criminalise every small payment can amount to regulatory overreach that ignores local realities."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "In dysfunctional systems, absolute prohibition can be more harmful than limited tolerance.",
+        "examples": [
+          "In dysfunctional systems, absolute prohibition can be more harmful than limited tolerance because it ignores how people actually survive.",
+          "When formal channels are broken, absolute prohibition can be more harmful than limited tolerance of minor facilitation payments.",
+          "Policy makers must recognise that in dysfunctional systems, absolute prohibition can be more harmful than limited tolerance."
+        ]
+      },
+      {
+        "phrase": "Context matters more than abstract moral rules when institutions have collapsed.",
+        "examples": [
+          "Context matters more than abstract moral rules when institutions have collapsed and citizens face impossible bureaucratic barriers.",
+          "Judging every payment by the same standard ignores that context matters more than abstract moral rules when institutions have collapsed.",
+          "Effective policy accepts that context matters more than abstract moral rules when institutions have collapsed."
+        ]
+      },
+      {
+        "phrase": "Blanket criminalisation often drives the practice further underground without reducing it.",
+        "examples": [
+          "Blanket criminalisation often drives the practice further underground without reducing it, making oversight even harder.",
+          "Experience shows that blanket criminalisation often drives the practice further underground without reducing it.",
+          "Rather than solving the problem, blanket criminalisation often drives the practice further underground without reducing it."
+        ]
+      },
+      {
+        "phrase": "The real problem is institutional failure, not the individual payments that respond to it.",
+        "examples": [
+          "The real problem is institutional failure, not the individual payments that respond to it; attacking only the payments leaves the failure untouched.",
+          "Focusing exclusively on bribery misses the point that the real problem is institutional failure, not the individual payments that respond to it.",
+          "Sustainable reform must address the fact that the real problem is institutional failure, not the individual payments that respond to it."
+        ]
+      },
+      {
+        "phrase": "Zero-tolerance rhetoric is easy; building functional alternatives is hard.",
+        "examples": [
+          "Zero-tolerance rhetoric is easy; building functional alternatives is hard and requires long-term investment in capacity and pay.",
+          "Politicians prefer zero-tolerance rhetoric because it is easy; building functional alternatives is hard and yields slower political rewards.",
+          "We should be honest that zero-tolerance rhetoric is easy while building functional alternatives is hard."
+        ]
+      },
+      {
+        "phrase": "Moral purity that ignores practical consequences is itself a form of irresponsibility.",
+        "examples": [
+          "Moral purity that ignores practical consequences is itself a form of irresponsibility when people’s livelihoods are at stake.",
+          "Demanding absolute honesty while leaving broken systems in place is moral purity that ignores practical consequences.",
+          "In the real world, moral purity that ignores practical consequences is itself a form of irresponsibility."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "to grease the wheels",
+        "definition": "To make a stalled or overly slow process move by means of a practical payment or favour.",
+        "examples": [
+          "In some administrative systems the only way to grease the wheels is a modest payment that officials have come to expect.",
+          "Businesses operating across multiple jurisdictions sometimes find they must grease the wheels simply to stay competitive.",
+          "Critics call it bribery; practitioners call it the necessary step to grease the wheels of a broken bureaucracy."
+        ]
+      },
+      {
+        "idiom": "the lesser of two evils",
+        "definition": "The less harmful of two unwelcome options when no good option is available.",
+        "examples": [
+          "When the alternative is indefinite delay and lost livelihoods, a facilitation payment can be the lesser of two evils.",
+          "In extreme institutional failure, limited payments may represent the lesser of two evils compared with total paralysis.",
+          "Policy that refuses to acknowledge the lesser of two evils often produces worse outcomes than the practice it condemns."
+        ]
+      },
+      {
+        "idiom": "to work around the system",
+        "definition": "To find informal ways to achieve a legitimate goal when formal procedures are unusable.",
+        "examples": [
+          "Ordinary citizens and small businesses frequently have to work around the system because the official channels simply do not function.",
+          "What looks like corruption from the outside is sometimes people trying to work around the system that has failed them.",
+          "Until the formal system is repaired, people will continue to work around the system by whatever means are available."
+        ]
+      },
+      {
+        "idiom": "a necessary evil",
+        "definition": "Something undesirable that must be accepted because the alternatives are worse or because it enables a greater good.",
+        "examples": [
+          "In certain high-friction environments, limited payments have been described as a necessary evil that keeps economic activity alive.",
+          "No one defends bribery as ideal, yet some treat it as a necessary evil while institutions remain dysfunctional.",
+          "Calling something a necessary evil does not make it good; it simply recognises the constraints of the real situation."
+        ]
+      },
+      {
+        "idiom": "to look the other way",
+        "definition": "To deliberately ignore a practice that one could stop, usually because stopping it would create larger problems.",
+        "examples": [
+          "Some managers look the other way on small facilitation payments because aggressive enforcement would halt operations entirely.",
+          "International organisations occasionally look the other way when local partners use informal methods to deliver results.",
+          "There is a difference between endorsing corruption and deciding to look the other way on minor practices while reforming the system."
+        ]
+      },
+      {
+        "idiom": "to cut through red tape",
+        "definition": "To overcome excessive bureaucratic obstacles that prevent timely and practical action.",
+        "examples": [
+          "In heavily regulated environments, informal payments are sometimes the only realistic way to cut through red tape.",
+          "Entrepreneurs argue that they are not seeking unfair advantage but merely trying to cut through red tape that serves no useful purpose.",
+          "When formal procedures become pure obstruction, people will find methods to cut through red tape whether or not the law approves."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "In systems of extreme bureaucratic failure, limited payments can be a rational response that keeps essential activity moving.",
+        "explanation": "There are environments in which official procedures are so slow, arbitrary or predatory that legitimate business and even basic citizen services become impossible through formal channels. In such settings a modest, predictable payment can function as an informal user fee that produces a concrete result. Historical and contemporary examples include certain post-Soviet administrative systems in the 1990s and some highly regulated sectors in developing economies today. Companies and individuals facing these conditions do not prefer corruption; they prefer a functioning state. Until that state is built, treating every payment as an equal moral crime ignores the difference between enrichment of the powerful and survival tactics of the powerless. Policy that criminalises the response while leaving the underlying failure untouched often increases hardship without reducing the practice."
+      },
+      {
+        "claim": "Zero-tolerance approaches frequently fail because they ignore the incentive structures that produce bribery.",
+        "explanation": "If low-level officials are paid wages that cannot support a family, and if promotion depends on patronage rather than performance, the demand for informal payments is structural. Simply raising the legal penalty does not remove the underlying pressure. Many anti-corruption drives have produced short-term publicity and selective prosecutions while the everyday pattern continues unchanged. Successful reformers, by contrast, have combined enforcement with higher official salaries, simplified procedures, digitalisation of services and reduced discretionary power. The lesson is that bribery is often a symptom of institutional design failures. Attacking only the symptom while leaving the design intact is politically convenient but practically ineffective. A more honest analysis begins with the question of why the formal system is so unattractive that people prefer the informal alternative."
+      },
+      {
+        "claim": "Cultural and historical context shapes what counts as bribery, and universal rules can misfire.",
+        "explanation": "Practices of gift-giving, reciprocal obligation and personalised service exist in many societies and predate modern anti-corruption norms. Drawing a sharp line between acceptable hospitality and criminal bribery is straightforward in theory and often contested in practice. International conventions and domestic laws that apply identical standards to every jurisdiction can criminalise behaviour that local populations regard as normal social exchange. This does not mean that all payments are harmless; large-scale diversion of public funds remains damaging everywhere. It does mean that effective policy must distinguish between predatory extraction and culturally embedded reciprocity, and must invest in local legitimacy rather than relying solely on external moral categories. Otherwise the law loses the support of the very people whose cooperation is required for enforcement."
+      },
+      {
+        "claim": "Aggressive enforcement can be weaponised for political or commercial advantage.",
+        "explanation": "Anti-bribery laws are powerful tools. In the hands of impartial institutions they can deter genuine abuse. In the hands of partisan or captured institutions they become instruments for eliminating rivals, extracting further payments, or protecting favoured networks. Documented cases exist in which anti-corruption campaigns have been used to sideline political opponents while leaving allied networks untouched. International enforcement of extra-territorial statutes can also create uneven playing fields: companies from jurisdictions with aggressive prosecutors face higher compliance costs than competitors from jurisdictions that look the other way. The result is not necessarily less bribery overall, but a redistribution of who is allowed to engage in it. Recognition of this risk does not require abandoning enforcement; it requires designing institutions that are harder to capture and standards that are applied consistently."
+      },
+      {
+        "claim": "The economic costs of absolute prohibition can exceed the costs of limited, transparent informal practices.",
+        "explanation": "When every small payment is treated as a serious crime, companies and officials face strong incentives to hide activity, avoid written records, and limit cooperation with investigators. The resulting opacity makes genuine oversight more difficult. In addition, the compliance apparatus required by zero-tolerance regimes—internal controls, external audits, extensive documentation—imposes real costs that are ultimately borne by consumers or taxpayers. In environments where formal procedures are already dysfunctional, these costs can outweigh the harm prevented by the marginal reduction in payments. Some jurisdictions have experimented with clearer distinctions between facilitation and corruption, or with amnesty-plus-reform approaches that prioritise systemic change over maximal punishment of past minor acts. The empirical record suggests that purity of principle is not always aligned with maximisation of public welfare."
+      },
+      {
+        "claim": "Focusing exclusively on bribery distracts from deeper structural drivers of poor governance.",
+        "explanation": "Bribery is highly visible and morally vivid, which makes it an attractive target for reformers and campaigners. Yet many of the harms attributed to bribery—misallocated resources, weak services, low trust—also arise from incompetence, underfunding, political interference, and poorly designed regulations that create artificial scarcity. An exclusive focus on payments can leave these deeper problems unaddressed. A licensing system that requires dozens of sequential approvals, each with discretionary power, will generate pressure for payments regardless of the formal legal regime. Simplifying the system, reducing discretion, and publishing clear criteria often reduce bribery more effectively than adding new criminal penalties. Treating bribery as the master problem rather than as one symptom among several leads to incomplete and sometimes counterproductive policy."
+      },
+      {
+        "claim": "In the absence of functional formal institutions, informal payments can serve as a crude coordinating mechanism.",
+        "explanation": "Markets and hierarchies both require reliable ways to allocate resources and resolve competing claims. When formal institutions cannot perform these functions, informal practices emerge to fill the gap. Limited, relatively predictable payments can, in some settings, provide a rough signal of urgency or willingness to pay that allows scarce administrative attention to be allocated. This is not an endorsement of the practice as ideal; it is a recognition that spontaneous order of some kind tends to appear when planned order fails. Historical examples include periods of rapid institutional collapse in which informal networks and payments kept certain economic activities alive until new formal structures could be built. The policy implication is that the priority should be the construction of better formal institutions, not the criminalisation of every informal adaptation that people make in the meantime."
+      },
+      {
+        "claim": "Moral condemnation without practical alternatives leaves ordinary people trapped between illegality and impossibility.",
+        "explanation": "Citizens and small-business owners in high-friction environments often face a genuine dilemma: follow the formal rules and watch opportunities disappear through delay or obstruction, or make a payment and accept legal and ethical risk. Abstract statements that bribery is always wrong do not dissolve the dilemma. They simply add moral injury to material difficulty. Effective ethics and effective policy both require attention to the feasible set of actions available to real people under real constraints. Expanding that feasible set—by simplifying procedures, raising official salaries, introducing digital one-stop services, and reducing discretionary gatekeeping—does more to reduce bribery than repeated declarations of principle. Until those alternatives exist, purely condemnatory approaches risk being experienced as remote and unhelpful by the people most affected."
+      },
+      {
+        "claim": "International anti-bribery regimes can impose costs that fall disproportionately on poorer countries and smaller firms.",
+        "explanation": "Extra-territorial laws and the compliance expectations of multilateral organisations have raised the cost of doing business in many emerging markets. Large multinational companies can absorb the expense of extensive due-diligence systems and legal advice. Smaller local firms and companies from lower-income countries often cannot. The result can be a form of regulatory protectionism in which market access is restricted to those who can demonstrate sophisticated compliance programmes. Meanwhile, the underlying administrative problems that generate demand for payments remain largely unaddressed. A more balanced approach would pair enforcement with substantial investment in the institutional capacity of the jurisdictions where the pressures originate, rather than relying primarily on the threat of prosecution in distant courts."
+      },
+      {
+        "claim": "Sustainable reduction of bribery requires improving the attractiveness of formal channels, not only punishing informal ones.",
+        "explanation": "People and organisations use informal payments when the formal alternative is slower, less predictable, more expensive in time, or more likely to produce an arbitrary refusal. Changing behaviour therefore depends on changing the relative attractiveness of the two channels. Successful cases of reform—such as the introduction of transparent, digitalised public services in several countries—have reduced the incidence of payments by making the official route faster and more reliable than the informal one. Enforcement remains necessary to deal with residual abuse, but enforcement alone rarely succeeds when the formal system continues to repel users. The strategic priority should be institutional redesign that makes honesty the path of least resistance. Moral campaigns and criminal penalties are supporting instruments, not substitutes for that redesign."
+      }
+    ]
+  }
+}

@@ -13,6 +13,7 @@ export const REASON_ICON: Record<string, string> = {
   Match: '🎯', match: '🎯',
   Reading: '📚', read: '📚',
   'SRS Review': '🔄',
+  Structure: '🧩',
   Homework: '📋',
   'Streak Bonus': '🔥',
   'Level Complete': '🏆',

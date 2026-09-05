@@ -1,0 +1,407 @@
+{
+  "motion": "This house believes that homeschooling is a better option than traditional schooling for the majority of children",
+  "for": {
+    "vocab": [
+      {
+        "term": "individualised learning",
+        "definition": "Education tailored precisely to a child’s pace, interests, strengths and weaknesses rather than a standardised classroom schedule.",
+        "example": "Individualised learning allows a child who struggles with maths to master foundations thoroughly before advancing, instead of being left behind."
+      },
+      {
+        "term": "pedagogical freedom",
+        "definition": "The ability of parents or tutors to choose teaching methods, materials and schedules without institutional constraints.",
+        "example": "Pedagogical freedom lets families abandon rigid age-based grades in favour of mastery-based progression."
+      },
+      {
+        "term": "family-centred education",
+        "definition": "An approach that places the family as the primary educational environment and integrates learning with daily life and values.",
+        "example": "Family-centred education strengthens intergenerational bonds while transmitting knowledge and character."
+      },
+      {
+        "term": "intellectual autonomy",
+        "definition": "The capacity of a learner to direct their own inquiry, question assumptions and pursue knowledge independently.",
+        "example": "Homeschooling environments often cultivate intellectual autonomy more effectively than systems built on compliance."
+      },
+      {
+        "term": "safe learning environment",
+        "definition": "A setting free from bullying, social pressure, violence and the negative peer influences common in many schools.",
+        "example": "A safe learning environment allows sensitive or neurodivergent children to flourish without constant social threat."
+      },
+      {
+        "term": "mastery-based progression",
+        "definition": "Advancing to new material only after genuine understanding of previous material has been demonstrated.",
+        "example": "Mastery-based progression prevents the accumulation of learning gaps that plague age-based classroom systems."
+      },
+      {
+        "term": "values transmission",
+        "definition": "The deliberate passing on of moral, cultural or religious principles within the educational process.",
+        "example": "Many parents choose homeschooling precisely for coherent values transmission that state schools cannot provide."
+      },
+      {
+        "term": "flexible scheduling",
+        "definition": "The freedom to organise learning around a child’s natural rhythms, family needs and real-world opportunities.",
+        "example": "Flexible scheduling permits deeper project work, travel-based learning and accommodation of different chronotypes."
+      },
+      {
+        "term": "reduced institutionalisation",
+        "definition": "Minimising the effects of large, impersonal systems that prioritise order, standardisation and bureaucratic control over individual growth.",
+        "example": "Reduced institutionalisation helps children retain curiosity and agency instead of learning mainly how to comply."
+      },
+      {
+        "term": "customised socialisation",
+        "definition": "Deliberate, age-appropriate social experiences chosen by parents rather than the uncontrolled peer culture of institutional schools.",
+        "example": "Customised socialisation can include mixed-age groups, community activities and mentorship instead of same-age peer dominance."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "One size does not fit all when it comes to the minds of children.",
+        "examples": [
+          "One size does not fit all when it comes to the minds of children; traditional classrooms force exactly that uniformity.",
+          "One size does not fit all when it comes to the minds of children, which is why so many bright students disengage in school.",
+          "One size does not fit all when it comes to the minds of children; homeschooling begins from that obvious truth."
+        ]
+      },
+      {
+        "phrase": "Children are not industrial products to be processed in batches.",
+        "examples": [
+          "Children are not industrial products to be processed in batches by age and standardised tests.",
+          "Children are not industrial products to be processed in batches; treating them as such damages both the quick and the slow.",
+          "Children are not industrial products to be processed in batches, and the classroom model still reflects factory-era thinking."
+        ]
+      },
+      {
+        "phrase": "The best teacher-to-student ratio is one-to-one or small and intentional.",
+        "examples": [
+          "The best teacher-to-student ratio is one-to-one or small and intentional; no institutional school can match that consistently.",
+          "The best teacher-to-student ratio is one-to-one or small and intentional, which is why targeted attention produces faster progress.",
+          "The best teacher-to-student ratio is one-to-one or small and intentional; large classes inevitably leave some children invisible."
+        ]
+      },
+      {
+        "phrase": "Real socialisation is not the same as exposure to peer pressure and institutional norms.",
+        "examples": [
+          "Real socialisation is not the same as exposure to peer pressure and institutional norms; quality matters more than quantity.",
+          "Real socialisation is not the same as exposure to peer pressure and institutional norms, and many school environments fail that test.",
+          "Real socialisation is not the same as exposure to peer pressure and institutional norms; families can design better alternatives."
+        ]
+      },
+      {
+        "phrase": "Education should serve the child, not the administrative convenience of the system.",
+        "examples": [
+          "Education should serve the child, not the administrative convenience of the system that groups them by birth year.",
+          "Education should serve the child, not the administrative convenience of the system; homeschooling reverses that priority.",
+          "Education should serve the child, not the administrative convenience of the system, which is why flexibility outperforms rigidity."
+        ]
+      },
+      {
+        "phrase": "Parents who know their children deeply are often better placed to educate them than distant institutions.",
+        "examples": [
+          "Parents who know their children deeply are often better placed to educate them than distant institutions operating on averages.",
+          "Parents who know their children deeply are often better placed to educate them than distant institutions, especially in the early years.",
+          "Parents who know their children deeply are often better placed to educate them than distant institutions that see hundreds of students."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "square peg in a round hole",
+        "definition": "A child whose learning style or personality does not fit the standard classroom model.",
+        "examples": [
+          "Homeschooling rescues many square pegs in round holes who would otherwise be labelled as problems.",
+          "Forcing every child into the same classroom structure creates countless square pegs in round holes.",
+          "Recognising a square peg in a round hole early can prevent years of frustration and underachievement."
+        ]
+      },
+      {
+        "idiom": "teaching to the test",
+        "definition": "Narrowing education to whatever will be measured on standardised assessments, often at the expense of deeper learning.",
+        "examples": [
+          "Homeschooling escapes the trap of teaching to the test that dominates many conventional schools.",
+          "When schools spend months teaching to the test, genuine curiosity and broad knowledge suffer.",
+          "Parents who reject teaching to the test often recover their children’s love of learning."
+        ]
+      },
+      {
+        "idiom": "falling through the cracks",
+        "definition": "Being overlooked or inadequately supported in a large, standardised system.",
+        "examples": [
+          "Bright but unconventional children frequently end up falling through the cracks in busy classrooms.",
+          "Homeschooling is often chosen precisely to prevent a child from falling through the cracks.",
+          "Large class sizes make falling through the cracks almost inevitable for students who need extra attention."
+        ]
+      },
+      {
+        "idiom": "one-size-fits-all",
+        "definition": "An approach that applies the same methods and expectations to everyone regardless of individual differences.",
+        "examples": [
+          "The traditional school day is a classic one-size-fits-all model that ignores variation in readiness and interest.",
+          "Rejecting one-size-fits-all education is the starting point of most successful homeschooling approaches.",
+          "Children thrive when we abandon one-size-fits-all assumptions about how and when they should learn."
+        ]
+      },
+      {
+        "idiom": "bloom where you are planted",
+        "definition": "Flourishing in the specific environment and conditions that suit an individual rather than a prescribed setting.",
+        "examples": [
+          "Some children simply bloom where they are planted at home with tailored support rather than in institutional soil.",
+          "Forcing every child into school ignores the reality that not everyone will bloom where they are planted in that environment.",
+          "Homeschooling allows families to create the conditions in which their particular children can bloom where they are planted."
+        ]
+      },
+      {
+        "idiom": "the proof of the pudding is in the eating",
+        "definition": "The real test of a method is its actual results rather than theoretical objections.",
+        "examples": [
+          "Homeschooled students’ university admissions and adult outcomes show that the proof of the pudding is in the eating.",
+          "Critics should examine the evidence; the proof of the pudding is in the eating, not in assumptions about socialisation.",
+          "When homeschooled children outperform expectations, the proof of the pudding is in the eating."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "Homeschooling allows genuine individualisation that no classroom of twenty or thirty children can match.",
+        "explanation": "In a conventional classroom the teacher must aim at the middle of the group. Faster children grow bored; slower children accumulate gaps; those with atypical learning profiles are often labelled rather than accommodated. Homeschooling removes that constraint. A parent or tutor can spend extra time on a difficult concept, accelerate through material already mastered, or redesign an approach when something fails. This is not a minor advantage. Longitudinal studies and university admission data repeatedly show homeschooled students performing above average academically, precisely because their education was adjusted to them rather than the other way around. The claim that schools individualise through differentiation is largely aspirational; the structural reality of large groups and fixed timetables makes deep personalisation rare. For the majority of children, especially those outside the narrow band of average readiness, the individualised model is simply more effective."
+      },
+      {
+        "claim": "Many traditional schools expose children to bullying, social toxicity and unsafe environments that homeschooling avoids.",
+        "explanation": "Surveys in multiple countries reveal high rates of bullying, social exclusion and exposure to drugs, violence or premature sexualisation within schools. For a significant minority of children these experiences cause lasting psychological harm and interfere with learning. Homeschooling removes the child from that peer-dominated environment and allows social contact to be chosen rather than imposed. Critics often equate school attendance with healthy socialisation, yet much of what occurs in schools is not healthy. Mixed-age community activities, sports clubs, arts groups and structured co-ops can provide richer and safer social experiences than the forced same-age cohort of the classroom. Parents who have withdrawn children from traumatic school situations frequently report rapid improvements in confidence, sleep and academic engagement. Safety and psychological security are preconditions for learning; where schools cannot guarantee them, homeschooling is a rational protective response."
+      },
+      {
+        "claim": "Homeschooling restores educational authority to the people who know the child best and care most about long-term outcomes.",
+        "explanation": "Parents have permanent responsibility for their children; schools have temporary and partial responsibility. This difference in incentives matters. A parent lives with the consequences of educational failure for decades; a teacher or administrator moves on. When parents take direct responsibility for education they typically invest more attention, higher expectations and greater consistency than an overstretched institutional system can provide. They also transmit family values, work ethic and cultural continuity that many state systems treat as optional or even suspect. The result is often stronger character formation alongside academic progress. Democratic societies already trust parents with far more consequential decisions—medical consent, religious upbringing, basic safety. Extending that trust to education is consistent rather than radical. The burden of proof should lie with those who claim the state knows better than committed parents how to raise a particular child."
+      },
+      {
+        "claim": "Flexible, mastery-based learning produces deeper understanding than age-based cohort progression.",
+        "explanation": "Traditional schooling advances children by birthday rather than by demonstrated competence. A student who has not mastered fractions is still moved into algebra; gaps compound. Homeschooling can operate on mastery: the child proceeds only when ready. This eliminates the twin problems of chronic boredom for the quick and chronic confusion for the slower. It also allows learning to follow natural interest and developmental windows rather than an arbitrary calendar. Research on mastery learning and competency-based education consistently shows superior retention and performance. Homeschoolers apply these principles more easily because they are not constrained by the logistics of moving large groups through a fixed syllabus. The industrial model of schooling was designed for administrative efficiency, not for optimal cognitive development. Returning to a more organic, mastery-oriented approach is educationally progressive, not regressive."
+      },
+      {
+        "claim": "Homeschooling protects children from the narrowing effects of standardised testing and curriculum conformity.",
+        "explanation": "High-stakes testing regimes force schools to prioritise whatever is measured, often at the expense of deeper literacy, historical understanding, scientific curiosity or artistic development. Teachers teach to the test because their performance and the school’s rating depend on it. Homeschooling families are largely free of this pressure. They can pursue broad reading, extended projects, real scientific investigation and cultural literacy without constantly interrupting learning for practice exams. The result is frequently a more coherent and motivating education. International comparisons show that countries and systems with less obsessive testing often produce higher genuine achievement. Homeschoolers who later enter universities or the workplace demonstrate that the absence of constant standardised assessment does not produce ignorance; it often produces more capable and self-directed learners."
+      },
+      {
+        "claim": "The socialisation argument against homeschooling rests on a romanticised and inaccurate view of school peer culture.",
+        "explanation": "Critics claim homeschooled children will be socially stunted. Empirical studies of social skills, self-esteem, civic engagement and peer relations among homeschoolers generally find them comparable or superior to schooled peers. The assumption that forced proximity to same-age children for six hours a day constitutes optimal socialisation is rarely examined. Much school social life is hierarchical, status-driven and occasionally cruel. Homeschooling families typically arrange richer, more varied social contact: mixed-age groups, adult mentors, community service, sports, music and faith or interest-based communities. Children learn to interact across ages and contexts rather than primarily within a narrow peer cohort. Adult outcomes—college completion, employment, civic participation—do not support the claim that institutional schooling is necessary for healthy social development. The socialisation objection survives more on repetition than on evidence."
+      },
+      {
+        "claim": "Homeschooling can integrate real-life skills, work experience and family contribution in ways schools rarely manage.",
+        "explanation": "Conventional schooling isolates children from the productive life of their families and communities for most of the day. Homeschooling allows cooking, budgeting, caring for siblings, participating in family businesses, volunteering and apprenticeships to become part of education. These experiences build competence, responsibility and practical intelligence that pure academic schooling often neglects. Young people who have contributed meaningfully at home frequently enter adulthood with stronger executive function and work ethic. The artificial separation of ‘learning’ from ‘living’ is a recent historical development, not a pedagogical necessity. Societies that kept children involved in real tasks alongside formal instruction produced capable adults for centuries. Homeschooling recovers some of that integration without sacrificing literacy or numeracy."
+      },
+      {
+        "claim": "Many children with special educational needs or atypical profiles receive better support at home than in under-resourced classrooms.",
+        "explanation": "Even in well-funded systems, children with dyslexia, ADHD, autism, giftedness or chronic illness often receive delayed, partial or poorly implemented support. Large classes and limited specialist time make genuine accommodation difficult. Homeschooling parents can implement targeted interventions immediately, adjust the sensory environment, follow therapeutic recommendations consistently and avoid the stigma that sometimes accompanies school-based labels. Numerous families report that their children made dramatic progress only after leaving school settings that could not meet their needs. While not every parent is equipped for intensive special-needs education, those who are frequently outperform the bureaucratic alternatives. For this substantial minority of children, homeschooling is not merely preferable; it is the difference between flourishing and prolonged failure."
+      },
+      {
+        "claim": "Homeschooling fosters independent learning habits that serve people better in higher education and adult life.",
+        "explanation": "Traditional schooling trains students to wait for instructions, complete assigned work and seek external validation through grades. Homeschooling, especially in its more autonomous forms, requires children to manage time, locate resources, evaluate their own understanding and pursue questions beyond a set syllabus. These are precisely the skills demanded by university study and by most knowledge-work careers. Former homeschoolers often report that the transition to self-directed higher education felt natural, whereas many schooled peers struggle with the sudden absence of external structure. In an economy that increasingly rewards initiative and continuous self-education, the habits formed in a responsive home environment confer lasting advantage. The classroom’s hidden curriculum of compliance is less useful than it once was."
+      },
+      {
+        "claim": "The rapid growth of homeschooling reflects rational parental response to visible failures in many conventional schools.",
+        "explanation": "Homeschooling has expanded dramatically in multiple countries, accelerating further after the disruptions of recent years. Parents cite academic stagnation, safety concerns, ideological conflict, and the inability of schools to accommodate individual differences. These are not fringe complaints; they track measurable problems in literacy rates, classroom behaviour, teacher retention and public confidence. When institutions repeatedly fail to deliver on their core promises, exit is a legitimate and healthy response. The growth of homeschooling, hybrid models and micro-schools signals that many families have concluded the traditional model is no longer optimal for their children. Policy should treat this as useful feedback rather than as a threat. A society that values educational pluralism will support high-quality home education instead of trying to force every child back into systems that large numbers of parents have already judged inadequate."
+      }
+    ]
+  },
+  "against": {
+    "vocab": [
+      {
+        "term": "socialisation deficit",
+        "definition": "The risk that children educated primarily at home miss essential experience in navigating diverse peer groups and institutional expectations.",
+        "example": "Critics worry that a socialisation deficit leaves some homeschooled children unprepared for workplace and civic complexity."
+      },
+      {
+        "term": "curricular narrowness",
+        "definition": "The danger that home education reflects only the limited knowledge, biases or resources of the parents.",
+        "example": "Curricular narrowness can leave children with significant gaps in science, history or cultural literacy."
+      },
+      {
+        "term": "accountability gap",
+        "definition": "The absence of independent oversight that ensures children are actually receiving an adequate education.",
+        "example": "Without external assessment, an accountability gap allows educational neglect to remain hidden for years."
+      },
+      {
+        "term": "peer learning opportunity",
+        "definition": "The cognitive and social benefits that arise from working, arguing and collaborating with other children of similar age.",
+        "example": "Classroom discussion and group projects provide peer learning opportunities that solitary study cannot replicate."
+      },
+      {
+        "term": "professional expertise",
+        "definition": "The specialised training in pedagogy, child development and subject knowledge that qualified teachers bring.",
+        "example": "Most parents, however dedicated, lack the professional expertise required to teach advanced mathematics or laboratory science well."
+      },
+      {
+        "term": "civic preparation",
+        "definition": "The process of learning to function in a pluralistic society with people from different backgrounds and beliefs.",
+        "example": "Traditional schools, at their best, provide civic preparation by requiring daily cooperation across difference."
+      },
+      {
+        "term": "resource inequality",
+        "definition": "The wide variation in educational quality that results when outcomes depend heavily on parental education, time and income.",
+        "example": "Resource inequality means homeschooling works far better for affluent, highly educated parents than for everyone else."
+      },
+      {
+        "term": "detection failure",
+        "definition": "The reduced likelihood that abuse, neglect or severe learning difficulties will be noticed when a child is isolated from mandatory reporters.",
+        "example": "Teachers and school staff are often the first to identify problems; homeschooling increases the risk of detection failure."
+      },
+      {
+        "term": "credential barriers",
+        "definition": "Practical difficulties homeschooled students may face in demonstrating qualifications for further education or employment.",
+        "example": "In some systems, credential barriers still complicate university entrance or apprenticeship access for homeschoolers."
+      },
+      {
+        "term": "ideological insulation",
+        "definition": "The possibility that children are raised without serious encounter with opposing views, weakening critical thinking.",
+        "example": "Ideological insulation can occur when the only adults and materials a child encounters reinforce a single worldview."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "Children need to learn how to function among people who are not their relatives and do not share their assumptions.",
+        "examples": [
+          "Children need to learn how to function among people who are not their relatives and do not share their assumptions; schools provide that daily practice.",
+          "Children need to learn how to function among people who are not their relatives and do not share their assumptions—this is a core civic skill.",
+          "Children need to learn how to function among people who are not their relatives and do not share their assumptions; over-protection delays that learning."
+        ]
+      },
+      {
+        "phrase": "Good intentions do not automatically produce good education.",
+        "examples": [
+          "Good intentions do not automatically produce good education; expertise, structure and external standards still matter.",
+          "Good intentions do not automatically produce good education, which is why oversight of homeschooling remains necessary.",
+          "Good intentions do not automatically produce good education; love is not a substitute for pedagogical skill in every subject."
+        ]
+      },
+      {
+        "phrase": "The classroom is society in miniature; removing children from it has costs.",
+        "examples": [
+          "The classroom is society in miniature; removing children from it has costs in adaptability and resilience.",
+          "The classroom is society in miniature; removing children from it has costs that only appear later in life.",
+          "The classroom is society in miniature; removing children from it has costs that idealised versions of home education often ignore."
+        ]
+      },
+      {
+        "phrase": "Most parents are not trained teachers, and most subjects benefit from trained teaching.",
+        "examples": [
+          "Most parents are not trained teachers, and most subjects benefit from trained teaching—especially beyond the elementary years.",
+          "Most parents are not trained teachers, and most subjects benefit from trained teaching; enthusiasm cannot always close that gap.",
+          "Most parents are not trained teachers, and most subjects benefit from trained teaching, which is why specialist input remains valuable."
+        ]
+      },
+      {
+        "phrase": "Educational freedom for parents must be balanced against the child’s right to a broad and adequate education.",
+        "examples": [
+          "Educational freedom for parents must be balanced against the child’s right to a broad and adequate education.",
+          "Educational freedom for parents must be balanced against the child’s right to a broad and adequate education; these rights can conflict.",
+          "Educational freedom for parents must be balanced against the child’s right to a broad and adequate education, which justifies reasonable regulation."
+        ]
+      },
+      {
+        "phrase": "What works for a highly resourced minority does not automatically work for the majority.",
+        "examples": [
+          "What works for a highly resourced minority does not automatically work for the majority of families.",
+          "What works for a highly resourced minority does not automatically work for the majority; policy must consider real constraints of time and education.",
+          "What works for a highly resourced minority does not automatically work for the majority, and evidence from selective success stories can mislead."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "out of the frying pan into the fire",
+        "definition": "Escaping one set of problems only to encounter worse ones.",
+        "examples": [
+          "Leaving a mediocre school for unstructured homeschooling can be out of the frying pan into the fire for some children.",
+          "Parents fleeing bullying sometimes jump out of the frying pan into the fire of educational isolation or neglect.",
+          "Without planning, the cure of homeschooling becomes out of the frying pan into the fire."
+        ]
+      },
+      {
+        "idiom": "the blind leading the blind",
+        "definition": "A situation in which the person guiding others lacks the necessary knowledge themselves.",
+        "examples": [
+          "When parents attempt advanced subjects they themselves never mastered, it risks the blind leading the blind.",
+          "Homeschooling in specialised fields without external expertise can become the blind leading the blind.",
+          "Good will does not prevent the blind leading the blind if subject knowledge is missing."
+        ]
+      },
+      {
+        "idiom": "a double-edged sword",
+        "definition": "Something that has both advantages and serious corresponding disadvantages.",
+        "examples": [
+          "Parental control over the curriculum is a double-edged sword that can protect or severely limit a child.",
+          "The flexibility of homeschooling is a double-edged sword; freedom without structure often fails.",
+          "Removing institutional oversight is a double-edged sword that helps some families and harms others."
+        ]
+      },
+      {
+        "idiom": "throwing the baby out with the bathwater",
+        "definition": "Rejecting something valuable while trying to get rid of its problems.",
+        "examples": [
+          "Abandoning all institutional schooling because some schools are bad is throwing the baby out with the bathwater.",
+          "Discarding professional teaching and peer interaction entirely risks throwing the baby out with the bathwater.",
+          "Critiques of traditional schools sometimes end up throwing the baby out with the bathwater."
+        ]
+      },
+      {
+        "idiom": "in a bubble",
+        "definition": "Existing in an isolated environment that limits exposure to differing people and ideas.",
+        "examples": [
+          "Children educated entirely at home can grow up in a bubble that leaves them unprepared for pluralistic settings.",
+          "Ideological homeschooling sometimes deliberately keeps children in a bubble.",
+          "Healthy development usually requires periodically leaving the bubble of family assumptions."
+        ]
+      },
+      {
+        "idiom": "the exception that proves the rule",
+        "definition": "A successful special case that highlights how the general pattern differs.",
+        "examples": [
+          "Highly successful homeschoolers from educated families are often the exception that proves the rule about resource requirements.",
+          "Media stories of exceptional homeschool achievements can be the exception that proves the rule rather than evidence for universal superiority.",
+          "When only the most dedicated and resourced families succeed, they become the exception that proves the rule."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "Traditional schools provide essential socialisation in diverse, non-familial settings that homeschooling struggles to replicate consistently.",
+        "explanation": "Learning to negotiate status, cooperate with unrelated peers, manage conflict, and function under impersonal rules is a core developmental task. Schools supply a daily environment in which children must do these things with people they did not choose and who do not share their family culture. Homeschooling socialisation, however carefully arranged, remains largely optional, curated and often limited to similar families. The result can be reduced resilience when young adults later encounter workplaces, universities or civic spaces that are indifferent to their preferences. Studies of long-term outcomes show that while many homeschoolers do well, a subset displays greater difficulty with institutional navigation and diverse peer relations. Mass schooling evolved partly because societies recognised that family socialisation alone was insufficient for complex, pluralistic life. Replacing it entirely with parental design risks under-preparing children for the world as it is rather than the world as the family would prefer it to be."
+      },
+      {
+        "claim": "Most parents lack the breadth of subject expertise and pedagogical training required for a complete education through secondary level.",
+        "explanation": "Teaching advanced mathematics, laboratory science, foreign languages or rigorous literature requires knowledge that goes beyond general adult literacy. Even highly educated parents typically have deep competence in only a few domains. As children reach secondary age, the gaps become harder to fill with goodwill and generic resources. Online courses and tutors can help, yet they re-introduce the very institutional elements homeschooling claims to replace, often at significant cost. Qualified teachers spend years acquiring both content knowledge and the skill of explaining it to novices. The assumption that any committed parent can substitute for this expertise across the full curriculum is optimistic. Evidence from regulated systems shows that homeschooled students perform well on average partly because many participating families are unusually well-resourced and educated; the model does not generalise easily to the broader population."
+      },
+      {
+        "claim": "The absence of consistent external accountability creates a real risk of educational neglect that is hard to detect.",
+        "explanation": "In conventional schools, multiple adults—teachers, special-needs coordinators, administrators—observe a child’s progress and are legally required to act on serious concerns. Homeschooling removes most of these mandatory reporters from daily contact. While the majority of homeschooling parents are conscientious, the minority who are not can leave children with minimal education for years. Some jurisdictions have discovered cases only when the children later attempted to enter further education or the workforce. Light-touch registration systems often fail to identify problems early. A child’s right to an adequate education is independent of parental preference; societies therefore maintain a legitimate interest in verifying that education is actually occurring. Complete parental autonomy without verification prioritises adult liberty over child protection in a domain where the child’s future opportunities are at stake."
+      },
+      {
+        "claim": "Homeschooling outcomes are heavily skewed by parental education and resources, making it an unequal solution.",
+        "explanation": "Research consistently shows that the most successful homeschoolers tend to have parents with higher levels of education, greater income, and more flexible work arrangements. These families can afford materials, outside classes, travel and the opportunity cost of a parent remaining outside full-time paid work. Families lacking these advantages face a much steeper challenge. Promoting homeschooling as generally superior therefore risks widening educational inequality: the already advantaged gain a further tool while the less advantaged remain dependent on variable public systems. Public schooling, for all its flaws, remains the main mechanism by which societies attempt to give every child access to qualified teaching regardless of parental background. A model that works best for those who need it least cannot be the primary answer for the majority."
+      },
+      {
+        "claim": "Children benefit from regular exposure to professional adults with different strengths, styles and expectations.",
+        "explanation": "In a school, a child typically encounters multiple teachers across subjects and years, each modelling different intellectual virtues, authority styles and ways of thinking. This variety helps children learn that knowledge is not the possession of a single household and that they must adapt to different legitimate demands. Homeschooling concentrates authority and intellectual modelling in one or two adults. Even when those adults are excellent, the range of professional example is narrower. Later life requires the ability to learn from and work under many different people. Early and repeated practice with that reality is a form of preparation that home settings provide less automatically. The classroom’s succession of teachers is not merely an administrative arrangement; it is a developmental resource."
+      },
+      {
+        "claim": "Peer interaction in mixed-ability, same-age groups develops specific cognitive and collaborative skills.",
+        "explanation": "Explaining an idea to a classmate, defending a position in discussion, dividing labour on a group project, and managing disagreement without adult arbitration are powerful learning mechanisms. These activities are difficult to reproduce at the same intensity and frequency outside institutional settings. Research on collaborative learning shows gains in both understanding and social competence that solitary or purely adult-led study does not fully match. While homeschool co-ops attempt to supply some of these experiences, they are usually less frequent, less diverse and more parent-supervised than daily classroom life. The cognitive benefits of peer teaching and the social benefits of unsupervised negotiation are therefore systematically under-supplied in pure home education. For many children these missing experiences constitute a genuine loss."
+      },
+      {
+        "claim": "Homeschooling can entrench parental biases and limit children’s encounter with alternative viewpoints.",
+        "explanation": "Every family transmits values; that is inevitable and often desirable. Institutional schooling at least exposes children to teachers and peers who may not share those values, forcing some degree of intellectual confrontation. When education occurs entirely inside the family, especially in ideologically motivated homeschooling, children may reach adulthood without ever having to defend their assumptions against serious opposition. This weakens the capacity for critical thought and for citizenship in a plural society. While some homeschooling families deliberately introduce opposing views, the structural incentive runs the other way: it is easier and more comfortable not to. Societies have an interest in ensuring that the next generation can evaluate competing claims rather than simply inherit them. Pure parental control over the entire informational environment sits in tension with that interest."
+      },
+      {
+        "claim": "The logistical and emotional demands of full-time homeschooling are unsustainable for many families and fall disproportionately on mothers.",
+        "explanation": "Effective homeschooling requires significant time, organisational skill, emotional stamina and often the sacrifice of a second income. These demands are difficult to meet alongside paid work, caring for other family members, or managing household responsibilities. In practice the labour falls mainly on women, reinforcing traditional gender patterns even when that is not the family’s ideological goal. Burnout is commonly reported. When the teaching parent becomes exhausted or the family’s financial situation changes, the quality of education can decline sharply. Public schooling spreads the educational labour across trained professionals and allows both parents greater labour-market participation. Treating homeschooling as a general solution ignores these human and economic constraints that affect large numbers of households."
+      },
+      {
+        "claim": "Schools serve important child-protection and early-intervention functions that pure homeschooling weakens.",
+        "explanation": "Teachers and school staff are among the most important mandatory reporters of abuse, neglect, developmental disorders and mental-health crises. Daily observation by trained adults outside the family creates opportunities for early detection that simply do not exist when a child is educated at home. While most homeschooled children are safe, the children who are not safe become harder to reach. Historical cases in multiple countries have shown that some of the most severe educational and physical neglect occurred in unmonitored home settings. A society that values child welfare cannot treat the school’s protective function as optional. Reasonable registration, assessment and visitation requirements exist to preserve some of that protective capacity without eliminating parental choice. Complete deregulation prioritises adult autonomy over the detection of harm to children."
+      },
+      {
+        "claim": "Large-scale evidence still shows that high-quality traditional schooling remains the most reliable route to broad educational success for the population as a whole.",
+        "explanation": "Cross-national assessments, longitudinal studies and labour-market data continue to identify effective school systems as the main engine of literacy, numeracy and social mobility for the majority. Homeschooling success stories are real but selected; they disproportionately reflect families with high cultural capital. When researchers attempt to control for parental background, the academic advantages of homeschooling shrink or disappear, while concerns about variance in quality remain. For policymakers responsible for entire cohorts of children, the institutional school—continuously improved, properly resourced and held accountable—offers a more scalable and equitable instrument than relying on every family to become an effective school. Parental choice can and should exist at the margins and for specific needs. Treating homeschooling as superior for the majority reverses the evidence on what has actually raised population-level achievement across societies."
+      }
+    ]
+  }
+}

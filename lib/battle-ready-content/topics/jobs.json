@@ -1,0 +1,407 @@
+{
+  "motion": "This House believes that secure and meaningful employment is a fundamental requirement for individual dignity and a stable society.",
+  "for": {
+    "vocab": [
+      {
+        "term": "economic dignity",
+        "definition": "The sense of worth and independence that comes from earning a living through one’s own effort and contribution.",
+        "example": "Secure employment provides economic dignity that no welfare payment alone can fully replace."
+      },
+      {
+        "term": "social cohesion",
+        "definition": "The bonds of trust, shared purpose, and mutual reliance that hold communities and societies together.",
+        "example": "Widespread secure work strengthens social cohesion by giving people a common stake in collective prosperity."
+      },
+      {
+        "term": "structural unemployment",
+        "definition": "Long-term joblessness caused by mismatches between workers’ skills and the needs of the economy, or by permanent loss of industries.",
+        "example": "Structural unemployment in former industrial regions has produced lasting damage to families and local communities."
+      },
+      {
+        "term": "occupational identity",
+        "definition": "The part of a person’s self-understanding that is built around the work they do and the role they play in society.",
+        "example": "For many people, occupational identity is central to how they answer the question of who they are."
+      },
+      {
+        "term": "labour market inclusion",
+        "definition": "The ability of all groups — including the young, older workers, and those with disadvantages — to find and keep decent work.",
+        "example": "Policies that promote labour market inclusion reduce the risk of permanent exclusion and associated social costs."
+      },
+      {
+        "term": "purposeful contribution",
+        "definition": "The experience of adding value to others through one’s work, which supports psychological well-being.",
+        "example": "Even routine jobs can supply purposeful contribution when workers see the usefulness of what they produce."
+      },
+      {
+        "term": "income security",
+        "definition": "Reliable and predictable earnings that allow people to plan, invest in their families, and withstand temporary shocks.",
+        "example": "Income security from stable employment is the foundation on which households build long-term stability."
+      },
+      {
+        "term": "skill depreciation",
+        "definition": "The gradual loss of work-related abilities and confidence that occurs during extended periods without employment.",
+        "example": "Long-term unemployment leads to skill depreciation that makes re-entry into the labour market progressively harder."
+      },
+      {
+        "term": "intergenerational mobility",
+        "definition": "The capacity of children to achieve better economic and social outcomes than their parents, often linked to parental employment.",
+        "example": "Stable parental jobs are one of the strongest predictors of intergenerational mobility."
+      },
+      {
+        "term": "collective bargaining power",
+        "definition": "The ability of workers, acting together, to negotiate fair wages, conditions, and respect in the workplace.",
+        "example": "Secure employment with collective bargaining power has historically raised living standards for broad groups of workers."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "Work is not merely a means of earning money; it is a primary source of structure, identity, and social connection.",
+        "examples": [
+          "Work is not merely a means of earning money; it is a primary source of structure, identity, and social connection that unemployment rapidly erodes.",
+          "When people lose stable jobs they discover that work is not merely a means of earning money; it is a primary source of structure, identity, and social connection.",
+          "Psychological research confirms that work is not merely a means of earning money; it is a primary source of structure, identity, and social connection."
+        ]
+      },
+      {
+        "phrase": "A society that cannot offer most of its adults the chance of decent work is failing in a basic duty.",
+        "examples": [
+          "A society that cannot offer most of its adults the chance of decent work is failing in a basic duty of economic and moral organisation.",
+          "High levels of exclusion show that a society that cannot offer most of its adults the chance of decent work is failing in a basic duty.",
+          "Political legitimacy itself depends on the recognition that a society that cannot offer most of its adults the chance of decent work is failing in a basic duty."
+        ]
+      },
+      {
+        "phrase": "Secure employment remains the most effective and widely accepted route out of poverty and dependence.",
+        "examples": [
+          "Secure employment remains the most effective and widely accepted route out of poverty and dependence for the majority of households.",
+          "Across countries and decades, secure employment remains the most effective and widely accepted route out of poverty and dependence.",
+          "Welfare systems work best when secure employment remains the most effective and widely accepted route out of poverty and dependence."
+        ]
+      },
+      {
+        "phrase": "The loss of stable work damages not only individuals but entire communities and the next generation.",
+        "examples": [
+          "The loss of stable work damages not only individuals but entire communities and the next generation through reduced opportunity and fractured social fabric.",
+          "Longitudinal studies show that the loss of stable work damages not only individuals but entire communities and the next generation.",
+          "Former industrial areas illustrate how the loss of stable work damages not only individuals but entire communities and the next generation."
+        ]
+      },
+      {
+        "phrase": "Flexibility without security simply shifts risk from institutions onto workers who are least able to bear it.",
+        "examples": [
+          "Flexibility without security simply shifts risk from institutions onto workers who are least able to bear it.",
+          "The growth of precarious contracts demonstrates that flexibility without security simply shifts risk from institutions onto workers who are least able to bear it.",
+          "A fair labour market refuses the principle that flexibility without security simply shifts risk from institutions onto workers who are least able to bear it."
+        ]
+      },
+      {
+        "phrase": "Meaningful work supplies a sense of contribution that pure income transfers cannot replicate.",
+        "examples": [
+          "Meaningful work supplies a sense of contribution that pure income transfers cannot replicate, however necessary those transfers may be.",
+          "People repeatedly report that meaningful work supplies a sense of contribution that pure income transfers cannot replicate.",
+          "Dignity is partly rooted in the fact that meaningful work supplies a sense of contribution that pure income transfers cannot replicate."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "earn one's keep",
+        "definition": "To make a contribution that justifies one’s place and support within a household or society.",
+        "examples": [
+          "Most adults still want the chance to earn their keep rather than depend indefinitely on others.",
+          "Secure jobs allow people to earn their keep and feel they are pulling their weight.",
+          "The desire to earn one’s keep is a deep psychological and cultural motive that policy should respect."
+        ]
+      },
+      {
+        "idiom": "a foot on the ladder",
+        "definition": "An initial opportunity that makes further progress possible.",
+        "examples": [
+          "Entry-level secure jobs give young people a foot on the ladder that temporary gigs often fail to provide.",
+          "Without a foot on the ladder of stable employment, many remain stuck in cycles of low pay and insecurity.",
+          "Apprenticeships and first permanent contracts are classic ways of offering a foot on the ladder."
+        ]
+      },
+      {
+        "idiom": "put food on the table",
+        "definition": "To earn enough to meet the basic needs of oneself and one’s dependants.",
+        "examples": [
+          "For millions of people the first purpose of a job is simply to put food on the table.",
+          "When work disappears, the immediate crisis is the inability to put food on the table.",
+          "Any serious employment policy must start from the need to put food on the table for ordinary households."
+        ]
+      },
+      {
+        "idiom": "the backbone of society",
+        "definition": "The essential supporting structure without which the whole system weakens.",
+        "examples": [
+          "Stable employment has long been the backbone of society, supporting families, communities, and public finances.",
+          "When large numbers lose secure work, the backbone of society comes under strain.",
+          "Policies that protect and expand decent jobs strengthen the backbone of society."
+        ]
+      },
+      {
+        "idiom": "fall by the wayside",
+        "definition": "To be left behind or fail to keep up with others.",
+        "examples": [
+          "Without active support, displaced workers can fall by the wayside and never regain stable employment.",
+          "Young people who cannot find a first foothold often fall by the wayside into long-term disconnection.",
+          "A healthy labour market prevents large groups from falling by the wayside."
+        ]
+      },
+      {
+        "idiom": "stand on one's own two feet",
+        "definition": "To be independent and self-supporting through one’s own efforts.",
+        "examples": [
+          "Secure work enables people to stand on their own two feet and make their own choices.",
+          "Prolonged dependence undermines the ability and confidence to stand on one’s own two feet.",
+          "Most citizens still regard the chance to stand on their own two feet as a core element of adult dignity."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "Secure employment provides structure, purpose, and daily social contact that are central to psychological health for most adults.",
+        "explanation": "Decades of research on unemployment show elevated rates of depression, anxiety, loss of self-esteem, and even physical illness among those without work. The damage is not explained solely by loss of income; it also stems from the disappearance of time structure, shared goals, status, and regular interaction with others. Re-employment typically reverses many of these effects. Pure income support, while necessary, does not fully restore the psychological benefits that come from being needed and contributing. Societies that tolerate high levels of long-term joblessness therefore accept widespread, preventable harm to mental health. Maintaining broad access to secure and reasonably meaningful work is one of the most effective population-level interventions for well-being available to policy makers."
+      },
+      {
+        "claim": "Stable jobs remain the primary mechanism through which most households achieve income security and plan for the future.",
+        "explanation": "Mortgages, children’s education, retirement saving, and protection against shocks all depend on predictable earnings. Precarious or highly variable income makes long-term planning difficult and increases stress. While some high-skilled freelancers thrive under flexibility, the majority of workers in most economies still rely on the regularity of a steady wage or salary. Countries with strong systems of permanent or long-term contracts show lower rates of in-work poverty and higher rates of household investment in skills and housing. Weakening employment security without robust alternatives simply transfers risk onto individuals and families who have fewer resources to absorb it. Income security through stable work is therefore not an outdated preference; it is a practical foundation of household and macroeconomic stability."
+      },
+      {
+        "claim": "Widespread secure employment underpins social cohesion and reduces the risks of polarisation, crime, and political extremism.",
+        "explanation": "Historical and contemporary evidence links large-scale, persistent unemployment and under-employment to social fragmentation. Communities that lose their major employers often experience rising disorder, declining trust, and the growth of political movements that exploit resentment. Young people who cannot find a foothold in the labour market are at higher risk of disconnection and anti-social pathways. Conversely, periods and places of broad employment opportunity tend to show stronger civic participation and lower social tension. Work integrates people into shared institutions and gives them a stake in collective order. A labour market that systematically excludes significant groups therefore threatens not only individual welfare but the stability of the wider society."
+      },
+      {
+        "claim": "Intergenerational mobility and the life chances of children are strongly influenced by parental employment status and stability.",
+        "explanation": "Children raised in households with stable parental work benefit from higher material resources, more consistent routines, lower parental stress, and stronger role models of contribution. Longitudinal studies show that parental unemployment, especially long-term, is associated with poorer educational outcomes and higher risks of future joblessness for the next generation. The effect operates through both economic and psychological channels. Policies that protect and expand parental employment therefore function as investments in future human capital and social mobility. Treating employment as optional or easily replaced by transfers risks weakening one of the most powerful mechanisms through which advantage and disadvantage are transmitted across generations."
+      },
+      {
+        "claim": "The experience of contributing through work supplies a form of dignity and self-respect that pure redistribution cannot fully replace.",
+        "explanation": "Across cultures, adults commonly express a desire to be useful and to earn their place rather than to live indefinitely as recipients. This preference is not merely ideological; it appears in surveys, in the behaviour of people who continue working past financial necessity, and in the psychological literature on self-determination. Income support is essential when work is unavailable, yet most recipients themselves regard it as a second-best solution. Programmes that combine income with genuine pathways into contribution consistently show better outcomes for self-reported dignity and motivation. A society that abandons the goal of broad employment in favour of permanent transfers therefore risks creating a permanent class of people who feel surplus to requirements. Maintaining the possibility of meaningful contribution remains a core element of respect for citizens."
+      },
+      {
+        "claim": "Skill development, workplace socialisation, and on-the-job learning occur most effectively inside stable employment relationships.",
+        "explanation": "Many important capabilities — technical skills, professional norms, teamwork, and the ability to handle responsibility — are acquired through sustained participation in real work settings. Short-term or highly fragmented employment reduces the incentive for both employers and workers to invest in deeper training. Apprenticeship systems, internal labour markets, and long-term career ladders have historically been powerful engines of upward mobility precisely because they embed learning inside secure relationships. When employment becomes predominantly transactional and short-duration, these developmental channels weaken. The result is both slower productivity growth and reduced opportunity for workers to progress. Preserving spaces of stable employment is therefore important for human capital formation as well as for immediate income."
+      },
+      {
+        "claim": "Labour market exclusion carries large fiscal and social costs that outweigh the apparent savings of reduced employment protection.",
+        "explanation": "Long-term unemployment and under-employment generate direct costs in benefits, healthcare, and criminal justice, together with indirect costs in lost tax revenue and reduced demand. These costs are frequently under-estimated when policy focuses only on the flexibility preferences of employers. Regions with persistently high joblessness require continuous public support and show slower recovery. Active labour market policies, job creation in periods of deficiency, and employment protection that prevents unnecessary dismissal can reduce these downstream burdens. The argument that societies can simply pay people to remain outside work ignores both the fiscal arithmetic and the broader social damage. Full or near-full employment remains an economically rational as well as a socially desirable objective."
+      },
+      {
+        "claim": "Technological change and globalisation make the defence of secure employment more, not less, necessary.",
+        "explanation": "Automation and trade continually displace particular jobs and industries. Without deliberate policy, the gains from these changes concentrate among capital owners and high-skilled workers while the costs fall on those whose roles disappear. Historical experience shows that the benefits of technological progress are widely shared only when institutions exist to retrain, redeploy, and maintain demand for labour. Abandoning the goal of secure work in the face of disruption simply accelerates polarisation. Countries that have combined openness to innovation with strong employment systems and active adjustment support have achieved both dynamism and inclusion. The correct response to technological pressure is therefore to strengthen, not weaken, the commitment to broad access to decent jobs."
+      },
+      {
+        "claim": "Flexible and non-standard forms of work can supplement but cannot replace the core of secure employment for the majority of the workforce.",
+        "explanation": "Freelance, platform, and temporary work suit some people and some life stages. For the majority, however, they have so far delivered lower average earnings, weaker benefits, less training, and higher income volatility. Treating these forms as the new normal risks normalising insecurity. A healthy labour market contains a spectrum of arrangements, yet it still requires a substantial core of stable jobs that provide the income security, skill development, and social integration on which households and communities depend. Policy should improve the quality of flexible work where it exists, while continuing to treat secure employment as the central pillar rather than an outdated residual."
+      },
+      {
+        "claim": "The political and moral legitimacy of market economies rests in part on their ability to offer most citizens a realistic prospect of decent work.",
+        "explanation": "Democratic support for open markets and private enterprise has historically depended on the delivery of rising living standards and broad employment opportunity. When large groups experience the labour market as a source of permanent insecurity or exclusion, that support erodes. Populist and anti-system movements draw strength from regions and cohorts that have been left behind by job loss and weak re-employment prospects. Maintaining the promise that effort and contribution will be rewarded with a secure place in the economy is therefore not only a matter of individual welfare; it is a condition of political stability. Societies that allow the employment link to weaken on a large scale place their own institutional foundations under strain."
+      }
+    ]
+  },
+  "against": {
+    "vocab": [
+      {
+        "term": "labour market rigidity",
+        "definition": "Rules and practices that make it difficult for firms to adjust employment levels, slowing adaptation and sometimes reducing overall job creation.",
+        "example": "Excessive labour market rigidity can discourage hiring and leave more people permanently outside work."
+      },
+      {
+        "term": "creative destruction",
+        "definition": "The process by which innovation continuously replaces old industries and jobs with new ones, generating long-term progress despite short-term disruption.",
+        "example": "Creative destruction has repeatedly shifted employment from agriculture to industry and then to services."
+      },
+      {
+        "term": "portfolio career",
+        "definition": "A working life composed of multiple concurrent or sequential roles, projects, and income streams rather than a single long-term job.",
+        "example": "Many professionals now build portfolio careers that combine employment, freelancing, and personal projects."
+      },
+      {
+        "term": "job lock",
+        "definition": "The inability to leave an unsatisfactory or unsuitable job because of dependence on its benefits, security, or income.",
+        "example": "Job lock keeps people in roles that no longer fit their skills or health, reducing both well-being and productivity."
+      },
+      {
+        "term": "technological displacement",
+        "definition": "The replacement of human labour by machines or algorithms in specific tasks or occupations.",
+        "example": "Technological displacement in manufacturing and clerical work has been continuous for decades."
+      },
+      {
+        "term": "income diversification",
+        "definition": "The strategy of drawing earnings from several sources in order to reduce dependence on any single employer or role.",
+        "example": "Income diversification through side activities can provide resilience when traditional jobs become unstable."
+      },
+      {
+        "term": "autonomy premium",
+        "definition": "The additional well-being and motivation that many people derive from controlling their own time, tasks, and working methods.",
+        "example": "Surveys show a clear autonomy premium among freelancers and remote workers who value control over schedule."
+      },
+      {
+        "term": "skills obsolescence",
+        "definition": "The process by which particular abilities lose economic value as technology and market demand change.",
+        "example": "Rapid skills obsolescence makes lifelong dependence on a single occupational identity increasingly risky."
+      },
+      {
+        "term": "non-standard employment",
+        "definition": "Work arrangements that differ from the traditional full-time, permanent, single-employer model, including temporary, part-time, and platform work.",
+        "example": "Non-standard employment now accounts for a substantial and growing share of total work in many economies."
+      },
+      {
+        "term": "post-work transition",
+        "definition": "The longer-term shift toward a society in which traditional full-time employment occupies a smaller place in most people’s lives and identities.",
+        "example": "Some analysts argue that advanced economies are already entering a gradual post-work transition."
+      }
+    ],
+    "phrases": [
+      {
+        "phrase": "Clinging to the mid-twentieth-century model of lifelong full-time employment ignores both technological reality and changing worker preferences.",
+        "examples": [
+          "Clinging to the mid-twentieth-century model of lifelong full-time employment ignores both technological reality and changing worker preferences.",
+          "Younger cohorts increasingly reject the idea that clinging to the mid-twentieth-century model of lifelong full-time employment ignores both technological reality and changing worker preferences.",
+          "Policy that insists on restoring the past shows that clinging to the mid-twentieth-century model of lifelong full-time employment ignores both technological reality and changing worker preferences."
+        ]
+      },
+      {
+        "phrase": "Security can be provided through portable benefits, skills, and income floors rather than through rigid job protection.",
+        "examples": [
+          "Security can be provided through portable benefits, skills, and income floors rather than through rigid job protection that slows adaptation.",
+          "Modern social policy should ensure that security can be provided through portable benefits, skills, and income floors rather than through rigid job protection.",
+          "Several countries are experimenting with ways in which security can be provided through portable benefits, skills, and income floors rather than through rigid job protection."
+        ]
+      },
+      {
+        "phrase": "Many people experience traditional employment as constraining and prefer the autonomy of more flexible arrangements.",
+        "examples": [
+          "Many people experience traditional employment as constraining and prefer the autonomy of more flexible arrangements when genuine choice exists.",
+          "Surveys of freelancers and independent workers show that many people experience traditional employment as constraining and prefer the autonomy of more flexible arrangements.",
+          "For those with marketable skills, many people experience traditional employment as constraining and prefer the autonomy of more flexible arrangements."
+        ]
+      },
+      {
+        "phrase": "The goal should be good lives and adequate resources, not the preservation of particular job forms for their own sake.",
+        "examples": [
+          "The goal should be good lives and adequate resources, not the preservation of particular job forms for their own sake.",
+          "If technology can produce abundance, the goal should be good lives and adequate resources, not the preservation of particular job forms for their own sake.",
+          "A forward-looking policy accepts that the goal should be good lives and adequate resources, not the preservation of particular job forms for their own sake."
+        ]
+      },
+      {
+        "phrase": "Forcing people into low-quality or unnecessary jobs in the name of employment maximisation wastes human potential.",
+        "examples": [
+          "Forcing people into low-quality or unnecessary jobs in the name of employment maximisation wastes human potential and public resources.",
+          "Make-work schemes demonstrate that forcing people into low-quality or unnecessary jobs in the name of employment maximisation wastes human potential.",
+          "A mature economy should avoid forcing people into low-quality or unnecessary jobs in the name of employment maximisation wastes human potential."
+        ]
+      },
+      {
+        "phrase": "Resilience in the modern economy comes from adaptability and multiple income sources, not from dependence on a single employer.",
+        "examples": [
+          "Resilience in the modern economy comes from adaptability and multiple income sources, not from dependence on a single employer.",
+          "Workers who develop portable skills understand that resilience in the modern economy comes from adaptability and multiple income sources, not from dependence on a single employer.",
+          "Household strategies increasingly recognise that resilience in the modern economy comes from adaptability and multiple income sources, not from dependence on a single employer."
+        ]
+      }
+    ],
+    "idioms": [
+      {
+        "idiom": "put all one's eggs in one basket",
+        "definition": "To depend entirely on a single source of security or success, increasing vulnerability if it fails.",
+        "examples": [
+          "Relying on one long-term employer is often putting all one’s eggs in one basket in a rapidly changing economy.",
+          "Career advice now warns against putting all one’s eggs in one basket of a single occupational identity.",
+          "Income diversification is the practical alternative to putting all one’s eggs in one basket."
+        ]
+      },
+      {
+        "idiom": "move with the times",
+        "definition": "To adapt to new conditions rather than clinging to outdated patterns.",
+        "examples": [
+          "Labour market institutions need to move with the times instead of defending forms of work that technology is rendering less central.",
+          "Workers who move with the times by updating skills and exploring new arrangements fare better than those who wait for the old model to return.",
+          "Policy that refuses to move with the times risks protecting the past at the expense of the future."
+        ]
+      },
+      {
+        "idiom": "a square peg in a round hole",
+        "definition": "A person forced into a role or system that does not fit their abilities or preferences.",
+        "examples": [
+          "Many people in traditional jobs feel like a square peg in a round hole and would thrive under more flexible conditions.",
+          "Rigid employment structures turn creative or independent workers into a square peg in a round hole.",
+          "A better system reduces the number of people forced to live as a square peg in a round hole."
+        ]
+      },
+      {
+        "idiom": "keep one's options open",
+        "definition": "To avoid irreversible commitments so that future choices remain available.",
+        "examples": [
+          "In an uncertain labour market it is rational to keep one’s options open rather than locking into a single long-term path.",
+          "Portfolio careers allow people to keep their options open as industries rise and fall.",
+          "Young workers increasingly prefer to keep their options open instead of seeking immediate permanence."
+        ]
+      },
+      {
+        "idiom": "the writing on the wall",
+        "definition": "Clear signs that a major change is coming and that old patterns will not continue.",
+        "examples": [
+          "Automation and platform work are the writing on the wall for the dominance of traditional full-time employment.",
+          "Declining tenure and rising non-standard contracts are the writing on the wall that security must be rebuilt in new forms.",
+          "Policy makers who ignore the writing on the wall will leave workers unprepared for the actual labour market."
+        ]
+      },
+      {
+        "idiom": "think outside the box",
+        "definition": "To approach a problem with new ideas rather than conventional assumptions.",
+        "examples": [
+          "Providing security without traditional jobs requires us to think outside the box of mid-century employment models.",
+          "Universal basic services or income floors are attempts to think outside the box about how dignity and resources can be guaranteed.",
+          "The future of work debate only progresses when participants are willing to think outside the box."
+        ]
+      }
+    ],
+    "arguments": [
+      {
+        "claim": "Technological change is permanently altering the quantity and nature of available work; insisting on the old employment model is unrealistic.",
+        "explanation": "Automation, artificial intelligence, and digital platforms continue to transform or eliminate tasks that once required full-time human labour. While new roles appear, they often differ in skill requirements, location, and contractual form from the jobs they replace. Historical transitions from agriculture to industry and from industry to services already demonstrated that the dominant form of work changes. The current wave is faster and more pervasive. Policy that treats the mid-twentieth-century pattern of stable, full-time, single-employer careers as the natural and necessary default will leave large numbers of people poorly prepared. A more realistic approach accepts that non-standard and project-based work will constitute a larger share of economic activity and concentrates on making those arrangements compatible with security and dignity."
+      },
+      {
+        "claim": "Many workers, especially younger and higher-skilled cohorts, actively prefer autonomy and flexibility over traditional job security.",
+        "explanation": "Surveys of freelancers, independent professionals, and remote workers consistently show high levels of satisfaction with control over time, tasks, and location. For these groups, the traditional employment relationship is experienced as restrictive rather than protective. They accept income variability in exchange for freedom from hierarchical oversight and rigid schedules. Treating their preference as a temporary aberration or a failure of the system misreads the data. As education levels rise and digital tools lower the costs of independent work, the share of people who can and want to operate outside standard employment grows. A labour market that forces everyone into the old mould suppresses welfare for those who thrive under different arrangements. Respecting revealed preference means expanding genuine choice rather than maximising one particular form of contract."
+      },
+      {
+        "claim": "Security can be redesigned around portable benefits, continuous skill development, and income floors instead of around permanent jobs.",
+        "explanation": "The traditional employment contract bundled wages, health coverage, pensions, training, and dismissal protection. That bundling made sense when most people worked for one employer for decades. It makes less sense when careers involve multiple employers and spells of independent work. Portable benefits that follow the worker, publicly supported lifelong learning, and a reliable income floor can provide security without requiring firms to offer lifetime posts. Several countries are already experimenting with elements of this model. The advantage is that security becomes compatible with labour market fluidity rather than opposed to it. Clinging to job-based security in a fluid economy simply produces more people who fall outside the protected core. Redesigning the safety net for mobility is both more realistic and potentially more inclusive."
+      },
+      {
+        "claim": "Over-protection of existing jobs can reduce overall employment and slow the reallocation of labour toward more productive uses.",
+        "explanation": "Strict employment protection raises the cost of hiring and of dismissing workers. Firms respond by hiring more cautiously, relying more on temporary contracts, or substituting capital for labour. The result can be higher unemployment or under-employment, especially among young people and outsiders. At the same time, resources remain locked in declining activities instead of moving toward expanding ones. Countries with more flexible labour markets have often combined higher employment rates with strong social protection financed through other means. The goal of broad opportunity is better served by facilitating adjustment and supporting workers through transitions than by trying to freeze particular jobs in place. Rigidity protects insiders at the potential expense of overall participation and dynamism."
+      },
+      {
+        "claim": "Identity and dignity need not be tied exclusively to traditional employment; other forms of contribution and status are available and already valued.",
+        "explanation": "Caring for family members, voluntary work, creative production, community organising, and lifelong learning all supply purpose and social recognition for many people. As material productivity rises, societies can afford to support a wider range of valued activities beyond paid employment. The insistence that only a conventional job confers dignity reflects a particular historical period rather than a universal human requirement. Expanding the social definition of contribution reduces the stigma of non-employment and opens space for people whose circumstances or preferences do not fit standard jobs. Income guarantees and public recognition of unpaid work can further detach basic dignity from labour-market status. The result is a more inclusive understanding of a successful adult life."
+      },
+      {
+        "claim": "The fiscal and human costs of forcing people into low-productivity or artificial jobs often exceed the costs of supporting them outside traditional employment.",
+        "explanation": "Make-work programmes and heavy pressure to accept any available post can place people in roles that add little value, damage motivation, and still require substantial public subsidy. When technology can perform certain tasks more efficiently, maintaining human employment in those tasks for its own sake is economically wasteful. Resources spent on artificial job creation might generate greater welfare if directed toward education, health, care, or a straightforward income floor. The dignity argument is important, yet dignity is not automatically created by any occupation labelled “employment.” Low-quality, dead-end, or purely make-work positions can themselves erode self-respect. A more honest accounting weighs the full costs of employment maximisation against alternative ways of securing living standards and social participation."
+      },
+      {
+        "claim": "Household resilience is increasingly better served by multiple income streams and adaptable skills than by dependence on a single long-term employer.",
+        "explanation": "Employers can fail, downsize, or relocate. Workers who have invested their entire security in one organisation face catastrophic loss when that organisation changes. By contrast, individuals and households that maintain several sources of earnings, continuously update skills, and keep professional networks active absorb shocks more effectively. The same logic applies at the level of the wider economy: diversification reduces systemic risk. Encouraging and enabling this form of resilience is more realistic than promising a return to an era in which one job lasted a lifetime. Policy can support the shift through portable training accounts, easier combination of employment and self-employment, and social insurance that does not penalise mobility. Dependence on a single employer is a vulnerability, not a virtue."
+      },
+      {
+        "claim": "Global competition and rapid innovation make large-scale restoration of mid-century employment patterns unfeasible in open economies.",
+        "explanation": "Firms that face international rivals cannot indefinitely maintain employment levels or cost structures that their competitors have already automated or outsourced. Attempts to freeze domestic job patterns through heavy protection tend to produce either capital flight, informalisation, or declining competitiveness. The more sustainable response is to accelerate the movement of workers into activities where human input retains high value — care, education, complex services, creativity, and the design and oversight of automated systems — while providing strong transitional support. Nostalgia for a previous employment regime cannot override the arithmetic of global markets and technological possibility. Adaptation, not restoration, is the only viable long-term strategy."
+      },
+      {
+        "claim": "A growing body of evidence shows that well-being depends more on autonomy, mastery, and purpose than on the specific contractual form of work.",
+        "explanation": "Psychological research identifies autonomy, competence, and relatedness as core drivers of motivation and satisfaction. These can be present or absent in both traditional jobs and independent arrangements. Many conventional workplaces score poorly on autonomy and treat adults as subordinate. Many independent workers report high scores on the same dimensions. The policy implication is that the quality of the experience matters more than the label “employee.” Improving voice, task design, and development opportunities inside organisations, while also enabling high-quality independent work, addresses the real sources of well-being more directly than maximising the headcount of permanent contracts. Form should follow function: the goal is human flourishing, not the preservation of a particular legal status."
+      },
+      {
+        "claim": "The most constructive path forward is to decouple basic security and social participation from the requirement of traditional full-time employment.",
+        "explanation": "As the economy’s capacity to produce goods and services with less human labour continues to rise, the old link between individual survival and continuous paid work becomes less necessary and less feasible. Societies can choose to maintain that link artificially or to redesign institutions so that every citizen has a secure material foundation and genuine opportunities for contribution, learning, and care — whether or not those activities take the form of a standard job. Experiments with basic income, expanded public services, shorter standard working time, and recognition of unpaid work all point toward this decoupling. The transition will be gradual and contested, yet the direction is set by technology and by the limits of forcing employment for its own sake. Preparing for a world in which good lives are possible with less traditional work is more responsible than insisting that the old employment model must remain the centre of social organisation."
+      }
+    ]
+  }
+}
