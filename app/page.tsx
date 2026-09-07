@@ -262,12 +262,12 @@ export default function HomePage() {
               className="flex items-center justify-between gap-3 rounded-2xl p-4"
               style={{ background: 'linear-gradient(135deg, #be123c, #fb7185)', boxShadow: 'var(--card-elev)', textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
               <div>
-                <div className="text-[10px] font-black tracking-[1.2px] text-white/80 uppercase">Homework</div>
+                <div className="text-[10px] font-black tracking-[1.2px] text-white/80 uppercase">{t.classHome.homework}</div>
                 <div className="text-lg font-black text-white leading-tight">
-                  {pendingTotal} {pendingTotal === 1 ? 'assignment' : 'assignments'} due
+                  {pendingTotal} {pendingTotal === 1 ? t.classHome.assignmentDue : t.classHome.assignmentsDue}
                 </div>
               </div>
-              <span className="shrink-0 text-sm font-black text-white bg-white/25 border border-white/40 rounded-xl px-4 py-2.5">Open →</span>
+              <span className="shrink-0 text-sm font-black text-white bg-white/25 border border-white/40 rounded-xl px-4 py-2.5">{t.classHome.open} →</span>
             </TiltCard>
           </Link>
         )}
@@ -315,7 +315,7 @@ export default function HomePage() {
 
         <Link href="/classes"
           className="flex items-center justify-between gap-3 rounded-2xl px-4 py-3 border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-muted)] hover:border-[var(--primary)] hover:text-[var(--text)] transition-colors">
-          <span className="text-sm font-semibold">{teacherVariant ? 'Manage classes · create a class' : 'All classes · join another'}</span>
+          <span className="text-sm font-semibold">{teacherVariant ? t.classHome.manage : t.classHome.browse}</span>
           <span className="text-lg">→</span>
         </Link>
 

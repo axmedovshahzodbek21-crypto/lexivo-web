@@ -65,11 +65,11 @@ export default function LevelsPage() {
         <Link href="/" className="text-sm font-semibold text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
           {t.hub.backHome}
         </Link>
-        <h1 className="text-2xl font-bold text-[var(--text)] mt-2">Levels</h1>
+        <h1 className="text-2xl font-bold text-[var(--text)] mt-2">{t.levels.title}</h1>
         <p className="text-sm text-[var(--text-muted)] mt-0.5">
           <b className="text-[var(--text)]">{info.level}</b> · {displayXP(xp)} XP
-          {info.next && <> · {displayXP(info.xpToNext)} XP to {info.next}</>}
-          {' · '}<b className="text-[var(--text)]">{reachedCount}</b>/{LEVEL_THRESHOLDS.length} levels
+          {info.next && <> · {displayXP(info.xpToNext)} XP → {info.next}</>}
+          {' · '}<b className="text-[var(--text)]">{reachedCount}</b>/{LEVEL_THRESHOLDS.length} {t.levels.levelsCount}
         </p>
       </div>
 
@@ -112,7 +112,7 @@ export default function LevelsPage() {
                     {lvl.level}
                   </span>
                   <span className="text-[11px] font-semibold text-[var(--text-muted)] shrink-0">
-                    {lvl.min === 0 ? 'Start' : `${displayXP(lvl.min)} XP`}
+                    {lvl.min === 0 ? t.levels.start : `${displayXP(lvl.min)} XP`}
                   </span>
                 </div>
 
@@ -122,16 +122,16 @@ export default function LevelsPage() {
                       <div className="h-full rounded-full" style={{ width: `${info.progress}%`, background: color }} />
                     </div>
                     <div className="text-[11px] text-[var(--text-muted)] mt-1">
-                      {displayXP(info.xpToNext)} XP to {info.next}
+                      {displayXP(info.xpToNext)} XP → {info.next}
                     </div>
                   </div>
                 ) : reached ? (
                   <div className="text-[11px] text-[var(--text-muted)] mt-0.5">
-                    {lvl.min === 0 ? 'Where everyone begins' : date ? `Reached ${fmtDate(date)}` : 'Reached earlier'}
+                    {lvl.min === 0 ? t.levels.whereBegins : date ? `${t.levels.reached} ${fmtDate(date)}` : t.levels.reachedEarlier}
                   </div>
                 ) : (
                   <div className="text-[11px] text-[var(--text-muted)] mt-0.5">
-                    {displayXP(lvl.min - xp)} XP to unlock
+                    {displayXP(lvl.min - xp)} XP {t.levels.xpToUnlock}
                   </div>
                 )}
               </div>

@@ -50,6 +50,7 @@ function WordRow({ w, trailing }: { w: LearnedWord; trailing?: string }) {
 }
 
 function DayModal({ dayKey, words, onClose }: { dayKey: string; words: LearnedWord[]; onClose: () => void }) {
+  const t = useTranslation();
   useEffect(() => {
     document.body.style.overflow = 'hidden';
     return () => { document.body.style.overflow = ''; };
@@ -70,7 +71,7 @@ function DayModal({ dayKey, words, onClose }: { dayKey: string; words: LearnedWo
           <div>
             <h3 className="text-lg font-black text-[var(--text)]">{fmtLong(dayKey)}</h3>
             <p className="text-xs text-[var(--text-muted)] mt-0.5">
-              {words.length} {words.length === 1 ? 'word' : 'words'}
+              {words.length} {words.length === 1 ? t.wordsPage.word : t.wordsPage.words}
               {oneCollection && <> · {oneCollection}</>}
             </p>
           </div>
@@ -139,11 +140,11 @@ export default function WordsPage() {
         <Link href="/" className="text-sm font-semibold text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
           {t.hub.backHome}
         </Link>
-        <h1 className="text-2xl font-bold text-[var(--text)] mt-2">Words learned</h1>
+        <h1 className="text-2xl font-bold text-[var(--text)] mt-2">{t.wordsPage.title}</h1>
         <p className="text-sm text-[var(--text-muted)] mt-0.5">
-          <b className="text-[var(--text)]">{learned.length}</b> words over{' '}
-          <b className="text-[var(--text)]">{totalDays}</b> {totalDays === 1 ? 'day' : 'days'}
-          {bestDay > 0 && <> · best day <b className="text-[var(--text)]">{bestDay}</b></>}
+          <b className="text-[var(--text)]">{learned.length}</b> {t.wordsPage.words}
+          {' · '}<b className="text-[var(--text)]">{totalDays}</b> {totalDays === 1 ? t.wordsPage.day : t.wordsPage.days}
+          {bestDay > 0 && <> · {t.wordsPage.bestDay} <b className="text-[var(--text)]">{bestDay}</b></>}
         </p>
       </div>
 
@@ -155,7 +156,7 @@ export default function WordsPage() {
             style={{ color: ACCENT }} aria-label="Previous month">‹</button>
           <span className="text-sm font-bold text-[var(--text)]">
             {MONTH_NAMES[m]} {y}
-            {monthTotal > 0 && <span className="ml-2 text-xs font-semibold text-[var(--text-muted)]">{monthTotal} words</span>}
+            {monthTotal > 0 && <span className="ml-2 text-xs font-semibold text-[var(--text-muted)]">{monthTotal} {t.wordsPage.words}</span>}
           </span>
           <button onClick={() => canGoNext && setCalMonth(new Date(y, m + 1, 1))}
             className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-[var(--border)] transition-colors"
@@ -198,12 +199,10 @@ export default function WordsPage() {
       {/* ── All words ever learned ── */}
       <div>
         <h2 className="text-xs font-bold uppercase tracking-wide text-[var(--text-muted)] mb-2 px-1">
-          All words · {learned.length}
+          {t.wordsPage.allWords} · {learned.length}
         </h2>
         {allWords.length === 0 ? (
-          <p className="text-sm text-[var(--text-muted)] px-1">
-            You haven&apos;t learned any words yet. Start a Learn session from a collection.
-          </p>
+          <p className="text-sm text-[var(--text-muted)] px-1">{t.wordsPage.empty}</p>
         ) : (
           <div className="rounded-xl overflow-hidden border border-[var(--border)] divide-y divide-[var(--border)]">
             {allWords.map(({ w, key }, i) => (
