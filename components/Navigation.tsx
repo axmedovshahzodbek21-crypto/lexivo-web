@@ -8,35 +8,28 @@ import { useAuth } from '@/lib/auth-context';
 import { useTranslation } from '@/lib/useTranslation';
 import { LEVEL_COLORS, LEVEL_COLORS_FALLBACK } from '@/lib/colors';
 
+// Prototype: sidebar trimmed to the priority areas — core vocab study
+// (Review), Search, classes, leaderboard. Collections is entered from the
+// home "Ready to learn" hero; "More" from the home Explore bar.
 const NAV_HREFS = [
   { href: '/',             icon: '🏠', key: 'home'        },
-  { href: '/ielts-reading', icon: '📝', key: 'ielts_reading' },
-  { href: '/reading',      icon: '💡', key: 'reading'     },
   { href: '/srs',          icon: '🔄', key: 'review'      },
   { href: '/search',       icon: '🔍', key: 'search'      },
-  { href: '/progress',     icon: '📊', key: 'progress'    },
-  { href: '/real-english',  icon: '🗣️', key: 'real_english' },
-  { href: '/leaderboard',  icon: '🏆', key: 'leaderboard' },
   { href: '/classes',      icon: '👩‍🏫', key: 'classes'     },
-  { href: '/library',      icon: '📚', key: 'library'     },
-  { href: '/speaking',     icon: '🎤', key: 'speaking'    },
+  { href: '/leaderboard',  icon: '🏆', key: 'leaderboard' },
+  { href: '/progress',     icon: '📊', key: 'progress'    },
 ] as const;
 
 const NAV_COLORS: Record<string, { color: string; light: string; dark: string }> = {
   home:          { color: '#F97316', light: '#FB923C', dark: '#C2410C' },
-  ielts_reading: { color: '#6366F1', light: '#818CF8', dark: '#4338CA' },
-  reading:       { color: '#EAB308', light: '#FDE047', dark: '#A16207' },
   review:        { color: '#06B6D4', light: '#22D3EE', dark: '#0891B2' },
   search:        { color: '#8B5CF6', light: '#A78BFA', dark: '#6D28D9' },
-  progress:      { color: '#10B981', light: '#34D399', dark: '#059669' },
-  real_english:  { color: '#EC4899', light: '#F472B6', dark: '#BE185D' },
-  leaderboard:   { color: '#F59E0B', light: '#FCD34D', dark: '#B45309' },
   classes:       { color: '#EF4444', light: '#F87171', dark: '#B91C1C' },
-  library:       { color: '#84CC16', light: '#A3E635', dark: '#4D7C0F' },
-  speaking:      { color: '#FF6584', light: '#FF8FA3', dark: '#C2410C' },
+  leaderboard:   { color: '#F59E0B', light: '#FCD34D', dark: '#B45309' },
+  progress:      { color: '#10B981', light: '#34D399', dark: '#059669' },
 };
 
-// Mobile bottom bar: 5 core items only — Matching & Leaderboard are on the home page
+// Mobile bottom bar: first 5 = Home, Review, Search, Classes, Leaderboard
 const MOBILE_NAV_HREFS = NAV_HREFS.slice(0, 5);
 
 
@@ -190,7 +183,7 @@ export default function Navigation() {
                 className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-semibold"
                 style={active ? {
                   background: `linear-gradient(135deg, ${nc.light}, ${nc.color}, ${nc.dark})`,
-                  boxShadow: `0 3px 0 ${nc.dark}, 0 6px 16px ${nc.color}55`,
+                  boxShadow: `0 1px 2px ${nc.color}40, 0 4px 10px ${nc.color}38, 0 12px 26px ${nc.color}28`,
                   color: '#fff',
                 } : hovered ? {
                   background: `${nc.color}18`,

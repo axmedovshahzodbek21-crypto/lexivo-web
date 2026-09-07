@@ -14,10 +14,10 @@ import { speak } from '@/lib/speech';
 import { getTheme, toggleTheme, type Theme } from '@/lib/theme';
 import type { WordItem, UserSettings } from '@/lib/types';
 import XpModal from '@/components/XpModal';
+import TiltCard from '@/components/TiltCard';
 import DailyGoalModal from '@/components/DailyGoalModal';
 import { supabase } from '@/lib/supabase';
 import { APK_DOWNLOAD_URL } from '@/lib/constants';
-import { HUB_CATEGORIES } from '@/lib/hubCategories';
 
 type HomeClassSummary = {
   classId: string; className: string; isTeacher: boolean;
@@ -75,6 +75,12 @@ export default function HomePage() {
   const [showBanner, setShowBanner] = useState(false);
   const [showReviewBanner, setShowReviewBanner] = useState(true);
   const [homeClasses, setHomeClasses] = useState<HomeClassSummary[]>([]);
+  // ── Class-mode home (prototype) ──
+  // Default is the full learner home. A user who sets "Classes" on the /more
+  // page (localStorage 'lexivo_home_mode' === 'class') gets a class-first
+  // home instead. Delete this + the showClassHome branch below to revert.
+  const [homeClassesLoaded, setHomeClassesLoaded] = useState(false);
+  const [homeMode, setHomeModeState] = useState<'class' | 'full'>('full');
 
   useEffect(() => {
     if (authLoading) return;
@@ -200,36 +206,153 @@ export default function HomePage() {
         setHomeClasses(cards);
       } catch {
         // best-effort — leave whatever class cards were already loaded
+      } finally {
+        setHomeClassesLoaded(true);
       }
     })();
   }, [user]);
+
+  useEffect(() => {
+    try {
+      if (localStorage.getItem('lexivo_home_mode') === 'class') setHomeModeState('class');
+    } catch { /* private mode / disabled storage */ }
+  }, []);
 
   const t = useTranslation();
   const levelInfo = getLevelInfo(xp);
   const dailyProgress = Math.min((todayCount / settings.dailyGoal) * 100, 100);
   const pulseClass = (settings.pulseEnabled ?? true) ? `animate-heartbeat-${settings.pulseSpeed ?? 'normal'}` : '';
 
-  return (
-    <div className="p-4 space-y-6 animate-fade-in">
-      {/* Header */}
-      <div className="flex items-center justify-between pt-2">
-        <div>
-          <h1 className="text-2xl font-bold text-[var(--text)]">Hi, {settings.name}! 👋</h1>
-          <p className="text-sm text-[var(--text-muted)]">{t.home.readyToLearn}</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => { const next = toggleTheme(); setThemeState(next); }}
-            className="w-10 h-10 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-lg hover:bg-[var(--primary-bg)] transition-colors"
-            aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-          >
-            {theme === 'dark' ? '☀️' : '🌙'}
-          </button>
-          <Link href="/settings" className="w-10 h-10 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-lg">
-            ⚙️
-          </Link>
-        </div>
+  // ── Class-mode home (prototype) ──
+  const showClassHome = homeClassesLoaded && homeMode === 'class';
+  const teacherVariant = homeClasses.length > 0 && homeClasses.every(c => c.isTeacher);
+  const pendingTotal = homeClasses.reduce((s, c) => s + c.pendingHomework, 0);
+  // Home layout is switched from the "More" page (localStorage 'lexivo_home_mode');
+  // this component only reads it (mount effect above).
+
+  const header = (
+    <div className="flex items-center justify-between pt-2">
+      <div>
+        <h1 className="text-2xl font-bold text-[var(--text)]">Hi, {settings.name}! 👋</h1>
       </div>
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => { const next = toggleTheme(); setThemeState(next); }}
+          className="w-10 h-10 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-lg hover:bg-[var(--primary-bg)] transition-colors"
+          aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+        >
+          {theme === 'dark' ? '☀️' : '🌙'}
+        </button>
+        <Link href="/settings" className="w-10 h-10 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-lg">
+          ⚙️
+        </Link>
+      </div>
+    </div>
+  );
+
+  // ── Class-first home for class-only users (prototype; delete to revert) ──
+  if (showClassHome) {
+    return (
+      <div className="p-4 space-y-6 animate-fade-in max-w-5xl mx-auto">
+        {header}
+
+        {!teacherVariant && pendingTotal > 0 && (
+          <Link href="/classes" className="block">
+            <TiltCard intensity={5} edge edgeDepth={9}
+              className="flex items-center justify-between gap-3 rounded-2xl p-4"
+              style={{ background: 'linear-gradient(135deg, #be123c, #fb7185)', boxShadow: 'var(--card-elev)', textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
+              <div>
+                <div className="text-[10px] font-black tracking-[1.2px] text-white/80 uppercase">Homework</div>
+                <div className="text-lg font-black text-white leading-tight">
+                  {pendingTotal} {pendingTotal === 1 ? 'assignment' : 'assignments'} due
+                </div>
+              </div>
+              <span className="shrink-0 text-sm font-black text-white bg-white/25 border border-white/40 rounded-xl px-4 py-2.5">Open →</span>
+            </TiltCard>
+          </Link>
+        )}
+
+        <div>
+          <h2 className="text-xs font-bold uppercase tracking-wide text-[var(--text-muted)] mb-2 px-1">{t.hub.yourClasses}</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {homeClasses.map(card => {
+              const { bg } = classGradient(card.classId);
+              return (
+                <div key={card.classId} className="relative">
+                  {card.pendingHomework > 0 && (
+                    <div className="absolute -top-1.5 -right-1.5 min-w-[22px] h-[22px] rounded-full bg-white text-[var(--danger)] text-[10px] flex items-center justify-center font-black z-10 shadow px-1">
+                      {card.pendingHomework}
+                    </div>
+                  )}
+                  <Link href={`/classes/${card.classId}/home`} className="block h-full">
+                    <TiltCard intensity={6} edge
+                      className={`rounded-2xl h-full min-h-[104px] p-3 flex flex-col justify-between ${pulseClass}`}
+                      style={{ background: bg, boxShadow: 'var(--card-elev)', textShadow: '0 1px 3px rgba(0,0,0,0.35)' }}>
+                      <div className="flex items-start justify-between gap-1">
+                        <div className="flex-1 min-w-0">
+                          <div className="text-base font-black text-white leading-tight truncate">{card.className}</div>
+                          <div className="text-[10px] text-white/70 mt-1">
+                            {card.isTeacher ? `👨‍🎓 ${card.studentCount} students` : `⚡ ${displayXP(card.classXP)} XP`}
+                          </div>
+                        </div>
+                        <span className="text-lg opacity-80 shrink-0">{card.isTeacher ? '🏫' : '🎓'}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold bg-white/20 text-white rounded-full px-2 py-0.5">
+                          {card.isTeacher ? 'Teacher' : 'Student'}
+                        </span>
+                        {!card.isTeacher && card.classStreak > 0 && (
+                          <span className="text-[10px] text-white/70">🔥 {card.classStreak}d</span>
+                        )}
+                      </div>
+                    </TiltCard>
+                  </Link>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <Link href="/classes"
+          className="flex items-center justify-between gap-3 rounded-2xl px-4 py-3 border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-muted)] hover:border-[var(--primary)] hover:text-[var(--text)] transition-colors">
+          <span className="text-sm font-semibold">{teacherVariant ? 'Manage classes · create a class' : 'All classes · join another'}</span>
+          <span className="text-lg">→</span>
+        </Link>
+
+        <Link href="/more"
+          className="flex items-center justify-between gap-3 rounded-2xl px-4 py-3 border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-muted)] hover:border-[var(--primary)] hover:text-[var(--text)] transition-colors">
+          <span className="flex items-center gap-2 text-sm font-semibold">
+            <span className="text-base">✨</span>{t.nav.more}
+          </span>
+          <span className="text-lg">→</span>
+        </Link>
+
+        <div className="pb-4" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-4 space-y-6 animate-fade-in max-w-5xl mx-auto">
+      {header}
+
+      {/* ── Primary action: study now ──
+          Prototype: this is the home screen's only entry into Collections
+          (sidebar item + Explore card were removed). Always shown; the
+          orange review banner below stacks on top of it when reviews are due. */}
+      <Link href="/collections" className="block">
+        <TiltCard intensity={5}
+          className="flex items-center justify-between gap-3 rounded-2xl p-4"
+          style={{ background: 'linear-gradient(135deg, #6C63FF, #a78bfa)', boxShadow: 'var(--card-elev)', textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
+          <div>
+            <div className="text-[10px] font-black tracking-[1.2px] text-white/80 uppercase">{t.hub.today}</div>
+            <div className="text-lg font-black text-white leading-tight">{t.home.readyToLearn}</div>
+          </div>
+          <span className="shrink-0 text-sm font-black text-white bg-white/25 border border-white/40 rounded-xl px-4 py-2.5">
+            {t.nav.learn} →
+          </span>
+        </TiltCard>
+      </Link>
 
       {/* ── Download banner (shown once) ── */}
       {showBanner && (
@@ -255,7 +378,7 @@ export default function HomePage() {
         <div className="relative overflow-hidden rounded-2xl p-[18px]"
           style={{
             background: 'linear-gradient(135deg, #FB923C, #F97316, #C2410C)',
-            boxShadow: '0 4px 0 #7C2D12, 0 8px 18px rgba(249,115,22,0.35)',
+            boxShadow: 'var(--card-elev)',
           }}>
           {/* watermark */}
           <div className="absolute -right-2 -bottom-4 text-[80px] leading-none pointer-events-none select-none"
@@ -300,28 +423,25 @@ export default function HomePage() {
       <div>
         <h2 className="text-xs font-bold uppercase tracking-wide text-[var(--text-muted)] mb-2 px-1">{t.hub.today}</h2>
         <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
-          <Link href="/progress?tab=calendar" className="block">
-            <div className={`rounded-2xl p-4 h-full flex flex-col items-center justify-center text-center gap-2 hover:-translate-y-1 transition-all duration-200 ${pulseClass}`}
-              style={{ background: 'linear-gradient(135deg, #FF6B35, #ff9f7f)', boxShadow: '0 10px 0 #b84a1a, 0 18px 40px rgba(255,107,53,0.55)', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>
-              <div className="text-3xl">🔥</div>
-              <div className="text-xl font-black text-white">{streak}</div>
-              <div className="text-xs text-white/85 font-semibold">{t.home.dayStreak}</div>
-            </div>
+          <Link href="/progress?tab=calendar" className="block h-full">
+            <StatCard icon="🔥" value={streak} label={t.home.dayStreak}
+              gradient="linear-gradient(135deg, #FF6B35, #ff9f7f)" pulseClass={pulseClass} />
           </Link>
 
           <button onClick={() => setShowXpModal(true)} className="block w-full h-full text-left">
             <StatCard icon="⚡" value={displayXP(xp)} label={t.home.totalXp}
-              gradient="linear-gradient(135deg, #a78bfa, #6C63FF, #4C1D95)" edge="#3D1F9E" glowColor="rgba(108,99,255,0.4)" pulseClass={pulseClass} />
+              gradient="linear-gradient(135deg, #a78bfa, #6C63FF, #4C1D95)" pulseClass={pulseClass} />
           </button>
 
-          <Link href="/progress" className="block h-full">
+          <Link href="/words" className="block h-full">
             <StatCard icon="📚" value={learnedCount} label={t.home.words}
-              gradient="linear-gradient(135deg, #0284c7, #38bdf8)" edge="#0369a1" glowColor="rgba(2,132,199,0.4)" pulseClass={pulseClass} />
+              gradient="linear-gradient(135deg, #0284c7, #38bdf8)" pulseClass={pulseClass} />
           </Link>
 
           <button onClick={() => setShowDailyGoalModal(true)} className="block w-full h-full text-left">
-            <div className={`rounded-2xl p-4 h-full flex flex-col justify-center gap-3 hover:-translate-y-1 transition-all duration-200 ${pulseClass}`}
-              style={{ background: 'linear-gradient(135deg, #5b21b6, #8b5cf6)', boxShadow: '0 10px 0 #3b0764, 0 18px 40px rgba(91,33,182,0.5)' }}>
+            <TiltCard intensity={7} edge
+              className={`rounded-2xl p-4 h-full flex flex-col justify-center gap-3 ${pulseClass}`}
+              style={{ background: 'linear-gradient(135deg, #5b21b6, #8b5cf6)', boxShadow: 'var(--card-elev)' }}>
               <div className="relative self-center" style={{ width: 42, height: 42 }}>
                 <svg width="42" height="42" style={{ transform: 'rotate(-90deg)' }}>
                   <circle cx="21" cy="21" r="17" fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="4" />
@@ -337,21 +457,17 @@ export default function HomePage() {
                 <div className="text-xs font-black text-white">{todayCount} / {settings.dailyGoal}</div>
                 <div className="text-[10px] text-white/75">{t.home.dailyGoal}</div>
               </div>
-            </div>
+            </TiltCard>
           </button>
 
-          <Link href="/progress" className="block h-full">
-            <div className={`rounded-2xl p-4 h-full flex flex-col items-center justify-center text-center gap-1 ${pulseClass}`}
-              style={{ background: 'linear-gradient(135deg, #be123c, #fb7185)', boxShadow: '0 10px 0 #881337, 0 18px 40px rgba(190,18,60,0.5)', textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
-              <div className="text-2xl mb-1">⭐</div>
-              <div className="text-sm font-black text-white leading-tight">{levelInfo.level}</div>
-              <div className="text-xs text-white/75 mt-0.5">{displayXP(xp)} XP</div>
-            </div>
+          <Link href="/levels" className="block h-full">
+            <StatCard icon="⭐" value={levelInfo.level} label={`${displayXP(xp)} XP`}
+              gradient="linear-gradient(135deg, #be123c, #fb7185)" pulseClass={pulseClass} />
           </Link>
 
           {wod ? (
             <div className={`rounded-2xl p-4 h-full flex flex-col justify-between ${pulseClass}`}
-              style={{ background: 'linear-gradient(135deg, #a21caf, #e879f9)', boxShadow: '0 10px 0 #701a75, 0 18px 40px rgba(162,28,175,0.5)', textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
+              style={{ background: 'linear-gradient(135deg, #a21caf, #e879f9)', boxShadow: 'var(--card-elev)', textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
               <div className="flex items-start justify-between gap-1">
                 <div className="flex-1 min-w-0">
                   <div className="text-[9px] font-bold text-white/60 uppercase tracking-wider mb-1">{t.home.wordOfDay}</div>
@@ -378,48 +494,51 @@ export default function HomePage() {
       {/* ── Explore ── */}
       <div>
         <h2 className="text-xs font-bold uppercase tracking-wide text-[var(--text-muted)] mb-2 px-1">{t.hub.explore}</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-6 gap-3">
-          {HUB_CATEGORIES.map(cat => {
-            const label = t.hub.categories[cat.key as keyof typeof t.hub.categories];
-            return (
-              <Link key={cat.key} href={`/hub/${cat.key}`} className="block">
-                <div className="rounded-2xl h-full min-h-[128px] p-4 flex flex-col justify-between hover:-translate-y-1 transition-all duration-200"
-                  style={{ background: cat.gradient, boxShadow: `0 10px 0 ${cat.edge}, 0 18px 40px ${cat.glow}`, textShadow: '0 1px 3px rgba(0,0,0,0.35)' }}>
-                  <span className="text-2xl">{cat.icon}</span>
-                  <div>
-                    <div className="font-black text-sm text-white leading-tight">{label.title}</div>
-                    <div className="text-[10px] text-white/70 mt-0.5">{label.sub}</div>
-                  </div>
-                  <span className="text-[10px] font-mono text-white/60 self-end">{cat.items.length} →</span>
+        {/* Prototype: study entry is the hero CTA above. Explore = Review +
+            Classes + the "More" bar; everything non-priority sits behind More. */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <Link href="/srs" className="block">
+            <TiltCard intensity={6} edge
+              className="rounded-2xl h-full min-h-[128px] p-4 flex flex-col justify-between"
+              style={dueCount > 0
+                ? { background: 'linear-gradient(135deg, #d97706, #fbbf24)', boxShadow: 'var(--card-elev)', textShadow: '0 1px 3px rgba(0,0,0,0.35)' }
+                : { background: 'linear-gradient(135deg, #059669, #34d399)', boxShadow: 'var(--card-elev)', textShadow: '0 1px 3px rgba(0,0,0,0.35)' }}>
+              <span className="text-2xl">🔄</span>
+              <div>
+                <div className="font-black text-sm text-white leading-tight">{t.nav.review}</div>
+                <div className="text-[10px] text-white/70 mt-0.5">
+                  {dueCount > 0 ? `${dueCount} ${dueCount === 1 ? 'word' : 'words'} due` : 'All caught up'}
                 </div>
-              </Link>
-            );
-          })}
+              </div>
+              <span className="text-[10px] font-mono text-white/60 self-end">{dueCount > 0 ? `${dueCount} →` : '→'}</span>
+            </TiltCard>
+          </Link>
 
           <Link href="/classes" className="block">
-            <div className="rounded-2xl h-full min-h-[128px] p-4 flex flex-col justify-between hover:-translate-y-1 transition-all duration-200"
-              style={{ background: 'linear-gradient(135deg, #0284c7, #38bdf8)', boxShadow: '0 10px 0 #0369a1, 0 18px 40px rgba(2,132,199,0.4)', textShadow: '0 1px 3px rgba(0,0,0,0.35)' }}>
+            <TiltCard intensity={6} edge
+              className="rounded-2xl h-full min-h-[128px] p-4 flex flex-col justify-between"
+              style={{ background: 'linear-gradient(135deg, #0284c7, #38bdf8)', boxShadow: 'var(--card-elev)', textShadow: '0 1px 3px rgba(0,0,0,0.35)' }}>
               <span className="text-2xl">👩‍🏫</span>
               <div>
                 <div className="font-black text-sm text-white leading-tight">{t.home.classesTitle}</div>
                 <div className="text-[10px] text-white/70 mt-0.5">{t.home.classesSub}</div>
               </div>
               <span className="text-[10px] font-mono text-white/60 self-end">{homeClasses.length > 0 ? `${homeClasses.length} →` : '→'}</span>
-            </div>
-          </Link>
-
-          <Link href="/battle-ready" className="block">
-            <div className="rounded-2xl h-full min-h-[128px] p-4 flex flex-col justify-between hover:-translate-y-1 transition-all duration-200"
-              style={{ background: 'linear-gradient(135deg, #b91c1c, #f87171)', boxShadow: '0 10px 0 #7f1d1d, 0 18px 40px rgba(185,28,28,0.4)', textShadow: '0 1px 3px rgba(0,0,0,0.35)' }}>
-              <span className="text-2xl">🛡️</span>
-              <div>
-                <div className="font-black text-sm text-white leading-tight">{t.home.battleReadyTitle}</div>
-                <div className="text-[10px] text-white/70 mt-0.5">{t.home.battleReadySub}</div>
-              </div>
-              <span className="text-[10px] font-mono text-white/60 self-end">→</span>
-            </div>
+            </TiltCard>
           </Link>
         </div>
+
+        {/* Prototype: single, deliberately low-key doorway to every non-priority
+            feature (reading, speaking, focus tools, extras). */}
+        <Link href="/more"
+          className="mt-3 flex items-center justify-between gap-3 rounded-2xl px-4 py-3 border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-muted)] hover:border-[var(--primary)] hover:text-[var(--text)] transition-colors">
+          <span className="flex items-center gap-2 text-sm font-semibold">
+            <span className="text-base">✨</span>
+            {t.nav.more}
+            <span className="hidden sm:inline text-[var(--text-muted)] font-normal">— reading, speaking, focus tools &amp; extras</span>
+          </span>
+          <span className="text-lg">→</span>
+        </Link>
       </div>
 
       {/* ── Classes ── */}
@@ -428,7 +547,7 @@ export default function HomePage() {
         {homeClasses.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {homeClasses.map(card => {
-              const { bg, edge, glow } = classGradient(card.classId);
+              const { bg } = classGradient(card.classId);
               return (
                 <div key={card.classId} className="relative">
                   {card.pendingHomework > 0 && (
@@ -437,8 +556,9 @@ export default function HomePage() {
                     </div>
                   )}
                   <Link href={`/classes/${card.classId}/home`} className="block h-full">
-                    <div className={`rounded-2xl h-full min-h-[104px] p-3 flex flex-col justify-between hover:-translate-y-1 transition-all duration-200 ${pulseClass}`}
-                      style={{ background: bg, boxShadow: `0 10px 0 ${edge}, 0 18px 40px ${glow}`, textShadow: '0 1px 3px rgba(0,0,0,0.35)' }}>
+                    <TiltCard intensity={6} edge
+                      className={`rounded-2xl h-full min-h-[104px] p-3 flex flex-col justify-between ${pulseClass}`}
+                      style={{ background: bg, boxShadow: 'var(--card-elev)', textShadow: '0 1px 3px rgba(0,0,0,0.35)' }}>
                       <div className="flex items-start justify-between gap-1">
                         <div className="flex-1 min-w-0">
                           <div className="text-base font-black text-white leading-tight truncate">{card.className}</div>
@@ -456,7 +576,7 @@ export default function HomePage() {
                           <span className="text-[10px] text-white/70">🔥 {card.classStreak}d</span>
                         )}
                       </div>
-                    </div>
+                    </TiltCard>
                   </Link>
                 </div>
               );
@@ -475,22 +595,24 @@ export default function HomePage() {
   );
 }
 
-function StatCard({ icon, value, label, gradient, edge, glowColor, pulseClass = '' }: {
+function StatCard({ icon, value, label, gradient, pulseClass = '' }: {
   icon: string; value: number | string; label: string;
-  gradient: string; edge: string; glowColor: string; pulseClass?: string;
+  gradient: string; edge?: string; glowColor?: string; pulseClass?: string;
 }) {
   return (
-    <div
-      className={`rounded-2xl p-4 flex flex-col items-center text-center gap-1 transition-all duration-200 hover:-translate-y-1 w-full h-full ${pulseClass}`}
+    <TiltCard
+      intensity={7}
+      edge
+      className={`rounded-2xl p-4 flex flex-col items-center justify-center text-center gap-1 w-full h-full ${pulseClass}`}
       style={{
         background: gradient,
-        boxShadow: `0 10px 0 ${edge}, 0 18px 40px ${glowColor}`,
+        boxShadow: 'var(--card-elev)',
         textShadow: '0 1px 3px rgba(0,0,0,0.35)',
       }}
     >
       <div className="text-3xl">{icon}</div>
       <div className="text-xl font-black text-white">{value}</div>
       <div className="text-xs text-white/80 font-medium">{label}</div>
-    </div>
+    </TiltCard>
   );
 }

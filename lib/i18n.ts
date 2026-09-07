@@ -28,6 +28,7 @@ const en = {
     achievements: 'Achievements',
     grammar_tips: 'Grammar Tips',
     more: 'More',
+    vocabulary: 'My Vocabulary',
   },
   sidebar: {
     tagline: 'Vocabulary Learning',
@@ -547,6 +548,7 @@ const uz: typeof en = {
     achievements: 'Yutuqlar',
     grammar_tips: 'Grammatika maslahatlari',
     more: "Ko'proq",
+    vocabulary: "Mening lug'atim",
   },
   sidebar: {
     tagline: "Lug'at o'rganish",

@@ -18,6 +18,12 @@
   --radius-sm: 8px;
   --shadow: 0 4px 20px rgba(108, 99, 255, 0.10);
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 4px 14px rgba(120,100,60,0.10);
+  /* realistic soft card elevation — key light high & far (~10m) + ambient occlusion */
+  --card-elev:
+    0 1px 2px rgba(28, 22, 12, 0.06),
+    0 4px 8px rgba(28, 22, 12, 0.07),
+    0 12px 24px rgba(28, 22, 12, 0.09),
+    0 28px 52px rgba(28, 22, 12, 0.08);
   --sidebar-bg: rgba(255, 253, 249, 0.82);
   --sidebar-border: rgba(180, 160, 140, 0.28);
   /* light: clean subtle gradient, no photo */
@@ -42,6 +48,11 @@
   --danger: #f87171;
   --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  /* dark: deeper, still soft — cards sit above a dim ground */
+  --card-elev:
+    0 1px 3px rgba(0, 0, 0, 0.4),
+    0 6px 14px rgba(0, 0, 0, 0.45),
+    0 18px 44px rgba(0, 0, 0, 0.5);
   --sidebar-bg: rgba(14, 8, 28, 0.88);
   --sidebar-border: rgba(180, 140, 255, 0.10);
   /* dark: amethyst photo with deep purple-black veil */
@@ -438,6 +449,28 @@ body.focus-mode .focus-container {
 }
 .tilt-card:hover {
   transition: transform 0.06s linear, box-shadow 0.06s linear;
+}
+
+/* 3D slab — real thickness on deep tilt */
+.tilt-3d { transform-style: preserve-3d; }
+.tilt-edge {
+  position: absolute;
+  background: rgba(16, 12, 6, 0.55);
+  pointer-events: none;
+}
+.tilt-edge-bottom {
+  left: 0; right: 0; top: 100%;
+  transform-origin: top center;
+  transform: rotateX(-90deg);
+  border-bottom-left-radius: inherit;
+  border-bottom-right-radius: inherit;
+}
+.tilt-edge-right {
+  top: 0; bottom: 0; left: 100%;
+  transform-origin: left center;
+  transform: rotateY(90deg);
+  border-top-right-radius: inherit;
+  border-bottom-right-radius: inherit;
 }
 
 /* 3D press — for buttons and option tiles */

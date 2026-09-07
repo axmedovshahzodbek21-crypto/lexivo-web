@@ -130,7 +130,7 @@ export default function StarredPage() {
             <p className="text-[var(--text-muted)] text-sm mb-6">
               {t.starred.emptyHelper}
             </p>
-            <Link href="/learn" className="btn-primary inline-block">{t.starred.startLearning}</Link>
+            <Link href="/collections" className="btn-primary inline-block">{t.starred.startLearning}</Link>
           </div>
         ) : search.trim() ? (
           filtered.length === 0 ? (

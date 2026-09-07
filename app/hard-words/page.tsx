@@ -131,7 +131,7 @@ export default function HardWordsPage() {
             <p className="text-[var(--text-muted)] text-sm mb-6">
               Words you tap <strong>Too Hard</strong> while learning will appear here for focused practice.
             </p>
-            <Link href="/learn" className="btn-primary inline-block">Start Learning</Link>
+            <Link href="/collections" className="btn-primary inline-block">Start Learning</Link>
           </div>
         ) : (
           <div className="space-y-3">
