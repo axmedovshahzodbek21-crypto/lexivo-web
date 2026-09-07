@@ -597,7 +597,7 @@ export default function HomePage() {
 
 function StatCard({ icon, value, label, gradient, pulseClass = '' }: {
   icon: string; value: number | string; label: string;
-  gradient: string; edge?: string; glowColor?: string; pulseClass?: string;
+  gradient: string; pulseClass?: string;
 }) {
   return (
     <TiltCard
