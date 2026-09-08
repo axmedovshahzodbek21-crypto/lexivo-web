@@ -1,4 +1,5 @@
 ﻿'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { PageLoader } from '@/components/Loader';
 import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -47,6 +48,7 @@ function findWord(collections: WordCollection[], wordText: string): FullWord | n
 }
 
 export default function WordDetailPage({ params }: { params: Promise<{ word: string }> }) {
+  const t = useTranslation();
   const { word: encodedWord } = use(params);
   const wordText = decodeURIComponent(encodedWord);
   const router = useRouter();
@@ -129,9 +131,9 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
     return (
       <div className="p-6 text-center">
         <div className="text-5xl mb-4">🔍</div>
-        <h2 className="font-bold text-xl mb-2">Word not found</h2>
+        <h2 className="font-bold text-xl mb-2">{t.wordPage.notFound}</h2>
         <p className="text-[var(--text-muted)] text-sm mb-4">"{wordText}" isn't in any collection.</p>
-        <Link href="/search" className="btn-primary inline-block">Search Words</Link>
+        <Link href="/search" className="btn-primary inline-block">{t.wordPage.searchWords}</Link>
       </div>
     );
   }
@@ -145,7 +147,7 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
     <div className="flex flex-col min-h-screen animate-fade-in pb-8">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-[var(--border)]">
-        <button onClick={() => router.back()} className="btn-icon text-lg" aria-label="Go back">←</button>
+        <button onClick={() => router.back()} className="btn-icon text-lg" aria-label={t.wordPage.goBack}>←</button>
         <span className="badge">{word.topic}</span>
         <div className="flex gap-2">
           <button
@@ -172,12 +174,12 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
               <button
                 onClick={() => speak(word.word)}
                 className="w-10 h-10 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-lg hover:bg-[var(--primary)] hover:text-white transition-colors"
-                aria-label="Listen at normal speed"
+                aria-label={t.wordPage.listenNormal}
               >🔊</button>
               <button
                 onClick={() => speak(word.word, 0.6)}
                 className="w-10 h-10 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-base hover:bg-[var(--primary-bg)] transition-colors"
-                aria-label="Listen at slow speed"
+                aria-label={t.wordPage.listenSlow}
               >🐌</button>
             </div>
           </div>
@@ -205,7 +207,7 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
           ].filter(e => e.text).map((ex, i) => (
             <div key={i} className="space-y-1">
               <div className="bg-[var(--surface-2)] rounded-xl p-3">
-                <p className="text-xs text-[var(--text-muted)] mb-1">Example {i + 1}</p>
+                <p className="text-xs text-[var(--text-muted)] mb-1">{t.wordPage.example.replace("{n}", String(i + 1))}</p>
                 <p className="text-sm italic text-[var(--text)]">"{ex.text}"</p>
                 {ex.translation && (
                   <p className="text-xs text-[var(--primary)] mt-1">{ex.translation}</p>
@@ -228,7 +230,7 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
             {learnedAt ? (
               <>
                 <div className="text-2xl mb-1">✅</div>
-                <div className="text-xs font-semibold text-[var(--success)]">Learned</div>
+                <div className="text-xs font-semibold text-[var(--success)]">{t.wordPage.learned}</div>
                 <div className="text-xs text-[var(--text-muted)] mt-0.5">
                   {new Date(learnedAt).toLocaleDateString()}
                 </div>
@@ -236,7 +238,7 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
             ) : (
               <>
                 <div className="text-2xl mb-1">📚</div>
-                <div className="text-xs font-semibold text-[var(--text-muted)]">Not learned yet</div>
+                <div className="text-xs font-semibold text-[var(--text-muted)]">{t.wordPage.notLearned}</div>
               </>
             )}
           </div>
@@ -257,7 +259,7 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
             ) : (
               <>
                 <div className="text-2xl mb-1">💤</div>
-                <div className="text-xs font-semibold text-[var(--text-muted)]">Not in SRS</div>
+                <div className="text-xs font-semibold text-[var(--text-muted)]">{t.wordPage.notInSrs}</div>
               </>
             )}
           </div>
@@ -266,9 +268,9 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
         {/* Source */}
         <div className="card flex items-center justify-between">
           <div>
-            <p className="text-xs text-[var(--text-muted)]">From collection</p>
+            <p className="text-xs text-[var(--text-muted)]">{t.wordPage.fromCollection}</p>
             <p className="font-semibold text-sm text-[var(--text)]">{word.collectionName}</p>
-            <p className="text-xs text-[var(--text-muted)]">Unit {word.dayNumber} · {word.topic}</p>
+            <p className="text-xs text-[var(--text-muted)]">{t.wordPage.unitTopic.replace("{n}", String(word.dayNumber)).replace("{topic}", word.topic)}</p>
           </div>
           <Link href={unitUrl} className="text-[var(--primary)] text-sm font-medium hover:underline">
             View unit →
@@ -294,7 +296,7 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
             className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[var(--surface-2)] transition-colors"
           >
             <span className="text-lg">📋</span>
-            <span className="font-semibold text-[var(--text)] text-sm flex-1">Add to list</span>
+            <span className="font-semibold text-[var(--text)] text-sm flex-1">{t.wordPage.addToList}</span>
             {customLists.filter(l => isWordInList(l.id, word.word)).length > 0 && (
               <span className="text-xs bg-[var(--primary-bg)] text-[var(--primary)] px-2 py-0.5 rounded-full font-semibold">
                 {customLists.filter(l => isWordInList(l.id, word.word)).length}
@@ -306,7 +308,7 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
           {listPanelOpen && (
             <div className="border-t border-[var(--border)] p-3 space-y-2 animate-fade-in">
               {customLists.length === 0 ? (
-                <p className="text-xs text-[var(--text-muted)] text-center py-1">No lists yet.</p>
+                <p className="text-xs text-[var(--text-muted)] text-center py-1">{t.wordPage.noLists}</p>
               ) : (
                 customLists.map(list => {
                   const inList = isWordInList(list.id, word.word);
@@ -338,7 +340,7 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
                 className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-[var(--primary)] font-semibold hover:bg-[var(--primary-bg)] transition-colors border border-dashed border-[var(--primary)]"
               >
                 <span>+</span>
-                <span>Create new list & add</span>
+                <span>{t.wordPage.createAndAdd}</span>
               </button>
               <Link
                 href="/lists"

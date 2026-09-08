@@ -1,4 +1,5 @@
 ﻿'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { SectionLoader } from '@/components/Loader';
 import { use, useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
@@ -47,6 +48,7 @@ function searchWords(
 }
 
 export default function ListDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const t = useTranslation();
   const { id } = use(params);
   const router = useRouter();
   const { collections, collectionsLoaded } = useAppStore();
@@ -117,7 +119,7 @@ export default function ListDetailPage({ params }: { params: Promise<{ id: strin
   if (!list) {
     return (
       <div className="p-6 text-center space-y-4">
-        <p className="text-[var(--text-muted)]">List not found.</p>
+        <p className="text-[var(--text-muted)]">{t.listsPage.notFound}</p>
         <Link href="/lists" className="btn-primary inline-block">← My Lists</Link>
       </div>
     );
@@ -148,8 +150,8 @@ export default function ListDetailPage({ params }: { params: Promise<{ id: strin
               onKeyDown={e => { if (e.key === 'Enter') handleRename(); if (e.key === 'Escape') setEditingName(false); }}
               className="flex-1 text-xl font-bold px-3 py-1.5 rounded-xl border border-[var(--primary)] bg-[var(--surface-2)] text-[var(--text)] focus:outline-none"
             />
-            <button onClick={handleRename} className="btn-primary text-sm px-3 py-1.5">Save</button>
-            <button onClick={() => setEditingName(false)} className="btn-secondary text-sm px-3 py-1.5" aria-label="Cancel rename">✕</button>
+            <button onClick={handleRename} className="btn-primary text-sm px-3 py-1.5">{t.listsPage.save}</button>
+            <button onClick={() => setEditingName(false)} className="btn-secondary text-sm px-3 py-1.5" aria-label={t.listsPage.cancelRename}>✕</button>
           </div>
         ) : (
           <div className="flex items-center gap-2">
@@ -157,7 +159,7 @@ export default function ListDetailPage({ params }: { params: Promise<{ id: strin
             <button
               onClick={() => { setNameInput(list.name); setEditingName(true); }}
               className="w-8 h-8 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-sm hover:bg-[var(--primary-bg)] transition-colors"
-              aria-label="Rename list"
+              aria-label={t.listsPage.renameList}
             >
               ✏️
             </button>
@@ -180,7 +182,7 @@ export default function ListDetailPage({ params }: { params: Promise<{ id: strin
         {words.length === 0 ? (
           <div className="text-center py-10">
             <div className="text-5xl mb-3">📭</div>
-            <p className="text-[var(--text-muted)] text-sm mb-4">No words yet. Use the search below to add some.</p>
+            <p className="text-[var(--text-muted)] text-sm mb-4">{t.listsPage.noWords}</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -203,14 +205,14 @@ export default function ListDetailPage({ params }: { params: Promise<{ id: strin
                   <button
                     onClick={() => speak(w.word)}
                     className="w-8 h-8 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-sm hover:bg-[var(--primary)] hover:text-white transition-colors"
-                    aria-label="Listen to pronunciation"
+                    aria-label={t.listsPage.listen}
                   >
                     🔊
                   </button>
                   <button
                     onClick={() => handleRemove(w.word)}
                     className="w-8 h-8 rounded-full flex items-center justify-center text-sm text-[var(--text-muted)] hover:bg-red-50 hover:text-[var(--danger)] transition-colors"
-                    aria-label="Remove from list"
+                    aria-label={t.listsPage.removeFromList}
                   >
                     ✕
                   </button>
@@ -230,7 +232,7 @@ export default function ListDetailPage({ params }: { params: Promise<{ id: strin
             className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[var(--surface-2)] transition-colors"
           >
             <span className="text-lg">🔍</span>
-            <span className="font-semibold text-[var(--text)] text-sm flex-1">Add words</span>
+            <span className="font-semibold text-[var(--text)] text-sm flex-1">{t.listsPage.addWords}</span>
             <span className="text-xs text-[var(--text-muted)]">{addPanelOpen ? '▲' : '▼'}</span>
           </button>
 
@@ -239,7 +241,7 @@ export default function ListDetailPage({ params }: { params: Promise<{ id: strin
               <input
                 ref={searchRef}
                 type="text"
-                placeholder="Search by word, translation, or definition…"
+                placeholder={t.listsPage.searchPlaceholder}
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 className="w-full px-4 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]"

@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -10,6 +11,7 @@ export default function LoginPage() {
 }
 
 function LoginContent() {
+  const t = useTranslation();
   const router = useRouter();
   const searchParams = useSearchParams();
   const rawRedirect = searchParams.get('redirect') ?? '/';
@@ -69,8 +71,8 @@ function LoginContent() {
         <div className="w-full max-w-sm animate-depth-in">
           <div className="text-center mb-8">
             <div className="text-5xl mb-3">🔑</div>
-            <h1 className="text-3xl font-black" style={{ color: 'var(--primary)' }}>Reset Password</h1>
-            <p className="text-sm text-[var(--text-muted)] mt-1">We'll send you a link to reset it</p>
+            <h1 className="text-3xl font-black" style={{ color: 'var(--primary)' }}>{t.loginPage.resetPassword}</h1>
+            <p className="text-sm text-[var(--text-muted)] mt-1">{t.loginPage.resetSub}</p>
           </div>
 
           {resetSent ? (
@@ -87,7 +89,7 @@ function LoginContent() {
                   type="email"
                   value={resetEmail}
                   onChange={e => setResetEmail(e.target.value)}
-                  placeholder="you@example.com"
+                  placeholder={t.loginPage.emailPlaceholder}
                   required
                   autoFocus
                   className="w-full px-4 py-3.5 rounded-2xl border-2 border-[var(--border)] bg-[var(--surface)] text-[var(--text)] outline-none transition-colors focus:border-[var(--primary)] text-base"
@@ -130,8 +132,8 @@ function LoginContent() {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="text-5xl mb-3">📖</div>
-          <h1 className="text-3xl font-black" style={{ color: 'var(--primary)' }}>Lexivo</h1>
-          <p className="text-sm text-[var(--text-muted)] mt-1">Sign in to continue learning</p>
+          <h1 className="text-3xl font-black" style={{ color: 'var(--primary)' }}>{t.loginPage.brand}</h1>
+          <p className="text-sm text-[var(--text-muted)] mt-1">{t.loginPage.signInToContinue}</p>
         </div>
 
         {/* Google button */}
@@ -166,7 +168,7 @@ function LoginContent() {
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
-              placeholder="you@example.com"
+              placeholder={t.loginPage.emailPlaceholder}
               required
               autoFocus
               className="w-full px-4 py-3.5 rounded-2xl border-2 border-[var(--border)] bg-[var(--surface)] text-[var(--text)] outline-none transition-colors focus:border-[var(--primary)] text-base"
@@ -191,7 +193,7 @@ function LoginContent() {
               type="password"
               value={password}
               onChange={e => setPassword(e.target.value)}
-              placeholder="••••••••"
+              placeholder={t.loginPage.passwordPlaceholder}
               required
               className="w-full px-4 py-3.5 rounded-2xl border-2 border-[var(--border)] bg-[var(--surface)] text-[var(--text)] outline-none transition-colors focus:border-[var(--primary)] text-base"
             />

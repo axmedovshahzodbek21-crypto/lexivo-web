@@ -1,4 +1,5 @@
 ﻿'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
@@ -22,6 +23,7 @@ function fmt(s: number) {
 }
 
 export default function PomodoroPage() {
+  const t = useTranslation();
   const router = useRouter();
   const {
     pomPhase, pomSecondsLeft, pomRunning, pomWorkMins, pomBreakMins, pomSessions,
@@ -60,16 +62,16 @@ export default function PomodoroPage() {
         <button
           onClick={() => router.back()}
           className="btn-icon text-lg"
-          aria-label="Go back"
+          aria-label={t.pomodoro.goBack}
         >
           ←
         </button>
-        <h1 className="font-bold text-[var(--text)]">Focus Mode</h1>
+        <h1 className="font-bold text-[var(--text)]">{t.pomodoro.focusMode}</h1>
         <button
           onClick={() => router.push('/pomodoro/stats')}
           className="btn-icon text-lg"
-          aria-label="Focus time stats"
-          title="Focus time stats"
+          aria-label={t.pomodoro.focusStats}
+          title={t.pomodoro.focusStats}
         >
           📊
         </button>

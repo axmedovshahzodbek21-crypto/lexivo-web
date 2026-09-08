@@ -1,8 +1,10 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function LeveledWordsPage() {
+  const t = useTranslation();
   const router = useRouter();
 
   return (
@@ -12,7 +14,7 @@ export default function LeveledWordsPage() {
         <button
           onClick={() => router.back()}
           className="btn-icon text-lg"
-          aria-label="Go back"
+          aria-label={t.leveledWordsPage.goBack}
         >
           ←
         </button>
@@ -46,8 +48,8 @@ export default function LeveledWordsPage() {
               </span>
             </div>
             <div>
-              <div className="text-xl font-black text-white leading-tight">Foundation</div>
-              <div className="text-xs text-white/80 mt-1">Beginner to Intermediate vocabulary</div>
+              <div className="text-xl font-black text-white leading-tight">{t.leveledWordsPage.foundation}</div>
+              <div className="text-xs text-white/80 mt-1">{t.leveledWordsPage.foundationSub}</div>
             </div>
             <span className="absolute bottom-5 right-5 text-lg font-black text-white opacity-0 group-hover:opacity-100 transition-opacity">→</span>
           </Link>
@@ -69,8 +71,8 @@ export default function LeveledWordsPage() {
               </span>
             </div>
             <div>
-              <div className="text-xl font-black text-white leading-tight">Advanced</div>
-              <div className="text-xs text-white/80 mt-1">Upper-Intermediate to Mastery vocabulary</div>
+              <div className="text-xl font-black text-white leading-tight">{t.leveledWordsPage.advanced}</div>
+              <div className="text-xs text-white/80 mt-1">{t.leveledWordsPage.advancedSub}</div>
             </div>
             <span className="absolute bottom-5 right-5 text-lg font-black text-white opacity-0 group-hover:opacity-100 transition-opacity">→</span>
           </Link>

@@ -1,4 +1,5 @@
 ﻿'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { SectionLoader } from '@/components/Loader';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -63,6 +64,7 @@ function Avatar({ name, url, size = 40, userId }: { name: string; url: string | 
 let _leaderboardCache: LeaderboardEntry[] | null = null;
 
 export default function LeaderboardPage() {
+  const t = useTranslation();
   const router = useRouter();
   const { user } = useAuth();
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
@@ -259,7 +261,7 @@ export default function LeaderboardPage() {
                   <button
                     onClick={() => setCalMonth(m => { const d = new Date(m.year, m.month - 1); return { year: d.getFullYear(), month: d.getMonth() }; })}
                     className="w-7 h-7 rounded-full flex items-center justify-center text-base text-[var(--text-muted)] hover:bg-[var(--surface-2)]"
-                    aria-label="Previous month"
+                    aria-label={t.leaderboardPage.prevMonth}
                   >‹</button>
                   <p className="text-xs font-bold text-[var(--text-muted)]">
                     {new Date(cYear, cMonth).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
@@ -267,7 +269,7 @@ export default function LeaderboardPage() {
                   <button
                     onClick={() => setCalMonth(m => { const d = new Date(m.year, m.month + 1); return { year: d.getFullYear(), month: d.getMonth() }; })}
                     className="w-7 h-7 rounded-full flex items-center justify-center text-base text-[var(--text-muted)] hover:bg-[var(--surface-2)]"
-                    aria-label="Next month"
+                    aria-label={t.leaderboardPage.nextMonth}
                   >›</button>
                 </div>
                 <div className="grid grid-cols-7 mb-1">
@@ -311,13 +313,13 @@ export default function LeaderboardPage() {
                   );
                 })()}
                 <div className="flex items-center gap-3 mt-2">
-                  <div className="flex items-center gap-1"><div className="w-2.5 h-2.5 rounded-full" style={{ background: '#4338ca' }} /><span className="text-[10px] text-[var(--text-muted)]">SRS review</span></div>
-                  <div className="flex items-center gap-1"><div className="w-2.5 h-2.5 rounded-full" style={{ background: '#059669' }} /><span className="text-[10px] text-[var(--text-muted)]">Daily goal</span></div>
+                  <div className="flex items-center gap-1"><div className="w-2.5 h-2.5 rounded-full" style={{ background: '#4338ca' }} /><span className="text-[10px] text-[var(--text-muted)]">{t.leaderboardPage.srsReview}</span></div>
+                  <div className="flex items-center gap-1"><div className="w-2.5 h-2.5 rounded-full" style={{ background: '#059669' }} /><span className="text-[10px] text-[var(--text-muted)]">{t.leaderboardPage.dailyGoal}</span></div>
                 </div>
               </div>
               </div>
               <div className="px-5 pb-5 pt-2 shrink-0">
-                <button onClick={() => setSelected(null)} className="w-full btn-ghost py-3 text-sm">Close</button>
+                <button onClick={() => setSelected(null)} className="w-full btn-ghost py-3 text-sm">{t.leaderboardPage.close}</button>
               </div>
             </div>
           </div>
@@ -326,14 +328,14 @@ export default function LeaderboardPage() {
       {/* Gradient header */}
       <div className="px-4 pt-5 pb-5" style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)' }}>
         <div className="flex items-center gap-3 mb-4">
-          <button onClick={() => router.back()} aria-label="Go back"
+          <button onClick={() => router.back()} aria-label={t.leaderboardPage.goBack}
             className="w-9 h-9 rounded-full flex items-center justify-center text-white text-lg transition-all active:scale-95"
             style={{ background: 'rgba(255,255,255,0.2)' }}>←</button>
           <div className="flex-1">
             <h1 className="font-bold text-white text-lg leading-tight">🏆 Leaderboard</h1>
-            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.75)' }}>Top learners by total XP</p>
+            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.75)' }}>{t.leaderboardPage.topLearners}</p>
           </div>
-          <button onClick={load} aria-label="Refresh"
+          <button onClick={load} aria-label={t.leaderboardPage.refresh}
             className="w-9 h-9 rounded-full flex items-center justify-center text-white text-lg transition-all active:scale-95"
             style={{ background: 'rgba(255,255,255,0.2)' }}>↻</button>
         </div>
@@ -361,15 +363,15 @@ export default function LeaderboardPage() {
         {!loading && error && (
           <div className="text-center py-12">
             <p className="text-[var(--text-muted)] text-sm">{error}</p>
-            <button onClick={load} className="mt-4 btn-primary text-sm">Try again</button>
+            <button onClick={load} className="mt-4 btn-primary text-sm">{t.leaderboardPage.tryAgain}</button>
           </div>
         )}
 
         {!loading && !error && entries.length === 0 && (
           <div className="text-center py-20">
             <div className="text-5xl mb-3">🏆</div>
-            <p className="font-bold text-[var(--text)]">No entries yet</p>
-            <p className="text-sm text-[var(--text-muted)] mt-1">Be the first on the leaderboard!</p>
+            <p className="font-bold text-[var(--text)]">{t.leaderboardPage.noEntries}</p>
+            <p className="text-sm text-[var(--text-muted)] mt-1">{t.leaderboardPage.beFirst}</p>
           </div>
         )}
 
@@ -392,8 +394,8 @@ export default function LeaderboardPage() {
             {filter === 'starred' && visible.length === 0 && (
               <div className="text-center py-20">
                 <div className="text-5xl mb-3">⭐</div>
-                <p className="font-bold text-[var(--text)]">No starred users yet</p>
-                <p className="text-sm text-[var(--text-muted)] mt-1">Tap a user's profile and star them to follow their progress</p>
+                <p className="font-bold text-[var(--text)]">{t.leaderboardPage.noStarred}</p>
+                <p className="text-sm text-[var(--text-muted)] mt-1">{t.leaderboardPage.noStarredSub}</p>
               </div>
             )}
             {/* Top 3 podium */}
@@ -449,13 +451,13 @@ export default function LeaderboardPage() {
                           {displayXP(e.xp)} XP
                         </p>
                         {isTied && (
-                          <span style={{ fontSize: 9, fontWeight: 800, background: 'rgba(255,255,255,0.25)', color: '#fff', borderRadius: 20, padding: '2px 8px' }}>TIED</span>
+                          <span style={{ fontSize: 9, fontWeight: 800, background: 'rgba(255,255,255,0.25)', color: '#fff', borderRadius: 20, padding: '2px 8px' }}>{t.leaderboardPage.tied}</span>
                         )}
                         {e.streak > 0 && (
                           <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.75)' }}>🔥 {e.streak}</p>
                         )}
                         {e.last_study_date === today && (
-                          <span style={{ fontSize: 9, fontWeight: 800, background: 'rgba(255,255,255,0.25)', color: '#fff', borderRadius: 20, padding: '2px 8px' }}>TODAY</span>
+                          <span style={{ fontSize: 9, fontWeight: 800, background: 'rgba(255,255,255,0.25)', color: '#fff', borderRadius: 20, padding: '2px 8px' }}>{t.leaderboardPage.today}</span>
                         )}
                       </div>
                     </div>
@@ -496,11 +498,11 @@ export default function LeaderboardPage() {
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                         {savedIds.has(e.user_id) && <span style={{ fontSize: 13, lineHeight: 1 }}>⭐</span>}
                         <p style={{ fontWeight: 700, fontSize: 14, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.name}</p>
-                        {isMe && <span style={{ fontSize: 10, fontWeight: 800, background: '#6366F1', color: '#fff', borderRadius: 20, padding: '2px 7px', flexShrink: 0 }}>YOU</span>}
-                        {isTied && <span style={{ fontSize: 9, fontWeight: 700, background: 'var(--surface-2)', color: 'var(--text-muted)', borderRadius: 20, padding: '1px 7px', flexShrink: 0 }}>TIED</span>}
+                        {isMe && <span style={{ fontSize: 10, fontWeight: 800, background: '#6366F1', color: '#fff', borderRadius: 20, padding: '2px 7px', flexShrink: 0 }}>{t.leaderboardPage.you}</span>}
+                        {isTied && <span style={{ fontSize: 9, fontWeight: 700, background: 'var(--surface-2)', color: 'var(--text-muted)', borderRadius: 20, padding: '1px 7px', flexShrink: 0 }}>{t.leaderboardPage.tied}</span>}
                       </div>
                       {e.last_study_date === today && (
-                        <span style={{ fontSize: 9, fontWeight: 700, background: 'rgba(16,185,129,0.15)', color: 'var(--success)', borderRadius: 20, padding: '1px 7px' }}>TODAY</span>
+                        <span style={{ fontSize: 9, fontWeight: 700, background: 'rgba(16,185,129,0.15)', color: 'var(--success)', borderRadius: 20, padding: '1px 7px' }}>{t.leaderboardPage.today}</span>
                       )}
                     </div>
                     <div style={{ textAlign: 'right', flexShrink: 0 }}>
@@ -541,8 +543,8 @@ export default function LeaderboardPage() {
             {/* Your rank if outside top list */}
             {user && myIndex === -1 && (
               <div className="mt-4 rounded-2xl p-4 border border-dashed border-[var(--border)] text-center space-y-2">
-                <p className="text-sm font-semibold text-[var(--text)]">You're not on the leaderboard yet</p>
-                <p className="text-xs text-[var(--text-muted)]">Your data may not be synced. Tap below to sync now.</p>
+                <p className="text-sm font-semibold text-[var(--text)]">{t.leaderboardPage.notOnBoard}</p>
+                <p className="text-xs text-[var(--text-muted)]">{t.leaderboardPage.notSynced}</p>
                 {syncError && <p className="text-xs text-red-400 break-all">Error: {syncError}</p>}
                 <button onClick={manualSync} disabled={syncing}
                   className="mt-1 px-4 py-2 rounded-xl text-xs font-bold text-white disabled:opacity-50"
@@ -560,7 +562,7 @@ export default function LeaderboardPage() {
                 nothing indicating why. */}
             {user && myIndex !== -1 && syncError && (
               <div className="mt-4 rounded-2xl p-4 border border-dashed border-red-400/40 text-center space-y-2">
-                <p className="text-sm font-semibold text-[var(--text)]">Your latest progress hasn't synced</p>
+                <p className="text-sm font-semibold text-[var(--text)]">{t.leaderboardPage.latestNotSynced}</p>
                 <p className="text-xs text-red-400 break-all">Error: {syncError}</p>
                 <button onClick={manualSync} disabled={syncing}
                   className="mt-1 px-4 py-2 rounded-xl text-xs font-bold text-white disabled:opacity-50"
@@ -572,8 +574,8 @@ export default function LeaderboardPage() {
 
             {!user && (
               <div className="mt-4 rounded-2xl p-4 border border-dashed border-[var(--border)] text-center space-y-2">
-                <p className="text-sm font-semibold text-[var(--text)]">Sign in to appear on the leaderboard</p>
-                <button onClick={() => router.push('/login')} className="btn-primary text-sm">Sign in</button>
+                <p className="text-sm font-semibold text-[var(--text)]">{t.leaderboardPage.signInToAppear}</p>
+                <button onClick={() => router.push('/login')} className="btn-primary text-sm">{t.leaderboardPage.signIn}</button>
               </div>
             )}
 

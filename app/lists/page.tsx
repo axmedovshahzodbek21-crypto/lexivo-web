@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -17,6 +18,7 @@ function newList(name: string): CustomList {
 }
 
 export default function ListsPage() {
+  const t = useTranslation();
   const router = useRouter();
   const [lists, setLists] = useState<CustomList[]>([]);
   const [creating, setCreating] = useState(false);
@@ -56,7 +58,7 @@ export default function ListsPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-[var(--text)]">📋 My Lists</h1>
-            <p className="text-sm text-[var(--text-muted)] mt-0.5">Custom word collections for focused study</p>
+            <p className="text-sm text-[var(--text-muted)] mt-0.5">{t.listsPage.subtitle}</p>
           </div>
           <button
             onClick={() => { setCreating(true); setNewName(''); }}
@@ -71,11 +73,11 @@ export default function ListsPage() {
         {/* Create form */}
         {creating && (
           <div className="card space-y-3 animate-fade-in border-[var(--primary)]">
-            <p className="text-sm font-semibold text-[var(--text)]">New list name</p>
+            <p className="text-sm font-semibold text-[var(--text)]">{t.listsPage.newListName}</p>
             <input
               autoFocus
               type="text"
-              placeholder="e.g. IELTS Vocab, My Hard Words…"
+              placeholder={t.listsPage.placeholder}
               value={newName}
               onChange={e => setNewName(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') handleCreate(); if (e.key === 'Escape') setCreating(false); }}
@@ -96,7 +98,7 @@ export default function ListsPage() {
         {lists.length === 0 && !creating ? (
           <div className="text-center py-16">
             <div className="text-6xl mb-4">📋</div>
-            <h2 className="text-xl font-bold text-[var(--text)] mb-2">No lists yet</h2>
+            <h2 className="text-xl font-bold text-[var(--text)] mb-2">{t.listsPage.noLists}</h2>
             <p className="text-sm text-[var(--text-muted)] mb-6 max-w-xs mx-auto leading-relaxed">
               Create a list to group words from any collection and study them together.
             </p>
@@ -132,6 +134,7 @@ function ListRow({
   onDeleteConfirm: () => void;
   onDeleteCancel: () => void;
 }) {
+  const t = useTranslation();
   const created = new Date(list.createdAt).toLocaleDateString('en-US', {
     month: 'short', day: 'numeric', year: 'numeric',
   });
@@ -175,7 +178,7 @@ function ListRow({
         <button
           onClick={e => { e.stopPropagation(); onDeleteRequest(); }}
           className="w-8 h-8 rounded-full flex items-center justify-center text-sm text-[var(--text-muted)] hover:bg-red-50 hover:text-[var(--danger)] transition-colors"
-          aria-label="Delete list"
+          aria-label={t.listsPage.deleteList}
         >
           🗑
         </button>

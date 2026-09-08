@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { speak } from '@/lib/speech';
@@ -27,6 +28,7 @@ function formatTime(s: number) {
 const SESSION_KEY = 'lexivo_speaking_session';
 
 export default function SpeakingPage() {
+  const t = useTranslation();
   const router = useRouter();
   const [part, setPart] = useState<Part | null>(null);
 
@@ -197,8 +199,8 @@ export default function SpeakingPage() {
   return (
     <div className="flex flex-col min-h-screen">
       <div className="flex items-center gap-3 p-4 border-b border-[var(--border)]">
-        <button onClick={() => (part ? backToParts() : router.back())} className="btn-icon text-lg" aria-label="Go back">←</button>
-        <h1 className="font-bold text-[var(--text)]">Speaking Practice</h1>
+        <button onClick={() => (part ? backToParts() : router.back())} className="btn-icon text-lg" aria-label={t.speaking.goBack}>←</button>
+        <h1 className="font-bold text-[var(--text)]">{t.speaking.title}</h1>
       </div>
 
       <div className="p-4 max-w-lg mx-auto w-full flex-1 flex flex-col">
@@ -292,7 +294,7 @@ export default function SpeakingPage() {
                       onClick={() => speak(question.question)}
                       className="w-8 h-8 rounded-lg flex items-center justify-center text-sm shrink-0"
                       style={{ background: `${info.color}22`, color: info.color }}
-                      aria-label="Read question aloud"
+                      aria-label={t.speaking.readQuestion}
                     >🔊</button>
                   </div>
                   <p className="text-xl font-bold text-[var(--text)] leading-snug">{question.question}</p>
@@ -315,11 +317,11 @@ export default function SpeakingPage() {
                       onClick={() => speak([card.prompt, ...card.bullets, card.closing ?? ''].join('. '))}
                       className="w-8 h-8 rounded-lg flex items-center justify-center text-sm shrink-0"
                       style={{ background: `${info.color}22`, color: info.color }}
-                      aria-label="Read cue card aloud"
+                      aria-label={t.speaking.readCueCard}
                     >🔊</button>
                   </div>
                   <p className="text-lg font-bold text-[var(--text)] leading-snug mb-3">{card.prompt}</p>
-                  <p className="text-xs font-semibold text-[var(--text-muted)] mb-2">You should say:</p>
+                  <p className="text-xs font-semibold text-[var(--text-muted)] mb-2">{t.speaking.youShouldSay}</p>
                   <ul className="space-y-1.5 mb-3">
                     {card.bullets.map((b, i) => (
                       <li key={i} className="text-sm text-[var(--text)] flex gap-2">

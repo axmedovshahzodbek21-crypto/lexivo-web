@@ -1,4 +1,5 @@
 ﻿'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { PageLoader, SectionLoader } from '@/components/Loader';
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
@@ -36,6 +37,7 @@ function findHardWords(collections: WordCollection[], hardList: string[]): HardW
 }
 
 export default function HardWordsPage() {
+  const t = useTranslation();
   const router = useRouter();
   const { collections, collectionsLoaded } = useAppStore();
 
@@ -127,11 +129,11 @@ export default function HardWordsPage() {
         {hardList.length === 0 ? (
           <div className="text-center py-16">
             <div className="text-6xl mb-4">🎉</div>
-            <h2 className="text-xl font-bold text-[var(--text)] mb-2">No hard words!</h2>
+            <h2 className="text-xl font-bold text-[var(--text)] mb-2">{t.hardWordsPage.none}</h2>
             <p className="text-[var(--text-muted)] text-sm mb-6">
               Words you tap <strong>Too Hard</strong> while learning will appear here for focused practice.
             </p>
-            <Link href="/collections" className="btn-primary inline-block">Start Learning</Link>
+            <Link href="/collections" className="btn-primary inline-block">{t.hardWordsPage.startLearning}</Link>
           </div>
         ) : (
           <div className="space-y-3">

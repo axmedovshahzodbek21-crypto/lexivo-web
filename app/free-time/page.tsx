@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -16,6 +17,7 @@ const MAIN_COLLECTIONS = [
 ];
 
 export default function FreeTimePage() {
+  const t = useTranslation();
   const router = useRouter();
   const { collections, collectionsLoaded } = useAppStore();
   const [wod, setWod] = useState<WordItem | null>(null);
@@ -39,8 +41,8 @@ export default function FreeTimePage() {
     <div className="flex flex-col min-h-screen">
       {/* Header */}
       <div className="flex items-center gap-3 p-4 border-b border-[var(--border)]">
-        <button onClick={() => router.back()} className="btn-icon text-lg" aria-label="Go back">←</button>
-        <h1 className="font-bold text-[var(--text)]">Free Time</h1>
+        <button onClick={() => router.back()} className="btn-icon text-lg" aria-label={t.freeTime.goBack}>←</button>
+        <h1 className="font-bold text-[var(--text)]">{t.freeTime.title}</h1>
       </div>
 
       <div className="p-4 space-y-5 max-w-lg mx-auto w-full">
@@ -51,7 +53,7 @@ export default function FreeTimePage() {
           style={{ background: 'linear-gradient(135deg, #0F3460, #16213E)', boxShadow: '0 4px 0 #091a2e' }}
         >
           <p className="text-xl font-black text-white">🎉 You&apos;re all caught up!</p>
-          <p className="text-sm text-white/60 mt-1">No reviews due. Explore something fun while you wait.</p>
+          <p className="text-sm text-white/60 mt-1">{t.freeTime.noReviews}</p>
         </div>
 
         {/* Word of the Day */}
@@ -101,7 +103,7 @@ export default function FreeTimePage() {
         {/* Browse Collections */}
         <div>
           <h2 className="text-sm font-bold text-[var(--text-muted)] uppercase tracking-wider mb-2">🗂 Browse Collections</h2>
-          <p className="text-xs text-[var(--text-muted)] mb-3">Explore words freely — no limits, no pressure.</p>
+          <p className="text-xs text-[var(--text-muted)] mb-3">{t.freeTime.exploreFreely}</p>
           <div className="space-y-2">
             {MAIN_COLLECTIONS.map(col => (
               <Link
