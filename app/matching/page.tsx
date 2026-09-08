@@ -15,6 +15,7 @@ import { fireConfetti } from '@/lib/confetti';
 import { shuffleArray as shuffle } from '@/lib/shuffleArray';
 import UnitPicker from '@/components/UnitPicker';
 import type { WordItem, WordCollection } from '@/lib/types';
+import { useTranslation } from '@/lib/useTranslation';
 
 interface MatchWord extends WordItem {
   collectionName: string;
@@ -61,6 +62,7 @@ function formatTime(s: number) {
 
 
 function MatchingInner() {
+  const t = useTranslation();
   const searchParams = useSearchParams();
   const router = useRouter();
   const { collections, collectionsLoaded, setPendingLevelUp } = useAppStore();
@@ -317,9 +319,9 @@ function MatchingInner() {
     return (
       <div className="p-6 text-center space-y-4 animate-fade-in">
         <div className="text-6xl">📭</div>
-        <h2 className="text-xl font-bold text-[var(--text)]">Not enough words</h2>
-        <p className="text-sm text-[var(--text-muted)]">You need at least 2 words for a matching game.</p>
-        <Link href="/" className="btn-primary inline-block">← Home</Link>
+        <h2 className="text-xl font-bold text-[var(--text)]">{t.matching.notEnough}</h2>
+        <p className="text-sm text-[var(--text-muted)]">{t.matching.notEnoughSub}</p>
+        <Link href="/" className="btn-primary inline-block">{t.matching.home}</Link>
       </div>
     );
   }
@@ -330,12 +332,12 @@ function MatchingInner() {
       <div className="flex flex-col min-h-screen animate-fade-in">
         <div className="p-4 border-b border-[var(--border)]">
           <BackButton className="mb-3" />
-          <h1 className="text-xl font-bold text-[var(--text)]">🎯 Complete!</h1>
+          <h1 className="text-xl font-bold text-[var(--text)]">{t.matching.complete}</h1>
         </div>
         <div className="flex-1 p-4 space-y-4">
           {myUnitCompleted && (
             <div className="w-full rounded-2xl px-4 py-3 text-center font-bold animate-pop" style={{ background: 'rgba(34,197,94,0.12)', color: 'var(--success)', border: '1.5px solid var(--success)' }}>
-              🏆 Unit Complete!
+              {t.matching.unitComplete}
             </div>
           )}
           <div className="card text-center space-y-3">
@@ -345,19 +347,19 @@ function MatchingInner() {
             <div className="grid grid-cols-3 gap-3">
               <div className="rounded-xl bg-[var(--primary-bg)] p-3">
                 <div className="text-xl font-bold text-[var(--primary)]">{words.length}</div>
-                <div className="text-xs text-[var(--text-muted)]">Pairs</div>
+                <div className="text-xs text-[var(--text-muted)]">{t.matching.pairs}</div>
               </div>
               <div className="rounded-xl bg-red-50 p-3">
                 <div className="text-xl font-bold text-[var(--danger)]">{totalMistakes}</div>
-                <div className="text-xs text-[var(--text-muted)]">Mistakes</div>
+                <div className="text-xs text-[var(--text-muted)]">{t.matching.mistakes}</div>
               </div>
               <div className="rounded-xl bg-[var(--surface-2)] p-3">
                 <div className="text-xl font-bold text-[var(--text)]">{formatTime(totalTime)}</div>
-                <div className="text-xs text-[var(--text-muted)]">Time</div>
+                <div className="text-xs text-[var(--text-muted)]">{t.matching.time}</div>
               </div>
             </div>
             {totalMistakes === 0 && (
-              <p className="text-sm font-semibold text-[var(--success)]">🎉 Perfect — no mistakes!</p>
+              <p className="text-sm font-semibold text-[var(--success)]">{t.matching.perfect}</p>
             )}
           </div>
           {sessionXP > 0 && (
@@ -379,10 +381,10 @@ function MatchingInner() {
               }}
               className="flex-1 btn-primary"
             >
-              Play Again
+              {t.matching.playAgain}
             </button>
             <button onClick={() => sourceClassHW && searchParams.get('hwId') ? router.push(`/classes/${searchParams.get('classId')}/homework/${searchParams.get('hwId')}?completed=match`) : router.back()} className="flex-1 btn-secondary">
-              Done
+              {t.matching.done}
             </button>
           </div>
         </div>
@@ -395,12 +397,12 @@ function MatchingInner() {
     return (
       <div className="flex flex-col min-h-screen animate-fade-in">
         <div className="p-4 border-b border-[var(--border)]">
-          <h1 className="text-xl font-bold text-[var(--text)]">🎯 Matching</h1>
+          <h1 className="text-xl font-bold text-[var(--text)]">{t.matching.title}</h1>
         </div>
         <div className="flex-1 flex flex-col items-center justify-center p-6 gap-6">
           <div className="card w-full max-w-sm text-center space-y-3 animate-pop">
             <div className="text-5xl">{mistakes === 0 ? '🌟' : '✅'}</div>
-            <h2 className="text-xl font-bold text-[var(--text)]">Round {roundIndex + 1} done!</h2>
+            <h2 className="text-xl font-bold text-[var(--text)]">{t.matching.roundDone.replace("{n}", String(roundIndex + 1))}</h2>
             <p className="text-[var(--text-muted)] text-sm">
               {formatTime(elapsed)} · {mistakes} mistake{mistakes !== 1 ? 's' : ''}
             </p>
@@ -435,7 +437,7 @@ function MatchingInner() {
         <div className="flex items-center gap-4 mt-1.5 text-sm text-[var(--text-muted)]">
           <span>⏱ {formatTime(elapsed)}</span>
           {mistakes > 0 && <span className="text-[var(--danger)]">✗ {mistakes}</span>}
-          <span className="ml-auto text-xs opacity-70">{matched.size}/{roundWords.length} matched</span>
+          <span className="ml-auto text-xs opacity-70">{t.matching.matched.replace('{n}', String(matched.size)).replace('{total}', String(roundWords.length))}</span>
         </div>
         <div className="progress-bar mt-2" style={{ height: 4 }}>
           <div
