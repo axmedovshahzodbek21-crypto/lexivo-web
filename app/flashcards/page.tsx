@@ -322,14 +322,14 @@ function FlashcardsInner() {
       <div className="flex flex-col items-center justify-center min-h-screen p-6 text-center gap-5 animate-fade-in">
         <div className="text-5xl">🔒</div>
         <div className="space-y-2">
-          <h2 className="text-xl font-bold text-[var(--text)]">Complete Learn first</h2>
+          <h2 className="text-xl font-bold text-[var(--text)]">{t.extra.completeLearnFirst}</h2>
           <p className="text-sm text-[var(--text-muted)] max-w-xs leading-relaxed">
             You need to finish the <strong>Learn</strong> session for this unit before you can do Flashcards. It only takes a few minutes!
           </p>
         </div>
         <div className="flex flex-col gap-3 w-full max-w-xs">
-          <Link href={gateUrl} className="btn-primary text-center">Go to Learn →</Link>
-          <button onClick={() => router.back()} className="btn-secondary">Go back</button>
+          <Link href={gateUrl} className="btn-primary text-center">{t.extra.goToLearn}</Link>
+          <button onClick={() => router.back()} className="btn-secondary">{t.extra.goBack}</button>
         </div>
       </div>
     );
@@ -422,7 +422,7 @@ function FlashcardsInner() {
           if (sourceClassHW && sp.get('hwId')) router.push(`/classes/${sp.get('classId')}/homework/${sp.get('hwId')}`);
           else if (sourceClass && classId) router.push(`/classes/${classId}/words`);
           else router.back();
-        }} className="btn-icon" aria-label="Go back">←</button>
+        }} className="btn-icon" aria-label={t.extra.goBack}>←</button>
         <div className="text-center">
           <div className="font-semibold text-sm">{t.flashcards.title}</div>
           <div className="text-xs text-[var(--text-muted)]">{index + 1} / {deck.length}</div>
@@ -456,7 +456,7 @@ function FlashcardsInner() {
               <button
                 onClick={e => { e.stopPropagation(); current.language ? speakText(current.word, current.language) : speak(current.word); }}
                 className="mt-4 w-10 h-10 rounded-full bg-[var(--primary-bg)] flex items-center justify-center"
-                aria-label="Listen to pronunciation"
+                aria-label={t.extra.listen}
               >
                 🔊
               </button>

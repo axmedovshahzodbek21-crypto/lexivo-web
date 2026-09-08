@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -311,7 +312,7 @@ export default function SettingsPage() {
   return (
     <div className="p-4 space-y-4 animate-fade-in">
       <div className="sticky top-0 z-10 -mx-4 px-4 py-3 bg-[var(--background)] border-b border-[var(--border)] flex items-center gap-3">
-        <button onClick={() => router.back()} className="btn-icon" aria-label="Go back">←</button>
+        <button onClick={() => router.back()} className="btn-icon" aria-label={t.extra.goBack}>←</button>
         <h1 className="text-xl font-bold flex-1">{t.settings.title}</h1>
         <button
           onClick={handleSave}
@@ -325,7 +326,7 @@ export default function SettingsPage() {
       <div className="rounded-2xl p-5 relative overflow-hidden"
         style={{ background: 'linear-gradient(135deg, #6366f1 0%, #7c3aed 100%)', boxShadow: '0 10px 0 #3730a3, 0 18px 40px rgba(99,102,241,0.5)' }}>
         <div style={{ position: 'absolute', right: 12, top: 4, fontSize: 80, color: 'rgba(255,255,255,0.06)', lineHeight: 1, userSelect: 'none', pointerEvents: 'none' }}>⚙️</div>
-        <p className="text-[10px] font-black text-white/50 uppercase tracking-widest mb-3">Your Profile</p>
+        <p className="text-[10px] font-black text-white/50 uppercase tracking-widest mb-3">{t.extra.yourProfile}</p>
         <div className="flex items-center gap-4">
           <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl font-bold flex-shrink-0"
             style={{ background: 'rgba(255,255,255,0.18)', color: 'white', boxShadow: '0 4px 0 rgba(0,0,0,0.15)' }}>
@@ -366,7 +367,7 @@ export default function SettingsPage() {
             rows={3}
             maxLength={200}
             className="w-full px-4 py-3 rounded-xl bg-[var(--surface-2)] border-2 border-transparent focus:border-[var(--primary)] outline-none transition-colors resize-none text-sm text-[var(--text)]"
-            placeholder="Tell others about yourself…"
+            placeholder={t.extra.bioPlaceholder}
           />
           <p className="text-[10px] text-[var(--text-muted)] mt-1">{bio.length}/200 · Shared on leaderboard and in classes</p>
         </div>
@@ -573,7 +574,7 @@ export default function SettingsPage() {
             <button
               onClick={() => handleReduceMotion(!settings.reduceMotion)}
               className={`relative w-14 h-7 rounded-full transition-colors duration-300 focus:outline-none ${settings.reduceMotion ? 'bg-[var(--primary)]' : 'bg-[var(--surface-2)]'}`}
-              aria-label="Toggle reduce motion"
+              aria-label={t.extra.toggleReduceMotion}
             >
               <span className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-300 ${settings.reduceMotion ? 'translate-x-7' : 'translate-x-0'}`} />
             </button>
@@ -581,13 +582,13 @@ export default function SettingsPage() {
 
           <div className="flex items-center justify-between py-3">
             <div>
-              <p className="text-sm font-medium">Show on leaderboard</p>
-              <p className="text-xs text-[var(--text-muted)] mt-0.5">Display your name and XP publicly</p>
+              <p className="text-sm font-medium">{t.extra.showOnLeaderboard}</p>
+              <p className="text-xs text-[var(--text-muted)] mt-0.5">{t.extra.displayNameXpPublicly}</p>
             </div>
             <button
               onClick={() => updateSettings({ showOnLeaderboard: !settings.showOnLeaderboard })}
               className={`relative w-14 h-7 rounded-full transition-colors duration-300 focus:outline-none ${settings.showOnLeaderboard ?? true ? 'bg-[var(--primary)]' : 'bg-[var(--surface-2)]'}`}
-              aria-label="Toggle leaderboard visibility"
+              aria-label={t.extra.toggleLeaderboardVisibility}
             >
               <span className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-300 ${settings.showOnLeaderboard ?? true ? 'translate-x-7' : 'translate-x-0'}`} />
             </button>
@@ -600,18 +601,18 @@ export default function SettingsPage() {
         <div className="flex items-center gap-3">
           <div className="w-11 h-11 rounded-2xl flex items-center justify-center text-xl shrink-0"
             style={{ background: 'linear-gradient(135deg, #ec4899, #f472b6)', boxShadow: '0 4px 0 #be185d, 0 8px 16px rgba(236,72,153,0.35)' }}>💓</div>
-          <h2 className="font-black text-base">Card Pulse</h2>
+          <h2 className="font-black text-base">{t.extra.cardPulse}</h2>
         </div>
 
         <div className="flex items-center justify-between gap-4">
           <div>
-            <p className="text-sm font-semibold">Animate cards</p>
-            <p className="text-xs text-[var(--text-muted)]">Cards gently pulse on the home screen</p>
+            <p className="text-sm font-semibold">{t.extra.animateCards}</p>
+            <p className="text-xs text-[var(--text-muted)]">{t.extra.cardsGentlyPulse}</p>
           </div>
           <button
             onClick={() => { const s = { ...settings, pulseEnabled: !(settings.pulseEnabled ?? true) }; saveSettings(s); setSettings(s); }}
             className={`relative w-14 h-7 rounded-full transition-colors duration-300 shrink-0 ${(settings.pulseEnabled ?? true) ? 'bg-[var(--primary)]' : 'bg-[var(--border)]'}`}
-            aria-label="Toggle card pulse"
+            aria-label={t.extra.toggleCardPulse}
           >
             <span className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-300 ${(settings.pulseEnabled ?? true) ? 'translate-x-7' : 'translate-x-0'}`} />
           </button>
@@ -619,7 +620,7 @@ export default function SettingsPage() {
 
         {(settings.pulseEnabled ?? true) && (
           <div>
-            <p className="text-sm font-semibold mb-3">Speed</p>
+            <p className="text-sm font-semibold mb-3">{t.extra.speed}</p>
             <div className="flex gap-2">
               {(['slow', 'normal', 'fast'] as const).map(sp => (
                 <button
@@ -673,7 +674,7 @@ export default function SettingsPage() {
           <button
             onClick={() => updateSettings({ autoPlayOnReveal: !settings.autoPlayOnReveal })}
             className={`relative w-14 h-7 rounded-full transition-colors duration-300 focus:outline-none ${settings.autoPlayOnReveal ? 'bg-[var(--primary)]' : 'bg-[var(--surface-2)]'}`}
-            aria-label="Toggle auto-play on reveal"
+            aria-label={t.extra.toggleAutoPlayReveal}
           >
             <span className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-300 ${settings.autoPlayOnReveal ? 'translate-x-7' : 'translate-x-0'}`} />
           </button>
@@ -721,8 +722,8 @@ export default function SettingsPage() {
               <div className="flex items-center gap-3 py-3 first:pt-0">
                 <span className="text-2xl">📚</span>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-[var(--text)]">Good morning!</p>
-                  <p className="text-xs text-[var(--text-muted)]">Start your day with a few words</p>
+                  <p className="text-sm font-medium text-[var(--text)]">{t.extra.goodMorning}</p>
+                  <p className="text-xs text-[var(--text-muted)]">{t.extra.startDayFewWords}</p>
                 </div>
                 <span className="text-sm text-[var(--text-muted)] shrink-0">8:00 AM</span>
               </div>
@@ -731,7 +732,7 @@ export default function SettingsPage() {
               <div className="flex items-center gap-3 py-3">
                 <span className="text-2xl">🔥</span>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-[var(--text)]">Streak at Risk</p>
+                  <p className="text-sm font-medium text-[var(--text)]">{t.extra.streakAtRisk}</p>
                   <p className="text-xs text-[var(--text-muted)]">Don&apos;t forget to study today</p>
                 </div>
                 <span className="text-sm text-[var(--text-muted)] shrink-0">9:00 PM</span>
@@ -742,8 +743,8 @@ export default function SettingsPage() {
                 <div className="flex items-center gap-3 mb-3">
                   <span className="text-2xl">📖</span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-[var(--text)]">Reminder Time</p>
-                    <p className="text-xs text-[var(--text-muted)]">Tap to change</p>
+                    <p className="text-sm font-medium text-[var(--text)]">{t.extra.reminderTime}</p>
+                    <p className="text-xs text-[var(--text-muted)]">{t.extra.tapToChange}</p>
                   </div>
                   <span className="text-sm font-semibold text-[var(--primary)] shrink-0">{to12h(notif.time)}</span>
                 </div>
@@ -784,11 +785,11 @@ export default function SettingsPage() {
           <div className="flex items-center gap-3 mb-4">
             <div className="w-11 h-11 rounded-2xl flex items-center justify-center text-xl shrink-0"
               style={{ background: 'linear-gradient(135deg, #ef4444, #f87171)', boxShadow: '0 4px 0 #b91c1c, 0 8px 16px rgba(239,68,68,0.35)' }}>📚</div>
-            <h2 className="font-black text-base">Class Notifications</h2>
+            <h2 className="font-black text-base">{t.extra.classNotifications}</h2>
           </div>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium">Homework & announcements</p>
+              <p className="text-sm font-medium">{t.extra.homeworkAnnouncements}</p>
               <p className="text-xs text-[var(--text-muted)] mt-0.5">
                 {pushEnabled ? 'Notified when a teacher assigns homework or posts an announcement' : 'Off'}
               </p>
@@ -796,7 +797,7 @@ export default function SettingsPage() {
             <button
               onClick={handlePushToggle}
               className={`relative w-14 h-7 rounded-full transition-colors duration-300 focus:outline-none ${pushEnabled ? 'bg-[var(--primary)]' : 'bg-[var(--surface-2)]'}`}
-              aria-label="Toggle homework and announcement push notifications"
+              aria-label={t.extra.toggleHomeworkPush}
             >
               <span className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-300 ${pushEnabled ? 'translate-x-7' : 'translate-x-0'}`} />
             </button>
@@ -874,7 +875,7 @@ export default function SettingsPage() {
         <div className="flex items-center gap-3 mb-4">
           <div className="w-11 h-11 rounded-2xl flex items-center justify-center text-xl shrink-0"
             style={{ background: 'linear-gradient(135deg, #0284c7, #38bdf8)', boxShadow: '0 4px 0 #0369a1, 0 8px 16px rgba(2,132,199,0.35)' }}>💬</div>
-          <h2 className="font-black text-base">Support</h2>
+          <h2 className="font-black text-base">{t.extra.support}</h2>
         </div>
         <a
           href="https://t.me/lexivo_support_bot"

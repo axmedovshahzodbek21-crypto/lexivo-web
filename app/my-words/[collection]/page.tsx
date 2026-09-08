@@ -47,7 +47,7 @@ export default function FolderPage({ params }: Props) {
   return (
     <div className="flex flex-col min-h-screen animate-fade-in pb-24">
       <div className="flex items-center gap-3 p-4 border-b border-[var(--border)]">
-        <button onClick={() => router.back()} className="btn-icon text-lg" aria-label="Go back">←</button>
+        <button onClick={() => router.back()} className="btn-icon text-lg" aria-label={t.extra.goBack}>←</button>
         <div className="flex-1 min-w-0">
           <h1 className="font-bold text-[var(--text)] truncate">{folder}</h1>
           <p className="text-xs text-[var(--text-muted)]">
@@ -58,12 +58,12 @@ export default function FolderPage({ params }: Props) {
         <Link
           href={`/import?folder=${encodeURIComponent(folder)}`}
           className="w-9 h-9 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-lg font-bold text-[var(--primary)]"
-          aria-label="Add words to folder"
+          aria-label={t.extra.addWordsToFolderAria}
         >+</Link>
         <button
           onClick={handleDeleteFolder}
           className="btn-icon text-base text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors"
-          aria-label="Delete folder"
+          aria-label={t.extra.deleteFolderAria}
         >🗑️</button>
       </div>
 
@@ -71,7 +71,7 @@ export default function FolderPage({ params }: Props) {
         {collections.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-4 py-16 text-center">
             <div className="text-6xl">📂</div>
-            <p className="text-[var(--text-muted)] text-sm">No units yet. Tap + to add words.</p>
+            <p className="text-[var(--text-muted)] text-sm">{t.extra.noUnitsTapPlus}</p>
             <Link
               href={`/import?folder=${encodeURIComponent(folder)}`}
               className="btn-primary px-6 py-3 text-sm font-semibold"
@@ -108,7 +108,7 @@ export default function FolderPage({ params }: Props) {
               className="mt-5 flex items-center justify-center gap-2 w-full py-3 rounded-2xl border-2 border-dashed border-[var(--border)] text-sm font-medium text-[var(--text-muted)] hover:border-[var(--primary)] hover:text-[var(--primary)] transition-colors"
             >
               <span>+</span>
-              <span>New Unit</span>
+              <span>{t.extra.newUnit}</span>
             </Link>
           </>
         )}

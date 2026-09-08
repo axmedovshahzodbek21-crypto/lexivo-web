@@ -949,7 +949,7 @@ function LearnInner() {
       <div className="flex flex-col items-center justify-center min-h-screen p-6 text-center gap-5 animate-fade-in">
         <div className="text-5xl">📖</div>
         <div className="space-y-2">
-          <h2 className="text-xl font-bold text-[var(--text)]">Resume where you left off?</h2>
+          <h2 className="text-xl font-bold text-[var(--text)]">{t.extra.resumeWhereLeftOff}</h2>
           <p className="text-sm text-[var(--text-muted)] max-w-xs leading-relaxed">
             You made it to word <strong>{resumePrompt.savedIndex + 1}</strong> of <strong>{resumePrompt.total}</strong> last time.
           </p>
@@ -1017,7 +1017,7 @@ function LearnInner() {
             }
           }}
           className="btn-icon text-lg"
-          aria-label="Go back"
+          aria-label={t.extra.goBack}
         >←</button>
         <div className="flex-1 mx-3">
           <div className="flex items-center justify-between mb-1.5">
@@ -1029,7 +1029,7 @@ function LearnInner() {
                 onClick={() => { setIndex(i => Math.max(0, i - 1)); setRevealed(false); }}
                 disabled={index === 0}
                 className="w-6 h-6 flex items-center justify-center text-[var(--primary)] disabled:opacity-30 text-lg font-bold"
-                aria-label="Previous card"
+                aria-label={t.extra.prevCard}
               >‹</button>
               <span className="text-xs font-bold text-[var(--primary)] px-1">
                 {index + 1} <span className="text-[var(--text-muted)] font-normal">/ {words.length}</span>
@@ -1038,7 +1038,7 @@ function LearnInner() {
                 onClick={() => { setIndex(i => Math.min(words.length - 1, i + 1)); setRevealed(false); }}
                 disabled={index >= words.length - 1}
                 className="w-6 h-6 flex items-center justify-center text-[var(--primary)] disabled:opacity-30 text-lg font-bold"
-                aria-label="Next card"
+                aria-label={t.extra.nextCard}
               >›</button>
             </div>
           </div>
@@ -1098,7 +1098,7 @@ function LearnInner() {
               <button
                 onClick={e => { e.stopPropagation(); speakText(current.word, current.language!); }}
                 className="w-8 h-8 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-base hover:bg-[var(--primary-bg)] transition-colors"
-                aria-label="Listen to pronunciation"
+                aria-label={t.extra.listen}
               >🔊</button>
             ) : (
               <div className="flex gap-1.5">
@@ -1269,7 +1269,7 @@ function LearnInner() {
                   <p className="text-xs font-semibold text-orange-700">{t.learn.skipTipTitle}</p>
                   <p className="text-xs text-orange-600 mt-0.5">{t.learn.skipTipBody}</p>
                 </div>
-                <button onClick={dismissSkipTip} className="text-orange-400 hover:text-orange-600 text-sm font-bold shrink-0 mt-0.5" aria-label="Dismiss tip">✕</button>
+                <button onClick={dismissSkipTip} className="text-orange-400 hover:text-orange-600 text-sm font-bold shrink-0 mt-0.5" aria-label={t.extra.dismissTip}>✕</button>
               </div>
             )}
           </div>
@@ -1359,6 +1359,7 @@ function ExampleCard({
   num: number; example: string; translation?: string;
   showTranslation: boolean; onToggle: () => void; language?: string;
 }) {
+  const t = useTranslation();
   return (
     <div
       className="rounded-xl overflow-hidden border border-[var(--border)] cursor-pointer select-none"
@@ -1374,7 +1375,7 @@ function ExampleCard({
               <button
                 onClick={() => speakText(example, language)}
                 className="w-6 h-6 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-xs hover:bg-[var(--primary-bg)] transition-colors"
-                aria-label="Listen to pronunciation"
+                aria-label={t.extra.listen}
               >🔊</button>
             ) : (
               <>
@@ -1390,7 +1391,7 @@ function ExampleCard({
         <div className="px-3 py-2 bg-[var(--surface)]">
           {showTranslation
             ? <p className="text-xs text-[var(--primary)] animate-fade-in">{translation}</p>
-            : <p className="text-xs text-[var(--text-muted)] text-center">Tap to see translation</p>}
+            : <p className="text-xs text-[var(--text-muted)] text-center">{t.extra.tapToSeeTranslation}</p>}
         </div>
       )}
     </div>
@@ -1402,6 +1403,7 @@ function ExtraExampleCard({
 }: {
   index: number; example: string; translation?: string; language?: string;
 }) {
+  const t = useTranslation();
   const [show, setShow] = useState(false);
   return (
     <div
@@ -1419,7 +1421,7 @@ function ExtraExampleCard({
             <button
               onClick={e => { e.stopPropagation(); speakText(example, language); }}
               className="w-5 h-5 rounded-full flex items-center justify-center text-xs hover:bg-[var(--primary-bg)] transition-colors shrink-0"
-              aria-label="Listen to pronunciation"
+              aria-label={t.extra.listen}
             >🔊</button>
           )}
         </div>
@@ -1429,7 +1431,7 @@ function ExtraExampleCard({
         <div className="px-3 py-2 bg-[var(--surface)]">
           {show
             ? <p className="text-xs text-[var(--primary)] animate-fade-in">{translation}</p>
-            : <p className="text-xs text-[var(--text-muted)] text-center">Tap to see translation</p>}
+            : <p className="text-xs text-[var(--text-muted)] text-center">{t.extra.tapToSeeTranslation}</p>}
         </div>
       )}
     </div>
@@ -1572,8 +1574,8 @@ function SessionDone({
           style={{ background: 'linear-gradient(135deg, #ea580c, #f97316)' }}
         >
           <div>
-            <div className="font-bold text-sm">Next: Practice with Cards</div>
-            <div className="text-xs opacity-80 mt-0.5">Reinforce what you just learned</div>
+            <div className="font-bold text-sm">{t.extra.nextPracticeCards}</div>
+            <div className="text-xs opacity-80 mt-0.5">{t.extra.reinforceLearned}</div>
           </div>
           <span className="text-lg">→</span>
         </Link>

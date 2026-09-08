@@ -109,21 +109,21 @@ export default function MyWordsPage() {
   return (
     <div className="flex flex-col min-h-screen animate-fade-in pb-24">
       <div className="flex items-center justify-between p-4 border-b border-[var(--border)]">
-        <button onClick={() => router.back()} className="btn-icon text-lg" aria-label="Go back">←</button>
+        <button onClick={() => router.back()} className="btn-icon text-lg" aria-label={t.extra.goBack}>←</button>
         <h1 className="font-bold text-[var(--text)]">{t.myWords.title}</h1>
         <div className="flex items-center gap-1.5">
           {!isEmpty && (
             <button
               onClick={() => setResetConfirm(true)}
               className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-base text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors"
-              aria-label="Reset My Words progress"
+              aria-label={t.extra.resetMyWordsAria}
               title="Reset My Words progress"
             >↺</button>
           )}
           <button
             onClick={() => setCreating(true)}
             className="w-9 h-9 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-lg font-bold text-[var(--primary)]"
-            aria-label="Create folder"
+            aria-label={t.extra.createFolderAria}
           >+</button>
         </div>
       </div>
@@ -134,15 +134,15 @@ export default function MyWordsPage() {
             ref={inputRef}
             value={folderName}
             onChange={e => setFolderName(e.target.value)}
-            placeholder="Folder name..."
+            placeholder={t.extra.folderNamePlaceholder}
             className="flex-1 px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] text-sm outline-none focus:border-[var(--primary)]"
           />
-          <button type="submit" className="btn-primary px-4 py-2 text-sm font-semibold rounded-xl">Create</button>
+          <button type="submit" className="btn-primary px-4 py-2 text-sm font-semibold rounded-xl">{t.extra.create}</button>
           <button
             type="button"
             onClick={() => { setCreating(false); setFolderName(''); }}
             className="px-3 py-2 text-sm text-[var(--text-muted)]"
-          >Cancel</button>
+          >{t.extra.cancel}</button>
         </form>
       )}
 
@@ -150,11 +150,11 @@ export default function MyWordsPage() {
         {isEmpty ? (
           <div className="flex flex-col items-center justify-center gap-4 py-12 text-center">
             <div className="text-6xl">📁</div>
-            <p className="text-[var(--text-muted)] text-sm">No folders yet. Create one to get started.</p>
+            <p className="text-[var(--text-muted)] text-sm">{t.extra.noFoldersCreateOne}</p>
 
             {/* Illustrative example — not real data, just shows the Folder → Collection → Words shape */}
             <div className="max-w-sm">
-              <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider mb-3">How it works</p>
+              <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider mb-3">{t.extra.howItWorks}</p>
               <div className="flex items-center justify-center gap-2 flex-wrap opacity-70 pointer-events-none select-none">
                 <div className="rounded-xl px-3 py-2 text-left" style={{ background: cardColor(0), border: `1.5px dashed ${darken(cardColor(0))}` }}>
                   <p className="text-[9px] font-bold text-white/70 uppercase tracking-wide">Folder</p>
@@ -209,7 +209,7 @@ export default function MyWordsPage() {
 
             {orphaned.length > 0 && (
               <div className="mt-5">
-                <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide px-1 mb-3">Unfiled</p>
+                <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide px-1 mb-3">{t.extra.unfiled}</p>
                 <div className="grid grid-cols-3 gap-3">
                   {orphaned.map((col, i) => (
                     <Link
@@ -239,7 +239,7 @@ export default function MyWordsPage() {
               className="mt-5 flex items-center justify-center gap-2 w-full py-3 rounded-2xl border-2 border-dashed border-[var(--border)] text-sm font-medium text-[var(--text-muted)] hover:border-[var(--primary)] hover:text-[var(--primary)] transition-colors"
             >
               <span>+</span>
-              <span>New Folder</span>
+              <span>{t.extra.newFolder}</span>
             </button>
           </>
         )}
@@ -248,7 +248,7 @@ export default function MyWordsPage() {
       {resetConfirm && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 px-4 pb-4 sm:pb-0" onClick={() => setResetConfirm(false)}>
           <div className="bg-[var(--surface)] rounded-2xl w-full max-w-sm p-6 shadow-2xl" onClick={e => e.stopPropagation()}>
-            <p className="text-[var(--text)] font-bold mb-2">Reset My Words progress?</p>
+            <p className="text-[var(--text)] font-bold mb-2">{t.extra.resetMyWordsQ}</p>
             <p className="text-sm text-[var(--text-muted)] mb-6">
               This clears the Learn/Flashcards/Quiz/Match checkmarks and completion badges on every folder and unit,
               so you can study them again from scratch. Your words and folders are not deleted.

@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useEffect } from 'react';
 
 interface Props {
@@ -7,6 +8,7 @@ interface Props {
 }
 
 export default function GlobalError({ error, reset }: Props) {
+  const t = useTranslation();
   useEffect(() => {
     console.error('[app error boundary]', error);
   }, [error]);
@@ -27,7 +29,7 @@ export default function GlobalError({ error, reset }: Props) {
     <div className="flex flex-col items-center justify-center min-h-screen p-6 text-center gap-6">
       <div className="text-6xl">⚠️</div>
       <div className="space-y-2 max-w-xs">
-        <h1 className="text-xl font-bold text-[var(--text)]">Something went wrong</h1>
+        <h1 className="text-xl font-bold text-[var(--text)]">{t.extra.somethingWrong}</h1>
         <p className="text-sm text-[var(--text-muted)] leading-relaxed">
           The app encountered an unexpected error. Your account data is safe — this is usually caused by corrupt local storage.
         </p>

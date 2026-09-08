@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import Link from 'next/link';
 import BackButton from '@/components/BackButton';
 import { useAppStore } from '@/lib/store';
@@ -64,6 +65,7 @@ function CollectionCard({
 }
 
 export default function CollectionsPage() {
+  const t = useTranslation();
   const { collections } = useAppStore(useShallow(s => ({ collections: s.collections })));
   const [importedCount, setImportedCount] = useState(0);
 
@@ -83,7 +85,7 @@ export default function CollectionsPage() {
   return (
     <div className="px-6 py-8 pb-28">
       <BackButton href="/" />
-      <h1 className="text-3xl font-black text-[var(--text)] mb-8">Collections</h1>
+      <h1 className="text-3xl font-black text-[var(--text)] mb-8">{t.extra.collections}</h1>
 
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
         {/* 1. Leveled Words — best starting point */}

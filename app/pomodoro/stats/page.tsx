@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getFocusDays, getTodayFocusSeconds, getWeekFocusSeconds, getTotalFocusSeconds, localDateStr } from '@/lib/storage';
@@ -13,6 +14,7 @@ function fmtDuration(totalSeconds: number): string {
 }
 
 export default function PomodoroStatsPage() {
+  const t = useTranslation();
   const router = useRouter();
   const [today, setToday] = useState(0);
   const [week, setWeek] = useState(0);
@@ -44,8 +46,8 @@ export default function PomodoroStatsPage() {
   return (
     <div className="flex flex-col min-h-screen animate-fade-in">
       <div className="flex items-center justify-between p-4 border-b border-[var(--border)]">
-        <button onClick={() => router.back()} className="btn-icon text-lg" aria-label="Go back">←</button>
-        <h1 className="font-bold text-[var(--text)]">Focus Time</h1>
+        <button onClick={() => router.back()} className="btn-icon text-lg" aria-label={t.extra.goBack}>←</button>
+        <h1 className="font-bold text-[var(--text)]">{t.extra.focusTime}</h1>
         <div className="w-9 h-9" />
       </div>
 
@@ -57,7 +59,7 @@ export default function PomodoroStatsPage() {
         </div>
 
         <div className="card">
-          <h3 className="font-semibold mb-4">Last 7 Days</h3>
+          <h3 className="font-semibold mb-4">{t.extra.last7Days}</h3>
           <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end', height: 100 }}>
             {last7.map(d => (
               <div key={d.dateStr} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, height: '100%', justifyContent: 'flex-end' }}>

@@ -222,7 +222,7 @@ export default function ProfilePage() {
         <Link
           href="/settings"
           className="w-9 h-9 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-lg"
-          aria-label="Settings"
+          aria-label={t.extra.settingsAria}
         >⚙️</Link>
       </div>
 
@@ -429,8 +429,8 @@ export default function ProfilePage() {
             <Link href="/progress" className="flex items-center gap-3 w-full" style={{ margin: '-20px', padding: '20px' }}>
               <span className="text-2xl animate-float-icon">📊</span>
               <div>
-                <p className="text-sm font-semibold text-[var(--text)]">Progress</p>
-                <p className="text-xs text-[var(--text-muted)]">Charts & calendar</p>
+                <p className="text-sm font-semibold text-[var(--text)]">{t.extra.progress}</p>
+                <p className="text-xs text-[var(--text-muted)]">{t.extra.chartsCalendar}</p>
               </div>
             </Link>
           </TiltCard>
@@ -438,8 +438,8 @@ export default function ProfilePage() {
             <Link href="/settings" className="flex items-center gap-3 w-full" style={{ margin: '-20px', padding: '20px' }}>
               <span className="text-2xl animate-float-icon">⚙️</span>
               <div>
-                <p className="text-sm font-semibold text-[var(--text)]">Settings</p>
-                <p className="text-xs text-[var(--text-muted)]">Goals & preferences</p>
+                <p className="text-sm font-semibold text-[var(--text)]">{t.extra.settings}</p>
+                <p className="text-xs text-[var(--text-muted)]">{t.extra.goalsPreferences}</p>
               </div>
             </Link>
           </TiltCard>
@@ -496,7 +496,7 @@ export default function ProfilePage() {
             </button>
             {passwordSent && (
               <div className="rounded-xl border border-blue-200 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-800 p-3 space-y-1.5 animate-fade-in">
-                <p className="text-sm font-semibold text-blue-700 dark:text-blue-300">Check your email</p>
+                <p className="text-sm font-semibold text-blue-700 dark:text-blue-300">{t.extra.checkYourEmail}</p>
                 <p className="text-xs text-blue-600 dark:text-blue-400 leading-relaxed">
                   We sent a password reset link to <strong>{user?.email}</strong>. Open that email and click the link — it will bring you back here to set a new password.
                 </p>

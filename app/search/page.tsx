@@ -234,8 +234,8 @@ export default function SearchPage() {
         <>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
             <div>
-              <p style={{ fontSize: 14, fontWeight: 900, color: 'var(--text)' }}>Discover</p>
-              <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>Random words from your collections</p>
+              <p style={{ fontSize: 14, fontWeight: 900, color: 'var(--text)' }}>{t.extra.discover}</p>
+              <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>{t.extra.randomWords}</p>
             </div>
             <button
               onClick={() => setSeed(s => s + 1)}

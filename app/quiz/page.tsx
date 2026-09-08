@@ -400,7 +400,7 @@ function QuizInner() {
         </div>
         <div className="flex flex-col gap-3 w-full max-w-xs">
           <Link href={gateInfo.url} className="btn-primary text-center">Go to {gateInfo.missing} →</Link>
-          <button onClick={() => router.back()} className="btn-secondary">Go back</button>
+          <button onClick={() => router.back()} className="btn-secondary">{t.extra.goBack}</button>
         </div>
       </div>
     );
@@ -448,8 +448,8 @@ function QuizInner() {
               style={{ background: 'linear-gradient(135deg, #6366F1, #818CF8)' }}
             >
               <div>
-                <div className="font-bold text-sm">Play Matching</div>
-                <div className="text-xs opacity-80 mt-0.5">Lock it in with a quick game</div>
+                <div className="font-bold text-sm">{t.extra.playMatching}</div>
+                <div className="text-xs opacity-80 mt-0.5">{t.extra.lockItInGame}</div>
               </div>
               <span className="text-lg">→</span>
             </Link>
@@ -460,8 +460,8 @@ function QuizInner() {
               style={{ background: 'linear-gradient(135deg, #6366F1, #818CF8)' }}
             >
               <div>
-                <div className="font-bold text-sm">Play Matching</div>
-                <div className="text-xs opacity-80 mt-0.5">Lock it in with a quick game</div>
+                <div className="font-bold text-sm">{t.extra.playMatching}</div>
+                <div className="text-xs opacity-80 mt-0.5">{t.extra.lockItInGame}</div>
               </div>
               <span className="text-lg">→</span>
             </Link>
@@ -502,7 +502,7 @@ function QuizInner() {
           if (sourceClassHW && sp.get('hwId')) router.push(`/classes/${sp.get('classId')}/homework/${sp.get('hwId')}`);
           else if (sourceClass && classId) router.push(`/classes/${classId}/words`);
           else router.back();
-        }} className="btn-icon" aria-label="Go back">←</button>
+        }} className="btn-icon" aria-label={t.extra.goBack}>←</button>
         <div className="text-center">
           <div className="font-semibold text-sm">{t.quiz.title}</div>
           <div className="text-xs text-[var(--text-muted)]">{index + 1} / {questions.length}</div>
@@ -526,7 +526,7 @@ function QuizInner() {
             <button
               onClick={() => current.word.language ? speakText(current.word.word, current.word.language) : speak(current.word.word)}
               className="w-9 h-9 rounded-full bg-[var(--primary-bg)] flex items-center justify-center flex-shrink-0"
-              aria-label="Listen to pronunciation"
+              aria-label={t.extra.listen}
             >🔊</button>
           </div>
           {current.type === 'definition_to_word' && (

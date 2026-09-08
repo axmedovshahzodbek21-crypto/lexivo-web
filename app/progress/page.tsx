@@ -552,6 +552,7 @@ function StatBlock({
 // ─── XP History ──────────────────────────────────────────────────────────────
 
 function XpHistorySection({ xp }: { xp: number }) {
+  const t = useTranslation();
   const [open, setOpen] = useState(false);
 
   return (
@@ -574,7 +575,7 @@ function XpHistorySection({ xp }: { xp: number }) {
       >
         <span style={{ fontSize: 28 }}>📅</span>
         <span style={{ fontSize: 14, fontWeight: 700, color: '#fff', lineHeight: 1.2 }}>XP History</span>
-        <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.7)' }}>Your XP calendar</span>
+        <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.7)' }}>{t.extra.yourXpCalendar}</span>
       </button>
       {open && <XpHistoryModal xp={xp} onClose={() => setOpen(false)} />}
     </>
@@ -856,7 +857,7 @@ function StudyCalendar({
           <span className="text-xl relative z-10">🏆</span>
           <div className="text-3xl font-black text-white leading-tight relative z-10">{activeDays}</div>
           <div className="flex items-center gap-1 relative z-10">
-            <div className="text-[10px] text-white/70 font-bold leading-tight">Full days</div>
+            <div className="text-[10px] text-white/70 font-bold leading-tight">{t.extra.fullDays}</div>
             <InfoBtn k="fulldays" light />
           </div>
         </div>
@@ -904,9 +905,9 @@ function StudyCalendar({
       <div className="card">
         {/* Month nav */}
         <div className="flex items-center justify-between mb-5">
-          <button onClick={prevMonth} aria-label="Previous month" className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-[var(--surface-2)] transition-colors text-[var(--text)] text-xl font-bold">‹</button>
+          <button onClick={prevMonth} aria-label={t.extra.prevMonth} className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-[var(--surface-2)] transition-colors text-[var(--text)] text-xl font-bold">‹</button>
           <span className="font-bold text-[var(--text)]">{monthName}</span>
-          <button onClick={nextMonth} disabled={!canGoNext} aria-label="Next month" className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-[var(--surface-2)] transition-colors text-[var(--text)] text-xl font-bold disabled:opacity-30">›</button>
+          <button onClick={nextMonth} disabled={!canGoNext} aria-label={t.extra.nextMonth} className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-[var(--surface-2)] transition-colors text-[var(--text)] text-xl font-bold disabled:opacity-30">›</button>
         </div>
 
         <div className="max-w-[308px] mx-auto">
@@ -977,7 +978,7 @@ function StudyCalendar({
             <div className="w-3.5 h-3.5 rounded-full" style={{ background: TASK_COLORS.words.bg }} />
             <span className="text-[10px] text-[var(--text-muted)]">{`${dailyGoal} words goal`}</span>
           </div>
-          <span className="text-[10px] text-[var(--text-muted)] ml-auto">Tap a day for details</span>
+          <span className="text-[10px] text-[var(--text-muted)] ml-auto">{t.extra.tapDayDetails}</span>
         </div>
       </div>
       </div> {/* end left column */}
@@ -989,7 +990,7 @@ function StudyCalendar({
         <div className="rounded-2xl p-4 flex gap-3" style={{ background: 'var(--surface-2)' }}>
           <span className="text-xl shrink-0">💡</span>
           <div className="space-y-1.5">
-            <p className="text-sm font-bold" style={{ color: 'var(--text)' }}>How to mark a day</p>
+            <p className="text-sm font-bold" style={{ color: 'var(--text)' }}>{t.extra.howToMarkDay}</p>
             <div className="flex flex-col gap-1">
               <span className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--text-muted)' }}>
                 <span className="w-2.5 h-2.5 rounded-full shrink-0 inline-block" style={{ background: TASK_COLORS.review.bg }} />
@@ -1000,7 +1001,7 @@ function StudyCalendar({
                 Reach your self-set daily word goal
               </span>
             </div>
-            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Each task fills half the day circle. Complete both to fully mark a day.</p>
+            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{t.extra.eachTaskHalf}</p>
           </div>
         </div>
 
@@ -1120,7 +1121,7 @@ function StudyCalendar({
                     </div>
                     <div style={{ position: 'relative', zIndex: 1 }}>
                       {('nothingDue' in task && task.nothingDue) ? (
-                        <span className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>Nothing due</span>
+                        <span className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>{t.extra.nothingDue}</span>
                       ) : sheetIsToday && !task.done ? (
                         <Link href={task.href} onClick={() => setSelectedDay(null)}
                           className="block text-xs font-black px-3 py-2.5 rounded-xl text-white text-center transition-all"
@@ -1130,7 +1131,7 @@ function StudyCalendar({
                       ) : task.done ? (
                         <span className="text-xs font-bold" style={{ color: 'rgba(255,255,255,0.8)' }}>Done ✓</span>
                       ) : (
-                        <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Not done</span>
+                        <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{t.extra.notDone}</span>
                       )}
                     </div>
                   </div>

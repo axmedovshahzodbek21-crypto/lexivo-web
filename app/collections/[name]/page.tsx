@@ -230,7 +230,7 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
         <div className="flex-1 flex items-center justify-center p-8 text-center">
           <div>
             <div className="text-5xl mb-4">🎯</div>
-            <p className="font-bold text-[var(--text)] mb-1">No completed units yet</p>
+            <p className="font-bold text-[var(--text)] mb-1">{t.extra.noCompletedUnits}</p>
             <p className="text-sm text-[var(--text-muted)] leading-relaxed max-w-xs">
               Complete Learn → Flashcards → Quiz for a unit to unlock it here.
             </p>
@@ -298,6 +298,7 @@ function MasteryHeatmap({
   selectedUnit: number | null;
   onSelectUnit: (u: number | null) => void;
 }) {
+  const t = useTranslation();
   const drillUnit = selectedUnit !== null ? unitMastery.find(u => u.dayNumber === selectedUnit) : null;
   const collectionDay = drillUnit
     ? collection.days.find(d => d.dayNumber === drillUnit.dayNumber)
@@ -403,7 +404,7 @@ function MasteryHeatmap({
               </div>
             ))}
           </div>
-          <p className="text-[9px] text-[var(--text-muted)] px-1">Tap a unit to see word-by-word breakdown</p>
+          <p className="text-[9px] text-[var(--text-muted)] px-1">{t.extra.tapUnitBreakdown}</p>
         </div>
       )}
     </div>
@@ -655,7 +656,7 @@ function UnitCard({
                       onClick={() => { setTappedWord(null); setActiveStory(null); }}
                       className="text-xs font-bold px-3 py-1.5 rounded-lg text-white shrink-0"
                       style={{ background: 'var(--primary)' }}
-                    >Go to unit</button>
+                    >{t.extra.goToUnit}</button>
                     <button
                       onClick={() => setTappedWord(null)}
                       className="text-lg leading-none shrink-0"
@@ -667,7 +668,7 @@ function UnitCard({
             ) : (
               <div className="flex-1 flex flex-col items-center justify-center py-10 text-center">
                 <span className="text-4xl mb-3">{storyEmojis[activeStory.num - 1]}</span>
-                <p className="font-semibold text-[var(--text)] mb-1">Story coming soon</p>
+                <p className="font-semibold text-[var(--text)] mb-1">{t.extra.storyComingSoon}</p>
                 <p className="text-xs text-[var(--text-muted)]">
                   You&apos;ve unlocked this story, but it hasn&apos;t been written yet.
                 </p>
