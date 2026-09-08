@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { SectionLoader } from '@/components/Loader';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -53,6 +54,7 @@ type Cache = {
 const _cache = new Map<string, Cache>();
 
 export default function JoinedClassesPage() {
+  const t = useTranslation();
   const router = useRouter();
   const { user } = useAuth();
   const [joinedClasses, setJoinedClasses] = useState<ClassRow[]>([]);
@@ -187,13 +189,13 @@ export default function JoinedClassesPage() {
             style={{ background: 'rgba(255,255,255,0.18)', boxShadow: '0 4px 0 rgba(0,0,0,0.15)' }}
           >🎓</div>
           <div>
-            <p className="text-xs font-black text-white/50 uppercase tracking-widest mb-0.5">Joined Classes</p>
+            <p className="text-xs font-black text-white/50 uppercase tracking-widest mb-0.5">{t.classesPage.joinedClasses}</p>
             <h1 className="text-2xl font-black text-white leading-tight" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.25)' }}>
               {joinedClasses.length > 0 ? `${joinedClasses.length} Class${joinedClasses.length !== 1 ? 'es' : ''}` : 'Joined Classes'}
             </h1>
           </div>
         </div>
-        <p className="text-sm text-white/65 mt-2 ml-0.5">Classes you are enrolled in as a student.</p>
+        <p className="text-sm text-white/65 mt-2 ml-0.5">{t.classesPage.classesYouEnrolled}</p>
       </div>
 
       <div className="p-4 space-y-4 max-w-2xl mx-auto w-full">
@@ -208,7 +210,7 @@ export default function JoinedClassesPage() {
         ) : joinedClasses.length === 0 ? (
           <div className="rounded-2xl border-2 border-dashed border-[var(--border)] p-12 text-center space-y-3 opacity-60">
             <p className="text-5xl">🎓</p>
-            <p className="text-base font-bold text-[var(--text)]">Not enrolled yet</p>
+            <p className="text-base font-bold text-[var(--text)]">{t.classesPage.notEnrolledYet}</p>
             <p className="text-sm text-[var(--text-muted)]">Go back and tap &quot;Join a Class&quot; to enroll</p>
           </div>
         ) : joinedClasses.map(cls => {
@@ -246,10 +248,10 @@ export default function JoinedClassesPage() {
                       onClick={() => router.push(`/classes/${cls.id}/home`)}
                       className="font-black text-white text-xs px-4 py-2 rounded-xl transition-opacity hover:opacity-90"
                       style={{ background: 'rgba(255,255,255,0.25)', boxShadow: '0 3px 0 rgba(0,0,0,0.2), 0 6px 14px rgba(0,0,0,0.15)', border: '1px solid rgba(255,255,255,0.35)', backdropFilter: 'blur(8px)' }}
-                    >Enter →</button>
+                    >{t.classesPage.enterArrow}</button>
                     <div className="flex gap-1">
                       <button onClick={() => toggleLeaderboard(cls.id)} className={`text-xs px-2 py-1 rounded-lg font-medium transition-all ${expandedLeaderboard === cls.id ? 'bg-white/30 text-white' : 'bg-black/20 text-white/80 hover:bg-black/30'}`}>🏆</button>
-                      <button onClick={() => setLeaveTarget(cls.id)} className="text-xs px-2 py-1 rounded-lg bg-black/20 text-white/80 hover:bg-red-500/40 transition-colors font-medium">Leave</button>
+                      <button onClick={() => setLeaveTarget(cls.id)} className="text-xs px-2 py-1 rounded-lg bg-black/20 text-white/80 hover:bg-red-500/40 transition-colors font-medium">{t.classesPage.leave}</button>
                     </div>
                   </div>
                 </div>
@@ -269,7 +271,7 @@ export default function JoinedClassesPage() {
                               <p className="text-sm text-[var(--text)] leading-snug">{a.message}</p>
                               <p className="text-[10px] text-[var(--text-muted)] mt-1">{timeAgo(a.created_at)}</p>
                             </div>
-                            {isNew && <span className="text-[10px] font-bold text-[var(--primary)] shrink-0 mt-0.5">NEW</span>}
+                            {isNew && <span className="text-[10px] font-bold text-[var(--primary)] shrink-0 mt-0.5">{t.classesPage.new}</span>}
                           </div>
                         </div>
                       );
@@ -283,7 +285,7 @@ export default function JoinedClassesPage() {
                     {leaderboardLoading === cls.id ? (
                       <SectionLoader rows={2} />
                     ) : (classLeaderboards[cls.id] ?? []).length === 0 ? (
-                      <p className="text-xs text-[var(--text-muted)] text-center py-2">No data yet</p>
+                      <p className="text-xs text-[var(--text-muted)] text-center py-2">{t.classesPage.noDataYet}</p>
                     ) : (classLeaderboards[cls.id] ?? []).map((row, idx) => {
                       const isMe = row.student_id === user?.id;
                       const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : null;
@@ -337,7 +339,7 @@ export default function JoinedClassesPage() {
                             <p className="text-[var(--text)] leading-snug">{note.message}</p>
                             <p className="text-[10px] text-[var(--text-muted)] mt-1">{timeAgo(note.created_at)}</p>
                           </div>
-                          {!note.read_at && <span className="text-[10px] font-bold text-[var(--primary)] shrink-0 mt-0.5">NEW</span>}
+                          {!note.read_at && <span className="text-[10px] font-bold text-[var(--primary)] shrink-0 mt-0.5">{t.classesPage.new}</span>}
                         </div>
                       </div>
                     ))}
@@ -353,11 +355,11 @@ export default function JoinedClassesPage() {
       {leaveTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4" onClick={() => setLeaveTarget(null)}>
           <div className="bg-[var(--surface)] rounded-2xl p-6 w-full max-w-sm shadow-xl space-y-4" onClick={e => e.stopPropagation()}>
-            <p className="font-bold text-[var(--text)] text-lg">Leave this class?</p>
-            <p className="text-sm text-[var(--text-muted)]">You will need the class code to rejoin.</p>
+            <p className="font-bold text-[var(--text)] text-lg">{t.classesPage.leaveClassQ}</p>
+            <p className="text-sm text-[var(--text-muted)]">{t.classesPage.leaveClassBody}</p>
             <div className="flex gap-3 justify-end">
-              <button onClick={() => setLeaveTarget(null)} className="px-4 py-2 rounded-xl text-sm font-semibold text-[var(--text-muted)] hover:bg-[var(--surface-2)] transition-colors">Cancel</button>
-              <button onClick={leaveClass} className="px-4 py-2 rounded-xl text-sm font-semibold bg-red-500 text-white hover:bg-red-600 transition-colors">Leave</button>
+              <button onClick={() => setLeaveTarget(null)} className="px-4 py-2 rounded-xl text-sm font-semibold text-[var(--text-muted)] hover:bg-[var(--surface-2)] transition-colors">{t.classesPage.cancel}</button>
+              <button onClick={leaveClass} className="px-4 py-2 rounded-xl text-sm font-semibold bg-red-500 text-white hover:bg-red-600 transition-colors">{t.classesPage.leave}</button>
             </div>
           </div>
         </div>

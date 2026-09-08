@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { SectionLoader } from '@/components/Loader';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -21,6 +22,7 @@ interface ClassRow {
 const _cache = new Map<string, ClassRow[]>();
 
 export default function CreatedClassesPage() {
+  const t = useTranslation();
   const router = useRouter();
   const { user } = useAuth();
   const [myClasses, setMyClasses] = useState<ClassRow[]>([]);
@@ -132,13 +134,13 @@ export default function CreatedClassesPage() {
             style={{ background: 'rgba(255,255,255,0.18)', boxShadow: '0 4px 0 rgba(0,0,0,0.15)' }}
           >🏫</div>
           <div>
-            <p className="text-xs font-black text-white/50 uppercase tracking-widest mb-0.5">My Classes</p>
+            <p className="text-xs font-black text-white/50 uppercase tracking-widest mb-0.5">{t.classesPage.myClasses}</p>
             <h1 className="text-2xl font-black text-white leading-tight" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.25)' }}>
               {myClasses.length > 0 ? `${myClasses.length} Class${myClasses.length !== 1 ? 'es' : ''}` : 'My Classes'}
             </h1>
           </div>
         </div>
-        <p className="text-sm text-white/65 mt-2 ml-0.5">Classes you created as a teacher.</p>
+        <p className="text-sm text-white/65 mt-2 ml-0.5">{t.classesPage.classesYouCreated}</p>
       </div>
 
       <div className="p-4 max-w-5xl mx-auto w-full">
@@ -147,8 +149,8 @@ export default function CreatedClassesPage() {
         ) : myClasses.length === 0 ? (
           <div className="rounded-2xl border-2 border-dashed border-[var(--border)] p-12 text-center space-y-3 opacity-60">
             <p className="text-5xl">🏫</p>
-            <p className="text-base font-bold text-[var(--text)]">No classes yet</p>
-            <p className="text-sm text-[var(--text-muted)]">Tap + Create to make your first class</p>
+            <p className="text-base font-bold text-[var(--text)]">{t.classesPage.noClassesYet}</p>
+            <p className="text-sm text-[var(--text-muted)]">{t.classesPage.tapCreateFirst}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -182,8 +184,8 @@ export default function CreatedClassesPage() {
                     </div>
                   </div>
                   <div className="bg-black/20 flex items-center justify-between px-4 py-2.5">
-                    <button onClick={e => { e.stopPropagation(); setDeleteConfirmId(cls.id); }} className="text-xs text-white/40 hover:text-red-300 transition-colors font-medium">Delete</button>
-                    <button onClick={() => router.push(`/classes/${cls.id}/home`)} className="text-xs font-black text-white bg-white/20 hover:bg-white/30 px-3.5 py-1.5 rounded-xl transition-colors">Enter →</button>
+                    <button onClick={e => { e.stopPropagation(); setDeleteConfirmId(cls.id); }} className="text-xs text-white/40 hover:text-red-300 transition-colors font-medium">{t.classesPage.delete}</button>
+                    <button onClick={() => router.push(`/classes/${cls.id}/home`)} className="text-xs font-black text-white bg-white/20 hover:bg-white/30 px-3.5 py-1.5 rounded-xl transition-colors">{t.classesPage.enterArrow}</button>
                   </div>
                 </div>
               );
@@ -200,12 +202,12 @@ export default function CreatedClassesPage() {
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-red-500/15 flex items-center justify-center text-xl shrink-0">🗑️</div>
               <div>
-                <h2 className="font-bold text-lg text-[var(--text)]">Delete Class?</h2>
-                <p className="text-xs text-[var(--text-muted)]">This will remove all members and data.</p>
+                <h2 className="font-bold text-lg text-[var(--text)]">{t.classesPage.deleteClassQ}</h2>
+                <p className="text-xs text-[var(--text-muted)]">{t.classesPage.deleteClassBody}</p>
               </div>
             </div>
             <div className="flex gap-3">
-              <button onClick={() => setDeleteConfirmId(null)} className="flex-1 btn-ghost py-3 text-sm">Cancel</button>
+              <button onClick={() => setDeleteConfirmId(null)} className="flex-1 btn-ghost py-3 text-sm">{t.classesPage.cancel}</button>
               <button onClick={() => deleteClass(deleteConfirmId)} className="flex-1 py-3 rounded-2xl font-bold text-sm text-white bg-red-500 hover:bg-red-600 active:scale-95 transition-all">
                 Yes, Delete
               </button>
@@ -219,12 +221,12 @@ export default function CreatedClassesPage() {
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setShowCreate(false)}>
           <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-5 space-y-4" onClick={e => e.stopPropagation()}>
             <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto" />
-            <h2 className="font-bold text-lg text-[var(--text)]">Create a Class</h2>
+            <h2 className="font-bold text-lg text-[var(--text)]">{t.classesPage.createAClass}</h2>
             <div>
-              <label className="text-sm text-[var(--text-muted)] mb-1 block">Class name</label>
+              <label className="text-sm text-[var(--text-muted)] mb-1 block">{t.classesPage.className}</label>
               <input
                 type="text" autoFocus
-                placeholder="e.g. English B1 — Group A"
+                placeholder={t.classesPage.classNamePlaceholder}
                 value={className}
                 onChange={e => setClassName(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && createClass()}
@@ -232,9 +234,9 @@ export default function CreatedClassesPage() {
               />
             </div>
             {createError && <p className="text-sm text-[var(--danger)]">{createError}</p>}
-            <p className="text-xs text-[var(--text-muted)]">A unique join code will be generated automatically.</p>
+            <p className="text-xs text-[var(--text-muted)]">{t.classesPage.joinCodeAuto}</p>
             <div className="flex gap-3">
-              <button onClick={() => { setShowCreate(false); setCreateError(''); }} className="flex-1 btn-ghost py-3 text-sm">Cancel</button>
+              <button onClick={() => { setShowCreate(false); setCreateError(''); }} className="flex-1 btn-ghost py-3 text-sm">{t.classesPage.cancel}</button>
               <button onClick={createClass} disabled={creating || !className.trim()} className="flex-1 btn-primary py-3 disabled:opacity-50">
                 {creating ? 'Creating…' : 'Create Class'}
               </button>

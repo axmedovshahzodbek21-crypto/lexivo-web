@@ -1,4 +1,5 @@
 ﻿'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { PageLoader, SectionLoader } from '@/components/Loader';
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
@@ -260,6 +261,7 @@ function AnalyticsTab({
   digestLoading: boolean;
   onDigest: () => void;
 }) {
+  const tt = useTranslation();
   const studentName = (id: string) => students.find(s => s.student_id === id)?.name ?? 'Unknown';
 
   const [folderHeatmap, setFolderHeatmap] = useState<FolderHeatFolder[]>([]);
@@ -313,8 +315,8 @@ function AnalyticsTab({
     return (
       <div className="card text-center py-16 space-y-3">
         <div className="text-5xl">📊</div>
-        <p className="font-bold text-[var(--text)]">No session data yet</p>
-        <p className="text-sm text-[var(--text-muted)]">Data appears here once students complete learn sessions with Phase 4 active.</p>
+        <p className="font-bold text-[var(--text)]">{tt.classesPage.noSessionDataYet}</p>
+        <p className="text-sm text-[var(--text-muted)]">{tt.classesPage.sessionDataAppears}</p>
       </div>
     );
   }
@@ -355,7 +357,7 @@ function AnalyticsTab({
           🟢 Studying now ({activeStudents.length})
         </p>
         {activeStudents.length === 0 ? (
-          <p className="text-sm text-[var(--text-muted)] px-1">No one studying right now</p>
+          <p className="text-sm text-[var(--text-muted)] px-1">{tt.classesPage.noOneStudying}</p>
         ) : (
           <div className="flex flex-wrap gap-2">
             {activeStudents.map(s => (
@@ -388,7 +390,7 @@ function AnalyticsTab({
                 {r.genuine_mastery_pct != null && (
                   <div className="text-right">
                     <p className="text-sm font-bold" style={{ color: r.genuine_mastery_pct < 60 ? 'var(--danger)' : 'var(--success)' }}>{r.genuine_mastery_pct}%</p>
-                    <p className="text-[9px] text-[var(--text-muted)]">gate accuracy</p>
+                    <p className="text-[9px] text-[var(--text-muted)]">{tt.classesPage.gateAccuracy}</p>
                   </div>
                 )}
               </div>
@@ -468,10 +470,10 @@ function AnalyticsTab({
                         <p className="text-sm font-black" style={{ color: r.genuine_mastery_pct >= 80 ? 'var(--success)' : r.genuine_mastery_pct >= 60 ? '#f97316' : 'var(--danger)' }}>
                           {r.genuine_mastery_pct}%
                         </p>
-                        <p className="text-[9px] text-[var(--text-muted)]">mastery</p>
+                        <p className="text-[9px] text-[var(--text-muted)]">{tt.classesPage.masteryLc}</p>
                       </>
                     ) : (
-                      <p className="text-[10px] text-[var(--text-muted)]">no gate data</p>
+                      <p className="text-[10px] text-[var(--text-muted)]">{tt.classesPage.noGateData}</p>
                     )}
                     {r.speed_flag_sessions > 0 && <p className="text-[9px] text-[var(--danger)] font-semibold mt-0.5">⚡ {r.speed_flag_sessions} flags</p>}
                   </div>
@@ -499,7 +501,7 @@ function AnalyticsTab({
                     <span className="text-[10px] font-bold text-[var(--text)]">📁 {folder.name}</span>
                     {avgPct !== null
                       ? <span className="text-[9px] font-semibold" style={{ color: classMasteryColor(avgPct) }}>{avgPct}% avg</span>
-                      : <span className="text-[9px] text-[var(--text-muted)]">no homework yet</span>}
+                      : <span className="text-[9px] text-[var(--text-muted)]">{tt.classesPage.noHomeworkYetLc}</span>}
                   </div>
                   <div className="flex flex-wrap gap-1">
                     {folder.units.map((unit, i) => (
@@ -522,7 +524,7 @@ function AnalyticsTab({
             <div className="flex items-center gap-3 flex-wrap pt-1 border-t border-[var(--border)]">
               <div className="flex items-center gap-1">
                 <div className="w-2.5 h-2.5 rounded" style={{ border: '1px dashed var(--border)' }} />
-                <span className="text-[9px] text-[var(--text-muted)]">No HW</span>
+                <span className="text-[9px] text-[var(--text-muted)]">{tt.classesPage.noHw}</span>
               </div>
               {[{ color: 'var(--border)', label: '0%' }, { color: '#ef4444', label: '<25%' }, { color: '#eab308', label: '50%' }, { color: '#84cc16', label: '75%' }, { color: '#22c55e', label: '90%+' }].map(({ color, label }) => (
                 <div key={label} className="flex items-center gap-1">
@@ -630,6 +632,7 @@ function SRSTab({
   srsNames: Record<string, string>;
   loading: boolean;
 }) {
+  const tt = useTranslation();
   if (loading) return <div className="flex justify-center py-12"><div className="text-4xl animate-bounce">📚</div></div>;
 
   const today = localDateStr();
@@ -649,11 +652,11 @@ function SRSTab({
     <div className="space-y-5">
       {/* Per-student overview */}
       <section>
-        <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-widest mb-3">Student SRS Overview</p>
+        <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-widest mb-3">{tt.classesPage.studentSrsOverview}</p>
         {studentIds.length === 0 ? (
           <div className="card text-center py-10 space-y-2">
             <p className="text-4xl">📚</p>
-            <p className="text-sm text-[var(--text-muted)]">No SRS data yet — students need to study class words first.</p>
+            <p className="text-sm text-[var(--text-muted)]">{tt.classesPage.noSrsDataYet}</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -696,13 +699,13 @@ function SRSTab({
       {/* Word Mastery Grid */}
       {gridWords.length > 0 && studentIds.length > 0 && (
         <section>
-          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-widest mb-3">Word Mastery Grid</p>
+          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-widest mb-3">{tt.classesPage.wordMasteryGrid}</p>
           <div className="card p-0 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-xs border-collapse">
                 <thead>
                   <tr>
-                    <th className="sticky left-0 z-10 text-left px-3 py-2 font-semibold border-b border-r text-[var(--text-muted)]" style={{ background: 'var(--surface)', borderColor: 'var(--border)', minWidth: 130 }}>Word</th>
+                    <th className="sticky left-0 z-10 text-left px-3 py-2 font-semibold border-b border-r text-[var(--text-muted)]" style={{ background: 'var(--surface)', borderColor: 'var(--border)', minWidth: 130 }}>{tt.classesPage.word}</th>
                     {studentIds.map(uid => (
                       <th key={uid} className="px-2 py-2 text-center font-medium text-[var(--text-muted)] border-b" style={{ borderColor: 'var(--border)', minWidth: 64 }}>
                         <span className="block truncate max-w-[72px]">{srsNames[uid] ?? uid.slice(0, 6)}</span>
@@ -756,7 +759,7 @@ function SRSTab({
       {/* Class Hard Words */}
       {hardSorted.length > 0 && (
         <section>
-          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-widest mb-3">Class Hard Words</p>
+          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-widest mb-3">{tt.classesPage.classHardWords}</p>
           <div className="space-y-2">
             {hardSorted.map(([word, count], i) => {
               const info = gridWords.find(w => w.word === word);
@@ -800,13 +803,14 @@ function ReviewPatternTab({
   srsRows: SRSRow[];
   loading: boolean;
 }) {
+  const tt = useTranslation();
   if (loading) return <div className="flex justify-center py-12"><div className="text-4xl animate-bounce">🔄</div></div>;
 
   if (students.length === 0) {
     return (
       <div className="card text-center py-10 space-y-2">
         <p className="text-4xl">🔄</p>
-        <p className="text-sm text-[var(--text-muted)]">No students yet.</p>
+        <p className="text-sm text-[var(--text-muted)]">{tt.classesPage.noStudentsYetDot}</p>
       </div>
     );
   }
@@ -898,6 +902,7 @@ function CurriculumTab({
   classId: string;
   students: { studentId: string; name: string }[];
 }) {
+  const tt = useTranslation();
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [folders, setFolders] = useState<CurrFolder[]>([]);
@@ -1249,8 +1254,8 @@ function CurriculumTab({
         {folders.length === 0 ? (
           <div className="card text-center py-12 space-y-3">
             <div className="text-4xl">📚</div>
-            <p className="font-bold text-[var(--text)]">No folders assigned</p>
-            <p className="text-sm text-[var(--text-muted)]">Assign a folder from your library to give students access to its units.</p>
+            <p className="font-bold text-[var(--text)]">{tt.classesPage.noFoldersAssigned}</p>
+            <p className="text-sm text-[var(--text-muted)]">{tt.classesPage.assignFolderGiveAccess}</p>
             <button onClick={openFolderPicker} className="btn-primary">+ Assign Folder</button>
           </div>
         ) : (
@@ -1281,13 +1286,13 @@ function CurriculumTab({
                       onClick={e => { e.stopPropagation(); unassignFolder(folder.assignmentId); }}
                       className="text-xs px-2 py-1 rounded-lg transition-colors shrink-0 mr-1"
                       style={{ color: 'rgba(255,255,255,0.7)', background: 'rgba(0,0,0,0.15)' }}
-                    >Remove</button>
+                    >{tt.classesPage.remove}</button>
                     <span className="shrink-0 text-xs" style={{ color: 'rgba(255,255,255,0.8)' }}>{isOpen ? '▲' : '▼'}</span>
                   </button>
                   {isOpen && (
                     <div className="space-y-1 p-2" style={{ background: 'var(--surface)' }}>
                       {folder.units.length === 0 ? (
-                        <p className="text-xs text-[var(--text-muted)] text-center py-4">No units in this folder</p>
+                        <p className="text-xs text-[var(--text-muted)] text-center py-4">{tt.classesPage.noUnitsInFolder}</p>
                       ) : folder.units.map(unit => {
                         const hw = homework.find(h => h.source === 'library' && h.unitId === unit.id);
                         return (
@@ -1323,8 +1328,8 @@ function CurriculumTab({
         {cwUnits.length === 0 ? (
           <div className="card text-center py-10 space-y-2">
             <div className="text-4xl">📝</div>
-            <p className="font-bold text-[var(--text)]">No units yet</p>
-            <p className="text-sm text-[var(--text-muted)]">Create a unit to organise class words into homework groups.</p>
+            <p className="font-bold text-[var(--text)]">{tt.classesPage.noUnitsYet}</p>
+            <p className="text-sm text-[var(--text-muted)]">{tt.classesPage.createUnitOrganise}</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -1344,8 +1349,8 @@ function CurriculumTab({
                       <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)' }}>{unit.wordCount} word{unit.wordCount !== 1 ? 's' : ''}</p>
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0">
-                      <button onClick={e => { e.stopPropagation(); setCwUnitRenameName(unit.name); setCwUnitRenaming(unit); }} className="text-xs px-2 py-1 rounded-lg transition-colors" style={{ color: 'rgba(255,255,255,0.7)', background: 'rgba(0,0,0,0.15)' }}>Rename</button>
-                      <button onClick={e => { e.stopPropagation(); deleteCWUnit(unit); }} className="text-xs px-2 py-1 rounded-lg transition-colors" style={{ color: 'rgba(255,255,255,0.7)', background: 'rgba(0,0,0,0.15)' }}>Delete</button>
+                      <button onClick={e => { e.stopPropagation(); setCwUnitRenameName(unit.name); setCwUnitRenaming(unit); }} className="text-xs px-2 py-1 rounded-lg transition-colors" style={{ color: 'rgba(255,255,255,0.7)', background: 'rgba(0,0,0,0.15)' }}>{tt.classesPage.rename}</button>
+                      <button onClick={e => { e.stopPropagation(); deleteCWUnit(unit); }} className="text-xs px-2 py-1 rounded-lg transition-colors" style={{ color: 'rgba(255,255,255,0.7)', background: 'rgba(0,0,0,0.15)' }}>{tt.classesPage.delete}</button>
                       <span className="text-xs ml-1" style={{ color: 'rgba(255,255,255,0.8)' }}>{isOpen ? '▲' : '▼'}</span>
                     </div>
                   </button>
@@ -1381,8 +1386,8 @@ function CurriculumTab({
             {groupEntries.length === 0 ? (
               <div className="card text-center py-8 space-y-2">
                 <div className="text-3xl">📗</div>
-                <p className="text-sm font-bold text-[var(--text)]">Pre-built Collection Days</p>
-                <p className="text-xs text-[var(--text-muted)]">Assign a day from 30 Days, A1, A2, B1, and more directly as homework.</p>
+                <p className="text-sm font-bold text-[var(--text)]">{tt.classesPage.prebuiltCollectionDays}</p>
+                <p className="text-xs text-[var(--text-muted)]">{tt.classesPage.prebuiltCollectionDaysSub}</p>
                 <button onClick={() => { setCollPickerOpen(true); setCollPickerStep(1); }} className="btn-primary text-xs px-4 py-2 !mt-3">+ Assign a Day</button>
               </div>
             ) : (
@@ -1464,7 +1469,7 @@ function CurriculumTab({
         {homework.length === 0 ? (
           <div className="card text-center py-10 space-y-2">
             <div className="text-4xl">📋</div>
-            <p className="text-sm text-[var(--text-muted)]">No homework assigned yet — expand a folder and tap + Homework on a unit.</p>
+            <p className="text-sm text-[var(--text-muted)]">{tt.classesPage.noHomeworkAssignedExpand}</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -1539,15 +1544,15 @@ function CurriculumTab({
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setCwUnitCreating(false)}>
           <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-5 space-y-4" onClick={e => e.stopPropagation()}>
             <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto" />
-            <p className="font-bold text-[var(--text)]">New Unit</p>
+            <p className="font-bold text-[var(--text)]">{tt.classesPage.newUnit}</p>
             <input
               autoFocus value={cwUnitNewName} onChange={e => setCwUnitNewName(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && createCWUnit()}
-              placeholder="Unit name" className="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]"
+              placeholder={tt.classesPage.unitNamePlaceholder} className="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]"
             />
             <div className="flex gap-3">
-              <button onClick={() => setCwUnitCreating(false)} className="flex-1 btn-ghost py-3 text-sm">Cancel</button>
-              <button onClick={createCWUnit} disabled={!cwUnitNewName.trim()} className="flex-1 btn-primary py-3 disabled:opacity-50">Create</button>
+              <button onClick={() => setCwUnitCreating(false)} className="flex-1 btn-ghost py-3 text-sm">{tt.classesPage.cancel}</button>
+              <button onClick={createCWUnit} disabled={!cwUnitNewName.trim()} className="flex-1 btn-primary py-3 disabled:opacity-50">{tt.classesPage.create}</button>
             </div>
           </div>
         </div>
@@ -1558,15 +1563,15 @@ function CurriculumTab({
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setCwUnitRenaming(null)}>
           <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-5 space-y-4" onClick={e => e.stopPropagation()}>
             <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto" />
-            <p className="font-bold text-[var(--text)]">Rename Unit</p>
+            <p className="font-bold text-[var(--text)]">{tt.classesPage.renameUnit}</p>
             <input
               autoFocus value={cwUnitRenameName} onChange={e => setCwUnitRenameName(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && renameCWUnit()}
               className="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]"
             />
             <div className="flex gap-3">
-              <button onClick={() => setCwUnitRenaming(null)} className="flex-1 btn-ghost py-3 text-sm">Cancel</button>
-              <button onClick={renameCWUnit} disabled={!cwUnitRenameName.trim()} className="flex-1 btn-primary py-3 disabled:opacity-50">Save</button>
+              <button onClick={() => setCwUnitRenaming(null)} className="flex-1 btn-ghost py-3 text-sm">{tt.classesPage.cancel}</button>
+              <button onClick={renameCWUnit} disabled={!cwUnitRenameName.trim()} className="flex-1 btn-primary py-3 disabled:opacity-50">{tt.classesPage.save}</button>
             </div>
           </div>
         </div>
@@ -1579,7 +1584,7 @@ function CurriculumTab({
             <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto shrink-0" />
             <p className="font-bold text-[var(--text)] shrink-0">Words in &ldquo;{cwWordsMgr.name}&rdquo;</p>
             {cwWordsAll.length === 0 ? (
-              <p className="text-sm text-center text-[var(--text-muted)] py-6">No words in this class yet.</p>
+              <p className="text-sm text-center text-[var(--text-muted)] py-6">{tt.classesPage.noWordsInClass}</p>
             ) : (
               <div className="flex-1 overflow-y-auto min-h-0 space-y-1">
                 {cwWordsAll.map(w => (
@@ -1598,7 +1603,7 @@ function CurriculumTab({
               </div>
             )}
             <div className="flex gap-3 shrink-0">
-              <button onClick={() => setCwWordsMgr(null)} className="flex-1 btn-ghost py-3 text-sm">Cancel</button>
+              <button onClick={() => setCwWordsMgr(null)} className="flex-1 btn-ghost py-3 text-sm">{tt.classesPage.cancel}</button>
               <button onClick={saveManageWords} disabled={cwWordsSaving} className="flex-1 btn-primary py-3 disabled:opacity-50">
                 {cwWordsSaving ? 'Saving…' : 'Save'}
               </button>
@@ -1612,7 +1617,7 @@ function CurriculumTab({
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setShowFolderPicker(false)}>
           <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-5 space-y-4 max-h-[70vh] flex flex-col" onClick={e => e.stopPropagation()}>
             <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto shrink-0" />
-            <p className="font-bold text-[var(--text)] shrink-0">Assign a Folder</p>
+            <p className="font-bold text-[var(--text)] shrink-0">{tt.classesPage.assignAFolder}</p>
             {folderPickerLoading ? (
               <div className="flex justify-center py-8"><div className="text-3xl animate-bounce">📁</div></div>
             ) : availFolders.length === 0 ? (
@@ -1633,7 +1638,7 @@ function CurriculumTab({
                 ))}
               </div>
             )}
-            <button onClick={() => setShowFolderPicker(false)} className="w-full btn-ghost py-3 shrink-0">Cancel</button>
+            <button onClick={() => setShowFolderPicker(false)} className="w-full btn-ghost py-3 shrink-0">{tt.classesPage.cancel}</button>
           </div>
         </div>
       )}
@@ -1643,7 +1648,7 @@ function CurriculumTab({
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setCollPickerOpen(false)}>
           <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-5 space-y-4 max-h-[75vh] flex flex-col" onClick={e => e.stopPropagation()}>
             <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto shrink-0" />
-            <p className="font-bold text-[var(--text)] shrink-0">Pick a Collection</p>
+            <p className="font-bold text-[var(--text)] shrink-0">{tt.classesPage.pickACollection}</p>
             <div className="flex-1 overflow-y-auto space-y-2 min-h-0">
               {COLLECTION_META.map(c => (
                 <button key={c.name} onClick={() => pickCollection(c.name)} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-[var(--primary-bg)] transition-colors" style={{ background: 'var(--surface-2)' }}>
@@ -1655,7 +1660,7 @@ function CurriculumTab({
                 </button>
               ))}
             </div>
-            <button onClick={() => setCollPickerOpen(false)} className="w-full btn-ghost py-3 shrink-0">Cancel</button>
+            <button onClick={() => setCollPickerOpen(false)} className="w-full btn-ghost py-3 shrink-0">{tt.classesPage.cancel}</button>
           </div>
         </div>
       )}
@@ -1692,7 +1697,7 @@ function CurriculumTab({
                 })}
               </div>
             )}
-            <button onClick={() => { setCollPickerOpen(false); setCollPickerStep(1); }} className="w-full btn-ghost py-3 shrink-0">Cancel</button>
+            <button onClick={() => { setCollPickerOpen(false); setCollPickerStep(1); }} className="w-full btn-ghost py-3 shrink-0">{tt.classesPage.cancel}</button>
           </div>
         </div>
       )}
@@ -1702,10 +1707,10 @@ function CurriculumTab({
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setShowPassagePicker(false)}>
           <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-5 space-y-3 max-h-[75vh] flex flex-col" onClick={e => e.stopPropagation()}>
             <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto shrink-0" />
-            <p className="font-bold text-[var(--text)] shrink-0">Assign a Reading Passage</p>
+            <p className="font-bold text-[var(--text)] shrink-0">{tt.classesPage.assignAReadingPassage}</p>
             <input
               autoFocus value={passageSearch} onChange={e => setPassageSearch(e.target.value)}
-              placeholder="Search by title or topic…"
+              placeholder={tt.classesPage.searchByTitleTopic}
               className="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)] shrink-0"
             />
             <div className="flex-1 overflow-y-auto space-y-2 min-h-0">
@@ -1731,7 +1736,7 @@ function CurriculumTab({
                   );
                 })}
             </div>
-            <button onClick={() => setShowPassagePicker(false)} className="w-full btn-ghost py-3 shrink-0">Cancel</button>
+            <button onClick={() => setShowPassagePicker(false)} className="w-full btn-ghost py-3 shrink-0">{tt.classesPage.cancel}</button>
           </div>
         </div>
       )}
@@ -1745,7 +1750,7 @@ function CurriculumTab({
 
             {!hwPassage && (
             <div className="shrink-0">
-              <p className="text-xs font-semibold text-[var(--text-muted)] mb-2">Modes</p>
+              <p className="text-xs font-semibold text-[var(--text-muted)] mb-2">{tt.classesPage.modes}</p>
               <div className="flex flex-wrap gap-2">
                 {[...REQUIRED_MODES, ...OPTIONAL_MODES].map(mode => {
                   const required = REQUIRED_MODES.includes(mode);
@@ -1768,12 +1773,12 @@ function CurriculumTab({
             )}
 
             <div className="shrink-0">
-              <label className="text-xs font-semibold text-[var(--text-muted)] mb-1.5 block">Due Date (optional)</label>
+              <label className="text-xs font-semibold text-[var(--text-muted)] mb-1.5 block">{tt.classesPage.dueDateOptional2}</label>
               <input type="date" value={hwDueDate} onChange={e => setHwDueDate(e.target.value)} min={localDateStr()} className="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]" />
             </div>
 
             <div className="shrink-0">
-              <p className="text-xs font-semibold text-[var(--text-muted)] mb-2">Assign to</p>
+              <p className="text-xs font-semibold text-[var(--text-muted)] mb-2">{tt.classesPage.assignTo}</p>
               <div className="flex gap-2">
                 {(['class', 'specific'] as const).map(who => (
                   <button key={who} onClick={() => setHwWho(who)} className="flex-1 py-2 rounded-xl text-sm font-semibold border transition-all"
@@ -1799,7 +1804,7 @@ function CurriculumTab({
             )}
 
             <div className="flex gap-3 shrink-0">
-              <button onClick={closeHwModal} className="flex-1 btn-ghost py-3 text-sm">Cancel</button>
+              <button onClick={closeHwModal} className="flex-1 btn-ghost py-3 text-sm">{tt.classesPage.cancel}</button>
               <button onClick={saveHomework} disabled={hwSaving || (hwWho === 'specific' && hwStudentIds.size === 0)} className="flex-1 btn-primary py-3 disabled:opacity-50">
                 {hwSaving ? 'Saving…' : 'Assign 📋'}
               </button>
@@ -1875,7 +1880,7 @@ function CurriculumTab({
                       disabled={hwDeleting}
                       className="active:scale-95 transition-transform disabled:opacity-50"
                       style={{ fontSize: 11, fontWeight: 700, padding: '7px 12px', borderRadius: 10, background: 'var(--surface-2)', color: 'var(--text)' }}
-                    >Cancel</button>
+                    >{tt.classesPage.cancel}</button>
                     <button
                       onClick={deleteHomework}
                       disabled={hwDeleting}
@@ -1892,7 +1897,7 @@ function CurriculumTab({
               {detailLoading ? (
                 <div className="flex justify-center py-10"><div className="text-3xl animate-bounce">📋</div></div>
               ) : detailProgress.length === 0 ? (
-                <p className="text-sm text-center text-[var(--text-muted)] py-8">No students assigned</p>
+                <p className="text-sm text-center text-[var(--text-muted)] py-8">{tt.classesPage.noStudentsAssigned}</p>
               ) : detailProgress.map(sp => {
                 const doneModes = hwDetail.modes.filter(m => sp.modes.has(m));
                 const allDone = doneModes.length === hwDetail.modes.length;
@@ -1957,7 +1962,7 @@ function CurriculumTab({
                   boxShadow: 'inset 0 2px 5px rgba(0,0,0,0.2), 0 1px 0 rgba(255,255,255,0.04)',
                   border: 'none',
                 }}
-              >Close</button>
+              >{tt.classesPage.close}</button>
             </div>
           </div>
         </div>
@@ -2005,6 +2010,7 @@ type UnitRow = { day_number: number; learn_done: boolean; flashcard_done: boolea
 type CollectionModal = { student: StudentRow; collectionName: string; label: string; total: number; color: string };
 
 export default function ClassDashboardPage() {
+  const tt = useTranslation();
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -2438,17 +2444,17 @@ export default function ClassDashboardPage() {
   if (!user) return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8">
       <div className="text-5xl">🔒</div>
-      <p className="text-[var(--text-muted)]">Sign in to view this class</p>
-      <button onClick={() => router.push('/login')} className="btn-primary">Sign in</button>
+      <p className="text-[var(--text-muted)]">{tt.classesPage.signInToViewClass}</p>
+      <button onClick={() => router.push('/login')} className="btn-primary">{tt.classesPage.signIn}</button>
     </div>
   );
 
   if (notTeacher) return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8">
       <div className="text-5xl">⛔</div>
-      <p className="font-bold text-[var(--text)]">Not your class</p>
-      <p className="text-sm text-[var(--text-muted)]">Only the teacher can view this dashboard</p>
-      <button onClick={() => router.push(`/classes/${id}/home`)} className="btn-primary">Go back</button>
+      <p className="font-bold text-[var(--text)]">{tt.classesPage.notYourClass}</p>
+      <p className="text-sm text-[var(--text-muted)]">{tt.classesPage.onlyTeacherDashboard}</p>
+      <button onClick={() => router.push(`/classes/${id}/home`)} className="btn-primary">{tt.classesPage.goBack}</button>
     </div>
   );
 
@@ -2478,17 +2484,17 @@ export default function ClassDashboardPage() {
           <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shrink-0"
             style={{ background: 'rgba(255,255,255,0.18)', boxShadow: '0 4px 0 rgba(0,0,0,0.15)' }}>🏫</div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-black text-white/50 uppercase tracking-widest mb-0.5">Teacher Dashboard</p>
+            <p className="text-xs font-black text-white/50 uppercase tracking-widest mb-0.5">{tt.classesPage.teacherDashboard}</p>
             <h1 className="text-2xl font-black text-white leading-tight truncate" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.25)' }}>{classInfo?.name ?? '…'}</h1>
             <div className="flex items-center gap-2 mt-1">
-              <p className="text-xs text-white/60">Join code:</p>
+              <p className="text-xs text-white/60">{tt.classesPage.joinCode}</p>
               <code className="text-xs font-black text-white/90">{classInfo?.join_code}</code>
-              <button onClick={copyCode} className="text-sm hover:scale-110 transition-transform" aria-label="Copy join code">{copied ? '✅' : '📋'}</button>
+              <button onClick={copyCode} className="text-sm hover:scale-110 transition-transform" aria-label={tt.classesPage.copyJoinCode}>{copied ? '✅' : '📋'}</button>
             </div>
           </div>
           <div className="shrink-0 text-right">
             <p className="text-2xl font-black text-white leading-tight">{students.length}</p>
-            <p className="text-xs text-white/60">students</p>
+            <p className="text-xs text-white/60">{tt.classesPage.students}</p>
           </div>
         </div>
         <div className="flex gap-2 flex-wrap">
@@ -2532,8 +2538,8 @@ export default function ClassDashboardPage() {
           {pendingMembers.map(m => (
             <div key={m.student_id} className="flex items-center gap-3">
               <p className="flex-1 text-sm text-[var(--text)] truncate">{m.name}</p>
-              <button onClick={() => rejectPending(m.student_id)} className="text-xs font-bold text-[var(--danger)] px-2 py-1">Reject</button>
-              <button onClick={() => approvePending(m.student_id)} className="text-xs font-bold text-white px-3 py-1.5 rounded-lg" style={{ background: 'var(--primary)' }}>Approve</button>
+              <button onClick={() => rejectPending(m.student_id)} className="text-xs font-bold text-[var(--danger)] px-2 py-1">{tt.classesPage.reject}</button>
+              <button onClick={() => approvePending(m.student_id)} className="text-xs font-bold text-white px-3 py-1.5 rounded-lg" style={{ background: 'var(--primary)' }}>{tt.classesPage.approve}</button>
             </div>
           ))}
         </div>
@@ -2560,7 +2566,7 @@ export default function ClassDashboardPage() {
       {!loading && tab === 'students' && students.length > 0 && (
         <div className="px-4 py-2.5 border-b border-[var(--border)] space-y-2">
           <div className="flex items-center gap-2 overflow-x-auto pb-0.5">
-            <span className="text-[10px] font-semibold text-[var(--text-muted)] shrink-0">Sort:</span>
+            <span className="text-[10px] font-semibold text-[var(--text-muted)] shrink-0">{tt.classesPage.sort}</span>
             {SORT_OPTIONS.map(opt => (
               <button
                 key={opt.key}
@@ -2572,7 +2578,7 @@ export default function ClassDashboardPage() {
             ))}
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-semibold text-[var(--text-muted)] shrink-0">Filter:</span>
+            <span className="text-[10px] font-semibold text-[var(--text-muted)] shrink-0">{tt.classesPage.filter}</span>
             {FILTER_OPTIONS.map(opt => (
               <button
                 key={opt.key}
@@ -2597,8 +2603,8 @@ export default function ClassDashboardPage() {
           ) : activityFeed.length === 0 ? (
             <div className="card text-center py-12 space-y-3">
               <div className="text-5xl">📡</div>
-              <p className="font-bold text-[var(--text)]">No activity yet</p>
-              <p className="text-sm text-[var(--text-muted)]">Activity appears here as students complete units</p>
+              <p className="font-bold text-[var(--text)]">{tt.classesPage.noActivityYet}</p>
+              <p className="text-sm text-[var(--text-muted)]">{tt.classesPage.activityAppearsHere}</p>
             </div>
           ) : (
             <div className="space-y-5">
@@ -2673,14 +2679,14 @@ export default function ClassDashboardPage() {
           hardWords.length === 0 ? (
             <div className="card text-center py-16 space-y-3">
               <div className="text-5xl">📡</div>
-              <p className="font-bold text-[var(--text)]">No data yet</p>
-              <p className="text-sm text-[var(--text-muted)]">Words appear here once students have studied them at least 3 times.</p>
+              <p className="font-bold text-[var(--text)]">{tt.classesPage.noDataYet}</p>
+              <p className="text-sm text-[var(--text-muted)]">{tt.classesPage.wordsAppearAfter3}</p>
             </div>
           ) : (
             <div className="space-y-3">
               <div className="flex items-center gap-2 p-3 rounded-xl bg-[var(--primary-bg)] border border-[var(--primary)]/20">
                 <span className="text-lg shrink-0">📡</span>
-                <p className="text-xs text-[var(--text)]">Words ranked by how often students struggle — lowest accuracy first.</p>
+                <p className="text-xs text-[var(--text)]">{tt.classesPage.wordsRankedByStruggle}</p>
               </div>
               {hardWords.map((w, i) => {
                 const pct = w.accuracy_pct;
@@ -2738,18 +2744,18 @@ export default function ClassDashboardPage() {
           students.length === 0 ? (
             <div className="card text-center py-12 space-y-3">
               <div className="text-5xl">👥</div>
-              <p className="font-bold text-[var(--text)]">No students yet</p>
-              <p className="text-sm text-[var(--text-muted)]">Share this code with your students:</p>
+              <p className="font-bold text-[var(--text)]">{tt.classesPage.noStudentsYet}</p>
+              <p className="text-sm text-[var(--text-muted)]">{tt.classesPage.shareThisCode}</p>
               <div className="flex items-center justify-center gap-2">
                 <code className="text-xl font-black text-[var(--primary)] bg-[var(--primary-bg)] px-5 py-2.5 rounded-xl tracking-wider">{classInfo?.join_code}</code>
-                <button onClick={copyCode} className="text-2xl" aria-label="Copy join code">{copied ? '✅' : '📋'}</button>
+                <button onClick={copyCode} className="text-2xl" aria-label={tt.classesPage.copyJoinCode}>{copied ? '✅' : '📋'}</button>
               </div>
             </div>
           ) : visibleStudents.length === 0 ? (
             <div className="card text-center py-10 space-y-2">
               <div className="text-4xl">😴</div>
-              <p className="font-bold text-[var(--text)]">No inactive students</p>
-              <p className="text-sm text-[var(--text-muted)]">Everyone studied in the last 7 days!</p>
+              <p className="font-bold text-[var(--text)]">{tt.classesPage.noInactiveStudents}</p>
+              <p className="text-sm text-[var(--text-muted)]">{tt.classesPage.everyoneStudied7d}</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -2782,7 +2788,7 @@ export default function ClassDashboardPage() {
 
                     <div className="pl-8">
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-[10px] font-semibold text-[var(--text-muted)]">Overall progress</span>
+                        <span className="text-[10px] font-semibold text-[var(--text-muted)]">{tt.classesPage.overallProgress}</span>
                         <span className="text-[10px] font-bold text-[var(--text-muted)]">{totalProgress}/{s.total_units_sum} units</span>
                       </div>
                       <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
@@ -2822,7 +2828,7 @@ export default function ClassDashboardPage() {
                         🎯 Target
                         {activeTargets > 0 && <span className="bg-[var(--surface-2)] text-[var(--text-muted)] text-[9px] font-bold px-1.5 py-0.5 rounded-full border border-[var(--border)]">{activeTargets}</span>}
                       </button>
-                      <button onClick={() => removeStudent(s.student_id)} className="text-[10px] text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors ml-auto">Remove</button>
+                      <button onClick={() => removeStudent(s.student_id)} className="text-[10px] text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors ml-auto">{tt.classesPage.remove}</button>
                     </div>
                   </div>
                 );
@@ -2839,11 +2845,11 @@ export default function ClassDashboardPage() {
             <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto shrink-0" />
             <div className="flex items-center gap-3 shrink-0">
               <Avatar name={noteTarget.name} url={noteTarget.avatar_url} size={36} />
-              <div><p className="font-bold text-[var(--text)]">{noteTarget.name}</p><p className="text-xs text-[var(--text-muted)]">Send a note</p></div>
+              <div><p className="font-bold text-[var(--text)]">{noteTarget.name}</p><p className="text-xs text-[var(--text-muted)]">{tt.classesPage.sendANote}</p></div>
             </div>
             {(studentNotes[noteTarget.student_id] ?? []).length > 0 && (
               <div className="flex-1 overflow-y-auto space-y-2 min-h-0">
-                <p className="text-xs font-semibold text-[var(--text-muted)]">Previous notes</p>
+                <p className="text-xs font-semibold text-[var(--text-muted)]">{tt.classesPage.previousNotes}</p>
                 {(studentNotes[noteTarget.student_id] ?? []).map(n => (
                   <div key={n.id} className="rounded-xl px-3 py-2.5 text-sm" style={{ background: 'var(--surface-2)' }}>
                     <p className="text-[var(--text)]">{n.message}</p>
@@ -2855,7 +2861,7 @@ export default function ClassDashboardPage() {
             <div className="shrink-0 space-y-3">
               <textarea placeholder={`Write a note to ${noteTarget.name}…`} value={noteText} onChange={e => setNoteText(e.target.value)} rows={3} autoFocus className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm resize-none focus:outline-none focus:border-[var(--primary)]" />
               <div className="flex gap-3">
-                <button onClick={() => setNoteTarget(null)} className="flex-1 btn-ghost py-3 text-sm">Cancel</button>
+                <button onClick={() => setNoteTarget(null)} className="flex-1 btn-ghost py-3 text-sm">{tt.classesPage.cancel}</button>
                 <button onClick={sendNote} disabled={sending || !noteText.trim()} className="flex-1 btn-primary py-3 disabled:opacity-50">{sending ? 'Sending…' : 'Send ✉️'}</button>
               </div>
             </div>
@@ -2878,7 +2884,7 @@ export default function ClassDashboardPage() {
             {/* Past announcements */}
             {announcements.length > 0 && (
               <div className="flex-1 overflow-y-auto space-y-2 min-h-0">
-                <p className="text-xs font-semibold text-[var(--text-muted)]">Past announcements</p>
+                <p className="text-xs font-semibold text-[var(--text-muted)]">{tt.classesPage.pastAnnouncements}</p>
                 {announcements.map(a => (
                   <div key={a.id} className="rounded-xl px-3 py-2.5 flex items-start gap-2" style={{ background: 'var(--surface-2)' }}>
                     <p className="flex-1 text-sm text-[var(--text)]">{a.message}</p>
@@ -2894,7 +2900,7 @@ export default function ClassDashboardPage() {
             {/* Compose */}
             <div className="shrink-0 space-y-3">
               <textarea
-                placeholder="Write an announcement for all students…"
+                placeholder={tt.classesPage.announcementPlaceholder}
                 value={announceText}
                 onChange={e => setAnnounceText(e.target.value)}
                 rows={3}
@@ -2902,7 +2908,7 @@ export default function ClassDashboardPage() {
                 className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm resize-none focus:outline-none focus:border-[var(--primary)]"
               />
               <div className="flex gap-3">
-                <button onClick={() => setShowAnnounce(false)} className="flex-1 btn-ghost py-3 text-sm">Cancel</button>
+                <button onClick={() => setShowAnnounce(false)} className="flex-1 btn-ghost py-3 text-sm">{tt.classesPage.cancel}</button>
                 <button onClick={postAnnouncement} disabled={announcing || !announceText.trim()} className="flex-1 btn-primary py-3 disabled:opacity-50">
                   {announcing ? 'Posting…' : 'Post 📢'}
                 </button>
@@ -2919,11 +2925,11 @@ export default function ClassDashboardPage() {
             <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto shrink-0" />
             <div className="flex items-center gap-3 shrink-0">
               <Avatar name={targetStudent.name} url={targetStudent.avatar_url} size={36} />
-              <div><p className="font-bold text-[var(--text)]">{targetStudent.name}</p><p className="text-xs text-[var(--text-muted)]">Set a target</p></div>
+              <div><p className="font-bold text-[var(--text)]">{targetStudent.name}</p><p className="text-xs text-[var(--text-muted)]">{tt.classesPage.setATarget}</p></div>
             </div>
             {(studentTargets[targetStudent.student_id] ?? []).length > 0 && (
               <div className="flex-1 overflow-y-auto space-y-2 min-h-0">
-                <p className="text-xs font-semibold text-[var(--text-muted)]">Active targets</p>
+                <p className="text-xs font-semibold text-[var(--text-muted)]">{tt.classesPage.activeTargets}</p>
                 {(studentTargets[targetStudent.student_id] ?? []).map(t => {
                   const due = dueDateLabel(t.due_date);
                   return (
@@ -2934,7 +2940,7 @@ export default function ClassDashboardPage() {
                         {due && <p className={`text-[10px] mt-0.5 font-medium ${due.overdue && !t.completed_at ? 'text-[var(--danger)]' : 'text-[var(--text-muted)]'}`}>{t.completed_at ? `Completed ${timeAgo(t.completed_at)}` : due.text}</p>}
                         {t.completed_at && !due && <p className="text-[10px] mt-0.5 text-[var(--text-muted)]">Completed {timeAgo(t.completed_at)}</p>}
                       </div>
-                      <button onClick={() => deleteTarget(t.id)} className="text-[10px] text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors shrink-0 mt-1" aria-label="Delete target">✕</button>
+                      <button onClick={() => deleteTarget(t.id)} className="text-[10px] text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors shrink-0 mt-1" aria-label={tt.classesPage.deleteTarget}>✕</button>
                     </div>
                   );
                 })}
@@ -2943,11 +2949,11 @@ export default function ClassDashboardPage() {
             <div className="shrink-0 space-y-3">
               <input type="text" placeholder='e.g. "Complete A1 Unit 5 by Friday"' value={targetTitle} onChange={e => setTargetTitle(e.target.value)} autoFocus className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]" />
               <div>
-                <label className="text-xs text-[var(--text-muted)] mb-1 block">Due date (optional)</label>
+                <label className="text-xs text-[var(--text-muted)] mb-1 block">{tt.classesPage.dueDateOptional}</label>
                 <input type="date" value={targetDate} onChange={e => setTargetDate(e.target.value)} min={localDateStr()} className="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]" />
               </div>
               <div className="flex gap-3">
-                <button onClick={() => setTargetStudent(null)} className="flex-1 btn-ghost py-3 text-sm">Cancel</button>
+                <button onClick={() => setTargetStudent(null)} className="flex-1 btn-ghost py-3 text-sm">{tt.classesPage.cancel}</button>
                 <button onClick={addTarget} disabled={settingTarget || !targetTitle.trim()} className="flex-1 btn-primary py-3 disabled:opacity-50">{settingTarget ? 'Setting…' : 'Set target 🎯'}</button>
               </div>
             </div>
@@ -2988,7 +2994,7 @@ export default function ClassDashboardPage() {
                 <Avatar name={streakModal.name} url={streakModal.avatar_url} size={36} />
                 <div className="flex-1 min-w-0">
                   <p className="font-bold text-sm text-[var(--text)] truncate">{streakModal.name}</p>
-                  <p className="text-[10px] text-[var(--text-muted)]">Study calendar</p>
+                  <p className="text-[10px] text-[var(--text-muted)]">{tt.classesPage.studyCalendar}</p>
                 </div>
                 <div className="text-right shrink-0">
                   <p className="text-xl font-black text-orange-400">🔥 {streakModal.streak}</p>
@@ -3001,9 +3007,9 @@ export default function ClassDashboardPage() {
                 <div className="bg-[var(--surface-2)] rounded-2xl p-4">
                   {/* Month nav */}
                   <div className="flex items-center justify-between mb-4">
-                    <button onClick={prev} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--border)] text-[var(--text)] text-lg font-bold" aria-label="Previous month">‹</button>
+                    <button onClick={prev} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--border)] text-[var(--text)] text-lg font-bold" aria-label={tt.classesPage.prevMonth}>‹</button>
                     <p className="font-bold text-sm text-[var(--text)]">{MONTH_NAMES[month]} {year}</p>
-                    <button onClick={next} disabled={!canNext} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--border)] text-[var(--text)] text-lg font-bold disabled:opacity-25" aria-label="Next month">›</button>
+                    <button onClick={next} disabled={!canNext} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--border)] text-[var(--text)] text-lg font-bold disabled:opacity-25" aria-label={tt.classesPage.nextMonth}>›</button>
                   </div>
                   {/* Day headers */}
                   <div className="grid grid-cols-7 mb-2">
@@ -3031,11 +3037,11 @@ export default function ClassDashboardPage() {
                   <div className="flex items-center gap-5 mt-4 pt-3 border-t border-[var(--border)]">
                     <div className="flex items-center gap-1.5">
                       <div style={{ width: 14, height: 14, borderRadius: 4, border: '2px solid var(--primary)' }} />
-                      <span className="text-[10px] text-[var(--text-muted)]">Today</span>
+                      <span className="text-[10px] text-[var(--text-muted)]">{tt.classesPage.todayCap}</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                       <div style={{ width: 14, height: 14, borderRadius: 4, background: 'var(--primary)' }} />
-                      <span className="text-[10px] text-[var(--text-muted)]">Studied</span>
+                      <span className="text-[10px] text-[var(--text-muted)]">{tt.classesPage.studied}</span>
                     </div>
                   </div>
                 </div>
@@ -3067,7 +3073,7 @@ export default function ClassDashboardPage() {
                       <p style={{ fontSize: 24, fontWeight: 900, color: c, lineHeight: 1 }}>
                         {learnedCount}<span className="text-sm font-normal text-[var(--text-muted)]">/{collectionModal.total}</span>
                       </p>
-                      <p className="text-[9px] text-[var(--text-muted)] mt-0.5">learned</p>
+                      <p className="text-[9px] text-[var(--text-muted)] mt-0.5">{tt.classesPage.learnedLc}</p>
                     </div>
                   )}
                 </div>
@@ -3106,7 +3112,7 @@ export default function ClassDashboardPage() {
                             )}
                             {/* Latest chip */}
                             {isLatest && (
-                              <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 text-[8px] font-black px-1.5 py-0.5 rounded-full whitespace-nowrap text-white" style={{ background: c }}>LATEST</div>
+                              <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 text-[8px] font-black px-1.5 py-0.5 rounded-full whitespace-nowrap text-white" style={{ background: c }}>{tt.classesPage.latest}</div>
                             )}
                             <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-black" style={{
                               background: allDone ? c : anyDone ? `${c}25` : 'var(--border)',

@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
@@ -118,6 +119,7 @@ function WordCard({ w }: { w: ClassWord }) {
 }
 
 export default function ClassWordsPage() {
+  const t = useTranslation();
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const { user } = useAuth();
@@ -448,15 +450,15 @@ export default function ClassWordsPage() {
   if (!user) return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8">
       <div className="text-5xl">🔒</div>
-      <button onClick={() => router.push('/login')} className="btn-primary">Sign in</button>
+      <button onClick={() => router.push('/login')} className="btn-primary">{t.classesPage.signIn}</button>
     </div>
   );
 
   if (notMember) return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8">
       <div className="text-5xl">⛔</div>
-      <p className="font-bold text-[var(--text)]">You're not in this class</p>
-      <button onClick={() => router.push(`/classes/${id}/home`)} className="btn-primary">Go back</button>
+      <p className="font-bold text-[var(--text)]">{t.classesPage.notInThisClass}</p>
+      <button onClick={() => router.push(`/classes/${id}/home`)} className="btn-primary">{t.classesPage.goBack}</button>
     </div>
   );
 
@@ -466,13 +468,13 @@ export default function ClassWordsPage() {
   // Folder/collection shared input card (shown in both tabs)
   const FolderCollectionCard = (
     <div className="card space-y-3">
-      <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">Assign to</p>
+      <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">{t.classesPage.assignTo}</p>
       <div className="flex gap-3">
         <div className="flex-1">
           <label className="text-xs font-medium text-[var(--text-muted)] mb-1 block">📁 Folder <span className="font-normal">(optional)</span></label>
           <input
             type="text"
-            placeholder="e.g. Unit 1, Chapter 2…"
+            placeholder={t.classesPage.folderPlaceholder}
             value={folderInput}
             onChange={e => setFolderInput(e.target.value)}
             className="w-full px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]"
@@ -482,7 +484,7 @@ export default function ClassWordsPage() {
           <label className="text-xs font-medium text-[var(--text-muted)] mb-1 block">📖 Group <span className="font-normal">(optional)</span></label>
           <input
             type="text"
-            placeholder="e.g. Week 1, Greetings…"
+            placeholder={t.classesPage.groupPlaceholder}
             value={collectionInput}
             onChange={e => setCollectionInput(e.target.value)}
             className="w-full px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]"
@@ -525,8 +527,8 @@ export default function ClassWordsPage() {
             style={{ background: 'rgba(255,255,255,0.18)', boxShadow: '0 4px 0 rgba(0,0,0,0.15)' }}>📝</div>
           <div>
             <p className="text-xs font-black text-white/50 uppercase tracking-widest mb-0.5">{className || '...'}</p>
-            <h1 className="text-2xl font-black text-white leading-tight" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.25)' }}>Class Words</h1>
-            <p className="text-sm text-white/60 mt-1">All vocabulary in this class</p>
+            <h1 className="text-2xl font-black text-white leading-tight" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.25)' }}>{t.classesPage.classWords}</h1>
+            <p className="text-sm text-white/60 mt-1">{t.classesPage.allVocabInClass}</p>
           </div>
         </div>
       </div>
@@ -577,7 +579,7 @@ export default function ClassWordsPage() {
                         <div key={w.id} className={`card flex items-start gap-3 ${folder ? 'border-l-2 border-[var(--primary)] border-opacity-30' : ''}`}>
                           <WordCard w={w} />
                           {isTeacher && w.source !== 'library' ? (
-                            <button onClick={() => deleteWord(w.id)} className="text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors text-sm shrink-0 mt-0.5" aria-label="Delete word">✕</button>
+                            <button onClick={() => deleteWord(w.id)} className="text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors text-sm shrink-0 mt-0.5" aria-label={t.classesPage.deleteWord}>✕</button>
                           ) : !isTeacher ? (
                             <button
                               onClick={() => toggleStar(w.word)}
@@ -599,7 +601,7 @@ export default function ClassWordsPage() {
           {words.length === 0 && !loading && (
             <div className="card text-center py-10 space-y-2">
               <div className="text-4xl">📝</div>
-              <p className="font-bold text-[var(--text)]">No words yet</p>
+              <p className="font-bold text-[var(--text)]">{t.classesPage.noWordsYet}</p>
               <p className="text-sm text-[var(--text-muted)]">{isTeacher ? 'Add words below' : 'Your teacher hasn\'t added any words yet'}</p>
             </div>
           )}
@@ -628,13 +630,13 @@ export default function ClassWordsPage() {
               <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">── Review</p>
               <div className="card flex items-center justify-between gap-3">
                 <div>
-                  <p className="font-bold text-sm text-[var(--text)]">SRS Review</p>
+                  <p className="font-bold text-sm text-[var(--text)]">{t.classesPage.srsReview}</p>
                   <p className="text-xs text-[var(--text-muted)]">
                     {dueCount > 0 ? `${dueCount} word${dueCount !== 1 ? 's' : ''} due today` : 'All caught up ✓'}
                   </p>
                 </div>
                 {dueCount > 0 ? (
-                  <button onClick={() => router.push(`/classes/${id}/review`)} className="shrink-0 px-4 py-2 rounded-2xl text-sm font-bold text-white" style={{ background: 'linear-gradient(135deg, #f59e0b, #ef4444)', boxShadow: '0 4px 10px rgba(239,68,68,0.3)' }}>Review →</button>
+                  <button onClick={() => router.push(`/classes/${id}/review`)} className="shrink-0 px-4 py-2 rounded-2xl text-sm font-bold text-white" style={{ background: 'linear-gradient(135deg, #f59e0b, #ef4444)', boxShadow: '0 4px 10px rgba(239,68,68,0.3)' }}>{t.classesPage.reviewArrow}</button>
                 ) : <span className="text-2xl">✅</span>}
               </div>
               {!isTeacher && (
@@ -663,7 +665,7 @@ export default function ClassWordsPage() {
           {/* ── Add words (teacher only) — at the bottom ── */}
           {isTeacher && (
           <div className="space-y-4 pt-2 border-t border-[var(--border)]">
-            <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">Add words</p>
+            <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">{t.classesPage.addWords}</p>
             <div className="flex rounded-2xl overflow-hidden border border-[var(--border)]">
               {(['manual', 'ai', 'collection'] as InputTab[]).map(t => (
                 <button
@@ -687,7 +689,7 @@ export default function ClassWordsPage() {
                     <label className="text-xs font-semibold text-[var(--text-muted)] mb-1 block">Word *</label>
                     <input
                       type="text"
-                      placeholder="e.g. enormous"
+                      placeholder={t.classesPage.wordPlaceholder}
                       value={manualWord}
                       onChange={e => setManualWord(e.target.value)}
                       onKeyDown={e => e.key === 'Enter' && addManual()}
@@ -698,7 +700,7 @@ export default function ClassWordsPage() {
                     <label className="text-xs font-semibold text-[var(--text-muted)] mb-1 block">Translation *</label>
                     <input
                       type="text"
-                      placeholder="e.g. ulkan"
+                      placeholder={t.classesPage.translationPlaceholder}
                       value={manualTranslation}
                       onChange={e => setManualTranslation(e.target.value)}
                       onKeyDown={e => e.key === 'Enter' && addManual()}
@@ -710,7 +712,7 @@ export default function ClassWordsPage() {
                   <label className="text-xs font-semibold text-[var(--text-muted)] mb-1 block">Definition <span className="font-normal">(optional)</span></label>
                   <input
                     type="text"
-                    placeholder="Short definition…"
+                    placeholder={t.classesPage.shortDefinitionPlaceholder}
                     value={manualDefinition}
                     onChange={e => setManualDefinition(e.target.value)}
                     className="w-full px-3 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]"
@@ -721,8 +723,8 @@ export default function ClassWordsPage() {
                 </button>
                 {showExamples && (
                   <div className="space-y-2">
-                    <input type="text" placeholder="Example sentence…" value={manualExample1} onChange={e => setManualExample1(e.target.value)} className="w-full px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]" />
-                    <input type="text" placeholder="Translation of example…" value={manualExample1Trans} onChange={e => setManualExample1Trans(e.target.value)} className="w-full px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]" />
+                    <input type="text" placeholder={t.classesPage.exampleSentencePlaceholder} value={manualExample1} onChange={e => setManualExample1(e.target.value)} className="w-full px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]" />
+                    <input type="text" placeholder={t.classesPage.exampleTranslationPlaceholder} value={manualExample1Trans} onChange={e => setManualExample1Trans(e.target.value)} className="w-full px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]" />
                   </div>
                 )}
                 <button onClick={addManual} disabled={adding || !manualWord.trim() || !manualTranslation.trim()} className="w-full btn-primary py-3 disabled:opacity-50">
@@ -741,13 +743,13 @@ export default function ClassWordsPage() {
               <div className="card">
                 <div className="flex gap-3">
                   <div className="flex-1">
-                    <label className="text-xs font-medium text-[var(--text-muted)] mb-1 block">Word language</label>
+                    <label className="text-xs font-medium text-[var(--text-muted)] mb-1 block">{t.classesPage.wordLanguage}</label>
                     <select value={wordLang} onChange={e => { const lang = LANGUAGES.find(l => l.label === e.target.value); setWordLang(e.target.value); if (lang) setWordLangCode(lang.code); }} className="w-full px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]">
                       {LANGUAGES.map(l => <option key={l.code}>{l.label}</option>)}
                     </select>
                   </div>
                   <div className="flex-1">
-                    <label className="text-xs font-medium text-[var(--text-muted)] mb-1 block">Translation language</label>
+                    <label className="text-xs font-medium text-[var(--text-muted)] mb-1 block">{t.classesPage.translationLanguage}</label>
                     <select value={transLang} onChange={e => setTransLang(e.target.value)} className="w-full px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]">
                       {LANGUAGES.map(l => <option key={l.code}>{l.label}</option>)}
                     </select>
@@ -759,8 +761,8 @@ export default function ClassWordsPage() {
               <div className="card space-y-3">
                 <button onClick={() => setOpen1(p => !p)} className="w-full flex items-center justify-between">
                   <div className="text-left">
-                    <p className="font-semibold text-sm text-[var(--text)]">I have words only (no translations)</p>
-                    <p className="text-xs text-[var(--text-muted)] mt-0.5">AI adds translations, definitions, examples</p>
+                    <p className="font-semibold text-sm text-[var(--text)]">{t.classesPage.haveWordsOnly}</p>
+                    <p className="text-xs text-[var(--text-muted)] mt-0.5">{t.classesPage.aiAddsAll}</p>
                   </div>
                   <span className="text-[var(--text-muted)] ml-2">{open1 ? '▲' : '▼'}</span>
                 </button>
@@ -778,8 +780,8 @@ export default function ClassWordsPage() {
               <div className="card space-y-3">
                 <button onClick={() => setOpen2(p => !p)} className="w-full flex items-center justify-between">
                   <div className="text-left">
-                    <p className="font-semibold text-sm text-[var(--text)]">I have word-translation pairs</p>
-                    <p className="text-xs text-[var(--text-muted)] mt-0.5">AI keeps your translations, adds definitions and examples</p>
+                    <p className="font-semibold text-sm text-[var(--text)]">{t.classesPage.havePairs}</p>
+                    <p className="text-xs text-[var(--text-muted)] mt-0.5">{t.classesPage.aiKeepsTranslations}</p>
                   </div>
                   <span className="text-[var(--text-muted)] ml-2">{open2 ? '▲' : '▼'}</span>
                 </button>
@@ -797,8 +799,8 @@ export default function ClassWordsPage() {
               <div className="card space-y-3">
                 <button onClick={() => setOpenFmt(p => !p)} className="w-full flex items-center justify-between">
                   <div className="text-left">
-                    <p className="font-semibold text-sm text-[var(--text)]">Format reference</p>
-                    <p className="text-xs text-[var(--text-muted)] mt-0.5">Exact structure expected — open if pasting manually or fixing errors</p>
+                    <p className="font-semibold text-sm text-[var(--text)]">{t.classesPage.formatReference}</p>
+                    <p className="text-xs text-[var(--text-muted)] mt-0.5">{t.classesPage.formatReferenceSub}</p>
                   </div>
                   <span className="text-[var(--text-muted)] ml-2">{openFmt ? '▲' : '▼'}</span>
                 </button>
@@ -820,7 +822,7 @@ export default function ClassWordsPage() {
                       <div className="pt-1 text-[var(--text-muted)] italic">next word block goes here...</div>
                     </div>
                     <div className="rounded-xl border border-amber-200 bg-amber-50 dark:bg-amber-900/10 dark:border-amber-800 p-3 space-y-1">
-                      <p className="text-xs font-semibold text-amber-700 dark:text-amber-400">Common mistakes</p>
+                      <p className="text-xs font-semibold text-amber-700 dark:text-amber-400">{t.classesPage.commonMistakes}</p>
                       <ul className="text-xs text-amber-600 dark:text-amber-400 space-y-0.5 list-disc list-inside">
                         <li>Missing <code className="bg-amber-100 dark:bg-amber-900/30 px-1 rounded">---</code> separator between words</li>
                         <li>Using <code className="bg-amber-100 dark:bg-amber-900/30 px-1 rounded">**bold**</code> or markdown formatting in values</li>
@@ -833,15 +835,15 @@ export default function ClassWordsPage() {
 
               {/* Paste area */}
               <div className="card space-y-2">
-                <p className="font-semibold text-sm text-[var(--text)]">Paste AI response here</p>
-                <textarea value={pasted} onChange={e => setPasted(e.target.value)} placeholder="Paste the AI-formatted output here…" rows={8} className="w-full px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)] resize-none font-mono" />
+                <p className="font-semibold text-sm text-[var(--text)]">{t.classesPage.pasteAiResponseHere}</p>
+                <textarea value={pasted} onChange={e => setPasted(e.target.value)} placeholder={t.classesPage.pasteAiPlaceholder} rows={8} className="w-full px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)] resize-none font-mono" />
               </div>
 
               {/* Preview & add */}
               {pasted.trim() && (
                 <div className="card space-y-3">
                   <div className="flex items-center justify-between">
-                    <p className="font-semibold text-sm text-[var(--text)]">Preview</p>
+                    <p className="font-semibold text-sm text-[var(--text)]">{t.classesPage.preview}</p>
                     <div className="flex items-center gap-2 text-xs">
                       {parsed.length > 0 && (
                         <span className="px-2 py-0.5 rounded-full font-semibold" style={{ background: 'rgba(16,185,129,0.12)', color: 'var(--success)' }}>✓ {parsed.length} ready</span>
@@ -903,7 +905,7 @@ export default function ClassWordsPage() {
           {isTeacher && tab === 'collection' && (
             <div className="space-y-3">
               <div className="card space-y-3">
-                <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">Pick a Collection</p>
+                <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">{t.classesPage.pickACollection}</p>
                 <div className="space-y-2">
                   {BUILT_IN_COLLECTIONS.map(col => {
                     const isSelected = selectedCollection === col.file;
@@ -928,7 +930,7 @@ export default function ClassWordsPage() {
 
               {!loadingCollection && collectionData && (
                 <div className="card space-y-2">
-                  <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">Pick a Unit</p>
+                  <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">{t.classesPage.pickAUnit}</p>
                   <div className="space-y-1.5 max-h-72 overflow-y-auto">
                     {collectionData.days.map((day, i) => {
                       const isSelected = selectedDayIdx === i;

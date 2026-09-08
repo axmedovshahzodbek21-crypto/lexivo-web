@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
@@ -23,6 +24,7 @@ function last30Days(): string[] {
 }
 
 export default function ProgressPage() {
+  const t = useTranslation();
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const { user } = useAuth();
@@ -88,8 +90,8 @@ export default function ProgressPage() {
             style={{ background: 'rgba(255,255,255,0.18)', boxShadow: '0 4px 0 rgba(0,0,0,0.15)' }}>📊</div>
           <div>
             <p className="text-xs font-black text-white/50 uppercase tracking-widest mb-0.5">{className || '...'}</p>
-            <h1 className="text-2xl font-black text-white leading-tight" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.25)' }}>My Progress</h1>
-            <p className="text-sm text-white/60 mt-1">Your personal study stats</p>
+            <h1 className="text-2xl font-black text-white leading-tight" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.25)' }}>{t.classesPage.myProgress}</h1>
+            <p className="text-sm text-white/60 mt-1">{t.classesPage.yourPersonalStats}</p>
           </div>
         </div>
       </div>
@@ -111,7 +113,7 @@ export default function ProgressPage() {
 
         {/* SRS Stage breakdown */}
         <div className="card space-y-3">
-          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-widest">SRS Stages</p>
+          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-widest">{t.classesPage.srsStages}</p>
           {stageCounts.map((count, s) => (
             <div key={s} className="space-y-1">
               <div className="flex items-center justify-between text-xs">
@@ -133,7 +135,7 @@ export default function ProgressPage() {
             </div>
           ))}
           {learnedCount === 0 && (
-            <p className="text-xs text-[var(--text-muted)] text-center py-2">Start studying to see your SRS progress.</p>
+            <p className="text-xs text-[var(--text-muted)] text-center py-2">{t.classesPage.startStudyingSrs}</p>
           )}
         </div>
 
@@ -141,8 +143,8 @@ export default function ProgressPage() {
         {hardCount > 0 && (
           <div className="card flex items-center justify-between">
             <div>
-              <p className="font-semibold text-sm text-[var(--text)]">Hard words</p>
-              <p className="text-xs text-[var(--text-muted)]">Words you got wrong in quizzes</p>
+              <p className="font-semibold text-sm text-[var(--text)]">{t.classesPage.hardWords}</p>
+              <p className="text-xs text-[var(--text-muted)]">{t.classesPage.hardWordsSub}</p>
             </div>
             <span className="text-xl font-bold text-[var(--danger)]">{hardCount}</span>
           </div>
@@ -150,7 +152,7 @@ export default function ProgressPage() {
 
         {/* 30-day study calendar */}
         <div className="card space-y-3">
-          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-widest">Study Calendar · Last 30 days</p>
+          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-widest">{t.classesPage.studyCalendar30d}</p>
           <div className="grid gap-1.5" style={{ gridTemplateColumns: 'repeat(10, 1fr)' }}>
             {days.map(day => {
               const studied = reviewDates.has(day);

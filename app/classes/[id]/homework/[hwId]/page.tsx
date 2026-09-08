@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useEffect, useRef, useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
@@ -22,6 +23,7 @@ type HWMeta = { unitName: string; modes: string[]; dueDate: string | null; words
 const _hwCache = new Map<string, HWMeta>();
 
 export default function UnitStudyHubPage() {
+  const t = useTranslation();
   const { id: classId, hwId } = useParams<{ id: string; hwId: string }>();
   const { user } = useAuth();
   const router = useRouter();
@@ -305,7 +307,7 @@ export default function UnitStudyHubPage() {
       <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8">
         <div className="text-5xl">⛔</div>
         <p className="font-bold text-[var(--text)]">This homework isn&apos;t assigned to you</p>
-        <button onClick={() => router.push(`/classes/${classId}/home`)} className="btn-primary">Go back</button>
+        <button onClick={() => router.push(`/classes/${classId}/home`)} className="btn-primary">{t.classesPage.goBack}</button>
       </div>
     );
   }
@@ -314,9 +316,9 @@ export default function UnitStudyHubPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8">
         <div className="text-5xl">🔍</div>
-        <p className="font-bold text-[var(--text)]">This homework no longer exists</p>
-        <p className="text-sm text-[var(--text-muted)] text-center">It may have been deleted by your teacher.</p>
-        <button onClick={() => router.push(`/classes/${classId}/homework`)} className="btn-primary">Go back</button>
+        <p className="font-bold text-[var(--text)]">{t.classesPage.homeworkGone}</p>
+        <p className="text-sm text-[var(--text-muted)] text-center">{t.classesPage.homeworkGoneSub}</p>
+        <button onClick={() => router.push(`/classes/${classId}/homework`)} className="btn-primary">{t.classesPage.goBack}</button>
       </div>
     );
   }
@@ -327,7 +329,7 @@ export default function UnitStudyHubPage() {
         <div className="text-5xl">⚠️</div>
         <p className="font-bold text-[var(--text)]">Couldn&apos;t load this homework</p>
         <p className="text-sm text-[var(--text-muted)] text-center break-all">{loadError}</p>
-        <button onClick={() => load()} className="btn-primary">Try again</button>
+        <button onClick={() => load()} className="btn-primary">{t.classesPage.tryAgain}</button>
       </div>
     );
   }
@@ -404,7 +406,7 @@ export default function UnitStudyHubPage() {
             <div className="bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-xl p-2.5 flex items-center gap-2">
               <span className="text-lg">🎉</span>
               <div>
-                <p className="font-bold text-green-700 dark:text-green-400 text-xs">Nice work!</p>
+                <p className="font-bold text-green-700 dark:text-green-400 text-xs">{t.classesPage.niceWork}</p>
                 <p className="text-green-600 dark:text-green-500 text-[10px] mt-0.5">You&apos;ve completed this reading assignment.</p>
               </div>
             </div>
@@ -529,8 +531,8 @@ export default function UnitStudyHubPage() {
           <div className="bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-xl p-2.5 flex items-center gap-2">
             <span className="text-lg">🎉</span>
             <div>
-              <p className="font-bold text-green-700 dark:text-green-400 text-xs">All modes complete!</p>
-              <p className="text-green-600 dark:text-green-500 text-[10px] mt-0.5">Great work on this unit.</p>
+              <p className="font-bold text-green-700 dark:text-green-400 text-xs">{t.classesPage.allModesComplete}</p>
+              <p className="text-green-600 dark:text-green-500 text-[10px] mt-0.5">{t.classesPage.greatWorkUnit}</p>
             </div>
           </div>
         )}
@@ -538,7 +540,7 @@ export default function UnitStudyHubPage() {
         {/* Recommended next step */}
         {!allDone && nextMode && completedModes.size > 0 && (
           <div className="space-y-2">
-            <p className="text-[10px] font-bold text-[var(--text-muted)] tracking-widest uppercase">Recommended next step</p>
+            <p className="text-[10px] font-bold text-[var(--text-muted)] tracking-widest uppercase">{t.classesPage.recommendedNext}</p>
             <button
               onClick={() => startMode(nextMode)}
               disabled={!!navigating || gatedByLearn(nextMode)}
@@ -577,7 +579,7 @@ export default function UnitStudyHubPage() {
                   </p>
                   <p className="text-[9px] text-[var(--text-muted)] opacity-70">You&apos;ll skip {MODE_LABEL[nextMode] ?? nextMode}</p>
                 </div>
-                <span className="text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-wide">Skip</span>
+                <span className="text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-wide">{t.classesPage.skip}</span>
               </button>
             )}
           </div>
@@ -586,7 +588,7 @@ export default function UnitStudyHubPage() {
         {/* Word list preview */}
         {words.length > 0 && (
           <div>
-            <p className="text-[10px] font-bold text-[var(--text-muted)] tracking-widest uppercase mb-2">Words in this unit</p>
+            <p className="text-[10px] font-bold text-[var(--text-muted)] tracking-widest uppercase mb-2">{t.classesPage.wordsInThisUnit}</p>
             <div className="space-y-1.5">
               {words.map((w, i) => (
                 <div key={i} className="flex items-center gap-2.5 p-2.5 bg-[var(--surface)] rounded-lg">
@@ -614,6 +616,7 @@ function HWModeButton({
 }: {
   mode: string; done: boolean; busy: boolean; disabled: boolean; onClick: () => void; wide?: boolean; locked?: boolean;
 }) {
+  const t = useTranslation();
   const color = MODE_COLOR[mode] ?? 'var(--primary)';
   const icon = MODE_ICON[mode] ?? '📖';
   const label = MODE_LABEL[mode] ?? mode;
@@ -622,7 +625,7 @@ function HWModeButton({
   if (locked) {
     return (
       <div
-        title="Complete Learn first"
+        title={t.classesPage.completeLearnFirst}
         className={`${base} cursor-not-allowed select-none`}
         style={{ background: 'var(--surface-2)', border: '1.5px dashed var(--border)', opacity: 0.4 }}
       >

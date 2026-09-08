@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useEffect, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import BackButton from '@/components/BackButton';
@@ -7,6 +8,7 @@ import { useAuth } from '@/lib/auth-context';
 import { AssignedUnitCard, isHomeworkDone, fetchCollectionByName, type AssignedUnit } from '../../_shared';
 
 export default function ClassCollectionHomeworkPage() {
+  const t = useTranslation();
   const { id: classId, name } = useParams<{ id: string; name: string }>();
   const collectionName = decodeURIComponent(name);
   const { user } = useAuth();
@@ -91,7 +93,7 @@ export default function ClassCollectionHomeworkPage() {
         <div className="text-5xl">⚠️</div>
         <p className="font-bold text-[var(--text)]">Couldn&apos;t load this collection</p>
         <p className="text-sm text-[var(--text-muted)] text-center break-all">{loadError}</p>
-        <button onClick={() => load()} className="btn-primary">Try again</button>
+        <button onClick={() => load()} className="btn-primary">{t.classesPage.tryAgain}</button>
       </div>
     );
   }
@@ -149,7 +151,7 @@ export default function ClassCollectionHomeworkPage() {
         <div className="flex-1 flex items-center justify-center p-8 text-center">
           <div>
             <div className="text-5xl mb-4">📗</div>
-            <p className="font-bold text-[var(--text)] mb-1">No units assigned yet</p>
+            <p className="font-bold text-[var(--text)] mb-1">{t.classesPage.noUnitsAssignedYet}</p>
           </div>
         </div>
       ) : (

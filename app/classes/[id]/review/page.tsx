@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
@@ -35,6 +36,7 @@ const OPTIONS_BEAT_MS = 450;
 const CARD_LOCKOUT_MS = 350;
 
 export default function ClassReviewPage() {
+  const t = useTranslation();
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const [queue,      setQueue]      = useState<ClassSRSEntry[]>([]);
@@ -259,8 +261,8 @@ export default function ClassReviewPage() {
     return (
       <div className="p-6 text-center flex flex-col items-center justify-center min-h-screen animate-fade-in">
         <div className="text-6xl mb-4">✅</div>
-        <h2 className="text-2xl font-bold mb-2">All caught up!</h2>
-        <p className="text-[var(--text-muted)] mb-6">No SRS words due today for this class.</p>
+        <h2 className="text-2xl font-bold mb-2">{t.classesPage.allCaughtUp}</h2>
+        <p className="text-[var(--text-muted)] mb-6">{t.classesPage.noSrsDueToday}</p>
         <button onClick={() => router.push(`/classes/${id}/words`)} className="btn-primary">
           Back to class →
         </button>
@@ -277,18 +279,18 @@ export default function ClassReviewPage() {
     return (
       <div className="p-6 text-center flex flex-col items-center justify-center min-h-screen animate-fade-in">
         <div className="text-6xl mb-4">{score >= 80 ? '🧠' : '💪'}</div>
-        <h2 className="text-2xl font-bold mb-2">Review complete</h2>
+        <h2 className="text-2xl font-bold mb-2">{t.classesPage.reviewComplete}</h2>
         <p className="text-[var(--text-muted)] mb-6">{knewCount}/{results.length} knew · +{displayXP(sessionXP)} XP</p>
         <div className="grid grid-cols-3 gap-2 w-full mb-6">
-          <div className="card text-center"><div className="text-xl font-bold text-[var(--success)]">{knewCount}</div><div className="text-xs text-[var(--text-muted)]">Correct</div></div>
-          <div className="card text-center"><div className="text-xl font-bold text-[var(--danger)]">{notYetCount}</div><div className="text-xs text-[var(--text-muted)]">Not yet</div></div>
-          <div className="card text-center"><div className="text-xl font-bold text-[var(--primary)]">{score}%</div><div className="text-xs text-[var(--text-muted)]">Score</div></div>
+          <div className="card text-center"><div className="text-xl font-bold text-[var(--success)]">{knewCount}</div><div className="text-xs text-[var(--text-muted)]">{t.classesPage.correct}</div></div>
+          <div className="card text-center"><div className="text-xl font-bold text-[var(--danger)]">{notYetCount}</div><div className="text-xs text-[var(--text-muted)]">{t.classesPage.notYet}</div></div>
+          <div className="card text-center"><div className="text-xl font-bold text-[var(--primary)]">{score}%</div><div className="text-xs text-[var(--text-muted)]">{t.classesPage.score}</div></div>
         </div>
         <div className="flex gap-3 w-full">
           <button
             onClick={() => { setLoading(true); void loadQueue(); }}
             className="btn-secondary flex-1"
-          >Redo</button>
+          >{t.classesPage.redo}</button>
           <button onClick={() => router.push(`/classes/${id}/words`)} className="btn-primary flex-1">
             Back to class
           </button>
@@ -322,7 +324,7 @@ export default function ClassReviewPage() {
       <div className="flex items-center justify-between p-4">
         <button
           onClick={() => router.push(`/classes/${id}/words`)}
-          className="btn-icon" aria-label="Exit review"
+          className="btn-icon" aria-label={t.classesPage.exitReview}
         >✕</button>
         <div className="text-center">
           <div className="font-semibold text-sm">SRS Review · {className}</div>
@@ -373,11 +375,11 @@ export default function ClassReviewPage() {
           role={choices !== null && !optionsShown ? 'button' : undefined}
         >
           <div className="flex items-center justify-between">
-            <span className="badge text-xs">Class word</span>
+            <span className="badge text-xs">{t.classesPage.classWord}</span>
             <button
               onClick={(e) => { e.stopPropagation(); speak(current.word); }}
               className="w-8 h-8 rounded-full bg-[var(--primary-bg)] flex items-center justify-center hover:bg-[var(--primary)] hover:text-white transition-colors"
-              aria-label="Listen"
+              aria-label={t.classesPage.listen}
             >🔊</button>
           </div>
 
@@ -386,7 +388,7 @@ export default function ClassReviewPage() {
           {revealed ? (
             <div className="space-y-3 animate-fade-in">
               <div className="bg-[var(--primary-bg)] rounded-xl p-3">
-                <p className="text-xs font-semibold text-[var(--primary)] mb-1">Translation</p>
+                <p className="text-xs font-semibold text-[var(--primary)] mb-1">{t.classesPage.translation}</p>
                 <p className="text-lg font-semibold text-[var(--primary)]">{current.translation}</p>
               </div>
             </div>

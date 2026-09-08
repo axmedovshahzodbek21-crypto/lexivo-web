@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
@@ -9,6 +10,7 @@ import { createClass as createClassRow } from '@/lib/class-create';
 interface ClassWord { word: string; translation: string; classId: string; className: string; }
 
 export default function ClassesPage() {
+  const t = useTranslation();
   const router = useRouter();
   const { user } = useAuth();
   const [createdCount, setCreatedCount] = useState<number | null>(null);
@@ -98,8 +100,8 @@ export default function ClassesPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8">
         <div className="text-5xl">🏫</div>
-        <h1 className="text-xl font-bold text-[var(--text)]">Classes</h1>
-        <p className="text-[var(--text-muted)] text-center">Sign in to create or join a class</p>
+        <h1 className="text-xl font-bold text-[var(--text)]">{t.classesPage.classes}</h1>
+        <p className="text-[var(--text-muted)] text-center">{t.classesPage.signInToCreateJoin}</p>
         <button onClick={() => router.push('/login')} className="btn-primary">Sign in</button>
       </div>
     );
@@ -136,7 +138,7 @@ export default function ClassesPage() {
             </h1>
           </div>
         </div>
-        <p className="text-sm text-white/65 mt-2 ml-0.5">Create or join a class with your teacher or students.</p>
+        <p className="text-sm text-white/65 mt-2 ml-0.5">{t.classesPage.createOrJoin}</p>
       </div>
 
       {/* Tab bar */}
@@ -227,7 +229,7 @@ export default function ClassesPage() {
             >
               <div className="w-8 h-8 rounded-lg flex items-center justify-center text-base shrink-0" style={{ background: 'rgba(163,230,53,0.15)' }}>📚</div>
               <div>
-                <p className="text-xs font-bold" style={{ color: 'var(--text)' }}>Library</p>
+                <p className="text-xs font-bold" style={{ color: 'var(--text)' }}>{t.classesPage.library}</p>
                 <p className="text-[10px] text-[var(--text-muted)] mt-0.5">Folders &amp; units</p>
               </div>
             </button>
@@ -242,15 +244,15 @@ export default function ClassesPage() {
             ) : myWords.length === 0 ? (
               <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center py-16">
                 <span className="text-5xl">📚</span>
-                <p className="font-bold text-[var(--text)]">No words yet</p>
-                <p className="text-sm text-[var(--text-muted)]">Complete Learn mode in a class or homework to see your words here.</p>
+                <p className="font-bold text-[var(--text)]">{t.classesPage.noWordsYet}</p>
+                <p className="text-sm text-[var(--text-muted)]">{t.classesPage.completeLearnToSee}</p>
               </div>
             ) : (
               <>
                 {/* Search */}
                 <input
                   type="text"
-                  placeholder="Search words…"
+                  placeholder={t.classesPage.searchWords}
                   value={wordSearch}
                   onChange={e => setWordSearch(e.target.value)}
                   className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]"
@@ -301,12 +303,12 @@ export default function ClassesPage() {
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setShowCreate(false)}>
           <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-5 space-y-4" onClick={e => e.stopPropagation()}>
             <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto" />
-            <h2 className="font-bold text-lg text-[var(--text)]">Create a Class</h2>
+            <h2 className="font-bold text-lg text-[var(--text)]">{t.classesPage.createAClass}</h2>
             <div>
-              <label className="text-sm text-[var(--text-muted)] mb-1 block">Class name</label>
+              <label className="text-sm text-[var(--text-muted)] mb-1 block">{t.classesPage.className}</label>
               <input
                 type="text" autoFocus
-                placeholder="e.g. English B1 — Group A"
+                placeholder={t.classesPage.classNamePlaceholder}
                 value={className}
                 onChange={e => setClassName(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && createClass()}
@@ -314,9 +316,9 @@ export default function ClassesPage() {
               />
             </div>
             {createError && <p className="text-sm text-[var(--danger)]">{createError}</p>}
-            <p className="text-xs text-[var(--text-muted)]">A unique join code will be generated automatically.</p>
+            <p className="text-xs text-[var(--text-muted)]">{t.classesPage.joinCodeAuto}</p>
             <div className="flex gap-3">
-              <button onClick={() => { setShowCreate(false); setCreateError(''); }} className="flex-1 btn-ghost py-3 text-sm">Cancel</button>
+              <button onClick={() => { setShowCreate(false); setCreateError(''); }} className="flex-1 btn-ghost py-3 text-sm">{t.classesPage.cancel}</button>
               <button onClick={createClass} disabled={creating || !className.trim()} className="flex-1 btn-primary py-3 disabled:opacity-50">
                 {creating ? 'Creating…' : 'Create Class'}
               </button>
@@ -330,12 +332,12 @@ export default function ClassesPage() {
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setShowJoin(false)}>
           <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-5 space-y-4" onClick={e => e.stopPropagation()}>
             <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto" />
-            <h2 className="font-bold text-lg text-[var(--text)]">Join a Class</h2>
+            <h2 className="font-bold text-lg text-[var(--text)]">{t.classesPage.joinAClass}</h2>
             <div>
-              <label className="text-sm text-[var(--text-muted)] mb-1 block">Class code</label>
+              <label className="text-sm text-[var(--text-muted)] mb-1 block">{t.classesPage.classCode}</label>
               <input
                 type="text" autoFocus
-                placeholder="e.g. LEXI-8X2K"
+                placeholder={t.classesPage.classCodePlaceholder}
                 value={joinCode}
                 onChange={e => setJoinCode(e.target.value.toUpperCase())}
                 onKeyDown={e => e.key === 'Enter' && joinClass()}
@@ -345,8 +347,8 @@ export default function ClassesPage() {
             </div>
             {joinError && <p className="text-sm text-[var(--danger)]">{joinError}</p>}
             <div className="flex gap-3">
-              <button onClick={() => { setShowJoin(false); setJoinError(''); setJoinCode(''); }} className="flex-1 btn-ghost py-3 text-sm">Cancel</button>
-              <button onClick={joinClass} disabled={!joinCode.trim()} className="flex-1 btn-primary py-3 disabled:opacity-50">Join →</button>
+              <button onClick={() => { setShowJoin(false); setJoinError(''); setJoinCode(''); }} className="flex-1 btn-ghost py-3 text-sm">{t.classesPage.cancel}</button>
+              <button onClick={joinClass} disabled={!joinCode.trim()} className="flex-1 btn-primary py-3 disabled:opacity-50">{t.classesPage.joinArrow}</button>
             </div>
           </div>
         </div>

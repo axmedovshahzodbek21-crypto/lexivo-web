@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useEffect, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
@@ -66,6 +67,7 @@ const GLOW: Record<string, string> = {
 };
 
 export default function ClassHomePage() {
+  const tx = useTranslation();
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const router = useRouter();
@@ -342,7 +344,7 @@ const [memberCount, setMemberCount] = useState(0);
                 </div>
               )}
               <p className="text-lg font-bold text-[var(--text)]">{teacherName}</p>
-              <span className="text-[10px] font-bold bg-[var(--primary-bg)] text-[var(--primary)] rounded-full px-2.5 py-0.5">Teacher</span>
+              <span className="text-[10px] font-bold bg-[var(--primary-bg)] text-[var(--primary)] rounded-full px-2.5 py-0.5">{tx.classesPage.teacher}</span>
             </div>
             <div className="bg-[var(--surface-2)] rounded-xl px-4 py-3">
               <p className="text-sm leading-relaxed text-center" style={{ color: teacherBio ? 'var(--text)' : 'var(--text-muted)', fontStyle: teacherBio ? 'normal' : 'italic' }}>
@@ -373,8 +375,8 @@ const [memberCount, setMemberCount] = useState(0);
               {sortedPending.length === 0 ? (
                 <div className="text-center py-10 space-y-2">
                   <p className="text-4xl">🎉</p>
-                  <p className="text-sm font-bold text-[var(--text)]">All caught up!</p>
-                  <p className="text-xs text-[var(--text-muted)]">No pending homework</p>
+                  <p className="text-sm font-bold text-[var(--text)]">{tx.classesPage.allCaughtUp}</p>
+                  <p className="text-xs text-[var(--text-muted)]">{tx.classesPage.noPendingHomework}</p>
                 </div>
               ) : sortedPending.map(t => {
                 const due = dueLabel(t.due_date);
@@ -386,7 +388,7 @@ const [memberCount, setMemberCount] = useState(0);
                       {due ? (
                         <p className={`text-xs mt-0.5 font-medium ${due.overdue ? 'text-red-500' : 'text-[var(--text-muted)]'}`}>{due.text}</p>
                       ) : (
-                        <p className="text-xs mt-0.5 text-[var(--text-muted)]">No deadline</p>
+                        <p className="text-xs mt-0.5 text-[var(--text-muted)]">{tx.classesPage.noDeadline}</p>
                       )}
                     </div>
                   </div>
@@ -394,7 +396,7 @@ const [memberCount, setMemberCount] = useState(0);
               })}
             </div>
             <div className="px-5 pb-5 pt-3 shrink-0">
-              <button onClick={() => setShowHW(false)} className="w-full btn-ghost py-3 text-sm">Close</button>
+              <button onClick={() => setShowHW(false)} className="w-full btn-ghost py-3 text-sm">{tx.classesPage.close}</button>
             </div>
           </div>
         </div>
@@ -418,7 +420,7 @@ const [memberCount, setMemberCount] = useState(0);
               ) : studentsError ? (
                 <p className="text-center text-xs text-red-400 py-10 break-all px-2">{studentsError}</p>
               ) : students.length === 0 ? (
-                <p className="text-center text-sm text-[var(--text-muted)] py-10">No students yet</p>
+                <p className="text-center text-sm text-[var(--text-muted)] py-10">{tx.classesPage.noStudentsYet}</p>
               ) : students.map((s, i) => {
                 const today = localDateStr();
                 const isActive = s.last_study_date === today;
@@ -437,7 +439,7 @@ const [memberCount, setMemberCount] = useState(0);
                       <div className="flex items-center gap-1.5">
                         <p className="font-bold text-sm truncate text-[var(--text)]">{s.name}</p>
                         {isActive && (
-                          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full shrink-0" style={{ background: 'rgba(16,185,129,0.15)', color: 'var(--success)' }}>TODAY</span>
+                          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full shrink-0" style={{ background: 'rgba(16,185,129,0.15)', color: 'var(--success)' }}>{tx.classesPage.today}</span>
                         )}
                       </div>
                       {s.streak > 0 && <p className="text-xs text-[var(--text-muted)]">🔥 {s.streak} day streak</p>}
@@ -451,7 +453,7 @@ const [memberCount, setMemberCount] = useState(0);
               })}
             </div>
             <div className="px-5 pb-5 pt-3 shrink-0">
-              <button onClick={() => setShowStudents(false)} className="w-full btn-ghost py-3 text-sm">Close</button>
+              <button onClick={() => setShowStudents(false)} className="w-full btn-ghost py-3 text-sm">{tx.classesPage.close}</button>
             </div>
           </div>
         </div>
@@ -476,7 +478,7 @@ const [memberCount, setMemberCount] = useState(0);
           {isTeacher ? (
             <span className="text-3xl">🏫</span>
           ) : (
-            <button onClick={() => setShowTeacherBio(true)} className="shrink-0 focus:outline-none active:scale-95 transition-transform" aria-label="View teacher profile">
+            <button onClick={() => setShowTeacherBio(true)} className="shrink-0 focus:outline-none active:scale-95 transition-transform" aria-label={tx.classesPage.viewTeacherProfile}>
               {teacherAvatar ? (
                 <img src={teacherAvatar} alt={teacherName}
                   className="w-12 h-12 rounded-full object-cover border-2 border-white/30 shadow-md" />
@@ -586,7 +588,7 @@ const [memberCount, setMemberCount] = useState(0);
               <p className="text-sm font-black text-white">
                 {pendingHwCount === 1 ? 'You have new homework!' : `You have ${pendingHwCount} homework assignments`}
               </p>
-              <p className="text-xs text-white/75">Tap to view and complete →</p>
+              <p className="text-xs text-white/75">{tx.classesPage.tapToViewComplete}</p>
             </div>
             <span className="text-white text-lg shrink-0">→</span>
           </button>
@@ -639,7 +641,7 @@ const [memberCount, setMemberCount] = useState(0);
         <section>
           <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--text-muted)] mb-3">📢 Announcements</h2>
           {announcements.length === 0 ? (
-            <p className="text-sm text-[var(--text-muted)] text-center py-6">No announcements yet</p>
+            <p className="text-sm text-[var(--text-muted)] text-center py-6">{tx.classesPage.noAnnouncements}</p>
           ) : (
             <div className="space-y-2">
               {announcements.map(a => {
@@ -653,7 +655,7 @@ const [memberCount, setMemberCount] = useState(0);
                     </div>
                     {isTeacher
                       ? <span className="text-[9px] font-bold text-[var(--text-muted)] self-start pt-0.5 bg-[var(--surface-2)] px-1.5 py-0.5 rounded-md shrink-0">{readCounts[a.id] ?? 0}/{memberCount}</span>
-                      : isNew && <span className="text-[10px] font-bold text-[var(--primary)] self-start pt-0.5">NEW</span>
+                      : isNew && <span className="text-[10px] font-bold text-[var(--primary)] self-start pt-0.5">{tx.classesPage.new}</span>
                     }
                   </div>
                 );

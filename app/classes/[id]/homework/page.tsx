@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useEffect, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
@@ -63,6 +64,7 @@ type CachedHW = {
 const _cache: Record<string, CachedHW> = {};
 
 export default function ClassHomeworkPage() {
+  const t = useTranslation();
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const router = useRouter();
@@ -327,8 +329,8 @@ export default function ClassHomeworkPage() {
             style={{ background: 'rgba(255,255,255,0.18)', boxShadow: '0 4px 0 rgba(0,0,0,0.15)' }}>📋</div>
           <div>
             <p className="text-xs font-black text-white/50 uppercase tracking-widest mb-0.5">{className || '...'}</p>
-            <h1 className="text-2xl font-black text-white leading-tight" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.25)' }}>Homework</h1>
-            <p className="text-sm text-white/60 mt-1">Assigned folders to review</p>
+            <h1 className="text-2xl font-black text-white leading-tight" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.25)' }}>{t.classesPage.homework}</h1>
+            <p className="text-sm text-white/60 mt-1">{t.classesPage.assignedFoldersToReview}</p>
           </div>
         </div>
       </div>
@@ -348,7 +350,7 @@ export default function ClassHomeworkPage() {
         {totalAssigned > 0 && (
           <div className="bg-[var(--primary-bg)] border border-[var(--primary)]/30 rounded-2xl p-4 mb-4">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-sm font-black text-[var(--text)]">My Progress</p>
+              <p className="text-sm font-black text-[var(--text)]">{t.classesPage.myProgress}</p>
               <p className="text-sm font-bold text-[var(--primary)]">{totalDone} / {totalAssigned} done</p>
             </div>
             <div className="h-1.5 bg-[var(--primary)]/15 rounded-full overflow-hidden">
@@ -367,7 +369,7 @@ export default function ClassHomeworkPage() {
         {folders.length === 0 && cwUnits.length === 0 && collFolders.length === 0 && passageItems.length === 0 && (
           <div className="flex flex-col items-center justify-center py-20 gap-3 text-center">
             <span className="text-5xl">📚</span>
-            <p className="text-base font-bold text-[var(--text)]">No homework yet</p>
+            <p className="text-base font-bold text-[var(--text)]">{t.classesPage.noHomeworkYet}</p>
             <p className="text-sm text-[var(--text-muted)]">Your teacher hasn&apos;t assigned any units yet</p>
           </div>
         )}
@@ -423,7 +425,7 @@ export default function ClassHomeworkPage() {
           <div className="mt-2">
             <div className="flex items-center gap-2 mb-2 px-1">
               <span className="text-xs">📝</span>
-              <p className="flex-1 text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">Class Words</p>
+              <p className="flex-1 text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">{t.classesPage.classWords}</p>
             </div>
             <div className="space-y-2">
               {cwUnits.map(unit => {
@@ -488,7 +490,7 @@ export default function ClassHomeworkPage() {
           <div className="mt-2">
             <div className="flex items-center gap-2 mb-2 px-1">
               <span className="text-xs">📚</span>
-              <p className="flex-1 text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">Reading</p>
+              <p className="flex-1 text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">{t.classesPage.reading}</p>
             </div>
             <div className="space-y-2">
               {passageItems.map(item => {
@@ -543,7 +545,7 @@ export default function ClassHomeworkPage() {
           <div className="mt-2">
             <div className="flex items-center gap-2 mb-2 px-1">
               <span className="text-xs">📗</span>
-              <p className="flex-1 text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">Collections</p>
+              <p className="flex-1 text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">{t.classesPage.collections}</p>
             </div>
             <div className="space-y-2">
               {collFolders.map(folder => {

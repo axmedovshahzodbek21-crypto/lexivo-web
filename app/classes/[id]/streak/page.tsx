@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useEffect, useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
@@ -60,6 +61,7 @@ const MONTH_NAMES = [
 ];
 
 export default function ClassStreakPage() {
+  const t = useTranslation();
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -122,7 +124,7 @@ export default function ClassStreakPage() {
       <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8">
         <div className="text-5xl">⛔</div>
         <p className="font-bold text-[var(--text)]">You&apos;re not allowed to view this</p>
-        <button onClick={() => router.push(`/classes/${id}/home`)} className="btn-primary">Go back</button>
+        <button onClick={() => router.push(`/classes/${id}/home`)} className="btn-primary">{t.classesPage.goBack}</button>
       </div>
     );
   }
@@ -250,11 +252,11 @@ export default function ClassStreakPage() {
             <div className="flex items-center gap-4 mt-5 pt-3 border-t border-[var(--border)]">
               <div className="flex items-center gap-1.5">
                 <div className="w-3.5 h-3.5 rounded-full" style={{ background: accent }} />
-                <span className="text-[10px] text-[var(--text-muted)]">Studied in class</span>
+                <span className="text-[10px] text-[var(--text-muted)]">{t.classesPage.studiedInClass}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <div className="w-3.5 h-3.5 rounded-full border-2 border-[#6366f1]" />
-                <span className="text-[10px] text-[var(--text-muted)]">Today</span>
+                <span className="text-[10px] text-[var(--text-muted)]">{t.classesPage.todayCap}</span>
               </div>
             </div>
           </div>

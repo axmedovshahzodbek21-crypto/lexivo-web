@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useEffect, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import BackButton from '@/components/BackButton';
@@ -14,6 +15,7 @@ interface UnassignedUnit {
 }
 
 export default function ClassFolderHomeworkPage() {
+  const t = useTranslation();
   const { id: classId, folderId } = useParams<{ id: string; folderId: string }>();
   const { user } = useAuth();
   const router = useRouter();
@@ -120,7 +122,7 @@ export default function ClassFolderHomeworkPage() {
         <div className="text-5xl">⚠️</div>
         <p className="font-bold text-[var(--text)]">Couldn&apos;t load this folder</p>
         <p className="text-sm text-[var(--text-muted)] text-center break-all">{loadError}</p>
-        <button onClick={() => load()} className="btn-primary">Try again</button>
+        <button onClick={() => load()} className="btn-primary">{t.classesPage.tryAgain}</button>
       </div>
     );
   }
@@ -180,7 +182,7 @@ export default function ClassFolderHomeworkPage() {
         <div className="flex-1 flex items-center justify-center p-8 text-center">
           <div>
             <div className="text-5xl mb-4">📁</div>
-            <p className="font-bold text-[var(--text)] mb-1">No units in this folder yet</p>
+            <p className="font-bold text-[var(--text)] mb-1">{t.classesPage.noUnitsInFolderYet}</p>
           </div>
         </div>
       ) : (

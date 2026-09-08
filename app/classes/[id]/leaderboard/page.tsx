@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
@@ -38,6 +39,7 @@ const PODIUM_COLORS = ['#f59e0b', '#94a3b8', '#cd7f32']; // gold, silver, bronze
 const PODIUM_ORDER = [1, 0, 2]; // display order: 2nd, 1st, 3rd
 
 export default function ClassLeaderboardPage() {
+  const t = useTranslation();
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const { user } = useAuth();
@@ -88,7 +90,7 @@ export default function ClassLeaderboardPage() {
       <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8">
         <div className="text-5xl">⛔</div>
         <p className="font-bold text-[var(--text)]">You&apos;re not in this class</p>
-        <button onClick={() => router.push('/classes')} className="btn-primary">Go back</button>
+        <button onClick={() => router.push('/classes')} className="btn-primary">{t.classesPage.goBack}</button>
       </div>
     );
   }
@@ -113,8 +115,8 @@ export default function ClassLeaderboardPage() {
           style={{ background: 'rgba(255,255,255,0.18)', boxShadow: '0 4px 0 rgba(0,0,0,0.15)' }}>🏆</div>
         <div>
           <p className="text-xs font-black text-white/50 uppercase tracking-widest mb-0.5">{className || '...'}</p>
-          <h1 className="text-2xl font-black text-white leading-tight" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.25)' }}>Leaderboard</h1>
-          <p className="text-sm text-white/60 mt-1">Ranked by XP earned in class</p>
+          <h1 className="text-2xl font-black text-white leading-tight" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.25)' }}>{t.classesPage.leaderboard}</h1>
+          <p className="text-sm text-white/60 mt-1">{t.classesPage.rankedByXpInClass}</p>
         </div>
       </div>
     </div>
@@ -126,8 +128,8 @@ export default function ClassLeaderboardPage() {
         {lbHero}
         <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center p-8">
           <span className="text-5xl">🏆</span>
-          <h1 className="text-lg font-bold text-[var(--text)]">No rankings yet</h1>
-          <p className="text-sm text-[var(--text-muted)]">Students need to earn XP to appear here</p>
+          <h1 className="text-lg font-bold text-[var(--text)]">{t.classesPage.noRankingsYet}</h1>
+          <p className="text-sm text-[var(--text-muted)]">{t.classesPage.noRankingsYetSub}</p>
         </div>
       </div>
     );
@@ -144,7 +146,7 @@ export default function ClassLeaderboardPage() {
         <div className="mx-4 mt-4 p-3 rounded-2xl bg-[var(--primary-bg)] border border-[var(--primary)]/30 flex items-center gap-3">
           <span className="text-2xl">🎓</span>
           <div className="flex-1 min-w-0">
-            <p className="text-xs text-[var(--text-muted)]">Your position</p>
+            <p className="text-xs text-[var(--text-muted)]">{t.classesPage.yourPosition}</p>
             <p className="text-lg font-black text-[var(--primary)]">#{myRank} in class</p>
           </div>
           <p className="text-base font-bold text-[var(--primary)]">{displayXP(rows[myRank - 1]?.xp ?? 0)} XP</p>
