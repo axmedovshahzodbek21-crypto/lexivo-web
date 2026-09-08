@@ -102,7 +102,7 @@ export default function ClassesPage() {
         <div className="text-5xl">🏫</div>
         <h1 className="text-xl font-bold text-[var(--text)]">{t.classesPage.classes}</h1>
         <p className="text-[var(--text-muted)] text-center">{t.classesPage.signInToCreateJoin}</p>
-        <button onClick={() => router.push('/login')} className="btn-primary">Sign in</button>
+        <button onClick={() => router.push('/login')} className="btn-primary">{t.classesPage.signIn}</button>
       </div>
     );
   }
@@ -175,7 +175,7 @@ export default function ClassesPage() {
                 <div className="p-6 flex items-center gap-5">
                   <div className="w-16 h-16 rounded-2xl bg-white/15 flex items-center justify-center text-3xl shrink-0">🏫</div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xl font-black text-white">My Classes</p>
+                    <p className="text-xl font-black text-white">{t.classesPage.myClasses}</p>
                     <p className="text-sm text-white/60 mt-0.5">
                       {createdCount === 0 ? 'No classes yet' : `${createdCount} class${createdCount !== 1 ? 'es' : ''} created`}
                     </p>
@@ -193,7 +193,7 @@ export default function ClassesPage() {
                 <div className="p-6 flex items-center gap-5">
                   <div className="w-16 h-16 rounded-2xl bg-white/15 flex items-center justify-center text-3xl shrink-0">🎓</div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xl font-black text-white">Joined Classes</p>
+                    <p className="text-xl font-black text-white">{t.classesPage.joinedClasses}</p>
                     <p className="text-sm text-white/60 mt-0.5">
                       {joinedCount === 0 ? 'Not enrolled yet' : `${joinedCount} class${joinedCount !== 1 ? 'es' : ''} joined`}
                     </p>

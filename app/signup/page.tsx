@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -7,6 +8,7 @@ import { isOnboarded } from '@/lib/storage';
 import { supabase } from '@/lib/supabase';
 
 export default function SignupPage() {
+  const t = useTranslation();
   const router = useRouter();
   const { signUp } = useAuth();
   const [email, setEmail]         = useState('');
@@ -47,7 +49,7 @@ export default function SignupPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="text-5xl mb-3">🎉</div>
-          <h1 className="text-3xl font-black" style={{ color: 'var(--primary)' }}>Create Account</h1>
+          <h1 className="text-3xl font-black" style={{ color: 'var(--primary)' }}>{t.extra.createAccount}</h1>
           <p className="text-sm text-[var(--text-muted)] mt-1">Free forever · no credit card</p>
         </div>
 

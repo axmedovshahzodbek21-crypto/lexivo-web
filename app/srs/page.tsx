@@ -311,14 +311,14 @@ export default function SRSReviewPage() {
       <div className="flex flex-col min-h-screen">
         <div className="flex items-center justify-between p-4 border-b border-[var(--border)]">
           <button onClick={() => setManaging(false)} className="btn-icon" aria-label="Go back">←</button>
-          <h1 className="font-bold">Manage SRS Deck</h1>
+          <h1 className="font-bold">{t.extra.manageSrsDeck}</h1>
           <span className="text-sm text-[var(--text-muted)]">{allWords.length} words</span>
         </div>
 
         {allWords.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center p-6">
             <div className="text-5xl">📭</div>
-            <p className="font-semibold text-[var(--text)]">No words in your SRS deck yet</p>
+            <p className="font-semibold text-[var(--text)]">{t.extra.noSrsDeck}</p>
             <p className="text-sm text-[var(--text-muted)]">Words are added automatically when you complete a learning session.</p>
           </div>
         ) : (

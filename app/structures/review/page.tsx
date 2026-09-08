@@ -226,7 +226,7 @@ export default function StructuresReviewPage() {
           {revealed ? (
             <div className="space-y-3 animate-fade-in">
               <div className="bg-[var(--primary-bg)] rounded-xl p-3">
-                <p className="text-xs font-semibold text-[var(--primary)] mb-1">Translation</p>
+                <p className="text-xs font-semibold text-[var(--primary)] mb-1">{t.extra.translation}</p>
                 <p className="text-lg font-semibold text-[var(--primary)]">{current.uzTranslation}</p>
               </div>
               <p className="text-sm text-[var(--text)]">{current.definition}</p>
@@ -261,7 +261,7 @@ export default function StructuresReviewPage() {
               style={{ padding: '20px 16px', background: 'linear-gradient(135deg, #EF4444, #DC2626)', boxShadow: '0 4px 0 #991B1B, 0 8px 24px #EF444455' }}
             >
               <span className="text-2xl leading-none">✗</span>
-              <span className="text-sm font-black">Not Yet</span>
+              <span className="text-sm font-black">{t.extra.notYet}</span>
               <span className="text-xs opacity-60">← J</span>
             </button>
             <button
@@ -270,7 +270,7 @@ export default function StructuresReviewPage() {
               style={{ padding: '20px 16px', background: 'linear-gradient(135deg, #22C55E, #16A34A)', boxShadow: '0 4px 0 #15803D, 0 8px 24px #22C55E55' }}
             >
               <span className="text-2xl leading-none">✓</span>
-              <span className="text-sm font-black">Knew It</span>
+              <span className="text-sm font-black">{t.extra.knewIt}</span>
               <span className="text-xs opacity-60">K →</span>
             </button>
           </div>

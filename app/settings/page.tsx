@@ -885,8 +885,8 @@ export default function SettingsPage() {
         >
           <span className="text-2xl">✈️</span>
           <div className="flex-1">
-            <p className="text-sm font-semibold text-[var(--text)]">Contact Support</p>
-            <p className="text-xs text-[var(--text-muted)]">Chat with us on Telegram</p>
+            <p className="text-sm font-semibold text-[var(--text)]">{t.extra.contactSupport}</p>
+            <p className="text-xs text-[var(--text-muted)]">{t.extra.chatTelegram}</p>
           </div>
           <span className="text-xs text-[var(--primary)] font-medium">@lexivo_support_bot →</span>
         </a>

@@ -321,7 +321,7 @@ export default function ReadingPage() {
       <div className="max-w-5xl mx-auto px-6 py-10 space-y-6 pb-24">
         <BackButton href="/reading" />
         <div>
-          <h1 className="text-3xl font-bold text-[var(--text)] mb-2">Reading</h1>
+          <h1 className="text-3xl font-bold text-[var(--text)] mb-2">{t.extra.reading}</h1>
           <p className="text-sm text-[var(--text-muted)] leading-relaxed">
             Paste any English text. Select words as you read — we collect them and build an AI prompt to create vocabulary cards.
           </p>
