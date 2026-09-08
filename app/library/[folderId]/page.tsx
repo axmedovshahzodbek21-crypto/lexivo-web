@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useEffect, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -28,6 +29,7 @@ const lighten = (hex: string, amt = 0.3) => {
 };
 
 export default function FolderPage() {
+  const t = useTranslation();
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const params = useParams();
@@ -152,17 +154,17 @@ export default function FolderPage() {
       {showCreate && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <div className="bg-[var(--surface)] rounded-2xl p-6 w-full max-w-sm shadow-2xl">
-            <h2 className="text-lg font-bold text-[var(--text)] mb-4">New Unit</h2>
+            <h2 className="text-lg font-bold text-[var(--text)] mb-4">{t.libraryPage.newUnit}</h2>
             <input
               autoFocus
               value={newName}
               onChange={e => setNewName(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') createUnit(); if (e.key === 'Escape') setShowCreate(false); }}
-              placeholder="Unit name"
+              placeholder={t.libraryPage.unitNamePlaceholder}
               className="w-full px-3 py-2.5 rounded-xl bg-[var(--surface-2)] text-[var(--text)] text-sm border border-[var(--border)] outline-none focus:border-[var(--primary)] mb-4"
             />
             <div className="flex gap-2 justify-end">
-              <button onClick={() => setShowCreate(false)} className="px-4 py-2 rounded-xl text-sm font-medium text-[var(--text-muted)] hover:bg-[var(--surface-2)]">Cancel</button>
+              <button onClick={() => setShowCreate(false)} className="px-4 py-2 rounded-xl text-sm font-medium text-[var(--text-muted)] hover:bg-[var(--surface-2)]">{t.libraryPage.cancel}</button>
               <button onClick={createUnit} disabled={creating || !newName.trim()} className="px-4 py-2 rounded-xl text-sm font-bold text-white bg-[var(--primary)] disabled:opacity-50">
                 {creating ? 'Creating…' : 'Create'}
               </button>
@@ -175,7 +177,7 @@ export default function FolderPage() {
       {renameId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <div className="bg-[var(--surface)] rounded-2xl p-6 w-full max-w-sm shadow-2xl">
-            <h2 className="text-lg font-bold text-[var(--text)] mb-4">Rename Unit</h2>
+            <h2 className="text-lg font-bold text-[var(--text)] mb-4">{t.libraryPage.renameUnit}</h2>
             <input
               autoFocus
               value={renameName}
@@ -184,8 +186,8 @@ export default function FolderPage() {
               className="w-full px-3 py-2.5 rounded-xl bg-[var(--surface-2)] text-[var(--text)] text-sm border border-[var(--border)] outline-none focus:border-[var(--primary)] mb-4"
             />
             <div className="flex gap-2 justify-end">
-              <button onClick={() => setRenameId(null)} className="px-4 py-2 rounded-xl text-sm font-medium text-[var(--text-muted)] hover:bg-[var(--surface-2)]">Cancel</button>
-              <button onClick={renameUnit} disabled={!renameName.trim()} className="px-4 py-2 rounded-xl text-sm font-bold text-white bg-[var(--primary)] disabled:opacity-50">Save</button>
+              <button onClick={() => setRenameId(null)} className="px-4 py-2 rounded-xl text-sm font-medium text-[var(--text-muted)] hover:bg-[var(--surface-2)]">{t.libraryPage.cancel}</button>
+              <button onClick={renameUnit} disabled={!renameName.trim()} className="px-4 py-2 rounded-xl text-sm font-bold text-white bg-[var(--primary)] disabled:opacity-50">{t.libraryPage.save}</button>
             </div>
           </div>
         </div>
@@ -195,9 +197,9 @@ export default function FolderPage() {
       {units.length === 0 ? (
         <div className="text-center py-20">
           <div className="text-6xl mb-4">📖</div>
-          <h2 className="text-xl font-bold text-[var(--text)] mb-2">No units yet</h2>
-          <p className="text-sm text-[var(--text-muted)] mb-6">Add a unit to start building your vocabulary library.</p>
-          <button onClick={() => setShowCreate(true)} className="px-6 py-3 rounded-xl text-sm font-bold text-white" style={{ background: 'var(--primary)' }}>New Unit</button>
+          <h2 className="text-xl font-bold text-[var(--text)] mb-2">{t.libraryPage.noUnitsYet}</h2>
+          <p className="text-sm text-[var(--text-muted)] mb-6">{t.libraryPage.addUnitToBuild}</p>
+          <button onClick={() => setShowCreate(true)} className="px-6 py-3 rounded-xl text-sm font-bold text-white" style={{ background: 'var(--primary)' }}>{t.libraryPage.newUnit}</button>
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">

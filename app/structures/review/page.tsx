@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -14,6 +15,7 @@ import type { SRSStructure } from '@/lib/types';
 // no need to defer everything to a session-end batch, since there's no
 // review-log bookkeeping left to do at once.
 export default function StructuresReviewPage() {
+  const t = useTranslation();
   const router = useRouter();
   const [queue, setQueue] = useState<SRSStructure[]>([]);
   const [index, setIndex] = useState(0);
@@ -95,15 +97,15 @@ export default function StructuresReviewPage() {
     return (
       <div className="flex flex-col min-h-screen">
         <div className="flex items-center justify-between p-4 border-b border-[var(--border)]">
-          <button onClick={() => setManaging(false)} className="btn-icon" aria-label="Go back">←</button>
-          <h1 className="font-bold">Manage Structures Deck</h1>
+          <button onClick={() => setManaging(false)} className="btn-icon" aria-label={t.structuresPage.goBack}>←</button>
+          <h1 className="font-bold">{t.structuresPage.manageDeck}</h1>
           <span className="text-sm text-[var(--text-muted)]">{allItems.length} items</span>
         </div>
 
         {allItems.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center p-6">
             <div className="text-5xl">📭</div>
-            <p className="font-semibold text-[var(--text)]">No structures in your deck yet</p>
+            <p className="font-semibold text-[var(--text)]">{t.structuresPage.noneInDeck}</p>
             <p className="text-sm text-[var(--text-muted)]">Click "Learned" on structures in Discover to add them here.</p>
           </div>
         ) : (
@@ -142,10 +144,10 @@ export default function StructuresReviewPage() {
     return (
       <div className="p-6 text-center flex flex-col items-center justify-center min-h-screen animate-fade-in">
         <div className="text-6xl mb-4">✅</div>
-        <h2 className="text-2xl font-bold mb-2">All caught up</h2>
-        <p className="text-[var(--text-muted)] mb-6">No structures due for review right now.</p>
+        <h2 className="text-2xl font-bold mb-2">{t.structuresPage.allCaughtUp}</h2>
+        <p className="text-[var(--text-muted)] mb-6">{t.structuresPage.noDueNow}</p>
         <div className="flex flex-col gap-3 w-full max-w-xs">
-          <Link href="/structures" className="btn-primary text-center">Back to Structures</Link>
+          <Link href="/structures" className="btn-primary text-center">{t.structuresPage.backToStructures}</Link>
           <button onClick={() => { setAllItems(getStructuresSRS()); setManaging(true); }} className="btn-secondary">
             Manage deck ({allItems.length} items)
           </button>
@@ -160,14 +162,14 @@ export default function StructuresReviewPage() {
     return (
       <div className="p-6 text-center flex flex-col items-center justify-center min-h-screen animate-fade-in">
         <div className="text-6xl mb-4">{score >= 80 ? '🧠' : '💪'}</div>
-        <h2 className="text-2xl font-bold mb-2">Review complete</h2>
+        <h2 className="text-2xl font-bold mb-2">{t.structuresPage.reviewComplete}</h2>
         <p className="text-[var(--text-muted)] mb-6">{knewCount}/{total} knew · +{displayXP(sessionXP)} XP</p>
         <div className="grid grid-cols-3 gap-2 w-full mb-6">
-          <div className="card text-center"><div className="text-xl font-bold text-[var(--success)]">{knewCount}</div><div className="text-xs text-[var(--text-muted)]">Correct</div></div>
-          <div className="card text-center"><div className="text-xl font-bold text-[var(--danger)]">{notYetCount}</div><div className="text-xs text-[var(--text-muted)]">Not yet</div></div>
-          <div className="card text-center"><div className="text-xl font-bold text-[var(--primary)]">{score}%</div><div className="text-xs text-[var(--text-muted)]">Score</div></div>
+          <div className="card text-center"><div className="text-xl font-bold text-[var(--success)]">{knewCount}</div><div className="text-xs text-[var(--text-muted)]">{t.structuresPage.correct}</div></div>
+          <div className="card text-center"><div className="text-xl font-bold text-[var(--danger)]">{notYetCount}</div><div className="text-xs text-[var(--text-muted)]">{t.structuresPage.notYet}</div></div>
+          <div className="card text-center"><div className="text-xl font-bold text-[var(--primary)]">{score}%</div><div className="text-xs text-[var(--text-muted)]">{t.structuresPage.score}</div></div>
         </div>
-        <Link href="/structures" className="btn-primary w-full text-center mb-3">Back to Structures</Link>
+        <Link href="/structures" className="btn-primary w-full text-center mb-3">{t.structuresPage.backToStructures}</Link>
         <button onClick={() => { setAllItems(getStructuresSRS()); setManaging(true); }} className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] underline">
           Manage deck
         </button>
@@ -182,9 +184,9 @@ export default function StructuresReviewPage() {
   return (
     <div className="flex flex-col min-h-screen">
       <div className="flex items-center justify-between p-4">
-        <button onClick={() => router.back()} className="btn-icon" aria-label="Go back">✕</button>
+        <button onClick={() => router.back()} className="btn-icon" aria-label={t.structuresPage.goBack}>✕</button>
         <div className="text-center">
-          <div className="font-semibold text-sm">Structures Review</div>
+          <div className="font-semibold text-sm">{t.structuresPage.reviewTitle}</div>
           <div className="text-xs text-[var(--text-muted)]">{index + 1} / {queue.length}</div>
         </div>
         <button

@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { use, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -22,6 +23,7 @@ const UNIT_COLORS = [
 ];
 
 export default function UnitDayPickerPage({ params }: { params: Promise<{ unit: string }> }) {
+  const t = useTranslation();
   const { unit: slug } = use(params);
   const router = useRouter();
   const unit = UNIT_SLUGS[slug];
@@ -32,8 +34,8 @@ export default function UnitDayPickerPage({ params }: { params: Promise<{ unit: 
   if (!unit) {
     return (
       <div className="p-6 text-center flex flex-col items-center justify-center min-h-screen">
-        <p className="text-[var(--text-muted)] mb-4">Unknown unit.</p>
-        <Link href="/structures" className="btn-primary inline-block">Back to Structures</Link>
+        <p className="text-[var(--text-muted)] mb-4">{t.structuresPage.unknownUnit}</p>
+        <Link href="/structures" className="btn-primary inline-block">{t.structuresPage.backToStructures}</Link>
       </div>
     );
   }
@@ -41,7 +43,7 @@ export default function UnitDayPickerPage({ params }: { params: Promise<{ unit: 
   return (
     <div className="p-4 pb-24 animate-fade-in">
       <div className="flex items-center gap-3 pt-2 mb-5">
-        <button onClick={() => router.push(`/structures/${slug}`)} className="btn-icon" aria-label="Go back">←</button>
+        <button onClick={() => router.push(`/structures/${slug}`)} className="btn-icon" aria-label={t.structuresPage.goBack}>←</button>
         <div className="min-w-0">
           <p className="text-xs text-[var(--text-muted)] truncate">{unit}</p>
           <h1 className="text-lg font-bold text-[var(--text)] leading-tight">🔎 Pick a day to learn</h1>

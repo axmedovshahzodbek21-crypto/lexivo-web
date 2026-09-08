@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useMemo, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { notFound } from 'next/navigation';
@@ -15,6 +16,7 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 export default function VocabMatchPage() {
+  const t = useTranslation();
   const params = useParams();
   const slug = String(params.topic);
   const side = String(params.side) as BRSide;
@@ -52,8 +54,8 @@ export default function VocabMatchPage() {
   return (
     <div className="p-4 space-y-5 animate-fade-in max-w-xl mx-auto">
       <BackButton href={`/battle-ready/${slug}/${side}/vocabulary`} label="Vocabulary" />
-      <h1 className="text-lg font-bold text-[var(--text)]">Match</h1>
-      <p className="text-xs text-[var(--text-muted)]">Tap a word, then tap its matching meaning.</p>
+      <h1 className="text-lg font-bold text-[var(--text)]">{t.battleReadyPage.match}</h1>
+      <p className="text-xs text-[var(--text-muted)]">{t.battleReadyPage.tapWordMeaning}</p>
 
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-2">

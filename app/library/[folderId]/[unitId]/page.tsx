@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useEffect, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
@@ -30,6 +31,7 @@ interface ParsedWord {
 const LANGUAGES = ['English','Uzbek','Russian','Turkish','German','French','Spanish','Korean','Japanese','Chinese','Arabic'];
 
 export default function UnitPage() {
+  const t = useTranslation();
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const params = useParams();
@@ -218,7 +220,7 @@ export default function UnitPage() {
     <div className="max-w-2xl mx-auto px-4 py-6">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-[var(--text-muted)] mb-1">
-        <button onClick={() => router.push('/library')} className="hover:text-[var(--primary)]">Library</button>
+        <button onClick={() => router.push('/library')} className="hover:text-[var(--primary)]">{t.libraryPage.title}</button>
         <span>/</span>
         <button onClick={() => router.push(`/library/${folderId}`)} className="hover:text-[var(--primary)]">{folderName}</button>
       </div>
@@ -257,9 +259,9 @@ export default function UnitPage() {
         words.length === 0 ? (
           <div className="text-center py-20">
             <div className="text-6xl mb-4">📝</div>
-            <h2 className="text-xl font-bold text-[var(--text)] mb-2">No words yet</h2>
-            <p className="text-sm text-[var(--text-muted)] mb-6">Go to Add Words to import words with AI.</p>
-            <button onClick={() => setTab('add')} className="px-6 py-3 rounded-xl text-sm font-bold text-white" style={{ background: 'var(--primary)' }}>Add Words</button>
+            <h2 className="text-xl font-bold text-[var(--text)] mb-2">{t.libraryPage.noWordsYet}</h2>
+            <p className="text-sm text-[var(--text-muted)] mb-6">{t.libraryPage.goToAddWords}</p>
+            <button onClick={() => setTab('add')} className="px-6 py-3 rounded-xl text-sm font-bold text-white" style={{ background: 'var(--primary)' }}>{t.libraryPage.addWords}</button>
           </div>
         ) : (
           <div className="space-y-2">
@@ -308,7 +310,7 @@ export default function UnitPage() {
         <div className="space-y-4">
           {/* Language selectors */}
           <div className="p-4 bg-[var(--surface)] rounded-2xl">
-            <p className="text-xs font-bold text-[var(--text-muted)] mb-3">Word Language / Translation Language</p>
+            <p className="text-xs font-bold text-[var(--text-muted)] mb-3">{t.libraryPage.wordLangTrLang}</p>
             <div className="flex items-center gap-3">
               <select value={wordLang} onChange={e => setWordLang(e.target.value)} className="flex-1 px-3 py-2 rounded-xl bg-[var(--surface-2)] text-[var(--text)] text-sm border border-[var(--border)] outline-none">
                 {LANGUAGES.map(l => <option key={l}>{l}</option>)}
@@ -348,7 +350,7 @@ export default function UnitPage() {
             <textarea
               value={pasteText}
               onChange={e => setPasteText(e.target.value)}
-              placeholder="Paste the AI response here..."
+              placeholder={t.libraryPage.pasteAiResponse}
               rows={6}
               className="w-full px-3 py-2.5 rounded-xl bg-[var(--surface-2)] text-[var(--text)] text-xs font-mono border border-[var(--border)] outline-none focus:border-[var(--primary)] resize-none"
             />
@@ -403,7 +405,7 @@ export default function UnitPage() {
             </div>
             {detailWord.examples.length > 0 && (
               <div>
-                <p className="text-xs font-bold text-[var(--text-muted)] mb-3 tracking-wider">EXAMPLES</p>
+                <p className="text-xs font-bold text-[var(--text-muted)] mb-3 tracking-wider">{t.libraryPage.examples}</p>
                 <div className="space-y-2">
                   {detailWord.examples.map((ex, i) => (
                     <div key={i} className="p-3 bg-[var(--surface-2)] rounded-xl">

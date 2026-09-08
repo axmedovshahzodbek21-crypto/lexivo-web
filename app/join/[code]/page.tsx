@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
@@ -11,6 +12,7 @@ interface ClassInfo {
 }
 
 export default function JoinPage() {
+  const t = useTranslation();
   const { code } = useParams<{ code: string }>();
   const router = useRouter();
   const { user } = useAuth();
@@ -85,17 +87,17 @@ export default function JoinPage() {
     <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8 animate-fade-in">
       <div className="text-6xl">⚠️</div>
       <p className="text-xl font-bold text-[var(--text)]">Couldn&#39;t load this invite</p>
-      <p className="text-sm text-[var(--text-muted)]">Something went wrong checking this link. Check your connection and try again.</p>
-      <button onClick={() => setRetryKey(k => k + 1)} className="btn-primary">Try again</button>
+      <p className="text-sm text-[var(--text-muted)]">{t.joinPage.checkFailed}</p>
+      <button onClick={() => setRetryKey(k => k + 1)} className="btn-primary">{t.joinPage.tryAgain}</button>
     </div>
   );
 
   if (notFound) return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8 animate-fade-in">
       <div className="text-6xl">❓</div>
-      <p className="text-xl font-bold text-[var(--text)]">Class not found</p>
-      <p className="text-sm text-[var(--text-muted)]">This invite link may be invalid or the class was deleted.</p>
-      <button onClick={() => router.push('/classes')} className="btn-primary">Go to Classes</button>
+      <p className="text-xl font-bold text-[var(--text)]">{t.joinPage.classNotFound}</p>
+      <p className="text-sm text-[var(--text-muted)]">{t.joinPage.inviteInvalid}</p>
+      <button onClick={() => router.push('/classes')} className="btn-primary">{t.joinPage.goToClasses}</button>
     </div>
   );
 
@@ -108,7 +110,7 @@ export default function JoinPage() {
   if (status === 'joined') return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8 animate-fade-in">
       <div className="text-6xl">🎉</div>
-      <p className="text-2xl font-black text-[var(--text)]">You joined!</p>
+      <p className="text-2xl font-black text-[var(--text)]">{t.joinPage.youJoined}</p>
       <p className="text-[var(--text-muted)]">{cls.name}</p>
       <p className="text-sm text-[var(--text-muted)]">Redirecting…</p>
     </div>
@@ -117,7 +119,7 @@ export default function JoinPage() {
   if (status === 'pending') return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8 animate-fade-in">
       <div className="text-6xl">⏳</div>
-      <p className="text-2xl font-black text-[var(--text)]">Request sent!</p>
+      <p className="text-2xl font-black text-[var(--text)]">{t.joinPage.requestSent}</p>
       <p className="text-[var(--text-muted)]">Waiting for your teacher to approve you into {cls.name}</p>
       <p className="text-sm text-[var(--text-muted)]">Redirecting…</p>
     </div>
@@ -126,7 +128,7 @@ export default function JoinPage() {
   if (status === 'already') return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8 animate-fade-in">
       <div className="text-6xl">✅</div>
-      <p className="text-2xl font-black text-[var(--text)]">Already a member</p>
+      <p className="text-2xl font-black text-[var(--text)]">{t.joinPage.alreadyMember}</p>
       <p className="text-[var(--text-muted)]">{cls.name}</p>
       <p className="text-sm text-[var(--text-muted)]">Redirecting…</p>
     </div>
@@ -136,15 +138,15 @@ export default function JoinPage() {
     <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8 animate-fade-in">
       <div className="text-6xl">⚠️</div>
       <p className="text-xl font-bold text-[var(--text)]">Couldn&apos;t join {cls.name}</p>
-      <p className="text-sm text-[var(--text-muted)]">Something went wrong. Check your connection and try again.</p>
-      <button onClick={() => setStatus('idle')} className="btn-primary">Try again</button>
+      <p className="text-sm text-[var(--text-muted)]">{t.joinPage.somethingWrong}</p>
+      <button onClick={() => setStatus('idle')} className="btn-primary">{t.joinPage.tryAgain}</button>
     </div>
   );
 
   if (status === 'ownClass') return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8 animate-fade-in">
       <div className="text-6xl">👩‍🏫</div>
-      <p className="text-xl font-bold text-[var(--text)]">That's your class!</p>
+      <p className="text-xl font-bold text-[var(--text)]">{t.joinPage.thatsYourClass}</p>
       <p className="text-sm text-[var(--text-muted)]">Opening dashboard…</p>
     </div>
   );

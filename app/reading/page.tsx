@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import BackButton from '@/components/BackButton';
@@ -308,6 +309,7 @@ const VISITED_KEY = 'lexivo_reading_visited';
 const SURPRISE_TICKS = 9;
 
 export default function ReadingPage() {
+  const t = useTranslation();
   const [selected, setSelected] = useState<ReadingPassage | null>(null);
   const [search, setSearch] = useState('');
   const [topic, setTopic] = useState('All');
@@ -509,7 +511,7 @@ export default function ReadingPage() {
         type="text"
         value={search}
         onChange={e => setSearch(e.target.value)}
-        placeholder="Search passages…"
+        placeholder={t.readingPage.searchPassages}
         className="w-full px-4 py-3 rounded-2xl text-sm outline-none transition-all mb-4"
         style={{
           background: 'var(--surface)',
@@ -551,7 +553,7 @@ export default function ReadingPage() {
       {filtered.length === 0 ? (
         <div className="text-center py-20" style={{ color: 'var(--text-muted)' }}>
           <p className="text-3xl mb-3">🔍</p>
-          <p className="text-sm font-semibold">No passages match your search.</p>
+          <p className="text-sm font-semibold">{t.readingPage.noPassagesMatch}</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">

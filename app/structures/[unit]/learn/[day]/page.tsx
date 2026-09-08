@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { use, useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -19,6 +20,7 @@ type Mark = 'learned' | 'skipped' | null;
 // pattern/meaning) — that's the word Learn card's front-shows-word,
 // back-shows-meaning shape, just with the scenario standing in for the word.
 export default function UnitDayLearnPage({ params }: { params: Promise<{ unit: string; day: string }> }) {
+  const t = useTranslation();
   const { unit: slug, day: dayParam } = use(params);
   const router = useRouter();
   const unit = UNIT_SLUGS[slug];
@@ -72,8 +74,8 @@ export default function UnitDayLearnPage({ params }: { params: Promise<{ unit: s
   if (!unit || Number.isNaN(day)) {
     return (
       <div className="p-6 text-center flex flex-col items-center justify-center min-h-screen">
-        <p className="text-[var(--text-muted)] mb-4">Unknown day.</p>
-        <Link href="/structures" className="btn-primary inline-block">Back to Structures</Link>
+        <p className="text-[var(--text-muted)] mb-4">{t.structuresPage.unknownDay}</p>
+        <Link href="/structures" className="btn-primary inline-block">{t.structuresPage.backToStructures}</Link>
       </div>
     );
   }
@@ -81,8 +83,8 @@ export default function UnitDayLearnPage({ params }: { params: Promise<{ unit: s
   if (structures.length === 0) {
     return (
       <div className="p-6 text-center flex flex-col items-center justify-center min-h-screen">
-        <p className="text-[var(--text-muted)] mb-4">No structures in this day.</p>
-        <Link href={`/structures/${slug}/learn`} className="btn-primary inline-block">Back to days</Link>
+        <p className="text-[var(--text-muted)] mb-4">{t.structuresPage.noneInDay}</p>
+        <Link href={`/structures/${slug}/learn`} className="btn-primary inline-block">{t.structuresPage.backToDays}</Link>
       </div>
     );
   }
@@ -93,7 +95,7 @@ export default function UnitDayLearnPage({ params }: { params: Promise<{ unit: s
       <div className="p-6 animate-fade-in flex flex-col items-center min-h-screen">
         <div className="flex flex-col items-center text-center pt-10 pb-6">
           <div className="text-6xl mb-3 animate-pop">🎉</div>
-          <h2 className="text-2xl font-bold text-[var(--text)]">Day complete!</h2>
+          <h2 className="text-2xl font-bold text-[var(--text)]">{t.structuresPage.dayComplete}</h2>
           <p className="text-sm text-[var(--text-muted)] mt-1">{unit} · Day {day}</p>
         </div>
 
@@ -107,8 +109,8 @@ export default function UnitDayLearnPage({ params }: { params: Promise<{ unit: s
         <div className="flex flex-col gap-3 w-full mt-auto pt-4">
           <Link href={`/structures/${slug}/flashcards`} className="w-full flex items-center justify-between px-5 py-4 rounded-2xl text-white" style={{ background: 'linear-gradient(135deg, #FF6B35, #FF8C42)' }}>
             <div>
-              <div className="font-bold text-sm">Practice Flashcards</div>
-              <div className="text-xs opacity-80 mt-0.5">Reinforce what you just learned</div>
+              <div className="font-bold text-sm">{t.structuresPage.practiceFlashcards}</div>
+              <div className="text-xs opacity-80 mt-0.5">{t.structuresPage.reinforceLearned}</div>
             </div>
             <span className="text-lg">→</span>
           </Link>
@@ -119,7 +121,7 @@ export default function UnitDayLearnPage({ params }: { params: Promise<{ unit: s
             >
               Again
             </button>
-            <Link href={`/structures/${slug}/learn`} className="btn-primary flex-1 text-center">Back to days</Link>
+            <Link href={`/structures/${slug}/learn`} className="btn-primary flex-1 text-center">{t.structuresPage.backToDays}</Link>
           </div>
         </div>
       </div>
@@ -137,7 +139,7 @@ export default function UnitDayLearnPage({ params }: { params: Promise<{ unit: s
     <div className="flex flex-col min-h-screen">
       {/* Header */}
       <div className="flex items-center justify-between p-4 pb-2">
-        <button onClick={() => router.push(`/structures/${slug}/learn`)} className="btn-icon text-lg" aria-label="Go back">←</button>
+        <button onClick={() => router.push(`/structures/${slug}/learn`)} className="btn-icon text-lg" aria-label={t.structuresPage.goBack}>←</button>
         <div className="flex-1 mx-3">
           <div className="flex items-center justify-between mb-1.5">
             <span className="text-xs font-medium text-[var(--text-muted)] truncate">{unit} · Day {day}</span>
@@ -200,7 +202,7 @@ export default function UnitDayLearnPage({ params }: { params: Promise<{ unit: s
                 <p className="text-sm text-[var(--text)] leading-relaxed">{current.scenario}</p>
               </div>
               <div className="text-5xl mt-4">🤔</div>
-              <p className="text-sm font-medium text-[var(--text-muted)]">Do you know this structure?</p>
+              <p className="text-sm font-medium text-[var(--text-muted)]">{t.structuresPage.doYouKnowStructure}</p>
               <div className="flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold pointer-events-none" style={{ background: 'var(--primary-bg)', color: 'var(--primary)' }}>
                 Tap to reveal
               </div>
@@ -295,6 +297,7 @@ function StructureExampleCard({
 }: {
   num: number; example: string; translation: string; shown: boolean; onToggle: () => void;
 }) {
+  const t = useTranslation();
   return (
     <div className="rounded-xl overflow-hidden border border-[var(--border)] cursor-pointer select-none" onClick={onToggle}>
       <div className="bg-[var(--surface-2)] px-3 pt-3 pb-2">
@@ -305,7 +308,7 @@ function StructureExampleCard({
           <button
             onClick={e => { e.stopPropagation(); speakAccent(example, 'us'); }}
             className="w-6 h-6 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-xs hover:bg-[var(--primary-bg)] transition-colors shrink-0"
-            aria-label="Listen"
+            aria-label={t.structuresPage.listen}
           >🔊</button>
         </div>
         <p className="text-sm italic text-[var(--text)]">&ldquo;{example}&rdquo;</p>
@@ -313,13 +316,14 @@ function StructureExampleCard({
       <div className="px-3 py-2 bg-[var(--surface)]">
         {shown
           ? <p className="text-xs text-[var(--primary)] animate-fade-in">{translation}</p>
-          : <p className="text-xs text-[var(--text-muted)] text-center">Tap to see translation</p>}
+          : <p className="text-xs text-[var(--text-muted)] text-center">{t.structuresPage.tapToSeeTranslation}</p>}
       </div>
     </div>
   );
 }
 
 function ExtraExampleCard({ index, example, translation }: { index: number; example: string; translation: string }) {
+  const t = useTranslation();
   const [show, setShow] = useState(false);
   return (
     <div
@@ -336,7 +340,7 @@ function ExtraExampleCard({ index, example, translation }: { index: number; exam
       <div className="px-3 py-2 bg-[var(--surface)]">
         {show
           ? <p className="text-xs text-[var(--primary)] animate-fade-in">{translation}</p>
-          : <p className="text-xs text-[var(--text-muted)] text-center">Tap to see translation</p>}
+          : <p className="text-xs text-[var(--text-muted)] text-center">{t.structuresPage.tapToSeeTranslation}</p>}
       </div>
     </div>
   );

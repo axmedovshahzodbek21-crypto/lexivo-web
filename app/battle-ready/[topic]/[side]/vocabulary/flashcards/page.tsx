@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import { notFound } from 'next/navigation';
@@ -6,6 +7,7 @@ import BackButton from '@/components/BackButton';
 import { getBRSideContent, type BRSide } from '@/lib/battleReadyContent';
 
 export default function VocabFlashcardsPage() {
+  const t = useTranslation();
   const params = useParams();
   const slug = String(params.topic);
   const side = String(params.side) as BRSide;
@@ -25,7 +27,7 @@ export default function VocabFlashcardsPage() {
   return (
     <div className="p-4 space-y-5 animate-fade-in max-w-xl mx-auto">
       <BackButton href={`/battle-ready/${slug}/${side}/vocabulary`} label="Vocabulary" />
-      <h1 className="text-lg font-bold text-[var(--text)]">Flashcards</h1>
+      <h1 className="text-lg font-bold text-[var(--text)]">{t.battleReadyPage.flashcards}</h1>
       <div className="text-xs text-[var(--text-muted)] text-center">{i + 1} / {content.vocab.length}</div>
 
       <button
@@ -38,8 +40,8 @@ export default function VocabFlashcardsPage() {
 
       <div className="flex gap-2">
         <button onClick={() => go(-1)} className="flex-1 rounded-xl py-2.5 font-bold text-sm border border-[var(--border)] text-[var(--text)]">← Prev</button>
-        <button onClick={() => setFlipped(f => !f)} className="flex-1 rounded-xl py-2.5 font-bold text-sm text-white" style={{ background: sideColor }}>Flip</button>
-        <button onClick={() => go(1)} className="flex-1 rounded-xl py-2.5 font-bold text-sm border border-[var(--border)] text-[var(--text)]">Next →</button>
+        <button onClick={() => setFlipped(f => !f)} className="flex-1 rounded-xl py-2.5 font-bold text-sm text-white" style={{ background: sideColor }}>{t.battleReadyPage.flip}</button>
+        <button onClick={() => go(1)} className="flex-1 rounded-xl py-2.5 font-bold text-sm border border-[var(--border)] text-[var(--text)]">{t.battleReadyPage.next}</button>
       </div>
     </div>
   );

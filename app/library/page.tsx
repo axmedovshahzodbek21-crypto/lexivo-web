@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -62,6 +63,7 @@ async function seedExampleFolder(teacherId: string): Promise<boolean> {
 }
 
 export default function LibraryPage() {
+  const t = useTranslation();
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const cached = user ? (_cache[user.id] ?? null) : null;
@@ -168,17 +170,17 @@ export default function LibraryPage() {
       {showCreate && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <div className="bg-[var(--surface)] rounded-2xl p-6 w-full max-w-sm shadow-2xl">
-            <h2 className="text-lg font-bold text-[var(--text)] mb-4">New Folder</h2>
+            <h2 className="text-lg font-bold text-[var(--text)] mb-4">{t.libraryPage.newFolder}</h2>
             <input
               autoFocus
               value={newName}
               onChange={e => setNewName(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') createFolder(); if (e.key === 'Escape') setShowCreate(false); }}
-              placeholder="Folder name"
+              placeholder={t.libraryPage.folderNamePlaceholder}
               className="w-full px-3 py-2.5 rounded-xl bg-[var(--surface-2)] text-[var(--text)] text-sm border border-[var(--border)] outline-none focus:border-[var(--primary)] mb-4"
             />
             <div className="flex gap-2 justify-end">
-              <button onClick={() => setShowCreate(false)} className="px-4 py-2 rounded-xl text-sm font-medium text-[var(--text-muted)] hover:bg-[var(--surface-2)]">Cancel</button>
+              <button onClick={() => setShowCreate(false)} className="px-4 py-2 rounded-xl text-sm font-medium text-[var(--text-muted)] hover:bg-[var(--surface-2)]">{t.libraryPage.cancel}</button>
               <button onClick={createFolder} disabled={creating || !newName.trim()} className="px-4 py-2 rounded-xl text-sm font-bold text-white bg-[var(--primary)] disabled:opacity-50">
                 {creating ? 'Creating…' : 'Create'}
               </button>
@@ -191,7 +193,7 @@ export default function LibraryPage() {
       {renameId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <div className="bg-[var(--surface)] rounded-2xl p-6 w-full max-w-sm shadow-2xl">
-            <h2 className="text-lg font-bold text-[var(--text)] mb-4">Rename Folder</h2>
+            <h2 className="text-lg font-bold text-[var(--text)] mb-4">{t.libraryPage.renameFolder}</h2>
             <input
               autoFocus
               value={renameName}
@@ -200,8 +202,8 @@ export default function LibraryPage() {
               className="w-full px-3 py-2.5 rounded-xl bg-[var(--surface-2)] text-[var(--text)] text-sm border border-[var(--border)] outline-none focus:border-[var(--primary)] mb-4"
             />
             <div className="flex gap-2 justify-end">
-              <button onClick={() => setRenameId(null)} className="px-4 py-2 rounded-xl text-sm font-medium text-[var(--text-muted)] hover:bg-[var(--surface-2)]">Cancel</button>
-              <button onClick={renameFolder} disabled={!renameName.trim()} className="px-4 py-2 rounded-xl text-sm font-bold text-white bg-[var(--primary)] disabled:opacity-50">Save</button>
+              <button onClick={() => setRenameId(null)} className="px-4 py-2 rounded-xl text-sm font-medium text-[var(--text-muted)] hover:bg-[var(--surface-2)]">{t.libraryPage.cancel}</button>
+              <button onClick={renameFolder} disabled={!renameName.trim()} className="px-4 py-2 rounded-xl text-sm font-bold text-white bg-[var(--primary)] disabled:opacity-50">{t.libraryPage.save}</button>
             </div>
           </div>
         </div>
@@ -211,18 +213,18 @@ export default function LibraryPage() {
       {folders.length === 0 ? (
         <div className="text-center py-12">
           <div className="text-6xl mb-4">📚</div>
-          <h2 className="text-xl font-bold text-[var(--text)] mb-2">No folders yet</h2>
-          <p className="text-sm text-[var(--text-muted)] mb-8">Create a folder to organise your teaching units.</p>
+          <h2 className="text-xl font-bold text-[var(--text)] mb-2">{t.libraryPage.noFoldersYet}</h2>
+          <p className="text-sm text-[var(--text-muted)] mb-8">{t.libraryPage.createFolderOrganise}</p>
 
           {/* Illustrative example — not real data, just shows the Folder → Unit → Words shape */}
           <div className="max-w-sm mx-auto mb-8">
-            <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider mb-3">How it works</p>
+            <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider mb-3">{t.libraryPage.howItWorks}</p>
             <div className="flex items-center justify-center gap-2 flex-wrap opacity-70 pointer-events-none select-none">
               <div
                 className="rounded-xl px-3 py-2 text-left"
                 style={{ background: `linear-gradient(135deg, ${lighten(CARD_COLORS[0])}, ${CARD_COLORS[0]}, ${darken(CARD_COLORS[0])})`, border: `1.5px dashed ${darken(CARD_COLORS[0])}` }}
               >
-                <p className="text-[9px] font-bold text-white/70 uppercase tracking-wide">Folder</p>
+                <p className="text-[9px] font-bold text-white/70 uppercase tracking-wide">{t.libraryPage.folder}</p>
                 <p className="text-xs font-bold text-white">📁 Vocabulary 101</p>
               </div>
               <span className="text-[var(--text-muted)]">→</span>
@@ -230,12 +232,12 @@ export default function LibraryPage() {
                 className="rounded-xl px-3 py-2 text-left"
                 style={{ background: `linear-gradient(135deg, ${lighten(CARD_COLORS[1])}, ${CARD_COLORS[1]}, ${darken(CARD_COLORS[1])})`, border: `1.5px dashed ${darken(CARD_COLORS[1])}` }}
               >
-                <p className="text-[9px] font-bold text-white/70 uppercase tracking-wide">Unit</p>
+                <p className="text-[9px] font-bold text-white/70 uppercase tracking-wide">{t.libraryPage.unit}</p>
                 <p className="text-xs font-bold text-white">📖 Unit 1</p>
               </div>
               <span className="text-[var(--text-muted)]">→</span>
               <div className="rounded-xl px-3 py-2 text-left border border-[var(--border)]" style={{ background: 'var(--surface-2)' }}>
-                <p className="text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-wide">Words</p>
+                <p className="text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-wide">{t.libraryPage.words}</p>
                 <p className="text-xs font-bold text-[var(--text)]">apple · book · water</p>
               </div>
             </div>
@@ -245,7 +247,7 @@ export default function LibraryPage() {
             onClick={() => setShowCreate(true)}
             className="px-6 py-3 rounded-xl text-sm font-bold text-white"
             style={{ background: 'var(--primary)' }}
-          >New Folder</button>
+          >{t.libraryPage.newFolder}</button>
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">

@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import Link from 'next/link';
 import { use, useState } from 'react';
 import BackButton from '@/components/BackButton';
@@ -7,6 +8,7 @@ import { ieltsData } from '@/lib/ielts-data';
 const TOTAL_TESTS = 30;
 
 export default function PassagePage({ params }: { params: Promise<{ passageId: string }> }) {
+  const t = useTranslation();
   const { passageId } = use(params);
   const section = ieltsData.find(s => s.passageSection === Number(passageId));
   const availableTests = new Set((section?.tests ?? []).map(t => t.testNumber));
@@ -17,9 +19,9 @@ export default function PassagePage({ params }: { params: Promise<{ passageId: s
       <BackButton href="/ielts-reading" label="Back to Passages" className="mb-8" />
 
       <div className="mb-10">
-        <p className="text-[11px] font-black text-[var(--text-muted)] uppercase tracking-[0.15em] mb-1">IELTS Reading</p>
+        <p className="text-[11px] font-black text-[var(--text-muted)] uppercase tracking-[0.15em] mb-1">{t.ieltsPage.title}</p>
         <h1 className="text-4xl font-black text-[var(--text)] leading-none">Passage {passageId}</h1>
-        <p className="text-sm text-[var(--text-muted)] mt-2">Hover a test to reveal actions. Tap on mobile.</p>
+        <p className="text-sm text-[var(--text-muted)] mt-2">{t.ieltsPage.hoverToReveal}</p>
       </div>
 
       {/* Timeline */}
@@ -209,7 +211,7 @@ export default function PassagePage({ params }: { params: Promise<{ passageId: s
                   >
                     <div>
                       <p style={{ fontSize: '9px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Test {n}</p>
-                      <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>Coming soon</p>
+                      <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>{t.ieltsPage.comingSoon}</p>
                     </div>
                   </div>
                 )}

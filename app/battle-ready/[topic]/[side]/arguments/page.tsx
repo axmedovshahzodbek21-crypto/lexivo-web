@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import { notFound } from 'next/navigation';
@@ -6,6 +7,7 @@ import BackButton from '@/components/BackButton';
 import { getBRSideContent, type BRSide } from '@/lib/battleReadyContent';
 
 export default function ArgumentsPage() {
+  const t = useTranslation();
   const params = useParams();
   const slug = String(params.topic);
   const side = String(params.side) as BRSide;
@@ -20,7 +22,7 @@ export default function ArgumentsPage() {
     <div className="p-4 space-y-5 animate-fade-in max-w-2xl mx-auto">
       <BackButton href={`/battle-ready/${slug}/${side}`} label="Categories" />
       <div>
-        <h1 className="text-lg font-bold text-[var(--text)]">Arguments</h1>
+        <h1 className="text-lg font-bold text-[var(--text)]">{t.battleReadyPage.arguments}</h1>
         <p className="text-xs text-[var(--text-muted)]">{content.arguments.length} arguments. Tap one to read the full explanation.</p>
       </div>
 

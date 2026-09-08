@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useMemo, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { notFound } from 'next/navigation';
@@ -15,6 +16,7 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 export default function VocabQuizPage() {
+  const t = useTranslation();
   const params = useParams();
   const slug = String(params.topic);
   const side = String(params.side) as BRSide;
@@ -45,11 +47,11 @@ export default function VocabQuizPage() {
   return (
     <div className="p-4 space-y-5 animate-fade-in max-w-xl mx-auto">
       <BackButton href={`/battle-ready/${slug}/${side}/vocabulary`} label="Vocabulary" />
-      <h1 className="text-lg font-bold text-[var(--text)]">Quiz</h1>
+      <h1 className="text-lg font-bold text-[var(--text)]">{t.battleReadyPage.quiz}</h1>
       <div className="text-xs text-[var(--text-muted)]">{i + 1} / {questions.length}</div>
 
       <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5">
-        <div className="text-xs text-[var(--text-muted)] mb-1">What does this mean?</div>
+        <div className="text-xs text-[var(--text-muted)] mb-1">{t.battleReadyPage.whatDoesMean}</div>
         <div className="font-bold text-lg text-[var(--text)]">{q.term}</div>
       </div>
 
@@ -82,7 +84,7 @@ export default function VocabQuizPage() {
         </button>
       )}
       {picked !== null && isLast && (
-        <p className="text-center text-sm font-semibold text-[var(--text-muted)]">Quiz complete.</p>
+        <p className="text-center text-sm font-semibold text-[var(--text-muted)]">{t.battleReadyPage.quizComplete}</p>
       )}
     </div>
   );

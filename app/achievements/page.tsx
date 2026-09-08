@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useEffect, useState } from 'react';
 import { ALL_ACHIEVEMENTS, CATEGORY_META, CATEGORY_ORDER, getAchievementProgress, groupAchievementsByCategory, computeAchievementXp } from '@/lib/gamification';
 import { getUnlockedAchievements, getLearnedWords, getStreak, getXP, getGraduatedCount, getTotalStudyDays, getFlashcardTotalDays, getFlashcardStreak, getQuizTotalDays, getQuizStreak, getAchievementDate } from '@/lib/storage';
@@ -39,6 +40,7 @@ function RingProgress({ pct }: { pct: number }) {
 }
 
 export default function AchievementsPage() {
+  const t = useTranslation();
   const [unlockedIds, setUnlockedIds] = useState<string[]>([]);
   const [stats, setStats] = useState<Stats>({ learnedCount: 0, streak: 0, xp: 0, masteredCount: 0, totalDays: 0, flashDays: 0, flashStreak: 0, quizDays: 0, quizStreak: 0 });
   const [selected, setSelected] = useState<AchDetail | null>(null);
@@ -85,11 +87,11 @@ export default function AchievementsPage() {
         <div style={{ display:'flex', alignItems:'center', gap:20, position:'relative' }}>
           <RingProgress pct={total > 0 ? unlocked / total : 0} />
           <div>
-            <p style={{ color:'rgba(255,255,255,0.7)', fontSize:11, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', margin:0 }}>Achievements</p>
+            <p style={{ color:'rgba(255,255,255,0.7)', fontSize:11, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', margin:0 }}>{t.achievementsPage.title}</p>
             <p style={{ color:'white', fontSize:28, fontWeight:800, lineHeight:1.1, margin:'4px 0 2px' }}>
               {unlocked}<span style={{ fontSize:16, fontWeight:500, opacity:0.7 }}> / {total}</span>
             </p>
-            <p style={{ color:'rgba(255,255,255,0.65)', fontSize:12, margin:0 }}>badges unlocked</p>
+            <p style={{ color:'rgba(255,255,255,0.65)', fontSize:12, margin:0 }}>{t.achievementsPage.badgesUnlocked}</p>
             <div style={{ marginTop:10, display:'flex', alignItems:'center', gap:6 }}>
               <span style={{ fontSize:12, color:'rgba(255,255,255,0.8)', fontWeight:600 }}>✨ {xpEarned} XP earned</span>
               <span style={{ fontSize:11, color:'rgba(255,255,255,0.45)' }}>/ {totalXpAvailable} total</span>
@@ -175,7 +177,7 @@ export default function AchievementsPage() {
                         {isUnlocked ? (
                           <div style={{ display:'flex', alignItems:'center', gap:4 }}>
                             <div style={{ width:16, height:16, borderRadius:'50%', background:'linear-gradient(135deg, var(--primary), var(--primary-light))', display:'flex', alignItems:'center', justifyContent:'center', fontSize:9, color:'white', fontWeight:700 }}>✓</div>
-                            <span style={{ fontSize:9, color:'var(--primary)', fontWeight:600 }}>Achieved</span>
+                            <span style={{ fontSize:9, color:'var(--primary)', fontWeight:600 }}>{t.achievementsPage.achieved}</span>
                           </div>
                         ) : prog ? (
                           <>
@@ -245,7 +247,7 @@ export default function AchievementsPage() {
                 return (
                   <div style={{ width:'100%' }}>
                     <div style={{ display:'flex', justifyContent:'space-between', marginBottom:7 }}>
-                      <span style={{ fontSize:12, fontWeight:600, color:'var(--text-muted)' }}>Progress</span>
+                      <span style={{ fontSize:12, fontWeight:600, color:'var(--text-muted)' }}>{t.achievementsPage.progress}</span>
                       <span style={{ fontSize:12, fontWeight:700, color:'var(--primary)' }}>{prog.current} / {prog.target} {prog.label}</span>
                     </div>
                     <div style={{ height:10, borderRadius:5, background:'var(--border)', overflow:'hidden' }}>

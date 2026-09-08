@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import BackButton from '@/components/BackButton';
@@ -35,6 +36,7 @@ function VideoCard({ video, index, wordCount, onClick }: {
   wordCount: number;
   onClick: () => void;
 }) {
+  const t = useTranslation();
   const unlocked = getVideoUnlocked(video.collectionName, wordCount);
   const { color, light, dark } = CARD_COLORS[index % CARD_COLORS.length];
   const numStr = String(index + 1).padStart(2, '0');
@@ -54,7 +56,7 @@ function VideoCard({ video, index, wordCount, onClick }: {
         <span style={{ fontSize: 20 }}>⏳</span>
         <div>
           <p style={{ fontSize: 11, fontWeight: 900, color: 'var(--text)', lineHeight: 1.2 }}>{video.title}</p>
-          <p style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 3 }}>Coming soon</p>
+          <p style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 3 }}>{t.realEnglishPage.comingSoon}</p>
         </div>
       </div>
     );
@@ -123,6 +125,7 @@ function VideoCard({ video, index, wordCount, onClick }: {
 }
 
 export default function RealEnglishSetPage({ params }: { params: Promise<{ id: string }> }) {
+  const t = useTranslation();
   const { id } = use(params);
   const router = useRouter();
   const set = realEnglishSets.find(s => s.id === id);
@@ -154,7 +157,7 @@ export default function RealEnglishSetPage({ params }: { params: Promise<{ id: s
   if (!set) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-16 text-center">
-        <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>Set not found.</p>
+        <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>{t.realEnglishPage.setNotFound}</p>
         <BackButton className="mt-4" />
       </div>
     );

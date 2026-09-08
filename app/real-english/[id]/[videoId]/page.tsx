@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import BackButton from '@/components/BackButton';
@@ -91,6 +92,7 @@ function UnitCard({ unit, collectionName, accentColor }: {
 }
 
 export default function RealEnglishVideoPage({ params }: { params: Promise<{ id: string; videoId: string }> }) {
+  const t = useTranslation();
   const { id, videoId } = use(params);
   const router = useRouter();
 
@@ -118,7 +120,7 @@ export default function RealEnglishVideoPage({ params }: { params: Promise<{ id:
   if (!set || !video) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-16 text-center">
-        <p className="text-[var(--text-muted)] text-sm">Video not found.</p>
+        <p className="text-[var(--text-muted)] text-sm">{t.realEnglishPage.videoNotFound}</p>
         <BackButton className="mt-4" />
       </div>
     );
@@ -156,7 +158,7 @@ export default function RealEnglishVideoPage({ params }: { params: Promise<{ id:
       {units.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-[var(--border)] bg-[var(--surface)] p-10 text-center">
           <span className="text-4xl">📭</span>
-          <p className="text-sm font-bold text-[var(--text)] mt-3">Units coming soon</p>
+          <p className="text-sm font-bold text-[var(--text)] mt-3">{t.realEnglishPage.unitsComingSoon}</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-3">

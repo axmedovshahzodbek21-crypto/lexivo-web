@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useRouter } from 'next/navigation';
 import { realEnglishSets } from "@/lib/real-english-data";
 
@@ -21,6 +22,7 @@ const STEPS = [
 ];
 
 export default function RealEnglishPage() {
+  const t = useTranslation();
   const router = useRouter();
 
   return (
@@ -31,7 +33,7 @@ export default function RealEnglishPage() {
         <p style={{ fontSize: 11, fontWeight: 900, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: 6 }}>
           Listening Skills
         </p>
-        <h1 style={{ fontSize: 40, fontWeight: 900, color: 'var(--text)', lineHeight: 1 }}>Real English</h1>
+        <h1 style={{ fontSize: 40, fontWeight: 900, color: 'var(--text)', lineHeight: 1 }}>{t.realEnglishPage.title}</h1>
         <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 8 }}>
           Learn the words from a real video — then unlock it and actually understand it.
         </p>
@@ -46,8 +48,8 @@ export default function RealEnglishPage() {
           justifyContent: 'center', textAlign: 'center', gap: 12,
         }}>
           <span style={{ fontSize: 48 }}>🎬</span>
-          <p style={{ fontWeight: 700, color: 'var(--text)', fontSize: 15 }}>No sets yet</p>
-          <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>Video sets are coming soon.</p>
+          <p style={{ fontWeight: 700, color: 'var(--text)', fontSize: 15 }}>{t.realEnglishPage.noSets}</p>
+          <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>{t.realEnglishPage.setsComingSoon}</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-3 mb-8">

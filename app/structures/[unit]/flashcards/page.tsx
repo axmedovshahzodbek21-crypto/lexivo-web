@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { use, useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -9,6 +10,7 @@ import type { SRSStructure } from '@/lib/types';
 type CardSide = 'front' | 'back';
 
 export default function UnitFlashcardsPage({ params }: { params: Promise<{ unit: string }> }) {
+  const t = useTranslation();
   const { unit: slug } = use(params);
   const router = useRouter();
   const unit = UNIT_SLUGS[slug];
@@ -68,8 +70,8 @@ export default function UnitFlashcardsPage({ params }: { params: Promise<{ unit:
   if (!unit) {
     return (
       <div className="p-6 text-center flex flex-col items-center justify-center min-h-screen">
-        <p className="text-[var(--text-muted)] mb-4">Unknown unit.</p>
-        <Link href="/structures" className="btn-primary inline-block">Back to Structures</Link>
+        <p className="text-[var(--text-muted)] mb-4">{t.structuresPage.unknownUnit}</p>
+        <Link href="/structures" className="btn-primary inline-block">{t.structuresPage.backToStructures}</Link>
       </div>
     );
   }
@@ -81,7 +83,7 @@ export default function UnitFlashcardsPage({ params }: { params: Promise<{ unit:
       <div className="p-6 text-center flex flex-col items-center justify-center min-h-screen animate-fade-in">
         <div className="text-5xl mb-4">📭</div>
         <h2 className="font-bold text-xl mb-2">No {unit} structures in your deck yet</h2>
-        <p className="text-sm text-[var(--text-muted)] mb-6">Learn some structures from this unit first, then come back to practice.</p>
+        <p className="text-sm text-[var(--text-muted)] mb-6">{t.structuresPage.learnFromUnitFirst}</p>
         <Link href={`/structures/${slug}/learn`} className="btn-primary inline-block">Learn {unit} →</Link>
       </div>
     );
@@ -92,12 +94,12 @@ export default function UnitFlashcardsPage({ params }: { params: Promise<{ unit:
     return (
       <div className="p-6 text-center flex flex-col items-center justify-center min-h-screen animate-fade-in">
         <div className="text-6xl mb-4">{score >= 80 ? '🎉' : score >= 50 ? '👍' : '💪'}</div>
-        <h2 className="text-2xl font-bold mb-2">Deck complete</h2>
+        <h2 className="text-2xl font-bold mb-2">{t.structuresPage.deckComplete}</h2>
         <p className="text-[var(--text-muted)] mb-6">{known} known · {unknown} to review · {score}%</p>
         <div className="grid grid-cols-3 gap-3 w-full mb-6">
-          <div className="card text-center"><div className="text-2xl font-bold text-[var(--success)]">{known}</div><div className="text-xs text-[var(--text-muted)]">Known</div></div>
-          <div className="card text-center"><div className="text-2xl font-bold text-[var(--danger)]">{unknown}</div><div className="text-xs text-[var(--text-muted)]">Review</div></div>
-          <div className="card text-center"><div className="text-2xl font-bold text-[var(--primary)]">{score}%</div><div className="text-xs text-[var(--text-muted)]">Score</div></div>
+          <div className="card text-center"><div className="text-2xl font-bold text-[var(--success)]">{known}</div><div className="text-xs text-[var(--text-muted)]">{t.structuresPage.known}</div></div>
+          <div className="card text-center"><div className="text-2xl font-bold text-[var(--danger)]">{unknown}</div><div className="text-xs text-[var(--text-muted)]">{t.structuresPage.review}</div></div>
+          <div className="card text-center"><div className="text-2xl font-bold text-[var(--primary)]">{score}%</div><div className="text-xs text-[var(--text-muted)]">{t.structuresPage.score}</div></div>
         </div>
         {sessionXP > 0 && (
           <div className="w-full card mb-6 flex items-center justify-center gap-2">
@@ -106,10 +108,10 @@ export default function UnitFlashcardsPage({ params }: { params: Promise<{ unit:
           </div>
         )}
         <div className="flex flex-col gap-3 w-full">
-          <Link href={`/structures/${slug}/translate`} className="btn-primary text-center">Practice Translation →</Link>
+          <Link href={`/structures/${slug}/translate`} className="btn-primary text-center">{t.structuresPage.practiceTranslation}</Link>
           <div className="flex gap-3">
-            <button onClick={() => { setIndex(0); setSide('front'); setKnown(0); setUnknown(0); setSessionXP(0); setDone(false); }} className="btn-secondary flex-1">Again</button>
-            <Link href={`/structures/${slug}`} className="btn-primary flex-1 text-center">Back</Link>
+            <button onClick={() => { setIndex(0); setSide('front'); setKnown(0); setUnknown(0); setSessionXP(0); setDone(false); }} className="btn-secondary flex-1">{t.structuresPage.again}</button>
+            <Link href={`/structures/${slug}`} className="btn-primary flex-1 text-center">{t.structuresPage.back}</Link>
           </div>
         </div>
       </div>
@@ -121,7 +123,7 @@ export default function UnitFlashcardsPage({ params }: { params: Promise<{ unit:
   return (
     <div className="flex flex-col min-h-screen">
       <div className="flex items-center justify-between p-4">
-        <button onClick={() => router.push(`/structures/${slug}`)} className="btn-icon" aria-label="Go back">←</button>
+        <button onClick={() => router.push(`/structures/${slug}`)} className="btn-icon" aria-label={t.structuresPage.goBack}>←</button>
         <div className="text-center">
           <div className="font-semibold text-sm">Flashcards · {unit}</div>
           <div className="text-xs text-[var(--text-muted)]">{index + 1} / {deck.length}</div>
@@ -153,7 +155,7 @@ export default function UnitFlashcardsPage({ params }: { params: Promise<{ unit:
               </div>
               <h2 className="text-xl font-bold text-[var(--text)] leading-snug">{current.pattern}</h2>
               <p className="text-xs text-[var(--text-muted)] mt-3 leading-relaxed">💭 {current.scenario}</p>
-              <p className="text-xs text-[var(--text-muted)] mt-4">Tap to reveal</p>
+              <p className="text-xs text-[var(--text-muted)] mt-4">{t.structuresPage.tapToReveal}</p>
             </div>
 
             <div className="flip-card-back card flex flex-col items-center justify-center text-center p-6" style={{ minHeight: 320, background: 'var(--primary-bg)' }}>
@@ -185,7 +187,7 @@ export default function UnitFlashcardsPage({ params }: { params: Promise<{ unit:
             </button>
           </div>
         ) : (
-          <div className="text-center text-sm text-[var(--text-muted)]">Tap to reveal</div>
+          <div className="text-center text-sm text-[var(--text-muted)]">{t.structuresPage.tapToReveal}</div>
         )}
       </div>
     </div>

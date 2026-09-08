@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useParams } from 'next/navigation';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
@@ -7,6 +8,7 @@ import { getDebateTopic } from '@/lib/debateMock';
 import { getBRSideContent, type BRSide } from '@/lib/battleReadyContent';
 
 export default function BattleReadySidePage() {
+  const t = useTranslation();
   const params = useParams();
   const slug = String(params.topic);
   const side = String(params.side) as BRSide;
@@ -38,7 +40,7 @@ export default function BattleReadySidePage() {
       </div>
 
       {!content && (
-        <p className="text-sm text-[var(--text-muted)]">No content written for this side yet.</p>
+        <p className="text-sm text-[var(--text-muted)]">{t.battleReadyPage.noContentSide}</p>
       )}
 
       <div className="grid grid-cols-2 gap-3">

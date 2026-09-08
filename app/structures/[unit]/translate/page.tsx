@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { use, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -16,6 +17,7 @@ import type { TranslationSentence } from '@/lib/types';
 // this is the one exercise in the Structures feature that asks for actual
 // output rather than recognition.
 export default function UnitTranslatePage({ params }: { params: Promise<{ unit: string }> }) {
+  const t = useTranslation();
   const { unit: slug } = use(params);
   const router = useRouter();
   const unit = UNIT_SLUGS[slug];
@@ -40,8 +42,8 @@ export default function UnitTranslatePage({ params }: { params: Promise<{ unit: 
   if (!unit) {
     return (
       <div className="p-6 text-center flex flex-col items-center justify-center min-h-screen">
-        <p className="text-[var(--text-muted)] mb-4">Unknown unit.</p>
-        <Link href="/structures" className="btn-primary inline-block">Back to Structures</Link>
+        <p className="text-[var(--text-muted)] mb-4">{t.structuresPage.unknownUnit}</p>
+        <Link href="/structures" className="btn-primary inline-block">{t.structuresPage.backToStructures}</Link>
       </div>
     );
   }
@@ -51,7 +53,7 @@ export default function UnitTranslatePage({ params }: { params: Promise<{ unit: 
       <div className="p-6 text-center flex flex-col items-center justify-center min-h-screen animate-fade-in">
         <div className="text-5xl mb-4">📭</div>
         <h2 className="font-bold text-xl mb-2">Learn a few {unit} structures first</h2>
-        <p className="text-sm text-[var(--text-muted)] mb-6">Translation practice draws on structures you've already learned in this unit.</p>
+        <p className="text-sm text-[var(--text-muted)] mb-6">{t.structuresPage.translateIntro}</p>
         <Link href={`/structures/${slug}/learn`} className="btn-primary inline-block">Learn {unit} →</Link>
       </div>
     );
@@ -92,7 +94,7 @@ export default function UnitTranslatePage({ params }: { params: Promise<{ unit: 
   return (
     <div className="flex flex-col min-h-screen">
       <div className="flex items-center justify-between p-4">
-        <button onClick={() => router.push(`/structures/${slug}`)} className="btn-icon" aria-label="Go back">←</button>
+        <button onClick={() => router.push(`/structures/${slug}`)} className="btn-icon" aria-label={t.structuresPage.goBack}>←</button>
         <div className="text-center">
           <div className="font-semibold text-sm">Translate · {unit}</div>
           <div className="text-xs text-[var(--text-muted)]">{progress}/{total} done</div>
@@ -110,13 +112,13 @@ export default function UnitTranslatePage({ params }: { params: Promise<{ unit: 
               <textarea
                 value={attempts[i]}
                 onChange={e => setAttempt(i, e.target.value)}
-                placeholder="Write your English translation here…"
+                placeholder={t.structuresPage.writeTranslation}
                 rows={3}
                 className="w-full px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)] resize-none"
               />
               {revealed[i] ? (
                 <div className="bg-[var(--primary-bg)] rounded-xl p-3 space-y-1 animate-fade-in">
-                  <p className="text-xs font-semibold text-[var(--primary)]">Model answer — compare it with your own:</p>
+                  <p className="text-xs font-semibold text-[var(--primary)]">{t.structuresPage.modelAnswerCompare}</p>
                   <p className="text-sm font-semibold text-[var(--primary)]">{sentence.en}</p>
                   {structure && (
                     <p className="text-xs text-[var(--text-muted)] pt-1">uses: {structure.pattern}</p>

@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import BackButton from '@/components/BackButton';
@@ -27,6 +28,7 @@ function ProgressRing({ forP, againstP, size = 44 }: { forP: number; againstP: n
 }
 
 export default function DebateArenaPage() {
+  const t = useTranslation();
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState<'progress' | 'az'>('progress');
 
@@ -51,8 +53,8 @@ export default function DebateArenaPage() {
         <div className="flex items-center gap-3">
           <span className="text-3xl">🗣️</span>
           <div>
-            <h1 className="text-2xl font-bold text-[var(--text)]">Debate Arena</h1>
-            <p className="text-sm text-[var(--text-muted)]">Master both sides. Argue anything, instantly.</p>
+            <h1 className="text-2xl font-bold text-[var(--text)]">{t.debatePage.title}</h1>
+            <p className="text-sm text-[var(--text-muted)]">{t.debatePage.subtitle}</p>
           </div>
         </div>
       </div>
@@ -65,8 +67,8 @@ export default function DebateArenaPage() {
       >
         <div className="flex items-center justify-between text-white">
           <div>
-            <div className="font-bold text-sm">Core Skills</div>
-            <div className="text-xs text-white/70">Openings, signposting, rebuttal phrases</div>
+            <div className="font-bold text-sm">{t.debatePage.coreSkills}</div>
+            <div className="text-xs text-white/70">{t.debatePage.coreSkillsSub}</div>
           </div>
           <div className="text-right">
             <div className="font-bold">{CORE_SKILLS_PROGRESS}%</div>
@@ -85,7 +87,7 @@ export default function DebateArenaPage() {
           style={{ background: 'linear-gradient(135deg, #b91c1c, #f87171)', boxShadow: '0 10px 0 #7f1d1d, 0 18px 40px rgba(185,28,28,0.4)' }}
         >
           <div className="text-2xl mb-1">⚔️</div>
-          <div className="font-bold text-sm">Battle Drills</div>
+          <div className="font-bold text-sm">{t.debatePage.battleDrills}</div>
           <div className="text-xs text-white/70">{battleReadyCount} topics unlocked</div>
         </Link>
         <Link
@@ -94,7 +96,7 @@ export default function DebateArenaPage() {
           style={{ background: 'linear-gradient(135deg, #d97706, #fbbf24)', boxShadow: '0 10px 0 #92400e, 0 18px 40px rgba(217,119,6,0.4)' }}
         >
           <div className="text-2xl mb-1">📊</div>
-          <div className="font-bold text-sm">My Progress</div>
+          <div className="font-bold text-sm">{t.debatePage.myProgress}</div>
           <div className="text-xs text-white/70">{battleReadyCount}/{DEBATE_TOPICS.length} battle-ready</div>
         </Link>
       </div>
@@ -104,7 +106,7 @@ export default function DebateArenaPage() {
         <input
           value={search}
           onChange={e => setSearch(e.target.value)}
-          placeholder="Search topics..."
+          placeholder={t.debatePage.searchTopics}
           className="flex-1 rounded-xl px-3 py-2 text-sm bg-[var(--surface)] border border-[var(--border)] text-[var(--text)] outline-none focus:border-[#818cf8]"
         />
         <select
@@ -112,8 +114,8 @@ export default function DebateArenaPage() {
           onChange={e => setSort(e.target.value as 'progress' | 'az')}
           className="rounded-xl px-3 py-2 text-sm bg-[var(--surface)] border border-[var(--border)] text-[var(--text)]"
         >
-          <option value="progress">Sort: Progress</option>
-          <option value="az">Sort: A-Z</option>
+          <option value="progress">{t.debatePage.sortProgress}</option>
+          <option value="az">{t.debatePage.sortAZ}</option>
         </select>
       </div>
 
@@ -139,7 +141,7 @@ export default function DebateArenaPage() {
           );
         })}
         {filtered.length === 0 && (
-          <p className="col-span-full text-sm text-[var(--text-muted)] text-center py-8">No topics match your search.</p>
+          <p className="col-span-full text-sm text-[var(--text-muted)] text-center py-8">{t.debatePage.noTopicsMatch}</p>
         )}
       </div>
     </div>

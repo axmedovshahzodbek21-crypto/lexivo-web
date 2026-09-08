@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -11,6 +12,7 @@ import { pickRandom, playShuffleTick, playShuffleReveal } from '@/lib/shuffle';
 const SURPRISE_TICKS = 9;
 
 export default function BattleReadyHubPage() {
+  const t = useTranslation();
   const router = useRouter();
   const [search, setSearch] = useState('');
   const [doneSet, setDoneSet] = useState<Set<string>>(new Set());
@@ -106,7 +108,7 @@ export default function BattleReadyHubPage() {
       <div className="flex items-center gap-3">
         <span className="text-3xl">🛡️</span>
         <div className="flex-1">
-          <h1 className="text-2xl font-bold text-[var(--text)]">Battle-Ready</h1>
+          <h1 className="text-2xl font-bold text-[var(--text)]">{t.battleReadyPage.title}</h1>
           <p className="text-sm text-[var(--text-muted)]">{withContent.length}/{DEBATE_TOPICS.length} topics filled in</p>
         </div>
         <button
@@ -122,7 +124,7 @@ export default function BattleReadyHubPage() {
       <input
         value={search}
         onChange={e => setSearch(e.target.value)}
-        placeholder="Search topics..."
+        placeholder={t.battleReadyPage.searchTopics}
         className="w-full rounded-xl px-3 py-2 text-sm bg-[var(--surface)] border border-[var(--border)] text-[var(--text)] outline-none focus:border-[#818cf8]"
       />
 
@@ -147,7 +149,7 @@ export default function BattleReadyHubPage() {
           );
         })}
         {filtered.length === 0 && (
-          <p className="col-span-full text-sm text-[var(--text-muted)] text-center py-8">No topics match your search.</p>
+          <p className="col-span-full text-sm text-[var(--text-muted)] text-center py-8">{t.battleReadyPage.noTopicsMatch}</p>
         )}
       </div>
     </div>

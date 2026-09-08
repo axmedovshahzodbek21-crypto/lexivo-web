@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import BackButton from '@/components/BackButton';
@@ -116,6 +117,7 @@ function parseAIResponse(text: string): ImportedWord[] {
 }
 
 export default function ReadingPage() {
+  const t = useTranslation();
   const { user } = useAuth();
   const [passage, setPassage] = useState('');
   const [reading, setReading] = useState(false);
@@ -332,7 +334,7 @@ export default function ReadingPage() {
               value={urlInput}
               onChange={e => { setUrlInput(e.target.value); setFetchError(''); }}
               onKeyDown={e => { if (e.key === 'Enter') fetchArticle(); }}
-              placeholder="Or paste a URL to fetch article text…"
+              placeholder={t.readingFreePage.pasteUrl}
               className="flex-1 px-4 py-3 rounded-2xl border-2 border-[var(--border)] bg-[var(--surface)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)] transition-colors"
             />
             <button
@@ -348,13 +350,13 @@ export default function ReadingPage() {
 
         <div className="flex items-center gap-3">
           <div className="flex-1 h-px" style={{ background: 'var(--border)' }} />
-          <span className="text-xs" style={{ color: 'var(--text-muted)' }}>or paste text directly</span>
+          <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{t.readingFreePage.orPasteText}</span>
           <div className="flex-1 h-px" style={{ background: 'var(--border)' }} />
         </div>
 
         <textarea
           className="w-full h-56 p-4 rounded-2xl border-2 border-[var(--border)] bg-[var(--surface)] text-[var(--text)] text-base resize-none focus:outline-none focus:border-[var(--primary)] transition-colors leading-relaxed"
-          placeholder="Paste your reading passage here…"
+          placeholder={t.readingFreePage.pastePassage}
           value={passage}
           onChange={e => setPassage(e.target.value)}
           autoFocus
@@ -432,7 +434,7 @@ export default function ReadingPage() {
         <div className="px-8 pt-5 pb-2 border-b border-[var(--border)]">
           <p className="text-xs text-[var(--text-muted)]">
             {autoCollect
-              ? <>⚡ <strong className="text-[var(--primary)]">Auto-collect on</strong> — tap any word to instantly collect it</>
+              ? <>⚡ <strong className="text-[var(--primary)]">{t.readingFreePage.autoCollectOn}</strong> — tap any word to instantly collect it</>
               : <>Select any word or phrase → tap <strong className="text-[var(--primary)]">+ Add</strong> to collect it</>
             }
           </p>
@@ -467,7 +469,7 @@ export default function ReadingPage() {
       {wordList.length > 0 && (
         <div className="card mx-4 space-y-1">
           <div className="flex items-center justify-between mb-2">
-            <h2 className="font-semibold text-sm text-[var(--text)]">Collected words</h2>
+            <h2 className="font-semibold text-sm text-[var(--text)]">{t.readingFreePage.collectedWords}</h2>
             <div className="flex items-center gap-3">
               <button
                 onClick={undo}
@@ -500,8 +502,8 @@ export default function ReadingPage() {
       {wordList.length > 0 && (
         <div className="card mx-4 space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="font-semibold text-sm text-[var(--text)]">AI Prompt</h2>
-            <span className="text-xs text-[var(--text-muted)]">Copy → paste into ChatGPT or Claude</span>
+            <h2 className="font-semibold text-sm text-[var(--text)]">{t.readingFreePage.aiPrompt}</h2>
+            <span className="text-xs text-[var(--text-muted)]">{t.readingFreePage.copyPasteChatgpt}</span>
           </div>
           <pre className="text-xs text-[var(--text-muted)] bg-[var(--surface-2)] rounded-xl p-3 whitespace-pre-wrap font-mono leading-relaxed max-h-52 overflow-y-auto">
             {prompt}
@@ -533,7 +535,7 @@ export default function ReadingPage() {
               </p>
               <textarea
                 className="w-full h-40 p-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-xs text-[var(--text)] font-mono resize-none focus:outline-none focus:border-[var(--primary)] transition-colors leading-relaxed"
-                placeholder="Paste AI response here…"
+                placeholder={t.readingFreePage.pasteAiResponse}
                 value={importText}
                 onChange={e => { setImportText(e.target.value); setParsedWords(null); }}
               />

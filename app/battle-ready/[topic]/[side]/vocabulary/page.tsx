@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useParams } from 'next/navigation';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
@@ -7,6 +8,7 @@ import { getDebateTopic } from '@/lib/debateMock';
 import { getBRSideContent, type BRSide } from '@/lib/battleReadyContent';
 
 export default function VocabularyHubPage() {
+  const t = useTranslation();
   const params = useParams();
   const slug = String(params.topic);
   const side = String(params.side) as BRSide;
@@ -27,7 +29,7 @@ export default function VocabularyHubPage() {
       <BackButton href={`/battle-ready/${slug}/${side}`} label="Categories" />
 
       <div>
-        <h1 className="text-xl font-bold text-[var(--text)]">Vocabulary</h1>
+        <h1 className="text-xl font-bold text-[var(--text)]">{t.battleReadyPage.vocabulary}</h1>
         <p className="text-xs text-[var(--text-muted)]">{content?.vocab.length ?? 0} words · {topic.title}</p>
       </div>
 

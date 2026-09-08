@@ -1,9 +1,11 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 
 export default function UpdatePasswordPage() {
+  const t = useTranslation();
   const router = useRouter();
   const [password, setPassword]   = useState('');
   const [password2, setPassword2] = useState('');
@@ -74,8 +76,8 @@ export default function UpdatePasswordPage() {
       <div className="w-full max-w-sm animate-depth-in">
         <div className="text-center mb-8">
           <div className="text-5xl mb-3">🔒</div>
-          <h1 className="text-3xl font-black" style={{ color: 'var(--primary)' }}>New Password</h1>
-          <p className="text-sm text-[var(--text-muted)] mt-1">Choose a new password for your account</p>
+          <h1 className="text-3xl font-black" style={{ color: 'var(--primary)' }}>{t.updatePasswordPage.title}</h1>
+          <p className="text-sm text-[var(--text-muted)] mt-1">{t.updatePasswordPage.subtitle}</p>
         </div>
 
         {done ? (
@@ -92,7 +94,7 @@ export default function UpdatePasswordPage() {
                 type="password"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
-                placeholder="At least 6 characters"
+                placeholder={t.updatePasswordPage.atLeast6}
                 required
                 autoFocus
                 className="w-full px-4 py-3.5 rounded-2xl border-2 border-[var(--border)] bg-[var(--surface)] text-[var(--text)] outline-none transition-colors focus:border-[var(--primary)] text-base"
@@ -107,7 +109,7 @@ export default function UpdatePasswordPage() {
                 type="password"
                 value={password2}
                 onChange={e => setPassword2(e.target.value)}
-                placeholder="••••••••"
+                placeholder={t.updatePasswordPage.passwordPlaceholder}
                 required
                 className="w-full px-4 py-3.5 rounded-2xl border-2 border-[var(--border)] bg-[var(--surface)] text-[var(--text)] outline-none transition-colors focus:border-[var(--primary)] text-base"
               />

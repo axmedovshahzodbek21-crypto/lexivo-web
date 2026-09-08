@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import BackButton from '@/components/BackButton';
@@ -16,6 +17,7 @@ const UNIT_ICONS: Record<string, string> = {
 const ALL = 'All';
 
 export default function StructuresPage() {
+  const t = useTranslation();
   const [activeTag, setActiveTag] = useState(ALL);
   const [openId, setOpenId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
@@ -53,7 +55,7 @@ export default function StructuresPage() {
           {learnedIds.size} / {STRUCTURES.length} learned
         </p>
 
-        <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mt-4 mb-1.5">Learn by unit</p>
+        <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mt-4 mb-1.5">{t.structuresPage.learnByUnit}</p>
         <div className="grid grid-cols-2 gap-2">
           {STRUCTURE_UNITS.map(unit => {
             const c = unitCounts[unit];
@@ -71,19 +73,19 @@ export default function StructuresPage() {
           })}
         </div>
 
-        <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mt-4 mb-1.5">Practice everything</p>
+        <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mt-4 mb-1.5">{t.structuresPage.practiceEverything}</p>
         <div className="grid grid-cols-3 gap-2">
           <Link href="/structures/flashcards" className="card flex flex-col items-center justify-center gap-1 py-4 text-center hover:bg-[var(--surface-2)] transition-colors">
             <span className="text-2xl">🃏</span>
-            <span className="text-xs font-semibold text-[var(--text)]">Flashcards</span>
+            <span className="text-xs font-semibold text-[var(--text)]">{t.structuresPage.flashcards}</span>
           </Link>
           <Link href="/structures/detective" className="card flex flex-col items-center justify-center gap-1 py-4 text-center hover:bg-[var(--surface-2)] transition-colors">
             <span className="text-2xl">🕵️</span>
-            <span className="text-xs font-semibold text-[var(--text)]">Detective</span>
+            <span className="text-xs font-semibold text-[var(--text)]">{t.structuresPage.detective}</span>
           </Link>
           <Link href="/structures/review" className="card flex flex-col items-center justify-center gap-1 py-4 text-center hover:bg-[var(--surface-2)] transition-colors relative">
             <span className="text-2xl">🔄</span>
-            <span className="text-xs font-semibold text-[var(--text)]">Review</span>
+            <span className="text-xs font-semibold text-[var(--text)]">{t.structuresPage.review}</span>
             {dueCount > 0 && (
               <span
                 className="absolute -top-1.5 -right-1.5 min-w-[20px] h-5 px-1 rounded-full text-[10px] font-bold text-white flex items-center justify-center"
@@ -98,7 +100,7 @@ export default function StructuresPage() {
         <div className="mt-4">
           <input
             type="text"
-            placeholder="Search structures…"
+            placeholder={t.structuresPage.searchPlaceholder}
             value={search}
             onChange={e => setSearch(e.target.value)}
             className="w-full px-4 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]"
@@ -126,7 +128,7 @@ export default function StructuresPage() {
         {visible.length === 0 ? (
           <div className="text-center py-16 text-[var(--text-muted)]">
             <div className="text-5xl mb-3">🔍</div>
-            <p>No structures match your search.</p>
+            <p>{t.structuresPage.noMatch}</p>
           </div>
         ) : (
           visible.map(s => (

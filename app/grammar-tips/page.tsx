@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import BackButton from '@/components/BackButton';
@@ -7,6 +8,7 @@ import { GRAMMAR_TIPS, TIP_CATEGORIES, type GrammarTip } from '@/lib/grammar-tip
 const ALL = 'All';
 
 export default function GrammarTipsPage() {
+  const t = useTranslation();
   const router = useRouter();
   const [activeCategory, setActiveCategory] = useState(ALL);
   const [openId, setOpenId] = useState<string | null>(null);
@@ -41,7 +43,7 @@ export default function GrammarTipsPage() {
         <div className="mt-3">
           <input
             type="text"
-            placeholder="Search tips…"
+            placeholder={t.grammarTipsPage.searchPlaceholder}
             value={search}
             onChange={e => setSearch(e.target.value)}
             className="w-full px-4 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]"
@@ -71,7 +73,7 @@ export default function GrammarTipsPage() {
         {visible.length === 0 ? (
           <div className="text-center py-16 text-[var(--text-muted)]">
             <div className="text-5xl mb-3">🔍</div>
-            <p>No tips match your search.</p>
+            <p>{t.grammarTipsPage.noMatch}</p>
           </div>
         ) : (
           visible.map(tip => (

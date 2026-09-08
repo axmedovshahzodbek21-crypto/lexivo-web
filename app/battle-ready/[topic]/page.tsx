@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { notFound } from 'next/navigation';
@@ -9,6 +10,7 @@ import { getBRSideContent } from '@/lib/battleReadyContent';
 import { isTopicDone, toggleTopicDone } from '@/lib/battleReadyDone';
 
 export default function BattleReadyTopicPage() {
+  const t = useTranslation();
   const params = useParams();
   const slug = String(params.topic);
   const topic = getDebateTopic(slug);
@@ -47,6 +49,7 @@ export default function BattleReadyTopicPage() {
 }
 
 function SideCard({ slug, side, label, color, edge }: { slug: string; side: 'for' | 'against'; label: string; color: string; edge: string }) {
+  const t = useTranslation();
   const hasContent = !!getBRSideContent(slug, side);
   return (
     <Link
@@ -56,7 +59,7 @@ function SideCard({ slug, side, label, color, edge }: { slug: string; side: 'for
     >
       <div className="text-3xl mb-2">{side === 'for' ? '👍' : '👎'}</div>
       <div className="font-bold">{label}</div>
-      {!hasContent && <div className="text-[10px] text-white/70 mt-1">content coming soon</div>}
+      {!hasContent && <div className="text-[10px] text-white/70 mt-1">{t.battleReadyPage.contentComingSoon}</div>}
     </Link>
   );
 }

@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { notFound } from 'next/navigation';
@@ -10,6 +11,7 @@ import { getStepIndex, setStepIndex, getCaseSelection, setCaseSelection, type Ca
 const REQUIRED_ARGS = 2;
 
 export default function DebateStepPage() {
+  const t = useTranslation();
   const params = useParams();
   const router = useRouter();
   const topic = String(params.topic);
@@ -91,6 +93,7 @@ function StepFooter({ color, onDone, label = 'Continue', disabled = false }: { c
 
 // ---------- Vocabulary + Idioms: flip cards through the whole bank ----------
 function VocabStep({ vocab, idioms, color, onDone }: { vocab: VocabItem[]; idioms: IdiomItem[]; color: string; onDone: () => void }) {
+  const t = useTranslation();
   const items = useMemo(() => [
     ...vocab.map(v => ({ term: v.term, definition: v.definition, example: v.example, kind: 'vocab' as const })),
     ...idioms.map(i => ({ term: i.idiom, definition: i.definition, example: i.example, kind: 'idiom' as const })),
@@ -136,6 +139,7 @@ function VocabStep({ vocab, idioms, color, onDone }: { vocab: VocabItem[]; idiom
 function PickYourCaseStep({ topic, side, items, phraseBank, color, onDone }: {
   topic: string; side: DebateSide; items: ArgumentItem[]; phraseBank: string[]; color: string; onDone: () => void;
 }) {
+  const t = useTranslation();
   const [sel, setSel] = useState<CaseSelection>({ argIndices: [], openingIdx: null, closingIdx: null });
   const [phase, setPhase] = useState<'pick-args' | 'pick-phrases'>('pick-args');
   const [revealedIdx, setRevealedIdx] = useState<number | null>(null);
@@ -180,7 +184,7 @@ function PickYourCaseStep({ topic, side, items, phraseBank, color, onDone }: {
                         <div className="italic">“{it.phrase}”</div>
                       </div>
                     )}
-                    {!revealed && <div className="text-xs text-[var(--text-muted)] mt-1">tap to expand</div>}
+                    {!revealed && <div className="text-xs text-[var(--text-muted)] mt-1">{t.debatePage.tapToExpand}</div>}
                   </button>
                   <button
                     onClick={() => toggleArg(idx)}
@@ -201,9 +205,9 @@ function PickYourCaseStep({ topic, side, items, phraseBank, color, onDone }: {
 
   return (
     <div>
-      <p className="text-xs text-[var(--text-muted)] mb-3">Pick one line to open your case, and a different one to close it.</p>
+      <p className="text-xs text-[var(--text-muted)] mb-3">{t.debatePage.pickOpenClose}</p>
       <div className="mb-4">
-        <div className="text-xs font-bold text-[var(--text-muted)] mb-1.5 uppercase">Opening line</div>
+        <div className="text-xs font-bold text-[var(--text-muted)] mb-1.5 uppercase">{t.debatePage.openingLine}</div>
         <div className="space-y-1.5">
           {phraseBank.map((p, idx) => (
             <button
@@ -219,7 +223,7 @@ function PickYourCaseStep({ topic, side, items, phraseBank, color, onDone }: {
         </div>
       </div>
       <div className="mb-2">
-        <div className="text-xs font-bold text-[var(--text-muted)] mb-1.5 uppercase">Closing line</div>
+        <div className="text-xs font-bold text-[var(--text-muted)] mb-1.5 uppercase">{t.debatePage.closingLine}</div>
         <div className="space-y-1.5">
           {phraseBank.map((p, idx) => (
             <button
@@ -243,6 +247,7 @@ function PickYourCaseStep({ topic, side, items, phraseBank, color, onDone }: {
 function BuildStep({ topic, side, arguments: bank, phraseBank, color, onDone }: {
   topic: string; side: DebateSide; arguments: ArgumentItem[]; phraseBank: string[]; color: string; onDone: () => void;
 }) {
+  const t = useTranslation();
   const [sel, setSel] = useState<CaseSelection | null>(null);
   useEffect(() => { setSel(getCaseSelection(topic, side)); }, [topic, side]);
 
@@ -266,7 +271,7 @@ function BuildStep({ topic, side, arguments: bank, phraseBank, color, onDone }: 
 
   if (!sel) return null;
   if (!pieces) {
-    return <p className="text-sm text-[var(--text-muted)]">Go back and pick your case first — no arguments or phrases selected yet.</p>;
+    return <p className="text-sm text-[var(--text-muted)]">{t.debatePage.pickCaseFirst}</p>;
   }
 
   const remaining = pieces.filter(p => !placed.includes(p));
@@ -274,10 +279,10 @@ function BuildStep({ topic, side, arguments: bank, phraseBank, color, onDone }: 
 
   return (
     <div>
-      <p className="text-xs text-[var(--text-muted)] mb-2">These are the pieces you picked. Tap them in the order a strong case should flow.</p>
+      <p className="text-xs text-[var(--text-muted)] mb-2">{t.debatePage.tapInOrder}</p>
 
       <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-3 min-h-[140px] space-y-2 mb-3">
-        {placed.length === 0 && <div className="text-xs text-[var(--text-muted)] text-center py-8">Your case will build here</div>}
+        {placed.length === 0 && <div className="text-xs text-[var(--text-muted)] text-center py-8">{t.debatePage.caseBuildsHere}</div>}
         {placed.map((p, idx) => {
           const correct = checked && p.correctIndex === idx;
           const wrong = checked && p.correctIndex !== idx;
@@ -327,6 +332,7 @@ function BuildStep({ topic, side, arguments: bank, phraseBank, color, onDone }: 
 
 // ---------- Rebuttal: multiple choice ----------
 function RebuttalStep({ items, color, onDone }: { items: RebuttalItem[]; color: string; onDone: () => void }) {
+  const t = useTranslation();
   const [i, setI] = useState(0);
   const [picked, setPicked] = useState<number | null>(null);
   const item = items[i];
@@ -343,7 +349,7 @@ function RebuttalStep({ items, color, onDone }: { items: RebuttalItem[]; color: 
     <div>
       <div className="text-xs text-[var(--text-muted)] mb-2">{i + 1} / {items.length}</div>
       <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 mb-3">
-        <div className="text-xs text-[var(--text-muted)] mb-1">Opponent says:</div>
+        <div className="text-xs text-[var(--text-muted)] mb-1">{t.debatePage.opponentSays}</div>
         <div className="font-bold text-[var(--text)]">“{item.opposing}”</div>
       </div>
       <div className="space-y-2">
@@ -378,6 +384,7 @@ function RebuttalStep({ items, color, onDone }: { items: RebuttalItem[]; color: 
 function DeliverStep({ topic, side, arguments: bank, phraseBank, modelCase, color, onDone }: {
   topic: string; side: DebateSide; arguments: ArgumentItem[]; phraseBank: string[]; modelCase: string; color: string; onDone: () => void;
 }) {
+  const t = useTranslation();
   const [sel, setSel] = useState<CaseSelection | null>(null);
   useEffect(() => { setSel(getCaseSelection(topic, side)); }, [topic, side]);
 

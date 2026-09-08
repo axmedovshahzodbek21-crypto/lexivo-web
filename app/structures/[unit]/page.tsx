@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { use, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -6,6 +7,7 @@ import { STRUCTURES, UNIT_SLUGS } from '@/lib/structures-data';
 import { getStructuresSRS, getSentenceProgress, getSentenceTotal } from '@/lib/storage';
 
 export default function StructureUnitHubPage({ params }: { params: Promise<{ unit: string }> }) {
+  const t = useTranslation();
   const { unit: slug } = use(params);
   const router = useRouter();
   const unit = UNIT_SLUGS[slug];
@@ -19,8 +21,8 @@ export default function StructureUnitHubPage({ params }: { params: Promise<{ uni
   if (!unit) {
     return (
       <div className="p-6 text-center flex flex-col items-center justify-center min-h-screen">
-        <p className="text-[var(--text-muted)] mb-4">Unknown unit.</p>
-        <Link href="/structures" className="btn-primary inline-block">Back to Structures</Link>
+        <p className="text-[var(--text-muted)] mb-4">{t.structuresPage.unknownUnit}</p>
+        <Link href="/structures" className="btn-primary inline-block">{t.structuresPage.backToStructures}</Link>
       </div>
     );
   }
@@ -28,7 +30,7 @@ export default function StructureUnitHubPage({ params }: { params: Promise<{ uni
   return (
     <div className="flex flex-col min-h-screen animate-fade-in">
       <div className="p-4 border-b border-[var(--border)]">
-        <button onClick={() => router.push('/structures')} className="btn-icon mb-3" aria-label="Go back">←</button>
+        <button onClick={() => router.push('/structures')} className="btn-icon mb-3" aria-label={t.structuresPage.goBack}>←</button>
         <h1 className="text-xl font-bold text-[var(--text)]">{unit}</h1>
         <p className="text-sm text-[var(--text-muted)] mt-0.5">
           {learnedInUnit}/{structuresInUnit.length} structures learned · {sentenceProgress}/{sentenceTotal} sentences translated
@@ -42,8 +44,8 @@ export default function StructureUnitHubPage({ params }: { params: Promise<{ uni
         >
           <span className="text-3xl">🔎</span>
           <div>
-            <div className="font-bold text-[var(--text)]">Learn</div>
-            <div className="text-xs text-[var(--text-muted)]">Discover structures for this unit, one at a time</div>
+            <div className="font-bold text-[var(--text)]">{t.structuresPage.learn}</div>
+            <div className="text-xs text-[var(--text-muted)]">{t.structuresPage.learnSub}</div>
           </div>
         </Link>
 
@@ -53,8 +55,8 @@ export default function StructureUnitHubPage({ params }: { params: Promise<{ uni
         >
           <span className="text-3xl">🃏</span>
           <div>
-            <div className="font-bold text-[var(--text)]">Flashcards</div>
-            <div className="text-xs text-[var(--text-muted)]">Drill what you've learned in this unit</div>
+            <div className="font-bold text-[var(--text)]">{t.structuresPage.flashcards}</div>
+            <div className="text-xs text-[var(--text-muted)]">{t.structuresPage.flashcardsSub}</div>
           </div>
         </Link>
 
@@ -64,8 +66,8 @@ export default function StructureUnitHubPage({ params }: { params: Promise<{ uni
         >
           <span className="text-3xl">✍️</span>
           <div>
-            <div className="font-bold text-[var(--text)]">Translate</div>
-            <div className="text-xs text-[var(--text-muted)]">Translate Uzbek sentences yourself, then check your answer</div>
+            <div className="font-bold text-[var(--text)]">{t.structuresPage.translate}</div>
+            <div className="text-xs text-[var(--text-muted)]">{t.structuresPage.translateSub}</div>
           </div>
         </Link>
       </div>
