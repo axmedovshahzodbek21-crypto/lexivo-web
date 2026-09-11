@@ -2017,7 +2017,7 @@ export default function ClassDashboardPage() {
   const { user } = useAuth();
   const [classInfo, setClassInfo] = useState<ClassInfo | null>(null);
   const [students, setStudents] = useState<StudentRow[]>([]);
-  const [pendingMembers, setPendingMembers] = useState<{ student_id: string; name: string }[]>([]);
+  const [pendingMembers, setPendingMembers] = useState<{ student_id: string; name: string; avatar_url: string | null }[]>([]);
   const [collections, setCollections] = useState<CollectionMeta[]>([]);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
@@ -2383,14 +2383,14 @@ export default function ClassDashboardPage() {
   };
 
   const loadPendingMembers = async () => {
-    const { data: rows } = await supabase.from('class_members').select('student_id').eq('class_id', id).eq('status', 'pending');
-    const ids = (rows ?? []).map((r: { student_id: string }) => r.student_id);
-    let names: Record<string, string> = {};
-    if (ids.length > 0) {
-      const { data: profiles } = await supabase.from('profiles').select('id, name').in('id', ids);
-      for (const p of profiles ?? []) names[p.id] = p.name ?? 'Student';
-    }
-    setPendingMembers(ids.map((sid: string) => ({ student_id: sid, name: names[sid] ?? 'Student' })));
+    // get_class_pending_members is a SECURITY DEFINER RPC (not a direct
+    // class_members + profiles query) because profiles RLS only lets a user
+    // read their own row — a teacher querying profiles for their students
+    // directly gets zero rows back silently, same failure shape the
+    // class_members read itself had before it got its own RLS policy.
+    const { data } = await supabase.rpc('get_class_pending_members', { p_class_id: id });
+    setPendingMembers(((data ?? []) as { student_id: string; name: string; avatar_url: string | null }[])
+      .map(r => ({ student_id: r.student_id, name: r.name ?? 'Student', avatar_url: r.avatar_url })));
   };
 
   const approvePending = async (studentId: string) => {
@@ -2537,6 +2537,7 @@ export default function ClassDashboardPage() {
           <p className="text-xs font-bold text-[var(--text)]">⏳ Pending approval ({pendingMembers.length})</p>
           {pendingMembers.map(m => (
             <div key={m.student_id} className="flex items-center gap-3">
+              <Avatar name={m.name} url={m.avatar_url} size={28} />
               <p className="flex-1 text-sm text-[var(--text)] truncate">{m.name}</p>
               <button onClick={() => rejectPending(m.student_id)} className="text-xs font-bold text-[var(--danger)] px-2 py-1">{tt.classesPage.reject}</button>
               <button onClick={() => approvePending(m.student_id)} className="text-xs font-bold text-white px-3 py-1.5 rounded-lg" style={{ background: 'var(--primary)' }}>{tt.classesPage.approve}</button>

@@ -97,6 +97,7 @@ const [memberCount, setMemberCount] = useState(0);
   const [readCounts, setReadCounts] = useState<Record<string, number>>({});
   const [myClassXp, setMyClassXp] = useState(0);
   const [myClassStreak, setMyClassStreak] = useState(0);
+  const [pendingMembers, setPendingMembers] = useState<{ student_id: string; name: string; avatar_url: string | null }[]>([]);
 
   useEffect(() => {
     if (!user) return;
@@ -269,6 +270,35 @@ const [memberCount, setMemberCount] = useState(0);
     })();
     return () => { cancelled = true; };
   }, [id, user, router]);
+
+  useEffect(() => {
+    if (!user || !isTeacher) return;
+    loadPendingMembers();
+  }, [user, isTeacher, id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const loadPendingMembers = async () => {
+    // get_class_pending_members is a SECURITY DEFINER RPC (not a direct
+    // class_members + profiles query) because profiles RLS only lets a user
+    // read their own row — a teacher querying profiles for their students
+    // directly gets zero rows back silently, same failure shape the
+    // class_members read itself had before it got its own RLS policy.
+    const { data } = await supabase.rpc('get_class_pending_members', { p_class_id: id });
+    setPendingMembers(((data ?? []) as { student_id: string; name: string; avatar_url: string | null }[])
+      .map(r => ({ student_id: r.student_id, name: r.name ?? 'Student', avatar_url: r.avatar_url })));
+  };
+
+  const approvePending = async (studentId: string) => {
+    const { error } = await supabase.from('class_members').update({ status: 'approved' }).eq('class_id', id).eq('student_id', studentId);
+    if (error) { alert('Failed to approve — try again.'); return; }
+    setPendingMembers(prev => prev.filter(m => m.student_id !== studentId));
+    _homeCache.delete(`${user?.id}:${id}`);
+  };
+
+  const rejectPending = async (studentId: string) => {
+    const { error } = await supabase.from('class_members').delete().eq('class_id', id).eq('student_id', studentId);
+    if (error) { alert('Failed to reject — try again.'); return; }
+    setPendingMembers(prev => prev.filter(m => m.student_id !== studentId));
+  };
 
   const openXpHistory = (s: StudentProfile) => setXpHistoryStudent(s);
 
@@ -558,6 +588,27 @@ const [memberCount, setMemberCount] = useState(0);
       </div>
 
       <div className="flex-1 p-4 space-y-5">
+
+        {/* Pending join requests (teacher only) */}
+        {isTeacher && pendingMembers.length > 0 && (
+          <div className="rounded-2xl p-3.5 space-y-2.5" style={{ background: 'var(--primary-bg)', border: '1px solid color-mix(in srgb, var(--primary) 30%, transparent)' }}>
+            <p className="text-xs font-bold text-[var(--text)]">⏳ Pending approval ({pendingMembers.length})</p>
+            {pendingMembers.map(m => (
+              <div key={m.student_id} className="flex items-center gap-3">
+                {m.avatar_url ? (
+                  <img src={m.avatar_url} alt={m.name} className="w-7 h-7 rounded-full object-cover shrink-0" />
+                ) : (
+                  <div className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-black shrink-0" style={{ background: avatarColor(m.student_id) }}>
+                    {(m.name[0] || '?').toUpperCase()}
+                  </div>
+                )}
+                <p className="flex-1 text-sm text-[var(--text)] truncate">{m.name}</p>
+                <button onClick={() => rejectPending(m.student_id)} className="text-xs font-bold text-[var(--danger)] px-2 py-1">{tx.classesPage.reject}</button>
+                <button onClick={() => approvePending(m.student_id)} className="text-xs font-bold text-white px-3 py-1.5 rounded-lg" style={{ background: 'var(--primary)' }}>{tx.classesPage.approve}</button>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Spotlight banner (teacher only) */}
         {isTeacher && needsAttention > 0 && (
