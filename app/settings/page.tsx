@@ -386,8 +386,8 @@ export default function SettingsPage() {
 
         <div>
           <label className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide block mb-2">{t.settings.sessionSize}</label>
-          <div className="grid grid-cols-5 gap-2">
-            {[5, 10, 15, 20, 30].map(n => (
+          <div className="grid grid-cols-3 gap-2">
+            {[5, 10, 15, 20, 30, 50].map(n => (
               <button
                 key={n}
                 onClick={() => updateSettings({ sessionSize: n })}
