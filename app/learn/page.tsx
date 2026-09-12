@@ -24,7 +24,7 @@ import { checkAchievements } from '@/lib/gamification';
 import { fireConfetti } from '@/lib/confetti';
 import { shuffleArray } from '@/lib/shuffleArray';
 import type { WordItem, WordCollection } from '@/lib/types';
-import { getImportedWords, getImportedWordsByCollection, importedWordExampleFields, getMyActivityPendingNewWords, markMyLearnComplete } from '@/lib/storage';
+import { getImportedWords, getImportedWordsByCollection, importedWordExampleFields, getMyActivityPendingNewWords, markMyLearnComplete, getMyWordsPendingLearnWords, addMyWordsLearnSeenWords } from '@/lib/storage';
 import Link from 'next/link';
 import UnitPicker from '@/components/UnitPicker';
 import TiltCard from '@/components/TiltCard';
@@ -346,6 +346,11 @@ function LearnInner() {
       let imported = myCollection ? getImportedWordsByCollection(myCollection, myFolder) : getImportedWords();
       if (onlyNew && myCollection) {
         const pending = new Set(getMyActivityPendingNewWords(myFolder, myCollection, 'learn', imported.map(w => w.word)));
+        imported = imported.filter(w => pending.has(w.word));
+      } else if (!myCollection) {
+        // Aggregate "My Words" (no unit selected): rotate through unseen
+        // words instead of always re-slicing the same first sessionSize.
+        const pending = new Set(getMyWordsPendingLearnWords(imported.map(w => w.word)));
         imported = imported.filter(w => pending.has(w.word));
       }
       const list: StudyWord[] = imported.map(w => ({
@@ -711,6 +716,8 @@ function LearnInner() {
         clearLearnProgress(classHWKey, 0);
       } else if (sourceMyWords && myCollection) {
         if (markMyLearnComplete(myFolder, myCollection)) { setMyUnitCompleted(true); fireConfetti(); }
+      } else if (sourceMyWords && !myCollection && words.length > 0) {
+        addMyWordsLearnSeenWords(words.map(w => w.word));
       }
       // Class sessions change nothing in the personal Lexivo store, so there's
       // nothing to sync up — skip the round-trip.

@@ -60,6 +60,7 @@ const KEYS = {
   myWordsXpUnits:    'lexivo_my_words_xp_units',
   srsLockedDays:     'lexivo_srs_locked_days',
   myUnitProgress:    'lexivo_my_unit_progress',
+  myWordsLearnSeen:  'lexivo_my_words_learn_seen',
   focusDays:         'lexivo_focus_days',
   focusUpdatedAt:    'lexivo_focus_updated_at',
   structuresSrs:            'lexivo_structures_srs',
@@ -1185,6 +1186,33 @@ export function getMyUnitPendingNewWords(folderName: string | undefined, collect
   return currentWords.filter(w => pending.has(w));
 }
 
+// ─── My Words flat-list Learn rotation ────────────────────────────────────────
+// The aggregate "My Words" list (no specific unit selected) has no per-unit
+// progress record to hang "already learned" tracking off of, so Learn always
+// re-sliced words[0:sessionSize] — anything past the session size was simply
+// unreachable once the list grew beyond it. This tracks which words have been
+// through a completed aggregate Learn session, so each new session serves the
+// next unseen batch instead of repeating the same first N forever.
+
+export function getMyWordsLearnSeenWords(): string[] {
+  return get<string[]>(KEYS.myWordsLearnSeen, []);
+}
+
+export function addMyWordsLearnSeenWords(words: string[]): void {
+  const seen = new Set(getMyWordsLearnSeenWords());
+  words.forEach(w => seen.add(w));
+  set(KEYS.myWordsLearnSeen, Array.from(seen));
+}
+
+// Words not yet learned in a prior aggregate session. Once every current word
+// has been seen, the rotation restarts from the top rather than leaving the
+// list permanently empty.
+export function getMyWordsPendingLearnWords(currentWords: string[]): string[] {
+  const seen = new Set(getMyWordsLearnSeenWords());
+  const pending = currentWords.filter(w => !seen.has(w));
+  return pending.length > 0 ? pending : currentWords;
+}
+
 // Clears all My Words unit progress (per-activity done-flags, word snapshots,
 // completion badges) and their XP-awarded markers, for every folder/unit —
 // but leaves the imported words/folders themselves untouched. Distinct from
@@ -1199,6 +1227,7 @@ export function resetMyWordsProgress(): void {
   }
   toRemove.forEach(k => localStorage.removeItem(k));
   localStorage.removeItem(KEYS.myWordsXpUnits);
+  localStorage.removeItem(KEYS.myWordsLearnSeen);
 }
 
 // ─── Starred words ───────────────────────────────────────────────────────────
