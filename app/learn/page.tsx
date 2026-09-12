@@ -121,6 +121,12 @@ function buildStudyList(
   return words;
 }
 
+// Sentinel "collection name" the generic (collectionName, dayNumber) progress
+// store is keyed under for the aggregate My Words list — that list has no
+// real collection/day of its own, but reusing saveLearnProgress/getLearnProgress
+// lets it share the same resume mechanism Library units already use.
+const MY_WORDS_PROGRESS_KEY = 'my-words-aggregate';
+
 function LearnInner() {
   const router = useRouter();
   const sp = useSearchParams();
@@ -283,6 +289,9 @@ function LearnInner() {
       } else if (sourceClassHW && hwId) {
         saveLearnProgress(classHWKey, 0, index);
         saveLearnMarks(classHWKey, 0, tooHard, pure);
+      } else if (sourceMyWords && !myCollection) {
+        saveLearnProgress(MY_WORDS_PROGRESS_KEY, 0, index);
+        saveLearnMarks(MY_WORDS_PROGRESS_KEY, 0, tooHard, pure);
       }
       classBookmarkRef.current.save();
     };
@@ -369,6 +378,19 @@ function LearnInner() {
       const mySlice = list.slice(0, sessionSize);
       setWords(mySlice);
       setMarks(new Array(mySlice.length).fill(null));
+      if (!myCollection && !startIndexApplied) {
+        const saved = getLearnProgress(MY_WORDS_PROGRESS_KEY, 0);
+        if (saved && saved > 0 && saved < mySlice.length) {
+          const savedMarks = getLearnMarks(MY_WORDS_PROGRESS_KEY, 0);
+          setResumePrompt({
+            savedIndex: saved,
+            total: mySlice.length,
+            tooHard: savedMarks?.tooHard ?? [],
+            skipped: savedMarks?.skipped ?? [],
+          });
+        }
+        setStartIndexApplied(true);
+      }
       return;
     }
     if (collectionsLoaded && collections.length > 0) {
@@ -718,6 +740,7 @@ function LearnInner() {
         if (markMyLearnComplete(myFolder, myCollection)) { setMyUnitCompleted(true); fireConfetti(); }
       } else if (sourceMyWords && !myCollection && words.length > 0) {
         addMyWordsLearnSeenWords(words.map(w => w.word));
+        clearLearnProgress(MY_WORDS_PROGRESS_KEY, 0);
       }
       // Class sessions change nothing in the personal Lexivo store, so there's
       // nothing to sync up — skip the round-trip.
