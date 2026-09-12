@@ -1205,12 +1205,16 @@ export function addMyWordsLearnSeenWords(words: string[]): void {
 }
 
 // Words not yet learned in a prior aggregate session. Once every current word
-// has been seen, the rotation restarts from the top rather than leaving the
-// list permanently empty.
+// has been seen, the seen-set is cleared and a fresh lap starts from the top —
+// clearing here (not just returning the full list) matters, because otherwise
+// every word stays permanently "seen" and this would keep re-slicing the same
+// first sessionSize words forever, reproducing the original bug one lap later.
 export function getMyWordsPendingLearnWords(currentWords: string[]): string[] {
   const seen = new Set(getMyWordsLearnSeenWords());
   const pending = currentWords.filter(w => !seen.has(w));
-  return pending.length > 0 ? pending : currentWords;
+  if (pending.length > 0) return pending;
+  set(KEYS.myWordsLearnSeen, []);
+  return currentWords;
 }
 
 // Clears all My Words unit progress (per-activity done-flags, word snapshots,
