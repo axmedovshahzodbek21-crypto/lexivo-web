@@ -1014,6 +1014,7 @@ function LearnInner() {
               if (collectionName && dayNumber !== undefined) clearLearnProgress(collectionName, dayNumber);
               else if (sourceClass) clearLearnProgress(classNameParam, 0);
               else if (sourceClassHW && hwId) clearLearnProgress(classHWKey, 0);
+              else if (sourceMyWords && !myCollection) clearLearnProgress(MY_WORDS_PROGRESS_KEY, 0);
               classBookmarkRef.current.clear();
               setResumePrompt(null);
             }}
