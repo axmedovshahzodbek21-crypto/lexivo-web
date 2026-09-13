@@ -660,6 +660,7 @@ function LearnInner() {
       const gateCorrectFirst = perWordDataRef.current.filter(w => w.outcome === 'learned' && w.gate_correct_first).length;
       await supabase.from('learn_session_analytics').insert({
         student_id: user.id,
+        class_id: (sourceClass || sourceClassHW) && classIdParam ? classIdParam : null,
         collection_name: sourceClass ? classNameParam : (collectionName ?? 'all'),
         day_number: sourceClass ? 0 : (dayNumber ?? 0),
         started_at: new Date(sessionStartRef.current).toISOString(),
@@ -676,7 +677,7 @@ function LearnInner() {
       await supabase.from('student_presence').delete().eq('student_id', user.id);
     };
     emit();
-  }, [done, marks, words, collectionName, dayNumber]);
+  }, [done, marks, words, collectionName, dayNumber, sourceClass, sourceClassHW, classIdParam, classNameParam]);
 
   // Shared tail end of both "Got it" and "Too Hard" — XP, streak bookkeeping,
   // achievements, and unit-completion detection are identical for both

@@ -149,10 +149,10 @@ const [memberCount, setMemberCount] = useState(0);
       memberIdsRef.current = memberIds;
       const annIds = ((anns ?? []) as Announcement[]).map(a => a.id);
 
-      const [{ data: profiles }, { data: reads }, { data: tgts }, { data: tProfile }] = await Promise.all([
+      const [{ data: studyDays }, { data: reads }, { data: tgts }, { data: tProfile }] = await Promise.all([
         memberCount > 0
-          ? supabase.from('user_data').select('id, last_study_date').in('id', memberIds)
-          : Promise.resolve({ data: [] as { last_study_date: string | null }[] }),
+          ? supabase.from('class_study_days').select('student_id, study_date').eq('class_id', id).in('student_id', memberIds)
+          : Promise.resolve({ data: [] as { student_id: string; study_date: string }[] }),
         teacher && annIds.length > 0
           ? supabase.from('class_announcement_reads').select('announcement_id').in('announcement_id', annIds)
           : Promise.resolve({ data: [] as { announcement_id: string }[] }),
@@ -167,8 +167,16 @@ const [memberCount, setMemberCount] = useState(0);
 
       const today = localDateStr();
       const threeDaysAgo = addDaysToDateStr(today, -3);
-      const activeToday = (profiles ?? []).filter(p => p.last_study_date === today).length;
-      const needsAttention = (profiles ?? []).filter(p => !p.last_study_date || p.last_study_date < threeDaysAgo).length;
+      const lastStudyByStudent = new Map<string, string>();
+      for (const row of studyDays ?? []) {
+        const current = lastStudyByStudent.get(row.student_id);
+        if (!current || row.study_date > current) lastStudyByStudent.set(row.student_id, row.study_date);
+      }
+      const activeToday = memberIds.filter(id => lastStudyByStudent.get(id) === today).length;
+      const needsAttention = memberIds.filter(id => {
+        const date = lastStudyByStudent.get(id);
+        return !date || date < threeDaysAgo;
+      }).length;
 
       const counts: Record<string, number> = {};
       for (const r of reads ?? []) {
