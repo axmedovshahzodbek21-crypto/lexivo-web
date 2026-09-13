@@ -1,4 +1,4 @@
-﻿import type { StructureItem, StructureUnit } from './types';
+import type { StructureItem, StructureUnit } from './types';
 
 // Transcribed from two source PDFs:
 //  - struct-01..struct-80: "ONLY MINE.pdf" — sentence structures with English
