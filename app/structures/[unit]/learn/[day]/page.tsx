@@ -197,6 +197,10 @@ export default function UnitDayLearnPage({ params }: { params: Promise<{ unit: s
               className="cursor-pointer select-none flex flex-col items-center gap-3 text-center py-6"
               onClick={() => setRevealed(true)}
             >
+              <div className="rounded-xl p-3 flex gap-2 items-start text-left w-full" style={{ background: 'var(--surface-2)', borderLeft: '3px solid var(--warning)' }}>
+                <span className="text-lg flex-shrink-0">💭</span>
+                <p className="text-sm text-[var(--text)] leading-relaxed">{current.scenario}</p>
+              </div>
               <div className="text-5xl mt-4">🤔</div>
               <p className="text-sm font-medium text-[var(--text-muted)]">{t.structuresPage.doYouKnowStructure}</p>
               <div className="flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold pointer-events-none" style={{ background: 'var(--primary-bg)', color: 'var(--primary)' }}>
