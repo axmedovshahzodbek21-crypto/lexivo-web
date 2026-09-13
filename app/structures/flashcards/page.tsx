@@ -142,7 +142,6 @@ export default function StructuresFlashcardsPage() {
                 ))}
               </div>
               <h2 className="text-xl font-bold text-[var(--text)] leading-snug">{current.pattern}</h2>
-              <p className="text-xs text-[var(--text-muted)] mt-3 leading-relaxed">💭 {current.scenario}</p>
               <p className="text-xs text-[var(--text-muted)] mt-4">{t.structuresPage.tapToReveal}</p>
             </div>
 

@@ -221,7 +221,6 @@ export default function StructuresReviewPage() {
             ))}
           </div>
           <h2 className="text-2xl font-bold text-[var(--text)] leading-snug">{current.pattern}</h2>
-          <p className="text-xs text-[var(--text-muted)] leading-relaxed">💭 {current.scenario}</p>
 
           {revealed ? (
             <div className="space-y-3 animate-fade-in">

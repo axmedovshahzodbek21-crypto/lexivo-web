@@ -178,10 +178,6 @@ function StructureCard({
       {open && (
         <div className="px-4 pb-4 space-y-3 animate-fade-in border-t border-[var(--border)]">
           <p className="text-sm text-[var(--text)] pt-3 leading-relaxed">{item.definition}</p>
-          <div className="rounded-xl px-3 py-2.5 flex gap-2 items-start" style={{ background: 'var(--surface-2)', borderLeft: '3px solid var(--warning)' }}>
-            <span className="text-lg flex-shrink-0">💭</span>
-            <p className="text-sm text-[var(--text)] leading-relaxed">{item.scenario}</p>
-          </div>
           <div className="bg-[var(--primary-bg)] rounded-xl px-3 py-2.5 space-y-2">
             <p className="text-sm font-semibold text-[var(--primary)]">{item.uzTranslation}</p>
             <p className="text-sm text-[var(--primary)] leading-relaxed">{item.uzDefinition}</p>
