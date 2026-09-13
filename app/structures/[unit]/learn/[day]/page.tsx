@@ -197,8 +197,7 @@ export default function UnitDayLearnPage({ params }: { params: Promise<{ unit: s
               className="cursor-pointer select-none flex flex-col items-center gap-3 text-center py-6"
               onClick={() => setRevealed(true)}
             >
-              <div className="text-5xl mt-4">🤔</div>
-              <p className="text-sm font-medium text-[var(--text-muted)]">{t.structuresPage.doYouKnowStructure}</p>
+              <h2 className="text-2xl font-bold text-[var(--text)] leading-snug">{current.pattern}</h2>
               <div className="flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold pointer-events-none" style={{ background: 'var(--primary-bg)', color: 'var(--primary)' }}>
                 Tap to reveal
               </div>
