@@ -7,7 +7,7 @@ import { displayXP } from '@/lib/storage';
 import { recordClassStudyDay } from '@/lib/class-xp';
 import { speak } from '@/lib/speech';
 import {
-  getClassDueWords, getClassSRSAll, advanceClassSRSWord, addClassHardWord,
+  getClassDueWords, getClassSRSAll, countDueClassWords, advanceClassSRSWord, addClassHardWord,
   recordClassReviewEvent, stageLabel, stageColor, type ClassSRSEntry,
 } from '@/lib/class-srs';
 import { shuffleArray } from '@/lib/shuffleArray';
@@ -256,6 +256,12 @@ export default function ClassReviewPage() {
     );
   }
 
+  // True count of everything due right now, ignoring getClassDueWords' cap on
+  // never-reviewed words — so the student can see more is waiting instead of
+  // the session's own size quietly looking like the whole picture.
+  const totalDue = countDueClassWords(allPool);
+  const remaining = Math.max(0, totalDue - queue.length);
+
   // ── No due words ─────────────────────────────────────────────────────────────
   if (done && queue.length === 0) {
     return (
@@ -280,8 +286,11 @@ export default function ClassReviewPage() {
       <div className="p-6 text-center flex flex-col items-center justify-center min-h-screen animate-fade-in">
         <div className="text-6xl mb-4">{score >= 80 ? '🧠' : '💪'}</div>
         <h2 className="text-2xl font-bold mb-2">{t.classesPage.reviewComplete}</h2>
-        <p className="text-[var(--text-muted)] mb-6">{knewCount}/{results.length} knew · +{displayXP(sessionXP)} XP</p>
-        <div className="grid grid-cols-3 gap-2 w-full mb-6">
+        <p className="text-[var(--text-muted)] mb-1">{knewCount}/{results.length} knew · +{displayXP(sessionXP)} XP</p>
+        {remaining > 0 && (
+          <p className="text-sm text-[var(--text-muted)] mb-6">{remaining} more waiting</p>
+        )}
+        <div className={`grid grid-cols-3 gap-2 w-full ${remaining > 0 ? 'mb-6' : 'mb-6 mt-5'}`}>
           <div className="card text-center"><div className="text-xl font-bold text-[var(--success)]">{knewCount}</div><div className="text-xs text-[var(--text-muted)]">{t.classesPage.correct}</div></div>
           <div className="card text-center"><div className="text-xl font-bold text-[var(--danger)]">{notYetCount}</div><div className="text-xs text-[var(--text-muted)]">{t.classesPage.notYet}</div></div>
           <div className="card text-center"><div className="text-xl font-bold text-[var(--primary)]">{score}%</div><div className="text-xs text-[var(--text-muted)]">{t.classesPage.score}</div></div>
@@ -289,9 +298,9 @@ export default function ClassReviewPage() {
         <div className="flex gap-3 w-full">
           <button
             onClick={() => { setLoading(true); void loadQueue(); }}
-            className="btn-secondary flex-1"
-          >{t.classesPage.redo}</button>
-          <button onClick={() => router.push(`/classes/${id}/words`)} className="btn-primary flex-1">
+            className={remaining > 0 ? 'btn-primary flex-1' : 'btn-secondary flex-1'}
+          >{remaining > 0 ? 'Continue reviewing' : t.classesPage.redo}</button>
+          <button onClick={() => router.push(`/classes/${id}/words`)} className={remaining > 0 ? 'btn-secondary flex-1' : 'btn-primary flex-1'}>
             Back to class
           </button>
         </div>
@@ -328,7 +337,9 @@ export default function ClassReviewPage() {
         >✕</button>
         <div className="text-center">
           <div className="font-semibold text-sm">SRS Review · {className}</div>
-          <div className="text-xs text-[var(--text-muted)]">{index + 1} / {queue.length}</div>
+          <div className="text-xs text-[var(--text-muted)]">
+            {index + 1} / {queue.length}{remaining > 0 ? ` (${remaining} more waiting)` : ''}
+          </div>
         </div>
         <div className="flex items-center gap-1">
           <button

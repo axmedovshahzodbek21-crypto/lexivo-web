@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useMemo } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
-import { getClassDueWords, getClassSRSAll, getClassStarredWordIds, addClassStarredWord, removeClassStarredWord } from '@/lib/class-srs';
+import { getClassSRSAll, countDueClassWords, getClassStarredWordIds, addClassStarredWord, removeClassStarredWord } from '@/lib/class-srs';
 import { classGradientColors } from '@/lib/class-gradient';
 import { buildAiImportPrompt, parseAiImportOutput } from '@/lib/ai-import';
 
@@ -198,13 +198,14 @@ export default function ClassWordsPage() {
   useEffect(() => {
     if (!user || !id) return;
     (async () => {
-      const [due, all, { count: hard }, starIds] = await Promise.all([
-        getClassDueWords(user.id, id),
+      const [all, { count: hard }, starIds] = await Promise.all([
         getClassSRSAll(user.id, id),
         supabase.from('class_hard_words').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('class_id', id),
         getClassStarredWordIds(user.id, id),
       ]);
-      setDueCount(due.length);
+      // True due count, not getClassDueWords' per-session-capped size — this
+      // badge should reflect everything actually waiting.
+      setDueCount(countDueClassWords(all));
       setLearnedCount(all.length);
       setHardCount(hard ?? 0);
       setStarredIds(starIds);

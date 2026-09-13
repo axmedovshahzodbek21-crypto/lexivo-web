@@ -150,6 +150,18 @@ export async function getClassDueWords(
   return [...review, ...fresh.slice(0, NEW_WORDS_PER_SESSION)];
 }
 
+// True count of words due right now, ignoring getClassDueWords' per-session
+// cap on never-reviewed words. That cap paces one review session so a big
+// learn-day doesn't dump as one wall — it's not meant to hide from the
+// student (or a due-count badge) how many words are actually waiting, or a
+// 31-word learning day looks like it silently lost 21 words instead of
+// spreading them over a few more rounds. Mirrors Flutter's
+// countDueClassWords in class_srs_service.dart — keep both in sync.
+export function countDueClassWords(all: ClassSRSEntry[]): number {
+  const today = todayStr();
+  return all.filter(e => e.stage < 5 && e.next_due <= today).length;
+}
+
 // Returns every SRS entry for the student in this class (all stages).
 export async function getClassSRSAll(
   userId: string,
