@@ -1,6 +1,6 @@
 import { supabase } from './supabase';
 import type { UserSettings, LearnedWord, SRSWord, UnitProgress, MyUnitProgress, CustomList } from './types';
-import { getSettings, saveSettings, getLearnedWords, getLearnedWordsRaw, getSRSWordsRaw, getImportedWordsRaw, getCustomListsRaw, localDateStr, getProfilePicUrl, saveProfilePicUrl, resetMyWordsProgress, PROGRESS_RESET_KEYS, PROGRESS_RESET_PREFIXES } from './storage';
+import { getSettings, saveSettings, getLearnedWords, getLearnedWordsRaw, getSRSWordsRaw, getImportedWordsRaw, getCustomListsRaw, localDateStr, getProfilePicUrl, saveProfilePicUrl, resetMyWordsProgress, PROGRESS_RESET_KEYS, PROGRESS_RESET_PREFIXES, getDueWords } from './storage';
 import type { HardWordEntry } from './storage';
 import { getNotifSettings, saveNotifSettings } from './notifications';
 
@@ -115,6 +115,12 @@ export async function pushStats(): Promise<void> {
       p_daily_words_learned: todayCountDate === today ? lsJSON<number>('lexivo_today_count', 0) : null,
       p_daily_words_date: todayCountDate === today ? today : null,
       p_stats_updated_at: ts,
+      // Drives the due_reviews scheduled push (send-scheduled-push) — the
+      // server has no other way to know personal (non-class) SRS due-state,
+      // since that lives only on-device. A plain snapshot, not an
+      // accumulator; the RPC coalesces onto the existing value if this ever
+      // gets called somewhere getDueWords() isn't available.
+      p_due_words_count: getDueWords().length,
     });
     if (error) throw error;
     // The RPC resolves total_xp/streak server-side (GREATEST against the

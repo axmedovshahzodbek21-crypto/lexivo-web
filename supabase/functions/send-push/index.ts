@@ -100,7 +100,7 @@ Deno.serve(async (req) => {
     .from('profiles')
     .select('id')
     .in('id', recipientIds)
-    .eq('push_enabled', true);
+    .filter('push_prefs->>class_activity', 'eq', 'true');
   const externalIds = (optedIn ?? []).map((p) => p.id);
   if (externalIds.length === 0) {
     return new Response(JSON.stringify({ sent: 0, reason: 'no opted-in recipients' }), { status: 200 });

@@ -24,8 +24,9 @@ const AuthContext = createContext<AuthCtx>({
 });
 
 async function relinkPushIfEnabled(userId: string) {
-  const { data } = await supabase.from('profiles').select('push_enabled').eq('id', userId).maybeSingle();
-  if (data?.push_enabled) linkUser(userId);
+  const { data } = await supabase.from('profiles').select('push_prefs').eq('id', userId).maybeSingle();
+  const prefs = data?.push_prefs as Record<string, boolean> | undefined;
+  if (prefs && Object.values(prefs).some(Boolean)) linkUser(userId);
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {

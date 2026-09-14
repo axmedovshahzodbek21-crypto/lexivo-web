@@ -25,6 +25,9 @@ function to12h(t: string): string {
   return `${h12}:${String(m).padStart(2, '0')} ${period}`;
 }
 
+type PushPrefs = { class_activity: boolean; due_reviews: boolean; streak_risk: boolean; homework_reminders: boolean; class_idle: boolean };
+const DEFAULT_PUSH_PREFS: PushPrefs = { class_activity: true, due_reviews: true, streak_risk: true, homework_reminders: true, class_idle: true };
+
 export default function SettingsPage() {
   const router = useRouter();
   const [settings, setSettings] = useState<UserSettings>(() =>
@@ -51,8 +54,9 @@ export default function SettingsPage() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [bio, setBio] = useState('');
   const [userId, setUserId] = useState<string | null>(null);
-  const [pushEnabled, setPushEnabled] = useState(false);
+  const [pushPrefs, setPushPrefs] = useState<PushPrefs>(DEFAULT_PUSH_PREFS);
   const [pushSupported, setPushSupported] = useState(false);
+  const [isTeacher, setIsTeacher] = useState(false);
 
   useEffect(() => {
     setThemeState(getTheme());
@@ -64,27 +68,37 @@ export default function SettingsPage() {
       setUserEmail(user?.email ?? null);
       if (user) {
         setUserId(user.id);
-        supabase.from('profiles').select('bio, push_enabled').eq('id', user.id).maybeSingle()
+        supabase.from('profiles').select('bio, push_prefs').eq('id', user.id).maybeSingle()
           .then(({ data }) => {
             if (data?.bio) setBio(data.bio);
-            setPushEnabled(!!data?.push_enabled);
+            if (data?.push_prefs) setPushPrefs({ ...DEFAULT_PUSH_PREFS, ...data.push_prefs });
           });
+        supabase.from('classes').select('id', { count: 'exact', head: true }).eq('teacher_id', user.id)
+          .then(({ count }) => setIsTeacher(!!count));
       }
     });
   }, []);
 
-  const handlePushToggle = async () => {
+  const handlePushPrefToggle = async (key: keyof PushPrefs) => {
     if (!userId) return;
-    if (!pushEnabled) {
+    const wasAnyOn = Object.values(pushPrefs).some(Boolean);
+    const next = { ...pushPrefs, [key]: !pushPrefs[key] };
+    const isAnyOn = Object.values(next).some(Boolean);
+
+    if (!wasAnyOn && isAnyOn) {
+      // First toggle turned on out of a fully-off state: this is the moment
+      // to request the browser permission and link the OneSignal alias,
+      // same as the old single-switch handlePushToggle did.
       const granted = await requestPush();
       if (!granted) return;
       await linkUser(userId);
-      await supabase.from('profiles').update({ push_enabled: true }).eq('id', userId);
-      setPushEnabled(true);
-    } else {
+    }
+
+    setPushPrefs(next);
+    await supabase.from('profiles').update({ push_prefs: next }).eq('id', userId);
+
+    if (wasAnyOn && !isAnyOn) {
       await unlinkUser();
-      await supabase.from('profiles').update({ push_enabled: false }).eq('id', userId);
-      setPushEnabled(false);
     }
   };
 
@@ -779,29 +793,37 @@ export default function SettingsPage() {
         </div>
       )}
 
-      {/* Homework & announcement push notifications */}
+      {/* Push notifications, one switch per type */}
       {pushSupported && (
-        <div className="card" style={{ borderTop: '3px solid #ef4444', boxShadow: '0 4px 20px rgba(0,0,0,0.07)' }}>
-          <div className="flex items-center gap-3 mb-4">
+        <div className="card space-y-4" style={{ borderTop: '3px solid #ef4444', boxShadow: '0 4px 20px rgba(0,0,0,0.07)' }}>
+          <div className="flex items-center gap-3">
             <div className="w-11 h-11 rounded-2xl flex items-center justify-center text-xl shrink-0"
               style={{ background: 'linear-gradient(135deg, #ef4444, #f87171)', boxShadow: '0 4px 0 #b91c1c, 0 8px 16px rgba(239,68,68,0.35)' }}>📚</div>
             <h2 className="font-black text-base">{t.extra.classNotifications}</h2>
           </div>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium">{t.extra.homeworkAnnouncements}</p>
-              <p className="text-xs text-[var(--text-muted)] mt-0.5">
-                {pushEnabled ? 'Notified when a teacher assigns homework or posts an announcement' : 'Off'}
-              </p>
+          {(
+            [
+              ['class_activity', t.extra.homeworkAnnouncements, undefined] as const,
+              ['due_reviews', t.extra.pushDueReviews, t.extra.pushDueReviewsDesc] as const,
+              ['streak_risk', t.extra.pushStreakRisk, t.extra.pushStreakRiskDesc] as const,
+              ['homework_reminders', t.extra.pushHomeworkReminders, t.extra.pushHomeworkRemindersDesc] as const,
+              ...(isTeacher ? [['class_idle', t.extra.pushClassIdle, t.extra.pushClassIdleDesc] as const] : []),
+            ] as const
+          ).map(([key, label, desc]) => (
+            <div key={key} className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium">{label}</p>
+                {desc && <p className="text-xs text-[var(--text-muted)] mt-0.5">{desc}</p>}
+              </div>
+              <button
+                onClick={() => handlePushPrefToggle(key)}
+                className={`relative w-14 h-7 rounded-full transition-colors duration-300 focus:outline-none shrink-0 ${pushPrefs[key] ? 'bg-[var(--primary)]' : 'bg-[var(--surface-2)]'}`}
+                aria-label={label}
+              >
+                <span className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-300 ${pushPrefs[key] ? 'translate-x-7' : 'translate-x-0'}`} />
+              </button>
             </div>
-            <button
-              onClick={handlePushToggle}
-              className={`relative w-14 h-7 rounded-full transition-colors duration-300 focus:outline-none ${pushEnabled ? 'bg-[var(--primary)]' : 'bg-[var(--surface-2)]'}`}
-              aria-label={t.extra.toggleHomeworkPush}
-            >
-              <span className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-300 ${pushEnabled ? 'translate-x-7' : 'translate-x-0'}`} />
-            </button>
-          </div>
+          ))}
         </div>
       )}
 
