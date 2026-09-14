@@ -6,12 +6,12 @@
 -- that reacts to time passing / inaction rather than a row being inserted.
 -- See the approved plan (linked-forging-cookie) for full context.
 --
--- BEFORE RUNNING: this migration touches `classes`, `class_targets`, and
--- `class_announcements`, which — same caveat as 20260820_push_notifications.sql
--- — predate tracked migrations and were created directly in Supabase Studio.
--- Confirm column names (classes.id/name/teacher_id/created_at,
--- class_targets.class_id/created_at, class_announcements.class_id/created_at)
--- against the live schema (information_schema.columns) before applying.
+-- This migration touches `classes`, `class_targets`, and `class_announcements`,
+-- which — same caveat as 20260820_push_notifications.sql — predate tracked
+-- migrations and were created directly in Supabase Studio. Column names used
+-- here (classes.id/name/teacher_id/created_at, class_targets.class_id/
+-- due_date/completed_at/created_at, class_announcements.class_id/created_at)
+-- were confirmed against information_schema.columns on 2026-09-14.
 --
 -- Requires the pg_cron and pg_net extensions (Database → Extensions).
 -- Requires the same `push_trigger_secret` Vault secret used by

@@ -19,10 +19,10 @@
 // window is 7 days, not "today", so it can't rely on the same-day unique
 // constraint and instead does an explicit lookback check before inserting.
 //
-// BEFORE RUNNING: `classes` (id/name/teacher_id/created_at), `class_targets`
-// (class_id/created_at), and `class_announcements` (class_id/created_at)
-// predate tracked migrations (see 20260820_push_notifications.sql's own
-// caveat) — verify those column names against the live schema first.
+// `classes`, `class_targets`, and `class_announcements` predate tracked
+// migrations (see 20260820_push_notifications.sql's own caveat) — the column
+// names used below were confirmed against information_schema.columns on
+// 2026-09-14.
 //
 // Deploy: supabase functions deploy send-scheduled-push
 // Secrets: same as send-push (ONESIGNAL_REST_API_KEY, PUSH_TRIGGER_SECRET) —
@@ -225,6 +225,59 @@ Deno.serve(async (req) => {
     }
   } catch (e) {
     console.error('[send-scheduled-push] homework_reminders check failed:', e);
+  }
+
+  // ── 3b. Class target (ad-hoc per-student goal) due-soon / skipped ───────
+  // class_targets is a separate assignable item from class_homework (its own
+  // due_date/completed_at, one row per student rather than a modes[] gate),
+  // so it needs its own — simpler — completion check: done iff completed_at
+  // is set. Shares the homework_reminders opt-in flag since both are
+  // "something your teacher assigned isn't done" nudges.
+  try {
+    const tomorrow = tashkentDateStr(1);
+    const yesterday = tashkentDateStr(-1);
+
+    const { data: targetRows } = await supabase
+      .from('class_targets')
+      .select('id, class_id, student_id, title, due_date, completed_at')
+      .in('due_date', [tomorrow, yesterday])
+      .is('completed_at', null);
+
+    if (targetRows && targetRows.length > 0) {
+      const classIds = [...new Set(targetRows.map((t) => t.class_id))];
+      const { data: classRows } = await supabase.from('classes').select('id, name').in('id', classIds);
+      const classNameById = new Map((classRows ?? []).map((c) => [c.id, c.name]));
+
+      const studentIds = [...new Set(targetRows.map((t) => t.student_id))];
+      const { data: optedIn } = await supabase
+        .from('profiles')
+        .select('id')
+        .in('id', studentIds)
+        .filter('push_prefs->>homework_reminders', 'eq', 'true');
+      const optedInIds = new Set((optedIn ?? []).map((p) => p.id));
+
+      for (const target of targetRows) {
+        if (!optedInIds.has(target.student_id)) continue;
+        const notificationType = target.due_date === tomorrow ? 'target_due_soon' : 'target_overdue';
+
+        const { data: inserted } = await supabase
+          .from('push_notification_log')
+          .upsert(
+            [{ user_id: target.student_id, notification_type: notificationType, class_id: target.class_id, sent_on: today }],
+            { onConflict: 'user_id,notification_type,class_id,sent_on', ignoreDuplicates: true },
+          )
+          .select('user_id');
+        if ((inserted ?? []).length === 0) continue;
+
+        const className = classNameById.get(target.class_id) ?? 'Your class';
+        const heading = notificationType === 'target_due_soon' ? '🎯 Goal due tomorrow' : '⏰ Goal overdue';
+        const content = `${className}: ${target.title ?? 'Check your class page'}`;
+        await sendOneSignal([target.student_id], heading, content, { kind: notificationType, class_id: target.class_id });
+        sent.homework_reminders++;
+      }
+    }
+  } catch (e) {
+    console.error('[send-scheduled-push] target_reminders check failed:', e);
   }
 
   // ── 4. Idle class (teacher-facing) ──────────────────────────────────────
