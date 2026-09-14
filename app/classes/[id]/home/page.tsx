@@ -82,6 +82,7 @@ export default function ClassHomePage() {
   const [showTeacherBio, setShowTeacherBio] = useState(false);
   const [showHW, setShowHW] = useState(false);
   const [showStudents, setShowStudents] = useState(false);
+  const [showPending, setShowPending] = useState(false);
   const [students, setStudents] = useState<StudentProfile[]>([]);
   const [studentsLoading, setStudentsLoading] = useState(false);
   const [studentsError, setStudentsError] = useState('');
@@ -439,6 +440,43 @@ const [memberCount, setMemberCount] = useState(0);
           </div>
         </div>
       )}
+      {/* Pending join requests sheet (teacher only) */}
+      {showPending && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setShowPending(false)}>
+          <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl flex flex-col max-h-[85dvh]" onClick={e => e.stopPropagation()}>
+            <div className="pt-4 px-5 pb-3 shrink-0 border-b border-[var(--border)]">
+              <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto mb-3" />
+              <div className="flex items-center justify-between">
+                <h2 className="font-bold text-[var(--text)]">⏳ Pending approval</h2>
+                <span className="text-xs font-semibold text-[var(--text-muted)] bg-[var(--surface-2)] px-2.5 py-1 rounded-full">
+                  {pendingMembers.length}
+                </span>
+              </div>
+            </div>
+            <div className="overflow-y-auto flex-1 px-5 py-3 space-y-2">
+              {pendingMembers.length === 0 ? (
+                <p className="text-center text-sm text-[var(--text-muted)] py-10">No pending requests</p>
+              ) : pendingMembers.map(m => (
+                <div key={m.student_id} className="flex items-center gap-3 p-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)]">
+                  {m.avatar_url ? (
+                    <img src={m.avatar_url} alt={m.name} className="w-9 h-9 rounded-full object-cover shrink-0" />
+                  ) : (
+                    <div className="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-black shrink-0" style={{ background: avatarColor(m.student_id) }}>
+                      {(m.name[0] || '?').toUpperCase()}
+                    </div>
+                  )}
+                  <p className="flex-1 text-sm text-[var(--text)] truncate">{m.name}</p>
+                  <button onClick={() => rejectPending(m.student_id)} className="text-xs font-bold text-[var(--danger)] px-2 py-1">{tx.classesPage.reject}</button>
+                  <button onClick={() => approvePending(m.student_id)} className="text-xs font-bold text-white px-3 py-1.5 rounded-lg" style={{ background: 'var(--primary)' }}>{tx.classesPage.approve}</button>
+                </div>
+              ))}
+            </div>
+            <div className="px-5 pb-5 pt-3 shrink-0">
+              <button onClick={() => setShowPending(false)} className="w-full btn-ghost py-3 text-sm">{tx.classesPage.close}</button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Students sheet (teacher only) */}
       {showStudents && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setShowStudents(false)}>
@@ -552,6 +590,14 @@ const [memberCount, setMemberCount] = useState(0);
         </div>
         <div className="flex flex-wrap gap-2 mb-3">
 <span className="text-xs font-semibold bg-black/20 text-white rounded-full px-3 py-1">✅ {activeToday}/{memberCount} active</span>
+          {isTeacher && pendingMembers.length > 0 && (
+            <button
+              onClick={() => setShowPending(true)}
+              className="text-xs font-semibold bg-black/20 text-white rounded-full px-3 py-1 hover:bg-black/35 transition-colors active:scale-95"
+            >
+              ⏳ {pendingMembers.length} pending
+            </button>
+          )}
           {!isTeacher && (
             <button
               onClick={() => setShowHW(true)}
@@ -596,27 +642,6 @@ const [memberCount, setMemberCount] = useState(0);
       </div>
 
       <div className="flex-1 p-4 space-y-5">
-
-        {/* Pending join requests (teacher only) */}
-        {isTeacher && pendingMembers.length > 0 && (
-          <div className="rounded-2xl p-3.5 space-y-2.5" style={{ background: 'var(--primary-bg)', border: '1px solid color-mix(in srgb, var(--primary) 30%, transparent)' }}>
-            <p className="text-xs font-bold text-[var(--text)]">⏳ Pending approval ({pendingMembers.length})</p>
-            {pendingMembers.map(m => (
-              <div key={m.student_id} className="flex items-center gap-3">
-                {m.avatar_url ? (
-                  <img src={m.avatar_url} alt={m.name} className="w-7 h-7 rounded-full object-cover shrink-0" />
-                ) : (
-                  <div className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-black shrink-0" style={{ background: avatarColor(m.student_id) }}>
-                    {(m.name[0] || '?').toUpperCase()}
-                  </div>
-                )}
-                <p className="flex-1 text-sm text-[var(--text)] truncate">{m.name}</p>
-                <button onClick={() => rejectPending(m.student_id)} className="text-xs font-bold text-[var(--danger)] px-2 py-1">{tx.classesPage.reject}</button>
-                <button onClick={() => approvePending(m.student_id)} className="text-xs font-bold text-white px-3 py-1.5 rounded-lg" style={{ background: 'var(--primary)' }}>{tx.classesPage.approve}</button>
-              </div>
-            ))}
-          </div>
-        )}
 
         {/* Spotlight banner (teacher only) */}
         {isTeacher && needsAttention > 0 && (
