@@ -497,12 +497,14 @@ const [memberCount, setMemberCount] = useState(0);
                 <p className="text-center text-xs text-red-400 py-10 break-all px-2">{studentsError}</p>
               ) : students.length === 0 ? (
                 <p className="text-center text-sm text-[var(--text-muted)] py-10">{tx.classesPage.noStudentsYet}</p>
-              ) : students.map((s, i) => {
+              ) : (() => {
                 const today = localDateStr();
-                const isActive = s.last_study_date === today;
-                return (
+                const active = students.filter(s => s.last_study_date === today);
+                const inactive = students.filter(s => s.last_study_date !== today);
+                const rankOf = (id: string) => students.findIndex(s => s.id === id) + 1;
+                const row = (s: StudentProfile) => (
                   <div key={s.id} className="flex items-center gap-3 p-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)]">
-                    <div className="w-7 h-7 rounded-xl flex items-center justify-center text-xs font-black shrink-0 bg-[var(--surface)] text-[var(--text-muted)]">{i + 1}</div>
+                    <div className="w-7 h-7 rounded-xl flex items-center justify-center text-xs font-black shrink-0 bg-[var(--surface)] text-[var(--text-muted)]">{rankOf(s.id)}</div>
                     {s.avatar_url ? (
                       <img src={s.avatar_url} alt={s.name} className="w-9 h-9 rounded-full object-cover shrink-0" />
                     ) : (
@@ -514,7 +516,7 @@ const [memberCount, setMemberCount] = useState(0);
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
                         <p className="font-bold text-sm truncate text-[var(--text)]">{s.name}</p>
-                        {isActive && (
+                        {s.last_study_date === today && (
                           <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full shrink-0" style={{ background: 'rgba(16,185,129,0.15)', color: 'var(--success)' }}>{tx.classesPage.today}</span>
                         )}
                       </div>
@@ -526,7 +528,19 @@ const [memberCount, setMemberCount] = useState(0);
                     </button>
                   </div>
                 );
-              })}
+                return (
+                  <>
+                    <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide px-1">✅ Active today ({active.length})</p>
+                    {active.length === 0 ? (
+                      <p className="text-xs text-[var(--text-muted)] px-1 pb-2">No one yet</p>
+                    ) : active.map(row)}
+                    <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide px-1 pt-3">💤 Not active today ({inactive.length})</p>
+                    {inactive.length === 0 ? (
+                      <p className="text-xs text-[var(--text-muted)] px-1 pb-2">Everyone&apos;s active!</p>
+                    ) : inactive.map(row)}
+                  </>
+                );
+              })()}
             </div>
             <div className="px-5 pb-5 pt-3 shrink-0">
               <button onClick={() => setShowStudents(false)} className="w-full btn-ghost py-3 text-sm">{tx.classesPage.close}</button>
@@ -707,10 +721,10 @@ const [memberCount, setMemberCount] = useState(0);
             <div className="flex justify-center gap-3 [&>*]:w-40">
               {[
                 { icon: '👥', value: memberCount, label: 'Students', onClick: openStudentsSheet },
-                { icon: '✅', value: activeToday, label: 'Active today', onClick: undefined },
+                { icon: '✅', value: activeToday, label: 'Active today', onClick: openStudentsSheet },
               ].map(({ icon, value, label, onClick }) => (
                 <div key={label} onClick={onClick}
-                  className={`bg-[var(--surface)] border border-[var(--border)] rounded-xl p-3 flex flex-col items-center gap-1 ${onClick ? 'cursor-pointer hover:bg-[var(--surface-2)] active:scale-95 transition-all' : ''}`}>
+                  className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-3 flex flex-col items-center gap-1 cursor-pointer hover:bg-[var(--surface-2)] active:scale-95 transition-all">
                   <span className="text-xl">{icon}</span>
                   <span className="text-xl font-black text-[var(--text)]">{value}</span>
                   <span className="text-[10px] text-[var(--text-muted)] font-medium">{label}</span>
