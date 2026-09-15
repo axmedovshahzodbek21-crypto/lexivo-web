@@ -161,7 +161,7 @@ export default function HomePage() {
           const taughtList = taught.map((c: { id: string }) => c.id);
           const today = localDateStr();
           const [{ data: memberRows }, { data: activeTodayRows }] = await Promise.all([
-            supabase.from('class_members').select('class_id').in('class_id', taughtList),
+            supabase.from('class_members').select('class_id').in('class_id', taughtList).eq('status', 'approved'),
             supabase.from('class_study_days').select('class_id').in('class_id', taughtList).eq('study_date', today),
           ]);
           const memberCount: Record<string, number> = {};
