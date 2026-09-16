@@ -131,22 +131,22 @@ const SETTINGS_DEFAULTS: UserSettings = {
 };
 
 // uiLanguage lives in its own key so pullAll's saveSettings call never overwrites it
-export function getUILanguage(): 'en' | 'uz' {
+export function getUILanguage(): 'en' | 'uz' | 'ru' {
   if (typeof window === 'undefined') return 'en';
   const v = localStorage.getItem(KEYS.uiLang);
-  if (v === 'uz' || v === 'en') return v;
+  if (v === 'uz' || v === 'en' || v === 'ru') return v;
   // Migrate: fall back to value inside the settings object
   try {
     const raw = localStorage.getItem(KEYS.settings);
     if (raw) {
       const parsed = JSON.parse(raw) as Partial<UserSettings>;
-      if (parsed.uiLanguage === 'uz' || parsed.uiLanguage === 'en') return parsed.uiLanguage;
+      if (parsed.uiLanguage === 'uz' || parsed.uiLanguage === 'en' || parsed.uiLanguage === 'ru') return parsed.uiLanguage;
     }
   } catch { /* ignore */ }
   return 'en';
 }
 
-export function setUILanguage(lang: 'en' | 'uz') {
+export function setUILanguage(lang: 'en' | 'uz' | 'ru') {
   if (typeof window === 'undefined') return;
   localStorage.setItem(KEYS.uiLang, lang);
 }

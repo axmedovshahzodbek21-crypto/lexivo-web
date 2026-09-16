@@ -160,7 +160,7 @@ export interface UserSettings {
   studyOrder: 'random' | 'in-order';
   quizDirection: 'word-to-uz' | 'uz-to-word';
   reduceMotion: boolean;
-  uiLanguage: 'en' | 'uz';
+  uiLanguage: 'en' | 'uz' | 'ru';
   showOnLeaderboard: boolean;
   pulseEnabled: boolean;
   pulseSpeed: 'slow' | 'normal' | 'fast';

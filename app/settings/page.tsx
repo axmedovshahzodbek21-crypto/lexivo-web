@@ -559,7 +559,7 @@ export default function SettingsPage() {
             <p className="text-xs text-[var(--text-muted)] mt-0.5">{t.settings.interfaceLangHelper}</p>
           </div>
           <div className="flex rounded-xl overflow-hidden border border-[var(--border)]">
-            {(['en', 'uz'] as const).map(lang => (
+            {(['en', 'uz', 'ru'] as const).map(lang => (
               <button
                 key={lang}
                 onClick={() => {
@@ -573,7 +573,7 @@ export default function SettingsPage() {
                 }}
                 className={`px-4 py-2 text-sm font-semibold transition-colors ${settings.uiLanguage === lang ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface)] text-[var(--text-muted)] hover:bg-[var(--surface-2)]'}`}
               >
-                {lang === 'en' ? t.settings.langEn : t.settings.langUz}
+                {{ en: t.settings.langEn, uz: t.settings.langUz, ru: t.settings.langRu }[lang]}
               </button>
             ))}
           </div>
@@ -971,7 +971,7 @@ export default function SettingsPage() {
             <span className="text-xl">🔑</span>
             <div>
               <p className="text-sm font-semibold text-[var(--primary)]">{t.sidebar.signIn}</p>
-              <p className="text-xs text-[var(--text-muted)]">{settings.uiLanguage === 'uz' ? "Taraqqiyotingizni saqlash uchun kiring" : 'Sign in to save your progress'}</p>
+              <p className="text-xs text-[var(--text-muted)]">{t.sidebar.signInHint}</p>
             </div>
           </Link>
         )}

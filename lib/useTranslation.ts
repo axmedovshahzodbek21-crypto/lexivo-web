@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { getUILanguage } from './storage';
 import { translations, type Translations } from './i18n';
 
-function getLang(): 'en' | 'uz' {
+function getLang(): 'en' | 'uz' | 'ru' {
   return getUILanguage();
 }
 
