@@ -170,6 +170,10 @@ grant execute on function public.sync_user_stats(
 -- granularity, and it keeps this from turning into a spam engine.
 -- 14:00 UTC = 19:00 Asia/Tashkent (no DST there, so this offset is stable).
 
+-- timeout_milliseconds: net.http_post's 5000ms default is too tight for this
+-- function — unlike notify_push()'s single-row send-push call, this scans
+-- every user/class and can run multiple sequential queries plus OneSignal
+-- calls per check, easily exceeding 5s even with a small user base.
 select cron.schedule(
   'send-scheduled-push-daily',
   '0 14 * * *',
@@ -179,6 +183,7 @@ select cron.schedule(
          'Content-Type', 'application/json',
          'Authorization', 'Bearer ' || (select decrypted_secret from vault.decrypted_secrets where name = 'push_trigger_secret')
        ),
-       body := '{}'::jsonb
+       body := '{}'::jsonb,
+       timeout_milliseconds := 30000
      ); $$
 );
