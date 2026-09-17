@@ -146,7 +146,7 @@ export default function UnitPage() {
     try {
       await supabase.from('teacher_unit_words').insert(rows);
     } catch (e) {
-      alert(`Failed to add words: ${e instanceof Error ? e.message : e}`);
+      alert(t.libraryPage.failedToAddWords(e instanceof Error ? e.message : String(e)));
       setImporting(false);
       return;
     }
@@ -181,13 +181,13 @@ export default function UnitPage() {
   }
 
   function requestDeleteWord(id: string) {
-    setConfirmModal({ type: 'word', id, message: 'Delete this word?' });
+    setConfirmModal({ type: 'word', id, message: t.libraryPage.deleteWordConfirm });
   }
 
   function requestDeleteSelected() {
     if (selected.size === 0) return;
     const ids = [...selected];
-    setConfirmModal({ type: 'bulk', ids, message: `Delete ${ids.length} selected word${ids.length !== 1 ? 's' : ''}?` });
+    setConfirmModal({ type: 'bulk', ids, message: t.libraryPage.deleteSelectedConfirm(ids.length) });
   }
 
   async function confirmDelete() {
@@ -229,27 +229,27 @@ export default function UnitPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-black text-[var(--text)]">{unitName}</h1>
-          <p className="text-sm text-[var(--text-muted)] mt-0.5">{words.length} {words.length === 1 ? 'word' : 'words'}</p>
+          <p className="text-sm text-[var(--text-muted)] mt-0.5">{t.libraryPage.wordsCount(words.length)}</p>
         </div>
         {tab === 'words' && words.length > 0 && (
           <button
             onClick={toggleSelectMode}
             className={`text-xs font-semibold px-3 py-1.5 rounded-full transition-colors ${selectMode ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface-2)] text-[var(--text-muted)]'}`}
           >
-            {selectMode ? 'Cancel' : 'Select'}
+            {selectMode ? t.libraryPage.cancel : t.libraryPage.select}
           </button>
         )}
       </div>
 
       {/* Tabs */}
       <div className="flex gap-1 p-1 bg-[var(--surface-2)] rounded-xl mb-6">
-        {(['words', 'add'] as const).map(t => (
+        {(['words', 'add'] as const).map(tabOption => (
           <button
-            key={t}
-            onClick={() => setTab(t)}
-            className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${tab === t ? 'bg-[var(--surface)] text-[var(--primary)] shadow-sm' : 'text-[var(--text-muted)]'}`}
+            key={tabOption}
+            onClick={() => setTab(tabOption)}
+            className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${tab === tabOption ? 'bg-[var(--surface)] text-[var(--primary)] shadow-sm' : 'text-[var(--text-muted)]'}`}
           >
-            {t === 'words' ? '📖 Words' : '🤖 Add Words'}
+            {tabOption === 'words' ? t.libraryPage.wordsTab : t.libraryPage.addWordsTab}
           </button>
         ))}
       </div>
@@ -266,8 +266,8 @@ export default function UnitPage() {
         ) : (
           <div className="space-y-2">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-sm text-[var(--text-muted)] font-medium">{words.length} words</span>
-              {!selectMode && <button onClick={() => setTab('add')} className="text-xs font-semibold text-[var(--primary)] hover:underline">+ Add more</button>}
+              <span className="text-sm text-[var(--text-muted)] font-medium">{t.libraryPage.wordsCount(words.length)}</span>
+              {!selectMode && <button onClick={() => setTab('add')} className="text-xs font-semibold text-[var(--primary)] hover:underline">+ {t.libraryPage.addMore}</button>}
             </div>
             {words.map(word => {
               const isSelected = selected.has(word.id);
@@ -289,7 +289,7 @@ export default function UnitPage() {
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     <span className="text-[10px] font-bold px-2 py-1 rounded-lg bg-[var(--primary-bg)] text-[var(--primary)]">
-                      {word.examples.length}ex
+                      {t.libraryPage.exCount(word.examples.length)}
                     </span>
                     {!selectMode && (
                       <button
@@ -324,11 +324,11 @@ export default function UnitPage() {
 
           {/* Step 1 */}
           <div className="p-4 bg-[var(--surface)] rounded-2xl">
-            <p className="text-sm font-bold text-[var(--text)] mb-3">1. Enter words to import</p>
+            <p className="text-sm font-bold text-[var(--text)] mb-3">{t.libraryPage.enterWordsStep}</p>
             <textarea
               value={wordsInput}
               onChange={e => setWordsInput(e.target.value)}
-              placeholder={`apple, book, water\nor one per line\nor already-translated pairs like: apple - olma`}
+              placeholder={t.libraryPage.wordsInputPlaceholder}
               rows={4}
               className="w-full px-3 py-2.5 rounded-xl bg-[var(--surface-2)] text-[var(--text)] text-sm border border-[var(--border)] outline-none focus:border-[var(--primary)] resize-none mb-3"
             />
@@ -336,17 +336,17 @@ export default function UnitPage() {
               <button
                 onClick={() => copyPrompt(false)}
                 className="w-full py-2.5 rounded-xl text-sm font-semibold border border-[var(--primary)] text-[var(--primary)] hover:bg-[var(--primary-bg)] transition-colors"
-              >📋 Copy Prompt — just words, AI translates</button>
+              >{t.libraryPage.copyPromptWordsOnly}</button>
               <button
                 onClick={() => copyPrompt(true)}
                 className="w-full py-2.5 rounded-xl text-sm font-semibold border border-[var(--border)] text-[var(--text-muted)] hover:bg-[var(--surface-2)] transition-colors"
-              >📋 Copy Prompt — I already have translations</button>
+              >{t.libraryPage.copyPromptWithTranslations}</button>
             </div>
           </div>
 
           {/* Step 2 */}
           <div className="p-4 bg-[var(--surface)] rounded-2xl">
-            <p className="text-sm font-bold text-[var(--text)] mb-3">2. Paste AI output</p>
+            <p className="text-sm font-bold text-[var(--text)] mb-3">{t.libraryPage.pasteAiOutputStep}</p>
             <textarea
               value={pasteText}
               onChange={e => setPasteText(e.target.value)}
@@ -356,12 +356,12 @@ export default function UnitPage() {
             />
             {parsed.length > 0 && (
               <div className="mt-3 space-y-2">
-                <p className="text-xs font-bold text-green-500">✅ {parsed.length} {parsed.length === 1 ? 'word' : 'words'} recognized</p>
+                <p className="text-xs font-bold text-green-500">{t.libraryPage.wordsRecognized(parsed.length)}</p>
                 {parsed.map((w, i) => (
                   <div key={i} className="p-3 bg-[var(--surface-2)] rounded-xl">
                     <div className="flex items-start justify-between">
                       <span className="font-bold text-[var(--text)] text-sm">{w.word}</span>
-                      <span className="text-[10px] font-bold text-[var(--primary)] ml-2 shrink-0">{w.examples.length}ex</span>
+                      <span className="text-[10px] font-bold text-[var(--primary)] ml-2 shrink-0">{t.libraryPage.exCount(w.examples.length)}</span>
                     </div>
                     <span className="text-[var(--primary)] text-xs font-semibold">{w.translation}</span>
                     {w.definition && <p className="text-[var(--text-muted)] text-xs mt-0.5 truncate">{w.definition}</p>}
@@ -378,7 +378,7 @@ export default function UnitPage() {
               className="w-full py-3 rounded-xl text-sm font-bold text-white disabled:opacity-50"
               style={{ background: 'var(--primary)' }}
             >
-              {importing ? 'Importing…' : `Import All (${parsed.length} words)`}
+              {importing ? t.libraryPage.importing : t.libraryPage.importAllBtn(parsed.length)}
             </button>
           )}
         </div>
@@ -387,7 +387,7 @@ export default function UnitPage() {
       {/* Copy toast */}
       {copied && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl text-sm font-semibold text-white shadow-xl pointer-events-none" style={{ background: 'var(--primary)' }}>
-          📋 Prompt copied — paste into an AI chatbot
+          {t.libraryPage.promptCopiedToast}
         </div>
       )}
 
@@ -442,14 +442,14 @@ export default function UnitPage() {
                 onClick={() => setConfirmModal(null)}
                 className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-[var(--text-muted)] bg-[var(--surface-2)]"
               >
-                Cancel
+                {t.libraryPage.cancel}
               </button>
               <button
                 onClick={confirmDelete}
                 className="flex-1 py-2.5 rounded-xl text-sm font-bold text-white"
                 style={{ background: 'var(--danger)' }}
               >
-                Delete
+                {t.libraryPage.delete}
               </button>
             </div>
           </div>

@@ -404,7 +404,7 @@ function MatchingInner() {
             <div className="text-5xl">{mistakes === 0 ? '🌟' : '✅'}</div>
             <h2 className="text-xl font-bold text-[var(--text)]">{t.matching.roundDone.replace("{n}", String(roundIndex + 1))}</h2>
             <p className="text-[var(--text-muted)] text-sm">
-              {formatTime(elapsed)} · {mistakes} mistake{mistakes !== 1 ? 's' : ''}
+              {formatTime(elapsed)} · {t.matching.mistakesCount(mistakes)}
             </p>
           </div>
           <button
@@ -415,7 +415,7 @@ function MatchingInner() {
             }}
             className="btn-primary w-full max-w-sm"
           >
-            Round {roundIndex + 2} of {totalRounds} →
+            {t.matching.roundOf(roundIndex + 2, totalRounds)}
           </button>
         </div>
       </div>
@@ -429,9 +429,9 @@ function MatchingInner() {
       <div className="p-4 border-b border-[var(--border)] flex-shrink-0">
         <BackButton className="mb-2" />
         <div className="flex items-center justify-between">
-          <h1 className="text-lg font-bold text-[var(--text)]">🎯 Match the pairs</h1>
+          <h1 className="text-lg font-bold text-[var(--text)]">{t.matching.matchThePairs}</h1>
           <span className="text-sm text-[var(--text-muted)]">
-            {totalRounds > 1 ? `Round ${roundIndex + 1}/${totalRounds}` : `${matched.size}/${roundWords.length}`}
+            {totalRounds > 1 ? t.matching.roundFraction(roundIndex + 1, totalRounds) : `${matched.size}/${roundWords.length}`}
           </span>
         </div>
         <div className="flex items-center gap-4 mt-1.5 text-sm text-[var(--text-muted)]">

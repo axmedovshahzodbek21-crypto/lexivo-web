@@ -239,7 +239,7 @@ export default function HomePage() {
         <button
           onClick={() => { const next = toggleTheme(); setThemeState(next); }}
           className="w-10 h-10 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-lg hover:bg-[var(--primary-bg)] transition-colors"
-          aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+          aria-label={theme === 'dark' ? t.home.switchToLightMode : t.home.switchToDarkMode}
         >
           {theme === 'dark' ? '☀️' : '🌙'}
         </button>
@@ -292,14 +292,14 @@ export default function HomePage() {
                         <div className="flex-1 min-w-0">
                           <div className="text-base font-black text-white leading-tight truncate">{card.className}</div>
                           <div className="text-[10px] text-white/70 mt-1">
-                            {card.isTeacher ? `👨‍🎓 ${card.studentCount} students` : `⚡ ${displayXP(card.classXP)} XP`}
+                            {card.isTeacher ? `👨‍🎓 ${card.studentCount} ${t.classesPage.students}` : `⚡ ${displayXP(card.classXP)} XP`}
                           </div>
                         </div>
                         <span className="text-lg opacity-80 shrink-0">{card.isTeacher ? '🏫' : '🎓'}</span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-[10px] font-bold bg-white/20 text-white rounded-full px-2 py-0.5">
-                          {card.isTeacher ? 'Teacher' : 'Student'}
+                          {card.isTeacher ? t.classesPage.teacher : t.classHome.studentBadge}
                         </span>
                         {!card.isTeacher && card.classStreak > 0 && (
                           <span className="text-[10px] text-white/70">🔥 {card.classStreak}d</span>
@@ -404,7 +404,7 @@ export default function HomePage() {
           <Link href="/srs"
             className="mt-3.5 flex items-center justify-center w-full py-3 rounded-xl font-black text-[15px] text-white transition-opacity hover:opacity-90"
             style={{ background: 'rgba(255,255,255,0.25)', border: '1px solid rgba(255,255,255,0.4)' }}>
-            Start Reviews 🧠
+            {t.home.startReviewsCta}
           </Link>
         </div>
       )}
@@ -475,7 +475,7 @@ export default function HomePage() {
                 </div>
                 <button onClick={() => speak(wod.word)}
                   className="shrink-0 w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-xs hover:bg-white/30 transition-colors"
-                  style={{ textShadow: 'none' }} aria-label="Pronounce">🔊</button>
+                  style={{ textShadow: 'none' }} aria-label={t.freeTime.pronounce}>🔊</button>
               </div>
               {wodRevealed ? (
                 <p className="text-[10px] text-white/85 leading-snug mt-1 line-clamp-2">{wod.definition}</p>
@@ -507,7 +507,7 @@ export default function HomePage() {
               <div>
                 <div className="font-black text-sm text-white leading-tight">{t.nav.review}</div>
                 <div className="text-[10px] text-white/70 mt-0.5">
-                  {dueCount > 0 ? `${dueCount} ${dueCount === 1 ? 'word' : 'words'} due` : 'All caught up'}
+                  {dueCount > 0 ? t.home.srsDue(dueCount) : t.home.srsAllCaughtUp}
                 </div>
               </div>
               <span className="text-[10px] font-mono text-white/60 self-end">{dueCount > 0 ? `${dueCount} →` : '→'}</span>
@@ -563,14 +563,14 @@ export default function HomePage() {
                         <div className="flex-1 min-w-0">
                           <div className="text-base font-black text-white leading-tight truncate">{card.className}</div>
                           <div className="text-[10px] text-white/70 mt-1">
-                            {card.isTeacher ? `👨‍🎓 ${card.studentCount} students` : `⚡ ${displayXP(card.classXP)} XP`}
+                            {card.isTeacher ? `👨‍🎓 ${card.studentCount} ${t.classesPage.students}` : `⚡ ${displayXP(card.classXP)} XP`}
                           </div>
                         </div>
                         <span className="text-lg opacity-80 shrink-0">{card.isTeacher ? '🏫' : '🎓'}</span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-[10px] font-bold bg-white/20 text-white rounded-full px-2 py-0.5">
-                          {card.isTeacher ? 'Teacher' : 'Student'}
+                          {card.isTeacher ? t.classesPage.teacher : t.classHome.studentBadge}
                         </span>
                         {!card.isTeacher && card.classStreak > 0 && (
                           <span className="text-[10px] text-white/70">🔥 {card.classStreak}d</span>

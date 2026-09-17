@@ -92,7 +92,7 @@ export default function FolderPage() {
     try {
       await supabase.from('teacher_units').insert({ folder_id: folderId, teacher_id: user.id, name: newName.trim() });
     } catch (e) {
-      alert(`Failed to create unit: ${e instanceof Error ? e.message : e}`);
+      alert(t.libraryPage.failedToCreateUnit(e instanceof Error ? e.message : String(e)));
       setCreating(false);
       return;
     }
@@ -105,7 +105,7 @@ export default function FolderPage() {
     try {
       await supabase.from('teacher_units').update({ name: renameName.trim() }).eq('id', renameId).eq('teacher_id', user.id);
     } catch (e) {
-      alert(`Failed to rename unit: ${e instanceof Error ? e.message : e}`);
+      alert(t.libraryPage.failedToRenameUnit(e instanceof Error ? e.message : String(e)));
       return;
     }
     setRenameId(null); setRenameName('');
@@ -113,11 +113,11 @@ export default function FolderPage() {
   }
 
   async function deleteUnit(id: string, name: string) {
-    if (!confirm(`Delete "${name}" and all its words?`) || !user) return;
+    if (!confirm(t.libraryPage.deleteUnitConfirm(name)) || !user) return;
     try {
       await supabase.from('teacher_units').delete().eq('id', id).eq('teacher_id', user.id);
     } catch (e) {
-      alert(`Failed to delete unit: ${e instanceof Error ? e.message : e}`);
+      alert(t.libraryPage.failedToDeleteUnit(e instanceof Error ? e.message : String(e)));
       return;
     }
     load();
@@ -133,21 +133,21 @@ export default function FolderPage() {
     <div className="max-w-2xl mx-auto px-4 py-6">
       {/* Header */}
       <div className="flex items-center gap-3 mb-1">
-        <button onClick={() => router.push('/library')} className="text-[var(--text-muted)] hover:text-[var(--primary)] text-sm font-medium">← Library</button>
+        <button onClick={() => router.push('/library')} className="text-[var(--text-muted)] hover:text-[var(--primary)] text-sm font-medium">← {t.libraryPage.title}</button>
       </div>
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-black text-[var(--text)]">{folderName}</h1>
           <p className="text-sm text-[var(--text-muted)] mt-0.5">
-            {units.length} {units.length === 1 ? 'unit' : 'units'}
-            {units.length > 0 && (() => { const total = units.reduce((s, u) => s + u.word_count, 0); return ` · ${total} ${total === 1 ? 'word' : 'words'}`; })()}
+            {t.libraryPage.unitsCount(units.length)}
+            {units.length > 0 && (() => { const total = units.reduce((s, u) => s + u.word_count, 0); return ` · ${t.libraryPage.wordsCount(total)}`; })()}
           </p>
         </div>
         <button
           onClick={() => setShowCreate(true)}
           className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-white"
           style={{ background: 'linear-gradient(135deg, var(--primary), var(--primary-light))' }}
-        >+ New Unit</button>
+        >+ {t.libraryPage.newUnit}</button>
       </div>
 
       {/* Create modal */}
@@ -166,7 +166,7 @@ export default function FolderPage() {
             <div className="flex gap-2 justify-end">
               <button onClick={() => setShowCreate(false)} className="px-4 py-2 rounded-xl text-sm font-medium text-[var(--text-muted)] hover:bg-[var(--surface-2)]">{t.libraryPage.cancel}</button>
               <button onClick={createUnit} disabled={creating || !newName.trim()} className="px-4 py-2 rounded-xl text-sm font-bold text-white bg-[var(--primary)] disabled:opacity-50">
-                {creating ? 'Creating…' : 'Create'}
+                {creating ? t.libraryPage.creating : t.libraryPage.create}
               </button>
             </div>
           </div>
@@ -215,7 +215,7 @@ export default function FolderPage() {
                     <div className="p-4 text-2xl">📖</div>
                     <div className="absolute bottom-0 left-0 right-0 px-4 py-3" style={{ background: 'rgba(0,0,0,0.18)', backdropFilter: 'blur(8px)' }}>
                       <p className="text-white font-bold text-sm leading-tight line-clamp-2" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>{unit.name}</p>
-                      <p className="text-white/70 text-xs mt-0.5">{unit.word_count} {unit.word_count === 1 ? 'word' : 'words'}</p>
+                      <p className="text-white/70 text-xs mt-0.5">{t.libraryPage.wordsCount(unit.word_count)}</p>
                     </div>
                   </div>
                 </Link>
@@ -223,12 +223,12 @@ export default function FolderPage() {
                   <button
                     onClick={e => { e.preventDefault(); setRenameId(unit.id); setRenameName(unit.name); }}
                     className="w-6 h-6 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-white text-xs backdrop-blur"
-                    title="Rename"
+                    title={t.libraryPage.rename}
                   >✏️</button>
                   <button
                     onClick={e => { e.preventDefault(); deleteUnit(unit.id, unit.name); }}
                     className="w-6 h-6 rounded-full bg-white/20 hover:bg-red-500/80 flex items-center justify-center text-white text-xs backdrop-blur"
-                    title="Delete"
+                    title={t.libraryPage.delete}
                   >🗑</button>
                 </div>
               </div>

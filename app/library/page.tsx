@@ -112,7 +112,7 @@ export default function LibraryPage() {
     try {
       await supabase.from('teacher_folders').insert({ teacher_id: user.id, name: newName.trim() });
     } catch (e) {
-      alert(`Failed to create folder: ${e instanceof Error ? e.message : e}`);
+      alert(t.libraryPage.createFolderFailed(e instanceof Error ? e.message : String(e)));
       setCreating(false);
       return;
     }
@@ -125,7 +125,7 @@ export default function LibraryPage() {
     try {
       await supabase.from('teacher_folders').update({ name: renameName.trim() }).eq('id', renameId).eq('teacher_id', user.id);
     } catch (e) {
-      alert(`Failed to rename folder: ${e instanceof Error ? e.message : e}`);
+      alert(t.libraryPage.renameFolderFailed(e instanceof Error ? e.message : String(e)));
       return;
     }
     setRenameId(null); setRenameName('');
@@ -133,11 +133,11 @@ export default function LibraryPage() {
   }
 
   async function deleteFolder(id: string, name: string) {
-    if (!confirm(`Delete "${name}" and all its units and words?`) || !user) return;
+    if (!confirm(t.libraryPage.deleteFolderConfirm(name)) || !user) return;
     try {
       await supabase.from('teacher_folders').delete().eq('id', id).eq('teacher_id', user.id);
     } catch (e) {
-      alert(`Failed to delete folder: ${e instanceof Error ? e.message : e}`);
+      alert(t.libraryPage.deleteFolderFailed(e instanceof Error ? e.message : String(e)));
       return;
     }
     load();
@@ -154,15 +154,15 @@ export default function LibraryPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-black text-[var(--text)]">📚 My Library</h1>
-          <p className="text-sm text-[var(--text-muted)] mt-0.5">{folders.length} {folders.length === 1 ? 'folder' : 'folders'}</p>
+          <h1 className="text-2xl font-black text-[var(--text)]">{t.libraryPage.myLibraryTitle}</h1>
+          <p className="text-sm text-[var(--text-muted)] mt-0.5">{t.libraryPage.folderCount(folders.length)}</p>
         </div>
         <button
           onClick={() => setShowCreate(true)}
           className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-white"
           style={{ background: 'linear-gradient(135deg, var(--primary), var(--primary-light))' }}
         >
-          + New Folder
+          + {t.libraryPage.newFolder}
         </button>
       </div>
 
@@ -182,7 +182,7 @@ export default function LibraryPage() {
             <div className="flex gap-2 justify-end">
               <button onClick={() => setShowCreate(false)} className="px-4 py-2 rounded-xl text-sm font-medium text-[var(--text-muted)] hover:bg-[var(--surface-2)]">{t.libraryPage.cancel}</button>
               <button onClick={createFolder} disabled={creating || !newName.trim()} className="px-4 py-2 rounded-xl text-sm font-bold text-white bg-[var(--primary)] disabled:opacity-50">
-                {creating ? 'Creating…' : 'Create'}
+                {creating ? t.libraryPage.creating : t.libraryPage.create}
               </button>
             </div>
           </div>
@@ -263,7 +263,7 @@ export default function LibraryPage() {
                     <div className="p-4 text-2xl">📁</div>
                     <div className="absolute bottom-0 left-0 right-0 px-4 py-3" style={{ background: 'rgba(0,0,0,0.18)', backdropFilter: 'blur(8px)' }}>
                       <p className="text-white font-bold text-sm leading-tight line-clamp-2" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>{folder.name}</p>
-                      <p className="text-white/70 text-xs mt-0.5">{folder.unit_count} {folder.unit_count === 1 ? 'unit' : 'units'}</p>
+                      <p className="text-white/70 text-xs mt-0.5">{t.libraryPage.unitCount(folder.unit_count)}</p>
                     </div>
                   </div>
                 </Link>
@@ -272,12 +272,12 @@ export default function LibraryPage() {
                   <button
                     onClick={e => { e.preventDefault(); setRenameId(folder.id); setRenameName(folder.name); }}
                     className="w-6 h-6 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-white text-xs backdrop-blur"
-                    title="Rename"
+                    title={t.libraryPage.rename}
                   >✏️</button>
                   <button
                     onClick={e => { e.preventDefault(); deleteFolder(folder.id, folder.name); }}
                     className="w-6 h-6 rounded-full bg-white/20 hover:bg-red-500/80 flex items-center justify-center text-white text-xs backdrop-blur"
-                    title="Delete"
+                    title={t.libraryPage.delete}
                   >🗑</button>
                 </div>
               </div>

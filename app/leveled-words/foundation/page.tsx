@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from '@/lib/useTranslation';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
@@ -6,30 +7,30 @@ import { useAppStore } from '@/lib/store';
 const LEVELS = [
   {
     name: 'A1',
-    label: 'Beginner',
+    labelKey: 'levelBeginner' as const,
     emoji: '🌱',
     color: '#2ECC71',
-    desc: 'Basic everyday words and phrases',
+    descKey: 'levelBeginnerDesc' as const,
     gradient: 'linear-gradient(135deg, #1a9a50, #2ECC71)',
     edge: '#0f6634',
     glow: 'rgba(46,204,113,0.4)',
   },
   {
     name: 'A2',
-    label: 'Elementary',
+    labelKey: 'levelElementary' as const,
     emoji: '📗',
     color: '#27AE60',
-    desc: 'Common vocabulary for simple situations',
+    descKey: 'levelElementaryDesc' as const,
     gradient: 'linear-gradient(135deg, #15803d, #27AE60)',
     edge: '#14532d',
     glow: 'rgba(39,174,96,0.4)',
   },
   {
     name: 'B1',
-    label: 'Intermediate',
+    labelKey: 'levelIntermediate' as const,
     emoji: '📘',
     color: '#3498DB',
-    desc: 'Everyday topics and familiar situations',
+    descKey: 'levelIntermediateDesc' as const,
     gradient: 'linear-gradient(135deg, #1d4ed8, #3498DB)',
     edge: '#1e3a8a',
     glow: 'rgba(52,152,219,0.4)',
@@ -37,6 +38,7 @@ const LEVELS = [
 ];
 
 export default function FoundationPage() {
+  const t = useTranslation();
   const router = useRouter();
   const { collections } = useAppStore();
 
@@ -47,11 +49,11 @@ export default function FoundationPage() {
         <button
           onClick={() => router.back()}
           className="btn-icon text-lg"
-          aria-label="Go back"
+          aria-label={t.foundationPage.goBack}
         >
           ←
         </button>
-        <h1 className="font-bold text-[var(--text)]">🌱 Foundation</h1>
+        <h1 className="font-bold text-[var(--text)]">{t.foundationPage.title}</h1>
       </div>
 
       <div className="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -78,11 +80,11 @@ export default function FoundationPage() {
                 </span>
               </div>
               <div>
-                <div className="text-xl font-black text-white leading-tight">{level.label}</div>
-                <div className="text-xs text-white/80 mt-1">{level.desc}</div>
+                <div className="text-xl font-black text-white leading-tight">{t.foundationPage[level.labelKey]}</div>
+                <div className="text-xs text-white/80 mt-1">{t.foundationPage[level.descKey]}</div>
                 {unitCount != null && wordCount != null && (
                   <div className="text-[11px] font-bold text-white/70 mt-2">
-                    {unitCount} units · {wordCount} words
+                    {t.foundationPage.unitsAndWords(unitCount, wordCount)}
                   </div>
                 )}
               </div>

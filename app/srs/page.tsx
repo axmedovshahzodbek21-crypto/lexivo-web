@@ -310,23 +310,23 @@ export default function SRSReviewPage() {
     return (
       <div className="flex flex-col min-h-screen">
         <div className="flex items-center justify-between p-4 border-b border-[var(--border)]">
-          <button onClick={() => setManaging(false)} className="btn-icon" aria-label="Go back">←</button>
+          <button onClick={() => setManaging(false)} className="btn-icon" aria-label={t.extra.goBack}>←</button>
           <h1 className="font-bold">{t.extra.manageSrsDeck}</h1>
-          <span className="text-sm text-[var(--text-muted)]">{allWords.length} words</span>
+          <span className="text-sm text-[var(--text-muted)]">{t.srs.wordsCount(allWords.length)}</span>
         </div>
 
         {allWords.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center p-6">
             <div className="text-5xl">📭</div>
             <p className="font-semibold text-[var(--text)]">{t.extra.noSrsDeck}</p>
-            <p className="text-sm text-[var(--text-muted)]">Words are added automatically when you complete a learning session.</p>
+            <p className="text-sm text-[var(--text-muted)]">{t.srs.autoAddedHint}</p>
           </div>
         ) : (
           <div className="flex-1 overflow-auto p-4 space-y-4">
             {learning.length > 0 && (
               <section>
                 <h2 className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-2">
-                  In Progress · {learning.length}
+                  {t.srs.inProgress} · {learning.length}
                 </h2>
                 <div className="space-y-2">
                   {learning.map(w => (
@@ -338,7 +338,7 @@ export default function SRSReviewPage() {
             {graduated.length > 0 && (
               <section>
                 <h2 className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-2">
-                  Graduated · {graduated.length}
+                  {t.srs.graduated} · {graduated.length}
                 </h2>
                 <div className="space-y-2">
                   {graduated.map(w => (
@@ -363,7 +363,7 @@ export default function SRSReviewPage() {
         <div className="flex flex-col gap-3 w-full max-w-xs">
           <Link href="/" className="btn-primary text-center">{t.srs.goHome}</Link>
           <button onClick={() => { setAllWords(getSRSWords()); setManaging(true); }} className="btn-secondary">
-            Manage deck ({allWords.length} words)
+            {t.srs.manageDeckWithCount(allWords.length)}
           </button>
         </div>
       </div>
@@ -391,7 +391,7 @@ export default function SRSReviewPage() {
           <Link href="/" className="btn-primary flex-1 text-center">{t.srs.goHome}</Link>
         </div>
         <button onClick={() => { setAllWords(getSRSWords()); setManaging(true); }} className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] underline">
-          Manage deck
+          {t.srs.manageDeck}
         </button>
       </div>
     );
@@ -405,7 +405,7 @@ export default function SRSReviewPage() {
     <div className="flex flex-col min-h-screen">
       {/* Header */}
       <div className="flex items-center justify-between p-4">
-        <button onClick={() => { applyGrades(results); router.back(); }} className="btn-icon" aria-label="Go back">✕</button>
+        <button onClick={() => { applyGrades(results); router.back(); }} className="btn-icon" aria-label={t.extra.goBack}>✕</button>
         <div className="text-center">
           <div className="font-semibold text-sm">{t.srs.title}</div>
           <div className="text-xs text-[var(--text-muted)]">{index + 1} / {queue.length}</div>
@@ -414,22 +414,22 @@ export default function SRSReviewPage() {
           <button
             onClick={toggleShuffle}
             className={`btn-icon text-base ${isShuffled ? 'text-[var(--primary)]' : 'opacity-40'}`}
-            aria-label={isShuffled ? 'Shuffled' : 'In order'}
-            title={isShuffled ? 'Shuffled' : 'In order'}
+            aria-label={isShuffled ? t.srs.shuffled : t.srs.inOrder}
+            title={isShuffled ? t.srs.shuffled : t.srs.inOrder}
           >
             🔀
           </button>
           <button
             onClick={() => setAutoPlay(p => !p)}
             className="btn-icon text-base"
-            aria-label={autoPlay ? 'Auto-play on' : 'Auto-play off'}
+            aria-label={autoPlay ? t.srs.autoPlayOn : t.srs.autoPlayOff}
           >
             {autoPlay ? '🔊' : '🔇'}
           </button>
           <button
             onClick={() => { setAllWords(getSRSWords()); setManaging(true); }}
             className="btn-icon text-sm"
-            aria-label="Manage deck"
+            aria-label={t.srs.manageDeck}
           >
             ⚙️
           </button>
@@ -450,12 +450,12 @@ export default function SRSReviewPage() {
             onClick={goBack}
             disabled={index === 0}
             className="btn-icon text-sm disabled:opacity-30"
-            aria-label="Previous word"
+            aria-label={t.srs.previousWord}
           >
             ←
           </button>
           <div className="badge text-xs" style={{ background: '#4338ca20', color: '#4338ca' }}>
-            Day +{current.dueInterval} review
+            {t.srs.dayIntervalReview(current.dueInterval)}
           </div>
         </div>
 
@@ -481,7 +481,7 @@ export default function SRSReviewPage() {
             <button
               onClick={(e) => { e.stopPropagation(); if (current.language) speakText(current.word, current.language); else speak(current.word); }}
               className="w-8 h-8 rounded-full bg-[var(--primary-bg)] flex items-center justify-center hover:bg-[var(--primary)] hover:text-white transition-colors"
-              aria-label="Listen"
+              aria-label={t.extra.listen}
             >🔊</button>
           </div>
 
@@ -503,7 +503,7 @@ export default function SRSReviewPage() {
               <div className="flex items-center justify-between gap-2">
                 {openInUnitHref && (
                   <Link href={openInUnitHref} className="text-xs text-[var(--primary)] font-medium hover:underline">
-                    Open in unit →
+                    {t.srs.openInUnit}
                   </Link>
                 )}
                 {current.collectionName !== 'my-words' && (
@@ -518,7 +518,7 @@ export default function SRSReviewPage() {
             </div>
           ) : choices !== null && !optionsShown ? (
             <p className="mt-3 text-sm text-[var(--text-muted)] flex items-center gap-1.5">
-              <span aria-hidden>👆</span> Tap to see options
+              <span aria-hidden>👆</span> {t.srs.tapToSeeOptions}
             </p>
           ) : choices === null ? (
             <button
@@ -630,7 +630,7 @@ export default function SRSReviewPage() {
         {/* Info bar */}
         <div className="card p-3 flex justify-between text-xs text-[var(--text-muted)]">
           <span>{t.srs.collection} {current.collectionName}</span>
-          <span>Interval: +{current.dueInterval}d</span>
+          <span>{t.srs.intervalDays(current.dueInterval)}</span>
         </div>
       </div>
     </div>
@@ -645,6 +645,7 @@ function WordManageRow({
   completedCount: number;
   onRemove: (id: string) => void;
 }) {
+  const t = useTranslation();
   const [confirming, setConfirming] = useState(false);
   const graduated = completedCount >= SRS_INTERVALS.length;
 
@@ -658,7 +659,7 @@ function WordManageRow({
         className="badge text-xs shrink-0"
         style={{ background: `${stageColor(completedCount)}20`, color: stageColor(completedCount) }}
       >
-        {graduated ? 'Graduated' : `${completedCount}/${SRS_INTERVALS.length} done`}
+        {graduated ? t.srs.graduated : t.srs.completedCount(completedCount, SRS_INTERVALS.length)}
       </span>
 
       {confirming ? (
@@ -667,17 +668,17 @@ function WordManageRow({
             onClick={() => { onRemove(word.id); setConfirming(false); }}
             className="text-xs px-2 py-1 rounded-lg bg-red-100 text-red-700 font-semibold"
           >
-            Remove
+            {t.srs.remove}
           </button>
           <button onClick={() => setConfirming(false)} className="text-xs px-2 py-1 rounded-lg bg-[var(--surface-2)] text-[var(--text-muted)]">
-            Cancel
+            {t.extra.cancel}
           </button>
         </div>
       ) : (
         <button
           onClick={() => setConfirming(true)}
           className="text-xs px-2 py-1 rounded-lg bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-red-500 shrink-0"
-          aria-label="Remove from deck"
+          aria-label={t.srs.removeFromDeck}
         >
           ✕
         </button>

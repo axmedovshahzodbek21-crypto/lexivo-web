@@ -18,7 +18,7 @@ export default function LeveledWordsPage() {
         >
           ←
         </button>
-        <h1 className="font-bold text-[var(--text)]">📚 Leveled Words</h1>
+        <h1 className="font-bold text-[var(--text)]">{t.leveledWordsPage.title}</h1>
       </div>
 
       <div className="p-4 space-y-4">
@@ -26,7 +26,7 @@ export default function LeveledWordsPage() {
         <div className="card flex items-center gap-3 bg-[var(--primary-bg)]">
           <span className="text-2xl">📚</span>
           <p className="text-sm text-[var(--text)] flex-1 leading-relaxed">
-            Learn vocabulary sorted by CEFR level — from beginner to mastery.
+            {t.leveledWordsPage.subtitle}
           </p>
         </div>
 

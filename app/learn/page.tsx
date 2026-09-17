@@ -982,7 +982,7 @@ function LearnInner() {
         <div className="space-y-2">
           <h2 className="text-xl font-bold text-[var(--text)]">{t.extra.resumeWhereLeftOff}</h2>
           <p className="text-sm text-[var(--text-muted)] max-w-xs leading-relaxed">
-            You made it to word <strong>{resumePrompt.savedIndex + 1}</strong> of <strong>{resumePrompt.total}</strong> last time.
+            {t.extra.resumeProgress(resumePrompt.savedIndex + 1, resumePrompt.total)}
           </p>
         </div>
         <div className="flex flex-col gap-3 w-full max-w-xs">
@@ -1007,7 +1007,7 @@ function LearnInner() {
               setResumePrompt(null);
             }}
           >
-            Resume from word {resumePrompt.savedIndex + 1}
+            {t.extra.resumeFromWord(resumePrompt.savedIndex + 1)}
           </button>
           <button
             className="btn-secondary"
@@ -1020,7 +1020,7 @@ function LearnInner() {
               setResumePrompt(null);
             }}
           >
-            Start over
+            {t.extra.startOver}
           </button>
         </div>
       </div>
@@ -1054,7 +1054,7 @@ function LearnInner() {
         <div className="flex-1 mx-3">
           <div className="flex items-center justify-between mb-1.5">
             <span className="text-xs font-medium text-[var(--text-muted)] truncate">
-              {sourceClass ? classNameParam : (collectionName ? collectionName.split(' ').slice(0, 2).join(' ') : 'All Collections')}
+              {sourceClass ? classNameParam : (collectionName ? collectionName.split(' ').slice(0, 2).join(' ') : t.learn.allCollections)}
             </span>
             <div className="flex items-center shrink-0 ml-2">
               <button
@@ -1096,10 +1096,10 @@ function LearnInner() {
           </div>
         </div>
         <div className="flex gap-2 shrink-0">
-          <button onClick={handleStar} className="btn-icon text-lg" aria-label={starred ? 'Remove from starred' : 'Add to starred'}>
+          <button onClick={handleStar} className="btn-icon text-lg" aria-label={starred ? t.extra.removeFromStarred : t.extra.addToStarred}>
             {starred ? '⭐' : '☆'}
           </button>
-          <button onClick={() => setFocusMode(!focusMode)} className="btn-icon text-base" aria-label={focusMode ? 'Exit focus mode' : 'Enter focus mode'}>
+          <button onClick={() => setFocusMode(!focusMode)} className="btn-icon text-base" aria-label={focusMode ? t.extra.exitFocusMode : t.extra.enterFocusMode}>
             {focusMode ? '⊠' : '⛶'}
           </button>
         </div>
@@ -1118,9 +1118,9 @@ function LearnInner() {
               onClick={e => { e.stopPropagation(); setMarks(m => { const n = [...m]; n[index] = null; return n; }); setRevealed(false); }}
               className="mb-3 px-3 py-1.5 rounded-full text-xs font-bold text-white w-fit hover:opacity-80 active:scale-95 transition-all cursor-pointer"
               style={{ background: 'rgba(255,255,255,0.25)' }}
-              title="Click to undo this mark"
+              title={t.extra.clickToUndoMark}
             >
-              {mark === 'learned' ? '✓ Already marked as Learned' : mark === 'too-hard' ? '😤 Too Hard' : '⏭ Skipped — still counts!'} ✕
+              {mark === 'learned' ? t.learn.alreadyMarkedLearned : mark === 'too-hard' ? t.learn.tooHard : t.learn.skippedStillCounts} ✕
             </button>
           )}
           {/* Topic + audio */}
@@ -1182,7 +1182,7 @@ function LearnInner() {
                     onClick={() => setShowUzDefinition(v => !v)}
                     className="text-xs text-[var(--primary)] font-medium hover:underline"
                   >
-                    {showUzDefinition ? "Yopish" : "O'zbekcha tushuntirish"}
+                    {showUzDefinition ? t.learn.closeUzDefinition : t.learn.showUzDefinition}
                   </button>
                   {showUzDefinition && (
                     <p className="text-sm text-[var(--text-muted)] mt-1 animate-fade-in">{current.definitionUz}</p>
@@ -1225,7 +1225,7 @@ function LearnInner() {
                     onClick={() => setShowMoreExamples(v => !v)}
                     className="text-sm text-[var(--primary)] font-medium hover:underline flex items-center gap-1"
                   >
-                    {showMoreExamples ? '− Hide examples' : `+ More examples (${current.extraExamples.length})`}
+                    {showMoreExamples ? t.learn.hideExamples : t.learn.moreExamplesCount(current.extraExamples.length)}
                   </button>
                   {showMoreExamples && (
                     <div className="mt-2 space-y-2 animate-fade-in">
@@ -1335,14 +1335,14 @@ function LearnInner() {
           <div className="fixed inset-0 z-50 flex flex-col animate-fade-in" style={{ backgroundColor: 'var(--surface)' }}>
             <div className="flex flex-col flex-1 px-5 pt-12 pb-8 max-w-lg mx-auto w-full">
               <p className="text-xs font-extrabold tracking-widest uppercase mb-6" style={{ color: 'var(--primary)' }}>
-                {isSpot ? '🔍  Spot Check' : '🎯  Quick Check'}
+                {isSpot ? t.learn.spotCheck : t.learn.quickCheck}
               </p>
 
               {/* Question box */}
               <div className="w-full rounded-2xl p-5 mb-6" style={{ background: 'var(--surface-2)', border: '2px solid var(--border)' }}>
                 <p className="text-2xl font-black" style={{ color: 'var(--text)' }}>{word}</p>
                 <p className="text-sm mt-1.5" style={{ color: 'var(--text-muted)' }}>
-                  {isSpot ? 'What does this word mean?' : 'What is the translation?'}
+                  {isSpot ? t.learn.whatDoesWordMean : t.learn.whatIsTranslation}
                 </p>
               </div>
 
@@ -1400,7 +1400,7 @@ function ExampleCard({
       <div className="bg-[var(--surface-2)] px-3 pt-3 pb-2">
         <div className="flex items-start justify-between gap-2 mb-1">
           <span className="text-xs font-semibold text-[var(--primary)] bg-[var(--primary-bg)] px-2 py-0.5 rounded-full">
-            Example {num} · Medium
+            {t.learn.exampleMedium(num)}
           </span>
           <div className="flex gap-1 shrink-0" onClick={e => e.stopPropagation()}>
             {language ? (
@@ -1411,8 +1411,8 @@ function ExampleCard({
               >🔊</button>
             ) : (
               <>
-                <AccentButton onClick={() => speakAccent(example, 'us')} flag="🇺🇸" label="American" size="sm" />
-                <AccentButton onClick={() => speakAccent(example, 'uk')} flag="🇬🇧" label="British" size="sm" />
+                <AccentButton onClick={() => speakAccent(example, 'us')} flag="🇺🇸" label={t.learn.american} size="sm" />
+                <AccentButton onClick={() => speakAccent(example, 'uk')} flag="🇬🇧" label={t.learn.british} size="sm" />
               </>
             )}
           </div>
@@ -1448,7 +1448,7 @@ function ExtraExampleCard({
     >
       <div className="bg-[var(--surface-2)] px-3 pt-2.5 pb-2">
         <div className="flex items-start justify-between gap-2 mb-1">
-          <span className="text-xs text-[var(--text-muted)]">Extra {index + 1}</span>
+          <span className="text-xs text-[var(--text-muted)]">{t.learn.extraExampleLabel(index + 1)}</span>
           {language && (
             <button
               onClick={e => { e.stopPropagation(); speakText(example, language); }}
@@ -1530,7 +1530,7 @@ function SessionDone({
     <div className="p-6 animate-fade-in flex flex-col items-center min-h-screen">
       {myUnitCompleted && (
         <div className="w-full rounded-2xl px-4 py-3 mb-4 text-center font-bold animate-pop" style={{ background: 'rgba(34,197,94,0.12)', color: 'var(--success)', border: '1.5px solid var(--success)' }}>
-          🏆 Unit Complete!
+          {t.learn.unitCompleteBanner}
         </div>
       )}
       {/* Hero */}
@@ -1538,7 +1538,7 @@ function SessionDone({
         <div className="text-6xl mb-3 animate-pop">🎉</div>
         <h2 className="text-2xl font-bold text-[var(--text)]">{t.learn.sessionComplete}</h2>
         <p className="text-sm text-[var(--text-muted)] mt-1">
-          {collectionName ?? 'All Collections'}
+          {collectionName ?? t.learn.allCollections}
         </p>
       </div>
 
@@ -1546,7 +1546,7 @@ function SessionDone({
       <div className="grid grid-cols-2 gap-3 w-full mb-4">
         <StatTile icon="📚" value={sessionCount} label={t.learn.wordsLearned} color="var(--primary)" />
         {classHWNextUrl ? (
-          <StatTile icon="🎓" value="Class XP" label="awarded by class" color="var(--warning)" />
+          <StatTile icon="🎓" value={t.learn.classXpLabel} label={t.learn.awardedByClass} color="var(--warning)" />
         ) : (
           <StatTile icon="⚡" value={`+${displayXP(xpEarned)}`} label={t.learn.xpEarned} color="var(--warning)" />
         )}

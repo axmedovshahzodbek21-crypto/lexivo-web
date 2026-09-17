@@ -152,9 +152,9 @@ function QuizInner() {
     if (collectionName && dayNumber !== undefined) {
       const p = getUnitProgress(collectionName, dayNumber);
       if (!p.learnDone) {
-        setGateInfo({ url: `/learn?collection=${encodeURIComponent(collectionName)}&day=${dayNumber}`, missing: 'Learn' });
+        setGateInfo({ url: `/learn?collection=${encodeURIComponent(collectionName)}&day=${dayNumber}`, missing: t.nav.learn });
       } else if (!p.flashcardDone) {
-        setGateInfo({ url: `/flashcards?collection=${encodeURIComponent(collectionName)}&day=${dayNumber}`, missing: 'Flashcards' });
+        setGateInfo({ url: `/flashcards?collection=${encodeURIComponent(collectionName)}&day=${dayNumber}`, missing: t.nav.flashcards });
       }
     }
   }, [collectionName, dayNumber, sourceClass]);
@@ -393,13 +393,13 @@ function QuizInner() {
       <div className="flex flex-col items-center justify-center min-h-screen p-6 text-center gap-5 animate-fade-in">
         <div className="text-5xl">🔒</div>
         <div className="space-y-2">
-          <h2 className="text-xl font-bold text-[var(--text)]">Complete {gateInfo.missing} first</h2>
+          <h2 className="text-xl font-bold text-[var(--text)]">{t.quiz.completeXFirst(gateInfo.missing)}</h2>
           <p className="text-sm text-[var(--text-muted)] max-w-xs leading-relaxed">
             You need to finish <strong>{gateInfo.missing}</strong> for this unit before you can take the Quiz. The order is: Learn → Flashcards → Quiz.
           </p>
         </div>
         <div className="flex flex-col gap-3 w-full max-w-xs">
-          <Link href={gateInfo.url} className="btn-primary text-center">Go to {gateInfo.missing} →</Link>
+          <Link href={gateInfo.url} className="btn-primary text-center">{t.quiz.goToX(gateInfo.missing)}</Link>
           <button onClick={() => router.back()} className="btn-secondary">{t.extra.goBack}</button>
         </div>
       </div>
@@ -422,7 +422,7 @@ function QuizInner() {
       <div className="p-6 text-center flex flex-col items-center justify-center min-h-screen animate-fade-in">
         {myUnitCompleted && (
           <div className="w-full rounded-2xl px-4 py-3 mb-4 text-center font-bold animate-pop" style={{ background: 'rgba(34,197,94,0.12)', color: 'var(--success)', border: '1.5px solid var(--success)' }}>
-            🏆 Unit Complete!
+            {t.matching.unitComplete}
           </div>
         )}
         <div className="text-6xl mb-4">{score === 100 ? '🏆' : score >= 80 ? '🎉' : score >= 50 ? '👍' : '💪'}</div>
@@ -432,7 +432,7 @@ function QuizInner() {
           <div className="progress-bar" style={{ height: 12 }}>
             <div className="progress-bar-fill" style={{ width: `${score}%`, height: 12 }} />
           </div>
-          <p className="text-center text-sm mt-2 font-medium text-[var(--primary)]">{score}% accuracy</p>
+          <p className="text-center text-sm mt-2 font-medium text-[var(--primary)]">{t.quiz.scoreAccuracy(score)}</p>
         </div>
         {sessionXP > 0 && (
           <div className="w-full card mb-6 flex items-center justify-center gap-2">

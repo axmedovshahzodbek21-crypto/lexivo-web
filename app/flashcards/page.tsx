@@ -324,7 +324,10 @@ function FlashcardsInner() {
         <div className="space-y-2">
           <h2 className="text-xl font-bold text-[var(--text)]">{t.extra.completeLearnFirst}</h2>
           <p className="text-sm text-[var(--text-muted)] max-w-xs leading-relaxed">
-            You need to finish the <strong>Learn</strong> session for this unit before you can do Flashcards. It only takes a few minutes!
+            {(() => {
+              const [pre, post] = t.flashcards.gateLearnBody.split('{word}');
+              return <>{pre}<strong>{t.nav.learn}</strong>{post}</>;
+            })()}
           </p>
         </div>
         <div className="flex flex-col gap-3 w-full max-w-xs">
@@ -350,7 +353,7 @@ function FlashcardsInner() {
       <div className="p-6 text-center flex flex-col items-center justify-center min-h-screen animate-fade-in">
         {myUnitCompleted && (
           <div className="w-full rounded-2xl px-4 py-3 mb-4 text-center font-bold animate-pop" style={{ background: 'rgba(34,197,94,0.12)', color: 'var(--success)', border: '1.5px solid var(--success)' }}>
-            🏆 Unit Complete!
+            {t.matching.unitComplete}
           </div>
         )}
         <div className="text-6xl mb-4">{score >= 80 ? '🎉' : score >= 50 ? '👍' : '💪'}</div>
@@ -365,7 +368,7 @@ function FlashcardsInner() {
           <span className="text-xl">⚡</span>
           <span className="font-bold" style={{ color: 'var(--warning)' }}>+{displayXP(sessionXP)} XP</span>
           {sessionXP === 0 && unknown > 0 && (
-            <span className="text-xs text-[var(--text-muted)]">— mark all known to earn XP</span>
+            <span className="text-xs text-[var(--text-muted)]">{t.flashcards.markAllKnownHint}</span>
           )}
         </div>
         <div className="flex flex-col gap-3 w-full">
