@@ -21,7 +21,6 @@ interface CollectionMeta {
 }
 
 const ACTIVITY_ICON: Record<string, string> = { learn: '📖', flashcard: '🃏', quiz: '🧠' };
-const ACTIVITY_LABEL: Record<string, string> = { learn: 'Learn', flashcard: 'Flashcard', quiz: 'Quiz' };
 
 type SortKey = 'lastActive' | 'xp' | 'progress' | 'name';
 type FilterKey = 'all' | 'active' | 'inactive';
@@ -139,38 +138,38 @@ function Avatar({ name, url, size = 38 }: { name: string; url: string | null; si
   );
 }
 
-function lastActiveLabel(date: string | null): string {
-  if (!date) return 'Never';
+function lastActiveLabel(tt: ReturnType<typeof useTranslation>, date: string | null): string {
+  if (!date) return tt.classesPage.never;
   const today = localDateStr();
   const yesterday = addDaysToDateStr(today, -1);
-  if (date >= today) return 'Today ✅';
-  if (date >= yesterday) return 'Yesterday';
+  if (date >= today) return tt.classesPage.todayCheckmark;
+  if (date >= yesterday) return tt.classesPage.yesterday;
   const days = Math.floor((Date.now() - new Date(date).getTime()) / 86400000);
-  if (days < 7) return `${days}d ago`;
-  if (days < 30) return `${Math.floor(days / 7)}w ago`;
-  return `${Math.floor(days / 30)}mo ago`;
+  if (days < 7) return tt.classesPage.daysAgo(days);
+  if (days < 30) return tt.classesPage.weeksAgo(Math.floor(days / 7));
+  return tt.classesPage.monthsAgo(Math.floor(days / 30));
 }
 
-function timeAgo(iso: string): string {
+function timeAgo(tt: ReturnType<typeof useTranslation>, iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
   const m = Math.floor(diff / 60000);
-  if (m < 1) return 'just now';
-  if (m < 60) return `${m}m ago`;
+  if (m < 1) return tt.classesPage.justNow;
+  if (m < 60) return tt.classesPage.minutesAgo(m);
   const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h ago`;
+  if (h < 24) return tt.classesPage.hoursAgo(h);
   const d = Math.floor(h / 24);
-  if (d < 7) return `${d}d ago`;
+  if (d < 7) return tt.classesPage.daysAgo(d);
   return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }
 
-function dueDateLabel(due: string | null): { text: string; overdue: boolean } | null {
+function dueDateLabel(tt: ReturnType<typeof useTranslation>, due: string | null): { text: string; overdue: boolean } | null {
   if (!due) return null;
   const today = localDateStr();
   const tomorrow = addDaysToDateStr(today, 1);
-  if (due < today) return { text: `Overdue · ${new Date(due + 'T00:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`, overdue: true };
-  if (due === today) return { text: 'Due today', overdue: false };
-  if (due === tomorrow) return { text: 'Due tomorrow', overdue: false };
-  return { text: `Due ${new Date(due + 'T00:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`, overdue: false };
+  if (due < today) return { text: tt.classesPage.overdueDate(new Date(due + 'T00:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' })), overdue: true };
+  if (due === today) return { text: tt.classesPage.dueToday, overdue: false };
+  if (due === tomorrow) return { text: tt.classesPage.dueTomorrow, overdue: false };
+  return { text: tt.classesPage.dueDate(new Date(due + 'T00:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' })), overdue: false };
 }
 
 function isInactive(date: string | null): boolean {
@@ -179,12 +178,12 @@ function isInactive(date: string | null): boolean {
   return date < threeDaysAgo;
 }
 
-function dayLabel(iso: string): string {
+function dayLabel(tt: ReturnType<typeof useTranslation>, iso: string): string {
   const date = localDateStr(new Date(iso));
   const today = localDateStr();
   const yesterday = addDaysToDateStr(today, -1);
-  if (date === today) return 'Today';
-  if (date === yesterday) return 'Yesterday';
+  if (date === today) return tt.classesPage.todayCap;
+  if (date === yesterday) return tt.classesPage.yesterday;
   return new Date(date).toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' });
 }
 
@@ -262,7 +261,7 @@ function AnalyticsTab({
   onDigest: () => void;
 }) {
   const tt = useTranslation();
-  const studentName = (id: string) => students.find(s => s.student_id === id)?.name ?? 'Unknown';
+  const studentName = (id: string) => students.find(s => s.student_id === id)?.name ?? tt.classesPage.unknownStudent;
 
   const [folderHeatmap, setFolderHeatmap] = useState<FolderHeatFolder[]>([]);
   useEffect(() => {
@@ -354,7 +353,7 @@ function AnalyticsTab({
       {/* Live studying now */}
       <div>
         <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide mb-2">
-          🟢 Studying now ({activeStudents.length})
+          {tt.classesPage.studyingNow} ({activeStudents.length})
         </p>
         {activeStudents.length === 0 ? (
           <p className="text-sm text-[var(--text-muted)] px-1">{tt.classesPage.noOneStudying}</p>
@@ -378,14 +377,14 @@ function AnalyticsTab({
       {/* Speed flag warnings */}
       {speedFlagged.length > 0 && (
         <div>
-          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide mb-2">⚡ Speed flags (&gt;10 words/min)</p>
+          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide mb-2">{tt.classesPage.speedFlagsHeader}</p>
           <div className="space-y-2">
             {speedFlagged.map(r => (
               <div key={r.student_id} className="flex items-center gap-3 px-3 py-2.5 rounded-xl" style={{ background: 'color-mix(in srgb, var(--danger) 8%, var(--surface-2))' }}>
                 <span className="text-lg">⚠️</span>
                 <div className="flex-1">
                   <p className="text-sm font-semibold text-[var(--text)]">{studentName(r.student_id)}</p>
-                  <p className="text-[10px] text-[var(--text-muted)]">{r.speed_flag_sessions} flagged session{r.speed_flag_sessions > 1 ? 's' : ''} · possible rushing</p>
+                  <p className="text-[10px] text-[var(--text-muted)]">{tt.classesPage.flaggedSessions(r.speed_flag_sessions)}</p>
                 </div>
                 {r.genuine_mastery_pct != null && (
                   <div className="text-right">
@@ -402,7 +401,7 @@ function AnalyticsTab({
       {/* Progress over time */}
       {progressPoints.length > 1 && (
         <div>
-          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide mb-2">📈 Words learned (last 30 days)</p>
+          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide mb-2">{tt.classesPage.wordsLearnedLast30}</p>
           <div className="card p-3 overflow-hidden">
             <div className="w-full overflow-x-auto">
               <LineChart points={chartPoints} width={Math.max(300, chartPoints.length * 28)} height={88} />
@@ -410,7 +409,7 @@ function AnalyticsTab({
             <div className="flex justify-between mt-1">
               <span className="text-[9px] text-[var(--text-muted)]">{progressPoints[0]?.study_date?.slice(5)}</span>
               <span className="text-[9px] text-[var(--text-muted)] font-semibold">
-                Total: {progressPoints.reduce((s, p) => s + p.words_learned, 0)} words
+                {tt.classesPage.totalWordsCount(progressPoints.reduce((s, p) => s + p.words_learned, 0))}
               </span>
               <span className="text-[9px] text-[var(--text-muted)]">{progressPoints[progressPoints.length - 1]?.study_date?.slice(5)}</span>
             </div>
@@ -421,7 +420,7 @@ function AnalyticsTab({
       {/* Per-word time bar chart */}
       {wordStats.length > 0 && (
         <div>
-          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide mb-2">⏱ Slowest words (avg seconds to mark)</p>
+          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide mb-2">{tt.classesPage.slowestWordsHeader}</p>
           <div className="card p-3 space-y-2">
             {wordStats.map(({ word, avg }) => {
               const pct = (avg / maxAvg) * 100;
@@ -443,7 +442,7 @@ function AnalyticsTab({
       {/* Per-student summary with pie charts */}
       {analyticsData.length > 0 && (
         <div>
-          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide mb-2">👤 Per-student overview</p>
+          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide mb-2">{tt.classesPage.perStudentOverview}</p>
           <div className="space-y-2">
             {analyticsData.map(r => {
               const wordData = (r.per_word_data_all ?? []).flat();
@@ -461,7 +460,7 @@ function AnalyticsTab({
                       <span className="text-orange-500">{skipped}⏭</span>
                       {' · '}
                       <span className="text-red-500">{hard}😤</span>
-                      {' · '}{r.total_sessions} session{r.total_sessions !== 1 ? 's' : ''}
+                      {' · '}{tt.classesPage.sessionsCount(r.total_sessions)}
                     </p>
                   </div>
                   <div className="text-right shrink-0">
@@ -475,7 +474,7 @@ function AnalyticsTab({
                     ) : (
                       <p className="text-[10px] text-[var(--text-muted)]">{tt.classesPage.noGateData}</p>
                     )}
-                    {r.speed_flag_sessions > 0 && <p className="text-[9px] text-[var(--danger)] font-semibold mt-0.5">⚡ {r.speed_flag_sessions} flags</p>}
+                    {r.speed_flag_sessions > 0 && <p className="text-[9px] text-[var(--danger)] font-semibold mt-0.5">{tt.classesPage.flagsCount(r.speed_flag_sessions)}</p>}
                   </div>
                 </div>
               );
@@ -487,9 +486,9 @@ function AnalyticsTab({
       {/* Library Folder Heatmap */}
       {folderHeatmap.length > 0 && (
         <div>
-          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide mb-2">📁 Library Homework Completion</p>
+          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide mb-2">{tt.classesPage.libraryHwCompletion}</p>
           <div className="card p-3 space-y-3">
-            <p className="text-[10px] text-[var(--text-muted)]">% of assigned students who completed all modes · dashed = no homework assigned</p>
+            <p className="text-[10px] text-[var(--text-muted)]">{tt.classesPage.libraryHwCompletionSub}</p>
             {folderHeatmap.map(folder => {
               const hwUnits = folder.units.filter(u => u.hasHw);
               const avgPct = hwUnits.length > 0
@@ -500,14 +499,14 @@ function AnalyticsTab({
                   <div className="flex items-center justify-between mb-1.5">
                     <span className="text-[10px] font-bold text-[var(--text)]">📁 {folder.name}</span>
                     {avgPct !== null
-                      ? <span className="text-[9px] font-semibold" style={{ color: classMasteryColor(avgPct) }}>{avgPct}% avg</span>
+                      ? <span className="text-[9px] font-semibold" style={{ color: classMasteryColor(avgPct) }}>{avgPct}% {tt.classesPage.avgLc}</span>
                       : <span className="text-[9px] text-[var(--text-muted)]">{tt.classesPage.noHomeworkYetLc}</span>}
                   </div>
                   <div className="flex flex-wrap gap-1">
                     {folder.units.map((unit, i) => (
                       <div
                         key={unit.id}
-                        title={unit.hasHw ? `${unit.name}: ${unit.pct}% completed` : `${unit.name}: no homework assigned`}
+                        title={unit.hasHw ? tt.classesPage.unitCompletedTitle(unit.name, unit.pct) : tt.classesPage.unitNoHwTitle(unit.name)}
                         className="flex items-center justify-center text-[8px] font-black"
                         style={{
                           width: 28, height: 28, borderRadius: 5,
@@ -540,9 +539,9 @@ function AnalyticsTab({
       {/* Class Mastery Heatmap */}
       {students.length > 0 && collections.length > 0 && (
         <div>
-          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide mb-2">🗺 Class Mastery Heatmap</p>
+          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide mb-2">{tt.classesPage.classMasteryHeatmap}</p>
           <div className="card p-3 space-y-3">
-            <p className="text-[10px] text-[var(--text-muted)]">% of class that has completed each unit · tap for details</p>
+            <p className="text-[10px] text-[var(--text-muted)]">{tt.classesPage.classMasteryHeatmapSub}</p>
             {collections.map(col => {
               const completionPcts = Array.from({ length: col.total_units }, (_, i) => {
                 const unit = i + 1;
@@ -556,7 +555,7 @@ function AnalyticsTab({
                 <div key={col.collection_name}>
                   <div className="flex items-center justify-between mb-1.5">
                     <span className="text-[10px] font-bold text-[var(--text)]">{col.label}</span>
-                    <span className="text-[9px] font-semibold" style={{ color: classMasteryColor(avgPct) }}>{avgPct}% avg</span>
+                    <span className="text-[9px] font-semibold" style={{ color: classMasteryColor(avgPct) }}>{avgPct}% {tt.classesPage.avgLc}</span>
                   </div>
                   <div className="flex flex-wrap gap-1">
                     {completionPcts.map((pct, i) => (
@@ -569,7 +568,7 @@ function AnalyticsTab({
                           opacity: pct === 0 ? 0.35 : 1,
                           fontSize: 8,
                         }}
-                        title={`Unit ${i + 1}: ${pct}% of class completed`}
+                        title={tt.classesPage.unitClassCompletedTitle(i + 1, pct)}
                       >
                         {i + 1}
                       </div>
@@ -599,15 +598,15 @@ function AnalyticsTab({
 
       {/* AI Weekly Digest */}
       <div>
-        <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide mb-2">🤖 AI Weekly Digest</p>
+        <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide mb-2">{tt.classesPage.aiWeeklyDigest}</p>
         <div className="card space-y-3">
-          <p className="text-xs text-[var(--text-muted)]">Generate a personalised coaching summary based on this week&apos;s data.</p>
+          <p className="text-xs text-[var(--text-muted)]">{tt.classesPage.aiDigestSub}</p>
           <button
             onClick={onDigest}
             disabled={digestLoading || analyticsData.length === 0}
             className="w-full btn-primary py-3 disabled:opacity-50"
           >
-            {digestLoading ? '✨ Generating…' : '✨ Generate digest'}
+            {digestLoading ? tt.classesPage.generatingDigest : tt.classesPage.generateDigest}
           </button>
           {digestText && (
             <div className="text-sm text-[var(--text)] leading-relaxed whitespace-pre-wrap bg-[var(--surface-2)] rounded-xl p-3 animate-fade-in">
@@ -621,7 +620,6 @@ function AnalyticsTab({
 }
 
 const SRS_COLORS = ['#9CA3AF', '#F59E0B', '#3B82F6', '#8B5CF6', '#EC4899', '#10B981'];
-const SRS_LABELS = ['New', '+1d', '+3d', '+7d', '+14d', '✓'];
 
 function SRSTab({
   srsRows, gridWords, hardWordsRaw, srsNames, loading,
@@ -633,6 +631,7 @@ function SRSTab({
   loading: boolean;
 }) {
   const tt = useTranslation();
+  const SRS_LABELS = [tt.classesPage.srsNew, '+1d', '+3d', '+7d', '+14d', '✓'];
   if (loading) return <div className="flex justify-center py-12"><div className="text-4xl animate-bounce">📚</div></div>;
 
   const today = localDateStr();
@@ -671,15 +670,15 @@ function SRSTab({
                   <div className="flex items-center justify-between">
                     <p className="font-semibold text-sm text-[var(--text)]">{srsNames[uid] ?? uid.slice(0, 8)}</p>
                     <div className="flex items-center gap-3 text-xs">
-                      {dueToday > 0 && <span style={{ color: '#F59E0B' }} className="font-bold">{dueToday} due</span>}
-                      {overdue > 0 && <span className="text-[var(--danger)] font-bold">{overdue} overdue</span>}
-                      <span className="text-[var(--text-muted)]">{total} words</span>
+                      {dueToday > 0 && <span style={{ color: '#F59E0B' }} className="font-bold">{tt.classesPage.dueCount(dueToday)}</span>}
+                      {overdue > 0 && <span className="text-[var(--danger)] font-bold">{tt.classesPage.overdueCount(overdue)}</span>}
+                      <span className="text-[var(--text-muted)]">{tt.classesPage.wordsCount(total)}</span>
                     </div>
                   </div>
                   <div className="flex h-3 rounded-full overflow-hidden">
                     {stageCounts.map((count, s) =>
                       count > 0 ? (
-                        <div key={s} title={`Stage ${s}: ${count}`} style={{ flex: count, background: SRS_COLORS[s] }} />
+                        <div key={s} title={tt.classesPage.stageCountTitle(s, count)} style={{ flex: count, background: SRS_COLORS[s] }} />
                       ) : null
                     )}
                     {total === 0 && <div className="flex-1 rounded-full" style={{ background: 'var(--surface-2)' }} />}
@@ -729,7 +728,7 @@ function SRSTab({
                             <td key={uid} className="px-1 py-1 text-center" style={{ background: rowBg }}>
                               <div
                                 className="mx-auto w-8 h-7 rounded-md flex items-center justify-center text-[9px] font-bold"
-                                title={stage !== undefined ? SRS_LABELS[stage] : 'Not studied'}
+                                title={stage !== undefined ? SRS_LABELS[stage] : tt.classesPage.notStudied}
                                 style={stage !== undefined
                                   ? { background: SRS_COLORS[stage], color: 'white' }
                                   : { border: '1px solid var(--border)', color: 'var(--text-muted)' }}
@@ -777,7 +776,7 @@ function SRSTab({
                     <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
                       <div className="h-full rounded-full" style={{ width: `${(count / maxCount) * 100}%`, background: 'var(--danger)' }} />
                     </div>
-                    <p className="text-[10px] text-[var(--text-muted)] mt-0.5">{count} student{count !== 1 ? 's' : ''} got this wrong</p>
+                    <p className="text-[10px] text-[var(--text-muted)] mt-0.5">{tt.classesPage.studentsGotWrong(count)}</p>
                   </div>
                 </div>
               );
@@ -842,7 +841,7 @@ function ReviewPatternTab({
   return (
     <div className="space-y-3">
       <p className="text-xs text-[var(--text-muted)]">
-        Classified from each student&apos;s SRS Review activity over the last {REVIEW_WINDOW_DAYS} days. Sorted with students needing attention first.
+        {tt.classesPage.reviewClassifiedIntro(REVIEW_WINDOW_DAYS)}
       </p>
       {rows.map(r => {
         const meta = REVIEW_LABEL_META[r.label];
@@ -858,20 +857,20 @@ function ReviewPatternTab({
               </div>
               {r.overdue > 0 ? (
                 <span className="text-[10px] font-bold shrink-0 px-2 py-1 rounded-full" style={{ background: 'color-mix(in srgb, var(--danger) 12%, transparent)', color: 'var(--danger)' }}>
-                  {r.overdue} overdue
+                  {tt.classesPage.overdueCount(r.overdue)}
                 </span>
               ) : r.due > 0 ? (
                 <span className="text-[10px] font-bold shrink-0 px-2 py-1 rounded-full" style={{ background: 'color-mix(in srgb, var(--warning) 12%, transparent)', color: 'var(--warning)' }}>
-                  {r.due} due
+                  {tt.classesPage.dueCount(r.due)}
                 </span>
               ) : null}
             </div>
             <p className="text-[11px] text-[var(--text-muted)]">{meta.blurb}</p>
             <div className="flex flex-wrap gap-x-4 gap-y-1 text-[10px] text-[var(--text-muted)]">
-              <span><b className="text-[var(--text)]">{r.daysReviewed}</b>/{REVIEW_WINDOW_DAYS} days reviewed</span>
-              <span><b className="text-[var(--text)]">{r.streak}</b> day streak</span>
-              <span>longest gap: <b className="text-[var(--text)]">{r.longestGap}</b>d</span>
-              {r.totalReviews > 0 && <span>avg <b className="text-[var(--text)]">{r.avgPerActiveDay.toFixed(1)}</b> words/active day</span>}
+              <span><b className="text-[var(--text)]">{r.daysReviewed}</b>/{REVIEW_WINDOW_DAYS} {tt.classesPage.daysReviewedSuffix}</span>
+              <span><b className="text-[var(--text)]">{r.streak}</b> {tt.classesPage.dayStreakLc}</span>
+              <span>{tt.classesPage.longestGapPrefix} <b className="text-[var(--text)]">{r.longestGap}</b>d</span>
+              {r.totalReviews > 0 && <span>{tt.classesPage.avgLc} <b className="text-[var(--text)]">{r.avgPerActiveDay.toFixed(1)}</b> {tt.classesPage.wordsPerActiveDay}</span>}
             </div>
           </div>
         );
@@ -881,8 +880,10 @@ function ReviewPatternTab({
 }
 
 const HW_MODE_ICON: Record<string, string> = { learn: '📖', flashcard: '🃏', quiz: '🧠', match: '🎯', read: '📚' };
-const HW_MODE_LABEL: Record<string, string> = { learn: 'Learn', flashcard: 'Cards', quiz: 'Quiz', match: 'Match', read: 'Read' };
 const HW_MODE_COLOR: Record<string, string> = { learn: '#3B82F6', flashcard: '#8B5CF6', quiz: '#EC4899', match: '#10B981', read: '#F59E0B' };
+function hwModeLabel(tt: ReturnType<typeof useTranslation>, mode: string): string {
+  return ({ learn: tt.nav.learn, flashcard: tt.classesPage.hwModeCards, quiz: tt.nav.quiz, match: tt.classesPage.hwModeMatch, read: tt.classesPage.hwModeRead } as Record<string, string>)[mode] ?? mode;
+}
 const REQUIRED_MODES = ['learn', 'flashcard', 'quiz'];
 const OPTIONAL_MODES = ['match'];
 
@@ -965,7 +966,7 @@ function CurriculumTab({
 
     if (assignsRes.error || cwUnitRes.error) {
       console.error('[loadCurriculum]', assignsRes.error ?? cwUnitRes.error);
-      alert(`Failed to load curriculum: ${(assignsRes.error ?? cwUnitRes.error)?.message}`);
+      alert(tt.classesPage.failedToLoadCurriculum((assignsRes.error ?? cwUnitRes.error)?.message ?? ''));
       setLoading(false);
       return;
     }
@@ -979,7 +980,7 @@ function CurriculumTab({
       const { data: unitData, error: unitErr } = await supabase
         .from('teacher_units').select('id, folder_id, name, teacher_unit_words(count)')
         .in('folder_id', folderIds).order('position').order('created_at');
-      if (unitErr) { console.error('[loadCurriculum]', unitErr); alert(`Failed to load folder units: ${unitErr.message}`); setLoading(false); return; }
+      if (unitErr) { console.error('[loadCurriculum]', unitErr); alert(tt.classesPage.failedToLoadFolderUnits(unitErr.message)); setLoading(false); return; }
       parsedFolders = assigns.map((a: any) => ({
         id: a.teacher_folders.id, assignmentId: a.id, name: a.teacher_folders.name,
         units: (unitData ?? [])
@@ -997,14 +998,14 @@ function CurriculumTab({
       .from('class_homework')
       .select('id, unit_id, class_unit_id, collection_name, day_number, passage_id, modes, due_date, student_ids, teacher_units(name), class_word_units(name)')
       .eq('class_id', classId).order('created_at', { ascending: false });
-    if (hwErr) { console.error('[loadCurriculum]', hwErr); alert(`Failed to load homework: ${hwErr.message}`); setLoading(false); return; }
+    if (hwErr) { console.error('[loadCurriculum]', hwErr); alert(tt.classesPage.failedToLoadHomework(hwErr.message)); setLoading(false); return; }
 
     let parsedHw: CurrHW[] = [];
     if (hwData && hwData.length > 0) {
       const hwIds = (hwData as any[]).map(h => h.id);
       const { data: progData, error: progErr } = await supabase
         .from('class_homework_progress').select('homework_id, student_id, mode').in('homework_id', hwIds);
-      if (progErr) { console.error('[loadCurriculum]', progErr); alert(`Failed to load homework progress: ${progErr.message}`); setLoading(false); return; }
+      if (progErr) { console.error('[loadCurriculum]', progErr); alert(tt.classesPage.failedToLoadHomeworkProgress(progErr.message)); setLoading(false); return; }
       parsedHw = (hwData as any[]).map(h => {
         const rows = (progData ?? []).filter((p: any) => p.homework_id === h.id);
         const progressByMode: Record<string, number> = {};
@@ -1019,9 +1020,9 @@ function CurriculumTab({
         const isClass = h.class_unit_id != null;
         const source: CurrHW['source'] = isPassage ? 'passage' : isCollection ? 'collection' : isClass ? 'class' : 'library';
         const unitName = isPassage
-          ? (readingPassages.find(p => p.id === passageId)?.title ?? 'Reading Passage')
+          ? (readingPassages.find(p => p.id === passageId)?.title ?? tt.classesPage.defaultReadingPassageTitle)
           : isCollection ? `${collName} · Day ${dayNum}`
-          : isClass ? (h.class_word_units?.name ?? 'Unit') : (h.teacher_units?.name ?? 'Unit');
+          : isClass ? (h.class_word_units?.name ?? tt.classesPage.defaultUnitName) : (h.teacher_units?.name ?? tt.classesPage.defaultUnitName);
         return {
           id: h.id, unitId: h.unit_id ?? null, classUnitId: h.class_unit_id ?? null,
           collectionName: collName, dayNumber: dayNum, passageId,
@@ -1045,7 +1046,7 @@ function CurriculumTab({
     setFolderPickerLoading(true);
     const assignedIds = new Set(folders.map(f => f.id));
     const { data, error } = await supabase.from('teacher_folders').select('id, name, teacher_units(count)').eq('teacher_id', user.id).order('position');
-    if (error) { console.error('[openFolderPicker]', error); alert(`Failed to load folders: ${error.message}`); setFolderPickerLoading(false); return; }
+    if (error) { console.error('[openFolderPicker]', error); alert(tt.classesPage.failedToLoadFolders(error.message)); setFolderPickerLoading(false); return; }
     setAvailFolders(
       ((data ?? []) as any[])
         .filter(f => !assignedIds.has(f.id))
@@ -1056,15 +1057,15 @@ function CurriculumTab({
 
   const assignFolder = async (folderId: string) => {
     const { error } = await supabase.from('class_library_assignments').insert({ class_id: classId, folder_id: folderId });
-    if (error) { console.error('[assignFolder]', error); alert(`Failed to assign folder: ${error.message}`); return; }
+    if (error) { console.error('[assignFolder]', error); alert(tt.classesPage.failedToAssignFolder(error.message)); return; }
     setShowFolderPicker(false);
     await loadCurriculum();
   };
 
   const unassignFolder = async (assignmentId: string) => {
-    if (!confirm('Remove this folder from the class? Students will lose access to its units.')) return;
+    if (!confirm(tt.classesPage.confirmUnassignFolder)) return;
     const { error } = await supabase.from('class_library_assignments').delete().eq('id', assignmentId).eq('class_id', classId);
-    if (error) { console.error('[unassignFolder]', error); alert(`Failed to remove folder: ${error.message}`); return; }
+    if (error) { console.error('[unassignFolder]', error); alert(tt.classesPage.failedToRemoveFolder(error.message)); return; }
     await loadCurriculum();
   };
 
@@ -1105,7 +1106,7 @@ function CurriculumTab({
       due_date: hwDueDate || null,
       student_ids: hwWho === 'class' ? null : [...hwStudentIds],
     });
-    if (error) { console.error('[saveHomework]', error); alert(`Failed to save: ${error.message}`); setHwSaving(false); return; }
+    if (error) { console.error('[saveHomework]', error); alert(tt.classesPage.failedToSaveHomework(error.message)); setHwSaving(false); return; }
     closeHwModal();
     setHwSaving(false);
     await loadCurriculum();
@@ -1135,7 +1136,7 @@ function CurriculumTab({
   const createCWUnit = async () => {
     if (!user || !cwUnitNewName.trim()) return;
     const { error } = await supabase.from('class_word_units').insert({ class_id: classId, teacher_id: user.id, name: cwUnitNewName.trim() });
-    if (error) { console.error('[createCWUnit]', error); alert(`Failed to create unit: ${error.message}`); return; }
+    if (error) { console.error('[createCWUnit]', error); alert(tt.classesPage.failedToCreateClassUnit(error.message)); return; }
     setCwUnitCreating(false);
     setCwUnitNewName('');
     await loadCurriculum();
@@ -1144,7 +1145,7 @@ function CurriculumTab({
   const renameCWUnit = async () => {
     if (!cwUnitRenaming || !cwUnitRenameName.trim()) return;
     const { error } = await supabase.from('class_word_units').update({ name: cwUnitRenameName.trim() }).eq('id', cwUnitRenaming.id);
-    if (error) { console.error('[renameCWUnit]', error); alert(`Failed to rename unit: ${error.message}`); return; }
+    if (error) { console.error('[renameCWUnit]', error); alert(tt.classesPage.failedToRenameClassUnit(error.message)); return; }
     setCwUnitRenaming(null);
     await loadCurriculum();
   };
@@ -1154,11 +1155,11 @@ function CurriculumTab({
     // CASCADE, so deleting this unit silently wipes any homework assigned
     // from it (and all student completion history). Warn the teacher first.
     const { data: assignedHw, error: countErr } = await supabase.from('class_homework').select('id').eq('class_unit_id', unit.id);
-    if (countErr) { console.error('[deleteCWUnit]', countErr); alert(`Failed to check homework impact: ${countErr.message}`); return; }
+    if (countErr) { console.error('[deleteCWUnit]', countErr); alert(tt.classesPage.failedToCheckHomeworkImpact(countErr.message)); return; }
     const hwCount = assignedHw?.length ?? 0;
     const msg = hwCount === 0
-      ? `Delete unit "${unit.name}"? Words will remain but lose their unit assignment.`
-      : `Delete unit "${unit.name}"? Words will remain but lose their unit assignment. This unit is currently assigned as homework in ${hwCount} place${hwCount !== 1 ? 's' : ''} — deleting it will also remove that homework and every student's progress on it.`;
+      ? tt.classesPage.deleteClassUnitConfirmSimple(unit.name)
+      : tt.classesPage.deleteClassUnitConfirmWithHw(unit.name, hwCount);
     if (!confirm(msg)) return;
     // confirm() can sit open for a while — the warning above may now be
     // stale (homework could've been assigned/removed from this unit in the
@@ -1166,20 +1167,20 @@ function CurriculumTab({
     // right before the actual delete so a changed impact count aborts
     // instead of silently cascading more (or less) than what was shown.
     const { data: recheckHw, error: recheckErr } = await supabase.from('class_homework').select('id').eq('class_unit_id', unit.id);
-    if (recheckErr) { console.error('[deleteCWUnit]', recheckErr); alert(`Failed to re-check homework impact: ${recheckErr.message}`); return; }
+    if (recheckErr) { console.error('[deleteCWUnit]', recheckErr); alert(tt.classesPage.failedToRecheckHomeworkImpact(recheckErr.message)); return; }
     const recheckCount = recheckHw?.length ?? 0;
     if (recheckCount !== hwCount) {
-      alert(`This unit's homework assignments changed (now ${recheckCount}, was ${hwCount}) while you were confirming. Please try deleting again to see the up-to-date impact.`);
+      alert(tt.classesPage.homeworkImpactChanged(recheckCount, hwCount));
       return;
     }
     const { error } = await supabase.from('class_word_units').delete().eq('id', unit.id).eq('class_id', classId);
-    if (error) { console.error('[deleteCWUnit]', error); alert(`Failed to delete unit: ${error.message}`); return; }
+    if (error) { console.error('[deleteCWUnit]', error); alert(tt.classesPage.failedToDeleteClassUnit(error.message)); return; }
     await loadCurriculum();
   };
 
   const openManageWords = async (unit: CurrWordUnit) => {
     const { data, error } = await supabase.from('class_words').select('id, word, translation, unit_id').eq('class_id', classId).order('created_at');
-    if (error) { console.error('[openManageWords]', error); alert(`Failed to load words: ${error.message}`); return; }
+    if (error) { console.error('[openManageWords]', error); alert(tt.classesPage.failedToLoadWords(error.message)); return; }
     const words = (data ?? []) as any[];
     const pending: Record<string, boolean> = {};
     for (const w of words) pending[w.id] = w.unit_id === unit.id;
@@ -1206,7 +1207,7 @@ function CurriculumTab({
     ]);
     const failed = results.find(r => r?.error);
     setCwWordsSaving(false);
-    if (failed?.error) { console.error('[saveManageWords]', failed.error); alert(`Failed to save word changes: ${failed.error.message}`); return; }
+    if (failed?.error) { console.error('[saveManageWords]', failed.error); alert(tt.classesPage.failedToSaveWordChanges(failed.error.message)); return; }
     setCwWordsMgr(null);
     await loadCurriculum();
   };
@@ -1216,7 +1217,7 @@ function CurriculumTab({
     setHwDeleteConfirm(false);
     setDetailLoading(true);
     const { data, error } = await supabase.from('class_homework_progress').select('student_id, mode').eq('homework_id', hw.id);
-    if (error) { console.error('[openHwDetail]', error); alert(`Failed to load homework progress: ${error.message}`); setDetailLoading(false); return; }
+    if (error) { console.error('[openHwDetail]', error); alert(tt.classesPage.failedToLoadHomeworkProgress(error.message)); setDetailLoading(false); return; }
     const byStudent: Record<string, Set<string>> = {};
     for (const p of (data ?? []) as any[]) {
       if (!byStudent[p.student_id]) byStudent[p.student_id] = new Set();
@@ -1232,7 +1233,7 @@ function CurriculumTab({
     setHwDeleting(true);
     const { error } = await supabase.from('class_homework').delete().eq('id', hwDetail.id).eq('class_id', classId);
     setHwDeleting(false);
-    if (error) { console.error('[deleteHomework]', error); alert(`Failed to delete homework: ${error.message}`); return; }
+    if (error) { console.error('[deleteHomework]', error); alert(tt.classesPage.failedToDeleteHomework(error.message)); return; }
     setHwDetail(null);
     setHwDeleteConfirm(false);
     await loadCurriculum();
@@ -1247,8 +1248,8 @@ function CurriculumTab({
       {/* ── Library ── */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">📚 Library</p>
-          <button onClick={openFolderPicker} className="text-xs font-semibold text-[var(--primary)] hover:opacity-70 transition-opacity">+ Assign Folder</button>
+          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">{tt.classesPage.libraryHeader}</p>
+          <button onClick={openFolderPicker} className="text-xs font-semibold text-[var(--primary)] hover:opacity-70 transition-opacity">{tt.classesPage.assignFolderBtn}</button>
         </div>
 
         {folders.length === 0 ? (
@@ -1256,7 +1257,7 @@ function CurriculumTab({
             <div className="text-4xl">📚</div>
             <p className="font-bold text-[var(--text)]">{tt.classesPage.noFoldersAssigned}</p>
             <p className="text-sm text-[var(--text-muted)]">{tt.classesPage.assignFolderGiveAccess}</p>
-            <button onClick={openFolderPicker} className="btn-primary">+ Assign Folder</button>
+            <button onClick={openFolderPicker} className="btn-primary">{tt.classesPage.assignFolderBtn}</button>
           </div>
         ) : (
           <div className="space-y-3">
@@ -1280,7 +1281,7 @@ function CurriculumTab({
                     <span className="text-2xl shrink-0" style={{ filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.3))' }}>📁</span>
                     <div className="flex-1 min-w-0">
                       <p className="font-black text-sm truncate" style={{ color: 'white', textShadow: '0 1px 3px rgba(0,0,0,0.35)' }}>{folder.name}</p>
-                      <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)' }}>{folder.units.length} unit{folder.units.length !== 1 ? 's' : ''}</p>
+                      <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)' }}>{tt.classesPage.unitsCount(folder.units.length)}</p>
                     </div>
                     <button
                       onClick={e => { e.stopPropagation(); unassignFolder(folder.assignmentId); }}
@@ -1299,12 +1300,12 @@ function CurriculumTab({
                           <div key={unit.id} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[var(--surface-2)] transition-colors">
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-semibold text-[var(--text)] truncate">{unit.name}</p>
-                              <p className="text-xs text-[var(--text-muted)]">{unit.wordCount} words</p>
+                              <p className="text-xs text-[var(--text-muted)]">{tt.classesPage.wordsCount(unit.wordCount)}</p>
                             </div>
                             {hw ? (
-                              <button onClick={() => openHwDetail(hw)} className="shrink-0 text-xs font-bold px-3 py-1.5 rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/25 transition-colors">✓ Assigned</button>
+                              <button onClick={() => openHwDetail(hw)} className="shrink-0 text-xs font-bold px-3 py-1.5 rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/25 transition-colors">{tt.classesPage.assignedCheckmark}</button>
                             ) : (
-                              <button onClick={() => openHwModal(unit)} className="shrink-0 text-xs font-bold px-3 py-1.5 rounded-lg bg-[var(--primary-bg)] text-[var(--primary)] hover:opacity-80 transition-opacity">+ Assign</button>
+                              <button onClick={() => openHwModal(unit)} className="shrink-0 text-xs font-bold px-3 py-1.5 rounded-lg bg-[var(--primary-bg)] text-[var(--primary)] hover:opacity-80 transition-opacity">{tt.classesPage.assignPlus}</button>
                             )}
                           </div>
                         );
@@ -1321,8 +1322,8 @@ function CurriculumTab({
       {/* ── Class Words ── */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">📝 Class Words</p>
-          <button onClick={() => { setCwUnitNewName(''); setCwUnitCreating(true); }} className="text-xs font-semibold text-amber-500 hover:opacity-70 transition-opacity">+ New Unit</button>
+          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">{tt.classesPage.classWordsHeader}</p>
+          <button onClick={() => { setCwUnitNewName(''); setCwUnitCreating(true); }} className="text-xs font-semibold text-amber-500 hover:opacity-70 transition-opacity">{tt.classesPage.newUnitBtn}</button>
         </div>
 
         {cwUnits.length === 0 ? (
@@ -1346,7 +1347,7 @@ function CurriculumTab({
                     <span className="text-2xl shrink-0" style={{ filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.3))' }}>📝</span>
                     <div className="flex-1 min-w-0">
                       <p className="font-black text-sm truncate" style={{ color: 'white', textShadow: '0 1px 3px rgba(0,0,0,0.35)' }}>{unit.name}</p>
-                      <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)' }}>{unit.wordCount} word{unit.wordCount !== 1 ? 's' : ''}</p>
+                      <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)' }}>{tt.classesPage.wordsCount(unit.wordCount)}</p>
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0">
                       <button onClick={e => { e.stopPropagation(); setCwUnitRenameName(unit.name); setCwUnitRenaming(unit); }} className="text-xs px-2 py-1 rounded-lg transition-colors" style={{ color: 'rgba(255,255,255,0.7)', background: 'rgba(0,0,0,0.15)' }}>{tt.classesPage.rename}</button>
@@ -1356,11 +1357,11 @@ function CurriculumTab({
                   </button>
                   {isOpen && (
                     <div className="flex gap-2 p-3" style={{ background: 'var(--surface)' }}>
-                      <button onClick={() => openManageWords(unit)} className="flex-1 text-sm font-semibold py-2 rounded-xl bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">✏️ Manage Words</button>
+                      <button onClick={() => openManageWords(unit)} className="flex-1 text-sm font-semibold py-2 rounded-xl bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">{tt.classesPage.manageWordsBtn}</button>
                       {hw ? (
-                        <button onClick={() => openHwDetail(hw)} className="flex-1 text-sm font-semibold py-2 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 hover:bg-amber-500/25 transition-colors">📋 View Progress</button>
+                        <button onClick={() => openHwDetail(hw)} className="flex-1 text-sm font-semibold py-2 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 hover:bg-amber-500/25 transition-colors">{tt.classesPage.viewProgressBtn}</button>
                       ) : (
-                        <button onClick={() => openHwModal({ ...unit, isClassWords: true })} className="flex-1 text-sm font-semibold py-2 rounded-xl bg-[var(--primary-bg)] text-[var(--primary)] hover:opacity-80 transition-opacity">+ Assign HW</button>
+                        <button onClick={() => openHwModal({ ...unit, isClassWords: true })} className="flex-1 text-sm font-semibold py-2 rounded-xl bg-[var(--primary-bg)] text-[var(--primary)] hover:opacity-80 transition-opacity">{tt.classesPage.assignHwBtn}</button>
                       )}
                     </div>
                   )}
@@ -1380,15 +1381,15 @@ function CurriculumTab({
         return (
           <div>
             <div className="flex items-center justify-between mb-3">
-              <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">📗 Collections</p>
-              <button onClick={() => { setCollPickerOpen(true); setCollPickerStep(1); }} className="text-xs font-semibold text-green-600 dark:text-green-400 hover:opacity-70 transition-opacity">+ Assign Day</button>
+              <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">{tt.classesPage.collectionsHeader}</p>
+              <button onClick={() => { setCollPickerOpen(true); setCollPickerStep(1); }} className="text-xs font-semibold text-green-600 dark:text-green-400 hover:opacity-70 transition-opacity">{tt.classesPage.assignDayBtn}</button>
             </div>
             {groupEntries.length === 0 ? (
               <div className="card text-center py-8 space-y-2">
                 <div className="text-3xl">📗</div>
                 <p className="text-sm font-bold text-[var(--text)]">{tt.classesPage.prebuiltCollectionDays}</p>
                 <p className="text-xs text-[var(--text-muted)]">{tt.classesPage.prebuiltCollectionDaysSub}</p>
-                <button onClick={() => { setCollPickerOpen(true); setCollPickerStep(1); }} className="btn-primary text-xs px-4 py-2 !mt-3">+ Assign a Day</button>
+                <button onClick={() => { setCollPickerOpen(true); setCollPickerStep(1); }} className="btn-primary text-xs px-4 py-2 !mt-3">{tt.classesPage.assignADayBtn}</button>
               </div>
             ) : (
               <div className="space-y-3">
@@ -1401,7 +1402,7 @@ function CurriculumTab({
                         <span className="text-xl shrink-0">📗</span>
                         <div className="flex-1 min-w-0">
                           <p style={{ fontWeight: 900, fontSize: 14, color: 'white', textShadow: '0 1px 3px rgba(0,0,0,0.4)' }} className="truncate">{collName}</p>
-                          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)' }}>{days.length} day{days.length !== 1 ? 's' : ''} assigned</p>
+                          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)' }}>{tt.classesPage.daysAssignedCount(days.length)}</p>
                         </div>
                         <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 11, fontWeight: 700 }}>{open ? '▲' : '▼'}</span>
                       </button>
@@ -1409,19 +1410,19 @@ function CurriculumTab({
                         <div className="space-y-2" style={{ background: 'var(--surface)', padding: '12px' }}>
                           {days.sort((a, b) => (a.dayNumber ?? 0) - (b.dayNumber ?? 0)).map(hw => {
                             const total = totalStudentsForHw(hw);
-                            const due = dueDateLabel(hw.dueDate);
+                            const due = dueDateLabel(tt, hw.dueDate);
                             const allDone = hw.modes.every(m => (hw.progressByMode[m] ?? 0) >= total && total > 0);
                             const avgDone = total > 0 ? Math.floor(hw.modes.reduce((s, m) => s + (hw.progressByMode[m] ?? 0), 0) / hw.modes.length) : 0;
                             return (
                               <button key={hw.id} onClick={() => openHwDetail(hw)} className="w-full text-left" style={{ borderRadius: 12, padding: '12px 14px', background: 'var(--surface-2)', border: allDone ? '1px solid rgba(34,197,94,0.3)' : '1px solid var(--border)' }}>
                                 <div className="flex items-start justify-between gap-2 mb-2">
                                   <div className="flex-1 min-w-0">
-                                    <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }} className="truncate">Day {hw.dayNumber}: {hw.unitName.split(': ')[1] ?? hw.unitName}</p>
+                                    <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }} className="truncate">{tt.classesPage.dayNumberLabel} {hw.dayNumber}: {hw.unitName.split(': ')[1] ?? hw.unitName}</p>
                                     {due && <span style={{ fontSize: 10, color: due.overdue ? 'var(--danger)' : 'var(--text-muted)' }}>{due.text}</span>}
                                   </div>
                                   <div className="text-right shrink-0">
                                     <p style={{ fontSize: 14, fontWeight: 900, color: allDone ? '#22c55e' : 'var(--text)' }}>{avgDone}/{total}</p>
-                                    <p style={{ fontSize: 9, color: 'var(--text-muted)' }}>avg done</p>
+                                    <p style={{ fontSize: 9, color: 'var(--text-muted)' }}>{tt.classesPage.avgDoneLc}</p>
                                   </div>
                                 </div>
                                 <div className="space-y-1.5">
@@ -1431,7 +1432,7 @@ function CurriculumTab({
                                     const color = HW_MODE_COLOR[mode] ?? 'var(--primary)';
                                     return (
                                       <div key={mode} className="flex items-center gap-2">
-                                        <span style={{ fontSize: 11, width: 60, color }}>{HW_MODE_ICON[mode]} {HW_MODE_LABEL[mode] ?? mode}</span>
+                                        <span style={{ fontSize: 11, width: 60, color }}>{HW_MODE_ICON[mode]} {hwModeLabel(tt, mode)}</span>
                                         <div className="flex-1 rounded-full overflow-hidden" style={{ height: 6, background: 'var(--surface)' }}>
                                           <div style={{ width: `${pct}%`, height: '100%', background: color, borderRadius: 999 }} />
                                         </div>
@@ -1457,15 +1458,15 @@ function CurriculumTab({
       {/* ── Reading Passages ── */}
       <div className="card p-4 space-y-2">
         <div className="flex items-center justify-between">
-          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">📚 Reading Passages</p>
-          <button onClick={() => setShowPassagePicker(true)} className="shrink-0 text-xs font-bold px-3 py-1.5 rounded-lg bg-[var(--primary-bg)] text-[var(--primary)] hover:opacity-80 transition-opacity">+ Assign</button>
+          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">{tt.classesPage.readingPassagesHeader}</p>
+          <button onClick={() => setShowPassagePicker(true)} className="shrink-0 text-xs font-bold px-3 py-1.5 rounded-lg bg-[var(--primary-bg)] text-[var(--primary)] hover:opacity-80 transition-opacity">{tt.classesPage.assignPlus}</button>
         </div>
-        <p className="text-xs text-[var(--text-muted)]">Assign one of the {readingPassages.length} curated Ideas passages as reading homework — students read it and mark it done.</p>
+        <p className="text-xs text-[var(--text-muted)]">{tt.classesPage.assignReadingPassageSub(readingPassages.length)}</p>
       </div>
 
       {/* ── Homework ── */}
       <div>
-        <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide mb-3">📋 Homework</p>
+        <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide mb-3">{tt.classesPage.homeworkHeaderEmoji}</p>
         {homework.length === 0 ? (
           <div className="card text-center py-10 space-y-2">
             <div className="text-4xl">📋</div>
@@ -1475,7 +1476,7 @@ function CurriculumTab({
           <div className="space-y-3">
             {homework.map(hw => {
               const total = totalStudentsForHw(hw);
-              const due = dueDateLabel(hw.dueDate);
+              const due = dueDateLabel(tt, hw.dueDate);
               const allDone = hw.modes.every(m => (hw.progressByMode[m] ?? 0) >= total && total > 0);
               const allModeDone = total > 0 ? Math.floor(hw.modes.reduce((sum, m) => sum + (hw.progressByMode[m] ?? 0), 0) / hw.modes.length) : 0;
               return (
@@ -1494,9 +1495,9 @@ function CurriculumTab({
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5 flex-wrap mb-0.5">
                         <p className="font-bold text-sm text-[var(--text)] truncate">{hw.unitName}</p>
-                        {hw.source === 'class' && <span style={{ fontSize: 9, fontWeight: 800, padding: '2px 6px', borderRadius: 6, background: 'rgba(245,158,11,0.18)', color: '#F59E0B' }}>Class</span>}
+                        {hw.source === 'class' && <span style={{ fontSize: 9, fontWeight: 800, padding: '2px 6px', borderRadius: 6, background: 'rgba(245,158,11,0.18)', color: '#F59E0B' }}>{tt.classesPage.classSource}</span>}
                         {hw.source === 'collection' && <span style={{ fontSize: 9, fontWeight: 800, padding: '2px 6px', borderRadius: 6, background: 'rgba(34,197,94,0.15)', color: '#16a34a' }}>📗</span>}
-                        {hw.source === 'passage' && <span style={{ fontSize: 9, fontWeight: 800, padding: '2px 6px', borderRadius: 6, background: 'rgba(245,158,11,0.15)', color: '#F59E0B' }}>📚 Reading</span>}
+                        {hw.source === 'passage' && <span style={{ fontSize: 9, fontWeight: 800, padding: '2px 6px', borderRadius: 6, background: 'rgba(245,158,11,0.15)', color: '#F59E0B' }}>📚 {tt.classesPage.reading}</span>}
                         {due && (
                           <span style={{
                             fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 20,
@@ -1505,11 +1506,11 @@ function CurriculumTab({
                           }}>{due.text}</span>
                         )}
                       </div>
-                      <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>{total} student{total !== 1 ? 's' : ''}</p>
+                      <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>{tt.classesPage.studentsCount(total)}</p>
                     </div>
                     <div className="shrink-0 text-right">
                       <p style={{ fontSize: 15, fontWeight: 900, color: allDone ? '#22c55e' : 'var(--text)' }}>{allModeDone}/{total}</p>
-                      <p style={{ fontSize: 9, color: 'var(--text-muted)' }}>{allDone ? 'all done ✓' : 'avg done'}</p>
+                      <p style={{ fontSize: 9, color: 'var(--text-muted)' }}>{allDone ? tt.classesPage.allDoneCheckmark : tt.classesPage.avgDoneLc}</p>
                     </div>
                   </div>
                   {/* Per-mode bars */}
@@ -1522,7 +1523,7 @@ function CurriculumTab({
                         <div key={mode} className="flex items-center gap-2.5">
                           <div className="flex items-center gap-1.5 shrink-0" style={{ width: 76 }}>
                             <span style={{ fontSize: 13, lineHeight: 1 }}>{HW_MODE_ICON[mode]}</span>
-                            <span style={{ fontSize: 11, fontWeight: 700, color }}>{HW_MODE_LABEL[mode] ?? mode}</span>
+                            <span style={{ fontSize: 11, fontWeight: 700, color }}>{hwModeLabel(tt, mode)}</span>
                           </div>
                           <div className="flex-1 rounded-full overflow-hidden" style={{ height: 7, background: 'var(--surface-2)', boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.3)' }}>
                             <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: `linear-gradient(90deg, ${color}, color-mix(in srgb, ${color} 70%, white))`, boxShadow: `0 0 6px ${color}80` }} />
@@ -1582,7 +1583,7 @@ function CurriculumTab({
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setCwWordsMgr(null)}>
           <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-5 space-y-4 max-h-[75vh] flex flex-col" onClick={e => e.stopPropagation()}>
             <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto shrink-0" />
-            <p className="font-bold text-[var(--text)] shrink-0">Words in &ldquo;{cwWordsMgr.name}&rdquo;</p>
+            <p className="font-bold text-[var(--text)] shrink-0">{tt.classesPage.wordsInQuoted(cwWordsMgr.name)}</p>
             {cwWordsAll.length === 0 ? (
               <p className="text-sm text-center text-[var(--text-muted)] py-6">{tt.classesPage.noWordsInClass}</p>
             ) : (
@@ -1605,7 +1606,7 @@ function CurriculumTab({
             <div className="flex gap-3 shrink-0">
               <button onClick={() => setCwWordsMgr(null)} className="flex-1 btn-ghost py-3 text-sm">{tt.classesPage.cancel}</button>
               <button onClick={saveManageWords} disabled={cwWordsSaving} className="flex-1 btn-primary py-3 disabled:opacity-50">
-                {cwWordsSaving ? 'Saving…' : 'Save'}
+                {cwWordsSaving ? tt.classesPage.savingEllipsis : tt.classesPage.save}
               </button>
             </div>
           </div>
@@ -1623,7 +1624,7 @@ function CurriculumTab({
             ) : availFolders.length === 0 ? (
               <div className="text-center py-8 space-y-2">
                 <p className="text-4xl">📁</p>
-                <p className="text-sm text-[var(--text-muted)]">All your library folders are already assigned, or you haven&apos;t created any yet.</p>
+                <p className="text-sm text-[var(--text-muted)]">{tt.classesPage.allFoldersAssignedOrNone}</p>
               </div>
             ) : (
               <div className="flex-1 overflow-y-auto space-y-2 min-h-0">
@@ -1632,7 +1633,7 @@ function CurriculumTab({
                     <span className="text-xl">📁</span>
                     <div>
                       <p className="font-semibold text-sm text-[var(--text)]">{f.name}</p>
-                      <p className="text-[10px] text-[var(--text-muted)]">{f.unitCount} unit{f.unitCount !== 1 ? 's' : ''}</p>
+                      <p className="text-[10px] text-[var(--text-muted)]">{tt.classesPage.unitsCount(f.unitCount)}</p>
                     </div>
                   </button>
                 ))}
@@ -1655,7 +1656,7 @@ function CurriculumTab({
                   <span className="text-2xl">{c.emoji}</span>
                   <div>
                     <p className="font-semibold text-sm text-[var(--text)]">{c.name}</p>
-                    <p className="text-[10px] text-[var(--text-muted)]">{c.totalDays} days</p>
+                    <p className="text-[10px] text-[var(--text-muted)]">{tt.classesPage.daysCount(c.totalDays)}</p>
                   </div>
                 </button>
               ))}
@@ -1671,7 +1672,7 @@ function CurriculumTab({
           <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-5 space-y-4 max-h-[80vh] flex flex-col" onClick={e => e.stopPropagation()}>
             <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto shrink-0" />
             <div className="flex items-center gap-2 shrink-0">
-              <button onClick={() => setCollPickerStep(1)} className="text-xs text-[var(--text-muted)] hover:text-[var(--text)]">← Back</button>
+              <button onClick={() => setCollPickerStep(1)} className="text-xs text-[var(--text-muted)] hover:text-[var(--text)]">← {tt.classesPage.back}</button>
               <p className="font-bold text-[var(--text)] flex-1 truncate">{collPickerCollName}</p>
             </div>
             {collPickerLoading ? (
@@ -1690,7 +1691,7 @@ function CurriculumTab({
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-semibold text-sm text-[var(--text)] truncate">{d.topic}</p>
-                        <p className="text-[10px] text-[var(--text-muted)]">{d.wordCount} words{alreadyAssigned ? ' · Assigned ✓' : ''}</p>
+                        <p className="text-[10px] text-[var(--text-muted)]">{tt.classesPage.wordsCount(d.wordCount)}{alreadyAssigned ? ` · ${tt.classesPage.assignedCheckmark}` : ''}</p>
                       </div>
                     </button>
                   );
@@ -1730,7 +1731,7 @@ function CurriculumTab({
                       <span className="text-xl shrink-0">📚</span>
                       <div className="min-w-0">
                         <p className="font-semibold text-sm text-[var(--text)] truncate">{p.title}</p>
-                        <p className="text-[10px] text-[var(--text-muted)] truncate">{p.topic}{alreadyAssigned ? ' · Assigned ✓' : ''}</p>
+                        <p className="text-[10px] text-[var(--text-muted)] truncate">{p.topic}{alreadyAssigned ? ` · ${tt.classesPage.assignedCheckmark}` : ''}</p>
                       </div>
                     </button>
                   );
@@ -1746,7 +1747,7 @@ function CurriculumTab({
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={closeHwModal}>
           <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-5 space-y-4 max-h-[85vh] flex flex-col" onClick={e => e.stopPropagation()}>
             <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto shrink-0" />
-            <p className="font-bold text-[var(--text)] shrink-0">Assign: {hwPassage ? hwPassage.title : hwUnit!.name}</p>
+            <p className="font-bold text-[var(--text)] shrink-0">{tt.classesPage.assignPrefix} {hwPassage ? hwPassage.title : hwUnit!.name}</p>
 
             {!hwPassage && (
             <div className="shrink-0">
@@ -1763,12 +1764,12 @@ function CurriculumTab({
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all"
                       style={{ background: active ? 'var(--primary)' : 'var(--surface-2)', color: active ? 'white' : 'var(--text-muted)', borderColor: active ? 'var(--primary)' : 'var(--border)', opacity: required ? 0.75 : 1 }}
                     >
-                      {HW_MODE_ICON[mode]} {mode.charAt(0).toUpperCase() + mode.slice(1)}{required ? ' *' : ''}
+                      {HW_MODE_ICON[mode]} {hwModeLabel(tt, mode)}{required ? ' *' : ''}
                     </button>
                   );
                 })}
               </div>
-              <p className="text-[10px] text-[var(--text-muted)] mt-1">* Required</p>
+              <p className="text-[10px] text-[var(--text-muted)] mt-1">{tt.classesPage.requiredAsterisk}</p>
             </div>
             )}
 
@@ -1783,7 +1784,7 @@ function CurriculumTab({
                 {(['class', 'specific'] as const).map(who => (
                   <button key={who} onClick={() => setHwWho(who)} className="flex-1 py-2 rounded-xl text-sm font-semibold border transition-all"
                     style={{ background: hwWho === who ? 'var(--primary)' : 'var(--surface-2)', color: hwWho === who ? 'white' : 'var(--text-muted)', borderColor: hwWho === who ? 'var(--primary)' : 'var(--border)' }}>
-                    {who === 'class' ? '👥 Whole Class' : '👤 Specific Students'}
+                    {who === 'class' ? `👥 ${tt.classesPage.wholeClass}` : `👤 ${tt.classesPage.specificStudents}`}
                   </button>
                 ))}
               </div>
@@ -1806,7 +1807,7 @@ function CurriculumTab({
             <div className="flex gap-3 shrink-0">
               <button onClick={closeHwModal} className="flex-1 btn-ghost py-3 text-sm">{tt.classesPage.cancel}</button>
               <button onClick={saveHomework} disabled={hwSaving || (hwWho === 'specific' && hwStudentIds.size === 0)} className="flex-1 btn-primary py-3 disabled:opacity-50">
-                {hwSaving ? 'Saving…' : 'Assign 📋'}
+                {hwSaving ? tt.classesPage.savingEllipsis : `${tt.classesPage.assignBtnLabel} 📋`}
               </button>
             </div>
           </div>
@@ -1844,10 +1845,10 @@ function CurriculumTab({
                           background: `color-mix(in srgb, ${color} 20%, transparent)`,
                           color,
                           border: `1px solid color-mix(in srgb, ${color} 35%, transparent)`,
-                        }}>{HW_MODE_ICON[m]} {HW_MODE_LABEL[m]}</span>
+                        }}>{HW_MODE_ICON[m]} {hwModeLabel(tt, m)}</span>
                       );
                     })}
-                    {(() => { const d = dueDateLabel(hwDetail.dueDate); return d ? <span style={{ fontSize: 10, color: d.overdue ? 'var(--danger)' : 'var(--text-muted)' }}>· {d.text}</span> : null; })()}
+                    {(() => { const d = dueDateLabel(tt, hwDetail.dueDate); return d ? <span style={{ fontSize: 10, color: d.overdue ? 'var(--danger)' : 'var(--text-muted)' }}>· {d.text}</span> : null; })()}
                   </div>
                 </div>
                 <button
@@ -1860,7 +1861,7 @@ function CurriculumTab({
                     color: 'var(--danger)',
                     border: '1px solid color-mix(in srgb, var(--danger) 30%, transparent)',
                   }}
-                >{hwDeleting ? 'Deleting…' : '🗑 Delete'}</button>
+                >{hwDeleting ? tt.classesPage.deletingEllipsis : `🗑 ${tt.classesPage.delete}`}</button>
               </div>
 
               {hwDeleteConfirm && (
@@ -1872,7 +1873,7 @@ function CurriculumTab({
                   }}
                 >
                   <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)', lineHeight: 1.35 }}>
-                    Delete this homework? Progress for all assigned students will be lost. Any XP they already earned from it stays on the leaderboard.
+                    {tt.classesPage.deleteHomeworkConfirm}
                   </p>
                   <div className="flex items-center gap-2 shrink-0">
                     <button
@@ -1886,7 +1887,7 @@ function CurriculumTab({
                       disabled={hwDeleting}
                       className="active:scale-95 transition-transform disabled:opacity-50"
                       style={{ fontSize: 11, fontWeight: 700, padding: '7px 12px', borderRadius: 10, background: 'var(--danger)', color: 'white' }}
-                    >{hwDeleting ? 'Deleting…' : 'Yes, delete'}</button>
+                    >{hwDeleting ? tt.classesPage.deletingEllipsis : tt.classesPage.yesDelete}</button>
                   </div>
                 </div>
               )}
@@ -1918,7 +1919,7 @@ function CurriculumTab({
                         color: allDone ? 'white' : 'var(--text-muted)',
                         boxShadow: allDone ? '0 2px 6px rgba(34,197,94,0.4), inset 0 1px 0 rgba(255,255,255,0.2)' : 'inset 0 1px 3px rgba(0,0,0,0.2)',
                       }}>
-                        {allDone ? '✓ Done' : `${doneModes.length}/${hwDetail.modes.length}`}
+                        {allDone ? tt.classesPage.doneCheckmark : `${doneModes.length}/${hwDetail.modes.length}`}
                       </span>
                     </div>
                     <div className="flex gap-1.5 flex-wrap">
@@ -1940,7 +1941,7 @@ function CurriculumTab({
                             }),
                           }}>
                             <span style={{ opacity: done ? 1 : 0.35, fontSize: 12 }}>{HW_MODE_ICON[m]}</span>
-                            {HW_MODE_LABEL[m] ?? m}
+                            {hwModeLabel(tt, m)}
                           </span>
                         );
                       })}
@@ -2124,7 +2125,7 @@ export default function ClassDashboardPage() {
     const groups: { label: string; items: ActivityRow[] }[] = [];
     let currentLabel = '';
     for (const item of activityFeed) {
-      const label = dayLabel(item.completed_at);
+      const label = dayLabel(tt, item.completed_at);
       if (label !== currentLabel) {
         groups.push({ label, items: [item] });
         currentLabel = label;
@@ -2191,7 +2192,7 @@ export default function ClassDashboardPage() {
   };
 
   const deleteAnnouncement = async (announcementId: string) => {
-    if (!confirm('Delete this announcement?')) return;
+    if (!confirm(tt.classesPage.deleteAnnouncementConfirm)) return;
     await supabase.from('class_announcements').delete().eq('id', announcementId).eq('class_id', id);
     setAnnouncements(prev => prev.filter(a => a.id !== announcementId));
   };
@@ -2357,9 +2358,9 @@ export default function ClassDashboardPage() {
   };
 
   const exportCSV = () => {
-    const headers = ['Name', 'Last Active', 'XP', 'Streak', 'Words Learned', ...collections.map(c => `${c.label} (/${c.total_units})`)];
+    const headers = [tt.classesPage.csvName, tt.classesPage.csvLastActive, tt.classesPage.csvXp, tt.classesPage.csvStreak, tt.classesPage.csvWordsLearned, ...collections.map(c => `${c.label} (/${c.total_units})`)];
     const rows = students.map(s => [
-      s.name, s.last_study_date ?? 'Never', s.xp, s.streak, s.total_words,
+      s.name, s.last_study_date ?? tt.classesPage.never, s.xp, s.streak, s.total_words,
       ...collections.map(c => s.collection_progress[c.collection_name] ?? 0),
     ]);
     const csv = [headers, ...rows].map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
@@ -2373,10 +2374,10 @@ export default function ClassDashboardPage() {
   };
 
   const removeStudent = async (studentId: string) => {
-    if (!confirm('Remove this student from the class?')) return;
+    if (!confirm(tt.classesPage.removeStudentConfirm)) return;
     const { data, error } = await supabase.from('class_members').delete().eq('class_id', id).eq('student_id', studentId).select();
     if (error || !data || data.length === 0) {
-      alert('Failed to remove student.');
+      alert(tt.classesPage.failedToRemoveStudent);
       return;
     }
     load();
@@ -2390,19 +2391,19 @@ export default function ClassDashboardPage() {
     // class_members read itself had before it got its own RLS policy.
     const { data } = await supabase.rpc('get_class_pending_members', { p_class_id: id });
     setPendingMembers(((data ?? []) as { student_id: string; name: string; avatar_url: string | null }[])
-      .map(r => ({ student_id: r.student_id, name: r.name ?? 'Student', avatar_url: r.avatar_url })));
+      .map(r => ({ student_id: r.student_id, name: r.name ?? tt.classesPage.defaultStudentName, avatar_url: r.avatar_url })));
   };
 
   const approvePending = async (studentId: string) => {
     const { error } = await supabase.from('class_members').update({ status: 'approved' }).eq('class_id', id).eq('student_id', studentId);
-    if (error) { alert('Failed to approve — try again.'); return; }
+    if (error) { alert(tt.classesPage.failedToApproveRetry); return; }
     setPendingMembers(prev => prev.filter(m => m.student_id !== studentId));
     load();
   };
 
   const rejectPending = async (studentId: string) => {
     const { error } = await supabase.from('class_members').delete().eq('class_id', id).eq('student_id', studentId);
-    if (error) { alert('Failed to reject — try again.'); return; }
+    if (error) { alert(tt.classesPage.failedToRejectRetry); return; }
     setPendingMembers(prev => prev.filter(m => m.student_id !== studentId));
   };
 
@@ -2436,7 +2437,7 @@ export default function ClassDashboardPage() {
   };
 
   const deleteTarget = async (targetId: string) => {
-    if (!confirm('Delete this target?')) return;
+    if (!confirm(tt.classesPage.deleteTargetConfirm)) return;
     await supabase.from('class_targets').delete().eq('id', targetId).eq('class_id', id);
     await loadTargets();
   };
@@ -2459,16 +2460,16 @@ export default function ClassDashboardPage() {
   );
 
   const SORT_OPTIONS: { key: SortKey; label: string }[] = [
-    { key: 'lastActive', label: '🕐 Active' },
-    { key: 'xp', label: '⚡ XP' },
-    { key: 'progress', label: '📈 Progress' },
-    { key: 'name', label: '🔤 Name' },
+    { key: 'lastActive', label: `🕐 ${tt.classesPage.sortActive}` },
+    { key: 'xp', label: `⚡ ${tt.classesPage.sortXp}` },
+    { key: 'progress', label: `📈 ${tt.classesPage.sortProgress}` },
+    { key: 'name', label: `🔤 ${tt.classesPage.sortName}` },
   ];
 
   const FILTER_OPTIONS: { key: FilterKey; label: string }[] = [
-    { key: 'all', label: 'All' },
-    { key: 'active', label: '✅ Active' },
-    { key: 'inactive', label: '😴 Inactive' },
+    { key: 'all', label: tt.classesPage.filterAll },
+    { key: 'active', label: `✅ ${tt.classesPage.sortActive}` },
+    { key: 'inactive', label: `😴 ${tt.classesPage.filterInactive}` },
   ];
 
   const { gradient: _grad, glow: _glow } = classGradientColors(id as string);
@@ -2479,7 +2480,7 @@ export default function ClassDashboardPage() {
       <div className={`bg-gradient-to-br ${_grad} px-5 pt-5 pb-6 relative`}
         style={{ boxShadow: `0 8px 32px ${_glow}cc` }}>
         <div style={{ position: 'absolute', right: 16, top: 8, fontSize: 80, fontWeight: 900, color: 'rgba(255,255,255,0.06)', lineHeight: 1, userSelect: 'none', pointerEvents: 'none' }}>🏫</div>
-        <button onClick={() => router.push(`/classes/${id}/home`)} className="inline-flex items-center gap-1.5 text-white/70 hover:text-white text-sm font-medium mb-4 transition-colors">← Back</button>
+        <button onClick={() => router.push(`/classes/${id}/home`)} className="inline-flex items-center gap-1.5 text-white/70 hover:text-white text-sm font-medium mb-4 transition-colors">← {tt.classesPage.back}</button>
         <div className="flex items-center gap-4 mb-4">
           <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shrink-0"
             style={{ background: 'rgba(255,255,255,0.18)', boxShadow: '0 4px 0 rgba(0,0,0,0.15)' }}>🏫</div>
@@ -2499,14 +2500,14 @@ export default function ClassDashboardPage() {
         </div>
         <div className="flex gap-2 flex-wrap">
           <button onClick={() => router.push(`/classes/${id}/words`)} className="text-xs font-bold px-3 py-1.5 rounded-xl text-white transition-opacity hover:opacity-80"
-            style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.25)', backdropFilter: 'blur(8px)' }}>📝 Words</button>
+            style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.25)', backdropFilter: 'blur(8px)' }}>📝 {tt.classesPage.wordsBtnLabel}</button>
           <button onClick={() => { setShowAnnounce(true); setAnnounceText(''); }} className="text-xs font-bold px-3 py-1.5 rounded-xl text-white transition-opacity hover:opacity-80"
-            style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.25)', backdropFilter: 'blur(8px)' }}>📢 Announce</button>
+            style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.25)', backdropFilter: 'blur(8px)' }}>📢 {tt.classesPage.announceBtnLabel}</button>
           <button onClick={load} className="text-xs font-bold px-3 py-1.5 rounded-xl text-white transition-opacity hover:opacity-80"
-            style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.25)', backdropFilter: 'blur(8px)' }}>🔄 Refresh</button>
+            style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.25)', backdropFilter: 'blur(8px)' }}>🔄 {tt.classesPage.refreshBtnLabel}</button>
           {students.length > 0 && (
             <button onClick={exportCSV} className="text-xs font-bold px-3 py-1.5 rounded-xl text-white transition-opacity hover:opacity-80"
-              style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.25)', backdropFilter: 'blur(8px)' }}>📥 CSV</button>
+              style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.25)', backdropFilter: 'blur(8px)' }}>📥 {tt.classesPage.csvBtnLabel}</button>
           )}
         </div>
       </div>
@@ -2525,7 +2526,7 @@ export default function ClassDashboardPage() {
               }`}
             >
               {t === 'students' ? '👥' : t === 'activity' ? '📡' : t === 'radar' ? '🎯' : t === 'analytics' ? '📊' : t === 'srs' ? '📚' : t === 'review' ? '🔄' : '📋'}
-              {' '}{t === 'students' ? 'Students' : t === 'activity' ? 'Activity' : t === 'radar' ? 'Radar' : t === 'analytics' ? 'Analytics' : t === 'srs' ? 'SRS' : t === 'review' ? 'Review' : 'Curriculum'}
+              {' '}{t === 'students' ? tt.classesPage.tabStudents : t === 'activity' ? tt.classesPage.tabActivity : t === 'radar' ? tt.classesPage.tabRadar : t === 'analytics' ? tt.classesPage.tabAnalytics : t === 'srs' ? tt.classesPage.tabSrs : t === 'review' ? tt.classesPage.tabReview : tt.classesPage.tabCurriculum}
             </button>
           ))}
         </div>
@@ -2534,7 +2535,7 @@ export default function ClassDashboardPage() {
       {/* Pending join requests — students tab only */}
       {!loading && tab === 'students' && pendingMembers.length > 0 && (
         <div className="mx-4 mt-3 mb-1 rounded-2xl p-3.5 space-y-2.5" style={{ background: 'var(--primary-bg)', border: '1px solid color-mix(in srgb, var(--primary) 30%, transparent)' }}>
-          <p className="text-xs font-bold text-[var(--text)]">⏳ Pending approval ({pendingMembers.length})</p>
+          <p className="text-xs font-bold text-[var(--text)]">⏳ {tt.classesPage.pendingApproval} ({pendingMembers.length})</p>
           {pendingMembers.map(m => (
             <div key={m.student_id} className="flex items-center gap-3">
               <Avatar name={m.name} url={m.avatar_url} size={28} />
@@ -2550,10 +2551,10 @@ export default function ClassDashboardPage() {
       {!loading && tab === 'students' && classStats && (
         <div className="grid grid-cols-4 divide-x divide-[var(--border)] border-b border-[var(--border)]">
           {[
-            { label: 'Total XP', value: (classStats.totalXP / 10).toLocaleString(), icon: '⚡' },
-            { label: 'Avg streak', value: `${classStats.avgStreak.toFixed(1)}d`, icon: '🔥' },
-            { label: 'Avg items', value: Math.round(classStats.avgWords).toString(), icon: '📚' },
-            { label: 'Active', value: `${classStats.activeCount}/${classStats.n}`, icon: '✅' },
+            { label: tt.classesPage.statTotalXp, value: (classStats.totalXP / 10).toLocaleString(), icon: '⚡' },
+            { label: tt.classesPage.statAvgStreak, value: `${classStats.avgStreak.toFixed(1)}d`, icon: '🔥' },
+            { label: tt.classesPage.statAvgItems, value: Math.round(classStats.avgWords).toString(), icon: '📚' },
+            { label: tt.classesPage.sortActive, value: `${classStats.activeCount}/${classStats.n}`, icon: '✅' },
           ].map(stat => (
             <div key={stat.label} className="flex flex-col items-center py-2.5 px-1">
               <p className="text-base font-black text-[var(--text)] leading-tight">{stat.icon} {stat.value}</p>
@@ -2619,11 +2620,11 @@ export default function ClassDashboardPage() {
                         <div className="flex-1 min-w-0">
                           <p className="text-sm text-[var(--text)] leading-tight">
                             <span className="font-semibold">{item.student_name}</span>
-                            {' '}completed {ACTIVITY_ICON[item.completion_type]}{' '}
-                            <span className="font-medium">{ACTIVITY_LABEL[item.completion_type]}</span>
-                            {' · '}<span className="text-[var(--text-muted)]">{item.collection_name} Unit {item.day_number}</span>
+                            {' '}{tt.classesPage.completedActivity} {ACTIVITY_ICON[item.completion_type]}{' '}
+                            <span className="font-medium">{{ learn: tt.nav.learn, flashcard: tt.classesPage.flashcardSingular, quiz: tt.nav.quiz }[item.completion_type] ?? item.completion_type}</span>
+                            {' · '}<span className="text-[var(--text-muted)]">{item.collection_name} {tt.classesPage.unitLabel} {item.day_number}</span>
                           </p>
-                          <p className="text-[10px] text-[var(--text-muted)] mt-0.5">{timeAgo(item.completed_at)}</p>
+                          <p className="text-[10px] text-[var(--text-muted)] mt-0.5">{timeAgo(tt, item.completed_at)}</p>
                         </div>
                       </div>
                     ))}
@@ -2651,7 +2652,7 @@ export default function ClassDashboardPage() {
                 const payload = analyticsData.map(r => {
                   const s = students.find(st => st.student_id === r.student_id);
                   return {
-                    studentName: s?.name ?? 'Unknown',
+                    studentName: s?.name ?? tt.classesPage.unknownStudent,
                     totalSessions: r.total_sessions,
                     totalWordsLearned: r.total_words_learned,
                     avgSessionSeconds: r.avg_session_seconds,
@@ -2669,8 +2670,8 @@ export default function ClassDashboardPage() {
                   body: JSON.stringify({ classId: id, analytics: payload }),
                 });
                 const json = await res.json();
-                setDigestText(json.digest ?? json.error ?? 'Error generating digest');
-              } catch { setDigestText('Error connecting to AI service'); }
+                setDigestText(json.digest ?? json.error ?? tt.classesPage.errorGeneratingDigest);
+              } catch { setDigestText(tt.classesPage.errorConnectingToAiService); }
               setDigestLoading(false);
             }}
           />
@@ -2706,7 +2707,7 @@ export default function ClassDashboardPage() {
                       <div className="mt-1.5 h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
                         <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: barColor }} />
                       </div>
-                      <p className="text-[10px] text-[var(--text-muted)] mt-1">{w.correct_count}/{w.attempts} correct · {pct}% accuracy</p>
+                      <p className="text-[10px] text-[var(--text-muted)] mt-1">{tt.classesPage.correctOfAttemptsAccuracy(w.correct_count, w.attempts, pct)}</p>
                     </div>
                   </div>
                 );
@@ -2774,9 +2775,9 @@ export default function ClassDashboardPage() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5">
                           <p className="font-bold text-sm text-[var(--text)] truncate">{s.name}</p>
-                          {isInactive(s.last_study_date) && <span className="text-[10px] font-bold text-[var(--danger)] shrink-0">⚠️ Inactive</span>}
+                          {isInactive(s.last_study_date) && <span className="text-[10px] font-bold text-[var(--danger)] shrink-0">⚠️ {tt.classesPage.inactiveLabel}</span>}
                         </div>
-                        <p className="text-xs text-[var(--text-muted)]">Last active: {lastActiveLabel(s.last_study_date)}</p>
+                        <p className="text-xs text-[var(--text-muted)]">{tt.classesPage.lastActivePrefix} {lastActiveLabel(tt, s.last_study_date)}</p>
                       </div>
                       <div className="text-right shrink-0">
                         <p className="text-sm font-black text-[var(--primary)]">{displayXP(s.xp)} XP</p>
@@ -2790,7 +2791,7 @@ export default function ClassDashboardPage() {
                     <div className="pl-8">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-[10px] font-semibold text-[var(--text-muted)]">{tt.classesPage.overallProgress}</span>
-                        <span className="text-[10px] font-bold text-[var(--text-muted)]">{totalProgress}/{s.total_units_sum} units</span>
+                        <span className="text-[10px] font-bold text-[var(--text-muted)]">{totalProgress}/{s.total_units_sum} {tt.classesPage.unitsLc}</span>
                       </div>
                       <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
                         <div className="h-full rounded-full transition-all" style={{ width: `${s.total_units_sum > 0 ? Math.min(100, (totalProgress / s.total_units_sum) * 100) : 0}%`, background: 'linear-gradient(90deg, #2ECC71, #3498DB)' }} />
@@ -2822,11 +2823,11 @@ export default function ClassDashboardPage() {
 
                     <div className="flex items-center gap-4 pl-8">
                       <button onClick={() => openNoteModal(s)} className="flex items-center gap-1.5 text-xs font-semibold text-[var(--primary)] hover:opacity-70 transition-opacity">
-                        ✉️ Note
+                        ✉️ {tt.classesPage.noteBtnLabel}
                         {unreadNotes > 0 && <span className="bg-[var(--primary)] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">{unreadNotes}</span>}
                       </button>
                       <button onClick={() => { setTargetStudent(s); setTargetTitle(''); setTargetDate(''); }} className="flex items-center gap-1.5 text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--primary)] transition-colors">
-                        🎯 Target
+                        🎯 {tt.classesPage.targetBtnLabel}
                         {activeTargets > 0 && <span className="bg-[var(--surface-2)] text-[var(--text-muted)] text-[9px] font-bold px-1.5 py-0.5 rounded-full border border-[var(--border)]">{activeTargets}</span>}
                       </button>
                       <button onClick={() => removeStudent(s.student_id)} className="text-[10px] text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors ml-auto">{tt.classesPage.remove}</button>
@@ -2854,16 +2855,16 @@ export default function ClassDashboardPage() {
                 {(studentNotes[noteTarget.student_id] ?? []).map(n => (
                   <div key={n.id} className="rounded-xl px-3 py-2.5 text-sm" style={{ background: 'var(--surface-2)' }}>
                     <p className="text-[var(--text)]">{n.message}</p>
-                    <p className="text-[10px] text-[var(--text-muted)] mt-1">{timeAgo(n.created_at)} {n.read_at ? '· Seen ✓' : '· Not seen yet'}</p>
+                    <p className="text-[10px] text-[var(--text-muted)] mt-1">{timeAgo(tt, n.created_at)} {n.read_at ? `· ${tt.classesPage.seenCheckmark}` : `· ${tt.classesPage.notSeenYet}`}</p>
                   </div>
                 ))}
               </div>
             )}
             <div className="shrink-0 space-y-3">
-              <textarea placeholder={`Write a note to ${noteTarget.name}…`} value={noteText} onChange={e => setNoteText(e.target.value)} rows={3} autoFocus className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm resize-none focus:outline-none focus:border-[var(--primary)]" />
+              <textarea placeholder={tt.classesPage.writeNoteTo(noteTarget.name)} value={noteText} onChange={e => setNoteText(e.target.value)} rows={3} autoFocus className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm resize-none focus:outline-none focus:border-[var(--primary)]" />
               <div className="flex gap-3">
                 <button onClick={() => setNoteTarget(null)} className="flex-1 btn-ghost py-3 text-sm">{tt.classesPage.cancel}</button>
-                <button onClick={sendNote} disabled={sending || !noteText.trim()} className="flex-1 btn-primary py-3 disabled:opacity-50">{sending ? 'Sending…' : 'Send ✉️'}</button>
+                <button onClick={sendNote} disabled={sending || !noteText.trim()} className="flex-1 btn-primary py-3 disabled:opacity-50">{sending ? tt.classesPage.sendingEllipsis : `${tt.classesPage.sendBtnLabel} ✉️`}</button>
               </div>
             </div>
           </div>
@@ -2877,8 +2878,8 @@ export default function ClassDashboardPage() {
             <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto shrink-0" />
             <div className="flex items-center justify-between shrink-0">
               <div>
-                <p className="font-bold text-[var(--text)]">📢 Class Announcement</p>
-                <p className="text-xs text-[var(--text-muted)]">Sent to all students in {classInfo?.name}</p>
+                <p className="font-bold text-[var(--text)]">📢 {tt.classesPage.classAnnouncementHeader}</p>
+                <p className="text-xs text-[var(--text-muted)]">{tt.classesPage.sentToAllStudentsIn(classInfo?.name ?? '')}</p>
               </div>
             </div>
 
@@ -2890,8 +2891,8 @@ export default function ClassDashboardPage() {
                   <div key={a.id} className="rounded-xl px-3 py-2.5 flex items-start gap-2" style={{ background: 'var(--surface-2)' }}>
                     <p className="flex-1 text-sm text-[var(--text)]">{a.message}</p>
                     <div className="text-right shrink-0 space-y-1">
-                      <p className="text-[10px] text-[var(--text-muted)]">{timeAgo(a.created_at)}</p>
-                      <button onClick={() => deleteAnnouncement(a.id)} className="text-[10px] text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors block">✕ Delete</button>
+                      <p className="text-[10px] text-[var(--text-muted)]">{timeAgo(tt, a.created_at)}</p>
+                      <button onClick={() => deleteAnnouncement(a.id)} className="text-[10px] text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors block">✕ {tt.classesPage.delete}</button>
                     </div>
                   </div>
                 ))}
@@ -2911,7 +2912,7 @@ export default function ClassDashboardPage() {
               <div className="flex gap-3">
                 <button onClick={() => setShowAnnounce(false)} className="flex-1 btn-ghost py-3 text-sm">{tt.classesPage.cancel}</button>
                 <button onClick={postAnnouncement} disabled={announcing || !announceText.trim()} className="flex-1 btn-primary py-3 disabled:opacity-50">
-                  {announcing ? 'Posting…' : 'Post 📢'}
+                  {announcing ? tt.classesPage.postingEllipsis : `${tt.classesPage.postBtnLabel} 📢`}
                 </button>
               </div>
             </div>
@@ -2932,14 +2933,14 @@ export default function ClassDashboardPage() {
               <div className="flex-1 overflow-y-auto space-y-2 min-h-0">
                 <p className="text-xs font-semibold text-[var(--text-muted)]">{tt.classesPage.activeTargets}</p>
                 {(studentTargets[targetStudent.student_id] ?? []).map(t => {
-                  const due = dueDateLabel(t.due_date);
+                  const due = dueDateLabel(tt, t.due_date);
                   return (
                     <div key={t.id} className="flex items-start gap-3 rounded-xl px-3 py-2.5" style={{ background: 'var(--surface-2)' }}>
                       <span className="text-base mt-0.5 shrink-0">{t.completed_at ? '✅' : '🎯'}</span>
                       <div className="flex-1 min-w-0">
                         <p className={`text-sm text-[var(--text)] ${t.completed_at ? 'line-through opacity-50' : ''}`}>{t.title}</p>
-                        {due && <p className={`text-[10px] mt-0.5 font-medium ${due.overdue && !t.completed_at ? 'text-[var(--danger)]' : 'text-[var(--text-muted)]'}`}>{t.completed_at ? `Completed ${timeAgo(t.completed_at)}` : due.text}</p>}
-                        {t.completed_at && !due && <p className="text-[10px] mt-0.5 text-[var(--text-muted)]">Completed {timeAgo(t.completed_at)}</p>}
+                        {due && <p className={`text-[10px] mt-0.5 font-medium ${due.overdue && !t.completed_at ? 'text-[var(--danger)]' : 'text-[var(--text-muted)]'}`}>{t.completed_at ? tt.classesPage.completedAgo(timeAgo(tt, t.completed_at)) : due.text}</p>}
+                        {t.completed_at && !due && <p className="text-[10px] mt-0.5 text-[var(--text-muted)]">{tt.classesPage.completedAgo(timeAgo(tt, t.completed_at))}</p>}
                       </div>
                       <button onClick={() => deleteTarget(t.id)} className="text-[10px] text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors shrink-0 mt-1" aria-label={tt.classesPage.deleteTarget}>✕</button>
                     </div>
@@ -2948,14 +2949,14 @@ export default function ClassDashboardPage() {
               </div>
             )}
             <div className="shrink-0 space-y-3">
-              <input type="text" placeholder='e.g. "Complete A1 Unit 5 by Friday"' value={targetTitle} onChange={e => setTargetTitle(e.target.value)} autoFocus className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]" />
+              <input type="text" placeholder={tt.classesPage.targetTitlePlaceholder} value={targetTitle} onChange={e => setTargetTitle(e.target.value)} autoFocus className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]" />
               <div>
                 <label className="text-xs text-[var(--text-muted)] mb-1 block">{tt.classesPage.dueDateOptional}</label>
                 <input type="date" value={targetDate} onChange={e => setTargetDate(e.target.value)} min={localDateStr()} className="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:border-[var(--primary)]" />
               </div>
               <div className="flex gap-3">
                 <button onClick={() => setTargetStudent(null)} className="flex-1 btn-ghost py-3 text-sm">{tt.classesPage.cancel}</button>
-                <button onClick={addTarget} disabled={settingTarget || !targetTitle.trim()} className="flex-1 btn-primary py-3 disabled:opacity-50">{settingTarget ? 'Setting…' : 'Set target 🎯'}</button>
+                <button onClick={addTarget} disabled={settingTarget || !targetTitle.trim()} className="flex-1 btn-primary py-3 disabled:opacity-50">{settingTarget ? tt.classesPage.settingEllipsis : `${tt.classesPage.setTargetBtnLabel} 🎯`}</button>
               </div>
             </div>
           </div>
@@ -2967,7 +2968,7 @@ export default function ClassDashboardPage() {
         const today = new Date(); today.setHours(0, 0, 0, 0);
         const todayStr = localDateStr(today);
         const { year, month } = calendarMonth;
-        const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+        const MONTH_NAMES = tt.classesPage.monthNames;
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const firstDow = new Date(year, month, 1).getDay();
         const startOffset = firstDow === 0 ? 6 : firstDow - 1;
@@ -2999,7 +3000,7 @@ export default function ClassDashboardPage() {
                 </div>
                 <div className="text-right shrink-0">
                   <p className="text-xl font-black text-orange-400">🔥 {streakModal.streak}</p>
-                  <p className="text-[9px] text-[var(--text-muted)]">day streak</p>
+                  <p className="text-[9px] text-[var(--text-muted)]">{tt.classesPage.dayStreakLc}</p>
                 </div>
               </div>
               {streakLoading ? (
@@ -3014,7 +3015,7 @@ export default function ClassDashboardPage() {
                   </div>
                   {/* Day headers */}
                   <div className="grid grid-cols-7 mb-2">
-                    {['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d => (
+                    {tt.classesPage.dayLabelsShort.map(d => (
                       <div key={d} className="text-center text-[10px] font-semibold text-[var(--text-muted)]">{d}</div>
                     ))}
                   </div>

@@ -66,7 +66,7 @@ export default function CreatedClassesPage() {
     if (!user || !className.trim()) return;
     setCreating(true); setCreateError('');
     const { error: err } = await createClassRow(className.trim(), user.id);
-    if (err) { setCreateError('Failed to create class.'); setCreating(false); return; }
+    if (err) { setCreateError(t.classesPage.failedToCreateClass); setCreating(false); return; }
     setClassName(''); setShowCreate(false); setCreating(false);
     _cache.delete(user.id); load();
   };
@@ -76,7 +76,7 @@ export default function CreatedClassesPage() {
     try {
       await supabase.from('classes').delete().eq('id', classId);
     } catch (e) {
-      alert(`Failed to delete class: ${e instanceof Error ? e.message : e}`);
+      alert(t.classesPage.failedToDeleteClass(e instanceof Error ? e.message : String(e)));
       return;
     }
     setDeleteConfirmId(null);
@@ -89,7 +89,7 @@ export default function CreatedClassesPage() {
     try {
       await supabase.from('classes').update({ name: renameText.trim() }).eq('id', classId);
     } catch (e) {
-      alert(`Failed to rename class: ${e instanceof Error ? e.message : e}`);
+      alert(t.classesPage.failedToRenameClass(e instanceof Error ? e.message : String(e)));
       setRenaming(false);
       return;
     }
@@ -125,7 +125,7 @@ export default function CreatedClassesPage() {
             className="shrink-0 px-4 py-2 rounded-full text-sm font-black transition-opacity hover:opacity-90 active:opacity-70"
             style={{ background: 'rgba(255,255,255,0.22)', color: '#fff', boxShadow: '0 3px 0 rgba(0,0,0,0.2), 0 6px 14px rgba(0,0,0,0.15)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.3)' }}
           >
-            + Create
+            {t.classesPage.createShort}
           </button>
         </div>
         <div className="flex items-center gap-4">
@@ -136,7 +136,7 @@ export default function CreatedClassesPage() {
           <div>
             <p className="text-xs font-black text-white/50 uppercase tracking-widest mb-0.5">{t.classesPage.myClasses}</p>
             <h1 className="text-2xl font-black text-white leading-tight" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.25)' }}>
-              {myClasses.length > 0 ? `${myClasses.length} Class${myClasses.length !== 1 ? 'es' : ''}` : 'My Classes'}
+              {t.classesPage.classesCountTitle(myClasses.length)}
             </h1>
           </div>
         </div>
@@ -176,7 +176,7 @@ export default function CreatedClassesPage() {
                         <button onClick={e => { e.stopPropagation(); setRenamingId(cls.id); setRenameText(cls.name); }} className="text-white/40 hover:text-white/80 text-sm transition-colors shrink-0 mt-0.5">✏️</button>
                       </div>
                     )}
-                    <p className="text-sm text-white/60 mb-4">👥 {cls.member_count ?? 0} student{(cls.member_count ?? 0) !== 1 ? 's' : ''}</p>
+                    <p className="text-sm text-white/60 mb-4">{t.classesPage.studentCountLabel(cls.member_count ?? 0)}</p>
                     <div className="flex items-center gap-2">
                       <code className="text-xs font-black text-white bg-black/25 px-2.5 py-1 rounded-xl tracking-wider flex-1 text-center">{cls.join_code}</code>
                       <button onClick={e => { e.stopPropagation(); copyCode(cls.join_code, cls.id); }} className="text-base transition-transform hover:scale-110 shrink-0">{copiedId === cls.id ? '✅' : '📋'}</button>
@@ -209,7 +209,7 @@ export default function CreatedClassesPage() {
             <div className="flex gap-3">
               <button onClick={() => setDeleteConfirmId(null)} className="flex-1 btn-ghost py-3 text-sm">{t.classesPage.cancel}</button>
               <button onClick={() => deleteClass(deleteConfirmId)} className="flex-1 py-3 rounded-2xl font-bold text-sm text-white bg-red-500 hover:bg-red-600 active:scale-95 transition-all">
-                Yes, Delete
+                {t.classesPage.yesDelete}
               </button>
             </div>
           </div>
@@ -238,7 +238,7 @@ export default function CreatedClassesPage() {
             <div className="flex gap-3">
               <button onClick={() => { setShowCreate(false); setCreateError(''); }} className="flex-1 btn-ghost py-3 text-sm">{t.classesPage.cancel}</button>
               <button onClick={createClass} disabled={creating || !className.trim()} className="flex-1 btn-primary py-3 disabled:opacity-50">
-                {creating ? 'Creating…' : 'Create Class'}
+                {creating ? t.classesPage.creatingEllipsis : t.classesPage.createClassSubmit}
               </button>
             </div>
           </div>

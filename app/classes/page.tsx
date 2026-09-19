@@ -68,7 +68,7 @@ export default function ClassesPage() {
       word: r.word as string,
       translation: r.translation as string,
       classId: r.class_id as string,
-      className: nameMap[r.class_id as string] ?? 'Unknown class',
+      className: nameMap[r.class_id as string] ?? t.classesPage.unknownClass,
     })));
     setWordsLoading(false);
     setWordsLoaded(true);
@@ -78,7 +78,7 @@ export default function ClassesPage() {
     if (!user || !className.trim()) return;
     setCreating(true); setCreateError('');
     const { error: err } = await createClassRow(className.trim(), user.id);
-    if (err) { setCreateError('Failed to create class.'); setCreating(false); return; }
+    if (err) { setCreateError(t.classesPage.failedToCreateClass); setCreating(false); return; }
     setClassName(''); setShowCreate(false); setCreating(false);
     router.push('/classes/created');
   };
@@ -88,10 +88,10 @@ export default function ClassesPage() {
     setJoinError('');
     const code = joinCode.trim().toUpperCase();
     const { data: cls } = await supabase.from('classes').select('id, teacher_id').eq('join_code', code).single();
-    if (!cls) { setJoinError('Class not found. Check the code and try again.'); return; }
-    if (cls.teacher_id === user.id) { setJoinError("You can't join your own class."); return; }
+    if (!cls) { setJoinError(t.classesPage.classNotFound); return; }
+    if (cls.teacher_id === user.id) { setJoinError(t.classesPage.cantJoinOwnClass); return; }
     const { error: err } = await supabase.from('class_members').insert({ class_id: cls.id, student_id: user.id, status: 'pending' });
-    if (err) { setJoinError(err.code === '23505' ? 'Already in this class.' : 'Failed to join.'); return; }
+    if (err) { setJoinError(err.code === '23505' ? t.classesPage.alreadyInClass : t.classesPage.failedToJoin); return; }
     setJoinCode(''); setShowJoin(false);
     router.push('/classes/joined');
   };
@@ -132,9 +132,9 @@ export default function ClassesPage() {
             style={{ background: 'rgba(255,255,255,0.18)', boxShadow: '0 4px 0 rgba(0,0,0,0.15)' }}
           >🏫</div>
           <div>
-            <p className="text-xs font-black text-white/50 uppercase tracking-widest mb-0.5">Lexivo</p>
+            <p className="text-xs font-black text-white/50 uppercase tracking-widest mb-0.5">{t.classesPage.brand}</p>
             <h1 className="text-2xl font-black text-white leading-tight" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.25)' }}>
-              Classes
+              {t.classesPage.classes}
             </h1>
           </div>
         </div>
@@ -150,7 +150,7 @@ export default function ClassesPage() {
             className="py-3 px-4 text-sm font-semibold transition-colors relative"
             style={{ color: activeTab === tab ? 'var(--primary)' : 'var(--text-muted)' }}
           >
-            {tab === 'overview' ? 'Overview' : `My Words${myWords.length > 0 ? ` (${myWords.length})` : ''}`}
+            {tab === 'overview' ? t.classesPage.overviewTab : t.classesPage.myWordsTab(myWords.length)}
             {activeTab === tab && (
               <span className="absolute bottom-0 left-0 right-0 h-0.5 rounded-full" style={{ background: 'var(--primary)' }} />
             )}
@@ -177,7 +177,7 @@ export default function ClassesPage() {
                   <div className="flex-1 min-w-0">
                     <p className="text-xl font-black text-white">{t.classesPage.myClasses}</p>
                     <p className="text-sm text-white/60 mt-0.5">
-                      {createdCount === 0 ? 'No classes yet' : `${createdCount} class${createdCount !== 1 ? 'es' : ''} created`}
+                      {createdCount === 0 ? t.classesPage.noClassesYet : t.classesPage.classesCreatedCount(createdCount ?? 0)}
                     </p>
                   </div>
                   <span className="text-2xl text-white/50 group-hover:text-white/90 transition-colors">→</span>
@@ -195,7 +195,7 @@ export default function ClassesPage() {
                   <div className="flex-1 min-w-0">
                     <p className="text-xl font-black text-white">{t.classesPage.joinedClasses}</p>
                     <p className="text-sm text-white/60 mt-0.5">
-                      {joinedCount === 0 ? 'Not enrolled yet' : `${joinedCount} class${joinedCount !== 1 ? 'es' : ''} joined`}
+                      {joinedCount === 0 ? t.classesPage.notEnrolledYet : t.classesPage.classesJoinedCount(joinedCount ?? 0)}
                     </p>
                   </div>
                   <span className="text-2xl text-white/50 group-hover:text-white/90 transition-colors">→</span>
@@ -209,14 +209,14 @@ export default function ClassesPage() {
                   className="flex-1 py-4 rounded-2xl font-black text-sm text-white transition-all hover:-translate-y-0.5 active:translate-y-0"
                   style={{ background: 'linear-gradient(135deg, var(--primary) 0%, #9333ea 100%)', boxShadow: '0 5px 0 rgba(80,30,200,0.5)' }}
                 >
-                  + Create Class
+                  {t.classesPage.createClassCta}
                 </button>
                 <button
                   onClick={() => setShowJoin(true)}
                   className="flex-1 py-4 rounded-2xl font-black text-sm text-white transition-all hover:-translate-y-0.5 active:translate-y-0"
                   style={{ background: 'linear-gradient(135deg, #10b981, #0891b2)', boxShadow: '0 5px 0 rgba(7,120,100,0.55), 0 8px 20px rgba(16,185,129,0.25)' }}
                 >
-                  Join a Class
+                  {t.classesPage.joinAClass}
                 </button>
               </div>
             </div>
@@ -230,7 +230,7 @@ export default function ClassesPage() {
               <div className="w-8 h-8 rounded-lg flex items-center justify-center text-base shrink-0" style={{ background: 'rgba(163,230,53,0.15)' }}>📚</div>
               <div>
                 <p className="text-xs font-bold" style={{ color: 'var(--text)' }}>{t.classesPage.library}</p>
-                <p className="text-[10px] text-[var(--text-muted)] mt-0.5">Folders &amp; units</p>
+                <p className="text-[10px] text-[var(--text-muted)] mt-0.5">{t.classesPage.foldersAndUnits}</p>
               </div>
             </button>
           </div>
@@ -271,7 +271,7 @@ export default function ClassesPage() {
                   }, {});
 
                   if (filtered.length === 0) return (
-                    <p className="text-center text-sm text-[var(--text-muted)] py-8">No matches for &ldquo;{wordSearch}&rdquo;</p>
+                    <p className="text-center text-sm text-[var(--text-muted)] py-8">{t.classesPage.noMatchesFor(wordSearch)}</p>
                   );
 
                   return Object.entries(grouped).map(([classId, group]) => (
@@ -320,7 +320,7 @@ export default function ClassesPage() {
             <div className="flex gap-3">
               <button onClick={() => { setShowCreate(false); setCreateError(''); }} className="flex-1 btn-ghost py-3 text-sm">{t.classesPage.cancel}</button>
               <button onClick={createClass} disabled={creating || !className.trim()} className="flex-1 btn-primary py-3 disabled:opacity-50">
-                {creating ? 'Creating…' : 'Create Class'}
+                {creating ? t.classesPage.creatingEllipsis : t.classesPage.createClassSubmit}
               </button>
             </div>
           </div>

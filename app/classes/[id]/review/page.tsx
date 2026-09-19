@@ -270,7 +270,7 @@ export default function ClassReviewPage() {
         <h2 className="text-2xl font-bold mb-2">{t.classesPage.allCaughtUp}</h2>
         <p className="text-[var(--text-muted)] mb-6">{t.classesPage.noSrsDueToday}</p>
         <button onClick={() => router.push(`/classes/${id}/words`)} className="btn-primary">
-          Back to class →
+          {t.classesPage.backToClassArrow}
         </button>
       </div>
     );
@@ -288,7 +288,7 @@ export default function ClassReviewPage() {
         <h2 className="text-2xl font-bold mb-2">{t.classesPage.reviewComplete}</h2>
         <p className="text-[var(--text-muted)] mb-1">{knewCount}/{results.length} knew · +{displayXP(sessionXP)} XP</p>
         {remaining > 0 && (
-          <p className="text-sm text-[var(--text-muted)] mb-6">{remaining} more waiting</p>
+          <p className="text-sm text-[var(--text-muted)] mb-6">{t.classesPage.moreWaiting(remaining)}</p>
         )}
         <div className={`grid grid-cols-3 gap-2 w-full ${remaining > 0 ? 'mb-6' : 'mb-6 mt-5'}`}>
           <div className="card text-center"><div className="text-xl font-bold text-[var(--success)]">{knewCount}</div><div className="text-xs text-[var(--text-muted)]">{t.classesPage.correct}</div></div>
@@ -299,9 +299,9 @@ export default function ClassReviewPage() {
           <button
             onClick={() => { setLoading(true); void loadQueue(); }}
             className={remaining > 0 ? 'btn-primary flex-1' : 'btn-secondary flex-1'}
-          >{remaining > 0 ? 'Continue reviewing' : t.classesPage.redo}</button>
+          >{remaining > 0 ? t.classesPage.continueReviewing : t.classesPage.redo}</button>
           <button onClick={() => router.push(`/classes/${id}/words`)} className={remaining > 0 ? 'btn-secondary flex-1' : 'btn-primary flex-1'}>
-            Back to class
+            {t.classesPage.backToClass}
           </button>
         </div>
       </div>
@@ -319,10 +319,10 @@ export default function ClassReviewPage() {
   const gradeButtons = (
     <div className="flex gap-2 animate-slide-up">
       <button onClick={() => grade(false)} disabled={!gradeUnlocked} className="flex-1 py-4 rounded-xl border-2 border-[var(--danger)] text-[var(--danger)] font-bold text-sm hover:bg-red-50 transition-colors flex flex-col items-center gap-1 disabled:opacity-40 disabled:hover:bg-transparent">
-        <span>✗</span><span className="text-xs font-normal">Not yet <span className="opacity-50">J</span></span>
+        <span>✗</span><span className="text-xs font-normal">{t.classesPage.notYet} <span className="opacity-50">J</span></span>
       </button>
       <button onClick={() => grade(true)} disabled={!gradeUnlocked} className="flex-1 py-4 rounded-xl border-2 border-[var(--success)] text-[var(--success)] font-bold text-sm hover:bg-green-50 transition-colors flex flex-col items-center gap-1 disabled:opacity-40 disabled:hover:bg-transparent">
-        <span>✓</span><span className="text-xs font-normal">Knew it <span className="opacity-50">K</span></span>
+        <span>✓</span><span className="text-xs font-normal">{t.classesPage.knewIt} <span className="opacity-50">K</span></span>
       </button>
     </div>
   );
@@ -336,21 +336,21 @@ export default function ClassReviewPage() {
           className="btn-icon" aria-label={t.classesPage.exitReview}
         >✕</button>
         <div className="text-center">
-          <div className="font-semibold text-sm">SRS Review · {className}</div>
+          <div className="font-semibold text-sm">{t.classesPage.srsReview} · {className}</div>
           <div className="text-xs text-[var(--text-muted)]">
-            {index + 1} / {queue.length}{remaining > 0 ? ` (${remaining} more waiting)` : ''}
+            {index + 1} / {queue.length}{remaining > 0 ? ` (${t.classesPage.moreWaiting(remaining)})` : ''}
           </div>
         </div>
         <div className="flex items-center gap-1">
           <button
             onClick={toggleShuffle}
             className={`btn-icon text-base ${isShuffled ? 'text-[var(--primary)]' : 'opacity-40'}`}
-            title={isShuffled ? 'Shuffled' : 'In order'}
+            title={isShuffled ? t.srs.shuffled : t.srs.inOrder}
           >🔀</button>
           <button
             onClick={() => setAutoPlay(p => !p)}
             className="btn-icon text-base"
-            title={autoPlay ? 'Auto-play on' : 'Auto-play off'}
+            title={autoPlay ? t.srs.autoPlayOn : t.srs.autoPlayOff}
           >{autoPlay ? '🔊' : '🔇'}</button>
         </div>
       </div>
@@ -367,7 +367,7 @@ export default function ClassReviewPage() {
         <div className="flex justify-between items-center">
           {current.fail_streak >= 2 ? (
             <div className="badge text-xs" style={{ background: '#f59e0b20', color: '#f59e0b' }}>
-              Keeps tripping you up
+              {t.classesPage.keepsTrippingYouUp}
             </div>
           ) : <span />}
           <div
@@ -405,11 +405,11 @@ export default function ClassReviewPage() {
             </div>
           ) : choices === null ? (
             <button onClick={() => reveal()} disabled={cardLocked} className="mt-4 btn-secondary w-full disabled:opacity-40">
-              Reveal
+              {t.classesPage.reveal}
             </button>
           ) : !optionsShown ? (
             <p className="mt-3 text-sm text-[var(--text-muted)] flex items-center gap-1.5">
-              <span aria-hidden>👆</span> Tap to see options
+              <span aria-hidden>👆</span> {t.srs.tapToSeeOptions}
             </p>
           ) : null}
         </div>
@@ -451,7 +451,7 @@ export default function ClassReviewPage() {
             {tappedChoice && (
               <>
                 <p className="text-center text-xs text-[var(--text-muted)] animate-fade-in">
-                  {tappedChoice === current.translation ? 'Correct — nice' : `Answer: ${current.translation}`}
+                  {tappedChoice === current.translation ? t.classesPage.correctNice : t.classesPage.answerIs(current.translation)}
                 </p>
                 {gradeButtons}
               </>

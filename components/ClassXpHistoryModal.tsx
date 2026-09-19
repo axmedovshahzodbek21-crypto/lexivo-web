@@ -6,6 +6,7 @@ import { classifyReview, REVIEW_LABEL_META } from '@/lib/reviewPattern';
 import { localDateStr, addDaysToDateStr, displayXP } from '@/lib/storage';
 import { REASON_ICON } from '@/lib/xp-reason-icons';
 import { getAudioCtx, playTone } from '@/lib/web-audio';
+import { useTranslation } from '@/lib/useTranslation';
 import XpCalendar from './XpCalendar';
 
 interface XpEntry { id: string; amount: number; reason: string; created_at: string; }
@@ -75,6 +76,7 @@ function playPanelOpenSound() {
 
 export default function ClassXpHistoryModal({ classId, userId, xp, studentName, accentColor = 'var(--primary)', onClose }: Props) {
   const { user } = useAuth();
+  const t = useTranslation();
   const [history, setHistory] = useState<XpEntry[]>([]);
   const [overdueCount, setOverdueCount] = useState(0);
   const [dueCount, setDueCount] = useState(0);
@@ -164,9 +166,9 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
           {/* Calendar (right column once a day is selected) */}
           <div className="flex flex-col overflow-y-auto px-6 pb-6 space-y-4" style={{ width: '300px', flexShrink: 0, order: 2 }}>
             <div className="flex items-center justify-between">
-              <h3 className="text-xl font-black" style={{ color: 'var(--text)' }}>📅 XP History</h3>
+              <h3 className="text-xl font-black" style={{ color: 'var(--text)' }}>{t.classXpHistory.title}</h3>
               <div className="text-right min-w-0">
-                <p className="text-[10px] truncate max-w-[140px]" style={{ color: 'var(--text-muted)' }}>{studentName ?? 'Total class XP'}</p>
+                <p className="text-[10px] truncate max-w-[140px]" style={{ color: 'var(--text-muted)' }}>{studentName ?? t.classXpHistory.totalClassXp}</p>
                 <p className="text-2xl font-black" style={{ color: accentColor }}>{displayXP(xp)}</p>
               </div>
             </div>
@@ -180,7 +182,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
               >
                 <span>{reviewMeta.emoji}</span>
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs font-bold truncate" style={{ color: reviewMeta.color }}>Review: {reviewMeta.text}</p>
+                  <p className="text-xs font-bold truncate" style={{ color: reviewMeta.color }}>{t.classXpHistory.reviewLabel} {reviewMeta.text}</p>
                   <p className="text-[10px] text-[var(--text-muted)] truncate">
                     {reviewPattern.daysReviewed}/30 days · {reviewPattern.streak}d streak
                     {overdueCount > 0 ? ` · ${overdueCount} overdue` : dueCount > 0 ? ` · ${dueCount} due` : ''}
@@ -197,7 +199,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
             ) : history.length === 0 ? (
               <div className="py-10 text-center" style={{ color: 'var(--text-muted)' }}>
                 <p className="text-3xl mb-2">📭</p>
-                <p className="text-sm">No XP earned in this class yet</p>
+                <p className="text-sm">{t.classXpHistory.noXpYet}</p>
               </div>
             ) : (
               <XpCalendar
@@ -210,7 +212,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
                   if (!hasReview) return null;
                   return (
                     <span
-                      title="Did SRS Review this day"
+                      title={t.classXpHistory.didReviewTitle}
                       className="absolute top-0 right-0 w-3 h-3 rounded-full flex items-center justify-center"
                       style={{ background: '#06b6d4', boxShadow: '0 0 0 1.5px var(--surface-2)', fontSize: 6 }}
                     >🔄</span>
@@ -219,7 +221,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
                 legendExtra={
                   <span className="flex items-center gap-1.5">
                     <span style={{ fontSize: 11 }}>🔄</span>
-                    Did Review
+                    {t.classXpHistory.didReview}
                   </span>
                 }
               />
@@ -230,7 +232,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
               className="w-full py-3 rounded-xl text-sm font-bold text-white"
               style={{ background: accentColor }}
             >
-              Got it
+              {t.common.gotIt}
             </button>
           </div>
 
@@ -269,7 +271,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
                 <div className="flex items-center gap-2">
                   <span className="text-xl">{reviewMeta.emoji}</span>
                   <div>
-                    <p className="text-xs font-bold" style={{ color: 'var(--text-muted)' }}>Review Pattern</p>
+                    <p className="text-xs font-bold" style={{ color: 'var(--text-muted)' }}>{t.classXpHistory.reviewPatternLabel}</p>
                     <p className="text-sm font-black" style={{ color: reviewMeta.color }}>{reviewMeta.text}</p>
                   </div>
                 </div>
@@ -282,13 +284,13 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
                 {/* Stat breakdown */}
                 <div className="rounded-xl divide-y" style={{ background: 'var(--surface-2)', borderColor: 'var(--border)' }}>
                   {[
-                    { label: 'Days reviewed (last 30)', value: `${reviewPattern.daysReviewed}/30 (${Math.round(reviewPattern.coverage * 100)}%)` },
-                    { label: 'Current streak', value: `${reviewPattern.streak} day${reviewPattern.streak === 1 ? '' : 's'}` },
-                    { label: 'Longest gap', value: `${reviewPattern.longestGap} day${reviewPattern.longestGap === 1 ? '' : 's'}` },
-                    { label: 'Avg words / active day', value: reviewPattern.totalReviews > 0 ? reviewPattern.avgPerActiveDay.toFixed(1) : '—' },
-                    { label: 'Total reviews (30d)', value: `${reviewPattern.totalReviews}` },
-                    { label: 'Currently due for review', value: `${dueCount}` },
-                    { label: 'Currently overdue', value: `${overdueCount}` },
+                    { label: t.classXpHistory.statDaysReviewed, value: `${reviewPattern.daysReviewed}/30 (${Math.round(reviewPattern.coverage * 100)}%)` },
+                    { label: t.classXpHistory.statCurrentStreak, value: `${reviewPattern.streak} day${reviewPattern.streak === 1 ? '' : 's'}` },
+                    { label: t.classXpHistory.statLongestGap, value: `${reviewPattern.longestGap} day${reviewPattern.longestGap === 1 ? '' : 's'}` },
+                    { label: t.classXpHistory.statAvgWordsPerDay, value: reviewPattern.totalReviews > 0 ? reviewPattern.avgPerActiveDay.toFixed(1) : '—' },
+                    { label: t.classXpHistory.statTotalReviews, value: `${reviewPattern.totalReviews}` },
+                    { label: t.classXpHistory.statCurrentlyDue, value: `${dueCount}` },
+                    { label: t.classXpHistory.statCurrentlyOverdue, value: `${overdueCount}` },
                   ].map(row => (
                     <div key={row.label} className="flex items-center justify-between px-4 py-2.5 text-xs">
                       <span style={{ color: 'var(--text-muted)' }}>{row.label}</span>
@@ -299,7 +301,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
 
                 {/* 30-day review strip */}
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--text-muted)' }}>Last 30 days</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--text-muted)' }}>{t.classXpHistory.last30Days}</p>
                   <div className="grid grid-cols-10 gap-1">
                     {last30Days.map(d => {
                       const count = reviewCountByDay.get(d) ?? 0;
@@ -307,7 +309,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
                       return (
                         <div
                           key={d}
-                          title={`${d}${count > 0 ? ` · reviewed ${count} word${count === 1 ? '' : 's'}` : ' · no review'}`}
+                          title={`${d}${count > 0 ? t.classXpHistory.tooltipReviewedCount(count) : t.classXpHistory.tooltipNoReview}`}
                           className="aspect-square rounded"
                           style={{
                             background: count > 0 ? reviewMeta.color : 'var(--surface-2)',
@@ -321,8 +323,8 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
                     })}
                   </div>
                   <div className="flex items-center gap-3 mt-2 text-[10px]" style={{ color: 'var(--text-muted)' }}>
-                    <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm inline-block" style={{ background: reviewMeta.color }} />reviewed</span>
-                    <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm inline-block" style={{ border: '1px solid var(--border)' }} />no review</span>
+                    <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm inline-block" style={{ background: reviewMeta.color }} />{t.classXpHistory.legendReviewed}</span>
+                    <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm inline-block" style={{ border: '1px solid var(--border)' }} />{t.classXpHistory.legendNoReview}</span>
                   </div>
                 </div>
               </div>

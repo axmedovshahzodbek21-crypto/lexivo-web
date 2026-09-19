@@ -6,36 +6,39 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { getClassDueWords } from '@/lib/class-srs';
 import { useAppStore } from '@/lib/store';
+import { useTranslation } from '@/lib/useTranslation';
 
 // Not a route — clicking it just opens the Focus Mode setup widget in place,
 // so it works no matter which class tab the student/teacher is currently on.
 const POMODORO_SEG = '__pomodoro__';
-
-const STUDENT_ITEMS = [
-  { seg: 'home',        icon: '🏠', label: 'Home'     },
-  { seg: 'words',       icon: '📖', label: 'Words'    },
-  { seg: 'review',      icon: '🔄', label: 'Review'   },
-  { seg: 'leaderboard', icon: '🏆', label: 'Ranks'    },
-  { seg: 'homework',    icon: '📋', label: 'Homework' },
-  { seg: 'progress',   icon: '📊', label: 'Progress' },
-  { seg: POMODORO_SEG,  icon: '🍅', label: 'Pomodoro' },
-];
-
-const TEACHER_ITEMS = [
-  { seg: 'home',        icon: '🏠', label: 'Home'        },
-  { seg: 'words',       icon: '📖', label: 'Words'       },
-  { seg: 'leaderboard', icon: '🏆', label: 'Ranks'       },
-  { seg: '',            icon: '📊', label: 'Dashboard'   },
-  { seg: '__curriculum__', icon: '📋', label: 'Curriculum' },
-  { seg: POMODORO_SEG,  icon: '🍅', label: 'Pomodoro' },
-];
 
 export default function ClassShellNav({ classId }: { classId: string }) {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user } = useAuth();
+  const t = useTranslation();
   const showPomodoroSetup = useAppStore(s => s.showPomodoroSetup);
+
+  const STUDENT_ITEMS = [
+    { seg: 'home',        icon: '🏠', label: t.nav.home            },
+    { seg: 'words',       icon: '📖', label: t.classNav.words      },
+    { seg: 'review',      icon: '🔄', label: t.nav.review          },
+    { seg: 'leaderboard', icon: '🏆', label: t.classNav.ranks      },
+    { seg: 'homework',    icon: '📋', label: t.classHome.homework  },
+    { seg: 'progress',   icon: '📊', label: t.nav.progress         },
+    { seg: POMODORO_SEG,  icon: '🍅', label: t.nav.pomodoro        },
+  ];
+
+  const TEACHER_ITEMS = [
+    { seg: 'home',        icon: '🏠', label: t.nav.home              },
+    { seg: 'words',       icon: '📖', label: t.classNav.words        },
+    { seg: 'leaderboard', icon: '🏆', label: t.classNav.ranks        },
+    { seg: '',            icon: '📊', label: t.classNav.dashboard    },
+    { seg: '__curriculum__', icon: '📋', label: t.classNav.curriculum },
+    { seg: POMODORO_SEG,  icon: '🍅', label: t.nav.pomodoro          },
+  ];
+
   const [isTeacher, setIsTeacher] = useState(false);
   const [className, setClassName] = useState('');
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
@@ -148,7 +151,7 @@ export default function ClassShellNav({ classId }: { classId: string }) {
           <div className="px-5 pt-6 pb-4 flex items-start gap-3">
             <button
               onClick={handleBackClick}
-              title={atClassTop ? 'Back to classes' : 'Back to class home'}
+              title={atClassTop ? t.classNav.backToClasses : t.classNav.backToClassHome}
               className="mt-1 shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs text-[var(--text-muted)] hover:text-white hover:bg-[var(--primary)] transition-all duration-200"
             >
               ←
@@ -163,7 +166,7 @@ export default function ClassShellNav({ classId }: { classId: string }) {
                   backgroundClip: 'text',
                 }}
               >
-                Class
+                {t.classNav.classLabel}
               </span>
               {className && (
                 <div className="text-xs mt-0.5 truncate" style={{ color: 'var(--text-muted)' }}>
@@ -226,7 +229,7 @@ export default function ClassShellNav({ classId }: { classId: string }) {
               className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-[var(--text-muted)] hover:bg-[var(--surface-2)] hover:text-[var(--danger)] transition-colors"
             >
               <span>🚪</span>
-              <span>{atClassTop ? 'Exit class' : 'Back to class home'}</span>
+              <span>{atClassTop ? t.classNav.exitClass : t.classNav.backToClassHome}</span>
             </button>
           </div>
         </div>
@@ -246,11 +249,11 @@ export default function ClassShellNav({ classId }: { classId: string }) {
             <div className="flex items-start gap-3">
               <span className="text-2xl shrink-0">🚪</span>
               <div>
-                <p className="font-bold text-[var(--text)]">Exit this class?</p>
+                <p className="font-bold text-[var(--text)]">{t.classNav.exitConfirmTitle}</p>
                 <p className="text-sm text-[var(--text-muted)] mt-1">
                   {isTeacher
-                    ? "You'll return to your classes list."
-                    : "You'll return to your joined classes list — you'll stay enrolled in this class."}
+                    ? t.classNav.exitConfirmTeacherBody
+                    : t.classNav.exitConfirmStudentBody}
                 </p>
               </div>
             </div>
@@ -260,14 +263,14 @@ export default function ClassShellNav({ classId }: { classId: string }) {
                 className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-[var(--text)]"
                 style={{ background: 'var(--surface-2)' }}
               >
-                Cancel
+                {t.common.cancel}
               </button>
               <button
                 onClick={() => { setShowLeaveConfirm(false); router.push(isTeacher ? '/classes/created' : '/classes/joined'); }}
                 className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white"
                 style={{ background: 'var(--primary)' }}
               >
-                Exit
+                {t.classNav.exit}
               </button>
             </div>
           </div>

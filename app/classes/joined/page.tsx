@@ -20,26 +20,28 @@ interface Target { id: string; class_id: string; title: string; due_date: string
 interface LeaderboardRow { student_id: string; name: string; avatar_url: string | null; xp: number; streak: number; total_words: number; }
 interface Announcement { id: string; class_id: string; message: string; created_at: string; }
 
-function timeAgo(iso: string): string {
+type T = ReturnType<typeof useTranslation>;
+
+function timeAgo(iso: string, t: T): string {
   const diff = Date.now() - new Date(iso).getTime();
   const m = Math.floor(diff / 60000);
-  if (m < 1) return 'just now';
-  if (m < 60) return `${m}m ago`;
+  if (m < 1) return t.classesPage.justNow;
+  if (m < 60) return t.classesPage.minutesAgo(m);
   const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h ago`;
+  if (h < 24) return t.classesPage.hoursAgo(h);
   const d = Math.floor(h / 24);
-  if (d < 7) return `${d}d ago`;
+  if (d < 7) return t.classesPage.daysAgo(d);
   return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }
 
-function dueDateLabel(due: string | null): { text: string; overdue: boolean } | null {
+function dueDateLabel(due: string | null, t: T): { text: string; overdue: boolean } | null {
   if (!due) return null;
   const today = localDateStr();
   const tomorrow = addDaysToDateStr(today, 1);
-  if (due < today) return { text: `Overdue · ${new Date(due + 'T00:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`, overdue: true };
-  if (due === today) return { text: 'Due today', overdue: false };
-  if (due === tomorrow) return { text: 'Due tomorrow', overdue: false };
-  return { text: `Due ${new Date(due + 'T00:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`, overdue: false };
+  if (due < today) return { text: t.classesPage.overdueLabel(new Date(due + 'T00:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' })), overdue: true };
+  if (due === today) return { text: t.classesPage.dueToday, overdue: false };
+  if (due === tomorrow) return { text: t.classesPage.dueTomorrow, overdue: false };
+  return { text: t.classesPage.dueDateLabel(new Date(due + 'T00:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' })), overdue: false };
 }
 
 
@@ -191,7 +193,7 @@ export default function JoinedClassesPage() {
           <div>
             <p className="text-xs font-black text-white/50 uppercase tracking-widest mb-0.5">{t.classesPage.joinedClasses}</p>
             <h1 className="text-2xl font-black text-white leading-tight" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.25)' }}>
-              {joinedClasses.length > 0 ? `${joinedClasses.length} Class${joinedClasses.length !== 1 ? 'es' : ''}` : 'Joined Classes'}
+              {t.classesPage.joinedClassesCountTitle(joinedClasses.length)}
             </h1>
           </div>
         </div>
@@ -211,7 +213,7 @@ export default function JoinedClassesPage() {
           <div className="rounded-2xl border-2 border-dashed border-[var(--border)] p-12 text-center space-y-3 opacity-60">
             <p className="text-5xl">🎓</p>
             <p className="text-base font-bold text-[var(--text)]">{t.classesPage.notEnrolledYet}</p>
-            <p className="text-sm text-[var(--text-muted)]">Go back and tap &quot;Join a Class&quot; to enroll</p>
+            <p className="text-sm text-[var(--text-muted)]">{t.classesPage.goBackTapJoin}</p>
           </div>
         ) : joinedClasses.map(cls => {
           const notes = classNotes[cls.id] ?? [];
@@ -233,13 +235,13 @@ export default function JoinedClassesPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <p className="font-black text-white text-xl leading-tight" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>{cls.name}</p>
-                      {membershipStatus[cls.id] === 'pending' && <span className="bg-white/25 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">⏳ Pending approval</span>}
-                      {unreadNotes > 0 && <span className="bg-white/25 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">{unreadNotes} new</span>}
+                      {membershipStatus[cls.id] === 'pending' && <span className="bg-white/25 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">{t.classesPage.pendingApproval}</span>}
+                      {unreadNotes > 0 && <span className="bg-white/25 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">{t.classesPage.newCount(unreadNotes)}</span>}
                     </div>
-                    <p className="text-sm text-white/70 mt-0.5">👩‍🏫 {teacherProfiles[cls.teacher_id]?.name ?? 'Teacher'} · {cls.join_code}</p>
+                    <p className="text-sm text-white/70 mt-0.5">👩‍🏫 {teacherProfiles[cls.teacher_id]?.name ?? t.classesPage.teacher} · {cls.join_code}</p>
                     {activeTargets.length > 0 && (
                       <div className="flex gap-2 mt-2.5 flex-wrap">
-                        <span className="text-xs bg-black/20 text-white font-semibold px-2.5 py-1 rounded-full">🎯 {activeTargets.length} target{activeTargets.length !== 1 ? 's' : ''}</span>
+                        <span className="text-xs bg-black/20 text-white font-semibold px-2.5 py-1 rounded-full">{t.classesPage.targetCountBadge(activeTargets.length)}</span>
                       </div>
                     )}
                   </div>
@@ -260,7 +262,7 @@ export default function JoinedClassesPage() {
               <div className="bg-[var(--surface)] divide-y divide-[var(--border)]">
                 {(classAnnouncements[cls.id] ?? []).length > 0 && (
                   <div className="px-4 pt-3 pb-3 space-y-2">
-                    <p className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-wide">📢 Announcements</p>
+                    <p className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-wide">{t.classesPage.announcementsLabel}</p>
                     {(classAnnouncements[cls.id] ?? []).map(a => {
                       const isNew = Date.now() - new Date(a.created_at).getTime() < 24 * 3600000;
                       return (
@@ -269,7 +271,7 @@ export default function JoinedClassesPage() {
                           <div className="flex items-start gap-2">
                             <div className="flex-1 min-w-0">
                               <p className="text-sm text-[var(--text)] leading-snug">{a.message}</p>
-                              <p className="text-[10px] text-[var(--text-muted)] mt-1">{timeAgo(a.created_at)}</p>
+                              <p className="text-[10px] text-[var(--text-muted)] mt-1">{timeAgo(a.created_at, t)}</p>
                             </div>
                             {isNew && <span className="text-[10px] font-bold text-[var(--primary)] shrink-0 mt-0.5">{t.classesPage.new}</span>}
                           </div>
@@ -281,7 +283,7 @@ export default function JoinedClassesPage() {
 
                 {expandedLeaderboard === cls.id && (
                   <div className="px-4 pt-3 pb-3 space-y-2">
-                    <p className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-wide">🏆 Class Leaderboard</p>
+                    <p className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-wide">{t.classesPage.classLeaderboardLabel}</p>
                     {leaderboardLoading === cls.id ? (
                       <SectionLoader rows={2} />
                     ) : (classLeaderboards[cls.id] ?? []).length === 0 ? (
@@ -296,9 +298,9 @@ export default function JoinedClassesPage() {
                           {row.avatar_url
                             ? <img src={row.avatar_url} alt={row.name} className="w-7 h-7 rounded-full object-cover shrink-0" />
                             : <div className="w-7 h-7 rounded-full shrink-0 flex items-center justify-center text-white text-xs font-black" style={{ background: 'var(--primary)' }}>{row.name.charAt(0).toUpperCase()}</div>}
-                          <p className={`flex-1 text-sm truncate ${isMe ? 'font-bold text-[var(--primary)]' : 'text-[var(--text)]'}`}>{row.name}{isMe ? ' (you)' : ''}</p>
+                          <p className={`flex-1 text-sm truncate ${isMe ? 'font-bold text-[var(--primary)]' : 'text-[var(--text)]'}`}>{row.name}{isMe ? ` ${t.classesPage.you}` : ''}</p>
                           <div className="text-right shrink-0">
-                            <p className="text-xs font-bold text-[var(--primary)]">{displayXP(row.xp)} XP</p>
+                            <p className="text-xs font-bold text-[var(--primary)]">{t.classesPage.xpAmount(displayXP(row.xp))}</p>
                             <p className="text-[10px] text-[var(--text-muted)]">🔥 {row.streak}</p>
                           </div>
                         </div>
@@ -309,9 +311,9 @@ export default function JoinedClassesPage() {
 
                 {targets.length > 0 && (
                   <div className="px-4 pt-3 pb-3 space-y-2">
-                    <p className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-wide">🎯 Targets</p>
+                    <p className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-wide">{t.classesPage.targetsLabel}</p>
                     {[...activeTargets, ...doneTargets].map(target => {
-                      const due = dueDateLabel(target.due_date);
+                      const due = dueDateLabel(target.due_date, t);
                       return (
                         <button key={target.id} onClick={() => toggleTargetDone(target)}
                           className="w-full flex items-start gap-3 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-[var(--surface-2)]"
@@ -320,7 +322,7 @@ export default function JoinedClassesPage() {
                           <div className="flex-1 min-w-0">
                             <p className={`text-sm leading-snug ${target.completed_at ? 'line-through text-[var(--text-muted)]' : 'text-[var(--text)] font-medium'}`}>{target.title}</p>
                             {due && !target.completed_at && <p className={`text-[10px] mt-0.5 font-medium ${due.overdue ? 'text-[var(--danger)]' : 'text-[var(--text-muted)]'}`}>{due.text}</p>}
-                            {target.completed_at && <p className="text-[10px] mt-0.5 text-[var(--text-muted)]">Done {timeAgo(target.completed_at)}</p>}
+                            {target.completed_at && <p className="text-[10px] mt-0.5 text-[var(--text-muted)]">{t.classesPage.doneAgo(timeAgo(target.completed_at, t))}</p>}
                           </div>
                         </button>
                       );
@@ -330,14 +332,14 @@ export default function JoinedClassesPage() {
 
                 {notes.length > 0 && (
                   <div className="px-4 pt-3 pb-3 space-y-2">
-                    <p className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-wide">✉️ Notes from teacher</p>
+                    <p className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-wide">{t.classesPage.notesFromTeacherLabel}</p>
                     {notes.map(note => (
                       <div key={note.id} className="rounded-xl px-3 py-2.5 text-sm"
                         style={{ background: note.read_at ? 'var(--surface-2)' : 'var(--primary-bg)', borderLeft: note.read_at ? 'none' : '3px solid var(--primary)' }}>
                         <div className="flex items-start gap-2">
                           <div className="flex-1 min-w-0">
                             <p className="text-[var(--text)] leading-snug">{note.message}</p>
-                            <p className="text-[10px] text-[var(--text-muted)] mt-1">{timeAgo(note.created_at)}</p>
+                            <p className="text-[10px] text-[var(--text-muted)] mt-1">{timeAgo(note.created_at, t)}</p>
                           </div>
                           {!note.read_at && <span className="text-[10px] font-bold text-[var(--primary)] shrink-0 mt-0.5">{t.classesPage.new}</span>}
                         </div>

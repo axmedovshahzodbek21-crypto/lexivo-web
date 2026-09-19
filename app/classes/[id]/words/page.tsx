@@ -80,6 +80,7 @@ type WordsCache = { className: string; words: ClassWord[] };
 const _wordsCache = new Map<string, WordsCache>();
 
 function WordCard({ w }: { w: ClassWord }) {
+  const t = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const allExamples: WordExample[] = w.examples && w.examples.length > 0
     ? w.examples
@@ -111,7 +112,7 @@ function WordCard({ w }: { w: ClassWord }) {
           onClick={() => setExpanded(p => !p)}
           className="text-[10px] font-semibold text-[var(--primary)] mt-1"
         >
-          {expanded ? '▲ Show less' : `▼ +${hidden} more examples`}
+          {expanded ? t.classesPage.showLessExamples : t.classesPage.moreExamplesCount(hidden)}
         </button>
       )}
     </div>
@@ -238,7 +239,7 @@ export default function ClassWordsPage() {
         return next;
       });
       setStarredCount(c => isStarred ? c + 1 : c - 1);
-      setWordsError('Failed to update star — try again');
+      setWordsError(t.classesPage.failedToUpdateStar);
     }
   };
 
@@ -341,7 +342,7 @@ export default function ClassWordsPage() {
       setManualExample1Trans('');
       await loadWords();
     } catch (e) {
-      setWordsError(`Failed to add word: ${e instanceof Error ? e.message : e}`);
+      setWordsError(`${t.classesPage.failedToAddWord} ${e instanceof Error ? e.message : e}`);
     }
     setAdding(false);
   };
@@ -371,13 +372,13 @@ export default function ClassWordsPage() {
       setPasted('');
       await loadWords();
     } catch (e) {
-      setWordsError(`Failed to import words: ${e instanceof Error ? e.message : e}`);
+      setWordsError(`${t.classesPage.failedToImportWords} ${e instanceof Error ? e.message : e}`);
     }
     setImporting(false);
   };
 
   const deleteWord = async (wordId: string) => {
-    if (!confirm('Delete this word?')) return;
+    if (!confirm(t.classesPage.deleteThisWordConfirm)) return;
     setWordsError(null);
     // class_id scopes the delete to this class as defense-in-depth — RLS is
     // the real backstop, but a bare .eq('id', wordId) here would let a
@@ -385,7 +386,7 @@ export default function ClassWordsPage() {
     // which class it belongs to.
     const { error } = await supabase.from('class_words').delete().eq('id', wordId).eq('class_id', id);
     if (error) {
-      setWordsError(`Failed to delete word: ${error.message}`);
+      setWordsError(`${t.classesPage.failedToDeleteWord} ${error.message}`);
       return;
     }
     setWords(prev => {
@@ -437,7 +438,7 @@ export default function ClassWordsPage() {
       setSelectedDayIdx(null);
       await loadWords();
     } catch (e) {
-      setWordsError(`Failed to import collection: ${e instanceof Error ? e.message : e}`);
+      setWordsError(`${t.classesPage.failedToImportCollection} ${e instanceof Error ? e.message : e}`);
     }
     setImportingCollection(false);
   };
@@ -472,7 +473,7 @@ export default function ClassWordsPage() {
       <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">{t.classesPage.assignTo}</p>
       <div className="flex gap-3">
         <div className="flex-1">
-          <label className="text-xs font-medium text-[var(--text-muted)] mb-1 block">📁 Folder <span className="font-normal">(optional)</span></label>
+          <label className="text-xs font-medium text-[var(--text-muted)] mb-1 block">{t.classesPage.folderLabel} <span className="font-normal">{t.classesPage.optionalTag}</span></label>
           <input
             type="text"
             placeholder={t.classesPage.folderPlaceholder}
@@ -482,7 +483,7 @@ export default function ClassWordsPage() {
           />
         </div>
         <div className="flex-1">
-          <label className="text-xs font-medium text-[var(--text-muted)] mb-1 block">📖 Group <span className="font-normal">(optional)</span></label>
+          <label className="text-xs font-medium text-[var(--text-muted)] mb-1 block">{t.classesPage.groupLabel} <span className="font-normal">{t.classesPage.optionalTag}</span></label>
           <input
             type="text"
             placeholder={t.classesPage.groupPlaceholder}
@@ -522,7 +523,7 @@ export default function ClassWordsPage() {
       <div className={`bg-gradient-to-br ${_grad} px-5 pt-5 pb-7 relative`}
         style={{ boxShadow: `0 8px 32px ${_glow}cc` }}>
         <div style={{ position: 'absolute', right: 16, top: 8, fontSize: 80, fontWeight: 900, color: 'rgba(255,255,255,0.06)', lineHeight: 1, userSelect: 'none', pointerEvents: 'none' }}>📝</div>
-        <button onClick={() => router.push(`/classes/${id}/home`)} className="inline-flex items-center gap-1.5 text-white/70 hover:text-white text-sm font-medium mb-4 transition-colors">← Back</button>
+        <button onClick={() => router.push(`/classes/${id}/home`)} className="inline-flex items-center gap-1.5 text-white/70 hover:text-white text-sm font-medium mb-4 transition-colors">{t.common.back}</button>
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shrink-0"
             style={{ background: 'rgba(255,255,255,0.18)', boxShadow: '0 4px 0 rgba(0,0,0,0.15)' }}>📝</div>
@@ -550,7 +551,7 @@ export default function ClassWordsPage() {
           {words.length > 0 && (
             <div className="space-y-4 pt-2">
               <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">
-                {words.length} word{words.length !== 1 ? 's' : ''} in this class
+                {t.classesPage.wordsCountInClass(words.length)}
               </p>
               {Array.from(grouped.entries()).map(([folder, colMap]) => {
                 const folderCollapsed = folder ? collapsedFolders.has(folder) : false;
@@ -585,7 +586,7 @@ export default function ClassWordsPage() {
                             <button
                               onClick={() => toggleStar(w.word)}
                               className={`text-lg shrink-0 mt-0.5 transition-transform active:scale-75 ${starredIds.has(w.word) ? 'opacity-100' : 'opacity-25 hover:opacity-60'}`}
-                              aria-label={starredIds.has(w.word) ? 'Unstar word' : 'Star word'}
+                              aria-label={starredIds.has(w.word) ? t.classesPage.unstarWord : t.classesPage.starWord}
                             >{starredIds.has(w.word) ? '⭐' : '☆'}</button>
                           ) : null}
                         </div>
@@ -603,20 +604,20 @@ export default function ClassWordsPage() {
             <div className="card text-center py-10 space-y-2">
               <div className="text-4xl">📝</div>
               <p className="font-bold text-[var(--text)]">{t.classesPage.noWordsYet}</p>
-              <p className="text-sm text-[var(--text-muted)]">{isTeacher ? 'Add words below' : 'Your teacher hasn\'t added any words yet'}</p>
+              <p className="text-sm text-[var(--text-muted)]">{isTeacher ? t.classesPage.addWordsBelow : t.classesPage.teacherHasntAddedWords}</p>
             </div>
           )}
 
           {/* ── Study Hub ── */}
           {words.length > 0 && (
             <div className="space-y-3 pt-1">
-              <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">── Practice</p>
+              <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">{t.classesPage.practiceSectionHeader}</p>
               <div className="grid grid-cols-2 gap-2">
                 {([
-                  { label: '📖 Study',      href: `/learn?source=class&classId=${id}&className=${encodeURIComponent(className)}`,      primary: true  },
-                  { label: '🃏 Flashcards', href: `/flashcards?source=class&classId=${id}&className=${encodeURIComponent(className)}`, primary: false },
-                  { label: '❓ Quiz',       href: `/quiz?source=class&classId=${id}&className=${encodeURIComponent(className)}`,       primary: false },
-                  { label: '🔗 Match',      href: `/matching?source=class&classId=${id}&className=${encodeURIComponent(className)}`,   primary: false },
+                  { label: t.classesPage.studyLabel,      href: `/learn?source=class&classId=${id}&className=${encodeURIComponent(className)}`,      primary: true  },
+                  { label: t.classesPage.flashcardsLabel, href: `/flashcards?source=class&classId=${id}&className=${encodeURIComponent(className)}`, primary: false },
+                  { label: t.classesPage.quizLabel,       href: `/quiz?source=class&classId=${id}&className=${encodeURIComponent(className)}`,       primary: false },
+                  { label: t.classesPage.matchLabel,      href: `/matching?source=class&classId=${id}&className=${encodeURIComponent(className)}`,   primary: false },
                 ] as { label: string; href: string; primary: boolean }[]).map(({ label, href, primary }) => (
                   <button
                     key={label}
@@ -628,12 +629,12 @@ export default function ClassWordsPage() {
                   </button>
                 ))}
               </div>
-              <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">── Review</p>
+              <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">{t.classesPage.reviewSectionHeader}</p>
               <div className="card flex items-center justify-between gap-3">
                 <div>
                   <p className="font-bold text-sm text-[var(--text)]">{t.classesPage.srsReview}</p>
                   <p className="text-xs text-[var(--text-muted)]">
-                    {dueCount > 0 ? `${dueCount} word${dueCount !== 1 ? 's' : ''} due today` : 'All caught up ✓'}
+                    {dueCount > 0 ? t.classesPage.wordsDueToday(dueCount) : t.classesPage.allCaughtUpCheck}
                   </p>
                 </div>
                 {dueCount > 0 ? (
@@ -642,12 +643,12 @@ export default function ClassWordsPage() {
               </div>
               {!isTeacher && (
                 <>
-                  <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">── My Stats</p>
+                  <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">{t.classesPage.myStatsSectionHeader}</p>
                   <div className="grid grid-cols-3 gap-2">
                     {[
-                      { value: `${learnedCount}/${words.length}`, label: 'Learned', color: 'var(--primary)' },
-                      { value: hardCount,    label: 'Hard',    color: '#ef4444' },
-                      { value: starredCount, label: 'Starred', color: '#f59e0b' },
+                      { value: `${learnedCount}/${words.length}`, label: t.classesPage.learnedStat, color: 'var(--primary)' },
+                      { value: hardCount,    label: t.classesPage.hardStat,    color: '#ef4444' },
+                      { value: starredCount, label: t.classesPage.starredStat, color: '#f59e0b' },
                     ].map(({ value, label, color }) => (
                       <div key={label} className="card text-center py-3 space-y-0.5">
                         <p className="text-lg font-black" style={{ color }}>{value}</p>
@@ -656,7 +657,7 @@ export default function ClassWordsPage() {
                     ))}
                   </div>
                   <button onClick={() => router.push(`/classes/${id}/progress`)} className="w-full flex items-center justify-between px-4 py-3 rounded-2xl bg-[var(--surface-2)] text-sm font-semibold text-[var(--text)] active:scale-95 transition-transform">
-                    <span>📊 My Progress</span><span className="text-[var(--text-muted)] text-xs">→</span>
+                    <span>{t.classesPage.myProgress}</span><span className="text-[var(--text-muted)] text-xs">→</span>
                   </button>
                 </>
               )}
@@ -668,13 +669,13 @@ export default function ClassWordsPage() {
           <div className="space-y-4 pt-2 border-t border-[var(--border)]">
             <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">{t.classesPage.addWords}</p>
             <div className="flex rounded-2xl overflow-hidden border border-[var(--border)]">
-              {(['manual', 'ai', 'collection'] as InputTab[]).map(t => (
+              {(['manual', 'ai', 'collection'] as InputTab[]).map(tabKey => (
                 <button
-                  key={t}
-                  onClick={() => setTab(t)}
-                  className={`flex-1 py-2.5 text-xs font-semibold transition-colors ${tab === t ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface-2)] text-[var(--text-muted)]'}`}
+                  key={tabKey}
+                  onClick={() => setTab(tabKey)}
+                  className={`flex-1 py-2.5 text-xs font-semibold transition-colors ${tab === tabKey ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface-2)] text-[var(--text-muted)]'}`}
                 >
-                  {t === 'manual' ? '✏️ Manual' : t === 'ai' ? '🤖 AI' : '📚 Collection'}
+                  {tabKey === 'manual' ? t.classesPage.manualTab : tabKey === 'ai' ? t.classesPage.aiTab : t.classesPage.collectionTab}
                 </button>
               ))}
             </div>
@@ -687,7 +688,7 @@ export default function ClassWordsPage() {
               <div className="card space-y-3">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-xs font-semibold text-[var(--text-muted)] mb-1 block">Word *</label>
+                    <label className="text-xs font-semibold text-[var(--text-muted)] mb-1 block">{t.classesPage.wordRequired}</label>
                     <input
                       type="text"
                       placeholder={t.classesPage.wordPlaceholder}
@@ -698,7 +699,7 @@ export default function ClassWordsPage() {
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-semibold text-[var(--text-muted)] mb-1 block">Translation *</label>
+                    <label className="text-xs font-semibold text-[var(--text-muted)] mb-1 block">{t.classesPage.translationRequired}</label>
                     <input
                       type="text"
                       placeholder={t.classesPage.translationPlaceholder}
@@ -710,7 +711,7 @@ export default function ClassWordsPage() {
                   </div>
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-[var(--text-muted)] mb-1 block">Definition <span className="font-normal">(optional)</span></label>
+                  <label className="text-xs font-semibold text-[var(--text-muted)] mb-1 block">{t.classesPage.definitionOptional} <span className="font-normal">{t.classesPage.optionalTag}</span></label>
                   <input
                     type="text"
                     placeholder={t.classesPage.shortDefinitionPlaceholder}
@@ -720,7 +721,7 @@ export default function ClassWordsPage() {
                   />
                 </div>
                 <button onClick={() => setShowExamples(p => !p)} className="text-xs text-[var(--primary)] font-medium">
-                  {showExamples ? '▲ Hide example' : '▼ Add example sentence (optional)'}
+                  {showExamples ? t.classesPage.hideExample : t.classesPage.addExampleOptional}
                 </button>
                 {showExamples && (
                   <div className="space-y-2">
@@ -729,7 +730,7 @@ export default function ClassWordsPage() {
                   </div>
                 )}
                 <button onClick={addManual} disabled={adding || !manualWord.trim() || !manualTranslation.trim()} className="w-full btn-primary py-3 disabled:opacity-50">
-                  {adding ? 'Adding…' : '+ Add item'}
+                  {adding ? t.classesPage.addingEllipsis : t.classesPage.addItem}
                 </button>
               </div>
             </div>
@@ -771,7 +772,7 @@ export default function ClassWordsPage() {
                   <div className="space-y-2">
                     <pre className="text-xs bg-[var(--surface-2)] rounded-xl p-3 whitespace-pre-wrap text-[var(--text)] leading-relaxed overflow-x-auto">{aiPrompt1}</pre>
                     <button onClick={() => copyPrompt(aiPrompt1, 1)} className="w-full py-2 rounded-xl bg-[var(--primary)] text-white text-sm font-semibold">
-                      {copied1 ? '✅ Copied!' : '📋 Copy prompt'}
+                      {copied1 ? t.classesPage.copiedCheck : t.classesPage.copyPromptBtn}
                     </button>
                   </div>
                 )}
@@ -790,7 +791,7 @@ export default function ClassWordsPage() {
                   <div className="space-y-2">
                     <pre className="text-xs bg-[var(--surface-2)] rounded-xl p-3 whitespace-pre-wrap text-[var(--text)] leading-relaxed overflow-x-auto">{aiPrompt2}</pre>
                     <button onClick={() => copyPrompt(aiPrompt2, 2)} className="w-full py-2 rounded-xl bg-[var(--primary)] text-white text-sm font-semibold">
-                      {copied2 ? '✅ Copied!' : '📋 Copy prompt'}
+                      {copied2 ? t.classesPage.copiedCheck : t.classesPage.copyPromptBtn}
                     </button>
                   </div>
                 )}
@@ -807,27 +808,27 @@ export default function ClassWordsPage() {
                 </button>
                 {openFmt && (
                   <div className="space-y-3">
-                    <p className="text-xs text-[var(--text-muted)]">Each word is one block. Blocks are separated by <code className="bg-[var(--surface-2)] px-1 py-0.5 rounded font-mono">---</code> on its own line.</p>
+                    <p className="text-xs text-[var(--text-muted)]">{t.classesPage.blockSeparatorPrefix} <code className="bg-[var(--surface-2)] px-1 py-0.5 rounded font-mono">---</code> {t.classesPage.blockSeparatorSuffix}</p>
                     <div className="rounded-xl bg-[var(--surface-2)] p-3 space-y-1 font-mono text-xs leading-relaxed">
-                      <div><span className="text-[var(--primary)] font-bold">word:</span><span className="text-[var(--text)]"> enormous</span><span className="ml-2 text-green-500 font-sans font-semibold text-[10px]">required</span></div>
-                      <div><span className="text-[var(--primary)] font-bold">translation:</span><span className="text-[var(--text)]"> ulkan</span><span className="ml-2 text-green-500 font-sans font-semibold text-[10px]">required</span></div>
-                      <div><span className="text-[var(--text-muted)]">definition:</span><span className="text-[var(--text)]"> extremely large in size</span><span className="ml-2 text-[var(--text-muted)] font-sans text-[10px]">optional</span></div>
+                      <div><span className="text-[var(--primary)] font-bold">word:</span><span className="text-[var(--text)]"> enormous</span><span className="ml-2 text-green-500 font-sans font-semibold text-[10px]">{t.classesPage.requiredTag}</span></div>
+                      <div><span className="text-[var(--primary)] font-bold">translation:</span><span className="text-[var(--text)]"> ulkan</span><span className="ml-2 text-green-500 font-sans font-semibold text-[10px]">{t.classesPage.requiredTag}</span></div>
+                      <div><span className="text-[var(--text-muted)]">definition:</span><span className="text-[var(--text)]"> extremely large in size</span><span className="ml-2 text-[var(--text-muted)] font-sans text-[10px]">{t.classesPage.optionalTagLower}</span></div>
                       {Array.from({length: 10}, (_, i) => i + 1).map(n => (
                         <div key={n}>
-                          <span className="text-[var(--text-muted)]">example{n}:</span><span className="text-[var(--text)]"> sentence #{n}</span>
+                          <span className="text-[var(--text-muted)]">example{n}:</span><span className="text-[var(--text)]"> {t.classesPage.exampleSentenceHash(n)}</span>
                           <br />
-                          <span className="text-[var(--text-muted)]">example{n}Translation:</span><span className="text-[var(--text)]"> translation #{n}</span>
+                          <span className="text-[var(--text-muted)]">example{n}Translation:</span><span className="text-[var(--text)]"> {t.classesPage.translationHash(n)}</span>
                         </div>
                       ))}
                       <div className="pt-1 text-[var(--text-muted)]">---</div>
-                      <div className="pt-1 text-[var(--text-muted)] italic">next word block goes here...</div>
+                      <div className="pt-1 text-[var(--text-muted)] italic">{t.classesPage.nextWordBlockGoesHere}</div>
                     </div>
                     <div className="rounded-xl border border-amber-200 bg-amber-50 dark:bg-amber-900/10 dark:border-amber-800 p-3 space-y-1">
                       <p className="text-xs font-semibold text-amber-700 dark:text-amber-400">{t.classesPage.commonMistakes}</p>
                       <ul className="text-xs text-amber-600 dark:text-amber-400 space-y-0.5 list-disc list-inside">
-                        <li>Missing <code className="bg-amber-100 dark:bg-amber-900/30 px-1 rounded">---</code> separator between words</li>
-                        <li>Using <code className="bg-amber-100 dark:bg-amber-900/30 px-1 rounded">**bold**</code> or markdown formatting in values</li>
-                        <li><code className="bg-amber-100 dark:bg-amber-900/30 px-1 rounded">word</code> or <code className="bg-amber-100 dark:bg-amber-900/30 px-1 rounded">translation</code> field missing entirely</li>
+                        <li>{t.classesPage.missingSeparatorPrefix} <code className="bg-amber-100 dark:bg-amber-900/30 px-1 rounded">---</code> {t.classesPage.missingSeparatorSuffix}</li>
+                        <li>{t.classesPage.markdownMistakePrefix} <code className="bg-amber-100 dark:bg-amber-900/30 px-1 rounded">**bold**</code> {t.classesPage.markdownMistakeSuffix}</li>
+                        <li><code className="bg-amber-100 dark:bg-amber-900/30 px-1 rounded">word</code> {t.classesPage.orTag} <code className="bg-amber-100 dark:bg-amber-900/30 px-1 rounded">translation</code> {t.classesPage.fieldMissingEntirely}</li>
                       </ul>
                     </div>
                   </div>
@@ -857,14 +858,14 @@ export default function ClassWordsPage() {
 
                   {parseResult.errors.length > 0 && (
                     <div className="rounded-xl border border-red-200 bg-red-50 dark:bg-red-900/10 dark:border-red-800 p-3 space-y-2">
-                      <p className="text-xs font-semibold text-red-700 dark:text-red-400">{parseResult.errors.length} block{parseResult.errors.length > 1 ? 's' : ''} could not be parsed:</p>
+                      <p className="text-xs font-semibold text-red-700 dark:text-red-400">{t.classesPage.blocksCouldNotBeParsed(parseResult.errors.length)}</p>
                       {parseResult.errors.map(e => (
                         <div key={e.index} className="text-xs text-red-600 dark:text-red-400">
-                          <span className="font-semibold">Block {e.index}:</span> {e.reason}
+                          <span className="font-semibold">{t.classesPage.blockLabel} {e.index}:</span> {e.reason}
                           {e.preview && <span className="block text-red-400 font-mono mt-0.5 truncate">&quot;{e.preview}…&quot;</span>}
                         </div>
                       ))}
-                      <p className="text-xs text-red-500 mt-1">Make sure each block has <code className="bg-red-100 dark:bg-red-900/30 px-1 rounded">word:</code> and <code className="bg-red-100 dark:bg-red-900/30 px-1 rounded">translation:</code> fields, separated by <code className="bg-red-100 dark:bg-red-900/30 px-1 rounded">---</code></p>
+                      <p className="text-xs text-red-500 mt-1">{t.classesPage.makeSureEachBlockHas} <code className="bg-red-100 dark:bg-red-900/30 px-1 rounded">word:</code> {t.classesPage.andTag} <code className="bg-red-100 dark:bg-red-900/30 px-1 rounded">translation:</code> {t.classesPage.fieldsSeparatedBy} <code className="bg-red-100 dark:bg-red-900/30 px-1 rounded">---</code></p>
                     </div>
                   )}
 
@@ -885,7 +886,7 @@ export default function ClassWordsPage() {
                             </div>
                           ))}
                           {w.examples.length > 3 && (
-                            <p className="text-[10px] text-[var(--text-muted)] font-medium">+{w.examples.length - 3} more examples hidden</p>
+                            <p className="text-[10px] text-[var(--text-muted)] font-medium">{t.classesPage.moreExamplesHidden(w.examples.length - 3)}</p>
                           )}
                         </div>
                       ))}
@@ -894,7 +895,7 @@ export default function ClassWordsPage() {
 
                   {parsed.length > 0 && (
                     <button onClick={importWords} disabled={importing} className="w-full btn-primary py-3 disabled:opacity-50">
-                      {importing ? 'Adding…' : `Add ${parsed.length} item${parsed.length !== 1 ? 's' : ''} to class`}
+                      {importing ? t.classesPage.addingEllipsis : t.classesPage.addItemsToClass(parsed.length)}
                     </button>
                   )}
                 </div>
@@ -955,7 +956,7 @@ export default function ClassWordsPage() {
 
               {collectionData && selectedDayIdx !== null && (
                 <button onClick={importCollectionDay} disabled={importingCollection} className="w-full btn-primary py-3 disabled:opacity-50">
-                  {importingCollection ? 'Importing…' : `Import ${collectionData.days[selectedDayIdx].words.length} words to class`}
+                  {importingCollection ? t.classesPage.importingEllipsis : t.classesPage.importNWordsToClass(collectionData.days[selectedDayIdx].words.length)}
                 </button>
               )}
             </div>

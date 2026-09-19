@@ -232,7 +232,7 @@ export default function ClassHomeworkPage() {
           id: h.id,
           collectionName: name,
           dayNumber: day,
-          topic: dayData?.topic ?? `Day ${day}`,
+          topic: dayData?.topic ?? t.classesPage.dayFallback(day),
           wordCount: dayData?.words.length ?? 0,
           hwModes: (h.modes as string[]) ?? [],
           hwDue: (h.due_date as string | null) ?? null,
@@ -245,7 +245,7 @@ export default function ClassHomeworkPage() {
       const found = readingPassages.find(p => p.id === (h.passage_id as number));
       return {
         homeworkId: h.id,
-        title: found?.title ?? 'Reading Passage',
+        title: found?.title ?? t.classesPage.readingPassageFallback,
         topic: found?.topic ?? '',
         hwModes: (h.modes as string[]) ?? ['read'],
         hwDue: (h.due_date as string | null) ?? null,
@@ -323,7 +323,7 @@ export default function ClassHomeworkPage() {
       <div className={`bg-gradient-to-br ${_grad} px-5 pt-5 pb-7 relative`}
         style={{ boxShadow: `0 8px 32px ${_glow}cc` }}>
         <div style={{ position: 'absolute', right: 16, top: 8, fontSize: 80, fontWeight: 900, color: 'rgba(255,255,255,0.06)', lineHeight: 1, userSelect: 'none', pointerEvents: 'none' }}>📋</div>
-        <button onClick={() => router.push(`/classes/${id}/home`)} className="inline-flex items-center gap-1.5 text-white/70 hover:text-white text-sm font-medium mb-4 transition-colors">← Back</button>
+        <button onClick={() => router.push(`/classes/${id}/home`)} className="inline-flex items-center gap-1.5 text-white/70 hover:text-white text-sm font-medium mb-4 transition-colors">{t.common.back}</button>
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shrink-0"
             style={{ background: 'rgba(255,255,255,0.18)', boxShadow: '0 4px 0 rgba(0,0,0,0.15)' }}>📋</div>
@@ -340,7 +340,7 @@ export default function ClassHomeworkPage() {
           <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-xl p-3 mb-4 flex items-start gap-2.5">
             <span className="text-lg shrink-0">⚠️</span>
             <div>
-              <p className="font-bold text-red-700 dark:text-red-400 text-xs">Couldn&apos;t load homework</p>
+              <p className="font-bold text-red-700 dark:text-red-400 text-xs">{t.classesPage.couldntLoadHomework}</p>
               <p className="text-red-600 dark:text-red-500 text-[11px] mt-0.5 break-all">{loadError}</p>
             </div>
           </div>
@@ -351,7 +351,7 @@ export default function ClassHomeworkPage() {
           <div className="bg-[var(--primary-bg)] border border-[var(--primary)]/30 rounded-2xl p-4 mb-4">
             <div className="flex items-center justify-between mb-2">
               <p className="text-sm font-black text-[var(--text)]">{t.classesPage.myProgress}</p>
-              <p className="text-sm font-bold text-[var(--primary)]">{totalDone} / {totalAssigned} done</p>
+              <p className="text-sm font-bold text-[var(--primary)]">{t.classesPage.progressDoneOfTotal(totalDone, totalAssigned)}</p>
             </div>
             <div className="h-1.5 bg-[var(--primary)]/15 rounded-full overflow-hidden">
               <div
@@ -360,7 +360,7 @@ export default function ClassHomeworkPage() {
               />
             </div>
             {totalDone === totalAssigned && totalAssigned > 0 && (
-              <p className="text-xs font-bold text-[var(--primary)] mt-2">🎉 All done! Great work!</p>
+              <p className="text-xs font-bold text-[var(--primary)] mt-2">{t.classesPage.allDoneGreatWork}</p>
             )}
           </div>
         )}
@@ -370,7 +370,7 @@ export default function ClassHomeworkPage() {
           <div className="flex flex-col items-center justify-center py-20 gap-3 text-center">
             <span className="text-5xl">📚</span>
             <p className="text-base font-bold text-[var(--text)]">{t.classesPage.noHomeworkYet}</p>
-            <p className="text-sm text-[var(--text-muted)]">Your teacher hasn&apos;t assigned any units yet</p>
+            <p className="text-sm text-[var(--text-muted)]">{t.classesPage.teacherHasntAssignedUnits}</p>
           </div>
         )}
 
@@ -408,7 +408,7 @@ export default function ClassHomeworkPage() {
                       {folder.name}
                     </p>
                     <p className="text-xs text-[var(--text-muted)] truncate">
-                      {assignedUnits.length} unit{assignedUnits.length !== 1 ? 's' : ''} assigned · {doneCount}/{assignedUnits.length} done
+                      {t.classesPage.unitsAssignedDone(assignedUnits.length, doneCount)}
                     </p>
                   </div>
                   <svg className="w-4 h-4 text-[var(--text-muted)] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -432,7 +432,7 @@ export default function ClassHomeworkPage() {
                 const modes = unit.hwModes ?? [];
                 const completed = completedModes[unit.homeworkId!] ?? new Set();
                 const allDone = isHomeworkDone(modes, completed);
-                const due = dueLabel(unit.hwDue);
+                const due = dueLabel(unit.hwDue, t);
                 return (
                   <button
                     key={unit.id}
@@ -497,7 +497,7 @@ export default function ClassHomeworkPage() {
                 const modes = item.hwModes;
                 const completed = completedModes[item.homeworkId] ?? new Set();
                 const allDone = isHomeworkDone(modes, completed);
-                const due = dueLabel(item.hwDue);
+                const due = dueLabel(item.hwDue, t);
                 return (
                   <button
                     key={item.homeworkId}
@@ -577,7 +577,7 @@ export default function ClassHomeworkPage() {
                         {folder.name}
                       </p>
                       <p className="text-xs text-[var(--text-muted)] truncate">
-                        {folder.items.length} unit{folder.items.length !== 1 ? 's' : ''} assigned · {doneCount}/{folder.items.length} done
+                        {t.classesPage.unitsAssignedDone(folder.items.length, doneCount)}
                       </p>
                     </div>
                     <svg className="w-4 h-4 text-[var(--text-muted)] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

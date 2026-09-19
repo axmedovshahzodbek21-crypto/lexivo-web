@@ -25,24 +25,24 @@ type HomeCache = {
 
 const _homeCache = new Map<string, HomeCache>();
 
-function timeAgo(iso: string) {
+function timeAgo(iso: string, t: ReturnType<typeof useTranslation>) {
   const m = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
-  if (m < 1) return 'just now';
-  if (m < 60) return `${m}m ago`;
+  if (m < 1) return t.classesPage.justNow;
+  if (m < 60) return t.classesPage.minutesAgo(m);
   const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h ago`;
+  if (h < 24) return t.classesPage.hoursAgo(h);
   const d = Math.floor(h / 24);
-  return d < 7 ? `${d}d ago` : `${Math.floor(d / 7)}w ago`;
+  return d < 7 ? t.classesPage.daysAgo(d) : t.classesPage.weeksAgo(Math.floor(d / 7));
 }
 
-function dueLabel(due: string | null): { text: string; overdue: boolean } | null {
+function dueLabel(due: string | null, t: ReturnType<typeof useTranslation>): { text: string; overdue: boolean } | null {
   if (!due) return null;
   const today = localDateStr();
   const tomorrow = addDaysToDateStr(today, 1);
-  if (due < today) return { text: `Overdue · ${due}`, overdue: true };
-  if (due === today) return { text: 'Due today', overdue: false };
-  if (due === tomorrow) return { text: 'Due tomorrow', overdue: false };
-  return { text: `Due ${due}`, overdue: false };
+  if (due < today) return { text: t.classesPage.overdueDate(due), overdue: true };
+  if (due === today) return { text: t.classesPage.dueToday, overdue: false };
+  if (due === tomorrow) return { text: t.classesPage.dueTomorrow, overdue: false };
+  return { text: t.classesPage.dueDate(due), overdue: false };
 }
 
 const CLASS_COLORS = [
@@ -193,7 +193,7 @@ const [memberCount, setMemberCount] = useState(0);
       const tProfileData = tProfile as { name?: string; bio?: string; avatar_url?: string | null } | null;
       const snapshot: HomeCache = {
         className: cls.name, isTeacher: teacher,
-        teacherName: tProfileData?.name ?? 'Teacher',
+        teacherName: tProfileData?.name ?? tx.classesPage.teacher,
         teacherId: cls.teacher_id,
         teacherBio: tProfileData?.bio ?? '',
         teacherAvatar: tProfileData?.avatar_url ?? null,
@@ -293,19 +293,19 @@ const [memberCount, setMemberCount] = useState(0);
     // class_members read itself had before it got its own RLS policy.
     const { data } = await supabase.rpc('get_class_pending_members', { p_class_id: id });
     setPendingMembers(((data ?? []) as { student_id: string; name: string; avatar_url: string | null }[])
-      .map(r => ({ student_id: r.student_id, name: r.name ?? 'Student', avatar_url: r.avatar_url })));
+      .map(r => ({ student_id: r.student_id, name: r.name ?? tx.classesPage.studentFallback, avatar_url: r.avatar_url })));
   };
 
   const approvePending = async (studentId: string) => {
     const { error } = await supabase.from('class_members').update({ status: 'approved' }).eq('class_id', id).eq('student_id', studentId);
-    if (error) { alert('Failed to approve — try again.'); return; }
+    if (error) { alert(tx.classesPage.failedToApprove); return; }
     setPendingMembers(prev => prev.filter(m => m.student_id !== studentId));
     _homeCache.delete(`${user?.id}:${id}`);
   };
 
   const rejectPending = async (studentId: string) => {
     const { error } = await supabase.from('class_members').delete().eq('class_id', id).eq('student_id', studentId);
-    if (error) { alert('Failed to reject — try again.'); return; }
+    if (error) { alert(tx.classesPage.failedToReject); return; }
     setPendingMembers(prev => prev.filter(m => m.student_id !== studentId));
   };
 
@@ -387,12 +387,12 @@ const [memberCount, setMemberCount] = useState(0);
             </div>
             <div className="bg-[var(--surface-2)] rounded-xl px-4 py-3">
               <p className="text-sm leading-relaxed text-center" style={{ color: teacherBio ? 'var(--text)' : 'var(--text-muted)', fontStyle: teacherBio ? 'normal' : 'italic' }}>
-                {teacherBio || 'No bio yet'}
+                {teacherBio || tx.classesPage.noBioYet}
               </p>
             </div>
             <button onClick={() => setShowTeacherBio(false)}
               className="w-full py-3 rounded-xl text-sm font-medium text-[var(--text-muted)] hover:bg-[var(--surface-2)] transition-colors">
-              Close
+              {tx.classesPage.close}
             </button>
           </div>
         </div>
@@ -404,9 +404,9 @@ const [memberCount, setMemberCount] = useState(0);
             <div className="pt-4 px-5 pb-3 shrink-0 border-b border-[var(--border)]">
               <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto mb-3" />
               <div className="flex items-center justify-between">
-                <h2 className="font-bold text-[var(--text)]">📋 Pending Homework</h2>
+                <h2 className="font-bold text-[var(--text)]">{tx.classesPage.pendingHomeworkTitle}</h2>
                 <span className="text-xs font-semibold text-[var(--text-muted)] bg-[var(--surface-2)] px-2.5 py-1 rounded-full">
-                  {sortedPending.length} task{sortedPending.length !== 1 ? 's' : ''}
+                  {tx.classesPage.taskCount(sortedPending.length)}
                 </span>
               </div>
             </div>
@@ -418,7 +418,7 @@ const [memberCount, setMemberCount] = useState(0);
                   <p className="text-xs text-[var(--text-muted)]">{tx.classesPage.noPendingHomework}</p>
                 </div>
               ) : sortedPending.map(t => {
-                const due = dueLabel(t.due_date);
+                const due = dueLabel(t.due_date, tx);
                 return (
                   <div key={t.id} className="flex items-start gap-3 p-3.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)]">
                     <span className="text-lg mt-0.5 shrink-0">{due?.overdue ? '🔴' : '📌'}</span>
@@ -447,7 +447,7 @@ const [memberCount, setMemberCount] = useState(0);
             <div className="pt-4 px-5 pb-3 shrink-0 border-b border-[var(--border)]">
               <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto mb-3" />
               <div className="flex items-center justify-between">
-                <h2 className="font-bold text-[var(--text)]">⏳ Pending approval</h2>
+                <h2 className="font-bold text-[var(--text)]">{tx.classesPage.pendingApprovalTitle}</h2>
                 <span className="text-xs font-semibold text-[var(--text-muted)] bg-[var(--surface-2)] px-2.5 py-1 rounded-full">
                   {pendingMembers.length}
                 </span>
@@ -455,7 +455,7 @@ const [memberCount, setMemberCount] = useState(0);
             </div>
             <div className="overflow-y-auto flex-1 px-5 py-3 space-y-2">
               {pendingMembers.length === 0 ? (
-                <p className="text-center text-sm text-[var(--text-muted)] py-10">No pending requests</p>
+                <p className="text-center text-sm text-[var(--text-muted)] py-10">{tx.classesPage.noPendingRequests}</p>
               ) : pendingMembers.map(m => (
                 <div key={m.student_id} className="flex items-center gap-3 p-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)]">
                   {m.avatar_url ? (
@@ -484,7 +484,7 @@ const [memberCount, setMemberCount] = useState(0);
             <div className="pt-4 px-5 pb-3 shrink-0 border-b border-[var(--border)]">
               <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto mb-3" />
               <div className="flex items-center justify-between">
-                <h2 className="font-bold text-[var(--text)]">👥 Students</h2>
+                <h2 className="font-bold text-[var(--text)]">{tx.classesPage.studentsTitle}</h2>
                 <span className="text-xs font-semibold text-[var(--text-muted)] bg-[var(--surface-2)] px-2.5 py-1 rounded-full">{memberCount}</span>
               </div>
             </div>
@@ -520,23 +520,23 @@ const [memberCount, setMemberCount] = useState(0);
                           <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full shrink-0" style={{ background: 'rgba(16,185,129,0.15)', color: 'var(--success)' }}>{tx.classesPage.today}</span>
                         )}
                       </div>
-                      {s.streak > 0 && <p className="text-xs text-[var(--text-muted)]">🔥 {s.streak} day streak</p>}
+                      {s.streak > 0 && <p className="text-xs text-[var(--text-muted)]">{tx.classesPage.dayStreakCount(s.streak)}</p>}
                     </div>
                     <button onClick={() => openXpHistory(s)} className="text-right shrink-0 hover:opacity-70 transition-opacity active:scale-95">
                       <p className="text-sm font-black" style={{ color: 'var(--primary)' }}>{displayXP(s.xp)} XP</p>
-                      <p className="text-[10px] text-[var(--text-muted)]">{s.total_learned > 0 ? `${s.total_learned} words` : 'tap for history'}</p>
+                      <p className="text-[10px] text-[var(--text-muted)]">{s.total_learned > 0 ? tx.classesPage.wordsCount(s.total_learned) : tx.classesPage.tapForHistory}</p>
                     </button>
                   </div>
                 );
                 return (
                   <>
-                    <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide px-1">✅ Active today ({active.length})</p>
+                    <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide px-1">{tx.classesPage.activeTodayCount(active.length)}</p>
                     {active.length === 0 ? (
-                      <p className="text-xs text-[var(--text-muted)] px-1 pb-2">No one yet</p>
+                      <p className="text-xs text-[var(--text-muted)] px-1 pb-2">{tx.classesPage.noOneYet}</p>
                     ) : active.map(row)}
-                    <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide px-1 pt-3">💤 Not active today ({inactive.length})</p>
+                    <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide px-1 pt-3">{tx.classesPage.notActiveTodayCount(inactive.length)}</p>
                     {inactive.length === 0 ? (
-                      <p className="text-xs text-[var(--text-muted)] px-1 pb-2">Everyone&apos;s active!</p>
+                      <p className="text-xs text-[var(--text-muted)] px-1 pb-2">{tx.classesPage.everyoneIsActive}</p>
                     ) : inactive.map(row)}
                   </>
                 );
@@ -583,14 +583,14 @@ const [memberCount, setMemberCount] = useState(0);
           <div className="flex-1 min-w-0">
             <h1 className="text-xl font-black text-white leading-tight truncate">{className}</h1>
             <span className="inline-block text-[10px] font-bold bg-white/25 text-white rounded-full px-2.5 py-0.5 mt-0.5 mb-1">
-              {isTeacher ? 'Teacher' : '🎓 Student'}
+              {isTeacher ? tx.classesPage.teacher : tx.classesPage.studentBadge}
             </span>
             <p className="text-sm text-white/75">
               {isTeacher ? (
                 <button onClick={openStudentsSheet} className="underline underline-offset-2 hover:opacity-80 transition-opacity active:scale-95">
-                  {memberCount} students
+                  {tx.classesPage.nStudents(memberCount)}
                 </button>
-              ) : `Taught by ${teacherName}`}
+              ) : tx.classesPage.taughtBy(teacherName)}
             </p>
           </div>
           {isTeacher && (
@@ -598,18 +598,18 @@ const [memberCount, setMemberCount] = useState(0);
               onClick={() => router.push(`/classes/${id}`)}
               className="shrink-0 bg-white/20 hover:bg-white/30 transition-colors rounded-xl px-3 py-1.5 text-xs font-bold text-white"
             >
-              Dashboard →
+              {tx.classesPage.dashboardArrow}
             </button>
           )}
         </div>
         <div className="flex flex-wrap gap-2 mb-3">
-<span className="text-xs font-semibold bg-black/20 text-white rounded-full px-3 py-1">✅ {activeToday}/{memberCount} active</span>
+<span className="text-xs font-semibold bg-black/20 text-white rounded-full px-3 py-1">{tx.classesPage.activeOutOf(activeToday, memberCount)}</span>
           {isTeacher && pendingMembers.length > 0 && (
             <button
               onClick={() => setShowPending(true)}
               className="text-xs font-semibold bg-black/20 text-white rounded-full px-3 py-1 hover:bg-black/35 transition-colors active:scale-95"
             >
-              ⏳ {pendingMembers.length} pending
+              {tx.classesPage.pendingCount(pendingMembers.length)}
             </button>
           )}
           {!isTeacher && (
@@ -617,7 +617,7 @@ const [memberCount, setMemberCount] = useState(0);
               onClick={() => setShowHW(true)}
               className="text-xs font-semibold bg-black/20 text-white rounded-full px-3 py-1 hover:bg-black/35 transition-colors active:scale-95"
             >
-              📋 {pending.length} pending
+              {tx.classesPage.pendingHwCount(pending.length)}
             </button>
           )}
           {!isTeacher && (
@@ -633,7 +633,7 @@ const [memberCount, setMemberCount] = useState(0);
               onClick={() => router.push(`/classes/${id}/streak`)}
               className="text-xs font-semibold bg-black/20 text-white rounded-full px-3 py-1 hover:bg-black/35 transition-colors active:scale-95"
             >
-              🔥 {myClassStreak} day streak
+              {tx.classesPage.dayStreakCount(myClassStreak)}
             </button>
           )}
         </div>
@@ -641,9 +641,9 @@ const [memberCount, setMemberCount] = useState(0);
           <div>
             <div className="flex justify-between text-xs text-white/80 mb-1.5">
               <span className="font-semibold">
-                {activeToday >= memberCount ? '🔥 Everyone\'s active today!' : '🔥 Class Activity'}
+                {activeToday >= memberCount ? tx.classesPage.everyoneActiveToday : tx.classesPage.classActivity}
               </span>
-              <span>{activeToday} of {memberCount}</span>
+              <span>{tx.classesPage.xOfY(activeToday, memberCount)}</span>
             </div>
             <div className="h-1.5 bg-white/25 rounded-full overflow-hidden">
               <div
@@ -666,9 +666,9 @@ const [memberCount, setMemberCount] = useState(0);
             <span className="text-xl">⚠️</span>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-black text-red-600 dark:text-red-400">
-                {needsAttention} student{needsAttention > 1 ? 's' : ''} need attention
+                {tx.classesPage.studentsNeedAttention(needsAttention)}
               </p>
-              <p className="text-xs text-[var(--text-muted)]">Haven't studied in 3+ days · Tap to open Dashboard</p>
+              <p className="text-xs text-[var(--text-muted)]">{tx.classesPage.haventStudied3Days}</p>
             </div>
             <span className="text-red-500 text-sm shrink-0">→</span>
           </button>
@@ -684,7 +684,7 @@ const [memberCount, setMemberCount] = useState(0);
             <span className="text-2xl shrink-0">📋</span>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-black text-white">
-                {pendingHwCount === 1 ? 'You have new homework!' : `You have ${pendingHwCount} homework assignments`}
+                {pendingHwCount === 1 ? tx.classesPage.youHaveNewHomework : tx.classesPage.youHaveNHomeworkAssignments(pendingHwCount)}
               </p>
               <p className="text-xs text-white/75">{tx.classesPage.tapToViewComplete}</p>
             </div>
@@ -695,10 +695,10 @@ const [memberCount, setMemberCount] = useState(0);
         {/* Homework (student) */}
         {!isTeacher && targets.length > 0 && (
           <section>
-            <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--text-muted)] mb-3">📋 Homework</h2>
+            <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--text-muted)] mb-3">{tx.classesPage.homeworkSectionHeader}</h2>
             <div className="space-y-2">
               {targets.slice(0, 3).map(t => {
-                const due = dueLabel(t.due_date);
+                const due = dueLabel(t.due_date, tx);
                 const done = !!t.completed_at;
                 return (
                   <div key={t.id} className={`flex items-start gap-3 p-3 rounded-xl border ${done ? 'bg-green-50 border-green-200 dark:bg-green-950/30 dark:border-green-800' : 'bg-[var(--surface)] border-[var(--border)]'}`}>
@@ -717,11 +717,11 @@ const [memberCount, setMemberCount] = useState(0);
         {/* Quick stats (teacher) */}
         {isTeacher && (
           <section>
-            <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--text-muted)] mb-3">📊 Quick Stats</h2>
+            <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--text-muted)] mb-3">{tx.classesPage.quickStatsHeader}</h2>
             <div className="flex justify-center gap-3 [&>*]:w-40">
               {[
-                { icon: '👥', value: memberCount, label: 'Students', onClick: openStudentsSheet },
-                { icon: '✅', value: activeToday, label: 'Active today', onClick: openStudentsSheet },
+                { icon: '👥', value: memberCount, label: tx.classesPage.studentsStatLabel, onClick: openStudentsSheet },
+                { icon: '✅', value: activeToday, label: tx.classesPage.activeTodayStatLabel, onClick: openStudentsSheet },
               ].map(({ icon, value, label, onClick }) => (
                 <div key={label} onClick={onClick}
                   className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-3 flex flex-col items-center gap-1 cursor-pointer hover:bg-[var(--surface-2)] active:scale-95 transition-all">
@@ -737,7 +737,7 @@ const [memberCount, setMemberCount] = useState(0);
 
         {/* Announcements */}
         <section>
-          <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--text-muted)] mb-3">📢 Announcements</h2>
+          <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--text-muted)] mb-3">{tx.classesPage.announcementsHeader}</h2>
           {announcements.length === 0 ? (
             <p className="text-sm text-[var(--text-muted)] text-center py-6">{tx.classesPage.noAnnouncements}</p>
           ) : (
@@ -749,7 +749,7 @@ const [memberCount, setMemberCount] = useState(0);
                     <span className="text-base mt-0.5">📢</span>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-[var(--text)]">{a.message}</p>
-                      <p className="text-xs text-[var(--text-muted)] mt-0.5">{timeAgo(a.created_at)}</p>
+                      <p className="text-xs text-[var(--text-muted)] mt-0.5">{timeAgo(a.created_at, tx)}</p>
                     </div>
                     {isTeacher
                       ? <span className="text-[9px] font-bold text-[var(--text-muted)] self-start pt-0.5 bg-[var(--surface-2)] px-1.5 py-0.5 rounded-md shrink-0">{readCounts[a.id] ?? 0}/{memberCount}</span>

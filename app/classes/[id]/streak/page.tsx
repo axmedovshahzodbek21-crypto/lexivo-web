@@ -54,12 +54,6 @@ function buildMonthGrid(year: number, month: number): (number | null)[] {
   return cells;
 }
 
-const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-const MONTH_NAMES = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
-];
-
 export default function ClassStreakPage() {
   const t = useTranslation();
   const { id } = useParams<{ id: string }>();
@@ -82,6 +76,8 @@ export default function ClassStreakPage() {
   const [notMember, setNotMember] = useState(false);
 
   const accent = classAccentColor(id);
+  const DAY_LABELS = t.classesPage.dayLabels;
+  const MONTH_NAMES = t.classesPage.monthNames;
 
   useEffect(() => {
     if (!targetUserId || !user) return;
@@ -123,7 +119,7 @@ export default function ClassStreakPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8">
         <div className="text-5xl">⛔</div>
-        <p className="font-bold text-[var(--text)]">You&apos;re not allowed to view this</p>
+        <p className="font-bold text-[var(--text)]">{t.classesPage.notAllowedToView}</p>
         <button onClick={() => router.push(`/classes/${id}/home`)} className="btn-primary">{t.classesPage.goBack}</button>
       </div>
     );
@@ -148,7 +144,7 @@ export default function ClassStreakPage() {
     else setViewMonth(m => m + 1);
   }
 
-  const title = viewUserName ? `${viewUserName} · ${className}` : `${className} Streak`;
+  const title = viewUserName ? `${viewUserName} · ${className}` : `${className} ${t.classesPage.streakSuffix}`;
 
   return (
     <div className="min-h-screen bg-[var(--bg)] pb-12">
@@ -163,7 +159,7 @@ export default function ClassStreakPage() {
         </button>
         <div className="min-w-0">
           <h1 className="text-base font-black text-[var(--text)] leading-tight truncate">{title}</h1>
-          <p className="text-xs text-[var(--text-muted)]">{viewUserName ? 'Class streak calendar' : 'Your class streak'}</p>
+          <p className="text-xs text-[var(--text-muted)]">{viewUserName ? t.classesPage.classStreakCalendar : t.classesPage.yourClassStreak}</p>
         </div>
       </div>
 
@@ -177,9 +173,9 @@ export default function ClassStreakPage() {
           {/* ── Stat tiles ── */}
           <div className="grid grid-cols-3 gap-3">
             {([
-              { emoji: '🔥', value: currentStreak, label: 'Current Streak', bg: '#be123c', shadow: '#881337' },
-              { emoji: '⚡', value: longestStreak,  label: 'Longest streak',  bg: '#0369a1', shadow: '#0c4a6e' },
-              { emoji: '🏆', value: totalDays,      label: 'Full days',       bg: '#b45309', shadow: '#78350f' },
+              { emoji: '🔥', value: currentStreak, label: t.classesPage.currentStreak, bg: '#be123c', shadow: '#881337' },
+              { emoji: '⚡', value: longestStreak,  label: t.classesPage.longestStreakStat,  bg: '#0369a1', shadow: '#0c4a6e' },
+              { emoji: '🏆', value: totalDays,      label: t.classesPage.fullDays,       bg: '#b45309', shadow: '#78350f' },
             ] as const).map(({ emoji, value, label, bg, shadow }) => (
               <div
                 key={label}

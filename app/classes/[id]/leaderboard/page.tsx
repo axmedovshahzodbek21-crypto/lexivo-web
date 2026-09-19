@@ -89,7 +89,7 @@ export default function ClassLeaderboardPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8">
         <div className="text-5xl">⛔</div>
-        <p className="font-bold text-[var(--text)]">You&apos;re not in this class</p>
+        <p className="font-bold text-[var(--text)]">{t.classesPage.notInThisClass}</p>
         <button onClick={() => router.push('/classes')} className="btn-primary">{t.classesPage.goBack}</button>
       </div>
     );
@@ -109,7 +109,7 @@ export default function ClassLeaderboardPage() {
     <div className={`bg-gradient-to-br ${_grad} px-5 pt-5 pb-7 relative`}
       style={{ boxShadow: `0 8px 32px ${_glow}cc` }}>
       <div style={{ position: 'absolute', right: 16, top: 8, fontSize: 80, fontWeight: 900, color: 'rgba(255,255,255,0.06)', lineHeight: 1, userSelect: 'none', pointerEvents: 'none' }}>🏆</div>
-      <button onClick={() => router.push(`/classes/${id}/home`)} className="inline-flex items-center gap-1.5 text-white/70 hover:text-white text-sm font-medium mb-4 transition-colors">← Back</button>
+      <button onClick={() => router.push(`/classes/${id}/home`)} className="inline-flex items-center gap-1.5 text-white/70 hover:text-white text-sm font-medium mb-4 transition-colors">{t.common.back}</button>
       <div className="flex items-center gap-4">
         <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shrink-0"
           style={{ background: 'rgba(255,255,255,0.18)', boxShadow: '0 4px 0 rgba(0,0,0,0.15)' }}>🏆</div>
@@ -147,7 +147,7 @@ export default function ClassLeaderboardPage() {
           <span className="text-2xl">🎓</span>
           <div className="flex-1 min-w-0">
             <p className="text-xs text-[var(--text-muted)]">{t.classesPage.yourPosition}</p>
-            <p className="text-lg font-black text-[var(--primary)]">#{myRank} in class</p>
+            <p className="text-lg font-black text-[var(--primary)]">{t.classesPage.rankInClass(myRank)}</p>
           </div>
           <p className="text-base font-bold text-[var(--primary)]">{displayXP(rows[myRank - 1]?.xp ?? 0)} XP</p>
         </div>
@@ -211,7 +211,7 @@ export default function ClassLeaderboardPage() {
       {/* Full ranked list */}
       <div className="px-4 pb-4">
         <h2 className="text-xs font-black uppercase tracking-widest text-[var(--text-muted)] mb-3">
-          All Rankings
+          {t.classesPage.allRankings}
         </h2>
         <div className="space-y-2">
           {rows.map((row, i) => {
@@ -251,7 +251,7 @@ export default function ClassLeaderboardPage() {
                     className="text-xs text-[var(--text-muted)] hover:underline underline-offset-2 text-left"
                     onClick={() => router.push(`/classes/${id}/streak?userId=${row.student_id}&userName=${encodeURIComponent(row.name)}`)}
                   >
-                    🔥 {row.streak} day streak
+                    🔥 {t.classesPage.dayStreakCount(row.streak)}
                   </button>
                 </div>
                 {/* XP */}

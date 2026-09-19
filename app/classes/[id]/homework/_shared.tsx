@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { localDateStr, addDaysToDateStr } from '@/lib/storage';
 import { loadCollections, loadCEFRCollection } from '@/lib/data';
 import type { WordCollection } from '@/lib/types';
+import { useTranslation } from '@/lib/useTranslation';
+import type { Translations } from '@/lib/i18n';
 
 // Looks up one of the six built-in word collections by its exact display
 // name, as stored in class_homework.collection_name. Previously
@@ -27,6 +29,19 @@ export const MODE_ICON: Record<string, string> = { learn: '📖', flashcard: '�
 export const MODE_LABEL: Record<string, string> = { learn: 'Learn', flashcard: 'Cards', quiz: 'Quiz', match: 'Match' };
 export const MODE_COLOR: Record<string, string> = { learn: '#4f46e5', flashcard: '#ea580c', quiz: '#d97706', match: '#db2777' };
 
+// Translated mode labels — MODE_LABEL above stays as the untranslated
+// fallback for callers outside this file's own components (e.g.
+// homework/[hwId]/page.tsx), which isn't in scope for this pass.
+function modeLabel(t: Translations, mode: string): string {
+  switch (mode) {
+    case 'learn': return t.nav.learn;
+    case 'flashcard': return t.classesPage.modeCards;
+    case 'quiz': return t.nav.quiz;
+    case 'match': return t.home.matchTitle;
+    default: return mode;
+  }
+}
+
 // "Fully done" for a homework assignment: every assigned mode is present in
 // the completed set. Previously reimplemented independently 12+ times
 // across this file and homework/page.tsx, homework/[hwId]/page.tsx,
@@ -38,14 +53,18 @@ export function isHomeworkDone(modes: string[], completed: Set<string>): boolean
   return modes.length > 0 && modes.every(m => completed.has(m));
 }
 
-export function dueLabel(due: string | null): { text: string; overdue: boolean } | null {
+// `t` is optional so this still compiles for callers outside this file's
+// own components (e.g. homework/[hwId]/page.tsx) that aren't in scope for
+// this translation pass — they keep getting the English fallback text.
+export function dueLabel(due: string | null, t?: Translations): { text: string; overdue: boolean } | null {
   if (!due) return null;
   const today = localDateStr();
   const tomorrow = addDaysToDateStr(today, 1);
-  if (due < today) return { text: `Overdue · ${due}`, overdue: true };
-  if (due === today) return { text: 'Due today', overdue: false };
-  if (due === tomorrow) return { text: 'Due tomorrow', overdue: false };
-  return { text: `Due ${due}`, overdue: false };
+  const tr = t?.classesPage;
+  if (due < today) return { text: tr ? tr.dueOverdue(due) : `Overdue · ${due}`, overdue: true };
+  if (due === today) return { text: tr ? tr.dueToday : 'Due today', overdue: false };
+  if (due === tomorrow) return { text: tr ? tr.dueTomorrow : 'Due tomorrow', overdue: false };
+  return { text: tr ? tr.dueOn(due) : `Due ${due}`, overdue: false };
 }
 
 export interface AssignedUnit {
@@ -60,8 +79,9 @@ export interface AssignedUnit {
 export function AssignedUnitCard({
   classId, unit, completed,
 }: { classId: string; unit: AssignedUnit; completed: Set<string> }) {
+  const t = useTranslation();
   const allDone = isHomeworkDone(unit.modes, completed);
-  const due = dueLabel(unit.dueDate);
+  const due = dueLabel(unit.dueDate, t);
   const nonMatchModes = unit.modes.filter(m => m !== 'match');
   const hasMatch = unit.modes.includes('match');
   const learnAssigned = unit.modes.includes('learn');
@@ -96,8 +116,8 @@ export function AssignedUnitCard({
             >
               {unit.badge}
             </span>
-            <span className="text-[10px] text-[var(--text-muted)]">{unit.wordCount} words</span>
-            {allDone && <span className="text-[10px] font-bold text-green-500">✓ Done</span>}
+            <span className="text-[10px] text-[var(--text-muted)]">{unit.wordCount} {t.classesPage.wordsLc}</span>
+            {allDone && <span className="text-[10px] font-bold text-green-500">{t.classesPage.doneCheck}</span>}
           </div>
           <h3 className="font-bold text-[var(--text)] text-sm leading-tight truncate">{unit.title}</h3>
           {due && (
@@ -147,6 +167,7 @@ export function AssignedUnitCard({
 }
 
 export function UnassignedUnitCard({ badge, title, wordCount }: { badge: string; title: string; wordCount: number }) {
+  const t = useTranslation();
   return (
     <div
       className="rounded-2xl overflow-hidden flex flex-col"
@@ -158,7 +179,7 @@ export function UnassignedUnitCard({ badge, title, wordCount }: { badge: string;
           {badge}
         </span>
         <h3 className="font-bold text-[var(--text-muted)] text-sm leading-tight truncate">{title}</h3>
-        <p className="text-[10px] text-[var(--text-muted)]">{wordCount} words · Not yet assigned</p>
+        <p className="text-[10px] text-[var(--text-muted)]">{wordCount} {t.classesPage.wordsLc} · {t.classesPage.notYetAssigned}</p>
       </div>
     </div>
   );
@@ -167,15 +188,16 @@ export function UnassignedUnitCard({ badge, title, wordCount }: { badge: string;
 function GridModeButton({
   classId, hwId, mode, done, locked, wide,
 }: { classId: string; hwId: string; mode: string; done: boolean; locked?: boolean; wide?: boolean }) {
+  const t = useTranslation();
   const color = MODE_COLOR[mode] ?? 'var(--primary)';
   const icon = MODE_ICON[mode] ?? '📖';
-  const label = MODE_LABEL[mode] ?? mode;
+  const label = modeLabel(t, mode);
   const base = `flex items-center justify-center ${wide ? 'flex-row gap-2 py-2.5 px-4' : 'flex-col gap-1.5 py-3'} rounded-xl text-xs font-bold transition-all`;
 
   if (locked) {
     return (
       <div
-        title="Complete Learn first"
+        title={t.classesPage.completeLearnFirst}
         className={`${base} cursor-not-allowed select-none`}
         style={{ background: 'var(--surface-2)', border: '1.5px dashed var(--border)', opacity: 0.4 }}
       >

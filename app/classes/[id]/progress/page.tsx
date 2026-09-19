@@ -10,7 +10,6 @@ import { localDateStr, addDaysToDateStr } from '@/lib/storage';
 import { classGradientColors } from '@/lib/class-gradient';
 
 const STAGE_COLORS = ['#9CA3AF', '#F59E0B', '#3B82F6', '#8B5CF6', '#EC4899', '#10B981'];
-const STAGE_LABELS = ['New', '+1 day', '+3 days', '+7 days', '+14 days', 'Graduated'];
 
 function todayStr() {
   return localDateStr();
@@ -35,6 +34,15 @@ export default function ProgressPage() {
   const [hardCount, setHardCount] = useState(0);
   const [totalWords, setTotalWords] = useState(0);
   const [loading, setLoading] = useState(true);
+
+  const STAGE_LABELS = [
+    t.classesPage.stageNew,
+    t.classesPage.stagePlus1Day,
+    t.classesPage.stagePlus3Days,
+    t.classesPage.stagePlus7Days,
+    t.classesPage.stagePlus14Days,
+    t.srs.graduated,
+  ];
 
   useEffect(() => {
     if (!user) return;
@@ -84,7 +92,7 @@ export default function ProgressPage() {
       <div className={`bg-gradient-to-br ${_grad} px-5 pt-5 pb-7 relative`}
         style={{ boxShadow: `0 8px 32px ${_glow}cc` }}>
         <div style={{ position: 'absolute', right: 16, top: 8, fontSize: 80, fontWeight: 900, color: 'rgba(255,255,255,0.06)', lineHeight: 1, userSelect: 'none', pointerEvents: 'none' }}>📊</div>
-        <button onClick={() => router.push(`/classes/${id}/home`)} className="inline-flex items-center gap-1.5 text-white/70 hover:text-white text-sm font-medium mb-4 transition-colors">← Back</button>
+        <button onClick={() => router.push(`/classes/${id}/home`)} className="inline-flex items-center gap-1.5 text-white/70 hover:text-white text-sm font-medium mb-4 transition-colors">{t.common.back}</button>
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shrink-0"
             style={{ background: 'rgba(255,255,255,0.18)', boxShadow: '0 4px 0 rgba(0,0,0,0.15)' }}>📊</div>
@@ -100,9 +108,9 @@ export default function ProgressPage() {
         {/* Summary stats */}
         <div className="grid grid-cols-3 gap-2">
           {[
-            { value: `${learnedCount}/${totalWords}`, label: 'Learned', color: 'var(--primary)' },
-            { value: dueCount,                        label: 'Due today', color: dueCount > 0 ? '#f59e0b' : '#10B981' },
-            { value: starredCount,                    label: 'Starred',   color: '#f59e0b' },
+            { value: `${learnedCount}/${totalWords}`, label: t.classesPage.learned, color: 'var(--primary)' },
+            { value: dueCount,                        label: t.classesPage.dueToday, color: dueCount > 0 ? '#f59e0b' : '#10B981' },
+            { value: starredCount,                    label: t.classesPage.starred,   color: '#f59e0b' },
           ].map(({ value, label, color }) => (
             <div key={label} className="card text-center py-3 space-y-0.5">
               <p className="text-2xl font-bold" style={{ color }}>{value}</p>
@@ -121,7 +129,7 @@ export default function ProgressPage() {
                   <span className="w-2 h-2 rounded-full inline-block" style={{ background: STAGE_COLORS[s] }} />
                   <span className="text-[var(--text)] font-medium">{STAGE_LABELS[s]}</span>
                 </div>
-                <span className="text-[var(--text-muted)]">{count} word{count !== 1 ? 's' : ''}</span>
+                <span className="text-[var(--text-muted)]">{t.classesPage.wordCount(count)}</span>
               </div>
               <div className="h-2 rounded-full bg-[var(--surface-2)] overflow-hidden">
                 <div
@@ -175,8 +183,8 @@ export default function ProgressPage() {
             })}
           </div>
           <div className="flex items-center justify-end gap-2 text-[10px] text-[var(--text-muted)]">
-            <span className="w-3 h-3 rounded-sm inline-block bg-[var(--surface-2)] opacity-50" /> No study
-            <span className="w-3 h-3 rounded-sm inline-block bg-[var(--primary)]" /> Studied
+            <span className="w-3 h-3 rounded-sm inline-block bg-[var(--surface-2)] opacity-50" /> {t.classesPage.noStudy}
+            <span className="w-3 h-3 rounded-sm inline-block bg-[var(--primary)]" /> {t.classesPage.studied}
           </div>
         </div>
 
@@ -186,7 +194,7 @@ export default function ProgressPage() {
             onClick={() => router.push(`/classes/${id}/review`)}
             className="w-full btn-primary py-4"
           >
-            Review {dueCount} due word{dueCount !== 1 ? 's' : ''} →
+            {t.classesPage.reviewDueWords(dueCount)}
           </button>
         )}
       </div>
