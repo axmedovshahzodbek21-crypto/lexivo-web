@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { displayXP, fetchXPHistory, getXPByDate, type XpEntry } from '@/lib/storage';
 import { REASON_ICON as REASON_ICONS } from '@/lib/xp-reason-icons';
+import { useTranslation } from '@/lib/useTranslation';
 import XpCalendar from './XpCalendar';
 
 interface Props {
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export default function XpHistoryModal({ xp, onClose }: Props) {
+  const t = useTranslation();
   const [history, setHistory] = useState<XpEntry[]>([]);
   const [xpByDate, setXpByDate] = useState<Record<string, number>>({});
   const [dayDetail, setDayDetail] = useState<{ day: string; entries: XpEntry[]; total: number } | null>(null);
@@ -50,9 +52,9 @@ export default function XpHistoryModal({ xp, onClose }: Props) {
           <div className="flex flex-col overflow-y-auto px-6 pb-6 space-y-4" style={{ width: selectedDay ? '360px' : '100%', flexShrink: 0 }}>
             {/* Header */}
             <div className="flex items-center justify-between">
-              <h3 className="text-xl font-black" style={{ color: 'var(--text)' }}>📅 XP History</h3>
+              <h3 className="text-xl font-black" style={{ color: 'var(--text)' }}>{t.xpModal.historyTitle}</h3>
               <div className="text-right">
-                <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>Total XP</p>
+                <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{t.xpModal.totalXp}</p>
                 <p className="text-2xl font-black" style={{ color: 'var(--primary)' }}>{displayXP(xp)}</p>
               </div>
             </div>
@@ -60,7 +62,7 @@ export default function XpHistoryModal({ xp, onClose }: Props) {
             {history.length === 0 ? (
               <div className="py-10 text-center" style={{ color: 'var(--text-muted)' }}>
                 <p className="text-3xl mb-2">📭</p>
-                <p className="text-sm">No XP earned yet.<br/>Start learning to see your history!</p>
+                <p className="text-sm">{t.xpModal.noXpYet}<br/>{t.xpModal.startLearningToSeeHistory}</p>
               </div>
             ) : (
               <XpCalendar
@@ -76,7 +78,7 @@ export default function XpHistoryModal({ xp, onClose }: Props) {
               className="w-full py-3 rounded-xl text-sm font-bold text-white"
               style={{ background: 'var(--primary)' }}
             >
-              Got it
+              {t.common.gotIt}
             </button>
           </div>
 
@@ -95,7 +97,7 @@ export default function XpHistoryModal({ xp, onClose }: Props) {
               <div className="overflow-y-auto overscroll-contain pb-6">
                 {dayDetail.entries.length === 0 && (
                   <p className="text-[11px] text-center px-5 py-4" style={{ color: 'var(--text-muted)' }}>
-                    Detailed breakdown no longer available for this day — only recent activity is kept.
+                    {t.xpModal.detailedBreakdownUnavailable}
                   </p>
                 )}
                 {dayDetail.entries.map((e, j) => {

@@ -2,8 +2,10 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import type { GrammarTip } from '@/lib/grammar-tips';
+import { useTranslation } from '@/lib/useTranslation';
 
 export default function GrammarTipCard({ tip }: { tip: GrammarTip }) {
+  const t = useTranslation();
   const [open, setOpen] = useState(false);
 
   return (
@@ -73,7 +75,7 @@ export default function GrammarTipCard({ tip }: { tip: GrammarTip }) {
             className="text-xs font-medium hover:underline block text-right"
             style={{ color: tip.categoryColor }}
           >
-            See all tips →
+            {t.grammarTipsPage.seeAllTips}
           </Link>
         </div>
       )}

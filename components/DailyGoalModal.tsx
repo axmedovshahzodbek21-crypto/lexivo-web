@@ -51,7 +51,7 @@ export default function DailyGoalModal({ settings, todayCount, onSave, onClose }
           <div className="rounded-2xl p-4" style={{ background: 'var(--primary-bg)' }}>
             <div className="flex items-baseline justify-between mb-2">
               <span className="text-3xl font-black" style={{ color: 'var(--primary)' }}>{todayCount} / {goal}</span>
-              <span className="text-xs font-semibold" style={{ color: 'var(--text-muted)' }}>words today</span>
+              <span className="text-xs font-semibold" style={{ color: 'var(--text-muted)' }}>{t.home.wordsTodayLabel}</span>
             </div>
             <div className="h-2.5 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
               <div className="h-full rounded-full transition-all" style={{ width: `${progress}%`, background: 'var(--primary)' }} />
@@ -61,7 +61,7 @@ export default function DailyGoalModal({ settings, todayCount, onSave, onClose }
           {/* Customize goal */}
           <div>
             <label className="text-xs font-semibold uppercase tracking-wide block mb-2" style={{ color: 'var(--text-muted)' }}>
-              New words per day
+              {t.home.newWordsPerDay}
             </label>
             <div className="flex items-center gap-3">
               <button

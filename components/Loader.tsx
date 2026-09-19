@@ -1,10 +1,13 @@
+'use client';
 // Shared loading states — replaces bouncing emoji loaders throughout the app.
+import { useTranslation } from '@/lib/useTranslation';
 
 export function PageLoader() {
+  const t = useTranslation();
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-3">
       <div className="w-8 h-8 rounded-full border-[3px] border-[var(--border)] border-t-[var(--primary)] animate-spin" />
-      <p className="text-sm font-medium text-[var(--text-muted)]">Loading…</p>
+      <p className="text-sm font-medium text-[var(--text-muted)]">{t.common.loading}</p>
     </div>
   );
 }

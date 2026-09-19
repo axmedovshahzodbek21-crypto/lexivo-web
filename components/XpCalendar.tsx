@@ -1,8 +1,8 @@
 'use client';
 import { useState, type ReactNode } from 'react';
 import { displayXP, type XpEntry } from '@/lib/storage';
+import { useTranslation } from '@/lib/useTranslation';
 
-const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const DAY_LABELS = ['M','T','W','T','F','S','S'];
 
 interface Props {
@@ -40,6 +40,7 @@ export default function XpCalendar({
   history, xpByDate, onSelectDay, resetSelectionOnMonthChange = false,
   accentColor = 'var(--primary)', dayBadge, legendExtra,
 }: Props) {
+  const t = useTranslation();
   const [calMonth, setCalMonth] = useState(() => { const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), 1); });
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
 
@@ -78,7 +79,7 @@ export default function XpCalendar({
           className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--border)] transition-colors text-lg"
           style={{ color: accentColor }}>‹</button>
         <span className="text-sm font-bold" style={{ color: 'var(--text)' }}>
-          {MONTH_NAMES[calMonth.getMonth()]} {calMonth.getFullYear()}
+          {t.classesPage.monthNames[calMonth.getMonth()]} {calMonth.getFullYear()}
         </span>
         <button onClick={() => !isCurrentMonth && changeMonth(1)}
           className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--border)] transition-colors text-lg"
@@ -121,7 +122,7 @@ export default function XpCalendar({
       <div className="flex items-center justify-center gap-4 pb-3 text-[10px] flex-wrap" style={{ color: 'var(--text-muted)' }}>
         <span className="flex items-center gap-1.5">
           <span className="w-3 h-3 rounded-full inline-block" style={{ background: `color-mix(in srgb, ${accentColor} 85%, transparent)` }} />
-          XP earned
+          {t.classXpHistory.xpEarnedLegend}
         </span>
         {legendExtra}
       </div>

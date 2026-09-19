@@ -3,21 +3,23 @@ import { useEffect, useRef, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { localDateStr, addDaysToDateStr } from '@/lib/storage';
+import { useTranslation } from '@/lib/useTranslation';
 
 interface HWToast { id: string; title: string; dueDate: string | null; className: string; }
 
-function dueText(due: string | null): { label: string; urgent: boolean } {
-  if (!due) return { label: 'No deadline set', urgent: false };
+function dueText(due: string | null, t: ReturnType<typeof useTranslation>): { label: string; urgent: boolean } {
+  if (!due) return { label: t.classesPage.noDeadline, urgent: false };
   const today = localDateStr();
   const tomorrow = addDaysToDateStr(today, 1);
-  if (due < today) return { label: `Overdue · ${due}`, urgent: true };
-  if (due === today) return { label: 'Due today', urgent: true };
-  if (due === tomorrow) return { label: 'Due tomorrow', urgent: false };
-  return { label: `Due ${due}`, urgent: false };
+  if (due < today) return { label: t.classesPage.dueOverdue(due), urgent: true };
+  if (due === today) return { label: t.classesPage.dueToday, urgent: true };
+  if (due === tomorrow) return { label: t.classesPage.dueTomorrow, urgent: false };
+  return { label: t.classesPage.dueOn(due), urgent: false };
 }
 
 export default function HomeworkNotify() {
   const { user } = useAuth();
+  const t = useTranslation();
   const [toasts, setToasts] = useState<HWToast[]>([]);
   const classNames = useRef<Map<string, string>>(new Map());
 
@@ -50,7 +52,7 @@ export default function HomeworkNotify() {
           { event: 'INSERT', schema: 'public', table: 'class_targets', filter: `student_id=eq.${user.id}` },
           (payload) => {
             const row = payload.new as { id: string; class_id: string; title: string; due_date: string | null };
-            const className = classNames.current.get(row.class_id) ?? 'Class';
+            const className = classNames.current.get(row.class_id) ?? t.classNav.classLabel;
             const toast: HWToast = { id: row.id, title: row.title, dueDate: row.due_date, className };
             setToasts(prev => [...prev, toast]);
             setTimeout(() => setToasts(prev => prev.filter(x => x.id !== toast.id)), 8000);
@@ -66,22 +68,22 @@ export default function HomeworkNotify() {
 
   return (
     <div className="fixed top-4 right-4 z-[200] flex flex-col gap-2 pointer-events-none" style={{ maxWidth: 'min(360px, calc(100vw - 2rem))' }}>
-      {toasts.map(t => {
-        const { label, urgent } = dueText(t.dueDate);
+      {toasts.map(toast => {
+        const { label, urgent } = dueText(toast.dueDate, t);
         return (
-          <div key={t.id} className="pointer-events-auto flex items-start gap-3 bg-[var(--surface)] rounded-2xl border border-[var(--border)] p-4 shadow-xl animate-fade-in"
+          <div key={toast.id} className="pointer-events-auto flex items-start gap-3 bg-[var(--surface)] rounded-2xl border border-[var(--border)] p-4 shadow-xl animate-fade-in"
             style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.18)' }}>
             <div className="w-10 h-10 rounded-xl bg-[var(--primary-bg)] flex items-center justify-center shrink-0 text-xl">📋</div>
             <div className="flex-1 min-w-0">
-              <p className="text-[10px] font-bold uppercase tracking-wide text-[var(--primary)] mb-0.5">{t.className}</p>
-              <p className="text-sm font-bold text-[var(--text)] leading-snug">New homework assigned</p>
-              <p className="text-xs text-[var(--text-muted)] mt-0.5 truncate">{t.title}</p>
+              <p className="text-[10px] font-bold uppercase tracking-wide text-[var(--primary)] mb-0.5">{toast.className}</p>
+              <p className="text-sm font-bold text-[var(--text)] leading-snug">{t.homeworkNotify.newHomeworkAssigned}</p>
+              <p className="text-xs text-[var(--text-muted)] mt-0.5 truncate">{toast.title}</p>
               <p className={`text-xs font-semibold mt-1 ${urgent ? 'text-red-500' : 'text-[var(--text-muted)]'}`}>{label}</p>
             </div>
             <button
-              onClick={() => setToasts(prev => prev.filter(x => x.id !== t.id))}
+              onClick={() => setToasts(prev => prev.filter(x => x.id !== toast.id))}
               className="shrink-0 text-[var(--text-muted)] hover:text-[var(--text)] transition-colors text-sm leading-none mt-0.5"
-              aria-label="Dismiss"
+              aria-label={t.homeworkNotify.dismiss}
             >✕</button>
           </div>
         );

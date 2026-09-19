@@ -97,7 +97,7 @@ export default function Navigation() {
   const levelColor = LEVEL_COLORS[levelInfo.level] ?? LEVEL_COLORS_FALLBACK;
 
   const handleSignOut = async () => {
-    if (!confirm('Sign out of your account?')) return;
+    if (!confirm(t.sidebar.signOutConfirm)) return;
     await signOut();
     router.replace('/login');
   };
@@ -134,7 +134,7 @@ export default function Navigation() {
       {/* ── Desktop: floating expand button (visible only when sidebar is hidden) ── */}
       <button
         onClick={toggleSidebar}
-        aria-label="Show sidebar"
+        aria-label={t.sidebar.showSidebar}
         tabIndex={sidebarOpen ? -1 : 0}
         className={`hidden sm:flex fixed top-4 left-2 z-50 w-7 h-7 items-center justify-center rounded-full bg-[var(--surface)] border border-[var(--border)] shadow-sm text-[var(--text-muted)] hover:text-white hover:bg-[var(--primary)] hover:border-[var(--primary)] transition-all duration-200 ${sidebarOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
       >
@@ -160,7 +160,7 @@ export default function Navigation() {
           </div>
           <button
             onClick={toggleSidebar}
-            aria-label="Hide sidebar"
+            aria-label={t.sidebar.hideSidebar}
             className="mt-1 shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs text-[var(--text-muted)] hover:text-white hover:bg-[var(--primary)] transition-all duration-200"
           >
             ‹
@@ -211,7 +211,7 @@ export default function Navigation() {
               : { color: 'var(--text-muted)' }}
           >
             <span className="text-lg transition-transform duration-200">🧩</span>
-            <span>Other projects</span>
+            <span>{t.sidebar.otherProjects}</span>
             <span className="ml-auto text-[10px] text-[var(--text-muted)]">↗</span>
           </a>
         </nav>
@@ -232,7 +232,7 @@ export default function Navigation() {
                 }}
               >
                 {profilePic
-                  ? <img src={profilePic} alt="Profile" className="w-full h-full object-cover" />
+                  ? <img src={profilePic} alt={t.sidebar.profileAlt} className="w-full h-full object-cover" />
                   : initial}
               </div>
               <div className="flex-1 min-w-0">

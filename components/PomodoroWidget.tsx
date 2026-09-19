@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { pushLists } from '@/lib/sync';
 import { getAudioCtx, playTone } from '@/lib/web-audio';
+import { useTranslation } from '@/lib/useTranslation';
+import { getUILanguage } from '@/lib/storage';
+import { translations, type Translations } from '@/lib/i18n';
 
 type PomPhase = 'idle' | 'work' | 'break';
 
@@ -43,19 +46,19 @@ function sendNotification(title: string, body: string) {
 }
 
 // ── Break tips ────────────────────────────────────────────────────────────────
+// Text keys resolved against the live `t.pomodoro` namespace at render time
+// (see BREAK_TIP_ICONS usage below) so tips stay in the user's current
+// language instead of being hardcoded here.
 
-const BREAK_TIPS = [
-  { icon: '🚶', text: 'Take a short walk to stretch your legs and refresh your mind.' },
-  { icon: '💧', text: 'Drink a glass of water — staying hydrated sharpens focus.' },
-  { icon: '👀', text: 'Look at something 20 feet away for 20 seconds to rest your eyes.' },
-  { icon: '🧘', text: 'Take 5 slow deep breaths to calm your nervous system.' },
-  { icon: '🙆', text: 'Roll your neck and shoulders to release tension from studying.' },
-  { icon: '☀️', text: 'Step outside for a moment — natural light boosts your mood.' },
-  { icon: '😌', text: 'Close your eyes and let your mind go blank for 60 seconds.' },
-  { icon: '🍎', text: 'Grab a healthy snack to keep your brain fuelled and sharp.' },
-  { icon: '🎵', text: 'Listen to one song you enjoy — music resets your energy.' },
-  { icon: '✍️', text: 'Jot down anything on your mind so you can focus fully after the break.' },
-];
+const BREAK_TIP_ICONS = ['🚶', '💧', '👀', '🧘', '🙆', '☀️', '😌', '🍎', '🎵', '✍️'] as const;
+
+function breakTipText(t: Translations, i: number): string {
+  const keys: (keyof Translations['pomodoro'])[] = [
+    'breakTip1', 'breakTip2', 'breakTip3', 'breakTip4', 'breakTip5',
+    'breakTip6', 'breakTip7', 'breakTip8', 'breakTip9', 'breakTip10',
+  ];
+  return t.pomodoro[keys[i]] as string;
+}
 
 const STORAGE_KEY = 'pom-widget-pos';
 
@@ -106,6 +109,7 @@ function copyStylesInto(pipDoc: Document) {
 
 export default function PomodoroWidget() {
   const router = useRouter();
+  const t = useTranslation();
   const {
     pomPhase, pomSecondsLeft, pomRunning, pomSessions, pomVisible,
     pomWorkMins, pomBreakMins,
@@ -169,7 +173,7 @@ export default function PomodoroWidget() {
     try {
       const win = await api.requestWindow({ width: 180, height: 96 });
       copyStylesInto(win.document);
-      win.document.title = 'Focus Timer — Lexivo';
+      win.document.title = t.pomodoro.docTitle;
       win.document.body.style.margin = '0';
       win.document.body.style.background = 'var(--bg, #0a0a18)';
       win.addEventListener('pagehide', () => { setPipWin(null); setPipBody(null); });
@@ -217,25 +221,48 @@ export default function PomodoroWidget() {
   }, [pomRunning, pomPhase]);
 
   // Detect phase transitions → sound + notification
+  //
+  // Bug fix: this effect used to build the Notification title/body from
+  // hardcoded English strings. Simply switching those to `t.xxx` (the
+  // translations object from the `useTranslation()` hook above) would still
+  // be fragile here: this effect's dependency array is [pomPhase,
+  // pomBreakMins, pomWorkMins], NOT `t`, so if we ever changed the deps or
+  // this logic in the future it would be easy to end up executing a
+  // callback closure that was captured on a stale render (e.g. right after
+  // a language switch, before the next re-render lands). Because a browser
+  // Notification is scheduled/fired outside of React's render cycle, we
+  // don't want to trust "whatever `t` happened to be captured" — we
+  // re-resolve the language from storage and look up the translations
+  // object fresh, at the exact moment the phase actually flips, so the
+  // notification always reflects the user's language *right now* instead
+  // of whatever language was active when this effect was last created.
   useEffect(() => {
     const prev = prevPhaseRef.current;
     if (prev === pomPhase) return;
     prevPhaseRef.current = pomPhase;
 
+    const liveT = translations[getUILanguage()] ?? translations.en;
+
     if (pomPhase === 'break') {
       playBeep(true);
-      sendNotification('Break Time! ☕', `Great work! Take a ${pomBreakMins} min break — you earned it.`);
-      setTipIndex(Math.floor(Math.random() * BREAK_TIPS.length));
+      sendNotification(
+        liveT.pomodoro.notifBreakTitle,
+        liveT.pomodoro.notifBreakBody.replace('{n}', String(pomBreakMins)),
+      );
+      setTipIndex(Math.floor(Math.random() * BREAK_TIP_ICONS.length));
     } else if (pomPhase === 'work') {
       playBeep(false);
-      sendNotification('Focus Time! 🎯', `${pomWorkMins} min work session starting now. Let's go!`);
+      sendNotification(
+        liveT.pomodoro.notifFocusTitle,
+        liveT.pomodoro.notifFocusBody.replace('{n}', String(pomWorkMins)),
+      );
     }
   }, [pomPhase, pomBreakMins, pomWorkMins]);
 
   // Cycle tips every 8 s during break
   useEffect(() => {
     if (pomPhase !== 'break') return;
-    const id = setInterval(() => setTipIndex(i => (i + 1) % BREAK_TIPS.length), 8000);
+    const id = setInterval(() => setTipIndex(i => (i + 1) % BREAK_TIP_ICONS.length), 8000);
     return () => clearInterval(id);
   }, [pomPhase]);
 
@@ -298,7 +325,8 @@ export default function PomodoroWidget() {
 
   // ── Break overlay (portal, full-screen) ───────────────────────────────────
   if (isBreak) {
-    const tip = BREAK_TIPS[tipIndex % BREAK_TIPS.length];
+    const tipIdx = tipIndex % BREAK_TIP_ICONS.length;
+    const tip = { icon: BREAK_TIP_ICONS[tipIdx], text: breakTipText(t, tipIdx) };
     const breakProgress = 1 - pomSecondsLeft / (pomBreakMins * 60);
 
     return <>{createPortal(
@@ -319,15 +347,15 @@ export default function PomodoroWidget() {
             <button
               onClick={togglePip}
               className="absolute top-3 right-14 w-8 h-8 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-white text-sm transition-colors z-10"
-              aria-label={pipWin ? 'Return timer to page' : 'Pop out timer'}
-              title={pipWin ? 'Return timer to page' : 'Pop out timer so it stays visible over other windows'}
+              aria-label={pipWin ? t.pomodoro.returnTimerToPage : t.pomodoro.popOutTimer}
+              title={pipWin ? t.pomodoro.returnTimerToPage : t.pomodoro.popOutTimerTitle}
             >⧉</button>
           )}
           {/* Stop session button */}
           <button
             onClick={resetPomodoro}
             className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-white text-sm transition-colors z-10"
-            aria-label="Stop session"
+            aria-label={t.pomodoro.stopSession}
           >✕</button>
           {/* Progress bar at top */}
           <div className="h-1.5 bg-white/20">
@@ -341,10 +369,10 @@ export default function PomodoroWidget() {
             {/* Header */}
             <div className="text-center mb-5">
               <div className="text-5xl mb-2">☕</div>
-              <h2 className="text-white text-2xl font-black">Break Time</h2>
+              <h2 className="text-white text-2xl font-black">{t.pomodoro.breakTitle}</h2>
               {pomSessions > 0 && (
                 <p className="text-white/70 text-sm mt-0.5">
-                  Session {pomSessions} complete 🎉
+                  {t.pomodoro.sessionComplete.replace('{n}', String(pomSessions))}
                 </p>
               )}
             </div>
@@ -354,7 +382,7 @@ export default function PomodoroWidget() {
               <span className="text-white text-7xl font-black tabular-nums leading-none">
                 {fmt(pomSecondsLeft)}
               </span>
-              <p className="text-white/60 text-xs mt-1">of {pomBreakMins} min break</p>
+              <p className="text-white/60 text-xs mt-1">{t.pomodoro.ofBreakMin.replace('{n}', String(pomBreakMins))}</p>
             </div>
 
             {/* Tip card */}
@@ -373,13 +401,13 @@ export default function PomodoroWidget() {
                 className="flex-1 py-3 rounded-xl text-white text-sm font-bold transition-colors"
                 style={{ background: 'rgba(255,255,255,0.2)' }}
               >
-                {pomRunning ? '⏸ Pause' : '▶ Resume'}
+                {pomRunning ? t.pomodoro.pauseBtn : t.pomodoro.resumeBtn}
               </button>
               <button
                 onClick={skipPomodoro}
                 className="flex-1 py-3 rounded-xl bg-white text-emerald-600 text-sm font-black transition-colors hover:bg-white/90"
               >
-                Skip →
+                {t.pomodoro.skipBtn}
               </button>
             </div>
           </div>
@@ -390,9 +418,9 @@ export default function PomodoroWidget() {
   }
 
   const SETUP_PRESETS = [
-    { label: 'Classic', emoji: '🍅', work: 25, brk: 5 },
-    { label: 'Deep',    emoji: '🧠', work: 50, brk: 10 },
-    { label: 'Quick',   emoji: '⚡', work: 15, brk: 3 },
+    { label: t.pomodoro.presetClassic, emoji: '🍅', work: 25, brk: 5 },
+    { label: t.pomodoro.presetDeep,    emoji: '🧠', work: 50, brk: 10 },
+    { label: t.pomodoro.presetQuick,   emoji: '⚡', work: 15, brk: 3 },
   ];
 
   // ── Setup panel ───────────────────────────────────────────────────────────
@@ -420,13 +448,13 @@ export default function PomodoroWidget() {
         <div style={{ padding: '14px 14px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
             <span style={{ fontSize: 18 }}>🎯</span>
-            <span style={{ color: '#fff', fontWeight: 800, fontSize: 14, letterSpacing: '-0.3px' }}>Focus Mode</span>
+            <span style={{ color: '#fff', fontWeight: 800, fontSize: 14, letterSpacing: '-0.3px' }}>{t.pomodoro.focusMode}</span>
           </div>
           <button
             onPointerDown={e => e.stopPropagation()}
             onClick={e => { e.stopPropagation(); hidePomodoroSetup(); }}
             style={{ width: 24, height: 24, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', border: 'none', color: 'rgba(255,255,255,0.6)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-            aria-label="Close"
+            aria-label={t.pomodoro.closeLabel}
           >✕</button>
         </div>
 
@@ -472,16 +500,16 @@ export default function PomodoroWidget() {
             }}
           >
             <span style={{ fontSize: 16 }}>⚙️</span>
-            <span style={{ fontSize: 9, fontWeight: 700, color: isCustom ? '#a89fff' : 'rgba(255,255,255,0.4)' }}>Custom</span>
+            <span style={{ fontSize: 9, fontWeight: 700, color: isCustom ? '#a89fff' : 'rgba(255,255,255,0.4)' }}>{t.pomodoro.presetCustom}</span>
           </button>
         </div>
 
         {/* Custom sliders — only when custom selected */}
         {isCustom && (
           <div style={{ padding: '10px 14px 0', display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <MiniSlider label="Focus" value={pomWorkMins} min={5} max={60} color="var(--primary)"
+            <MiniSlider label={t.pomodoro.focus} value={pomWorkMins} min={5} max={60} color="var(--primary)"
               onChange={v => setPomSettings(v, pomBreakMins)} />
-            <MiniSlider label="Break" value={pomBreakMins} min={1} max={20} color="var(--success)"
+            <MiniSlider label={t.pomodoro.break} value={pomBreakMins} min={1} max={20} color="var(--success)"
               onChange={v => setPomSettings(pomWorkMins, v)} />
           </div>
         )}
@@ -498,7 +526,7 @@ export default function PomodoroWidget() {
               boxShadow: '0 4px 20px rgba(108,99,255,0.4)',
             }}
           >
-            Start Focusing
+            {t.pomodoro.startFocusing}
           </button>
         </div>
       </div>
@@ -553,7 +581,7 @@ export default function PomodoroWidget() {
             onPointerDown={e => e.stopPropagation()}
             onClick={() => { pomRunning ? pausePomodoro() : resumePomodoro(); }}
             style={{ flex: 1, padding: '8px 0', borderRadius: 10, border: 'none', background: accentColor, color: '#fff', fontWeight: 800, fontSize: 14, cursor: 'pointer' }}
-            aria-label={pomRunning ? 'Pause' : 'Resume'}
+            aria-label={pomRunning ? t.pomodoro.pause : t.pomodoro.resume}
           >
             {pomRunning ? '⏸' : '▶'}
           </button>
@@ -561,7 +589,7 @@ export default function PomodoroWidget() {
             onPointerDown={e => e.stopPropagation()}
             onClick={skipPomodoro}
             style={{ flex: 1, padding: '8px 0', borderRadius: 10, border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.7)', fontWeight: 800, fontSize: 14, cursor: 'pointer' }}
-            aria-label="Skip to next"
+            aria-label={t.pomodoro.skipToNext}
           >
             ⏭
           </button>
@@ -570,8 +598,8 @@ export default function PomodoroWidget() {
               onPointerDown={e => e.stopPropagation()}
               onClick={togglePip}
               style={{ padding: '8px 10px', borderRadius: 10, border: 'none', background: pipWin ? accentColor : 'rgba(255,255,255,0.06)', color: pipWin ? '#fff' : 'rgba(255,255,255,0.6)', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}
-              aria-label={pipWin ? 'Return timer to page' : 'Pop out timer'}
-              title={pipWin ? 'Return timer to page' : 'Pop out timer so it stays visible over other windows'}
+              aria-label={pipWin ? t.pomodoro.returnTimerToPage : t.pomodoro.popOutTimer}
+              title={pipWin ? t.pomodoro.returnTimerToPage : t.pomodoro.popOutTimerTitle}
             >
               ⧉
             </button>
@@ -580,7 +608,7 @@ export default function PomodoroWidget() {
             onPointerDown={e => e.stopPropagation()}
             onClick={resetPomodoro}
             style={{ padding: '8px 10px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.35)', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}
-            aria-label="Stop"
+            aria-label={t.pomodoro.stop}
           >
             ✕
           </button>
@@ -598,6 +626,7 @@ function PipTimerContent({ phase, secondsLeft, running, sessions, breakMins, onP
   phase: PomPhase; secondsLeft: number; running: boolean; sessions: number; breakMins: number;
   onPauseResume: () => void; onSkip: () => void; onStop: () => void;
 }) {
+  const t = useTranslation();
   const isBreak = phase === 'break';
   const accentColor = isBreak ? 'var(--success)' : 'var(--primary)';
   return (
@@ -629,14 +658,14 @@ function PipTimerContent({ phase, secondsLeft, running, sessions, breakMins, onP
         <button
           onClick={onPauseResume}
           style={{ flex: 1, padding: '4px 0', borderRadius: 8, border: 'none', background: isBreak ? 'rgba(255,255,255,0.25)' : accentColor, color: '#fff', fontWeight: 800, fontSize: 12, cursor: 'pointer' }}
-          aria-label={running ? 'Pause' : 'Resume'}
+          aria-label={running ? t.pomodoro.pause : t.pomodoro.resume}
         >
           {running ? '⏸' : '▶'}
         </button>
         <button
           onClick={onSkip}
           style={{ flex: 1, padding: '4px 0', borderRadius: 8, border: '1px solid rgba(255,255,255,0.25)', background: 'rgba(255,255,255,0.08)', color: '#fff', fontWeight: 800, fontSize: 12, cursor: 'pointer' }}
-          aria-label="Skip to next"
+          aria-label={t.pomodoro.skipToNext}
         >
           ⏭
         </button>

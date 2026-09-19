@@ -8,35 +8,7 @@ import { pushLists } from '@/lib/sync';
 import { buildAiImportPrompt, parseAiImportOutput } from '@/lib/ai-import';
 import type { ImportedWord } from '@/lib/types';
 
-const TUTORIAL = {
-  en: {
-    title: 'How to Import Words',
-    steps: [
-      { icon: '🌐', title: '1. Choose languages', desc: 'Select the language of your words and the language you want translations in.' },
-      { icon: '🤖', title: '2. Copy a prompt', desc: 'Expand a prompt below, copy it, open Claude or ChatGPT, paste it with your words and send.' },
-      { icon: '📋', title: '3. Paste the response', desc: "Copy the AI's reply and paste it into the box below. Your words will appear instantly." },
-    ],
-    btn: 'Got it!',
-  },
-  uz: {
-    title: "So'zlarni qanday import qilish",
-    steps: [
-      { icon: '🌐', title: '1. Tillarni tanlang', desc: "So'zlaringiz tilini va tarjima tilini tanlang." },
-      { icon: '🤖', title: "2. Promptni nusxalang", desc: "Quyidagi promptni oching, nusxalang, Claude yoki ChatGPT ga o'ting, promptni so'zlaringiz bilan joylashtiring va yuboring." },
-      { icon: '📋', title: '3. Javobni joylashtiring', desc: "Suniy intellekt javobini nusxalab, quyidagi maydonga joylashtiring. So'zlaringiz darhol ko'rinadi." },
-    ],
-    btn: 'Tushunarli!',
-  },
-  ru: {
-    title: 'Как импортировать слова',
-    steps: [
-      { icon: '🌐', title: '1. Выберите языки', desc: 'Выберите язык слов и язык, на который нужен перевод.' },
-      { icon: '🤖', title: '2. Скопируйте запрос', desc: 'Разверните запрос ниже, скопируйте его, откройте Claude или ChatGPT, вставьте слова и отправьте.' },
-      { icon: '📋', title: '3. Вставьте ответ', desc: 'Скопируйте ответ ИИ и вставьте в поле ниже. Слова появятся мгновенно.' },
-    ],
-    btn: 'Понятно!',
-  },
-} as const;
+const TUTORIAL_ICONS = ['🌐', '🤖', '📋'] as const;
 
 const LANGUAGES = [
   { label: 'English', code: 'en-US' },
@@ -70,7 +42,6 @@ function ImportPageInner() {
   const [copied, setCopied] = useState(false);
   const [added, setAdded] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
-  const [tutorialLang, setTutorialLang] = useState<'en' | 'uz' | 'ru'>('en');
 
   useEffect(() => {
     if (!localStorage.getItem('import_tutorial_seen')) {
@@ -94,7 +65,7 @@ function ImportPageInner() {
     const folder = folderName.trim();
     const name = collectionName.trim() || 'My Words';
     if (!folder) {
-      alert('Please enter a folder name before saving.');
+      alert(t.import.folderNameRequired);
       return;
     }
     const rows: ImportedWord[] = parsed.map(w => ({
@@ -122,16 +93,14 @@ function ImportPageInner() {
         <div className="fixed inset-0 z-50 flex items-end justify-center p-4 pb-8" style={{ background: 'rgba(0,0,0,0.5)' }} onClick={() => setShowHelp(false)}>
           <div className="w-full max-w-md bg-[var(--surface)] rounded-3xl p-6 space-y-5 animate-slide-up" onClick={e => e.stopPropagation()}>
             <div className="flex items-center gap-2">
-              <h2 className="flex-1 text-lg font-bold text-[var(--text)]">{TUTORIAL[tutorialLang].title}</h2>
-              {(['en', 'uz', 'ru'] as const).map(l => (
-                <button key={l} onClick={() => setTutorialLang(l)}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-colors ${tutorialLang === l ? 'bg-[var(--primary)] text-white' : 'bg-[var(--primary-bg)] text-[var(--primary)]'}`}>
-                  {l.toUpperCase()}
-                </button>
-              ))}
+              <h2 className="flex-1 text-lg font-bold text-[var(--text)]">{t.import.tutorialTitle}</h2>
             </div>
             <div className="space-y-4">
-              {TUTORIAL[tutorialLang].steps.map(({ icon, title, desc }) => (
+              {[
+                { icon: TUTORIAL_ICONS[0], title: t.import.tutorialStep1Title, desc: t.import.tutorialStep1Desc },
+                { icon: TUTORIAL_ICONS[1], title: t.import.tutorialStep2Title, desc: t.import.tutorialStep2Desc },
+                { icon: TUTORIAL_ICONS[2], title: t.import.tutorialStep3Title, desc: t.import.tutorialStep3Desc },
+              ].map(({ icon, title, desc }) => (
                 <div key={title} className="flex gap-3">
                   <div className="w-10 h-10 rounded-2xl flex items-center justify-center text-xl flex-shrink-0" style={{ background: 'var(--primary-bg)' }}>{icon}</div>
                   <div>
@@ -142,16 +111,16 @@ function ImportPageInner() {
               ))}
             </div>
             <button onClick={() => setShowHelp(false)} className="btn-primary w-full py-3 text-sm rounded-2xl">
-              {TUTORIAL[tutorialLang].btn}
+              {t.import.tutorialGotIt}
             </button>
           </div>
         </div>
       )}
 
       <div className="flex items-center gap-3 p-4 border-b border-[var(--border)]">
-        <button onClick={() => router.back()} className="btn-icon text-lg" aria-label="Go back">←</button>
+        <button onClick={() => router.back()} className="btn-icon text-lg" aria-label={t.extra.goBack}>←</button>
         <h1 className="font-bold text-[var(--text)] flex-1">{t.import.title}</h1>
-        <button onClick={() => setShowHelp(true)} className="btn-icon text-lg" aria-label="Show import help">💡</button>
+        <button onClick={() => setShowHelp(true)} className="btn-icon text-lg" aria-label={t.import.showHelpAria}>💡</button>
       </div>
 
       <div className="p-4 space-y-4">
@@ -159,35 +128,35 @@ function ImportPageInner() {
         {/* Folder + Collection name */}
         <div className="card space-y-3">
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">📁 Folder</label>
+            <label className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">{t.import.folderLabel}</label>
             <input
               type="text"
               value={folderName}
               onChange={e => setFolderName(e.target.value)}
-              placeholder="e.g. Spanish Course, B2 Prep…"
+              placeholder={t.import.folderPlaceholder}
               className="w-full px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
             />
           </div>
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide block">📖 Collection</label>
+            <label className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide block">{t.import.collectionLabel}</label>
             <input
               type="text"
               value={collectionName}
               onChange={e => setCollectionName(e.target.value)}
-              placeholder="e.g. Unit 1, Week 3 Vocab…"
+              placeholder={t.import.collectionPlaceholder}
               className="w-full px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
             />
           </div>
           {folderName.trim() && collectionName.trim() && (
             <p className="text-xs text-[var(--text-muted)]">
-              Will save to: <span className="text-[var(--primary)] font-medium">{folderName.trim()}</span> › <span className="text-[var(--text)] font-medium">{collectionName.trim()}</span>
+              {t.import.willSaveTo} <span className="text-[var(--primary)] font-medium">{folderName.trim()}</span> › <span className="text-[var(--text)] font-medium">{collectionName.trim()}</span>
             </p>
           )}
         </div>
 
         {/* Language selectors */}
         <div className="card space-y-3">
-          <p className="text-xs font-bold text-[var(--text-muted)]">Word Language / Translation Language</p>
+          <p className="text-xs font-bold text-[var(--text-muted)]">{t.libraryPage.wordLangTrLang}</p>
           <div className="flex items-center gap-3">
             <select
               value={wordLang}
@@ -213,11 +182,11 @@ function ImportPageInner() {
 
         {/* Step 1: words input + copy prompt */}
         <div className="card space-y-3">
-          <p className="text-sm font-bold text-[var(--text)]">1. Enter words to import</p>
+          <p className="text-sm font-bold text-[var(--text)]">{t.libraryPage.enterWordsStep}</p>
           <textarea
             value={wordsInput}
             onChange={e => setWordsInput(e.target.value)}
-            placeholder={`apple, book, water\nor one per line\nor already-translated pairs like: apple - olma`}
+            placeholder={t.libraryPage.wordsInputPlaceholder}
             rows={4}
             className="w-full px-3 py-2.5 rounded-xl bg-[var(--surface-2)] text-[var(--text)] text-sm border border-[var(--border)] outline-none focus:border-[var(--primary)] resize-none"
           />
@@ -225,21 +194,21 @@ function ImportPageInner() {
             <button
               onClick={() => copyPrompt(false)}
               className="w-full py-2.5 rounded-xl text-sm font-semibold border border-[var(--primary)] text-[var(--primary)] hover:bg-[var(--primary-bg)] transition-colors"
-            >📋 Copy Prompt — just words, AI translates</button>
+            >{t.libraryPage.copyPromptWordsOnly}</button>
             <button
               onClick={() => copyPrompt(true)}
               className="w-full py-2.5 rounded-xl text-sm font-semibold border border-[var(--border)] text-[var(--text-muted)] hover:bg-[var(--surface-2)] transition-colors"
-            >📋 Copy Prompt — I already have translations</button>
+            >{t.libraryPage.copyPromptWithTranslations}</button>
           </div>
         </div>
 
         {/* Paste area */}
         <div className="card space-y-2">
-          <p className="font-semibold text-sm text-[var(--text)]">2. Paste AI output</p>
+          <p className="font-semibold text-sm text-[var(--text)]">{t.libraryPage.pasteAiOutputStep}</p>
           <textarea
             value={pasted}
             onChange={e => setPasted(e.target.value)}
-            placeholder="Paste the AI response here..."
+            placeholder={t.libraryPage.pasteAiResponse}
             rows={8}
             className="w-full px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] resize-none font-mono"
           />
@@ -254,12 +223,12 @@ function ImportPageInner() {
               <div className="flex items-center gap-2 text-xs">
                 {parsed.length > 0 && (
                   <span className="px-2 py-0.5 rounded-full font-semibold" style={{ background: 'rgba(16,185,129,0.12)', color: 'var(--success)' }}>
-                    ✓ {parsed.length} ready
+                    {t.import.readyCount(parsed.length)}
                   </span>
                 )}
                 {parseResult.errors.length > 0 && (
                   <span className="px-2 py-0.5 rounded-full font-semibold" style={{ background: 'rgba(239,68,68,0.1)', color: '#DC2626' }}>
-                    ✕ {parseResult.errors.length} failed
+                    {t.import.failedCount(parseResult.errors.length)}
                   </span>
                 )}
               </div>
@@ -269,15 +238,15 @@ function ImportPageInner() {
             {parseResult.errors.length > 0 && (
               <div className="rounded-xl border border-red-200 bg-red-50 dark:bg-red-900/10 dark:border-red-800 p-3 space-y-2">
                 <p className="text-xs font-semibold text-red-700 dark:text-red-400">
-                  {parseResult.errors.length} block{parseResult.errors.length > 1 ? 's' : ''} could not be parsed:
+                  {t.import.blocksCouldNotBeParsed(parseResult.errors.length)}
                 </p>
                 {parseResult.errors.map(e => (
                   <div key={e.index} className="text-xs text-red-600 dark:text-red-400">
-                    <span className="font-semibold">Block {e.index}:</span> {e.reason}
+                    <span className="font-semibold">{t.import.blockLabel(e.index)}</span> {e.reason}
                     {e.preview && <span className="block text-red-400 font-mono mt-0.5 truncate">"{e.preview}…"</span>}
                   </div>
                 ))}
-                <p className="text-xs text-red-500 mt-1">Make sure each block has <code className="bg-red-100 dark:bg-red-900/30 px-1 rounded">word:</code> and <code className="bg-red-100 dark:bg-red-900/30 px-1 rounded">translation:</code> fields, separated by <code className="bg-red-100 dark:bg-red-900/30 px-1 rounded">---</code></p>
+                <p className="text-xs text-red-500 mt-1">{t.import.parseErrorHintPrefix} <code className="bg-red-100 dark:bg-red-900/30 px-1 rounded">word:</code> {t.import.parseErrorHintAnd} <code className="bg-red-100 dark:bg-red-900/30 px-1 rounded">translation:</code> {t.import.parseErrorHintFields} <code className="bg-red-100 dark:bg-red-900/30 px-1 rounded">---</code></p>
               </div>
             )}
 
@@ -328,7 +297,7 @@ function ImportPageInner() {
       {/* Copy toast */}
       {copied && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl text-sm font-semibold text-white shadow-xl pointer-events-none" style={{ background: 'var(--primary)' }}>
-          📋 Prompt copied — paste into an AI chatbot
+          {t.libraryPage.promptCopiedToast}
         </div>
       )}
     </div>

@@ -1,8 +1,10 @@
 'use client';
 import { useEffect } from 'react';
 import { useAppStore } from '@/lib/store';
+import { useTranslation } from '@/lib/useTranslation';
 
 export default function AchievementToast() {
+  const t = useTranslation();
   const { pendingAchievements, popAchievement } = useAppStore();
   const current = pendingAchievements[0];
 
@@ -20,7 +22,7 @@ export default function AchievementToast() {
         style={{ boxShadow: '0 8px 32px rgba(108,99,255,0.2)' }}>
         <span className="text-3xl">{current.icon}</span>
         <div>
-          <div className="text-xs font-semibold text-[var(--primary)] uppercase tracking-wider">Achievement Unlocked!</div>
+          <div className="text-xs font-semibold text-[var(--primary)] uppercase tracking-wider">{t.achievementsPage.unlockedToast}</div>
           <div className="font-bold text-[var(--text)]">{current.title}</div>
           <div className="text-xs text-[var(--text-muted)]">{current.description}</div>
         </div>

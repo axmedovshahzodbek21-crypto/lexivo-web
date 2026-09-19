@@ -10,12 +10,6 @@ const ARC_C = 2 * Math.PI * ARC_R;
 const RING_R = 90;
 const RING_C = 2 * Math.PI * RING_R;
 
-const PRESETS = [
-  { label: 'Classic',   emoji: '🍅', work: 25, break: 5  },
-  { label: 'Deep Work', emoji: '🧠', work: 50, break: 10 },
-  { label: 'Quick',     emoji: '⚡', work: 15, break: 3  },
-];
-
 function fmt(s: number) {
   const m = Math.floor(s / 60);
   const sec = s % 60;
@@ -30,11 +24,18 @@ export default function PomodoroPage() {
     startPomodoro, pausePomodoro, resumePomodoro, resetPomodoro, skipPomodoro, setPomSettings,
   } = useAppStore();
 
+  const PRESETS = [
+    { label: t.pomodoro.presetClassic,  emoji: '🍅', work: 25, break: 5  },
+    { label: t.pomodoro.presetDeepWork, emoji: '🧠', work: 50, break: 10 },
+    { label: t.pomodoro.presetQuick,    emoji: '⚡', work: 15, break: 3  },
+  ];
+
   const [selectedPreset, setSelectedPreset] = useState<number | null>(0);
 
   useEffect(() => {
     const idx = PRESETS.findIndex(p => p.work === pomWorkMins && p.break === pomBreakMins);
     setSelectedPreset(idx >= 0 ? idx : null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const isIdle = pomPhase === 'idle';
@@ -102,7 +103,7 @@ export default function PomodoroPage() {
                     <span style={{ color: 'var(--primary)' }}>{pomWorkMins}</span>
                     <span style={{ color: 'var(--success)', fontSize: 18 }}>+{pomBreakMins}</span>
                   </div>
-                  <div className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>min cycle</div>
+                  <div className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>{t.pomodoro.minCycle}</div>
                 </div>
               </div>
 
@@ -110,11 +111,11 @@ export default function PomodoroPage() {
               <div className="flex items-center gap-5">
                 <div className="flex items-center gap-1.5">
                   <div className="w-2 h-2 rounded-full" style={{ background: 'var(--primary)' }} />
-                  <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Focus</span>
+                  <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{t.pomodoro.focus}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <div className="w-2 h-2 rounded-full" style={{ background: 'var(--success)' }} />
-                  <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Break</span>
+                  <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{t.pomodoro.break}</span>
                 </div>
               </div>
             </div>
@@ -154,7 +155,7 @@ export default function PomodoroPage() {
               >
                 <span style={{ fontSize: 18 }}>⚙️</span>
                 <span className="text-[10px] font-semibold mt-1" style={{ color: selectedPreset === null ? 'var(--primary)' : 'var(--text-muted)' }}>
-                  Custom
+                  {t.pomodoro.presetCustom}
                 </span>
               </button>
             </div>
@@ -162,9 +163,9 @@ export default function PomodoroPage() {
             {/* Custom sliders */}
             {selectedPreset === null && (
               <div className="w-full space-y-3 animate-fade-in">
-                <PomSliderRow label="Focus" value={pomWorkMins} min={5} max={60} step={5} color="var(--primary)"
+                <PomSliderRow label={t.pomodoro.focus} value={pomWorkMins} min={5} max={60} step={5} color="var(--primary)"
                   onChange={v => setPomSettings(v, pomBreakMins)} />
-                <PomSliderRow label="Break" value={pomBreakMins} min={1} max={20} step={1} color="var(--success)"
+                <PomSliderRow label={t.pomodoro.break} value={pomBreakMins} min={1} max={20} step={1} color="var(--success)"
                   onChange={v => setPomSettings(pomWorkMins, v)} />
               </div>
             )}
@@ -176,7 +177,7 @@ export default function PomodoroPage() {
                 className="w-full py-4 rounded-2xl text-white font-bold text-base transition-all hover:opacity-90 active:scale-95"
                 style={{ background: 'var(--primary)' }}
               >
-                Start Focusing
+                {t.pomodoro.startFocusing}
               </button>
             </div>
           </>
@@ -201,7 +202,7 @@ export default function PomodoroPage() {
                     className="text-[11px] font-semibold uppercase tracking-widest"
                     style={{ color: ringColor }}
                   >
-                    {pomPhase === 'work' ? 'Focus' : 'Break'}
+                    {pomPhase === 'work' ? t.pomodoro.focus : t.pomodoro.break}
                   </div>
                   <div
                     className="font-bold tabular-nums"
@@ -210,7 +211,7 @@ export default function PomodoroPage() {
                     {fmt(pomSecondsLeft)}
                   </div>
                   <div className="text-xs" style={{ color: 'var(--text-muted)' }}>
-                    {pomRunning ? 'running' : 'paused'}
+                    {pomRunning ? t.pomodoro.running : t.pomodoro.paused}
                   </div>
                 </div>
               </div>
@@ -248,7 +249,7 @@ export default function PomodoroPage() {
                 ))}
                 {pomSessions > 0 && (
                   <span className="text-xs ml-1" style={{ color: 'var(--text-muted)' }}>
-                    {pomSessions} done
+                    {t.pomodoro.sessionsDone.replace('{n}', String(pomSessions))}
                   </span>
                 )}
               </div>
@@ -261,7 +262,7 @@ export default function PomodoroPage() {
                 className="w-full py-3 rounded-2xl text-sm font-semibold transition-all hover:opacity-80"
                 style={{ background: 'var(--surface-2)', color: 'var(--text-muted)' }}
               >
-                Stop Timer
+                {t.pomodoro.stopTimer}
               </button>
             </div>
           </>

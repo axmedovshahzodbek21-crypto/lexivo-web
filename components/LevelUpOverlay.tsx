@@ -1,6 +1,7 @@
 ﻿'use client';
 import { useEffect, useRef } from 'react';
 import { useAppStore } from '@/lib/store';
+import { useTranslation } from '@/lib/useTranslation';
 
 const LEVEL_META: Record<string, { icon: string; color: string; bg: string }> = {
   'Beginner':            { icon: '🌱', color: 'var(--success)', bg: '#d1fae5' },
@@ -46,6 +47,7 @@ function Confetti() {
 }
 
 export default function LevelUpOverlay() {
+  const t = useTranslation();
   const { pendingLevelUp, clearLevelUp } = useAppStore();
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -111,9 +113,9 @@ export default function LevelUpOverlay() {
 
           {/* "LEVEL UP!" */}
           <p className="text-xs font-bold tracking-widest uppercase text-[var(--text-muted)] mb-1">
-            Achievement Unlocked
+            {t.levelUp.achievementUnlocked}
           </p>
-          <h2 className="shimmer-text text-4xl font-black mb-2">LEVEL UP!</h2>
+          <h2 className="shimmer-text text-4xl font-black mb-2">{t.levelUp.levelUp}</h2>
 
           {/* New level name */}
           <div
@@ -125,7 +127,7 @@ export default function LevelUpOverlay() {
 
           {/* XP milestone */}
           <p className="text-sm font-medium mb-6" style={{ color: meta.color }}>
-            {pendingLevelUp.xp} XP total
+            {t.levelUp.xpTotal(pendingLevelUp.xp)}
           </p>
 
           <button
@@ -133,10 +135,10 @@ export default function LevelUpOverlay() {
             className="w-full py-3 rounded-xl font-bold text-white transition-all hover:opacity-90 active:scale-95"
             style={{ background: meta.color }}
           >
-            Let's keep going! 🚀
+            {t.levelUp.keepGoing}
           </button>
 
-          <p className="text-xs text-[var(--text-muted)] mt-3">Tap anywhere to dismiss</p>
+          <p className="text-xs text-[var(--text-muted)] mt-3">{t.levelUp.tapToDismiss}</p>
         </div>
       </div>
     </>

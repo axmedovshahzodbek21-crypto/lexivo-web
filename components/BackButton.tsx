@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from '@/lib/useTranslation';
 
 interface BackButtonProps {
   href?: string;
@@ -9,8 +10,10 @@ interface BackButtonProps {
   onClick?: () => void;
 }
 
-export default function BackButton({ href, label = 'Back', className = 'mb-6', onClick }: BackButtonProps) {
+export default function BackButton({ href, label, className = 'mb-6', onClick }: BackButtonProps) {
   const router = useRouter();
+  const t = useTranslation();
+  const resolvedLabel = label ?? t.common.backLabel;
 
   const inner = (
     <span
@@ -23,7 +26,7 @@ export default function BackButton({ href, label = 'Back', className = 'mb-6', o
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ marginRight: -2 }}>
         <path d="M10 3L5 8L10 13" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
-      {label}
+      {resolvedLabel}
     </span>
   );
 

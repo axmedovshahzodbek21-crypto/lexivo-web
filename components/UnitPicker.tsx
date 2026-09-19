@@ -4,9 +4,11 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
 import { getUnitProgress } from '@/lib/storage';
+import { useTranslation } from '@/lib/useTranslation';
 import type { UnitProgress, WordCollection } from '@/lib/types';
 
 type Mode = 'learn' | 'flashcards' | 'quiz' | 'match';
+type Translations = ReturnType<typeof useTranslation>;
 
 // The matching game lives at /matching, not /match — every other mode's
 // route matches its name, so this is the one exception when building hrefs.
@@ -14,21 +16,23 @@ const ROUTE_PATH: Record<Mode, string> = {
   learn: '/learn', flashcards: '/flashcards', quiz: '/quiz', match: '/matching',
 };
 
-const MODE_CONFIG: Record<Mode, {
+function getModeConfig(t: Translations): Record<Mode, {
   label: string; icon: string; color: string; desc: string; requires?: Mode;
   // Non-learn modes tint every collection card with the mode's own color instead
   // of each collection's individual color, so the whole screen reads as
   // "this is Flashcards mode" rather than looking identical to Learn.
   cardGradient?: string; cardEdge?: string; cardGlow?: string;
-}> = {
-  learn:      { label: 'Learn',      icon: '📖', color: '#4338CA', desc: 'Study new words, one at a time' },
-  flashcards: { label: 'Flashcards', icon: '🃏', color: '#D97706', desc: "Drill words you've already learned", requires: 'learn',
-    cardGradient: 'linear-gradient(135deg, #b45309, #fcd34d)', cardEdge: '#78350f', cardGlow: 'rgba(180,83,9,0.45)' },
-  quiz:       { label: 'Quiz',       icon: '❓', color: '#65A30D', desc: 'Test what you remember', requires: 'flashcards',
-    cardGradient: 'linear-gradient(135deg, #4d7c0f, #a3e635)', cardEdge: '#365314', cardGlow: 'rgba(77,124,15,0.45)' },
-  match:      { label: 'Matching',   icon: '🎯', color: '#EC4899', desc: 'Pair up the words', requires: 'learn',
-    cardGradient: 'linear-gradient(135deg, #db2777, #f472b6)', cardEdge: '#9d174d', cardGlow: 'rgba(219,39,119,0.45)' },
-};
+}> {
+  return {
+    learn:      { label: t.nav.learn,      icon: '📖', color: '#4338CA', desc: t.unitPicker.descLearn },
+    flashcards: { label: t.nav.flashcards, icon: '🃏', color: '#D97706', desc: t.unitPicker.descFlashcards, requires: 'learn',
+      cardGradient: 'linear-gradient(135deg, #b45309, #fcd34d)', cardEdge: '#78350f', cardGlow: 'rgba(180,83,9,0.45)' },
+    quiz:       { label: t.nav.quiz,       icon: '❓', color: '#65A30D', desc: t.unitPicker.descQuiz, requires: 'flashcards',
+      cardGradient: 'linear-gradient(135deg, #4d7c0f, #a3e635)', cardEdge: '#365314', cardGlow: 'rgba(77,124,15,0.45)' },
+    match:      { label: t.nav.matching,   icon: '🎯', color: '#EC4899', desc: t.unitPicker.descMatch, requires: 'learn',
+      cardGradient: 'linear-gradient(135deg, #db2777, #f472b6)', cardEdge: '#9d174d', cardGlow: 'rgba(219,39,119,0.45)' },
+  };
+}
 
 function isLocked(mode: Mode, p: UnitProgress): boolean {
   if (mode === 'flashcards') return !p.learnDone;
@@ -45,10 +49,10 @@ function isDone(mode: Mode, p: UnitProgress): boolean {
   return false;
 }
 
-function lockLabel(mode: Mode): string {
-  if (mode === 'flashcards') return 'Complete Learn first';
-  if (mode === 'quiz')       return 'Complete Flashcards first';
-  if (mode === 'match')      return 'Complete Learn first';
+function lockLabel(mode: Mode, t: Translations): string {
+  if (mode === 'flashcards') return t.unitPicker.completeFirst(t.nav.learn);
+  if (mode === 'quiz')       return t.unitPicker.completeFirst(t.nav.flashcards);
+  if (mode === 'match')      return t.unitPicker.completeFirst(t.nav.learn);
   return '';
 }
 
@@ -78,9 +82,11 @@ function UnitList({
 }: {
   mode: Mode;
   col: WordCollection;
-  cfg: typeof MODE_CONFIG[Mode];
+  cfg: ReturnType<typeof getModeConfig>[Mode];
   onBack: () => void;
 }) {
+  const t = useTranslation();
+  const modeConfig = getModeConfig(t);
   return (
     <div className="p-4 animate-fade-in pb-24">
       {/* Mode banner */}
@@ -88,14 +94,14 @@ function UnitList({
         style={{ background: `${cfg.color}18`, border: `1px solid ${cfg.color}40` }}>
         <span className="text-xl">{cfg.icon}</span>
         <div>
-          <p className="text-[10px] font-black uppercase tracking-wide" style={{ color: cfg.color }}>{cfg.label} mode</p>
+          <p className="text-[10px] font-black uppercase tracking-wide" style={{ color: cfg.color }}>{t.unitPicker.modeLabel(cfg.label)}</p>
           <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>{cfg.desc}</p>
           {cfg.requires && (
             <p className="text-[11px] mt-0.5 flex items-center gap-1" style={{ color: 'var(--text-muted)' }}>
-              🔒 <span>Units unlock after you complete{' '}
+              🔒 <span>{t.unitPicker.unlockHintPrefix}{' '}
                 <Link href={ROUTE_PATH[cfg.requires]} className="underline font-bold" style={{ color: cfg.color }}>
-                  {MODE_CONFIG[cfg.requires].label}
-                </Link>{' '}for them</span>
+                  {modeConfig[cfg.requires].label}
+                </Link>{' '}{t.unitPicker.unlockHintSuffix}</span>
             </p>
           )}
         </div>
@@ -103,11 +109,11 @@ function UnitList({
 
       {/* Header */}
       <div className="flex items-center gap-3 pt-2 mb-5">
-        <button onClick={onBack} className="btn-icon text-lg" aria-label="Go back">←</button>
+        <button onClick={onBack} className="btn-icon text-lg" aria-label={t.unitPicker.goBack}>←</button>
         <div className="min-w-0">
           <p className="text-xs text-[var(--text-muted)] truncate">{col.name}</p>
           <h1 className="text-lg font-bold text-[var(--text)] leading-tight">
-            {cfg.icon} Pick a unit to {cfg.label.toLowerCase()}
+            {cfg.icon} {t.unitPicker.pickUnitTo(cfg.label.toLowerCase())}
           </h1>
         </div>
       </div>
@@ -126,7 +132,7 @@ function UnitList({
             return (
               <div
                 key={day.dayNumber}
-                title={lockLabel(mode)}
+                title={lockLabel(mode, t)}
                 style={{
                   borderRadius: 20,
                   background: 'var(--surface)',
@@ -153,10 +159,10 @@ function UnitList({
                 <span style={{ fontSize: 20 }}>🔒</span>
                 <div>
                   <p style={{ fontSize: 11, fontWeight: 900, color: 'var(--text-muted)', lineHeight: 1.2 }}>
-                    Unit {day.dayNumber}
+                    {t.unitPicker.unitNumber(day.dayNumber)}
                   </p>
                   <p style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 3 }}>
-                    {lockLabel(mode)}
+                    {lockLabel(mode, t)}
                   </p>
                 </div>
               </div>
@@ -216,7 +222,7 @@ function UnitList({
                     color: 'rgba(255,255,255,0.65)',
                     textTransform: 'uppercase', letterSpacing: '0.1em',
                     marginBottom: 3,
-                  }}>Unit {day.dayNumber}</p>
+                  }}>{t.unitPicker.unitNumber(day.dayNumber)}</p>
                   <p style={{
                     fontSize: 12, fontWeight: 900, color: '#fff',
                     lineHeight: 1.25, marginBottom: 8,
@@ -235,7 +241,7 @@ function UnitList({
                       background: 'rgba(0,0,0,0.22)',
                       borderRadius: 6, padding: '2px 8px',
                     }}>
-                      {day.words.length} words
+                      {t.unitPicker.wordsCount(day.words.length)}
                     </span>
                     {(done || fullyDone) && (
                       <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.95)', fontWeight: 900 }}>✓</span>
@@ -266,7 +272,9 @@ const COLLECTION_META: Record<string, { icon: string; gradient: string; edge: st
 export default function UnitPicker({ mode }: { mode: Mode }) {
   const router = useRouter();
   const { collections, collectionsLoaded } = useAppStore();
-  const cfg = MODE_CONFIG[mode];
+  const t = useTranslation();
+  const modeConfig = getModeConfig(t);
+  const cfg = modeConfig[mode];
   const [selectedCollection, setSelectedCollection] = useState<string | null>(null);
 
   if (!collectionsLoaded) {
@@ -298,14 +306,14 @@ export default function UnitPicker({ mode }: { mode: Mode }) {
         style={{ background: `${cfg.color}18`, border: `1px solid ${cfg.color}40` }}>
         <span className="text-xl">{cfg.icon}</span>
         <div>
-          <p className="text-[10px] font-black uppercase tracking-wide" style={{ color: cfg.color }}>{cfg.label} mode</p>
+          <p className="text-[10px] font-black uppercase tracking-wide" style={{ color: cfg.color }}>{t.unitPicker.modeLabel(cfg.label)}</p>
           <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>{cfg.desc}</p>
           {cfg.requires && (
             <p className="text-[11px] mt-0.5 flex items-center gap-1" style={{ color: 'var(--text-muted)' }}>
-              🔒 <span>Units unlock after you complete{' '}
+              🔒 <span>{t.unitPicker.unlockHintPrefix}{' '}
                 <Link href={ROUTE_PATH[cfg.requires]} className="underline font-bold" style={{ color: cfg.color }}>
-                  {MODE_CONFIG[cfg.requires].label}
-                </Link>{' '}for them</span>
+                  {modeConfig[cfg.requires].label}
+                </Link>{' '}{t.unitPicker.unlockHintSuffix}</span>
             </p>
           )}
         </div>
@@ -313,9 +321,9 @@ export default function UnitPicker({ mode }: { mode: Mode }) {
 
       {/* Header */}
       <div className="flex items-center gap-3 pt-2 mb-5">
-        <button onClick={() => router.back()} className="btn-icon" aria-label="Go back">←</button>
+        <button onClick={() => router.back()} className="btn-icon" aria-label={t.unitPicker.goBack}>←</button>
         <h1 className="text-xl font-bold text-[var(--text)]">
-          {cfg.icon} Choose a collection
+          {cfg.icon} {t.unitPicker.chooseCollection}
         </h1>
       </div>
 
@@ -362,7 +370,7 @@ export default function UnitPicker({ mode }: { mode: Mode }) {
                 </div>
                 <div style={{ textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>
                   <p className="font-black text-white text-sm leading-snug">{col.name}</p>
-                  <p className="text-white/80 text-xs mt-0.5">{totalUnits} units · {totalWords} words</p>
+                  <p className="text-white/80 text-xs mt-0.5">{t.unitPicker.unitsAndWordsCount(totalUnits, totalWords)}</p>
                 </div>
                 <div className="mt-auto">
                   <div className="h-1.5 rounded-full bg-white/30 overflow-hidden">
@@ -372,7 +380,7 @@ export default function UnitPicker({ mode }: { mode: Mode }) {
                     />
                   </div>
                   <p className="text-white/80 text-[11px] font-semibold mt-1">
-                    {allDone ? 'Complete ✓' : `${modeDoneCount} / ${totalUnits}`}
+                    {allDone ? t.unitPicker.complete : `${modeDoneCount} / ${totalUnits}`}
                   </p>
                 </div>
               </div>

@@ -4,6 +4,7 @@ import { getLevelInfo } from '@/lib/gamification';
 import { LEVEL_THRESHOLDS } from '@/lib/types';
 import { displayXP, fetchXPHistory, getXPByDate, type XpEntry } from '@/lib/storage';
 import { REASON_ICON as REASON_ICONS } from '@/lib/xp-reason-icons';
+import { useTranslation } from '@/lib/useTranslation';
 import XpCalendar from './XpCalendar';
 import XpHistoryModal from './XpHistoryModal';
 
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export default function XpModal({ xp, onClose }: Props) {
+  const t = useTranslation();
   const [peekLevel, setPeekLevel] = useState<string | null>(null);
   const [history, setHistory] = useState<XpEntry[]>([]);
   const [xpByDate, setXpByDate] = useState<Record<string, number>>({});
@@ -52,11 +54,11 @@ export default function XpModal({ xp, onClose }: Props) {
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Your Level</p>
+              <p className="text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>{t.xpModal.yourLevel}</p>
               <h3 className="text-2xl font-black mt-0.5" style={{ color: 'var(--text)' }}>⭐ {levelInfo.level}</h3>
             </div>
             <div className="text-right">
-              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Total XP</p>
+              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{t.xpModal.totalXp}</p>
               <p className="text-3xl font-black" style={{ color: 'var(--primary)' }}>{displayXP(xp)}</p>
             </div>
           </div>
@@ -91,7 +93,7 @@ export default function XpModal({ xp, onClose }: Props) {
                   className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold transition-colors hover:opacity-80"
                   style={{ background: 'var(--surface)', color: 'var(--primary)' }}
                 >
-                  📅 XP history
+                  {t.xpModal.xpHistoryButton}
                 </button>
               </div>
               <div className="text-center">
@@ -99,17 +101,17 @@ export default function XpModal({ xp, onClose }: Props) {
                   {displayXP(levelInfo.xpToNext)} XP
                 </p>
                 <p className="text-sm mt-0.5" style={{ color: 'var(--text-muted)' }}>
-                  to reach <strong style={{ color: 'var(--text)' }}>{levelInfo.next}</strong>
+                  {t.xpModal.toReach} <strong style={{ color: 'var(--text)' }}>{levelInfo.next}</strong>
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-2 text-center border-t pt-3" style={{ borderColor: 'var(--border)' }}>
                 <div className="rounded-xl py-2 px-3" style={{ background: 'var(--surface-2)' }}>
                   <p className="text-lg font-black" style={{ color: 'var(--text)' }}>{Math.ceil(levelInfo.xpToNext / 10)}</p>
-                  <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>words to learn</p>
+                  <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>{t.xpModal.wordsToLearn}</p>
                 </div>
                 <div className="rounded-xl py-2 px-3" style={{ background: 'var(--surface-2)' }}>
                   <p className="text-lg font-black" style={{ color: 'var(--text)' }}>{Math.ceil(levelInfo.xpToNext / 7)}</p>
-                  <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>Day 7 reviews</p>
+                  <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>{t.xpModal.day7Reviews}</p>
                 </div>
               </div>
             </div>
@@ -121,12 +123,12 @@ export default function XpModal({ xp, onClose }: Props) {
                   className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold transition-colors hover:opacity-80"
                   style={{ background: 'var(--surface)', color: 'var(--primary)' }}
                 >
-                  📅 XP history
+                  {t.xpModal.xpHistoryButton}
                 </button>
               </div>
               <p className="text-3xl mb-1">🏆</p>
-              <p className="font-bold" style={{ color: 'var(--primary)' }}>Legend Level reached!</p>
-              <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>You&apos;ve conquered all levels.</p>
+              <p className="font-bold" style={{ color: 'var(--primary)' }}>{t.xpModal.legendReached}</p>
+              <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{t.xpModal.conqueredAllLevels}</p>
             </div>
           )}
 
@@ -135,19 +137,19 @@ export default function XpModal({ xp, onClose }: Props) {
           {/* Level ladder */}
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--text-muted)' }}>
-              XP to reach each level
+              {t.xpModal.xpToReachEachLevel}
             </p>
             <div className="space-y-1">
-              {LEVEL_THRESHOLDS.map((t, i) => {
-                const isCurrentLevel = t.level === levelInfo.level;
-                const isPast   = xp > t.max && t.max !== Infinity;
+              {LEVEL_THRESHOLDS.map((lvl, i) => {
+                const isCurrentLevel = lvl.level === levelInfo.level;
+                const isPast   = xp > lvl.max && lvl.max !== Infinity;
                 const isFuture = !isPast && !isCurrentLevel;
-                const isPeeked = peekLevel === t.level;
-                const xpNeeded = Math.max(0, t.min - xp);
+                const isPeeked = peekLevel === lvl.level;
+                const xpNeeded = Math.max(0, lvl.min - xp);
                 return (
-                  <div key={t.level}>
+                  <div key={lvl.level}>
                     <button
-                      onClick={() => isFuture && setPeekLevel(isPeeked ? null : t.level)}
+                      onClick={() => isFuture && setPeekLevel(isPeeked ? null : lvl.level)}
                       className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl transition-all text-left ${
                         isFuture ? 'cursor-pointer' : 'cursor-default'
                       }`}
@@ -171,18 +173,18 @@ export default function XpModal({ xp, onClose }: Props) {
                       <div className="flex-1">
                         <div className="flex items-center gap-1.5">
                           <span className="text-sm font-semibold" style={{ color: isCurrentLevel ? 'var(--primary)' : 'var(--text)' }}>
-                            {t.level}
+                            {lvl.level}
                           </span>
                           {isCurrentLevel && (
                             <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
                               style={{ color: 'var(--primary)', background: 'color-mix(in srgb, var(--primary) 12%, transparent)' }}>
-                              You
+                              {t.xpModal.youBadge}
                             </span>
                           )}
                         </div>
                         {isFuture && (
                           <p className="text-[10px] mt-0.5" style={{ color: 'var(--text-muted)' }}>
-                            {isPeeked ? 'tap to close' : 'tap to preview'}
+                            {isPeeked ? t.xpModal.tapToClose : t.xpModal.tapToPreview}
                           </p>
                         )}
                       </div>
@@ -190,7 +192,7 @@ export default function XpModal({ xp, onClose }: Props) {
                         <span className="text-[11px] font-semibold" style={{
                           color: isCurrentLevel ? 'var(--primary)' : isPast ? 'var(--success)' : 'var(--text-muted)'
                         }}>
-                          {displayXP(t.min)} XP
+                          {displayXP(lvl.min)} XP
                         </span>
                         {isFuture && (
                           <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{isPeeked ? '▲' : '▼'}</span>
@@ -203,19 +205,19 @@ export default function XpModal({ xp, onClose }: Props) {
                       <div className="mx-1 mb-1 px-3 py-3 rounded-xl space-y-2"
                         style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}>
                         <p className="text-xs font-bold" style={{ color: 'var(--text)' }}>
-                          To reach <span style={{ color: 'var(--primary)' }}>{t.level}</span>
+                          {t.xpModal.toReachLevel} <span style={{ color: 'var(--primary)' }}>{lvl.level}</span>
                         </p>
                         <p className="text-2xl font-black" style={{ color: 'var(--primary)' }}>
-                          {displayXP(xpNeeded)} more XP
+                          {displayXP(xpNeeded)} {t.xpModal.moreXp}
                         </p>
                         <div className="grid grid-cols-2 gap-2">
                           <div className="rounded-lg px-3 py-2 text-center" style={{ background: 'var(--surface)' }}>
                             <p className="text-base font-black" style={{ color: 'var(--text)' }}>{Math.ceil(xpNeeded / 10)}</p>
-                            <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>words to learn</p>
+                            <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{t.xpModal.wordsToLearn}</p>
                           </div>
                           <div className="rounded-lg px-3 py-2 text-center" style={{ background: 'var(--surface)' }}>
                             <p className="text-base font-black" style={{ color: 'var(--text)' }}>{Math.ceil(xpNeeded / 7)}</p>
-                            <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>Day 7 reviews</p>
+                            <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{t.xpModal.day7Reviews}</p>
                           </div>
                         </div>
                       </div>
@@ -245,7 +247,7 @@ export default function XpModal({ xp, onClose }: Props) {
                   </div>
                   {dayDetail.entries.length === 0 && (
                     <p className="text-[11px] text-center px-4 py-3" style={{ color: 'var(--text-muted)' }}>
-                      Detailed breakdown no longer available for this day — only recent activity is kept.
+                      {t.xpModal.detailedBreakdownUnavailable}
                     </p>
                   )}
                   {dayDetail.entries.map((e, j) => {
@@ -277,7 +279,7 @@ export default function XpModal({ xp, onClose }: Props) {
             className="w-full py-3 rounded-xl text-sm font-bold text-white"
             style={{ background: 'var(--primary)' }}
           >
-            Got it
+            {t.common.gotIt}
           </button>
         </div>
       </div>
