@@ -23,6 +23,7 @@ const CARD_COLORS = [
 const allTopics = ['All', ...Array.from(new Set(readingPassages.map(p => p.topic))).sort()];
 
 function PassageCardTile({ passage, visited, onClick, large }: { passage: ReadingPassage; visited?: boolean; onClick?: () => void; large?: boolean }) {
+  const t = useTranslation();
   const { color, light, dark } = CARD_COLORS[(passage.id - 1) % CARD_COLORS.length];
   const numStr = String(passage.id).padStart(2, '0');
   return (
@@ -92,7 +93,7 @@ function PassageCardTile({ passage, visited, onClick, large }: { passage: Readin
               background: 'rgba(0,0,0,0.22)',
               borderRadius: 6, padding: '2px 8px',
             }}>
-              {passage.questions.length} Q
+              {t.readingPage.questionCount(passage.questions.length)}
             </span>
           ) : <span />}
           {onClick && <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: 14 }}>›</span>}
@@ -107,6 +108,7 @@ type Tooltip = { text: string; x: number; y: number };
 const storageKey = (id: number) => `lexivo_collected_${id}`;
 
 function PassageView({ passage, onBack }: { passage: ReadingPassage; onBack: () => void }) {
+  const t = useTranslation();
   const [revealed, setRevealed] = useState<Set<number>>(new Set());
   const [collected, setCollected] = useState<string[]>(() => {
     try { return JSON.parse(localStorage.getItem(storageKey(passage.id)) ?? '[]'); }
@@ -171,7 +173,7 @@ function PassageView({ passage, onBack }: { passage: ReadingPassage; onBack: () 
             className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full shadow-lg"
             style={{ background: 'var(--primary)', color: 'white' }}
           >
-            + Collect
+            {t.readingPage.collectButton}
           </button>
           <div className="flex justify-center">
             <div className="w-2 h-2 rotate-45 -mt-1" style={{ background: 'var(--primary)' }} />
@@ -179,7 +181,7 @@ function PassageView({ passage, onBack }: { passage: ReadingPassage; onBack: () 
         </div>
       )}
 
-      <BackButton label="Back to Library" className="mb-6" onClick={onBack} />
+      <BackButton label={t.readingPage.backToLibrary} className="mb-6" onClick={onBack} />
 
       <span
         className="inline-block text-xs font-bold px-3 py-1 rounded-full mb-4"
@@ -192,7 +194,7 @@ function PassageView({ passage, onBack }: { passage: ReadingPassage; onBack: () 
         {passage.title}
       </h1>
       <p className="text-xs mb-6" style={{ color: 'var(--text-muted)' }}>
-        Select any word or phrase to collect it
+        {t.readingPage.selectHint}
       </p>
 
       <div ref={contentRef} className="space-y-5 mb-10">
@@ -207,10 +209,10 @@ function PassageView({ passage, onBack }: { passage: ReadingPassage; onBack: () 
         <>
           <div className="border-t mb-8" style={{ borderColor: 'var(--border)' }} />
           <h2 className="text-lg font-black mb-1" style={{ color: 'var(--text)' }}>
-            Comprehension Questions
+            {t.readingPage.comprehensionQuestions}
           </h2>
           <p className="text-sm mb-6" style={{ color: 'var(--text-muted)' }}>
-            Think about your answer, then reveal the explanation.
+            {t.readingPage.comprehensionInstructions}
           </p>
           <div className="space-y-3">
             {passage.questions.map((q, i) => {
@@ -253,7 +255,7 @@ function PassageView({ passage, onBack }: { passage: ReadingPassage; onBack: () 
                       background: isRevealed ? 'var(--surface)' : 'var(--primary-bg)',
                     }}
                   >
-                    {isRevealed ? 'Hide explanation' : 'Show explanation'}
+                    {isRevealed ? t.readingPage.hideExplanation : t.readingPage.showExplanation}
                   </button>
                 </div>
               );
@@ -271,14 +273,14 @@ function PassageView({ passage, onBack }: { passage: ReadingPassage; onBack: () 
           <div className="max-w-2xl mx-auto">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-bold" style={{ color: 'var(--text-muted)' }}>
-                {collected.length} collected
+                {t.readingPage.collectedCount(collected.length)}
               </span>
               <button
                 onClick={copyAll}
                 className="text-xs font-bold px-3 py-1.5 rounded-xl transition-all"
                 style={{ background: 'var(--primary)', color: 'white' }}
               >
-                {copied ? '✓ Copied!' : 'Copy all'}
+                {copied ? t.readingPage.copied : t.readingPage.copyAll}
               </button>
             </div>
             <div className="flex flex-wrap gap-1.5">
@@ -439,7 +441,7 @@ export default function ReadingPage() {
           <div className="w-full max-w-xs flex flex-col items-center gap-4">
             <p className="text-sm font-bold uppercase tracking-wider text-white flex items-center gap-2">
               <span className="inline-block animate-spin" style={{ animationDuration: '0.9s' }}>🎲</span>
-              Finding something for you…
+              {t.readingPage.findingSomething}
             </p>
             <div className="w-full">
               <PassageCardTile passage={surpriseShown} large />
@@ -452,11 +454,11 @@ export default function ReadingPage() {
       <div className="flex items-end justify-between mb-8">
         <div>
           <p style={{ fontSize: 11, fontWeight: 900, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: 6 }}>
-            Explore · {readingPassages.length} passages
+            {t.readingPage.exploreCount(readingPassages.length)}
           </p>
-          <h1 style={{ fontSize: 40, fontWeight: 900, color: 'var(--text)', lineHeight: 1 }}>Ideas</h1>
+          <h1 style={{ fontSize: 40, fontWeight: 900, color: 'var(--text)', lineHeight: 1 }}>{t.readingPage.ideas}</h1>
           <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 8 }}>
-            Read, collect vocabulary, and answer comprehension questions.
+            {t.readingPage.subtitle}
           </p>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
@@ -474,7 +476,7 @@ export default function ReadingPage() {
                 whiteSpace: 'nowrap',
               }}
             >
-              🎲 Surprise Me
+              {t.readingPage.surpriseMe}
             </button>
             <Link
               href="/reading/free"
@@ -487,19 +489,19 @@ export default function ReadingPage() {
                 whiteSpace: 'nowrap',
               }}
             >
-              Free Read →
+              {t.readingPage.freeRead}
             </Link>
           </div>
           {visited.size > 0 && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                {unvisitedCount > 0 ? `${unvisitedCount} unread` : '🎉 All read!'}
+                {unvisitedCount > 0 ? t.readingPage.unreadCount(unvisitedCount) : t.readingPage.allRead}
               </span>
               <button
                 onClick={resetVisited}
                 style={{ fontSize: 11, color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
               >
-                Reset
+                {t.readingPage.reset}
               </button>
             </div>
           )}

@@ -108,7 +108,7 @@ function VideoCard({ video, index, wordCount, onClick }: {
           <span style={{
             fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.9)',
             background: 'rgba(0,0,0,0.22)', borderRadius: 6, padding: '2px 7px',
-          }}>{wordCount} words</span>
+          }}>{t.unitPicker.wordsCount(wordCount)}</span>
           {video.duration && (
             <span style={{
               fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.7)',
@@ -116,7 +116,7 @@ function VideoCard({ video, index, wordCount, onClick }: {
             }}>{video.duration}</span>
           )}
           {unlocked && (
-            <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.95)' }}>✓ Unlocked</span>
+            <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.95)' }}>✓ {t.realEnglishPage.unlockedBadge}</span>
           )}
         </div>
       </div>
@@ -170,13 +170,13 @@ export default function RealEnglishSetPage({ params }: { params: Promise<{ id: s
         onClick={() => router.back()}
         style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', marginBottom: 24 }}
       >
-        ← Real English
+        ← {t.nav.real_english}
       </button>
 
       {/* Editorial header */}
       <div style={{ marginBottom: 28 }}>
         <p style={{ fontSize: 11, fontWeight: 900, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: 6 }}>
-          Video Set · {set.videos.length} episodes
+          {t.realEnglishPage.videoSetEyebrow(set.videos.length)}
         </p>
         <h1 style={{ fontSize: 32, fontWeight: 900, color: 'var(--text)', lineHeight: 1.1 }}>{set.title}</h1>
       </div>

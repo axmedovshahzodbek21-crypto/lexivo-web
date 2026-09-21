@@ -50,9 +50,9 @@ export default function StructuresPage() {
     <div className="flex flex-col min-h-screen animate-fade-in">
       <div className="p-4 border-b border-[var(--border)]">
         <BackButton />
-        <h1 className="text-xl font-bold text-[var(--text)]">🧩 IELTS Structures</h1>
+        <h1 className="text-xl font-bold text-[var(--text)]">🧩 {t.structuresPage.title}</h1>
         <p className="text-sm text-[var(--text-muted)] mt-0.5">
-          {learnedIds.size} / {STRUCTURES.length} learned
+          {t.structuresPage.learnedProgress(learnedIds.size, STRUCTURES.length)}
         </p>
 
         <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mt-4 mb-1.5">{t.structuresPage.learnByUnit}</p>
@@ -67,7 +67,7 @@ export default function StructuresPage() {
               >
                 <span className="text-2xl">{UNIT_ICONS[unit]}</span>
                 <span className="text-xs font-semibold text-[var(--text)]">{unit}</span>
-                <span className="text-[10px] text-[var(--text-muted)]">{c.learned}/{c.total} learned</span>
+                <span className="text-[10px] text-[var(--text-muted)]">{t.structuresPage.learnedProgress(c.learned, c.total)}</span>
               </Link>
             );
           })}

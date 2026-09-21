@@ -34,7 +34,7 @@ export default function GrammarTipsPage() {
       {/* Header */}
       <div className="p-4 border-b border-[var(--border)]">
         <BackButton />
-        <h1 className="text-xl font-bold text-[var(--text)]">📚 Grammar Tips</h1>
+        <h1 className="text-xl font-bold text-[var(--text)]">📚 {t.grammarTipsPage.title}</h1>
         <p className="text-sm text-[var(--text-muted)] mt-0.5">
           {GRAMMAR_TIPS.length} tips across {TIP_CATEGORIES.length} categories
         </p>

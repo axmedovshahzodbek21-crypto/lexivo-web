@@ -16,11 +16,11 @@ export default function PassagePage({ params }: { params: Promise<{ passageId: s
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 pb-24">
-      <BackButton href="/ielts-reading" label="Back to Passages" className="mb-8" />
+      <BackButton href="/ielts-reading" label={t.ieltsPage.backToPassages} className="mb-8" />
 
       <div className="mb-10">
         <p className="text-[11px] font-black text-[var(--text-muted)] uppercase tracking-[0.15em] mb-1">{t.ieltsPage.title}</p>
-        <h1 className="text-4xl font-black text-[var(--text)] leading-none">Passage {passageId}</h1>
+        <h1 className="text-4xl font-black text-[var(--text)] leading-none">{t.ieltsPage.passageHeading(passageId)}</h1>
         <p className="text-sm text-[var(--text-muted)] mt-2">{t.ieltsPage.hoverToReveal}</p>
       </div>
 
@@ -109,7 +109,7 @@ export default function PassagePage({ params }: { params: Promise<{ passageId: s
                               marginBottom: '6px',
                             }}
                           >
-                            Test {n}
+                            {t.ieltsPage.testLabel(n)}
                           </p>
                           <p
                             style={{
@@ -127,11 +127,11 @@ export default function PassagePage({ params }: { params: Promise<{ passageId: s
                           </p>
                         </div>
                         <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '6px' }}>
-                          {test?.questions.length} questions · 20 min
+                          {t.ieltsPage.questionsCount(test?.questions.length ?? 0)}
                         </p>
                         {isHero && (
                           <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px', fontStyle: 'italic' }}>
-                            Hover to start →
+                            {t.ieltsPage.hoverToStart}
                           </p>
                         )}
                       </div>
@@ -173,7 +173,7 @@ export default function PassagePage({ params }: { params: Promise<{ passageId: s
                                 cursor: 'pointer',
                               }}
                             >
-                              📖 Review
+                              {t.ieltsPage.reviewButton}
                             </button>
                           </Link>
                           <Link href={`/ielts-reading/${passageId}/${n}?mode=test`} onClick={e => e.stopPropagation()}>
@@ -189,7 +189,7 @@ export default function PassagePage({ params }: { params: Promise<{ passageId: s
                                 cursor: 'pointer',
                               }}
                             >
-                              📝 Test
+                              {t.ieltsPage.testButton}
                             </button>
                           </Link>
                         </div>
@@ -210,7 +210,7 @@ export default function PassagePage({ params }: { params: Promise<{ passageId: s
                     }}
                   >
                     <div>
-                      <p style={{ fontSize: '9px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Test {n}</p>
+                      <p style={{ fontSize: '9px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{t.ieltsPage.testLabel(n)}</p>
                       <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>{t.ieltsPage.comingSoon}</p>
                     </div>
                   </div>

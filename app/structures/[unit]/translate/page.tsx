@@ -52,9 +52,9 @@ export default function UnitTranslatePage({ params }: { params: Promise<{ unit: 
     return (
       <div className="p-6 text-center flex flex-col items-center justify-center min-h-screen animate-fade-in">
         <div className="text-5xl mb-4">📭</div>
-        <h2 className="font-bold text-xl mb-2">Learn a few {unit} structures first</h2>
+        <h2 className="font-bold text-xl mb-2">{t.structuresPage.learnUnitStructuresFirst(unit)}</h2>
         <p className="text-sm text-[var(--text-muted)] mb-6">{t.structuresPage.translateIntro}</p>
-        <Link href={`/structures/${slug}/learn`} className="btn-primary inline-block">Learn {unit} →</Link>
+        <Link href={`/structures/${slug}/learn`} className="btn-primary inline-block">{t.structuresPage.learnUnitArrow(unit)}</Link>
       </div>
     );
   }
@@ -64,13 +64,13 @@ export default function UnitTranslatePage({ params }: { params: Promise<{ unit: 
     return (
       <div className="p-6 text-center flex flex-col items-center justify-center min-h-screen animate-fade-in">
         <div className="text-6xl mb-4">{done ? '🏆' : '✅'}</div>
-        <h2 className="text-2xl font-bold mb-2">{done ? "That's every sentence!" : 'Batch complete'}</h2>
+        <h2 className="text-2xl font-bold mb-2">{done ? t.structuresPage.everySentenceDone : t.structuresPage.batchComplete}</h2>
         <p className="text-[var(--text-muted)] mb-6">
-          {Math.min(progress, total)}/{total} sentences translated in {unit}
-          {!done && ' — come back next time for the next batch.'}
+          {t.structuresPage.sentencesTranslatedInUnit(Math.min(progress, total), total, unit)}
+          {!done && ' ' + t.structuresPage.comeBackNextBatch}
         </p>
         <div className="flex flex-col gap-3 w-full max-w-xs">
-          <Link href={`/structures/${slug}`} className="btn-primary text-center">Back to {unit}</Link>
+          <Link href={`/structures/${slug}`} className="btn-primary text-center">{t.structuresPage.backToUnit(unit)}</Link>
         </div>
       </div>
     );
@@ -96,7 +96,7 @@ export default function UnitTranslatePage({ params }: { params: Promise<{ unit: 
       <div className="flex items-center justify-between p-4">
         <button onClick={() => router.push(`/structures/${slug}`)} className="btn-icon" aria-label={t.structuresPage.goBack}>←</button>
         <div className="text-center">
-          <div className="font-semibold text-sm">Translate · {unit}</div>
+          <div className="font-semibold text-sm">{t.structuresPage.translateUnitTitle(unit)}</div>
           <div className="text-xs text-[var(--text-muted)]">{progress}/{total} done</div>
         </div>
         <div style={{ width: 32 }} />
@@ -107,7 +107,7 @@ export default function UnitTranslatePage({ params }: { params: Promise<{ unit: 
           const structure = sentence.structureId ? STRUCTURES.find(s => s.id === sentence.structureId) : undefined;
           return (
             <div key={sentence.id} className="card p-4 flex flex-col gap-3" style={{ borderLeft: '3px solid var(--primary)' }}>
-              <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">Sentence {i + 1} of {batch.length}</p>
+              <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">{t.structuresPage.sentenceXOfY(i + 1, batch.length)}</p>
               <p className="text-lg font-bold text-[var(--text)] leading-snug">{sentence.uz}</p>
               <textarea
                 value={attempts[i]}
@@ -121,7 +121,7 @@ export default function UnitTranslatePage({ params }: { params: Promise<{ unit: 
                   <p className="text-xs font-semibold text-[var(--primary)]">{t.structuresPage.modelAnswerCompare}</p>
                   <p className="text-sm font-semibold text-[var(--primary)]">{sentence.en}</p>
                   {structure && (
-                    <p className="text-xs text-[var(--text-muted)] pt-1">uses: {structure.pattern}</p>
+                    <p className="text-xs text-[var(--text-muted)] pt-1">{t.structuresPage.usesPattern(structure.pattern)}</p>
                   )}
                 </div>
               ) : (
@@ -129,7 +129,7 @@ export default function UnitTranslatePage({ params }: { params: Promise<{ unit: 
                   onClick={() => reveal(i)}
                   className="w-full py-2.5 rounded-xl border-2 border-dashed border-[var(--primary)] text-[var(--primary)] font-semibold text-sm hover:bg-[var(--primary-bg)] transition-colors"
                 >
-                  Show model answer
+                  {t.structuresPage.showModelAnswer}
                 </button>
               )}
             </div>
@@ -141,7 +141,7 @@ export default function UnitTranslatePage({ params }: { params: Promise<{ unit: 
           disabled={!allRevealed}
           className="btn-primary w-full disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          {allRevealed ? 'Done with this batch' : 'Check all sentences to continue'}
+          {allRevealed ? t.structuresPage.doneWithBatch : t.structuresPage.checkAllToContinue}
         </button>
       </div>
     </div>

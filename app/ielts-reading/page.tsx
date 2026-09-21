@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useState } from 'react';
+import { useTranslation } from '@/lib/useTranslation';
 
 const PASSAGES = [
   {
@@ -24,6 +25,7 @@ const PASSAGES = [
 ];
 
 function PassageCard({ passage, isHero }: { passage: typeof PASSAGES[0]; isHero?: boolean }) {
+  const t = useTranslation();
   const [flipped, setFlipped] = useState(false);
   const { id, num, color, light, dark, description, tests } = passage;
 
@@ -94,13 +96,13 @@ function PassageCard({ passage, isHero }: { passage: typeof PASSAGES[0]; isHero?
               fontSize: 10, fontWeight: 900, color: 'rgba(255,255,255,0.65)',
               textTransform: 'uppercase', letterSpacing: '0.14em', marginBottom: 8,
             }}>
-              IELTS Reading
+              {t.ieltsPage.title}
             </p>
             <p style={{
               fontSize: isHero ? 38 : 24, fontWeight: 900,
               color: '#fff', lineHeight: 1.1,
             }}>
-              Passage {id}
+              {t.ieltsPage.passageHeading(id)}
             </p>
             {isHero && (
               <p style={{
@@ -118,10 +120,10 @@ function PassageCard({ passage, isHero }: { passage: typeof PASSAGES[0]; isHero?
               background: 'rgba(0,0,0,0.2)', borderRadius: 8,
               padding: '4px 10px',
             }}>
-              {tests} tests
+              {t.ieltsPage.testsCount(tests)}
             </span>
             <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)' }}>
-              hover to begin →
+              {t.ieltsPage.hoverToBegin}
             </span>
           </div>
         </div>
@@ -144,7 +146,7 @@ function PassageCard({ passage, isHero }: { passage: typeof PASSAGES[0]; isHero?
           }}
         >
           <p style={{ fontSize: isHero ? 22 : 16, fontWeight: 900, color: 'var(--text)' }}>
-            Passage {id}
+            {t.ieltsPage.passageHeading(id)}
           </p>
           <p style={{ fontSize: 12, color: 'var(--text-muted)', textAlign: 'center', maxWidth: 200 }}>
             {description}
@@ -159,7 +161,7 @@ function PassageCard({ passage, isHero }: { passage: typeof PASSAGES[0]; isHero?
                 boxShadow: `0 4px 16px ${color}66`,
               }}
             >
-              Begin →
+              {t.ieltsPage.begin}
             </button>
           </Link>
         </div>
@@ -171,6 +173,7 @@ function PassageCard({ passage, isHero }: { passage: typeof PASSAGES[0]; isHero?
 const CDI_URL = 'https://ielts-cdi-mauve.vercel.app';
 
 function CdiAdCard({ onOpen }: { onOpen: () => void }) {
+  const t = useTranslation();
   return (
     <div
       onClick={onOpen}
@@ -203,13 +206,13 @@ function CdiAdCard({ onOpen }: { onOpen: () => void }) {
           fontSize: 10, fontWeight: 900, color: 'rgba(255,255,255,0.7)',
           textTransform: 'uppercase', letterSpacing: '0.14em', marginBottom: 8,
         }}>
-          New from Lexivo
+          {t.ieltsPage.newFromLexivo}
         </p>
         <p style={{ fontSize: 24, fontWeight: 900, color: '#fff', lineHeight: 1.15 }}>
-          Try IELTS Reading CDI
+          {t.ieltsPage.tryIeltsCdi}
         </p>
         <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', marginTop: 6, maxWidth: 340, lineHeight: 1.5 }}>
-          A companion tool that turns paper-based reading tests into an interactive digital format.
+          {t.ieltsPage.cdiDescription}
         </p>
       </div>
       <span style={{
@@ -218,13 +221,14 @@ function CdiAdCard({ onOpen }: { onOpen: () => void }) {
         background: 'rgba(0,0,0,0.25)', borderRadius: 10,
         padding: '8px 16px', whiteSpace: 'nowrap',
       }}>
-        Learn more →
+        {t.ieltsPage.learnMore}
       </span>
     </div>
   );
 }
 
 function CdiInfoModal({ onClose }: { onClose: () => void }) {
+  const t = useTranslation();
   return (
     <div
       onClick={onClose}
@@ -250,15 +254,13 @@ function CdiInfoModal({ onClose }: { onClose: () => void }) {
           fontSize: 10, fontWeight: 900, color: '#A855F7',
           textTransform: 'uppercase', letterSpacing: '0.14em', marginBottom: 8,
         }}>
-          IELTS Reading CDI
+          {t.ieltsPage.cdiModalEyebrow}
         </p>
         <p style={{ fontSize: 20, fontWeight: 900, color: 'var(--text)', lineHeight: 1.2, marginBottom: 12 }}>
-          Paper tests, reimagined for the computer-delivered format
+          {t.ieltsPage.cdiModalTitle}
         </p>
         <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: 24 }}>
-          IELTS CDI takes real paper-based IELTS Reading tests and rebuilds them as an
-          on-screen, computer-delivered experience — so you can practice the way the
-          actual CDI exam looks and feels, right in your browser.
+          {t.ieltsPage.cdiModalBody}
         </p>
         <div style={{ display: 'flex', gap: 10 }}>
           <button
@@ -270,7 +272,7 @@ function CdiInfoModal({ onClose }: { onClose: () => void }) {
               border: '2px solid var(--border, #333)', cursor: 'pointer',
             }}
           >
-            Maybe later
+            {t.ieltsPage.maybeLater}
           </button>
           <a
             href={CDI_URL}
@@ -287,7 +289,7 @@ function CdiInfoModal({ onClose }: { onClose: () => void }) {
                 boxShadow: '0 4px 16px rgba(124,58,237,0.5)',
               }}
             >
-              Open IELTS CDI →
+              {t.ieltsPage.openIeltsCdi}
             </button>
           </a>
         </div>
@@ -297,19 +299,20 @@ function CdiInfoModal({ onClose }: { onClose: () => void }) {
 }
 
 export default function IeltsReadingPage() {
+  const t = useTranslation();
   const [showCdiInfo, setShowCdiInfo] = useState(false);
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 pb-24">
       <div className="mb-10">
         <p style={{ fontSize: 11, fontWeight: 900, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: 6 }}>
-          Practice
+          {t.ieltsPage.practiceEyebrow}
         </p>
         <h1 style={{ fontSize: 40, fontWeight: 900, color: 'var(--text)', lineHeight: 1 }}>
-          IELTS Reading
+          {t.ieltsPage.title}
         </h1>
         <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 8 }}>
-          Choose a passage to begin. Each section has 30 practice tests.
+          {t.ieltsPage.chooseAPassage}
         </p>
       </div>
 

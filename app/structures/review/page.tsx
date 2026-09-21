@@ -106,14 +106,14 @@ export default function StructuresReviewPage() {
           <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center p-6">
             <div className="text-5xl">📭</div>
             <p className="font-semibold text-[var(--text)]">{t.structuresPage.noneInDeck}</p>
-            <p className="text-sm text-[var(--text-muted)]">Click "Learned" on structures in Discover to add them here.</p>
+            <p className="text-sm text-[var(--text-muted)]">{t.structuresPage.clickLearnedHint}</p>
           </div>
         ) : (
           <div className="flex-1 overflow-auto p-4 space-y-4">
             {learning.length > 0 && (
               <section>
                 <h2 className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-2">
-                  In Progress · {learning.length}
+                  {t.structuresPage.inProgressCount(learning.length)}
                 </h2>
                 <div className="space-y-2">
                   {learning.map(s => (
@@ -125,7 +125,7 @@ export default function StructuresReviewPage() {
             {graduated.length > 0 && (
               <section>
                 <h2 className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-2">
-                  Graduated · {graduated.length}
+                  {t.structuresPage.graduatedCount(graduated.length)}
                 </h2>
                 <div className="space-y-2">
                   {graduated.map(s => (
@@ -149,7 +149,7 @@ export default function StructuresReviewPage() {
         <div className="flex flex-col gap-3 w-full max-w-xs">
           <Link href="/structures" className="btn-primary text-center">{t.structuresPage.backToStructures}</Link>
           <button onClick={() => { setAllItems(getStructuresSRS()); setManaging(true); }} className="btn-secondary">
-            Manage deck ({allItems.length} items)
+            {t.structuresPage.manageDeckItemsCount(allItems.length)}
           </button>
         </div>
       </div>
@@ -171,7 +171,7 @@ export default function StructuresReviewPage() {
         </div>
         <Link href="/structures" className="btn-primary w-full text-center mb-3">{t.structuresPage.backToStructures}</Link>
         <button onClick={() => { setAllItems(getStructuresSRS()); setManaging(true); }} className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] underline">
-          Manage deck
+          {t.structuresPage.manageDeck}
         </button>
       </div>
     );
@@ -192,7 +192,7 @@ export default function StructuresReviewPage() {
         <button
           onClick={() => { setAllItems(getStructuresSRS()); setManaging(true); }}
           className="btn-icon text-sm"
-          aria-label="Manage deck"
+          aria-label={t.structuresPage.manageDeck}
         >
           ⚙️
         </button>
@@ -207,7 +207,7 @@ export default function StructuresReviewPage() {
       <div className="flex-1 p-4 flex flex-col gap-4">
         <div className="flex items-center justify-end">
           <div className="badge text-xs" style={{ background: '#4338ca20', color: '#4338ca' }}>
-            Every {current.interval}d so far
+            {t.structuresPage.everyDaysSoFar(current.interval)}
           </div>
         </div>
 
@@ -247,7 +247,7 @@ export default function StructuresReviewPage() {
                 letterSpacing: '0.04em',
               }}
             >
-              Reveal
+              {t.structuresPage.reveal}
             </button>
           )}
         </div>
@@ -286,6 +286,7 @@ function StructureManageRow({
   stage: number;
   onRemove: (id: string) => void;
 }) {
+  const t = useTranslation();
   const [confirming, setConfirming] = useState(false);
   const graduated = item.interval >= GRADUATED_INTERVAL_DAYS;
   const colors = ['#9CA3AF', '#F59E0B', '#EF4444', '#8B5CF6', '#3B82F6', '#10B981'];
@@ -301,7 +302,7 @@ function StructureManageRow({
         className="badge text-xs shrink-0"
         style={{ background: `${color}20`, color }}
       >
-        {graduated ? 'Graduated' : `Every ${item.interval}d`}
+        {graduated ? t.srs.graduated : t.structuresPage.everyDays(item.interval)}
       </span>
 
       {confirming ? (
@@ -310,17 +311,17 @@ function StructureManageRow({
             onClick={() => { onRemove(item.id); setConfirming(false); }}
             className="text-xs px-2 py-1 rounded-lg bg-red-100 text-red-700 font-semibold"
           >
-            Remove
+            {t.srs.remove}
           </button>
           <button onClick={() => setConfirming(false)} className="text-xs px-2 py-1 rounded-lg bg-[var(--surface-2)] text-[var(--text-muted)]">
-            Cancel
+            {t.structuresPage.cancel}
           </button>
         </div>
       ) : (
         <button
           onClick={() => setConfirming(true)}
           className="text-xs px-2 py-1 rounded-lg bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-red-500 shrink-0"
-          aria-label="Remove from deck"
+          aria-label={t.srs.removeFromDeck}
         >
           ✕
         </button>

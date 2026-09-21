@@ -14,16 +14,16 @@ const CARD_COLORS = [
   { color: '#F59E0B', light: '#FCD34D', dark: '#B45309' },
 ];
 
-const STEPS = [
-  { icon: '📖', text: 'Learn the words from a real video',          color: '#EC4899', dark: '#BE185D' },
-  { icon: '🔄', text: 'Review them with SRS over ~11 days',         color: '#8B5CF6', dark: '#6D28D9' },
-  { icon: '🔓', text: 'Complete the +7 day review → link unlocks', color: '#F59E0B', dark: '#B45309' },
-  { icon: '🎬', text: 'Watch the video and understand every word',  color: '#10B981', dark: '#059669' },
-];
-
 export default function RealEnglishPage() {
   const t = useTranslation();
   const router = useRouter();
+
+  const STEPS = [
+    { icon: '📖', text: t.realEnglishPage.stepLearnWords,   color: '#EC4899', dark: '#BE185D' },
+    { icon: '🔄', text: t.realEnglishPage.stepReviewSrs,    color: '#8B5CF6', dark: '#6D28D9' },
+    { icon: '🔓', text: t.realEnglishPage.stepUnlockVideo,  color: '#F59E0B', dark: '#B45309' },
+    { icon: '🎬', text: t.realEnglishPage.stepWatchVideo,   color: '#10B981', dark: '#059669' },
+  ];
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 pb-24">
@@ -31,11 +31,11 @@ export default function RealEnglishPage() {
       {/* Editorial header */}
       <div style={{ marginBottom: 32 }}>
         <p style={{ fontSize: 11, fontWeight: 900, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: 6 }}>
-          Listening Skills
+          {t.realEnglishPage.eyebrow}
         </p>
         <h1 style={{ fontSize: 40, fontWeight: 900, color: 'var(--text)', lineHeight: 1 }}>{t.realEnglishPage.title}</h1>
         <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 8 }}>
-          Learn the words from a real video — then unlock it and actually understand it.
+          {t.realEnglishPage.intro}
         </p>
       </div>
 
@@ -98,7 +98,7 @@ export default function RealEnglishPage() {
                   <span style={{
                     fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.9)',
                     background: 'rgba(0,0,0,0.22)', borderRadius: 6, padding: '2px 8px',
-                  }}>{set.videos.length} videos</span>
+                  }}>{t.realEnglishPage.videoCount(set.videos.length)}</span>
                 </div>
               </button>
             );
@@ -109,7 +109,7 @@ export default function RealEnglishPage() {
       {/* How It Works — numbered timeline */}
       <div>
         <p style={{ fontSize: 11, fontWeight: 900, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: 20 }}>
-          How It Works
+          {t.realEnglishPage.howItWorks}
         </p>
 
         <div style={{ position: 'relative' }}>

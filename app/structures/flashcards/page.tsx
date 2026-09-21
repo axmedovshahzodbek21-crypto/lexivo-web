@@ -164,13 +164,13 @@ export default function StructuresFlashcardsPage() {
               onClick={() => advance(false)}
               className="flex-1 py-4 rounded-xl border-2 border-[var(--danger)] text-[var(--danger)] font-bold text-lg hover:bg-red-50 transition-colors press-3d"
             >
-              Again
+              {t.structuresPage.again}
             </button>
             <button
               onClick={() => advance(true)}
               className="flex-1 py-4 rounded-xl border-2 border-[var(--success)] text-[var(--success)] font-bold text-lg hover:bg-green-50 transition-colors press-3d"
             >
-              Know It
+              {t.structuresPage.knowIt}
             </button>
           </div>
         ) : (

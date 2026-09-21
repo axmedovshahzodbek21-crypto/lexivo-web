@@ -46,7 +46,7 @@ export default function UnitDayPickerPage({ params }: { params: Promise<{ unit: 
         <button onClick={() => router.push(`/structures/${slug}`)} className="btn-icon" aria-label={t.structuresPage.goBack}>←</button>
         <div className="min-w-0">
           <p className="text-xs text-[var(--text-muted)] truncate">{unit}</p>
-          <h1 className="text-lg font-bold text-[var(--text)] leading-tight">🔎 Pick a day to learn</h1>
+          <h1 className="text-lg font-bold text-[var(--text)] leading-tight">{t.structuresPage.pickADay}</h1>
         </div>
       </div>
 
@@ -90,11 +90,11 @@ export default function UnitDayPickerPage({ params }: { params: Promise<{ unit: 
                 </span>
                 <div style={{ marginTop: 10 }}>
                   <p style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.65)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 3 }}>
-                    Day {day}
+                    {t.structuresPage.dayLabel(day)}
                   </p>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.85)', background: 'rgba(0,0,0,0.22)', borderRadius: 6, padding: '2px 8px' }}>
-                      {structures.length} structures
+                      {t.structuresPage.structuresCount(structures.length)}
                     </span>
                     {done && <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.95)', fontWeight: 900 }}>✓</span>}
                   </div>

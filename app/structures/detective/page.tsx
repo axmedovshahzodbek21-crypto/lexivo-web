@@ -110,7 +110,7 @@ export default function StructuresDetectivePage() {
             onClick={() => { setIndex(0); setCorrectCount(0); setSessionXP(0); setDone(false); setDeck(d => [...d].sort(() => Math.random() - 0.5)); }}
             className="btn-secondary"
           >
-            Again
+            {t.structuresPage.again}
           </button>
           <Link href="/structures" className="btn-primary text-center">{t.structuresPage.backToStructures}</Link>
         </div>
@@ -125,7 +125,7 @@ export default function StructuresDetectivePage() {
       <div className="flex items-center justify-between p-4">
         <button onClick={() => router.back()} className="btn-icon" aria-label={t.structuresPage.goBack}>✕</button>
         <div className="text-center">
-          <div className="font-semibold text-sm">🕵️ Structure Detective</div>
+          <div className="font-semibold text-sm">🕵️ {t.structuresPage.detectiveTitle}</div>
           <div className="text-xs text-[var(--text-muted)]">{index + 1} / {deck.length}</div>
         </div>
         <span className="text-xs font-medium text-[var(--success)]">✓{correctCount}</span>

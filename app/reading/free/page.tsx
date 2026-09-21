@@ -274,11 +274,11 @@ export default function ReadingPage() {
 
   const fetchArticle = async () => {
     if (!urlInput.trim()) return;
-    if (!user) { setFetchError('Log in to fetch articles by URL.'); return; }
+    if (!user) { setFetchError(t.readingFreePage.loginToFetch); return; }
     setFetching(true); setFetchError('');
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) { setFetchError('Log in to fetch articles by URL.'); return; }
+      if (!session) { setFetchError(t.readingFreePage.loginToFetch); return; }
       const res = await fetch('/api/fetch-article', {
         method: 'POST',
         headers: {
@@ -288,11 +288,11 @@ export default function ReadingPage() {
         body: JSON.stringify({ url: urlInput.trim() }),
       });
       const data = await res.json();
-      if (!res.ok) { setFetchError(data.error ?? 'Failed to fetch'); return; }
+      if (!res.ok) { setFetchError(data.error ?? t.readingFreePage.fetchFailed); return; }
       setPassage(data.text);
       setUrlInput('');
     } catch {
-      setFetchError('Could not reach the URL');
+      setFetchError(t.readingFreePage.couldNotReachUrl);
     } finally {
       setFetching(false);
     }
@@ -323,7 +323,7 @@ export default function ReadingPage() {
         <div>
           <h1 className="text-3xl font-bold text-[var(--text)] mb-2">{t.extra.reading}</h1>
           <p className="text-sm text-[var(--text-muted)] leading-relaxed">
-            Paste any English text. Select words as you read — we collect them and build an AI prompt to create vocabulary cards.
+            {t.readingFreePage.intro}
           </p>
         </div>
         {/* URL fetch */}
@@ -342,7 +342,7 @@ export default function ReadingPage() {
               disabled={!urlInput.trim() || fetching}
               className="btn-secondary px-5 disabled:opacity-40 whitespace-nowrap shrink-0"
             >
-              {fetching ? '…' : 'Fetch'}
+              {fetching ? '…' : t.readingFreePage.fetch}
             </button>
           </div>
           {fetchError && <p className="text-xs px-1" style={{ color: 'var(--danger)' }}>{fetchError}</p>}
@@ -365,10 +365,10 @@ export default function ReadingPage() {
           <div className="flex items-center justify-between rounded-2xl px-4 py-3" style={{ background: 'var(--surface-2)' }}>
             <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--text-muted)' }}>
               <span>📖</span>
-              <span>Saved session{wordList.length > 0 ? ` · ${wordList.length} word${wordList.length !== 1 ? 's' : ''} collected` : ''}</span>
+              <span>{wordList.length > 0 ? t.readingFreePage.savedSessionWithWords(wordList.length) : t.readingFreePage.savedSession}</span>
             </div>
             <button onClick={clearSession} className="text-xs font-semibold hover:underline" style={{ color: 'var(--danger)' }}>
-              Clear
+              {t.readingFreePage.clear}
             </button>
           </div>
         )}
@@ -377,7 +377,7 @@ export default function ReadingPage() {
           disabled={!passage.trim()}
           className="btn-primary w-full disabled:opacity-40"
         >
-          {wordList.length > 0 ? 'Resume Reading →' : 'Start Reading →'}
+          {wordList.length > 0 ? t.readingFreePage.resumeReading : t.readingFreePage.startReading}
         </button>
       </div>
     );
@@ -401,10 +401,10 @@ export default function ReadingPage() {
             onClick={() => { setReading(false); setWordList([]); setSelectedText(''); setSelectionRect(null); }}
             className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors"
           >
-            ← Back
+            {t.readingFreePage.backArrow}
           </button>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-[var(--text-muted)]">~{readingTime} min read</span>
+            <span className="text-xs text-[var(--text-muted)]">{t.readingFreePage.minRead(readingTime)}</span>
             <div className="flex items-center gap-1 bg-[var(--surface-2)] rounded-full px-1 py-1">
               <button
                 onClick={() => setFontSizeIdx(i => Math.max(0, i - 1))}
@@ -423,7 +423,7 @@ export default function ReadingPage() {
                 autoCollect ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface-2)] text-[var(--text-muted)]'
               }`}
             >
-              ⚡ Auto
+              {t.readingFreePage.autoToggle}
             </button>
           </div>
         </div>
@@ -434,8 +434,8 @@ export default function ReadingPage() {
         <div className="px-8 pt-5 pb-2 border-b border-[var(--border)]">
           <p className="text-xs text-[var(--text-muted)]">
             {autoCollect
-              ? <>⚡ <strong className="text-[var(--primary)]">{t.readingFreePage.autoCollectOn}</strong> — tap any word to instantly collect it</>
-              : <>Select any word or phrase → tap <strong className="text-[var(--primary)]">+ Add</strong> to collect it</>
+              ? <>⚡ <strong className="text-[var(--primary)]">{t.readingFreePage.autoCollectOn}</strong> {t.readingFreePage.tapWordToCollect}</>
+              : <>{t.readingFreePage.selectWordToCollect} <strong className="text-[var(--primary)]">{t.readingFreePage.addPill}</strong> {t.readingFreePage.toCollectIt}</>
             }
           </p>
         </div>
@@ -460,7 +460,7 @@ export default function ReadingPage() {
         <div className="fixed bottom-24 right-4 z-40 sm:bottom-6">
           <div className="flex items-center gap-1.5 px-3 py-2 rounded-full bg-[var(--primary)] text-white text-xs font-bold shadow-lg">
             <span>📝</span>
-            <span>{wordList.length} word{wordList.length !== 1 ? 's' : ''}</span>
+            <span>{t.readingFreePage.wordsCount(wordList.length)}</span>
           </div>
         </div>
       )}
@@ -476,10 +476,10 @@ export default function ReadingPage() {
                 disabled={wordHistory.length === 0}
                 className="text-xs text-[var(--primary)] hover:underline disabled:opacity-30 disabled:cursor-default"
               >
-                ↩ Undo
+                {t.readingFreePage.undo}
               </button>
               <button onClick={() => { setWordHistory(h => [...h.slice(-29), wordList]); setWordList([]); }} className="text-xs text-[var(--danger)] hover:underline">
-                Clear all
+                {t.readingFreePage.clearAll}
               </button>
             </div>
           </div>
@@ -512,7 +512,7 @@ export default function ReadingPage() {
             onClick={copyPrompt}
             className={`w-full py-3 rounded-xl font-semibold text-sm transition-all ${copied ? 'bg-green-500 text-white' : 'btn-primary'}`}
           >
-            {copied ? '✓ Copied!' : '📋 Copy Prompt'}
+            {copied ? t.readingFreePage.copied : t.readingFreePage.copyPrompt}
           </button>
         </div>
       )}
@@ -524,14 +524,14 @@ export default function ReadingPage() {
             onClick={() => setShowImport(v => !v)}
             className="w-full flex items-center justify-between text-sm font-semibold text-[var(--text)]"
           >
-            <span>📥 Import AI result → My Words</span>
+            <span>{t.readingFreePage.importAiResult}</span>
             <span className="text-[var(--text-muted)] text-xs">{showImport ? '▲' : '▼'}</span>
           </button>
 
           {showImport && (
             <div className="space-y-3">
               <p className="text-xs text-[var(--text-muted)]">
-                Paste the AI response below exactly as received, then click Parse.
+                {t.readingFreePage.pasteAiResponseInstructions}
               </p>
               <textarea
                 className="w-full h-40 p-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] text-xs text-[var(--text)] font-mono resize-none focus:outline-none focus:border-[var(--primary)] transition-colors leading-relaxed"
@@ -544,19 +544,19 @@ export default function ReadingPage() {
                 disabled={!importText.trim()}
                 className="btn-secondary w-full disabled:opacity-40"
               >
-                Parse
+                {t.readingFreePage.parse}
               </button>
 
               {parsedWords !== null && parsedWords.length === 0 && (
                 <p className="text-xs text-[var(--danger)] text-center">
-                  Could not parse any words. Make sure the AI followed the exact format.
+                  {t.readingFreePage.parseError}
                 </p>
               )}
 
               {parsedWords !== null && parsedWords.length > 0 && (
                 <div className="space-y-2">
                   <p className="text-xs text-[var(--text-muted)]">
-                    {parsedWords.length} word{parsedWords.length !== 1 ? 's' : ''} ready to import:
+                    {t.readingFreePage.wordsReadyToImport(parsedWords.length)}
                   </p>
                   <div className="max-h-52 overflow-y-auto divide-y divide-[var(--border)]">
                     {parsedWords.map((w, i) => (
@@ -571,14 +571,14 @@ export default function ReadingPage() {
                     ))}
                   </div>
                   <button onClick={handleImport} className="btn-primary w-full">
-                    Add {parsedWords.length} word{parsedWords.length !== 1 ? 's' : ''} to My Words
+                    {t.readingFreePage.addWordsToMyWords(parsedWords.length)}
                   </button>
                 </div>
               )}
 
               {importDone && (
                 <p className="text-sm text-green-600 font-semibold text-center animate-fade-in">
-                  ✓ Words added to My Words!
+                  {t.readingFreePage.wordsAddedSuccess}
                 </p>
               )}
             </div>
@@ -606,7 +606,7 @@ export default function ReadingPage() {
               style={{ background: 'var(--bg)', border: '1px solid var(--border)' }}
             >
               {defLoading ? (
-                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Looking up…</p>
+                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{t.readingFreePage.lookingUp}</p>
               ) : quickDef ? (
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-2 flex-wrap">
@@ -634,7 +634,7 @@ export default function ReadingPage() {
             onTouchEnd={e => { e.preventDefault(); addWord(); }}
             onClick={addWord}
           >
-            + Add
+            {t.readingFreePage.addPill}
           </button>
         </div>
       )}

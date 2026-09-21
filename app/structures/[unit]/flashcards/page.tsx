@@ -82,9 +82,9 @@ export default function UnitFlashcardsPage({ params }: { params: Promise<{ unit:
     return (
       <div className="p-6 text-center flex flex-col items-center justify-center min-h-screen animate-fade-in">
         <div className="text-5xl mb-4">📭</div>
-        <h2 className="font-bold text-xl mb-2">No {unit} structures in your deck yet</h2>
+        <h2 className="font-bold text-xl mb-2">{t.structuresPage.noneInDeckForUnit(unit)}</h2>
         <p className="text-sm text-[var(--text-muted)] mb-6">{t.structuresPage.learnFromUnitFirst}</p>
-        <Link href={`/structures/${slug}/learn`} className="btn-primary inline-block">Learn {unit} →</Link>
+        <Link href={`/structures/${slug}/learn`} className="btn-primary inline-block">{t.structuresPage.learnUnitCta(unit)}</Link>
       </div>
     );
   }
@@ -95,7 +95,7 @@ export default function UnitFlashcardsPage({ params }: { params: Promise<{ unit:
       <div className="p-6 text-center flex flex-col items-center justify-center min-h-screen animate-fade-in">
         <div className="text-6xl mb-4">{score >= 80 ? '🎉' : score >= 50 ? '👍' : '💪'}</div>
         <h2 className="text-2xl font-bold mb-2">{t.structuresPage.deckComplete}</h2>
-        <p className="text-[var(--text-muted)] mb-6">{known} known · {unknown} to review · {score}%</p>
+        <p className="text-[var(--text-muted)] mb-6">{t.structuresPage.deckCompleteSummary(known, unknown, score)}</p>
         <div className="grid grid-cols-3 gap-3 w-full mb-6">
           <div className="card text-center"><div className="text-2xl font-bold text-[var(--success)]">{known}</div><div className="text-xs text-[var(--text-muted)]">{t.structuresPage.known}</div></div>
           <div className="card text-center"><div className="text-2xl font-bold text-[var(--danger)]">{unknown}</div><div className="text-xs text-[var(--text-muted)]">{t.structuresPage.review}</div></div>
@@ -125,7 +125,7 @@ export default function UnitFlashcardsPage({ params }: { params: Promise<{ unit:
       <div className="flex items-center justify-between p-4">
         <button onClick={() => router.push(`/structures/${slug}`)} className="btn-icon" aria-label={t.structuresPage.goBack}>←</button>
         <div className="text-center">
-          <div className="font-semibold text-sm">Flashcards · {unit}</div>
+          <div className="font-semibold text-sm">{t.structuresPage.flashcardsUnitHeader(unit)}</div>
           <div className="text-xs text-[var(--text-muted)]">{index + 1} / {deck.length}</div>
         </div>
         <div className="flex gap-2">
@@ -176,13 +176,13 @@ export default function UnitFlashcardsPage({ params }: { params: Promise<{ unit:
               onClick={() => advance(false)}
               className="flex-1 py-4 rounded-xl border-2 border-[var(--danger)] text-[var(--danger)] font-bold text-lg hover:bg-red-50 transition-colors press-3d"
             >
-              Again
+              {t.structuresPage.again}
             </button>
             <button
               onClick={() => advance(true)}
               className="flex-1 py-4 rounded-xl border-2 border-[var(--success)] text-[var(--success)] font-bold text-lg hover:bg-green-50 transition-colors press-3d"
             >
-              Know It
+              {t.structuresPage.knowIt}
             </button>
           </div>
         ) : (

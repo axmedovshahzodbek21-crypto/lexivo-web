@@ -4,6 +4,7 @@ import { use, useState, useEffect, useCallback, useRef, Suspense } from 'react';
 import BackButton from '@/components/BackButton';
 import { useSearchParams } from 'next/navigation';
 import { ieltsData, IeltsQuestion } from '@/lib/ielts-data';
+import { useTranslation } from '@/lib/useTranslation';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -327,6 +328,7 @@ function OptionsModal({ contrast, textSize, onContrast, onTextSize, onClose }: {
   onTextSize: (v: string) => void;
   onClose: () => void;
 }) {
+  const t = useTranslation();
   const [screen, setScreen] = useState<OptionsScreen>('main');
 
   // Modal adopts the currently active contrast theme
@@ -349,7 +351,7 @@ function OptionsModal({ contrast, textSize, onContrast, onTextSize, onClose }: {
             <button onClick={() => setScreen('main')} className="text-lg w-6 opacity-60 hover:opacity-100 transition-opacity" style={{ color: modalColor }}>‹</button>
           ) : <div className="w-6" />}
           <p className="text-sm font-black" style={{ color: modalColor }}>
-            {screen === 'main' ? 'Options' : screen === 'contrast' ? 'Contrast' : 'Text size'}
+            {screen === 'main' ? t.ieltsPage.optionsTitle : screen === 'contrast' ? t.ieltsPage.contrastLabel : t.ieltsPage.textSizeLabel}
           </p>
           <button onClick={onClose} className="text-sm opacity-60 hover:opacity-100 transition-opacity" style={{ color: modalColor }}>✕</button>
         </div>
@@ -358,8 +360,8 @@ function OptionsModal({ contrast, textSize, onContrast, onTextSize, onClose }: {
         {screen === 'main' && (
           <div>
             {[
-              { label: 'Contrast', value: contrast, next: 'contrast' as OptionsScreen },
-              { label: 'Text size', value: textSize, next: 'textsize' as OptionsScreen },
+              { label: t.ieltsPage.contrastLabel, value: contrast, next: 'contrast' as OptionsScreen },
+              { label: t.ieltsPage.textSizeLabel, value: textSize, next: 'textsize' as OptionsScreen },
             ].map((row, idx) => (
               <button key={row.label} onClick={() => setScreen(row.next)}
                 className="w-full flex items-center justify-between px-5 py-4 transition-opacity hover:opacity-70 text-left"
@@ -475,9 +477,10 @@ function RadioGroup({ name, options, value, onChange, disabled }: {
 function TextInput({ value, onChange, disabled, placeholder }: {
   value: string; onChange: (v: string) => void; disabled: boolean; placeholder?: string;
 }) {
+  const t = useTranslation();
   return (
     <input type="text" value={value} disabled={disabled} onChange={e => onChange(e.target.value)}
-      placeholder={placeholder ?? 'Type your answer…'}
+      placeholder={placeholder ?? t.ieltsPage.typeYourAnswerPlaceholder}
       className="mt-2 w-full px-3 py-2 rounded-xl text-sm border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--primary)] transition-colors disabled:opacity-60" />
   );
 }
@@ -485,6 +488,7 @@ function TextInput({ value, onChange, disabled, placeholder }: {
 function QuestionInput({ q, name, value, onChange, disabled }: {
   q: IeltsQuestion; name: string; value: string; onChange: (v: string) => void; disabled: boolean;
 }) {
+  const t = useTranslation();
   switch (q.type) {
     case 'true_false_not_given':
       return <PillSelect options={['TRUE', 'FALSE', 'NOT GIVEN']} value={value} onChange={onChange} disabled={disabled} />;
@@ -493,7 +497,7 @@ function QuestionInput({ q, name, value, onChange, disabled }: {
     case 'multiple_choice':
       return q.options ? <RadioGroup name={name} options={q.options} value={value} onChange={onChange} disabled={disabled} /> : <TextInput value={value} onChange={onChange} disabled={disabled} />;
     case 'multiple_choice_multi':
-      return q.options ? <MultiCheckbox options={q.options} value={value} onChange={onChange} disabled={disabled} /> : <TextInput value={value} onChange={onChange} disabled={disabled} placeholder="Comma-separated answers…" />;
+      return q.options ? <MultiCheckbox options={q.options} value={value} onChange={onChange} disabled={disabled} /> : <TextInput value={value} onChange={onChange} disabled={disabled} placeholder={t.ieltsPage.commaSeparatedPlaceholder} />;
     case 'matching_information':
     case 'matching_features':
     case 'matching_sentence_endings': {
@@ -516,29 +520,30 @@ function QuestionInput({ q, name, value, onChange, disabled }: {
 function AnswerReveal({ q, userAnswer, submitted, passageColor }: {
   q: IeltsQuestion; userAnswer?: string; submitted?: boolean; passageColor: string;
 }) {
+  const t = useTranslation();
   const correct = submitted && userAnswer !== undefined ? isCorrect(q, userAnswer) : null;
   return (
     <div className="border-t px-4 py-4 space-y-3" style={{ borderColor: `${passageColor}25` }}>
       {submitted && userAnswer !== undefined && (
         <div className="flex items-center gap-2 mb-1">
           <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${correct ? 'bg-green-500/15 text-green-500' : 'bg-red-500/15 text-red-500'}`}>
-            {correct ? '✓ Correct' : '✗ Incorrect'}
+            {correct ? t.ieltsPage.correctLabel : t.ieltsPage.incorrectLabel}
           </span>
           {!correct && userAnswer && (
-            <span className="text-xs" style={{ color: passageColor, opacity: 0.6 }}>Your answer: <strong>{userAnswer}</strong></span>
+            <span className="text-xs" style={{ color: passageColor, opacity: 0.6 }}>{t.ieltsPage.yourAnswer} <strong>{userAnswer}</strong></span>
           )}
         </div>
       )}
       <div className="flex items-center gap-2">
-        <span className="text-xs font-bold uppercase tracking-wider" style={{ color: passageColor, opacity: 0.6 }}>Answer:</span>
+        <span className="text-xs font-bold uppercase tracking-wider" style={{ color: passageColor, opacity: 0.6 }}>{t.ieltsPage.answerLabel}</span>
         <span className="px-2 py-0.5 rounded-lg text-sm font-black text-white" style={{ background: 'var(--primary)' }}>{q.answer}</span>
       </div>
       <div className="rounded-xl p-3" style={{ background: 'color-mix(in srgb, var(--primary) 10%, transparent)', borderLeft: '3px solid var(--primary)' }}>
-        <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: 'var(--primary)' }}>From the passage</p>
+        <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: 'var(--primary)' }}>{t.ieltsPage.fromThePassage}</p>
         <p className="text-sm italic leading-snug" style={{ color: passageColor }}>"{q.passage_excerpt}"</p>
       </div>
       <div>
-        <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: passageColor, opacity: 0.6 }}>Why?</p>
+        <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: passageColor, opacity: 0.6 }}>{t.ieltsPage.whyLabel}</p>
         <p className="text-sm leading-snug" style={{ color: passageColor, opacity: 0.75 }}>{q.explanation}</p>
       </div>
     </div>
@@ -622,6 +627,7 @@ function SummaryBlock({ text, title, summaryOptions, groupQuestions, startIdx, a
 // ─── Inner page ───────────────────────────────────────────────────────────────
 
 function TestPageInner({ passageId, testId }: { passageId: string; testId: string }) {
+  const t = useTranslation();
   const searchParams = useSearchParams();
   const mode = searchParams.get('mode') === 'test' ? 'test' : 'review';
 
@@ -784,11 +790,11 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
   if (!test) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-8 pb-24">
-        <BackButton href={`/ielts-reading/${passageId}`} label="Back to Tests" className="mb-8" />
+        <BackButton href={`/ielts-reading/${passageId}`} label={t.ieltsPage.backToTests} className="mb-8" />
         <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-10 flex flex-col items-center text-center gap-3">
           <span className="text-4xl">🔒</span>
-          <p className="text-lg font-bold text-[var(--text)]">Coming soon</p>
-          <p className="text-sm text-[var(--text-muted)]">This test is being prepared. Check back later.</p>
+          <p className="text-lg font-bold text-[var(--text)]">{t.ieltsPage.comingSoon}</p>
+          <p className="text-sm text-[var(--text-muted)]">{t.ieltsPage.testBeingPrepared}</p>
         </div>
       </div>
     );
@@ -807,19 +813,19 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
       <div className="shrink-0 px-4 py-2">
         {/* Row 1: Back | Timer (center) | Options + Lexivo */}
         <div className="flex items-center justify-between gap-4">
-          <BackButton href={`/ielts-reading/${passageId}`} label="Back to Tests" className="shrink-0" />
+          <BackButton href={`/ielts-reading/${passageId}`} label={t.ieltsPage.backToTests} className="shrink-0" />
 
           {/* Timer centered */}
           <div className="flex-1 flex justify-center">
             {mode === 'test' && !submitted && (
               <div className="text-center">
-                <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider leading-none mb-0.5">TIME LEFT</p>
+                <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider leading-none mb-0.5">{t.ieltsPage.timeLeft}</p>
                 <p className={`text-2xl font-black font-mono tabular-nums leading-none ${timerColor}`}>{formatTime(secondsLeft)}</p>
               </div>
             )}
             {mode === 'test' && submitted && score !== null && (
               <div className="flex items-center gap-3 rounded-xl border border-[var(--primary)] px-4 py-1.5" style={{ background: 'color-mix(in srgb, var(--primary) 8%, transparent)' }}>
-                <span className="text-xs font-bold text-[var(--primary)] uppercase tracking-wider">Score</span>
+                <span className="text-xs font-bold text-[var(--primary)] uppercase tracking-wider">{t.ieltsPage.score}</span>
                 <span className="text-xl font-black text-[var(--text)]">{score}<span className="text-sm text-[var(--text-muted)]">/{test.questions.length}</span></span>
                 <span className="text-xs text-[var(--text-muted)]">{Math.round((score / test.questions.length) * 100)}%</span>
               </div>
@@ -829,7 +835,7 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
           <div className="flex items-center gap-2 shrink-0">
             <button onClick={() => setShowOptions(true)}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--primary)] hover:text-[var(--primary)] transition-all">
-              ⚙ Options
+              ⚙ {t.ieltsPage.optionsTitle}
             </button>
             <a href="https://t.me/LexivoApp" target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all hover:opacity-80"
@@ -842,12 +848,12 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
 
         {/* Row 2: breadcrumb */}
         <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mt-1.5">
-          IELTS Reading · Passage {passageId} · Test {testId}
+          {t.ieltsPage.breadcrumb(passageId, testId)}
           <span className="ml-2 px-1.5 py-0.5 rounded-full text-[10px] font-black" style={{
             background: mode === 'test' ? 'var(--primary)' : 'color-mix(in srgb, var(--primary) 15%, transparent)',
             color: mode === 'test' ? 'white' : 'var(--primary)',
           }}>
-            {mode === 'test' ? '📝 TEST MODE' : '📖 REVIEW MODE'}
+            {mode === 'test' ? t.ieltsPage.testModeLabel : t.ieltsPage.reviewModeLabel}
           </span>
         </p>
       </div>
@@ -862,7 +868,7 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
           {/* Passage header */}
           <div className="mb-6">
             <p style={{ fontSize: fontSize - 1, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 6, color: passageStyle.color }}>
-              READING PASSAGE {passageId}
+              {t.ieltsPage.readingPassageLabel(passageId)}
             </p>
             {test.questionRange && (
               <p style={{ fontSize: fontSize - 1, fontStyle: 'italic', marginBottom: 12, color: passageStyle.color }}>
@@ -994,7 +1000,7 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
                                     background: isRev ? 'var(--primary)' : 'var(--surface-2)',
                                     color: isRev ? 'white' : 'var(--text-muted)',
                                   }}>
-                                  {isRev ? 'Hide Answer' : 'Show Answer'}
+                                  {isRev ? t.ieltsPage.hideAnswer : t.ieltsPage.showAnswer}
                                 </button>
                               )}
                             </div>
@@ -1028,7 +1034,7 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
             <button onClick={handleSubmit}
               className="w-full py-3.5 rounded-2xl text-sm font-black text-white transition-all active:scale-[0.98]"
               style={{ background: 'linear-gradient(135deg, var(--primary), var(--primary-light))' }}>
-              Submit Test →
+              {t.ieltsPage.submitTest}
             </button>
           )}
 
@@ -1036,12 +1042,12 @@ function TestPageInner({ passageId, testId }: { passageId: string; testId: strin
             <div className="flex gap-3">
               <Link href={`/ielts-reading/${passageId}/${testId}?mode=review`} className="flex-1">
                 <button className="w-full py-3 rounded-2xl text-sm font-bold border border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--primary)] hover:text-[var(--primary)] transition-all">
-                  📖 Full Review
+                  {t.ieltsPage.fullReview}
                 </button>
               </Link>
               <Link href={`/ielts-reading/${passageId}`} className="flex-1">
                 <button className="w-full py-3 rounded-2xl text-sm font-bold text-white transition-all" style={{ background: 'var(--primary)' }}>
-                  ← More Tests
+                  {t.ieltsPage.moreTests}
                 </button>
               </Link>
             </div>

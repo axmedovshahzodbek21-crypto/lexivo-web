@@ -47,6 +47,7 @@ function ModeButton({ href, icon, label, done, locked = false }: {
 function UnitCard({ unit, collectionName, accentColor }: {
   unit: UnitRow; collectionName: string; accentColor: string;
 }) {
+  const t = useTranslation();
   const enc = encodeURIComponent(collectionName);
   const learnUrl = `/learn?collection=${enc}&day=${unit.dayNumber}`;
   const flashUrl = `/flashcards?collection=${enc}&day=${unit.dayNumber}`;
@@ -69,22 +70,22 @@ function UnitCard({ unit, collectionName, accentColor }: {
         <div className="flex items-start justify-between gap-1 mb-2">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-wide mb-0.5"
-              style={{ color: 'var(--text-muted)' }}>Unit {unit.dayNumber}</p>
+              style={{ color: 'var(--text-muted)' }}>{t.unitPicker.unitNumber(unit.dayNumber)}</p>
             <p className="text-xs font-bold leading-snug line-clamp-2"
               style={{ color: allDone ? '#16a34a' : 'var(--text)' }}>{unit.topic}</p>
           </div>
           <span className="text-[10px] whitespace-nowrap shrink-0 mt-0.5"
-            style={{ color: 'var(--text-muted)' }}>{unit.wordCount} words</span>
+            style={{ color: 'var(--text-muted)' }}>{t.unitPicker.wordsCount(unit.wordCount)}</span>
         </div>
         <div className="h-1 rounded-full mb-2 overflow-hidden" style={{ background: 'var(--border)' }}>
           <div className="h-full rounded-full transition-all"
             style={{ width: `${pct}%`, background: allDone ? '#22c55e' : accentColor }} />
         </div>
         <div className="flex gap-1">
-          <ModeButton href={learnUrl} icon="📖" label="Learn"  done={learnDone} />
-          <ModeButton href={flashUrl} icon="🃏" label="Cards"  done={flashcardDone} locked={!learnDone} />
-          <ModeButton href={quizUrl}  icon="🧠" label="Quiz"   done={quizDone}     locked={!learnDone} />
-          <ModeButton href={matchUrl} icon="🔀" label="Match"  done={false}         locked={!learnDone} />
+          <ModeButton href={learnUrl} icon="📖" label={t.nav.learn}                     done={learnDone} />
+          <ModeButton href={flashUrl} icon="🃏" label={t.collectionsPage.cardsLabel}    done={flashcardDone} locked={!learnDone} />
+          <ModeButton href={quizUrl}  icon="🧠" label={t.nav.quiz}                      done={quizDone}     locked={!learnDone} />
+          <ModeButton href={matchUrl} icon="🔀" label={t.collectionsPage.matchLabel}    done={false}         locked={!learnDone} />
         </div>
       </div>
     </div>
@@ -110,7 +111,7 @@ export default function RealEnglishVideoPage({ params }: { params: Promise<{ id:
       setCollection(col);
       setUnits(col.days.map(day => ({
         dayNumber: day.dayNumber,
-        topic: day.topic || `Unit ${day.dayNumber}`,
+        topic: day.topic || t.unitPicker.unitNumber(day.dayNumber),
         wordCount: day.words.length,
         progress: getUnitProgress(col.name, day.dayNumber),
       })));
@@ -143,13 +144,13 @@ export default function RealEnglishVideoPage({ params }: { params: Promise<{ id:
         <h1 className="text-xl font-black leading-snug mb-3">{video.title}</h1>
         <div className="flex flex-wrap gap-2">
           {totalWords > 0 && (
-            <span className="text-xs font-semibold bg-black/20 rounded-full px-3 py-1">{totalWords} words</span>
+            <span className="text-xs font-semibold bg-black/20 rounded-full px-3 py-1">{t.unitPicker.wordsCount(totalWords)}</span>
           )}
           {video.duration && (
             <span className="text-xs font-semibold bg-black/20 rounded-full px-3 py-1">⏱ {video.duration}</span>
           )}
           {units.length > 0 && (
-            <span className="text-xs font-semibold bg-black/20 rounded-full px-3 py-1">{units.length} units</span>
+            <span className="text-xs font-semibold bg-black/20 rounded-full px-3 py-1">{t.realEnglishPage.unitCount(units.length)}</span>
           )}
         </div>
       </div>

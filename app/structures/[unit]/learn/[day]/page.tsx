@@ -96,14 +96,14 @@ export default function UnitDayLearnPage({ params }: { params: Promise<{ unit: s
         <div className="flex flex-col items-center text-center pt-10 pb-6">
           <div className="text-6xl mb-3 animate-pop">🎉</div>
           <h2 className="text-2xl font-bold text-[var(--text)]">{t.structuresPage.dayComplete}</h2>
-          <p className="text-sm text-[var(--text-muted)] mt-1">{unit} · Day {day}</p>
+          <p className="text-sm text-[var(--text-muted)] mt-1">{t.structuresPage.unitDayLabel(unit, day)}</p>
         </div>
 
         <div className="grid grid-cols-2 gap-3 w-full mb-4">
-          <StatTile icon="🧩" value={sessionCount} label="Structures learned" color="var(--primary)" />
-          <StatTile icon="⚡" value={`+${displayXP(sessionXP)}`} label="XP earned" color="var(--warning)" />
-          <StatTile icon="🔥" value={getStreak()} label="Day streak" color="#FF6B35" />
-          <StatTile icon="⏭️" value={skippedCount} label="Skipped" color={skippedCount > 0 ? 'var(--danger)' : 'var(--success)'} />
+          <StatTile icon="🧩" value={sessionCount} label={t.structuresPage.structuresLearned} color="var(--primary)" />
+          <StatTile icon="⚡" value={`+${displayXP(sessionXP)}`} label={t.structuresPage.xpEarned} color="var(--warning)" />
+          <StatTile icon="🔥" value={getStreak()} label={t.structuresPage.dayStreak} color="#FF6B35" />
+          <StatTile icon="⏭️" value={skippedCount} label={t.structuresPage.skipped} color={skippedCount > 0 ? 'var(--danger)' : 'var(--success)'} />
         </div>
 
         <div className="flex flex-col gap-3 w-full mt-auto pt-4">
@@ -119,7 +119,7 @@ export default function UnitDayLearnPage({ params }: { params: Promise<{ unit: s
               onClick={() => { setIndex(0); setMarks(structures.map(() => null)); setSessionCount(0); setSessionXP(0); setDone(false); }}
               className="btn-secondary flex-1"
             >
-              Again
+              {t.structuresPage.again}
             </button>
             <Link href={`/structures/${slug}/learn`} className="btn-primary flex-1 text-center">{t.structuresPage.backToDays}</Link>
           </div>
@@ -142,7 +142,7 @@ export default function UnitDayLearnPage({ params }: { params: Promise<{ unit: s
         <button onClick={() => router.push(`/structures/${slug}/learn`)} className="btn-icon text-lg" aria-label={t.structuresPage.goBack}>←</button>
         <div className="flex-1 mx-3">
           <div className="flex items-center justify-between mb-1.5">
-            <span className="text-xs font-medium text-[var(--text-muted)] truncate">{unit} · Day {day}</span>
+            <span className="text-xs font-medium text-[var(--text-muted)] truncate">{t.structuresPage.unitDayLabel(unit, day)}</span>
             <span className="text-xs font-bold text-[var(--primary)] px-1 shrink-0">
               {index + 1} <span className="text-[var(--text-muted)] font-normal">/ {structures.length}</span>
             </span>
@@ -165,7 +165,7 @@ export default function UnitDayLearnPage({ params }: { params: Promise<{ unit: s
       {capReached && (
         <div className="mx-4 mt-1 rounded-xl p-3 flex gap-2 items-start text-sm" style={{ background: 'var(--primary-bg)', color: 'var(--primary)' }}>
           <span>🌙</span>
-          <span>You've added {DISCOVER_DAILY_NEW_CAP} new structures today — come back tomorrow to mark more as Learned.</span>
+          <span>{t.structuresPage.dailyCapReached(DISCOVER_DAILY_NEW_CAP)}</span>
         </div>
       )}
 
@@ -180,9 +180,9 @@ export default function UnitDayLearnPage({ params }: { params: Promise<{ unit: s
               onClick={() => { setMarks(m => { const n = [...m]; n[index] = null; return n; }); setRevealed(false); }}
               className="mb-3 px-3 py-1.5 rounded-full text-xs font-bold text-white w-fit hover:opacity-80 active:scale-95 transition-all cursor-pointer"
               style={{ background: 'rgba(255,255,255,0.25)' }}
-              title="Click to undo this mark"
+              title={t.structuresPage.undoMarkTitle}
             >
-              {mark === 'learned' ? '✓ Already marked as Learned' : '⏭ Skipped — still counts!'} ✕
+              {mark === 'learned' ? t.structuresPage.alreadyMarkedLearned : t.structuresPage.skippedStillCounts} ✕
             </button>
           )}
 
@@ -199,7 +199,7 @@ export default function UnitDayLearnPage({ params }: { params: Promise<{ unit: s
             >
               <h2 className="text-2xl font-bold text-[var(--text)] leading-snug">{current.pattern}</h2>
               <div className="flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold pointer-events-none" style={{ background: 'var(--primary-bg)', color: 'var(--primary)' }}>
-                Tap to reveal
+                {t.structuresPage.tapToReveal}
               </div>
             </div>
           ) : (
@@ -214,7 +214,7 @@ export default function UnitDayLearnPage({ params }: { params: Promise<{ unit: s
 
               <div>
                 <button onClick={() => setShowUz(v => !v)} className="text-xs text-[var(--primary)] font-medium hover:underline">
-                  {showUz ? 'Yopish' : "O'zbekcha tushuntirish"}
+                  {showUz ? t.learn.closeUzDefinition : t.learn.showUzDefinition}
                 </button>
                 {showUz && <p className="text-sm text-[var(--text-muted)] mt-1 animate-fade-in">{current.uzDefinition}</p>}
               </div>
@@ -236,7 +236,7 @@ export default function UnitDayLearnPage({ params }: { params: Promise<{ unit: s
                     onClick={() => setShowMoreExamples(v => !v)}
                     className="text-sm text-[var(--primary)] font-medium hover:underline flex items-center gap-1"
                   >
-                    {showMoreExamples ? '− Hide examples' : `+ More examples (${extras.length})`}
+                    {showMoreExamples ? t.structuresPage.hideExamples : t.structuresPage.moreExamplesCount(extras.length)}
                   </button>
                   {showMoreExamples && (
                     <div className="mt-2 space-y-2 animate-fade-in">
@@ -260,14 +260,14 @@ export default function UnitDayLearnPage({ params }: { params: Promise<{ unit: s
                   onClick={skip}
                   className="flex-1 py-3.5 rounded-xl border-2 border-[var(--border)] text-[var(--text-muted)] font-semibold text-sm hover:border-orange-300 hover:text-orange-500 transition-colors press-3d"
                 >
-                  Skip
+                  {t.structuresPage.skip}
                 </button>
                 <button
                   onClick={markLearned}
                   disabled={capReached}
                   className="flex-[2] btn-primary py-3.5 text-center press-3d disabled:opacity-60"
                 >
-                  ✓ Learned
+                  {t.structuresPage.learnedCta}
                 </button>
               </div>
             )}
@@ -275,7 +275,7 @@ export default function UnitDayLearnPage({ params }: { params: Promise<{ unit: s
         )}
 
         <div className="text-center text-xs text-[var(--text-muted)]">
-          {structures.length - index - 1} remaining
+          {t.structuresPage.remaining(structures.length - index - 1)}
         </div>
       </div>
     </div>
@@ -293,7 +293,7 @@ function StructureExampleCard({
       <div className="bg-[var(--surface-2)] px-3 pt-3 pb-2">
         <div className="flex items-start justify-between gap-2 mb-1">
           <span className="text-xs font-semibold text-[var(--primary)] bg-[var(--primary-bg)] px-2 py-0.5 rounded-full">
-            Example {num}
+            {t.structuresPage.example(num)}
           </span>
           <button
             onClick={e => { e.stopPropagation(); speakAccent(example, 'us'); }}
@@ -324,7 +324,7 @@ function ExtraExampleCard({ index, example, translation }: { index: number; exam
       onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setShow(v => !v); } }}
     >
       <div className="bg-[var(--surface-2)] px-3 pt-2.5 pb-2">
-        <span className="text-xs text-[var(--text-muted)]">Extra {index + 1}</span>
+        <span className="text-xs text-[var(--text-muted)]">{t.structuresPage.extraExampleLabel(index + 1)}</span>
         <p className="text-sm italic text-[var(--text)] mt-1">&ldquo;{example}&rdquo;</p>
       </div>
       <div className="px-3 py-2 bg-[var(--surface)]">
