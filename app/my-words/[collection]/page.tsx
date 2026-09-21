@@ -38,7 +38,7 @@ export default function FolderPage({ params }: Props) {
   const completedUnits = collections.filter(c => !!getMyUnitProgress(folder, c.name).completedAt).length;
 
   function handleDeleteFolder() {
-    if (!confirm(`Delete the entire "${folder}" folder and all its words?`)) return;
+    if (!confirm(t.extra.deleteEntireFolderConfirm(folder))) return;
     deleteImportedFolder(folder);
     pushLists();
     router.push('/my-words');
@@ -51,7 +51,7 @@ export default function FolderPage({ params }: Props) {
         <div className="flex-1 min-w-0">
           <h1 className="font-bold text-[var(--text)] truncate">{folder}</h1>
           <p className="text-xs text-[var(--text-muted)]">
-            {collections.length} unit{collections.length !== 1 ? 's' : ''}
+            {t.extra.unitCount(collections.length)}
             {collections.length > 0 && <> · {t.collections.completed(completedUnits, collections.length)}</>}
           </p>
         </div>
@@ -76,7 +76,7 @@ export default function FolderPage({ params }: Props) {
               href={`/import?folder=${encodeURIComponent(folder)}`}
               className="btn-primary px-6 py-3 text-sm font-semibold"
             >
-              + Add Words
+              {t.extra.addWordsBtn}
             </Link>
           </div>
         ) : (

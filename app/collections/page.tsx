@@ -7,38 +7,40 @@ import { useShallow } from 'zustand/react/shallow';
 import { getImportedWords } from '@/lib/storage';
 import { useEffect, useState } from 'react';
 
-const COLLECTION_META: Record<string, { icon: string; gradient: string; edge: string; glow: string; desc: string }> = {
-  '30 Days of Powerful Words': {
-    icon: '🏆',
-    gradient: 'linear-gradient(135deg, #6c63ff 0%, #9b8fff 100%)',
-    edge: '#3f38cc',
-    glow: 'rgba(108,99,255,0.45)',
-    desc: 'Essential IELTS vocabulary by topic',
-  },
-  '24 Vocabulary Challenge': {
-    icon: '💡',
-    gradient: 'linear-gradient(135deg, #FF6584 0%, #ff9eb5 100%)',
-    edge: '#cc3355',
-    glow: 'rgba(255,101,132,0.45)',
-    desc: 'Idioms and phrases for fluent speakers',
-  },
-  'Word Mastery': {
-    icon: '🎯',
-    gradient: 'linear-gradient(135deg, #1a9a50 0%, #2ECC71 100%)',
-    edge: '#0f6634',
-    glow: 'rgba(46,204,113,0.45)',
-    desc: 'High-level C1 & B2 collocations',
-  },
-};
+function collectionMeta(t: ReturnType<typeof useTranslation>): Record<string, { icon: string; gradient: string; edge: string; glow: string; desc: string }> {
+  return {
+    '30 Days of Powerful Words': {
+      icon: '🏆',
+      gradient: 'linear-gradient(135deg, #6c63ff 0%, #9b8fff 100%)',
+      edge: '#3f38cc',
+      glow: 'rgba(108,99,255,0.45)',
+      desc: t.collectionsPage.desc30Days,
+    },
+    '24 Vocabulary Challenge': {
+      icon: '💡',
+      gradient: 'linear-gradient(135deg, #FF6584 0%, #ff9eb5 100%)',
+      edge: '#cc3355',
+      glow: 'rgba(255,101,132,0.45)',
+      desc: t.collectionsPage.desc24Challenge,
+    },
+    'Word Mastery': {
+      icon: '🎯',
+      gradient: 'linear-gradient(135deg, #1a9a50 0%, #2ECC71 100%)',
+      edge: '#0f6634',
+      glow: 'rgba(46,204,113,0.45)',
+      desc: t.collectionsPage.descWordMastery,
+    },
+  };
+}
 
 const LEVELED_NAMES = new Set(['A1', 'A2', 'B1', 'Advanced']);
 
 function CollectionCard({
-  href, icon, title, desc, meta, wordCount, units,
+  href, icon, title, desc, meta, wordCount, units, unitsWordsLabel,
 }: {
   href: string; icon: string; title: string; desc: string;
   meta: { gradient: string; edge: string; glow: string };
-  wordCount?: number; units?: number;
+  wordCount?: number; units?: number; unitsWordsLabel?: string;
 }) {
   return (
     <Link href={href} className="block group h-full">
@@ -55,7 +57,7 @@ function CollectionCard({
           <div className="text-white/90 text-sm mt-1 leading-snug">{desc}</div>
           {(units !== undefined && wordCount !== undefined) && (
             <div className="mt-2 inline-block text-xs font-bold text-white bg-black/25 rounded-full px-3 py-1">
-              {units} units · {wordCount} words
+              {unitsWordsLabel}
             </div>
           )}
         </div>
@@ -68,6 +70,7 @@ export default function CollectionsPage() {
   const t = useTranslation();
   const { collections } = useAppStore(useShallow(s => ({ collections: s.collections })));
   const [importedCount, setImportedCount] = useState(0);
+  const COLLECTION_META = collectionMeta(t);
 
   useEffect(() => {
     setImportedCount(getImportedWords().length);
@@ -92,8 +95,8 @@ export default function CollectionsPage() {
         <CollectionCard
           href="/leveled-words"
           icon="📚"
-          title="Leveled Words"
-          desc="A1 → C2 vocabulary by CEFR level"
+          title={t.nav.leveled_words}
+          desc={t.collectionsPage.leveledWordsDesc}
           meta={{ gradient: 'linear-gradient(135deg, #1fa85c 0%, #2ECC71 100%)', edge: '#136e3c', glow: 'rgba(46,204,113,0.45)' }}
         />
 
@@ -117,6 +120,7 @@ export default function CollectionsPage() {
               meta={meta}
               units={col.days.length}
               wordCount={wc}
+              unitsWordsLabel={t.collectionsPage.unitsWordsCount(col.days.length, wc)}
             />
           );
         })}
@@ -125,8 +129,8 @@ export default function CollectionsPage() {
         <CollectionCard
           href="/my-words"
           icon="✍️"
-          title="My Words"
-          desc={importedCount > 0 ? `${importedCount} words · your personal list` : 'Your personal word list — add your first word'}
+          title={t.nav.my_words}
+          desc={importedCount > 0 ? t.collectionsPage.myWordsDescCount(importedCount) : t.collectionsPage.myWordsDescEmpty}
           meta={{ gradient: 'linear-gradient(135deg, #6c63ff 0%, #a78bfa 100%)', edge: '#3f38cc', glow: 'rgba(108,99,255,0.45)' }}
         />
       </div>

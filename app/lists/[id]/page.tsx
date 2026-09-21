@@ -91,7 +91,7 @@ export default function ListDetailPage({ params }: { params: Promise<{ id: strin
   };
 
   const handleRemove = (word: string) => {
-    if (!confirm(`Remove "${word}" from this list?`)) return;
+    if (!confirm(t.listsPage.removeConfirm(word))) return;
     removeWordFromList(id, word);
     pushLists();
     reload();
@@ -120,7 +120,7 @@ export default function ListDetailPage({ params }: { params: Promise<{ id: strin
     return (
       <div className="p-6 text-center space-y-4">
         <p className="text-[var(--text-muted)]">{t.listsPage.notFound}</p>
-        <Link href="/lists" className="btn-primary inline-block">← My Lists</Link>
+        <Link href="/lists" className="btn-primary inline-block">← {t.nav.lists}</Link>
       </div>
     );
   }
@@ -137,7 +137,7 @@ export default function ListDetailPage({ params }: { params: Promise<{ id: strin
           onClick={() => router.back()}
           className="flex items-center gap-2 text-sm text-[var(--text-muted)] mb-3 hover:text-[var(--text)] transition-colors"
         >
-          ← My Lists
+          ← {t.nav.lists}
         </button>
 
         {/* Name row */}
@@ -170,9 +170,9 @@ export default function ListDetailPage({ params }: { params: Promise<{ id: strin
         {/* Study buttons */}
         {list.words.length > 0 && (
           <div className="flex gap-2 flex-wrap mt-3">
-            <StudyBtn href={`/flashcards?list=${enc}`} icon="🃏" label="Cards" disabled={!hasEnough} />
-            <StudyBtn href={`/quiz?list=${enc}`}       icon="❓" label="Quiz"  disabled={!hasForQuiz} />
-            <StudyBtn href={`/matching?list=${enc}`}   icon="🎯" label="Match" disabled={!hasEnough} />
+            <StudyBtn href={`/flashcards?list=${enc}`} icon="🃏" label={t.listsPage.studyCards} disabled={!hasEnough} />
+            <StudyBtn href={`/quiz?list=${enc}`}       icon="❓" label={t.nav.quiz}  disabled={!hasForQuiz} />
+            <StudyBtn href={`/matching?list=${enc}`}   icon="🎯" label={t.listsPage.studyMatch} disabled={!hasEnough} />
           </div>
         )}
       </div>
@@ -199,7 +199,7 @@ export default function ListDetailPage({ params }: { params: Promise<{ id: strin
                     <span className="text-xs text-[var(--text-muted)] italic">{w.partOfSpeech}</span>
                   </div>
                   <p className="text-xs text-[var(--primary)] font-medium mt-0.5 truncate">{w.translation}</p>
-                  <p className="text-xs text-[var(--text-muted)] truncate">{w.collectionName} · Unit {w.dayNumber}</p>
+                  <p className="text-xs text-[var(--text-muted)] truncate">{w.collectionName} · {t.listsPage.unitLabel(w.dayNumber)}</p>
                 </div>
                 <div className="flex items-center gap-1 flex-shrink-0">
                   <button
@@ -248,7 +248,7 @@ export default function ListDetailPage({ params }: { params: Promise<{ id: strin
               />
 
               {searchQuery.trim() && searchResults.length === 0 && (
-                <p className="text-sm text-[var(--text-muted)] text-center py-2">No results for "{searchQuery}"</p>
+                <p className="text-sm text-[var(--text-muted)] text-center py-2">{t.listsPage.noResultsFor(searchQuery)}</p>
               )}
 
               <div className="space-y-1.5 max-h-72 overflow-y-auto">
@@ -268,7 +268,7 @@ export default function ListDetailPage({ params }: { params: Promise<{ id: strin
                             : 'bg-[var(--primary-bg)] text-[var(--primary)] border border-[var(--primary)] hover:bg-[var(--primary)] hover:text-white'
                         }`}
                       >
-                        {inList ? '✓ Added' : '+ Add'}
+                        {inList ? t.listsPage.added : t.listsPage.addBtn}
                       </button>
                     </div>
                   );
@@ -277,7 +277,7 @@ export default function ListDetailPage({ params }: { params: Promise<{ id: strin
 
               {!searchQuery.trim() && (
                 <p className="text-xs text-[var(--text-muted)] text-center">
-                  Type to search across all {collections.reduce((a, c) => a + c.days.reduce((b, d) => b + d.words.length, 0), 0)} words
+                  {t.listsPage.searchAcrossWords(collections.reduce((a, c) => a + c.days.reduce((b, d) => b + d.words.length, 0), 0))}
                 </p>
               )}
             </div>

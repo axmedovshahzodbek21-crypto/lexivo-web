@@ -85,12 +85,12 @@ export default function FolderCollectionPage({ params }: Props) {
   }
 
   function requestDeleteCollection() {
-    setConfirmModal({ type: 'collection', message: `Delete the "${collectionName}" collection and all its words?` });
+    setConfirmModal({ type: 'collection', message: t.myWords.deleteCollectionConfirm(collectionName) });
   }
 
   function requestDeleteSelected() {
     if (selected.size === 0) return;
-    setConfirmModal({ type: 'bulk', count: selected.size, message: `Delete ${selected.size} selected word${selected.size !== 1 ? 's' : ''}?` });
+    setConfirmModal({ type: 'bulk', count: selected.size, message: t.myWords.deleteSelectedConfirm(selected.size) });
   }
 
   function confirmDelete() {
@@ -124,7 +124,7 @@ export default function FolderCollectionPage({ params }: Props) {
   return (
     <div className="flex flex-col min-h-screen animate-fade-in pb-24">
       <div className="flex items-center gap-3 p-4 border-b border-[var(--border)]">
-        <button onClick={() => router.back()} className="btn-icon text-lg" aria-label="Go back">←</button>
+        <button onClick={() => router.back()} className="btn-icon text-lg" aria-label={t.extra.goBack}>←</button>
         <div className="flex-1 min-w-0">
           <h1 className="font-bold text-[var(--text)] truncate">{collectionName}</h1>
           <p className="text-xs text-[var(--text-muted)] truncate">
@@ -136,13 +136,13 @@ export default function FolderCollectionPage({ params }: Props) {
             onClick={toggleSelectMode}
             className={`text-xs font-semibold px-3 py-1.5 rounded-full transition-colors ${selectMode ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface-2)] text-[var(--text-muted)]'}`}
           >
-            {selectMode ? 'Cancel' : 'Select'}
+            {selectMode ? t.libraryPage.cancel : t.libraryPage.select}
           </button>
         )}
         <button
           onClick={requestDeleteCollection}
           className="btn-icon text-base text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors"
-          aria-label="Delete collection"
+          aria-label={t.myWords.deleteCollectionAria}
         >🗑️</button>
         <Link
           href={`/import?folder=${encodeURIComponent(folder)}&collection=${encodeURIComponent(collectionName)}`}
@@ -181,30 +181,34 @@ export default function FolderCollectionPage({ params }: Props) {
               <StudyButton
                 href={`/learn?${studyParam}`}
                 onlyNewHref={`/learn?${studyParam}&onlyNew=1`}
-                icon="📖" label="Learn" color="var(--primary)"
+                icon="📖" label={t.home.learnTitle} color="var(--primary)"
                 bg="rgba(108,99,255,0.1)" border="rgba(108,99,255,0.3)"
                 done={progress.learnDone} pendingNew={pendingByActivity.learn}
+                newBadgeLabel={t.myWords.pendingNewBadge(pendingByActivity.learn)}
               />
               <StudyButton
                 href={`/flashcards?${studyParam}`}
                 onlyNewHref={`/flashcards?${studyParam}&onlyNew=1`}
-                icon="🃏" label="Flashcards" color="#FF6B35"
+                icon="🃏" label={t.home.flashcardsTitle} color="#FF6B35"
                 bg="rgba(255,107,53,0.1)" border="rgba(255,107,53,0.3)"
                 done={progress.flashcardDone} pendingNew={pendingByActivity.flashcard}
+                newBadgeLabel={t.myWords.pendingNewBadge(pendingByActivity.flashcard)}
               />
               <StudyButton
                 href={`/quiz?${studyParam}`}
                 onlyNewHref={`/quiz?${studyParam}&onlyNew=1`}
-                icon="❓" label="Quiz" color="var(--warning)"
+                icon="❓" label={t.home.quizTitle} color="var(--warning)"
                 bg="rgba(245,158,11,0.1)" border="rgba(245,158,11,0.3)"
                 done={progress.quizDone} pendingNew={pendingByActivity.quiz}
+                newBadgeLabel={t.myWords.pendingNewBadge(pendingByActivity.quiz)}
               />
               <StudyButton
                 href={`/matching?${studyParam}`}
                 onlyNewHref={`/matching?${studyParam}&onlyNew=1`}
-                icon="🔗" label="Match" color="var(--success)"
+                icon="🔗" label={t.home.matchTitle} color="var(--success)"
                 bg="rgba(16,185,129,0.1)" border="rgba(16,185,129,0.3)"
                 done={progress.matchDone} pendingNew={pendingByActivity.match}
+                newBadgeLabel={t.myWords.pendingNewBadge(pendingByActivity.match)}
               />
             </div>
 
@@ -229,7 +233,7 @@ export default function FolderCollectionPage({ params }: Props) {
                         <div className="flex items-center gap-2">
                           <span className="font-bold text-[var(--text)]">{w.word}</span>
                           {!selectMode && (
-                            <button onClick={e => { e.stopPropagation(); speakText(w.word, w.language); }} className="w-6 h-6 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-xs hover:bg-[var(--primary)] hover:text-white transition-colors shrink-0" aria-label="Listen">🔊</button>
+                            <button onClick={e => { e.stopPropagation(); speakText(w.word, w.language); }} className="w-6 h-6 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-xs hover:bg-[var(--primary)] hover:text-white transition-colors shrink-0" aria-label={t.home.listen}>🔊</button>
                           )}
                         </div>
                         <p className="text-sm font-medium text-[var(--primary)] mt-0.5">{w.translation}</p>
@@ -242,7 +246,7 @@ export default function FolderCollectionPage({ params }: Props) {
                         ))}
                       </div>
                       {!selectMode && (
-                        <button onClick={() => requestDelete(w.id)} className="text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors text-sm shrink-0 mt-0.5" aria-label="Delete word">🗑️</button>
+                        <button onClick={() => requestDelete(w.id)} className="text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors text-sm shrink-0 mt-0.5" aria-label={t.classesPage.deleteWord}>🗑️</button>
                       )}
                     </div>
                   </div>
@@ -265,13 +269,13 @@ export default function FolderCollectionPage({ params }: Props) {
 
       {selectMode && selected.size > 0 && (
         <div className="fixed bottom-20 sm:bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-3 px-5 py-3 rounded-2xl shadow-xl bg-[var(--surface)] border border-[var(--border)]">
-          <span className="text-sm font-semibold text-[var(--text)]">{selected.size} selected</span>
+          <span className="text-sm font-semibold text-[var(--text)]">{t.myWords.selectedCount(selected.size)}</span>
           <button
             onClick={requestDeleteSelected}
             className="px-4 py-2 rounded-xl text-sm font-bold text-white"
             style={{ background: 'var(--danger)' }}
           >
-            🗑️ Delete
+            🗑️ {t.libraryPage.delete}
           </button>
         </div>
       )}
@@ -285,14 +289,14 @@ export default function FolderCollectionPage({ params }: Props) {
                 onClick={() => setConfirmModal(null)}
                 className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-[var(--text-muted)] bg-[var(--surface-2)]"
               >
-                Cancel
+                {t.libraryPage.cancel}
               </button>
               <button
                 onClick={confirmDelete}
                 className="flex-1 py-2.5 rounded-xl text-sm font-bold text-white"
                 style={{ background: 'var(--danger)' }}
               >
-                Delete
+                {t.libraryPage.delete}
               </button>
             </div>
           </div>
@@ -307,10 +311,11 @@ export default function FolderCollectionPage({ params }: Props) {
 // there are pending new words, tapping jumps straight into a session with
 // just those words instead of the full set.
 function StudyButton({
-  href, onlyNewHref, icon, label, color, bg, border, done, pendingNew,
+  href, onlyNewHref, icon, label, color, bg, border, done, pendingNew, newBadgeLabel,
 }: {
   href: string; onlyNewHref: string; icon: string; label: string;
   color: string; bg: string; border: string; done: boolean; pendingNew: number;
+  newBadgeLabel: string;
 }) {
   const target = done && pendingNew > 0 ? onlyNewHref : href;
   return (
@@ -327,7 +332,7 @@ function StudyButton({
           className="absolute -top-1.5 -left-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full text-white"
           style={{ background: 'var(--success)' }}
         >
-          {pendingNew} new
+          {newBadgeLabel}
         </span>
       )}
     </Link>

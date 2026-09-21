@@ -57,14 +57,14 @@ export default function ListsPage() {
         <BackButton />
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold text-[var(--text)]">📋 My Lists</h1>
+            <h1 className="text-xl font-bold text-[var(--text)]">📋 {t.nav.lists}</h1>
             <p className="text-sm text-[var(--text-muted)] mt-0.5">{t.listsPage.subtitle}</p>
           </div>
           <button
             onClick={() => { setCreating(true); setNewName(''); }}
             className="btn-primary text-sm px-4 py-2"
           >
-            + New List
+            {t.listsPage.newListBtn}
           </button>
         </div>
       </div>
@@ -85,10 +85,10 @@ export default function ListsPage() {
             />
             <div className="flex gap-2">
               <button onClick={handleCreate} disabled={!newName.trim()} className="btn-primary flex-1 text-sm py-2">
-                Create & open
+                {t.listsPage.createAndOpen}
               </button>
               <button onClick={() => setCreating(false)} className="btn-secondary flex-1 text-sm py-2">
-                Cancel
+                {t.common.cancel}
               </button>
             </div>
           </div>
@@ -100,10 +100,10 @@ export default function ListsPage() {
             <div className="text-6xl mb-4">📋</div>
             <h2 className="text-xl font-bold text-[var(--text)] mb-2">{t.listsPage.noLists}</h2>
             <p className="text-sm text-[var(--text-muted)] mb-6 max-w-xs mx-auto leading-relaxed">
-              Create a list to group words from any collection and study them together.
+              {t.listsPage.emptyStateDesc}
             </p>
             <button onClick={() => setCreating(true)} className="btn-primary">
-              + Create your first list
+              {t.listsPage.createFirstList}
             </button>
           </div>
         ) : (
@@ -143,17 +143,17 @@ function ListRow({
     return (
       <div className="card border-[var(--danger)] space-y-3 animate-fade-in">
         <p className="text-sm font-semibold text-[var(--text)]">
-          Delete "<span className="text-[var(--danger)]">{list.name}</span>"?
+          {t.listsPage.deleteConfirmTitle(list.name)}
         </p>
         <p className="text-xs text-[var(--text-muted)]">
-          This removes the list and its {list.words.length} word{list.words.length !== 1 ? 's' : ''}. The words themselves are not affected.
+          {t.listsPage.deleteConfirmBody(list.words.length)}
         </p>
         <div className="flex gap-2">
           <button onClick={onDeleteConfirm} className="flex-1 py-2 rounded-xl bg-red-50 border border-[var(--danger)] text-[var(--danger)] text-sm font-semibold hover:bg-red-100 transition-colors">
-            Yes, delete
+            {t.classesPage.yesDelete}
           </button>
           <button onClick={onDeleteCancel} className="flex-1 btn-secondary text-sm py-2">
-            Cancel
+            {t.common.cancel}
           </button>
         </div>
       </div>
@@ -161,7 +161,7 @@ function ListRow({
   }
 
   return (
-    <div className="card flex items-center gap-3 hover:border-[var(--primary)] transition-colors cursor-pointer" onClick={onOpen} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpen(); } }} role="button" tabIndex={0} aria-label={`Open ${list.name}`}>
+    <div className="card flex items-center gap-3 hover:border-[var(--primary)] transition-colors cursor-pointer" onClick={onOpen} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpen(); } }} role="button" tabIndex={0} aria-label={t.listsPage.openList(list.name)}>
       <div
         className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
         style={{ background: 'var(--primary-bg)' }}

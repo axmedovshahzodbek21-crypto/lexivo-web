@@ -102,7 +102,7 @@ export default function StarredPage() {
             <div className="flex gap-2 flex-wrap">
               <Link href="/flashcards?starred=true" className="btn-secondary text-sm px-3 py-1.5">{t.starred.cards}</Link>
               <Link href="/quiz?starred=true" className="btn-secondary text-sm px-3 py-1.5">{t.starred.quiz}</Link>
-              <Link href="/matching?starred=true" className="btn-secondary text-sm px-3 py-1.5">🎯 Match</Link>
+              <Link href="/matching?starred=true" className="btn-secondary text-sm px-3 py-1.5">{t.starred.match}</Link>
             </div>
           )}
         </div>
@@ -159,25 +159,25 @@ export default function StarredPage() {
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <span className="text-lg">⭐</span>
-                      <span className="font-bold text-[var(--text)] text-base">Unit {i + 1}</span>
+                      <span className="font-bold text-[var(--text)] text-base">{t.starred.unitLabel(i + 1)}</span>
                     </div>
                     <span className="badge">{unitWords.length} / 30</span>
                   </div>
                   {isLast && remaining > 0 && (
-                    <p className="text-xs text-[var(--text-muted)] mb-3">{remaining} more to complete this unit</p>
+                    <p className="text-xs text-[var(--text-muted)] mb-3">{t.starred.remainingInUnit(remaining)}</p>
                   )}
                   <div className="flex gap-2">
                     <Link
                       href={`/learn?source=starred&unit=${i + 1}`}
                       className="flex-1 btn-primary text-center text-sm py-2"
                     >
-                      📖 Learn
+                      {t.starred.learn}
                     </Link>
                     <Link
                       href={`/flashcards?starred=true&unit=${i + 1}`}
                       className="flex-1 btn-secondary text-center text-sm py-2"
                     >
-                      🃏 Flashcard
+                      {t.starred.flashcard}
                     </Link>
                   </div>
                 </div>
@@ -216,12 +216,12 @@ function WordCard({
           <button
             onClick={() => speak(word.word)}
             className="w-8 h-8 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-sm hover:bg-[var(--primary)] hover:text-white transition-colors"
-            aria-label="Listen to pronunciation"
+            aria-label={t.starred.listenLabel}
           >🔊</button>
           <button
             onClick={onUnstar}
             className="w-8 h-8 rounded-full bg-yellow-50 flex items-center justify-center text-sm hover:bg-red-50 transition-colors"
-            aria-label="Remove from starred"
+            aria-label={t.starred.removeLabel}
           >⭐</button>
         </div>
       </div>

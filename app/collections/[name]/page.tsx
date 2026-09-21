@@ -232,7 +232,7 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
             <div className="text-5xl mb-4">🎯</div>
             <p className="font-bold text-[var(--text)] mb-1">{t.extra.noCompletedUnits}</p>
             <p className="text-sm text-[var(--text-muted)] leading-relaxed max-w-xs">
-              Complete Learn → Flashcards → Quiz for a unit to unlock it here.
+              {t.collectionsPage.completeToUnlockDoneOnly}
             </p>
           </div>
         </div>
@@ -278,13 +278,13 @@ function masteryColor(score: number): string {
   return '#22c55e';
 }
 
-function masteryLabel(score: number): string {
-  if (score === 0) return 'Not studied';
-  if (score < 0.2) return 'Needs work';
-  if (score < 0.4) return 'Struggling';
-  if (score < 0.6) return 'Learning';
-  if (score < 0.8) return 'Good';
-  return 'Mastered';
+function masteryLabel(score: number, t: ReturnType<typeof useTranslation>): string {
+  if (score === 0) return t.classesPage.notStudied;
+  if (score < 0.2) return t.collectionsPage.masteryNeedsWork;
+  if (score < 0.4) return t.collectionsPage.masteryStruggling;
+  if (score < 0.6) return t.collectionsPage.masteryLearning;
+  if (score < 0.8) return t.collectionsPage.masteryGood;
+  return t.collectionsPage.masteryMastered;
 }
 
 type WordMastery = { word: string; srsScore: number; gateScore: number | null; combined: number };
@@ -315,7 +315,7 @@ function MasteryHeatmap({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="font-bold text-sm text-[var(--text)]">🗺 Word Mastery Heatmap</h3>
+          <h3 className="font-bold text-sm text-[var(--text)]">{t.collectionsPage.wordMasteryHeatmap}</h3>
           <p className="text-[10px] text-[var(--text-muted)] mt-0.5">
             {totalStudied}/{totalWords} words studied · avg {Math.round(avgMastery * 100)}% mastery
           </p>
@@ -325,7 +325,7 @@ function MasteryHeatmap({
             onClick={() => onSelectUnit(null)}
             className="text-xs font-semibold text-[var(--primary)] hover:opacity-70 transition-opacity"
           >
-            ← All units
+            {t.collectionsPage.allUnitsBack}
           </button>
         )}
       </div>
@@ -334,7 +334,7 @@ function MasteryHeatmap({
         /* ── Per-word drill-down ── */
         <div className="space-y-2">
           <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">
-            Unit {drillUnit.dayNumber} · {drillUnit.topic}
+            {t.wordPage.unitTopic.replace('{n}', String(drillUnit.dayNumber)).replace('{topic}', drillUnit.topic)}
           </p>
           <div className="grid grid-cols-2 gap-2">
             {drillUnit.words.map((w, i) => {
@@ -353,7 +353,7 @@ function MasteryHeatmap({
                     <p className="text-xs font-black" style={{ color: masteryColor(w.combined) }}>
                       {Math.round(w.combined * 100)}%
                     </p>
-                    <p className="text-[9px] text-[var(--text-muted)]">{masteryLabel(w.combined)}</p>
+                    <p className="text-[9px] text-[var(--text-muted)]">{masteryLabel(w.combined, t)}</p>
                   </div>
                 </div>
               );
@@ -361,7 +361,7 @@ function MasteryHeatmap({
           </div>
           {/* SRS + gate breakdown legend */}
           <div className="flex gap-4 px-1 pt-1">
-            <p className="text-[9px] text-[var(--text-muted)]">⬜ SRS 60% + 🎯 Gate 40%</p>
+            <p className="text-[9px] text-[var(--text-muted)]">{t.collectionsPage.srsGateBreakdown}</p>
           </div>
         </div>
       ) : (
@@ -374,7 +374,7 @@ function MasteryHeatmap({
                 onClick={() => onSelectUnit(u.dayNumber)}
                 className="flex flex-col items-center gap-1 py-2.5 px-1 rounded-xl transition-transform active:scale-95 hover:opacity-80"
                 style={{ background: masteryColor(u.avgScore) + '22', border: `2px solid ${masteryColor(u.avgScore)}` }}
-                title={`Unit ${u.dayNumber}: ${masteryLabel(u.avgScore)} (${Math.round(u.avgScore * 100)}%)`}
+                title={t.collectionsPage.unitMasteryTitle(u.dayNumber, masteryLabel(u.avgScore, t), Math.round(u.avgScore * 100))}
               >
                 <div
                   className="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-black text-white"
@@ -392,11 +392,11 @@ function MasteryHeatmap({
           {/* Legend */}
           <div className="flex items-center gap-3 flex-wrap px-1 pt-1">
             {[
-              { color: 'var(--border)', label: 'Not studied' },
-              { color: '#ef4444', label: 'Needs work' },
-              { color: '#eab308', label: 'Learning' },
-              { color: '#84cc16', label: 'Good' },
-              { color: '#22c55e', label: 'Mastered' },
+              { color: 'var(--border)', label: t.classesPage.notStudied },
+              { color: '#ef4444', label: t.collectionsPage.masteryNeedsWork },
+              { color: '#eab308', label: t.collectionsPage.masteryLearning },
+              { color: '#84cc16', label: t.collectionsPage.masteryGood },
+              { color: '#22c55e', label: t.collectionsPage.masteryMastered },
             ].map(({ color, label }) => (
               <div key={label} className="flex items-center gap-1">
                 <div className="w-2.5 h-2.5 rounded-full" style={{ background: color }} />
@@ -454,7 +454,7 @@ function UnitCard({
   };
 
   const storyEmojis = ['📖', '📕', '📗'];
-  const storyLabels = ['Story 1 · Stage 4', 'Story 2 · Mastered', 'Story 3 · 30 Days Later'];
+  const storyLabels = [t.collectionsPage.story1Label, t.collectionsPage.story2Label, t.collectionsPage.story3Label];
   const storyFlags = [storyInfo.story1Unlocked, storyInfo.story2Unlocked, storyInfo.story3Unlocked];
 
   const enc = encodeURIComponent(collectionName);
@@ -493,7 +493,7 @@ function UnitCard({
                 Unit {unit.dayNumber}
               </span>
               <span className="text-[10px] text-[var(--text-muted)]">{unit.wordCount} words</span>
-              {isComplete && <span className="text-[10px] font-bold text-green-500">✓ Done</span>}
+              {isComplete && <span className="text-[10px] font-bold text-green-500">{t.collectionsPage.doneCheckmark}</span>}
               {storyInfo.anyUnlocked && (
                 <span className="text-[10px] font-bold text-amber-500">📚 {storyInfo.unlockedCount}</span>
               )}
@@ -545,11 +545,11 @@ function UnitCard({
 
         {/* Mode buttons */}
         <div className="grid grid-cols-3 gap-2">
-          <ModeButton href={learnUrl} icon="📖" label="Learn" done={learnDone} color="#4f46e5" />
+          <ModeButton href={learnUrl} icon="📖" label={t.nav.learn} done={learnDone} color="#4f46e5" />
           <ModeButton
             href={flashUrl}
             icon="🃏"
-            label={hardCount > 0 ? `Cards (${hardCount})` : 'Cards'}
+            label={hardCount > 0 ? t.collectionsPage.cardsLabelCount(hardCount) : t.collectionsPage.cardsLabel}
             done={flashcardDone}
             color="#ea580c"
             locked={!learnDone}
@@ -558,7 +558,7 @@ function UnitCard({
           <ModeButton
             href={quizUrl}
             icon="❓"
-            label="Quiz"
+            label={t.nav.quiz}
             done={quizDone}
             color="#d97706"
             locked={!learnDone}
@@ -572,7 +572,7 @@ function UnitCard({
         <ModeButton
           href={matchUrl}
           icon="🎯"
-          label="Match"
+          label={t.collectionsPage.matchLabel}
           done={!!matchDone}
           color="#db2777"
           wide
@@ -583,7 +583,7 @@ function UnitCard({
         {/* Stories */}
         {storyInfo.anyUnlocked && (
           <div className="pt-2 border-t border-[var(--border)]">
-            <p className="text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)] mb-2">📚 Stories</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)] mb-2">{t.collectionsPage.storiesHeader}</p>
             <div className="flex flex-col gap-1.5">
               {storyFlags.map((unlocked, i) => (
                 <button
@@ -670,7 +670,7 @@ function UnitCard({
                 <span className="text-4xl mb-3">{storyEmojis[activeStory.num - 1]}</span>
                 <p className="font-semibold text-[var(--text)] mb-1">{t.extra.storyComingSoon}</p>
                 <p className="text-xs text-[var(--text-muted)]">
-                  You&apos;ve unlocked this story, but it hasn&apos;t been written yet.
+                  {t.collectionsPage.storyUnlockedNotWritten}
                 </p>
               </div>
             )}
@@ -691,10 +691,10 @@ function UnitCard({
             <h3 className="font-bold text-lg mb-4 text-center">{t.collections.markingModal}</h3>
             <div className="space-y-3">
               {[
-                { icon: '📖', label: 'Learn', desc: t.collections.markingLearn },
-                { icon: '🃏', label: 'Flashcards', desc: t.collections.markingFlash },
-                { icon: '❓', label: 'Quiz', desc: t.collections.markingQuiz },
-                { icon: '🏆', label: 'Unit Complete', desc: t.collections.markingUnit },
+                { icon: '📖', label: t.nav.learn, desc: t.collections.markingLearn },
+                { icon: '🃏', label: t.nav.flashcards, desc: t.collections.markingFlash },
+                { icon: '❓', label: t.nav.quiz, desc: t.collections.markingQuiz },
+                { icon: '🏆', label: t.collectionsPage.unitCompleteLabel, desc: t.collections.markingUnit },
               ].map(({ icon, label, desc }) => (
                 <div key={label} className="flex gap-3 items-start">
                   <span className="text-xl shrink-0">{icon}</span>

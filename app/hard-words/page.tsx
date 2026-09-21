@@ -57,7 +57,7 @@ export default function HardWordsPage() {
   useEffect(() => { reload(); }, [reload]);
 
   const handleRemove = (word: string) => {
-    if (!confirm(`Remove "${word}" from hard words?`)) return;
+    if (!confirm(t.hardWordsPage.confirmRemove(word))) return;
     removeHardWord(word);
     pushLists();
     reload();
@@ -103,14 +103,14 @@ export default function HardWordsPage() {
         <BackButton />
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold text-[var(--text)]">😓 Hard Words</h1>
-            <p className="text-sm text-[var(--text-muted)] mt-0.5">{hardList.length} words to master</p>
+            <h1 className="text-xl font-bold text-[var(--text)]">{t.hardWordsPage.title}</h1>
+            <p className="text-sm text-[var(--text-muted)] mt-0.5">{t.hardWordsPage.subtitle(hardList.length)}</p>
           </div>
           {hardList.length > 0 && (
             <div className="flex gap-2 flex-wrap">
-              <Link href="/flashcards?hard=true" className="btn-secondary text-sm px-3 py-1.5">🃏 Cards</Link>
-              <Link href="/learn?hard=true" className="btn-secondary text-sm px-3 py-1.5">📖 Study</Link>
-              <Link href="/matching?hard=true" className="btn-secondary text-sm px-3 py-1.5">🎯 Match</Link>
+              <Link href="/flashcards?hard=true" className="btn-secondary text-sm px-3 py-1.5">{t.hardWordsPage.cards}</Link>
+              <Link href="/learn?hard=true" className="btn-secondary text-sm px-3 py-1.5">{t.hardWordsPage.study}</Link>
+              <Link href="/matching?hard=true" className="btn-secondary text-sm px-3 py-1.5">{t.hardWordsPage.match}</Link>
             </div>
           )}
         </div>
@@ -118,7 +118,7 @@ export default function HardWordsPage() {
         {hardList.length > 0 && (
           <div className="mt-3 bg-amber-50 border border-amber-200 rounded-xl p-3">
             <p className="text-xs text-amber-700">
-              💡 These words were marked <strong>Too Hard</strong> during learning. Study them here, then mark as learned to add them to your SRS review cycle.
+              💡 {t.hardWordsPage.bannerPrefix} <strong>{t.hardWordsPage.tooHard}</strong> {t.hardWordsPage.bannerSuffix}
             </p>
           </div>
         )}
@@ -131,7 +131,7 @@ export default function HardWordsPage() {
             <div className="text-6xl mb-4">🎉</div>
             <h2 className="text-xl font-bold text-[var(--text)] mb-2">{t.hardWordsPage.none}</h2>
             <p className="text-[var(--text-muted)] text-sm mb-6">
-              Words you tap <strong>Too Hard</strong> while learning will appear here for focused practice.
+              {t.hardWordsPage.emptyHelperPrefix} <strong>{t.hardWordsPage.tooHard}</strong> {t.hardWordsPage.emptyHelperSuffix}
             </p>
             <Link href="/collections" className="btn-primary inline-block">{t.hardWordsPage.startLearning}</Link>
           </div>
@@ -165,6 +165,7 @@ function HardWordCard({
   onRemove: () => void;
   onMarkLearned: () => void;
 }) {
+  const t = useTranslation();
   return (
     <div className="card border-l-4 border-l-[var(--danger)] transition-all">
       {/* Top row */}
@@ -182,12 +183,12 @@ function HardWordCard({
           <button
             onClick={() => speak(word.word)}
             className="w-8 h-8 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-sm hover:bg-[var(--primary)] hover:text-white transition-colors"
-            aria-label="Listen to pronunciation"
+            aria-label={t.hardWordsPage.listen}
           >🔊</button>
           <button
             onClick={onRemove}
             className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center text-sm hover:bg-red-100 transition-colors"
-            aria-label="Remove from hard list"
+            aria-label={t.hardWordsPage.remove}
           >✕</button>
         </div>
       </div>
@@ -197,13 +198,13 @@ function HardWordCard({
         onClick={onToggle}
         className="text-xs text-[var(--primary)] font-medium hover:underline"
       >
-        {expanded ? '▲ Less' : '▼ Definition & examples'}
+        {expanded ? t.hardWordsPage.showLess : t.hardWordsPage.showMore}
       </button>
       <Link
         href={`/word/${encodeURIComponent(word.word)}`}
         className="mt-2 text-xs text-[var(--text-muted)] hover:text-[var(--primary)] transition-colors block text-right"
       >
-        Full details →
+        {t.hardWordsPage.fullDetails}
       </Link>
 
       {/* Expanded content */}
@@ -217,7 +218,7 @@ function HardWordCard({
               .filter(item => item.ex)
               .map(({ ex, i }) => (
               <div key={i} className="bg-[var(--surface-2)] rounded-xl p-3">
-                <p className="text-xs text-[var(--text-muted)] mb-1">Example {i + 1}</p>
+                <p className="text-xs text-[var(--text-muted)] mb-1">{t.hardWordsPage.example(i + 1)}</p>
                 <p className="text-sm italic text-[var(--text)]">"{ex}"</p>
                 {i === 2 && word.example3Translation && (
                   <p className="text-xs text-[var(--primary)] mt-1">{word.example3Translation}</p>
@@ -227,14 +228,14 @@ function HardWordCard({
           </div>
 
           <div className="bg-amber-50 rounded-xl p-3 space-y-1">
-            <p className="text-xs font-semibold text-amber-700 mb-1">🗺️ Situations (O'zbek)</p>
+            <p className="text-xs font-semibold text-amber-700 mb-1">{t.hardWordsPage.situationsHeader}</p>
             {[word.example1Situation, word.example2Situation, word.example3Situation].filter(Boolean).map((s, i) => (
               <p key={i} className="text-xs text-amber-900">{s}</p>
             ))}
           </div>
 
           <div className="text-xs text-[var(--text-muted)]">
-            From: {word.collectionName} · Unit {word.dayNumber}
+            {t.hardWordsPage.from(word.collectionName, word.dayNumber)}
           </div>
         </div>
       )}
@@ -244,7 +245,7 @@ function HardWordCard({
         onClick={onMarkLearned}
         className="mt-3 w-full py-2 rounded-xl bg-green-50 border border-[var(--success)] text-[var(--success)] text-sm font-semibold hover:bg-green-100 transition-colors"
       >
-        ✓ I've got it — Mark as Learned
+        {t.hardWordsPage.markLearned}
       </button>
     </div>
   );

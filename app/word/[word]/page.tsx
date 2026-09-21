@@ -77,7 +77,7 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
         const nextInterval = SRS_INTERVALS.find(i => !completed.includes(i));
         const lr = getSRSLastReview()[srs.id];
         const baseDate = lr && lr > srs.learnedAt ? lr : srs.learnedAt; // clamp >= learnedAt (matches getDueWords / Flutter)
-        const nextReview = nextInterval ? addDaysToDateStr(baseDate, nextInterval) : 'Graduated';
+        const nextReview = nextInterval ? addDaysToDateStr(baseDate, nextInterval) : t.wordPage.graduated;
         setSrsInfo({ completedCount: completed.length, nextReview });
       }
     }
@@ -111,7 +111,7 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
 
   const handleCreateAndAdd = () => {
     if (!word) return;
-    const name = prompt('New list name:');
+    const name = prompt(t.wordPage.newListNamePrompt);
     if (!name?.trim()) return;
     const list: CustomList = {
       id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
@@ -132,7 +132,7 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
       <div className="p-6 text-center">
         <div className="text-5xl mb-4">🔍</div>
         <h2 className="font-bold text-xl mb-2">{t.wordPage.notFound}</h2>
-        <p className="text-[var(--text-muted)] text-sm mb-4">"{wordText}" isn't in any collection.</p>
+        <p className="text-[var(--text-muted)] text-sm mb-4">{t.wordPage.notInAnyCollection.replace('{word}', wordText)}</p>
         <Link href="/search" className="btn-primary inline-block">{t.wordPage.searchWords}</Link>
       </div>
     );
@@ -153,7 +153,7 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
           <button
             onClick={handleStar}
             className="btn-icon text-lg"
-            aria-label={starred ? 'Remove from starred' : 'Add to starred'}
+            aria-label={starred ? t.extra.removeFromStarred : t.extra.addToStarred}
           >{starred ? '⭐' : '☆'}</button>
         </div>
       </div>
@@ -193,13 +193,13 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
 
         {/* Definition */}
         <div className="card">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] mb-2">📖 Definition</h2>
+          <h2 className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] mb-2">{t.wordPage.definitionHeading}</h2>
           <p className="text-[var(--text)] leading-relaxed">{word.definition}</p>
         </div>
 
         {/* Examples */}
         <div className="card space-y-3">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">💬 Examples</h2>
+          <h2 className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">{t.wordPage.examplesHeading}</h2>
           {[
             { text: word.example1, situation: word.example1Situation, translation: null },
             { text: word.example2, situation: word.example2Situation, translation: null },
@@ -253,7 +253,7 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
                   style={{ color: stageColor(srsInfo.completedCount) }}
                 >{stageLabel(srsInfo.completedCount)}</div>
                 <div className="text-xs text-[var(--text-muted)] mt-0.5">
-                  Review: {srsInfo.nextReview}
+                  {t.wordPage.reviewLabel.replace('{nextReview}', srsInfo.nextReview)}
                 </div>
               </>
             ) : (
@@ -273,7 +273,7 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
             <p className="text-xs text-[var(--text-muted)]">{t.wordPage.unitTopic.replace("{n}", String(word.dayNumber)).replace("{topic}", word.topic)}</p>
           </div>
           <Link href={unitUrl} className="text-[var(--primary)] text-sm font-medium hover:underline">
-            View unit →
+            {t.wordPage.viewUnit}
           </Link>
         </div>
 
@@ -286,7 +286,7 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
               : 'border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--danger)] hover:text-[var(--danger)]'
           }`}
         >
-          {isHard ? '✓ In hard words list — tap to remove' : '😓 Add to Hard Words'}
+          {isHard ? t.wordPage.inHardWordsList : t.wordPage.addToHardWords}
         </button>
 
         {/* Add to list */}
@@ -329,7 +329,7 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
                         {list.name}
                       </span>
                       <span className="text-xs text-[var(--text-muted)] flex-shrink-0">
-                        {list.words.length} word{list.words.length !== 1 ? 's' : ''}
+                        {t.wordPage.wordCount.replace('{n}', String(list.words.length)).replace('{s}', list.words.length !== 1 ? 's' : '')}
                       </span>
                     </button>
                   );
@@ -346,7 +346,7 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
                 href="/lists"
                 className="block text-center text-xs text-[var(--text-muted)] hover:text-[var(--primary)] transition-colors pt-1"
               >
-                Manage all lists →
+                {t.wordPage.manageAllLists}
               </Link>
             </div>
           )}
@@ -355,10 +355,10 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
         {/* Practice buttons */}
         <div className="grid grid-cols-3 gap-2">
           <Link href={learnUrl} className="flex flex-col items-center gap-1 py-3 rounded-xl bg-[var(--primary-bg)] text-[var(--primary)] text-xs font-semibold hover:bg-[var(--primary)] hover:text-white transition-colors">
-            <span className="text-lg">📖</span>Learn
+            <span className="text-lg">📖</span>{t.nav.learn}
           </Link>
           <Link href={flashUrl} className="flex flex-col items-center gap-1 py-3 rounded-xl bg-[var(--primary-bg)] text-[var(--primary)] text-xs font-semibold hover:bg-[var(--primary)] hover:text-white transition-colors">
-            <span className="text-lg">🃏</span>Cards
+            <span className="text-lg">🃏</span>{t.wordPage.cards}
           </Link>
         </div>
       </div>

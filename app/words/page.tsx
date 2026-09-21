@@ -11,11 +11,7 @@ import type { LearnedWord } from '@/lib/types';
 // Compact month heat-strip; tapping a day opens a pop-up with that day's
 // words. The full "all words ever learned" list sits below the calendar.
 // Personal learning only — class Learn never writes lexivo_learned_words.
-// Copy is English-only; wire i18n before shipping.
 
-const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-const MON_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const DAY_LABELS = ['M','T','W','T','F','S','S'];
 const ACCENT = '#0284c7';
 
 function heat(count: number): string {
@@ -25,21 +21,18 @@ function heat(count: number): string {
 }
 const dateKey = (y: number, m: number, d: number) =>
   `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-const fmtLong = (key: string) => {
-  const [y, m, d] = key.split('-').map(Number);
-  return `${MONTH_NAMES[m - 1]} ${d}, ${y}`;
-};
-const fmtShort = (key: string) => {
+const fmtShort = (monthNamesShort: string[], key: string) => {
   const [, m, d] = key.split('-').map(Number);
-  return `${MON_SHORT[m - 1]} ${d}`;
+  return `${monthNamesShort[m - 1]} ${d}`;
 };
 
 function WordRow({ w, trailing }: { w: LearnedWord; trailing?: string }) {
+  const t = useTranslation();
   return (
     <div className="flex items-center gap-3 px-3 py-2">
       <button onClick={() => speak(w.word)}
         className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs text-[var(--text-muted)] hover:bg-[var(--primary-bg)] hover:text-[var(--primary)] transition-colors"
-        aria-label={`Pronounce ${w.word}`}>🔊</button>
+        aria-label={t.wordsPage.pronounceWord.replace('{word}', w.word)}>🔊</button>
       <div className="flex-1 min-w-0">
         <div className="text-sm font-semibold text-[var(--text)] leading-tight">{w.word}</div>
         {w.translation && <div className="text-xs text-[var(--text-muted)] truncate">{w.translation}</div>}
@@ -57,6 +50,8 @@ function DayModal({ dayKey, words, onClose }: { dayKey: string; words: LearnedWo
   }, []);
   const collections = Array.from(new Set(words.map(w => w.collectionName).filter(Boolean)));
   const oneCollection = collections.length === 1 ? collections[0] : null;
+  const [y, mo, d] = dayKey.split('-').map(Number);
+  const fmtLong = `${t.classesPage.monthNames[mo - 1]} ${d}, ${y}`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" onClick={onClose}>
@@ -69,7 +64,7 @@ function DayModal({ dayKey, words, onClose }: { dayKey: string; words: LearnedWo
         </div>
         <div className="flex items-start justify-between gap-3 px-5 pt-3 pb-3 shrink-0">
           <div>
-            <h3 className="text-lg font-black text-[var(--text)]">{fmtLong(dayKey)}</h3>
+            <h3 className="text-lg font-black text-[var(--text)]">{fmtLong}</h3>
             <p className="text-xs text-[var(--text-muted)] mt-0.5">
               {words.length} {words.length === 1 ? t.wordsPage.word : t.wordsPage.words}
               {oneCollection && <> · {oneCollection}</>}
@@ -153,20 +148,20 @@ export default function WordsPage() {
         <div className="flex items-center justify-between mb-2">
           <button onClick={() => setCalMonth(new Date(y, m - 1, 1))}
             className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-[var(--border)] transition-colors"
-            style={{ color: ACCENT }} aria-label="Previous month">‹</button>
+            style={{ color: ACCENT }} aria-label={t.wordsPage.previousMonth}>‹</button>
           <span className="text-sm font-bold text-[var(--text)]">
-            {MONTH_NAMES[m]} {y}
+            {t.classesPage.monthNames[m]} {y}
             {monthTotal > 0 && <span className="ml-2 text-xs font-semibold text-[var(--text-muted)]">{monthTotal} {t.wordsPage.words}</span>}
           </span>
           <button onClick={() => canGoNext && setCalMonth(new Date(y, m + 1, 1))}
             className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-[var(--border)] transition-colors"
             style={{ color: canGoNext ? ACCENT : 'var(--border)', cursor: canGoNext ? 'pointer' : 'default' }}
-            aria-label="Next month">›</button>
+            aria-label={t.wordsPage.nextMonth}>›</button>
         </div>
 
         <div className="grid grid-cols-7 gap-1">
-          {DAY_LABELS.map((d, i) => (
-            <div key={i} className="text-center text-[9px] font-bold text-[var(--text-muted)] pb-0.5">{d}</div>
+          {t.classesPage.dayLabels.map((d, i) => (
+            <div key={i} className="text-center text-[9px] font-bold text-[var(--text-muted)] pb-0.5">{d.charAt(0)}</div>
           ))}
           {Array.from({ length: firstWeekday }).map((_, i) => <div key={`e${i}`} />)}
           {Array.from({ length: daysInMonth }).map((_, i) => {
@@ -206,7 +201,7 @@ export default function WordsPage() {
         ) : (
           <div className="rounded-xl overflow-hidden border border-[var(--border)] divide-y divide-[var(--border)]">
             {allWords.map(({ w, key }, i) => (
-              <WordRow key={`${w.word}-${i}`} w={w} trailing={key ? fmtShort(key) : undefined} />
+              <WordRow key={`${w.word}-${i}`} w={w} trailing={key ? fmtShort(t.wordsPage.monthNamesShort, key) : undefined} />
             ))}
           </div>
         )}

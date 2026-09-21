@@ -117,7 +117,7 @@ export default function MyWordsPage() {
               onClick={() => setResetConfirm(true)}
               className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-base text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors"
               aria-label={t.extra.resetMyWordsAria}
-              title="Reset My Words progress"
+              title={t.extra.resetMyWordsAria}
             >↺</button>
           )}
           <button
@@ -157,17 +157,17 @@ export default function MyWordsPage() {
               <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider mb-3">{t.extra.howItWorks}</p>
               <div className="flex items-center justify-center gap-2 flex-wrap opacity-70 pointer-events-none select-none">
                 <div className="rounded-xl px-3 py-2 text-left" style={{ background: cardColor(0), border: `1.5px dashed ${darken(cardColor(0))}` }}>
-                  <p className="text-[9px] font-bold text-white/70 uppercase tracking-wide">Folder</p>
+                  <p className="text-[9px] font-bold text-white/70 uppercase tracking-wide">{t.extra.folder}</p>
                   <p className="text-xs font-bold text-white">📁 Vocabulary 101</p>
                 </div>
                 <span className="text-[var(--text-muted)]">→</span>
                 <div className="rounded-xl px-3 py-2 text-left" style={{ background: cardColor(1), border: `1.5px dashed ${darken(cardColor(1))}` }}>
-                  <p className="text-[9px] font-bold text-white/70 uppercase tracking-wide">Unit</p>
+                  <p className="text-[9px] font-bold text-white/70 uppercase tracking-wide">{t.extra.unit}</p>
                   <p className="text-xs font-bold text-white">📖 Unit 1</p>
                 </div>
                 <span className="text-[var(--text-muted)]">→</span>
                 <div className="rounded-xl px-3 py-2 text-left border border-[var(--border)]" style={{ background: 'var(--surface-2)' }}>
-                  <p className="text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-wide">Words</p>
+                  <p className="text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-wide">{t.extra.words}</p>
                   <p className="text-xs font-bold text-[var(--text)]">apple · book · water</p>
                 </div>
               </div>
@@ -175,7 +175,7 @@ export default function MyWordsPage() {
 
             {!creating && (
               <button onClick={() => setCreating(true)} className="btn-primary px-6 py-3 text-sm font-semibold">
-                Create Folder
+                {t.extra.createFolder}
               </button>
             )}
           </div>
@@ -196,7 +196,7 @@ export default function MyWordsPage() {
                   <div>
                     <p className="font-bold text-white text-sm leading-tight line-clamp-2">{folder.name}</p>
                     <p className="text-[11px] mt-0.5" style={{ color: 'rgba(255,255,255,0.75)' }}>
-                      {folder.wordCount} words
+                      {t.myWords.wordCount(folder.wordCount)}
                       {(() => {
                         const done = completedUnitsInFolder(folder.name);
                         return done > 0 ? ` · ✅ ${done}/${folder.collectionCount}` : '';
@@ -225,7 +225,7 @@ export default function MyWordsPage() {
                       <div>
                         <p className="font-bold text-white text-sm leading-tight line-clamp-2">{col.name}</p>
                         <p className="text-[11px] mt-0.5" style={{ color: 'rgba(255,255,255,0.75)' }}>
-                          {col.count} words
+                          {t.myWords.wordCount(col.count)}
                         </p>
                       </div>
                     </Link>
@@ -250,22 +250,21 @@ export default function MyWordsPage() {
           <div className="bg-[var(--surface)] rounded-2xl w-full max-w-sm p-6 shadow-2xl" onClick={e => e.stopPropagation()}>
             <p className="text-[var(--text)] font-bold mb-2">{t.extra.resetMyWordsQ}</p>
             <p className="text-sm text-[var(--text-muted)] mb-6">
-              This clears the Learn/Flashcards/Quiz/Match checkmarks and completion badges on every folder and unit,
-              so you can study them again from scratch. Your words and folders are not deleted.
+              {t.extra.resetMyWordsExplain}
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setResetConfirm(false)}
                 className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-[var(--text-muted)] bg-[var(--surface-2)]"
               >
-                Cancel
+                {t.extra.cancel}
               </button>
               <button
                 onClick={handleResetProgress}
                 className="flex-1 py-2.5 rounded-xl text-sm font-bold text-white"
                 style={{ background: 'var(--danger)' }}
               >
-                Reset
+                {t.extra.reset}
               </button>
             </div>
           </div>
