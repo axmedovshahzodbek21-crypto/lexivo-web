@@ -77,13 +77,13 @@ function LoginContent() {
 
           {resetSent ? (
             <div className="px-4 py-4 rounded-2xl text-center font-semibold" style={{ background: 'rgba(46,204,113,0.1)', color: 'var(--primary)' }}>
-              Check your email for the reset link!
+              {t.loginPage.checkEmailForReset}
             </div>
           ) : (
             <form onSubmit={handleReset} className="space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-[var(--text-muted)] mb-1.5 uppercase tracking-wide">
-                  Email
+                  {t.loginPage.emailLabel}
                 </label>
                 <input
                   type="email"
@@ -107,7 +107,7 @@ function LoginContent() {
                 disabled={resetLoading}
                 className="btn-primary w-full py-4 text-base font-bold disabled:opacity-60"
               >
-                {resetLoading ? 'Sending…' : 'Send Reset Link →'}
+                {resetLoading ? t.loginPage.sending : t.loginPage.sendResetLink}
               </button>
             </form>
           )}
@@ -118,7 +118,7 @@ function LoginContent() {
               className="font-semibold"
               style={{ color: 'var(--primary)' }}
             >
-              ← Back to Sign In
+              {t.loginPage.backToSignIn}
             </button>
           </p>
         </div>
@@ -149,20 +149,20 @@ function LoginContent() {
             <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
             <path fill="none" d="M0 0h48v48H0z"/>
           </svg>
-          {googleLoading ? 'Redirecting…' : 'Continue with Google'}
+          {googleLoading ? t.loginPage.redirecting : t.loginPage.continueWithGoogle}
         </button>
 
         {/* Divider */}
         <div className="flex items-center gap-3 mb-4">
           <div className="flex-1 h-px bg-[var(--border)]" />
-          <span className="text-xs text-[var(--text-muted)] font-medium">or</span>
+          <span className="text-xs text-[var(--text-muted)] font-medium">{t.loginPage.or}</span>
           <div className="flex-1 h-px bg-[var(--border)]" />
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-xs font-semibold text-[var(--text-muted)] mb-1.5 uppercase tracking-wide">
-              Email
+              {t.loginPage.emailLabel}
             </label>
             <input
               type="email"
@@ -178,7 +178,7 @@ function LoginContent() {
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label className="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">
-                Password
+                {t.loginPage.passwordLabel}
               </label>
               <button
                 type="button"
@@ -186,7 +186,7 @@ function LoginContent() {
                 className="text-xs font-semibold"
                 style={{ color: 'var(--primary)' }}
               >
-                Forgot password?
+                {t.loginPage.forgotPassword}
               </button>
             </div>
             <input
@@ -210,14 +210,14 @@ function LoginContent() {
             disabled={loading}
             className="btn-primary w-full py-4 text-base font-bold disabled:opacity-60"
           >
-            {loading ? 'Signing in…' : 'Sign In →'}
+            {loading ? t.loginPage.signingIn : t.loginPage.signInCta}
           </button>
         </form>
 
         <p className="text-center text-sm text-[var(--text-muted)] mt-6">
-          No account?{' '}
+          {t.loginPage.noAccount}{' '}
           <Link href="/signup" className="font-semibold" style={{ color: 'var(--primary)' }}>
-            Create one free
+            {t.loginPage.createOneFree}
           </Link>
         </p>
       </div>

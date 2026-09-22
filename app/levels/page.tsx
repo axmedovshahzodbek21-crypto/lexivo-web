@@ -13,12 +13,10 @@ import { LEVEL_THRESHOLDS } from '@/lib/types';
 // Dates are derived from lifetime XP-per-day (getXPByDate): the first day the
 // running total crosses a threshold. Day-precision, and only as far back as
 // xp_by_date has data — older crossings show as "reached earlier".
-// Copy is English-only; wire i18n before shipping.
 
-const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const fmtDate = (key: string) => {
+const fmtDate = (key: string, monthsShort: readonly string[]) => {
   const [y, m, d] = key.split('-').map(Number);
-  return `${MON[m - 1]} ${d}, ${y}`;
+  return `${monthsShort[m - 1]} ${d}, ${y}`;
 };
 
 // one accent per tier (LEVEL_COLORS in lib/colors is only partial)
@@ -127,7 +125,7 @@ export default function LevelsPage() {
                   </div>
                 ) : reached ? (
                   <div className="text-[11px] text-[var(--text-muted)] mt-0.5">
-                    {lvl.min === 0 ? t.levels.whereBegins : date ? `${t.levels.reached} ${fmtDate(date)}` : t.levels.reachedEarlier}
+                    {lvl.min === 0 ? t.levels.whereBegins : date ? `${t.levels.reached} ${fmtDate(date, t.levels.monthsShort)}` : t.levels.reachedEarlier}
                   </div>
                 ) : (
                   <div className="text-[11px] text-[var(--text-muted)] mt-0.5">

@@ -119,7 +119,7 @@ function ProgressPage() {
     const d = new Date();
     d.setDate(d.getDate() - (6 - i));
     const dateStr = localDateStr(d);
-    const label = i === 6 ? 'Today' : i === 5 ? 'Yes' :
+    const label = i === 6 ? t.progress.today : i === 5 ? t.progress.yesterdayShort :
       d.toLocaleDateString('default', { weekday: 'short' }).slice(0, 3);
     return { dateStr, label, active: studyDays.includes(dateStr) };
   });
@@ -190,7 +190,7 @@ function ProgressPage() {
                 <div className="h-2.5 rounded-full bg-white/25 overflow-hidden">
                   <div className="h-full rounded-full bg-white transition-all" style={{ width: `${levelInfo.progress}%` }} />
                 </div>
-                {levelInfo.next && <p className="text-white/50 text-xs mt-1.5">Next: {levelInfo.next}</p>}
+                {levelInfo.next && <p className="text-white/50 text-xs mt-1.5">{t.progress.next} {levelInfo.next}</p>}
               </div>
             </div>
 
@@ -233,8 +233,8 @@ function ProgressPage() {
             {/* Weekly Activity */}
             <div className="card">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold">📅 This Week</h3>
-                <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--primary)' }}>{activeThisWeek} / 7 days</span>
+                <h3 className="font-semibold">📅 {t.progress.thisWeek}</h3>
+                <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--primary)' }}>{t.progress.activeOfWeek(activeThisWeek)}</span>
               </div>
               <div style={{ display: 'flex', gap: 6 }}>
                 {weeklyActivity.map((day, i) => (
@@ -261,8 +261,8 @@ function ProgressPage() {
             {/* Averages */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               {[
-                { label: 'Words / study day', value: wordsPerDay, icon: '📚', light: '#818CF8', color: '#6366F1', dark: '#4338CA' },
-                { label: 'XP / study day',    value: xpPerDay,   icon: '⚡', light: '#FCD34D', color: '#F59E0B', dark: '#B45309' },
+                { label: t.progress.wordsPerStudyDay, value: wordsPerDay, icon: '📚', light: '#818CF8', color: '#6366F1', dark: '#4338CA' },
+                { label: t.progress.xpPerStudyDay,    value: xpPerDay,   icon: '⚡', light: '#FCD34D', color: '#F59E0B', dark: '#B45309' },
               ].map(({ label, value, icon, light, color, dark }) => (
                 <div key={label} style={{
                   borderRadius: 18, padding: '16px 14px',
@@ -281,7 +281,7 @@ function ProgressPage() {
             {/* Foundation Progress */}
             {LEVEL_META.some(l => foundationDone[l.name]?.total > 0) && (
               <div className="card">
-                <h3 className="font-semibold mb-4">🌱 Foundation Progress</h3>
+                <h3 className="font-semibold mb-4">🌱 {t.progress.foundationProgress}</h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                   {LEVEL_META.map(({ name, color }) => {
                     const fd = foundationDone[name];
@@ -293,7 +293,7 @@ function ProgressPage() {
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
                           <span style={{ fontSize: 14, fontWeight: 900, color }}>{name}</span>
                           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                            <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{fd.done} / {fd.total} units</span>
+                            <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{t.progress.unitsCount(fd.done, fd.total)}</span>
                             <span style={{ fontSize: 11, fontWeight: 800, color }}>{pctLabel}</span>
                           </div>
                         </div>
@@ -459,7 +459,7 @@ function ProgressPage() {
                                   background: 'linear-gradient(135deg, var(--primary), var(--primary-light))',
                                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                                   fontSize: 8, color: 'white', fontWeight: 700 }}>✓</div>
-                                <span style={{ fontSize: 9, color: 'var(--primary)', fontWeight: 600 }}>Achieved</span>
+                                <span style={{ fontSize: 9, color: 'var(--primary)', fontWeight: 600 }}>{t.extra.achieved}</span>
                               </div>
                             ) : prog ? (
                               <>
@@ -574,7 +574,7 @@ function XpHistorySection({ xp }: { xp: number }) {
         onMouseLeave={e => (e.currentTarget.style.transform = 'translateY(0)')}
       >
         <span style={{ fontSize: 28 }}>📅</span>
-        <span style={{ fontSize: 14, fontWeight: 700, color: '#fff', lineHeight: 1.2 }}>XP History</span>
+        <span style={{ fontSize: 14, fontWeight: 700, color: '#fff', lineHeight: 1.2 }}>{t.extra.xpHistory}</span>
         <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.7)' }}>{t.extra.yourXpCalendar}</span>
       </button>
       {open && <XpHistoryModal xp={xp} onClose={() => setOpen(false)} />}
@@ -583,8 +583,6 @@ function XpHistorySection({ xp }: { xp: number }) {
 }
 
 // ─── Study Calendar ───────────────────────────────────────────────────────────
-
-const MONTH_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 function calcCurrentStreak(days: string[]): number {
   if (!days.length) return 0;
@@ -640,6 +638,7 @@ const TASK_COLORS = {
 function MiniCalendar({ title, color, days, year, month, lockedDays }: {
   title: string; color: string; days: string[]; year: number; month: number; lockedDays?: string[];
 }) {
+  const t = useTranslation();
   const cells = buildMonthGrid(year, month);
   const todayStr = localDateStr(new Date());
   const mm = String(month + 1).padStart(2, '0');
@@ -653,11 +652,11 @@ function MiniCalendar({ title, color, days, year, month, lockedDays }: {
         </div>
         <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full shrink-0"
           style={{ background: color, color: '#fff' }}>
-          {monthCount} {monthCount === 1 ? 'day' : 'days'}
+          {t.progress.monthDaysCount(monthCount)}
         </span>
       </div>
       <div className="grid grid-cols-7 gap-y-1">
-        {['M','T','W','T','F','S','S'].map((d, i) => (
+        {t.progress.weekdaysInitial.map((d, i) => (
           <div key={i} className="flex items-center justify-center text-[8px] font-bold pb-0.5" style={{ color: 'var(--text-muted)' }}>{d}</div>
         ))}
         {cells.map((day, i) => {
@@ -719,12 +718,12 @@ function StudyCalendar({
   const [infoModal, setInfoModal] = useState<{ title: string; body: string; emoji: string; color: string; x: number; y: number; above: boolean } | null>(null);
 
   const INFO = {
-    review:   { title: 'SRS Review',       emoji: '🔁', color: TASK_COLORS.review.bg, body: 'Spaced Repetition System — words you\'ve learned come back for review at growing intervals. Complete all words due today to mark the blue half of your day circle.' },
-    words:    { title: 'Daily Word Goal',   emoji: '✏️', color: TASK_COLORS.words.bg,  body: 'Learn new words each day to hit your personal target. You set the number yourself in Settings. Reach it to mark the green half of your day circle.' },
-    streak:   { title: 'Current Streak',   emoji: '🔥', color: '#be123c',              body: 'Days in a row where you completed BOTH SRS review and your word goal. Miss a day without a streak freeze and it resets to 0.' },
-    longest:  { title: 'Longest Streak',   emoji: '⚡', color: '#0369a1',              body: 'Your all-time personal best — the longest consecutive run of perfect days you\'ve ever achieved. It never resets.' },
-    fulldays: { title: 'Full Days',         emoji: '🏆', color: '#b45309',              body: 'Total count of days where you completed both tasks. Every perfect day adds 1 — this is your lifetime tally of fully productive days.' },
-    monthly:  { title: 'Monthly Summary',  emoji: '📅', color: '#6d28d9',              body: 'Words you learned and days you studied each month. A day counts if you did at least one learning session.' },
+    review:   { title: t.extra.srsReview,       emoji: '🔁', color: TASK_COLORS.review.bg, body: t.progress.infoReviewBody },
+    words:    { title: t.progress.infoWordsTitle,   emoji: '✏️', color: TASK_COLORS.words.bg,  body: t.progress.infoWordsBody },
+    streak:   { title: t.progress.currentStreak,   emoji: '🔥', color: '#be123c',              body: t.progress.infoStreakBody },
+    longest:  { title: t.progress.longestStreak,   emoji: '⚡', color: '#0369a1',              body: t.progress.infoLongestBody },
+    fulldays: { title: t.extra.fullDays,         emoji: '🏆', color: '#b45309',              body: t.progress.infoFullDaysBody },
+    monthly:  { title: t.progress.monthlySummary,  emoji: '📅', color: '#6d28d9',              body: t.progress.infoMonthlyBody },
   };
   function InfoBtn({ k, light }: { k: keyof typeof INFO; light?: boolean }) {
     return (
@@ -782,8 +781,8 @@ function StudyCalendar({
         const reviewToday = reviewDays.includes(todayStr);
         const wordsToday  = wordGoalDays.includes(todayStr);
         const goalLabel   = wordsToday
-          ? `${dailyGoal} words ✓`
-          : `${Math.min(todayWordsCount, dailyGoal)}/${dailyGoal} words`;
+          ? t.progress.goalWordsDone(dailyGoal)
+          : t.progress.goalWordsProgress(Math.min(todayWordsCount, dailyGoal), dailyGoal);
         return (
           <div className="grid grid-cols-2 gap-3 mb-1">
             {/* Review card */}
@@ -798,11 +797,11 @@ function StudyCalendar({
               {reviewToday && <div style={{ position: 'absolute', right: -8, bottom: -10, fontSize: 60, opacity: 0.1, pointerEvents: 'none', userSelect: 'none', lineHeight: 1 }}>🔁</div>}
               <span style={{ fontSize: 26, position: 'relative', zIndex: 1 }}>{reviewToday ? '✅' : '○'}</span>
               <span className="flex items-center gap-1" style={{ position: 'relative', zIndex: 1 }}>
-                <span className="text-xs font-black" style={{ color: reviewToday ? '#fff' : 'var(--text-muted)' }}>Review</span>
+                <span className="text-xs font-black" style={{ color: reviewToday ? '#fff' : 'var(--text-muted)' }}>{t.extra.review}</span>
                 <InfoBtn k="review" light={reviewToday} />
               </span>
               <span className="text-[10px] font-bold" style={{ color: reviewToday ? 'rgba(255,255,255,0.75)' : 'var(--text-muted)', position: 'relative', zIndex: 1 }}>
-                {reviewToday ? 'All done!' : dueCount > 0 ? `${dueCount} due` : 'Nothing due'}
+                {reviewToday ? t.progress.allDone : dueCount > 0 ? t.progress.dueCount(dueCount) : t.extra.nothingDue}
               </span>
             </div>
             {/* Words card */}
@@ -817,7 +816,7 @@ function StudyCalendar({
               {wordsToday && <div style={{ position: 'absolute', right: -8, bottom: -10, fontSize: 60, opacity: 0.1, pointerEvents: 'none', userSelect: 'none', lineHeight: 1 }}>✏️</div>}
               <span style={{ fontSize: 26, position: 'relative', zIndex: 1 }}>{wordsToday ? '✅' : '✏️'}</span>
               <span className="flex items-center gap-1" style={{ position: 'relative', zIndex: 1 }}>
-                <span className="text-xs font-black" style={{ color: wordsToday ? '#fff' : 'var(--text-muted)' }}>Words</span>
+                <span className="text-xs font-black" style={{ color: wordsToday ? '#fff' : 'var(--text-muted)' }}>{t.extra.words2}</span>
                 <InfoBtn k="words" light={wordsToday} />
               </span>
               <span className="text-[10px] font-bold" style={{ color: wordsToday ? 'rgba(255,255,255,0.75)' : 'var(--text-muted)', position: 'relative', zIndex: 1 }}>{goalLabel}</span>
@@ -870,25 +869,25 @@ function StudyCalendar({
           className="w-full flex items-center justify-center gap-1.5 py-1.5 text-[11px] font-semibold"
           style={{ color: 'var(--text-muted)' }}
         >
-          Task breakdown
+          {t.progress.taskBreakdown}
           <span style={{ fontSize: 9 }}>{showBreakdown ? '▴' : '▾'}</span>
         </button>
 
         {showBreakdown && (
           <div className="space-y-2 mt-1">
             {([
-              { label: 'Words', color: TASK_COLORS.words.bg, current: wordsCurrent, longest: wordsLongest, total: wordGoalDays.length },
-              { label: 'SRS',   color: TASK_COLORS.review.bg, current: srsCurrent,  longest: srsLongest,  total: reviewDays.length   },
-            ] as const).map(row => (
+              { label: t.extra.words2, color: TASK_COLORS.words.bg, current: wordsCurrent, longest: wordsLongest, total: wordGoalDays.length },
+              { label: t.progress.srsShort,   color: TASK_COLORS.review.bg, current: srsCurrent,  longest: srsLongest,  total: reviewDays.length   },
+            ]).map(row => (
               <div key={row.label} className="rounded-xl px-4 py-3 flex items-center gap-3"
                 style={{ background: 'var(--surface-2)', borderLeft: `3px solid ${row.color}` }}>
                 <span className="text-xs font-bold w-10 shrink-0" style={{ color: row.color }}>{row.label}</span>
                 <div className="flex gap-4 flex-1 justify-around">
                   {([
-                    { val: row.current, label: 'Current' },
-                    { val: row.longest, label: 'Longest' },
-                    { val: row.total,   label: 'Days' },
-                  ] as const).map(stat => (
+                    { val: row.current, label: t.progress.current },
+                    { val: row.longest, label: t.progress.longest },
+                    { val: row.total,   label: t.progress.daysStat },
+                  ]).map(stat => (
                     <div key={stat.label} className="text-center">
                       <div className="text-sm font-black" style={{ color: 'var(--text)' }}>{stat.val}</div>
                       <div className="text-[9px] font-semibold" style={{ color: 'var(--text-muted)' }}>{stat.label}</div>
@@ -913,7 +912,7 @@ function StudyCalendar({
         <div className="max-w-[308px] mx-auto">
           {/* Day headers */}
           <div className="grid grid-cols-7 mb-1">
-            {MONTH_DAYS.map(d => (
+            {t.progress.weekdaysShort.map(d => (
               <div key={d} className="w-10 h-7 flex items-center justify-center text-[10px] font-bold text-[var(--text-muted)]">{d}</div>
             ))}
           </div>
@@ -972,11 +971,11 @@ function StudyCalendar({
         <div className="flex items-center gap-3 mt-5 pt-3 border-t border-[var(--border)] flex-wrap">
           <div className="flex items-center gap-1.5">
             <div className="w-3.5 h-3.5 rounded-full" style={{ background: TASK_COLORS.review.bg }} />
-            <span className="text-[10px] text-[var(--text-muted)]">SRS review</span>
+            <span className="text-[10px] text-[var(--text-muted)]">{t.extra.srsReview}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <div className="w-3.5 h-3.5 rounded-full" style={{ background: TASK_COLORS.words.bg }} />
-            <span className="text-[10px] text-[var(--text-muted)]">{`${dailyGoal} words goal`}</span>
+            <span className="text-[10px] text-[var(--text-muted)]">{t.progress.wordsGoalLegend(dailyGoal)}</span>
           </div>
           <span className="text-[10px] text-[var(--text-muted)] ml-auto">{t.extra.tapDayDetails}</span>
         </div>
@@ -994,11 +993,11 @@ function StudyCalendar({
             <div className="flex flex-col gap-1">
               <span className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--text-muted)' }}>
                 <span className="w-2.5 h-2.5 rounded-full shrink-0 inline-block" style={{ background: TASK_COLORS.review.bg }} />
-                Complete all due SRS reviews
+                {t.progress.completeAllDueSrs}
               </span>
               <span className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--text-muted)' }}>
                 <span className="w-2.5 h-2.5 rounded-full shrink-0 inline-block" style={{ background: TASK_COLORS.words.bg }} />
-                Reach your self-set daily word goal
+                {t.progress.reachDailyWordGoal}
               </span>
             </div>
             <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{t.extra.eachTaskHalf}</p>
@@ -1042,7 +1041,7 @@ function StudyCalendar({
               <button onClick={() => setInfoModal(null)}
                 className="mt-2.5 w-full py-1.5 rounded-lg text-[10px] font-bold text-white"
                 style={{ background: infoModal.color }}>
-                Got it
+                {t.progress.gotIt}
               </button>
             </div>
           </div>
@@ -1096,9 +1095,9 @@ function StudyCalendar({
               {/* Task cards — 3D gradient */}
               <div className="grid grid-cols-2 gap-3 mb-3">
                 {([
-                  { key: 'review', label: 'SRS Review',                done: sheetTasks.review, href: '/srs',   btnLabel: 'Go to Review', color: TASK_COLORS.review.bg, shadow: TASK_COLORS.review.shadow, emoji: '🔁', nothingDue: sheetIsToday && dueCount === 0 && !sheetTasks.review },
-                  { key: 'words',  label: `Words (${dailyGoal} goal)`, done: sheetTasks.words,  href: '/learn', btnLabel: 'Learn Words',  color: TASK_COLORS.words.bg,  shadow: TASK_COLORS.words.shadow,  emoji: '✏️' },
-                ] as const).map(task => (
+                  { key: 'review', label: t.extra.srsReview,                done: sheetTasks.review, href: '/srs',   btnLabel: t.progress.goToReview, color: TASK_COLORS.review.bg, shadow: TASK_COLORS.review.shadow, emoji: '🔁', nothingDue: sheetIsToday && dueCount === 0 && !sheetTasks.review },
+                  { key: 'words',  label: t.progress.wordsGoalLabel(dailyGoal), done: sheetTasks.words,  href: '/learn', btnLabel: t.progress.learnWordsBtn,  color: TASK_COLORS.words.bg,  shadow: TASK_COLORS.words.shadow,  emoji: '✏️' },
+                ]).map(task => (
                   <div key={task.key} className="rounded-2xl p-4 flex flex-col gap-3 relative overflow-hidden"
                     style={{
                       background: task.done
@@ -1129,7 +1128,7 @@ function StudyCalendar({
                           {task.btnLabel} →
                         </Link>
                       ) : task.done ? (
-                        <span className="text-xs font-bold" style={{ color: 'rgba(255,255,255,0.8)' }}>Done ✓</span>
+                        <span className="text-xs font-bold" style={{ color: 'rgba(255,255,255,0.8)' }}>{t.progress.doneCheck}</span>
                       ) : (
                         <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{t.extra.notDone}</span>
                       )}
@@ -1140,8 +1139,8 @@ function StudyCalendar({
 
               {/* Two mini-calendars — side by side */}
               <div className="grid grid-cols-2 gap-3">
-                <MiniCalendar title="SRS"                    color={TASK_COLORS.review.bg} days={reviewDays}   year={viewYear} month={viewMonth} lockedDays={srsLockedDays} />
-                <MiniCalendar title={`Words (${dailyGoal})`} color={TASK_COLORS.words.bg}  days={wordGoalDays} year={viewYear} month={viewMonth} />
+                <MiniCalendar title={t.progress.srsShort}          color={TASK_COLORS.review.bg} days={reviewDays}   year={viewYear} month={viewMonth} lockedDays={srsLockedDays} />
+                <MiniCalendar title={t.progress.wordsGoalTitle(dailyGoal)} color={TASK_COLORS.words.bg}  days={wordGoalDays} year={viewYear} month={viewMonth} />
               </div>
             </div>
           </div>

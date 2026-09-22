@@ -53,8 +53,8 @@ export default function UpdatePasswordPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    if (password.length < 6) { setError('Password must be at least 6 characters.'); return; }
-    if (password !== password2) { setError('Passwords do not match.'); return; }
+    if (password.length < 6) { setError(t.updatePasswordPage.passwordTooShort); return; }
+    if (password !== password2) { setError(t.updatePasswordPage.passwordsDontMatch); return; }
     setLoading(true);
     const { error } = await supabase.auth.updateUser({ password });
     setLoading(false);
@@ -66,7 +66,7 @@ export default function UpdatePasswordPage() {
   if (!ready) {
     return (
       <div className="fixed inset-0 flex items-center justify-center">
-        <div className="text-[var(--text-muted)]">Loading…</div>
+        <div className="text-[var(--text-muted)]">{t.updatePasswordPage.loading}</div>
       </div>
     );
   }
@@ -82,13 +82,13 @@ export default function UpdatePasswordPage() {
 
         {done ? (
           <div className="px-4 py-4 rounded-2xl text-center font-semibold" style={{ background: 'rgba(46,204,113,0.1)', color: 'var(--primary)' }}>
-            Password updated! Redirecting…
+            {t.updatePasswordPage.passwordUpdatedRedirecting}
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-xs font-semibold text-[var(--text-muted)] mb-1.5 uppercase tracking-wide">
-                New Password
+                {t.updatePasswordPage.newPasswordLabel}
               </label>
               <input
                 type="password"
@@ -103,7 +103,7 @@ export default function UpdatePasswordPage() {
 
             <div>
               <label className="block text-xs font-semibold text-[var(--text-muted)] mb-1.5 uppercase tracking-wide">
-                Confirm Password
+                {t.updatePasswordPage.confirmPasswordLabel}
               </label>
               <input
                 type="password"
@@ -126,7 +126,7 @@ export default function UpdatePasswordPage() {
               disabled={loading}
               className="btn-primary w-full py-4 text-base font-bold disabled:opacity-60"
             >
-              {loading ? 'Saving…' : 'Set New Password →'}
+              {loading ? t.updatePasswordPage.saving : t.updatePasswordPage.setNewPasswordCta}
             </button>
           </form>
         )}

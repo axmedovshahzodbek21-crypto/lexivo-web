@@ -21,8 +21,8 @@ export default function SignupPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    if (password.length < 6) { setError('Password must be at least 6 characters.'); return; }
-    if (password !== password2) { setError('Passwords do not match.'); return; }
+    if (password.length < 6) { setError(t.signupPage.passwordTooShort); return; }
+    if (password !== password2) { setError(t.signupPage.passwordsDontMatch); return; }
     setLoading(true);
     const { error } = await signUp(email.trim(), password);
     setLoading(false);
@@ -50,7 +50,7 @@ export default function SignupPage() {
         <div className="text-center mb-8">
           <div className="text-5xl mb-3">🎉</div>
           <h1 className="text-3xl font-black" style={{ color: 'var(--primary)' }}>{t.extra.createAccount}</h1>
-          <p className="text-sm text-[var(--text-muted)] mt-1">Free forever · no credit card</p>
+          <p className="text-sm text-[var(--text-muted)] mt-1">{t.signupPage.freeForeverSub}</p>
         </div>
 
         {/* Google button */}
@@ -66,26 +66,26 @@ export default function SignupPage() {
             <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
             <path fill="none" d="M0 0h48v48H0z"/>
           </svg>
-          {googleLoading ? 'Redirecting…' : 'Continue with Google'}
+          {googleLoading ? t.signupPage.redirecting : t.signupPage.continueWithGoogle}
         </button>
 
         {/* Divider */}
         <div className="flex items-center gap-3 mb-4">
           <div className="flex-1 h-px bg-[var(--border)]" />
-          <span className="text-xs text-[var(--text-muted)] font-medium">or</span>
+          <span className="text-xs text-[var(--text-muted)] font-medium">{t.signupPage.or}</span>
           <div className="flex-1 h-px bg-[var(--border)]" />
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-xs font-semibold text-[var(--text-muted)] mb-1.5 uppercase tracking-wide">
-              Email
+              {t.signupPage.emailLabel}
             </label>
             <input
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
-              placeholder="you@example.com"
+              placeholder={t.signupPage.emailPlaceholder}
               required
               autoFocus
               className="w-full px-4 py-3.5 rounded-2xl border-2 border-[var(--border)] bg-[var(--surface)] text-[var(--text)] outline-none transition-colors focus:border-[var(--primary)] text-base"
@@ -94,13 +94,13 @@ export default function SignupPage() {
 
           <div>
             <label className="block text-xs font-semibold text-[var(--text-muted)] mb-1.5 uppercase tracking-wide">
-              Password
+              {t.signupPage.passwordLabel}
             </label>
             <input
               type="password"
               value={password}
               onChange={e => setPassword(e.target.value)}
-              placeholder="At least 6 characters"
+              placeholder={t.signupPage.passwordPlaceholderMin}
               required
               className="w-full px-4 py-3.5 rounded-2xl border-2 border-[var(--border)] bg-[var(--surface)] text-[var(--text)] outline-none transition-colors focus:border-[var(--primary)] text-base"
             />
@@ -108,13 +108,13 @@ export default function SignupPage() {
 
           <div>
             <label className="block text-xs font-semibold text-[var(--text-muted)] mb-1.5 uppercase tracking-wide">
-              Confirm Password
+              {t.signupPage.confirmPasswordLabel}
             </label>
             <input
               type="password"
               value={password2}
               onChange={e => setPassword2(e.target.value)}
-              placeholder="••••••••"
+              placeholder={t.signupPage.passwordDotsPlaceholder}
               required
               className="w-full px-4 py-3.5 rounded-2xl border-2 border-[var(--border)] bg-[var(--surface)] text-[var(--text)] outline-none transition-colors focus:border-[var(--primary)] text-base"
             />
@@ -131,14 +131,14 @@ export default function SignupPage() {
             disabled={loading}
             className="btn-primary w-full py-4 text-base font-bold disabled:opacity-60"
           >
-            {loading ? 'Creating account…' : 'Create Account →'}
+            {loading ? t.signupPage.creatingAccount : t.signupPage.createAccountCta}
           </button>
         </form>
 
         <p className="text-center text-sm text-[var(--text-muted)] mt-6">
-          Already have an account?{' '}
+          {t.signupPage.alreadyHaveAccount}{' '}
           <Link href="/login" className="font-semibold" style={{ color: 'var(--primary)' }}>
-            Sign in
+            {t.signupPage.signIn}
           </Link>
         </p>
       </div>
