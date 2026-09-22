@@ -368,7 +368,9 @@ function OptionsModal({ contrast, textSize, onContrast, onTextSize, onClose }: {
                 style={{ borderTop: idx > 0 ? `1px solid ${modalBorder}` : undefined }}>
                 <span className="text-sm font-black" style={{ color: modalColor }}>{row.label}</span>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm opacity-60" style={{ color: modalColor }}>{row.value}</span>
+                  <span className="text-sm opacity-60" style={{ color: modalColor }}>
+                    {row.next === 'contrast' ? t.ieltsPage.contrastOptions[row.value] : t.ieltsPage.textSizeOptions[row.value]}
+                  </span>
                   <span className="opacity-60" style={{ color: modalColor }}>›</span>
                 </div>
               </button>
@@ -383,7 +385,7 @@ function OptionsModal({ contrast, textSize, onContrast, onTextSize, onClose }: {
               <button key={opt} onClick={() => { onContrast(opt); setScreen('main'); }}
                 className="w-full flex items-center justify-between px-5 py-4 transition-opacity hover:opacity-70 text-left"
                 style={{ borderTop: idx > 0 ? `1px solid ${modalBorder}` : undefined }}>
-                <span className="text-sm font-black" style={{ color: modalColor }}>{opt}</span>
+                <span className="text-sm font-black" style={{ color: modalColor }}>{t.ieltsPage.contrastOptions[opt]}</span>
                 {contrast === opt && <span className="text-sm font-bold" style={{ color: modalColor }}>?</span>}
               </button>
             ))}
@@ -397,7 +399,7 @@ function OptionsModal({ contrast, textSize, onContrast, onTextSize, onClose }: {
               <button key={opt} onClick={() => { onTextSize(opt); setScreen('main'); }}
                 className="w-full flex items-center justify-between px-5 py-4 transition-opacity hover:opacity-70 text-left"
                 style={{ borderTop: idx > 0 ? `1px solid ${modalBorder}` : undefined }}>
-                <span className="text-sm font-black" style={{ color: modalColor }}>{opt}</span>
+                <span className="text-sm font-black" style={{ color: modalColor }}>{t.ieltsPage.textSizeOptions[opt]}</span>
                 {textSize === opt && <span className="text-sm font-bold" style={{ color: modalColor }}>?</span>}
               </button>
             ))}
