@@ -1629,7 +1629,7 @@ const en = {
     deleteFolderConfirm: (name: string) => `Delete "${name}" and all its units and words?`,
     deleteFolderFailed: (msg: string) => `Failed to delete folder: ${msg}`,
     myLibraryTitle: '📚 My Library',
-    folderCount: (n: number) => `${n} folder`,
+    folderCount: (n: number) => `${n} folder${n === 1 ? '' : 's'}`,
     creating: 'Creating…',
     create: 'Create',
     unitCount: (n: number) => `${n} unit`,
