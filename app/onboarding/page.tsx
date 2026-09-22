@@ -8,26 +8,24 @@ import { APK_DOWNLOAD_URL } from '@/lib/constants';
 
 // ── Data ────────────────────────────────────────────────────────────────────
 
-const LEVELS: Array<{
-  code: UserSettings['languageLevel'];
-  name: string;
-  desc: string;
-  color: string;
-}> = [
-  { code: 'A1', name: 'Beginner',           desc: 'Just starting out',            color: '#2ECC71' },
-  { code: 'A2', name: 'Elementary',          desc: 'Basic conversations',          color: '#27AE60' },
-  { code: 'B1', name: 'Intermediate',        desc: 'Everyday topics',              color: '#3498DB' },
-  { code: 'B2', name: 'Upper-Intermediate',  desc: 'Fluent in most situations',    color: '#2980B9' },
-  { code: 'C1', name: 'Advanced',            desc: 'Complex & nuanced language',   color: '#9B59B6' },
-  { code: 'C2', name: 'Mastery',             desc: 'Near-native proficiency',      color: '#6C3483' },
-];
+// The display name/description text lives in t.onboarding.levels /
+// t.onboarding.goals (per UI language) — this just holds the visual
+// metadata that doesn't vary by language, keyed to merge with it.
+const LEVEL_META: Record<UserSettings['languageLevel'], { color: string }> = {
+  A1: { color: '#2ECC71' },
+  A2: { color: '#27AE60' },
+  B1: { color: '#3498DB' },
+  B2: { color: '#2980B9' },
+  C1: { color: '#9B59B6' },
+  C2: { color: '#6C3483' },
+};
 
-const GOALS: Array<{ value: number; emoji: string; label: string; sub: string }> = [
-  { value: 5,  emoji: '☕', label: 'Casual',     sub: '~3 min / day' },
-  { value: 10, emoji: '📚', label: 'Regular',    sub: '~7 min / day' },
-  { value: 15, emoji: '🚀', label: 'Committed',  sub: '~10 min / day' },
-  { value: 20, emoji: '🔥', label: 'Intensive',  sub: '~15 min / day' },
-];
+const GOAL_META: Record<number, { emoji: string }> = {
+  5:  { emoji: '☕' },
+  10: { emoji: '📚' },
+  15: { emoji: '🚀' },
+  20: { emoji: '🔥' },
+};
 
 // ── Component ────────────────────────────────────────────────────────────────
 
@@ -222,25 +220,26 @@ function StepLevel({
       </div>
 
       <div className="grid grid-cols-2 gap-3 w-full max-w-sm">
-        {LEVELS.map(l => {
+        {t.onboarding.levels.map(l => {
           const active = level === l.code;
+          const color = LEVEL_META[l.code as UserSettings['languageLevel']].color;
           return (
             <button
               key={l.code}
-              onClick={() => onChange(l.code)}
+              onClick={() => onChange(l.code as UserSettings['languageLevel'])}
               className="flex flex-col items-start gap-1 p-4 rounded-2xl border-2 transition-all text-left"
               style={{
-                borderColor: active ? l.color : 'var(--border)',
-                background: active ? `${l.color}14` : 'var(--card)',
+                borderColor: active ? color : 'var(--border)',
+                background: active ? `${color}14` : 'var(--card)',
               }}
             >
-              <span className="text-xl font-black" style={{ color: l.color }}>{l.code}</span>
+              <span className="text-xl font-black" style={{ color }}>{l.code}</span>
               <span className="text-xs font-semibold text-[var(--text)]">{l.name}</span>
               <span className="text-xs text-[var(--text-muted)]">{l.desc}</span>
               {active && (
                 <div
                   className="mt-1 w-4 h-4 rounded-full flex items-center justify-center text-white text-xs"
-                  style={{ background: l.color }}
+                  style={{ background: color }}
                 >
                   ✓
                 </div>
@@ -268,7 +267,7 @@ function StepGoal({
   onFinish: () => void;
 }) {
   const t = useTranslation();
-  const displayName = name.trim() || 'there';
+  const displayName = name.trim() || t.onboarding.namePlaceholderFallback;
   return (
     <div className="flex flex-col items-center px-5 py-10 gap-6">
       <div className="text-center">
@@ -280,7 +279,7 @@ function StepGoal({
       </div>
 
       <div className="grid grid-cols-2 gap-3 w-full max-w-sm">
-        {GOALS.map(g => {
+        {t.onboarding.goals.map(g => {
           const active = goal === g.value;
           return (
             <button
@@ -292,10 +291,10 @@ function StepGoal({
                 background: active ? 'var(--primary-bg)' : 'var(--card)',
               }}
             >
-              <span className="text-3xl">{g.emoji}</span>
+              <span className="text-3xl">{GOAL_META[g.value].emoji}</span>
               <span className="font-bold text-sm text-[var(--text)]">{g.label}</span>
               <span className="text-xs font-bold" style={{ color: active ? 'var(--primary)' : 'var(--text-muted)' }}>
-                {g.value} words
+                {t.srs.wordsCount(g.value)}
               </span>
               <span className="text-xs text-[var(--text-muted)]">{g.sub}</span>
             </button>
@@ -322,9 +321,11 @@ function StepDone({
   onFinish: () => void;
 }) {
   const t = useTranslation();
-  const lvl = LEVELS.find(l => l.code === level)!;
-  const g = GOALS.find(g => g.value === goal)!;
-  const displayName = name.trim() || 'Learner';
+  const lvl = t.onboarding.levels.find(l => l.code === level)!;
+  const levelColor = LEVEL_META[level].color;
+  const g = t.onboarding.goals.find(g => g.value === goal)!;
+  const goalEmoji = GOAL_META[goal].emoji;
+  const displayName = name.trim() || t.onboarding.learnerFallback;
 
   return (
     <div className="flex flex-col items-center justify-center min-h-full px-8 py-12 text-center gap-8">
@@ -337,8 +338,8 @@ function StepDone({
 
       <div className="w-full max-w-sm space-y-2 text-left">
         <SummaryRow icon="👤" label={t.onboarding.labelName}  value={displayName} />
-        <SummaryRow icon="📊" label={t.onboarding.labelLevel} value={`${lvl.code} · ${lvl.name}`} color={lvl.color} />
-        <SummaryRow icon={g.emoji} label={t.onboarding.labelGoal} value={`${goal} words · ${g.sub}`} />
+        <SummaryRow icon="📊" label={t.onboarding.labelLevel} value={`${lvl.code} · ${lvl.name}`} color={levelColor} />
+        <SummaryRow icon={goalEmoji} label={t.onboarding.labelGoal} value={`${t.srs.wordsCount(goal)} · ${g.sub}`} />
       </div>
 
       <button

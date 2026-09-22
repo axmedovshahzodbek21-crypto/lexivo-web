@@ -120,7 +120,7 @@ export default function ClassFolderHomeworkPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8">
         <div className="text-5xl">⚠️</div>
-        <p className="font-bold text-[var(--text)]">Couldn&apos;t load this folder</p>
+        <p className="font-bold text-[var(--text)]">{t.classesPage.couldntLoadFolder}</p>
         <p className="text-sm text-[var(--text-muted)] text-center break-all">{loadError}</p>
         <button onClick={() => load()} className="btn-primary">{t.classesPage.tryAgain}</button>
       </div>

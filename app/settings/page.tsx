@@ -18,13 +18,6 @@ import type { UserSettings } from '@/lib/types';
 import { translations } from '@/lib/i18n';
 import { APK_DOWNLOAD_URL } from '@/lib/constants';
 
-function to12h(t: string): string {
-  const [h, m] = t.split(':').map(Number);
-  const period = h >= 12 ? 'PM' : 'AM';
-  const h12 = h % 12 || 12;
-  return `${h12}:${String(m).padStart(2, '0')} ${period}`;
-}
-
 type PushPrefs = { class_activity: boolean; due_reviews: boolean; streak_risk: boolean; homework_reminders: boolean; class_idle: boolean };
 const DEFAULT_PUSH_PREFS: PushPrefs = { class_activity: true, due_reviews: true, streak_risk: true, homework_reminders: true, class_idle: true };
 
@@ -274,7 +267,7 @@ export default function SettingsPage() {
       window.location.replace('/');
     } catch (e) {
       console.error('Reset error:', e);
-      setResetError(e instanceof Error ? e.message : 'Something went wrong. Please try again.');
+      setResetError(e instanceof Error ? e.message : t.settings.genericError);
       setResetLoading(false);
     }
   };
@@ -289,13 +282,13 @@ export default function SettingsPage() {
       await new Promise(r => setTimeout(r, 200));
       window.location.replace('/login');
     } catch (e) {
-      setDeleteError('Something went wrong. Please try again.');
+      setDeleteError(t.settings.genericError);
       setDeleteLoading(false);
     }
   };
 
   const handleSignOut = async () => {
-    if (!confirm('Sign out of your account?')) return;
+    if (!confirm(t.sidebar.signOutConfirm)) return;
     clearUserData();
     await supabase.auth.signOut();
     window.location.replace('/login');
@@ -374,7 +367,7 @@ export default function SettingsPage() {
         </div>
 
         <div>
-          <label className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide block mb-1.5">Bio</label>
+          <label className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide block mb-1.5">{t.settings.bioLabel}</label>
           <textarea
             value={bio}
             onChange={e => setBio(e.target.value)}
@@ -383,7 +376,7 @@ export default function SettingsPage() {
             className="w-full px-4 py-3 rounded-xl bg-[var(--surface-2)] border-2 border-transparent focus:border-[var(--primary)] outline-none transition-colors resize-none text-sm text-[var(--text)]"
             placeholder={t.extra.bioPlaceholder}
           />
-          <p className="text-[10px] text-[var(--text-muted)] mt-1">{bio.length}/200 · Shared on leaderboard and in classes</p>
+          <p className="text-[10px] text-[var(--text-muted)] mt-1">{t.settings.bioCharCount(bio.length)}</p>
         </div>
 
         <div id="daily-goal">
@@ -739,7 +732,7 @@ export default function SettingsPage() {
                   <p className="text-sm font-medium text-[var(--text)]">{t.extra.goodMorning}</p>
                   <p className="text-xs text-[var(--text-muted)]">{t.extra.startDayFewWords}</p>
                 </div>
-                <span className="text-sm text-[var(--text-muted)] shrink-0">8:00 AM</span>
+                <span className="text-sm text-[var(--text-muted)] shrink-0">08:00</span>
               </div>
 
               {/* Streak — fixed */}
@@ -747,9 +740,9 @@ export default function SettingsPage() {
                 <span className="text-2xl">🔥</span>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-[var(--text)]">{t.extra.streakAtRisk}</p>
-                  <p className="text-xs text-[var(--text-muted)]">Don&apos;t forget to study today</p>
+                  <p className="text-xs text-[var(--text-muted)]">{t.settings.streakAtRiskSub}</p>
                 </div>
-                <span className="text-sm text-[var(--text-muted)] shrink-0">9:00 PM</span>
+                <span className="text-sm text-[var(--text-muted)] shrink-0">21:00</span>
               </div>
 
               {/* Custom reminder — editable */}
@@ -760,7 +753,7 @@ export default function SettingsPage() {
                     <p className="text-sm font-medium text-[var(--text)]">{t.extra.reminderTime}</p>
                     <p className="text-xs text-[var(--text-muted)]">{t.extra.tapToChange}</p>
                   </div>
-                  <span className="text-sm font-semibold text-[var(--primary)] shrink-0">{to12h(notif.time)}</span>
+                  <span className="text-sm font-semibold text-[var(--primary)] shrink-0">{notif.time}</span>
                 </div>
                 <input
                   type="time"

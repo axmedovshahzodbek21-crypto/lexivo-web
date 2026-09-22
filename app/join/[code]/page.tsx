@@ -86,7 +86,7 @@ export default function JoinPage() {
   if (fetchError) return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8 animate-fade-in">
       <div className="text-6xl">⚠️</div>
-      <p className="text-xl font-bold text-[var(--text)]">Couldn&#39;t load this invite</p>
+      <p className="text-xl font-bold text-[var(--text)]">{t.joinPage.couldntLoadInvite}</p>
       <p className="text-sm text-[var(--text-muted)]">{t.joinPage.checkFailed}</p>
       <button onClick={() => setRetryKey(k => k + 1)} className="btn-primary">{t.joinPage.tryAgain}</button>
     </div>
@@ -112,7 +112,7 @@ export default function JoinPage() {
       <div className="text-6xl">🎉</div>
       <p className="text-2xl font-black text-[var(--text)]">{t.joinPage.youJoined}</p>
       <p className="text-[var(--text-muted)]">{cls.name}</p>
-      <p className="text-sm text-[var(--text-muted)]">Redirecting…</p>
+      <p className="text-sm text-[var(--text-muted)]">{t.joinPage.redirecting}</p>
     </div>
   );
 
@@ -120,8 +120,8 @@ export default function JoinPage() {
     <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8 animate-fade-in">
       <div className="text-6xl">⏳</div>
       <p className="text-2xl font-black text-[var(--text)]">{t.joinPage.requestSent}</p>
-      <p className="text-[var(--text-muted)]">Waiting for your teacher to approve you into {cls.name}</p>
-      <p className="text-sm text-[var(--text-muted)]">Redirecting…</p>
+      <p className="text-[var(--text-muted)]">{t.joinPage.waitingForApproval(cls.name)}</p>
+      <p className="text-sm text-[var(--text-muted)]">{t.joinPage.redirecting}</p>
     </div>
   );
 
@@ -130,14 +130,14 @@ export default function JoinPage() {
       <div className="text-6xl">✅</div>
       <p className="text-2xl font-black text-[var(--text)]">{t.joinPage.alreadyMember}</p>
       <p className="text-[var(--text-muted)]">{cls.name}</p>
-      <p className="text-sm text-[var(--text-muted)]">Redirecting…</p>
+      <p className="text-sm text-[var(--text-muted)]">{t.joinPage.redirecting}</p>
     </div>
   );
 
   if (status === 'joinError') return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8 animate-fade-in">
       <div className="text-6xl">⚠️</div>
-      <p className="text-xl font-bold text-[var(--text)]">Couldn&apos;t join {cls.name}</p>
+      <p className="text-xl font-bold text-[var(--text)]">{t.joinPage.couldntJoin(cls.name)}</p>
       <p className="text-sm text-[var(--text-muted)]">{t.joinPage.somethingWrong}</p>
       <button onClick={() => setStatus('idle')} className="btn-primary">{t.joinPage.tryAgain}</button>
     </div>
@@ -147,14 +147,14 @@ export default function JoinPage() {
     <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8 animate-fade-in">
       <div className="text-6xl">👩‍🏫</div>
       <p className="text-xl font-bold text-[var(--text)]">{t.joinPage.thatsYourClass}</p>
-      <p className="text-sm text-[var(--text-muted)]">Opening dashboard…</p>
+      <p className="text-sm text-[var(--text-muted)]">{t.joinPage.openingDashboard}</p>
     </div>
   );
 
   if (status === 'joining') return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8 animate-fade-in">
       <div className="text-5xl animate-bounce">🎓</div>
-      <p className="font-bold text-[var(--text)]">Joining {cls.name}…</p>
+      <p className="font-bold text-[var(--text)]">{t.joinPage.joiningClass(cls.name)}</p>
     </div>
   );
 
@@ -163,7 +163,7 @@ export default function JoinPage() {
     <div className="flex flex-col items-center justify-center min-h-screen gap-6 p-8 animate-fade-in">
       <div className="text-6xl">🎓</div>
       <div className="text-center space-y-1">
-        <p className="text-sm text-[var(--text-muted)]">You&apos;ve been invited to join</p>
+        <p className="text-sm text-[var(--text-muted)]">{t.joinPage.invitedToJoin}</p>
         <p className="text-2xl font-black text-[var(--text)]">{cls.name}</p>
       </div>
       <div className="w-full max-w-xs space-y-4">
@@ -171,12 +171,12 @@ export default function JoinPage() {
           onClick={() => router.push(`/login?redirect=/join/${code}`)}
           className="btn-primary w-full py-3.5 text-base"
         >
-          Sign in to join →
+          {t.joinPage.signInToJoin}
         </button>
         <p className="text-center text-xs text-[var(--text-muted)]">
-          Or enter code{' '}
+          {t.joinPage.orEnterCodePrefix}{' '}
           <code className="font-bold text-[var(--primary)]">{code?.toUpperCase()}</code>
-          {' '}manually on the Classes page
+          {' '}{t.joinPage.orEnterCodeSuffix}
         </p>
       </div>
     </div>

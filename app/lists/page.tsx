@@ -135,7 +135,7 @@ function ListRow({
   onDeleteCancel: () => void;
 }) {
   const t = useTranslation();
-  const created = new Date(list.createdAt).toLocaleDateString('en-US', {
+  const created = new Date(list.createdAt).toLocaleDateString(undefined, {
     month: 'short', day: 'numeric', year: 'numeric',
   });
 

@@ -3091,7 +3091,7 @@ export default function ClassDashboardPage() {
                   <div className="flex justify-center py-8"><div className="text-3xl animate-bounce">📊</div></div>
                 ) : (() => {
                   const latestDoneUnit = unitRows.filter(r => r.completed_at).sort((a, b) => (b.completed_at! > a.completed_at! ? 1 : -1))[0];
-                  const fmtDate = (iso: string) => new Date(iso).toLocaleDateString('en', { month: 'short', day: 'numeric' });
+                  const fmtDate = (iso: string) => new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
                   return (
                     <div className="grid grid-cols-4 gap-2">
                       {Array.from({ length: collectionModal.total }, (_, i) => {

@@ -136,7 +136,7 @@ export default function JoinedClassesPage() {
     try {
       await supabase.from('class_targets').update({ completed_at }).eq('id', target.id);
     } catch {
-      setTargetError('Failed to update target — try again');
+      setTargetError(t.classesPage.failedToUpdateTarget);
       return;
     }
     setClassTargets(prev => {

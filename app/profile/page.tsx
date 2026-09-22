@@ -49,11 +49,6 @@ const LEVEL_COLORS: Record<string, string> = {
   Master:               '#F39C12',
 };
 
-const CEFR_LABELS: Record<string, string> = {
-  A1: 'Beginner', A2: 'Elementary', B1: 'Intermediate',
-  B2: 'Upper-Intermediate', C1: 'Advanced', C2: 'Mastery',
-};
-
 export default function ProfilePage() {
   const router = useRouter();
   const { collections, collectionsLoaded } = useAppStore();
@@ -112,7 +107,7 @@ export default function ProfilePage() {
     // Allowlist raster formats only — SVG/HTML can execute scripts when served from storage
     const allowed = ['image/jpeg', 'image/png', 'image/webp'];
     if (!allowed.includes(file.type)) {
-      alert('Only JPEG, PNG, and WebP images are allowed.');
+      alert(t.profile.invalidImageType);
       e.target.value = '';
       return;
     }
@@ -150,7 +145,7 @@ export default function ProfilePage() {
   }
 
   async function handleRemovePhoto() {
-    if (!confirm('Remove your profile photo? This cannot be undone.')) return;
+    if (!confirm(t.profile.removePhotoConfirm)) return;
     removeProfilePic();
     removeProfilePicUrl();
     if (user) {
@@ -163,7 +158,7 @@ export default function ProfilePage() {
   }
 
   async function handleSignOut() {
-    if (!confirm('Sign out of your account?')) return;
+    if (!confirm(t.sidebar.signOutConfirm)) return;
     await signOut();
     router.replace('/login');
   }
@@ -216,7 +211,7 @@ export default function ProfilePage() {
         <button
           onClick={() => router.back()}
           className="btn-icon text-lg"
-          aria-label="Go back"
+          aria-label={t.extra.goBack}
         >←</button>
         <h1 className="font-bold text-[var(--text)]">{t.profile.title}</h1>
         <Link
@@ -286,7 +281,7 @@ export default function ProfilePage() {
               className="text-xs font-bold px-2.5 py-1 rounded-full"
               style={{ background: `${levelColor}20`, color: levelColor }}
             >
-              {settings.languageLevel} · {CEFR_LABELS[settings.languageLevel] ?? ''}
+              {settings.languageLevel} · {t.onboarding.levels.find(l => l.code === settings.languageLevel)?.name ?? ''}
             </span>
           </div>
           {bio && (
@@ -447,7 +442,7 @@ export default function ProfilePage() {
             <Link href="/srs" className="flex items-center gap-3 w-full" style={{ margin: '-20px', padding: '20px' }}>
               <span className="text-2xl animate-float-icon">🔄</span>
               <div>
-                <p className="text-sm font-semibold text-[var(--text)]">SRS Review</p>
+                <p className="text-sm font-semibold text-[var(--text)]">{t.extra.srsReview}</p>
                 <p className={`text-xs font-medium ${dueCount > 0 ? 'text-[var(--danger)]' : 'text-[var(--text-muted)]'}`}>
                   {dueCount > 0 ? t.profile.dueCount(dueCount) : t.profile.allCaughtUp}
                 </p>

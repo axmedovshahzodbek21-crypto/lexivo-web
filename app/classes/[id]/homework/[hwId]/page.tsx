@@ -306,7 +306,7 @@ export default function UnitStudyHubPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8">
         <div className="text-5xl">⛔</div>
-        <p className="font-bold text-[var(--text)]">This homework isn&apos;t assigned to you</p>
+        <p className="font-bold text-[var(--text)]">{t.classesPage.notAssignedToYou}</p>
         <button onClick={() => router.push(`/classes/${classId}/home`)} className="btn-primary">{t.classesPage.goBack}</button>
       </div>
     );
@@ -327,7 +327,7 @@ export default function UnitStudyHubPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8">
         <div className="text-5xl">⚠️</div>
-        <p className="font-bold text-[var(--text)]">Couldn&apos;t load this homework</p>
+        <p className="font-bold text-[var(--text)]">{t.classesPage.couldntLoadHomework}</p>
         <p className="text-sm text-[var(--text-muted)] text-center break-all">{loadError}</p>
         <button onClick={() => load()} className="btn-primary">{t.classesPage.tryAgain}</button>
       </div>
@@ -359,7 +359,7 @@ export default function UnitStudyHubPage() {
             <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-xl p-3 flex items-start gap-2.5">
               <span className="text-lg shrink-0">⚠️</span>
               <div>
-                <p className="font-bold text-red-700 dark:text-red-400 text-xs">Couldn&apos;t save progress</p>
+                <p className="font-bold text-red-700 dark:text-red-400 text-xs">{t.classesPage.couldntSaveProgress}</p>
                 <p className="text-red-600 dark:text-red-500 text-[11px] mt-0.5 break-all">{progressError}</p>
               </div>
             </div>
@@ -379,7 +379,7 @@ export default function UnitStudyHubPage() {
                   📚 Reading
                 </span>
                 <span className="text-[9px] text-[var(--text-muted)]">{passage.topic}</span>
-                {passageDone && <span className="text-[9px] font-bold text-green-500">✓ Done</span>}
+                {passageDone && <span className="text-[9px] font-bold text-green-500">{t.collectionsPage.doneCheckmark}</span>}
                 {passageDue && (
                   <span className={`text-[9px] font-semibold ${passageDue.overdue ? 'text-red-500' : 'text-[var(--text-muted)]'}`}>
                     {passageDue.overdue ? '⚠️ ' : '📅 '}{passageDue.text}
@@ -397,7 +397,7 @@ export default function UnitStudyHubPage() {
                   ? { background: 'rgba(34,197,94,0.12)', border: '1.5px solid rgba(34,197,94,0.35)', color: '#16a34a' }
                   : { background: 'linear-gradient(135deg, #F59E0B, #ea580c)', color: 'white' }}
               >
-                {passageDone ? '✓ Marked as read' : markingRead ? 'Saving…' : 'Mark as Read ✓'}
+                {passageDone ? t.classesPage.markedAsRead : markingRead ? t.classesPage.savingEllipsis : t.classesPage.markAsReadBtn}
               </button>
             </div>
           </div>
@@ -407,7 +407,7 @@ export default function UnitStudyHubPage() {
               <span className="text-lg">🎉</span>
               <div>
                 <p className="font-bold text-green-700 dark:text-green-400 text-xs">{t.classesPage.niceWork}</p>
-                <p className="text-green-600 dark:text-green-500 text-[10px] mt-0.5">You&apos;ve completed this reading assignment.</p>
+                <p className="text-green-600 dark:text-green-500 text-[10px] mt-0.5">{t.classesPage.readingAssignmentComplete}</p>
               </div>
             </div>
           )}
@@ -433,7 +433,7 @@ export default function UnitStudyHubPage() {
         <button onClick={() => router.push(`/classes/${classId}/homework`)} className="btn-icon">←</button>
         <div className="min-w-0">
           {className && <p className="text-xs text-[var(--text-muted)] font-medium truncate">{className}</p>}
-          <p className="font-bold text-[var(--text)] text-sm truncate">{unitName || 'Homework'}</p>
+          <p className="font-bold text-[var(--text)] text-sm truncate">{unitName || t.classesPage.homeworkFallback}</p>
         </div>
       </div>
       <div className="p-3 space-y-3">
@@ -442,7 +442,7 @@ export default function UnitStudyHubPage() {
           <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-xl p-3 flex items-start gap-2.5">
             <span className="text-lg shrink-0">⚠️</span>
             <div>
-              <p className="font-bold text-red-700 dark:text-red-400 text-xs">Couldn&apos;t save progress</p>
+              <p className="font-bold text-red-700 dark:text-red-400 text-xs">{t.classesPage.couldntSaveProgress}</p>
               <p className="text-red-600 dark:text-red-500 text-[11px] mt-0.5 break-all">{progressError}</p>
             </div>
           </div>
@@ -471,10 +471,10 @@ export default function UnitStudyHubPage() {
                   className="text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full text-white"
                   style={{ background: allDone ? '#22c55e' : 'var(--primary)' }}
                 >
-                  Unit Homework
+                  {t.classesPage.unitHomeworkBadge}
                 </span>
-                <span className="text-[9px] text-[var(--text-muted)]">{words.length} word{words.length !== 1 ? 's' : ''}</span>
-                {allDone && <span className="text-[9px] font-bold text-green-500">✓ Done</span>}
+                <span className="text-[9px] text-[var(--text-muted)]">{t.srs.wordsCount(words.length)}</span>
+                {allDone && <span className="text-[9px] font-bold text-green-500">{t.collectionsPage.doneCheckmark}</span>}
                 {due && (
                   <span className={`text-[9px] font-semibold ${due.overdue ? 'text-red-500' : 'text-[var(--text-muted)]'}`}>
                     {due.overdue ? '⚠️ ' : '📅 '}{due.text}
