@@ -5,30 +5,16 @@ import { useTranslation } from '@/lib/useTranslation';
 import BackButton from '@/components/BackButton';
 
 const PASSAGES = [
-  {
-    id: 1, num: '01',
-    color: '#6366F1', light: '#818CF8', dark: '#4338CA',
-    description: 'Varied question types and academic texts',
-    tests: 30,
-  },
-  {
-    id: 2, num: '02',
-    color: '#F97316', light: '#FB923C', dark: '#C2410C',
-    description: 'Complex texts and nuanced comprehension',
-    tests: 30,
-  },
-  {
-    id: 3, num: '03',
-    color: '#10B981', light: '#34D399', dark: '#059669',
-    description: 'Advanced vocabulary and abstract reasoning',
-    tests: 30,
-  },
+  { id: 1, num: '01', color: '#6366F1', light: '#818CF8', dark: '#4338CA', tests: 30 },
+  { id: 2, num: '02', color: '#F97316', light: '#FB923C', dark: '#C2410C', tests: 30 },
+  { id: 3, num: '03', color: '#10B981', light: '#34D399', dark: '#059669', tests: 30 },
 ];
 
 function PassageCard({ passage, isHero }: { passage: typeof PASSAGES[0]; isHero?: boolean }) {
   const t = useTranslation();
   const [flipped, setFlipped] = useState(false);
-  const { id, num, color, light, dark, description, tests } = passage;
+  const { id, num, color, light, dark, tests } = passage;
+  const description = t.ieltsPage.passageDescriptions[id - 1];
 
   const height = isHero ? 220 : 160;
 
