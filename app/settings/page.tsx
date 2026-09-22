@@ -635,7 +635,7 @@ export default function SettingsPage() {
                   onClick={() => { const s = { ...settings, pulseSpeed: sp }; saveSettings(s); setSettings(s); }}
                   className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all ${(settings.pulseSpeed ?? 'normal') === sp ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface-2)] text-[var(--text-muted)]'}`}
                 >
-                  {sp.charAt(0).toUpperCase() + sp.slice(1)}
+                  {{ slow: t.extra.speedSlow, normal: t.extra.speedNormal, fast: t.extra.speedFast }[sp]}
                 </button>
               ))}
             </div>
