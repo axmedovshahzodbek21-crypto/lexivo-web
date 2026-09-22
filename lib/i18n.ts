@@ -3874,7 +3874,7 @@ const uz: typeof en = {
     // Wave C additions (reading/structures/IELTS)
     practiceEyebrow: 'Mashq',
     chooseAPassage: 'Boshlash uchun matnni tanlang. Har bir bo\'limda 30 ta mashq testi bor.',
-    passageHeading: (id: string | number) => `${id}-matn`,
+    passageHeading: (id: string | number) => `Passage ${id}`,
     passageDescriptions: [
       "Turli savol turlari va ilmiy matnlar",
       "Murakkab matnlar va nozik tushunish",
@@ -3916,10 +3916,10 @@ const uz: typeof en = {
     score: 'Ball',
     backToTests: 'Testlarga qaytish',
     timeLeft: 'QOLGAN VAQT',
-    breadcrumb: (p: string | number, testNum: string | number) => `IELTS Reading · ${p}-matn · ${testNum}-test`,
+    breadcrumb: (p: string | number, testNum: string | number) => `IELTS Reading · Passage ${p} · Test ${testNum}`,
     testModeLabel: '📝 TEST REJIMI',
     reviewModeLabel: '📖 KO\'RIB CHIQISH REJIMI',
-    readingPassageLabel: (p: string | number) => `${p}-O'QISH MATNI`,
+    readingPassageLabel: (p: string | number) => `PASSAGE ${p}`,
     showAnswer: 'Javobni ko\'rsatish',
     hideAnswer: 'Javobni yashirish',
     correctLabel: '✓ To\'g\'ri',
@@ -6333,7 +6333,7 @@ const ru: typeof en = {
     // Wave C additions (reading/structures/IELTS)
     practiceEyebrow: 'Практика',
     chooseAPassage: 'Выберите текст, чтобы начать. В каждом разделе по 30 практических тестов.',
-    passageHeading: (id: string | number) => `Текст ${id}`,
+    passageHeading: (id: string | number) => `Passage ${id}`,
     passageDescriptions: [
       'Разные типы вопросов и академические тексты',
       'Сложные тексты и тонкое понимание',
@@ -6375,10 +6375,10 @@ const ru: typeof en = {
     score: 'Счёт',
     backToTests: 'Назад к тестам',
     timeLeft: 'ОСТАЛОСЬ ВРЕМЕНИ',
-    breadcrumb: (p: string | number, testNum: string | number) => `IELTS Reading · Текст ${p} · Тест ${testNum}`,
+    breadcrumb: (p: string | number, testNum: string | number) => `IELTS Reading · Passage ${p} · Test ${testNum}`,
     testModeLabel: '📝 РЕЖИМ ТЕСТА',
     reviewModeLabel: '📖 РЕЖИМ ОБЗОРА',
-    readingPassageLabel: (p: string | number) => `ТЕКСТ ДЛЯ ЧТЕНИЯ ${p}`,
+    readingPassageLabel: (p: string | number) => `PASSAGE ${p}`,
     showAnswer: 'Показать ответ',
     hideAnswer: 'Скрыть ответ',
     correctLabel: '✓ Верно',
