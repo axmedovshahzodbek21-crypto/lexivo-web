@@ -180,7 +180,7 @@ export default function SettingsPage() {
         setImportMsg(result.error);
       } else {
         setPendingImport(text);
-        setImportMsg(`Found ${result.learnedWords} learned words, ${result.srsWords} SRS words. This will overwrite your current progress.`);
+        setImportMsg(t.settings.foundBackupSummary(result.learnedWords, result.srsWords));
         setImportState('confirm');
       }
     };
@@ -193,7 +193,7 @@ export default function SettingsPage() {
     const result = importData(pendingImport);
     if (result.ok) {
       setImportState('success');
-      setImportMsg(`Restored ${result.learnedWords} learned words and ${result.srsWords} SRS words.`);
+      setImportMsg(t.settings.restoredBackupSummary(result.learnedWords, result.srsWords));
       setTimeout(() => window.location.reload(), 1500);
     } else {
       setImportState('error');

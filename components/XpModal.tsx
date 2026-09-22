@@ -231,7 +231,7 @@ export default function XpModal({ xp, onClose }: Props) {
           {/* XP History Calendar */}
           {history.length > 0 && (
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--text-muted)' }}>XP History</p>
+              <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--text-muted)' }}>{t.xpModal.xpHistorySectionLabel}</p>
               <XpCalendar
                 history={history}
                 xpByDate={xpByDate}

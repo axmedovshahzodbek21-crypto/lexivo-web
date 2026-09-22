@@ -91,7 +91,7 @@ export default function LeaderboardPage() {
     }
     const { data, error: err } = await supabase.rpc('get_leaderboard').limit(500);
     if (err) {
-      if (!_leaderboardCache) setError('Could not load leaderboard. Please try again.');
+      if (!_leaderboardCache) setError(t.leaderboardPage.couldNotLoad);
     } else {
       _leaderboardCache = (data as LeaderboardEntry[]) ?? [];
       setEntries(_leaderboardCache);
@@ -524,7 +524,7 @@ export default function LeaderboardPage() {
                   {boxed.length > 0 && (
                     <div style={{ borderRadius: 20, border: '1.5px solid var(--border)', background: 'var(--surface-2)', padding: 12, marginBottom: rest.length > 0 ? 16 : 0 }}>
                       <p style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 0.5, padding: '0 4px 8px' }}>
-                        Almost there
+                        {t.leaderboardPage.almostThere}
                       </p>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                         {boxed.map((e, i) => renderRow(e, podiumEnd + i))}

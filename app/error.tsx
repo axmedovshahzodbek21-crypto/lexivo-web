@@ -31,7 +31,7 @@ export default function GlobalError({ error, reset }: Props) {
       <div className="space-y-2 max-w-xs">
         <h1 className="text-xl font-bold text-[var(--text)]">{t.extra.somethingWrong}</h1>
         <p className="text-sm text-[var(--text-muted)] leading-relaxed">
-          The app encountered an unexpected error. Your account data is safe — this is usually caused by corrupt local storage.
+          {t.extra.unexpectedErrorBody}
         </p>
       </div>
       <div className="flex flex-col gap-3 w-full max-w-xs">
@@ -39,13 +39,13 @@ export default function GlobalError({ error, reset }: Props) {
           onClick={reset}
           className="btn-primary py-3 text-sm font-semibold"
         >
-          Try again
+          {t.extra.tryAgainPlain}
         </button>
         <button
           onClick={clearAndReload}
           className="btn-secondary py-3 text-sm font-semibold"
         >
-          Clear local data and reload
+          {t.extra.clearDataAndReload}
         </button>
       </div>
       {error.message && (

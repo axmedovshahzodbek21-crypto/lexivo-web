@@ -1,4 +1,5 @@
-import { localDateStr } from './storage';
+import { localDateStr, getUILanguage } from './storage';
+import { translations } from './i18n';
 
 const BACKUP_VERSION = 1;
 
@@ -59,11 +60,12 @@ export type ImportResult =
   | { ok: false; error: string };
 
 export function importData(jsonStr: string): ImportResult {
+  const t = translations[getUILanguage()] ?? translations.en;
   let parsed: unknown;
   try {
     parsed = JSON.parse(jsonStr);
   } catch {
-    return { ok: false, error: 'Invalid file — could not parse JSON.' };
+    return { ok: false, error: t.settings.invalidBackupFile };
   }
 
   if (
@@ -73,13 +75,13 @@ export function importData(jsonStr: string): ImportResult {
     !('data' in parsed) ||
     (parsed as BackupFile).appName !== 'Lexivo'
   ) {
-    return { ok: false, error: 'This file does not look like a Lexivo backup.' };
+    return { ok: false, error: t.settings.notALexivoBackup };
   }
 
   const backup = parsed as BackupFile;
 
   if (backup.version > BACKUP_VERSION) {
-    return { ok: false, error: `Backup version ${backup.version} is newer than this app supports.` };
+    return { ok: false, error: t.settings.backupVersionTooNew(backup.version) };
   }
 
   const data = backup.data as Record<string, unknown>;
