@@ -1,5 +1,6 @@
 ﻿'use client';
 import { useTranslation } from '@/lib/useTranslation';
+import { fmtMonthDay, fmtWeekdayMonthDay } from '@/lib/i18n';
 import { PageLoader, SectionLoader } from '@/components/Loader';
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
@@ -159,17 +160,17 @@ function timeAgo(tt: ReturnType<typeof useTranslation>, iso: string): string {
   if (h < 24) return tt.classesPage.hoursAgo(h);
   const d = Math.floor(h / 24);
   if (d < 7) return tt.classesPage.daysAgo(d);
-  return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  return fmtMonthDay(tt, new Date(iso));
 }
 
 function dueDateLabel(tt: ReturnType<typeof useTranslation>, due: string | null): { text: string; overdue: boolean } | null {
   if (!due) return null;
   const today = localDateStr();
   const tomorrow = addDaysToDateStr(today, 1);
-  if (due < today) return { text: tt.classesPage.overdueDate(new Date(due + 'T00:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' })), overdue: true };
+  if (due < today) return { text: tt.classesPage.overdueDate(fmtMonthDay(tt, new Date(due + 'T00:00:00'))), overdue: true };
   if (due === today) return { text: tt.classesPage.dueToday, overdue: false };
   if (due === tomorrow) return { text: tt.classesPage.dueTomorrow, overdue: false };
-  return { text: tt.classesPage.dueDate(new Date(due + 'T00:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' })), overdue: false };
+  return { text: tt.classesPage.dueDate(fmtMonthDay(tt, new Date(due + 'T00:00:00'))), overdue: false };
 }
 
 function isInactive(date: string | null): boolean {
@@ -184,7 +185,7 @@ function dayLabel(tt: ReturnType<typeof useTranslation>, iso: string): string {
   const yesterday = addDaysToDateStr(today, -1);
   if (date === today) return tt.classesPage.todayCap;
   if (date === yesterday) return tt.classesPage.yesterday;
-  return new Date(date).toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' });
+  return fmtWeekdayMonthDay(tt, new Date(date));
 }
 
 // ── Analytics helpers ──────────────────────────────────────────────────────
@@ -3091,7 +3092,7 @@ export default function ClassDashboardPage() {
                   <div className="flex justify-center py-8"><div className="text-3xl animate-bounce">📊</div></div>
                 ) : (() => {
                   const latestDoneUnit = unitRows.filter(r => r.completed_at).sort((a, b) => (b.completed_at! > a.completed_at! ? 1 : -1))[0];
-                  const fmtDate = (iso: string) => new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                  const fmtDate = (iso: string) => fmtMonthDay(tt, new Date(iso));
                   return (
                     <div className="grid grid-cols-4 gap-2">
                       {Array.from({ length: collectionModal.total }, (_, i) => {

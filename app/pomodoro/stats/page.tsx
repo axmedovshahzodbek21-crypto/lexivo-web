@@ -38,7 +38,7 @@ export default function PomodoroStatsPage() {
   const last7 = Array.from({ length: 7 }, (_, i) => {
     const d = new Date(Date.now() - (6 - i) * 86400000);
     const dateStr = localDateStr(d);
-    const label = i === 6 ? t.pomodoro.statToday : d.toLocaleDateString('default', { weekday: 'short' }).slice(0, 3);
+    const label = i === 6 ? t.pomodoro.statToday : t.progress.weekdaysShort[(d.getDay() + 6) % 7];
     return { dateStr, label, seconds: days[dateStr] ?? 0 };
   });
   const maxSeconds = Math.max(...last7.map(d => d.seconds), 60);

@@ -1,5 +1,6 @@
 'use client';
 import { useTranslation } from '@/lib/useTranslation';
+import { fmtMonthDayYear } from '@/lib/i18n';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -135,9 +136,7 @@ function ListRow({
   onDeleteCancel: () => void;
 }) {
   const t = useTranslation();
-  const created = new Date(list.createdAt).toLocaleDateString(undefined, {
-    month: 'short', day: 'numeric', year: 'numeric',
-  });
+  const created = fmtMonthDayYear(t, new Date(list.createdAt));
 
   if (confirmDelete) {
     return (

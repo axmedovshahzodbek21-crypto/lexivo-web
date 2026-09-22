@@ -2082,6 +2082,7 @@ const en = {
     monthDaysCount: (n: number) => `${n} days`,
     weekdaysInitial: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
     weekdaysShort: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    weekdaysFull: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
     infoReviewBody: 'Spaced Repetition System — words you\'ve learned come back for review at growing intervals. Complete all words due today to mark the blue half of your day circle.',
     infoWordsTitle: 'Daily Word Goal',
     infoWordsBody: 'Learn new words each day to hit your personal target. You set the number yourself in Settings. Reach it to mark the green half of your day circle.',
@@ -4528,6 +4529,7 @@ const uz: typeof en = {
     monthDaysCount: (n: number) => `${n} kun`,
     weekdaysInitial: ['D', 'S', 'C', 'P', 'J', 'S', 'Y'],
     weekdaysShort: ['Dush', 'Sesh', 'Chor', 'Pay', 'Jum', 'Shan', 'Yak'],
+    weekdaysFull: ['Dushanba', 'Seshanba', 'Chorshanba', 'Payshanba', 'Juma', 'Shanba', 'Yakshanba'],
     infoReviewBody: 'Takroriy takrorlash tizimi (SRS) — o\'rgangan so\'zlaringiz o\'sib boruvchi oraliqlarda qayta takrorlash uchun qaytib keladi. Kun doirangizning ko\'k yarmini belgilash uchun bugun kerak bo\'lgan barcha so\'zlarni yakunlang.',
     infoWordsTitle: 'Kunlik so\'z maqsadi',
     infoWordsBody: 'Shaxsiy maqsadingizga yetish uchun har kuni yangi so\'zlarni o\'rganing. Sonini o\'zingiz Sozlamalarda belgilaysiz. Unga yetsangiz, kun doirangizning yashil yarmi belgilanadi.',
@@ -6988,6 +6990,7 @@ const ru: typeof en = {
     monthDaysCount: (n: number) => `${n} дней`,
     weekdaysInitial: ['П', 'В', 'С', 'Ч', 'П', 'С', 'В'],
     weekdaysShort: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
+    weekdaysFull: ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'],
     infoReviewBody: 'Система интервального повторения (SRS) — выученные слова возвращаются на повторение через увеличивающиеся промежутки времени. Завершите все слова на сегодня, чтобы закрасить синюю половину вашего дневного круга.',
     infoWordsTitle: 'Дневная цель по словам',
     infoWordsBody: 'Учите новые слова каждый день, чтобы достичь своей личной цели. Число вы задаёте сами в Настройках. Достигнув её, вы закрасите зелёную половину дневного круга.',
@@ -7367,3 +7370,21 @@ const ru: typeof en = {
 export type Translations = typeof en;
 export type Lang = 'en' | 'uz' | 'ru';
 export const translations: Record<Lang, Translations> = { en, uz, ru };
+
+// Shared date-display helpers — every screen that needs a formatted date
+// used `toLocaleDateString(undefined, ...)`, which follows the browser/OS
+// locale instead of the app's own language toggle, so switching the app to
+// Uzbek left dates like "Jan 5" or "Monday" in English. These use the
+// translated month/weekday name tables above instead.
+export function fmtMonthDay(t: Translations, d: Date): string {
+  return `${t.wordsPage.monthNamesShort[d.getMonth()]} ${d.getDate()}`;
+}
+export function fmtMonthDayYear(t: Translations, d: Date): string {
+  return `${t.wordsPage.monthNamesShort[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+}
+export function fmtWeekdayMonthDay(t: Translations, d: Date): string {
+  return `${t.progress.weekdaysFull[(d.getDay() + 6) % 7]}, ${t.wordsPage.monthNamesShort[d.getMonth()]} ${d.getDate()}`;
+}
+export function fmtMonthYear(t: Translations, d: Date): string {
+  return `${t.classesPage.monthNames[d.getMonth()]} ${d.getFullYear()}`;
+}

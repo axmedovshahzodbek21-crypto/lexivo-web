@@ -1,5 +1,6 @@
 'use client';
 import { useTranslation } from '@/lib/useTranslation';
+import { fmtMonthDayYear } from '@/lib/i18n';
 import { useEffect, useState } from 'react';
 import { achievementCount, getCategoryMeta, CATEGORY_ORDER, getAchievementProgress, groupAchievementsByCategory, computeAchievementXp } from '@/lib/gamification';
 import { getUnlockedAchievements, getLearnedWords, getStreak, getXP, getGraduatedCount, getTotalStudyDays, getFlashcardTotalDays, getFlashcardStreak, getQuizTotalDays, getQuizStreak, getAchievementDate } from '@/lib/storage';
@@ -16,10 +17,9 @@ interface AchDetail extends Omit<Achievement, 'unlockedAt'> {
   unlockedAt: string | null;
 }
 
-function fmtDate(iso: string | null): string {
+function fmtDate(t: ReturnType<typeof useTranslation>, iso: string | null): string {
   if (!iso) return '';
-  const d = new Date(iso);
-  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+  return fmtMonthDayYear(t, new Date(iso));
 }
 
 function RingProgress({ pct, completeLabel }: { pct: number; completeLabel: string }) {
@@ -241,7 +241,7 @@ export default function AchievementsPage() {
               {selected.unlocked ? (
                 <div style={{ padding:'10px 24px', borderRadius:12, textAlign:'center', background:'color-mix(in srgb, var(--success) 10%, transparent)', border:'1px solid color-mix(in srgb, var(--success) 25%, transparent)' }}>
                   <p style={{ fontSize:13, fontWeight:700, color:'var(--success)', margin:0 }}>✓ {t.achievementsPage.achieved}</p>
-                  {selected.unlockedAt && <p style={{ fontSize:11, color:'var(--text-muted)', marginTop:3 }}>{fmtDate(selected.unlockedAt)}</p>}
+                  {selected.unlockedAt && <p style={{ fontSize:11, color:'var(--text-muted)', marginTop:3 }}>{fmtDate(t, selected.unlockedAt)}</p>}
                 </div>
               ) : (() => {
                 const prog = getAchievementProgress(selected.id, stats, t);

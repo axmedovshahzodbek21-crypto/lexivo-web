@@ -1,5 +1,6 @@
 ﻿'use client';
 import { useTranslation } from '@/lib/useTranslation';
+import { fmtMonthDayYear } from '@/lib/i18n';
 import { PageLoader } from '@/components/Loader';
 import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -232,7 +233,7 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
                 <div className="text-2xl mb-1">✅</div>
                 <div className="text-xs font-semibold text-[var(--success)]">{t.wordPage.learned}</div>
                 <div className="text-xs text-[var(--text-muted)] mt-0.5">
-                  {new Date(learnedAt).toLocaleDateString()}
+                  {fmtMonthDayYear(t, new Date(learnedAt))}
                 </div>
               </>
             ) : (

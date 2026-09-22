@@ -1,5 +1,6 @@
 'use client';
 import { useTranslation } from '@/lib/useTranslation';
+import { fmtMonthDay } from '@/lib/i18n';
 import { SectionLoader } from '@/components/Loader';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -31,17 +32,17 @@ function timeAgo(iso: string, t: T): string {
   if (h < 24) return t.classesPage.hoursAgo(h);
   const d = Math.floor(h / 24);
   if (d < 7) return t.classesPage.daysAgo(d);
-  return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  return fmtMonthDay(t, new Date(iso));
 }
 
 function dueDateLabel(due: string | null, t: T): { text: string; overdue: boolean } | null {
   if (!due) return null;
   const today = localDateStr();
   const tomorrow = addDaysToDateStr(today, 1);
-  if (due < today) return { text: t.classesPage.overdueLabel(new Date(due + 'T00:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' })), overdue: true };
+  if (due < today) return { text: t.classesPage.overdueLabel(fmtMonthDay(t, new Date(due + 'T00:00:00'))), overdue: true };
   if (due === today) return { text: t.classesPage.dueToday, overdue: false };
   if (due === tomorrow) return { text: t.classesPage.dueTomorrow, overdue: false };
-  return { text: t.classesPage.dueDateLabel(new Date(due + 'T00:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' })), overdue: false };
+  return { text: t.classesPage.dueDateLabel(fmtMonthDay(t, new Date(due + 'T00:00:00'))), overdue: false };
 }
 
 

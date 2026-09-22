@@ -20,6 +20,7 @@ import { stageLabel, stageColor } from '@/lib/srs';
 import type { SRSWord } from '@/lib/types';
 import { SRS_INTERVALS } from '@/lib/types';
 import { useTranslation } from '@/lib/useTranslation';
+import { fmtMonthYear } from '@/lib/i18n';
 import XpHistoryModal from '@/components/XpHistoryModal';
 import BackButton from '@/components/BackButton';
 
@@ -120,7 +121,7 @@ function ProgressPage() {
     d.setDate(d.getDate() - (6 - i));
     const dateStr = localDateStr(d);
     const label = i === 6 ? t.progress.today : i === 5 ? t.progress.yesterdayShort :
-      d.toLocaleDateString('default', { weekday: 'short' }).slice(0, 3);
+      t.progress.weekdaysShort[(d.getDay() + 6) % 7];
     return { dateStr, label, active: studyDays.includes(dateStr) };
   });
   const activeThisWeek = weeklyActivity.filter(d => d.active).length;
@@ -752,7 +753,7 @@ function StudyCalendar({
   const srsLongest   = calcLongestStreak(reviewDays);
 
   const cells = buildMonthGrid(viewYear, viewMonth);
-  const monthName = new Date(viewYear, viewMonth, 1).toLocaleString('default', { month: 'long', year: 'numeric' });
+  const monthName = fmtMonthYear(t, new Date(viewYear, viewMonth, 1));
   const canGoNext = viewYear < now.getFullYear() || (viewYear === now.getFullYear() && viewMonth < now.getMonth());
 
   function prevMonth() {
@@ -1075,10 +1076,10 @@ function StudyCalendar({
                 </div>
                 <div style={{ position: 'relative', zIndex: 1 }}>
                   <p style={{ fontSize: 10, fontWeight: 900, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.14em', marginBottom: 6 }}>
-                    {new Date(selectedDay + 'T12:00:00').toLocaleDateString('default', { weekday: 'long' })}
+                    {t.progress.weekdaysFull[(new Date(selectedDay + 'T12:00:00').getDay() + 6) % 7]}
                   </p>
                   <p style={{ fontSize: 28, fontWeight: 900, color: 'var(--text)', lineHeight: 1.1 }}>
-                    {new Date(selectedDay + 'T12:00:00').toLocaleDateString('default', { month: 'long', day: 'numeric', year: 'numeric' })}
+                    {t.classesPage.monthNames[new Date(selectedDay + 'T12:00:00').getMonth()]} {new Date(selectedDay + 'T12:00:00').getDate()}, {new Date(selectedDay + 'T12:00:00').getFullYear()}
                   </p>
                 </div>
                 <button
@@ -1170,7 +1171,7 @@ function MonthlyBreakdown({ history, onInfo }: { history: Record<string, number>
     // *previous* month, showing the wrong month name here. Building the
     // Date from explicit local year/month components (as done elsewhere in
     // this file, e.g. the calendar grid below) avoids the UTC round-trip.
-    const label = new Date(parseInt(y), parseInt(m) - 1, 1).toLocaleString('default', { month: 'long', year: 'numeric' });
+    const label = fmtMonthYear(t, new Date(parseInt(y), parseInt(m) - 1, 1));
     months.push({ label, words, days });
     if (months.length >= 4) break;
   }
