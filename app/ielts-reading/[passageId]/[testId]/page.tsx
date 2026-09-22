@@ -21,6 +21,8 @@ function QuestionInstruction({ type, start, end, passageId, color, paragraphLabe
   type: string; start: number; end: number; passageId: string; color: string;
   paragraphLabels?: string; options?: string[]; featureListTitle?: string;
 }) {
+  const t = useTranslation();
+  const ir = t.ieltsReading;
   const range = end > start ? `${start}–${end}` : `${start}`;
   const it: React.CSSProperties = { fontStyle: 'italic', color, display: 'block', marginBottom: 6 };
   const kw: React.CSSProperties = { fontWeight: 900, fontStyle: 'italic', color, minWidth: 90, display: 'inline-block' };
@@ -28,16 +30,16 @@ function QuestionInstruction({ type, start, end, passageId, color, paragraphLabe
   const nb: React.CSSProperties = { color, display: 'block', marginBottom: 6 };
   const box: React.CSSProperties = { border: `1px solid ${color}`, display: 'inline-block', padding: '10px 20px', marginTop: 8, marginBottom: 4, minWidth: 200 };
 
-  const head = <span style={{ ...it, marginBottom: 10 }}>Questions {range}</span>;
+  const head = <span style={{ ...it, marginBottom: 10 }}>{ir.questionsLabel} {range}</span>;
 
   switch (type) {
     case 'true_false_not_given':
       return <div style={{ fontSize: 13, lineHeight: 1.6 }}>
         {head}
-        <span style={it}>Do the following statements agree with the information given in Reading Passage {passageId}?</span>
-        <span style={it}>In boxes {range} on your answer sheet, write</span>
+        <span style={it}>{ir.tfngIntro(passageId)}</span>
+        <span style={it}>{ir.writeInBoxesWrite(range)}</span>
         <div style={{ paddingLeft: 16, marginTop: 4 }}>
-          {[['TRUE','if the statement agrees with the information'],['FALSE','if the statement contradicts the information'],['NOT GIVEN','if there is no information on this']].map(([k,v]) => (
+          {[['TRUE',ir.tfngTrueDesc],['FALSE',ir.tfngFalseDesc],['NOT GIVEN',ir.notGivenDesc]].map(([k,v]) => (
             <div key={k} style={{ display: 'flex', gap: 16, marginBottom: 2 }}><span style={kw}>{k}</span><span style={vl}>{v}</span></div>
           ))}
         </div>
@@ -46,10 +48,10 @@ function QuestionInstruction({ type, start, end, passageId, color, paragraphLabe
     case 'yes_no_not_given':
       return <div style={{ fontSize: 13, lineHeight: 1.6 }}>
         {head}
-        <span style={it}>Do the following statements agree with the views of the writer in Reading Passage {passageId}?</span>
-        <span style={it}>In boxes {range} on your answer sheet, write</span>
+        <span style={it}>{ir.ynngIntro(passageId)}</span>
+        <span style={it}>{ir.writeInBoxesWrite(range)}</span>
         <div style={{ paddingLeft: 16, marginTop: 4 }}>
-          {[['YES','if the statement agrees with the views of the writer'],['NO','if the statement contradicts the views of the writer'],['NOT GIVEN','if it is impossible to say what the writer thinks about this']].map(([k,v]) => (
+          {[['YES',ir.ynngYesDesc],['NO',ir.ynngNoDesc],['NOT GIVEN',ir.ynngNotGivenDesc]].map(([k,v]) => (
             <div key={k} style={{ display: 'flex', gap: 16, marginBottom: 2 }}><span style={kw}>{k}</span><span style={vl}>{v}</span></div>
           ))}
         </div>
@@ -58,25 +60,25 @@ function QuestionInstruction({ type, start, end, passageId, color, paragraphLabe
     case 'multiple_choice':
       return <div style={{ fontSize: 13, lineHeight: 1.6 }}>
         {head}
-        <span style={it}>Choose the correct letter, <strong>A</strong>, <strong>B</strong>, <strong>C</strong> or <strong>D</strong>.</span>
-        <span style={it}>Write the correct letter in boxes {range} on your answer sheet.</span>
+        <span style={it}>{ir.chooseCorrectLetter} <strong>A</strong>, <strong>B</strong>, <strong>C</strong> {ir.orWord} <strong>D</strong>.</span>
+        <span style={it}>{ir.writeCorrectLetterInBoxes(range)}</span>
       </div>;
 
     case 'multiple_choice_multi':
       return <div style={{ fontSize: 13, lineHeight: 1.6 }}>
         {head}
-        <span style={it}>Choose <strong>TWO</strong> letters, <strong>A–E</strong>.</span>
-        <span style={it}>Write the correct letters in boxes {range} on your answer sheet.</span>
+        <span style={it}>{ir.chooseWord} <strong>TWO</strong> {ir.lettersRangeSuffix('A–E')}</span>
+        <span style={it}>{ir.writeCorrectLettersInBoxes(range)}</span>
       </div>;
 
     case 'matching_information': {
       const pl = paragraphLabels ?? 'A–G';
       return <div style={{ fontSize: 13, lineHeight: 1.6 }}>
         {head}
-        <span style={it}>Reading Passage {passageId} has several paragraphs, <strong>{pl}</strong>.</span>
-        <span style={it}>Which section contains the following information?</span>
-        <span style={it}>Write the correct letter, <strong>{pl}</strong>, in boxes {range} on your answer sheet.</span>
-        <span style={nb}><strong>NB</strong> You may use any letter more than once.</span>
+        <span style={it}>{ir.readingPassageHasParagraphs(passageId)} <strong>{pl}</strong>.</span>
+        <span style={it}>{ir.whichSectionContains}</span>
+        <span style={it}>{ir.writeCorrectLetterPlPrefix} <strong>{pl}</strong>{ir.writeCorrectLetterPlSuffix(range)}</span>
+        <span style={nb}><strong>{ir.nbLabel}</strong> {ir.mayUseLetterMoreThanOnce}</span>
       </div>;
     }
 
@@ -86,12 +88,12 @@ function QuestionInstruction({ type, start, end, passageId, color, paragraphLabe
       const romanRange = `${romans[0]}–${romans[romans.length - 1]}`;
       return <div style={{ fontSize: 13, lineHeight: 1.6 }}>
         {head}
-        <span style={it}>Reading Passage {passageId} has several paragraphs, <strong>{pl}</strong>.</span>
-        <span style={it}>Choose the correct heading for each paragraph from the list of headings below.</span>
-        <span style={it}>Write the correct number, <strong><em>{romanRange}</em></strong>, in boxes {range} on your answer sheet.</span>
+        <span style={it}>{ir.readingPassageHasParagraphs(passageId)} <strong>{pl}</strong>.</span>
+        <span style={it}>{ir.chooseHeadingForEachParagraph}</span>
+        <span style={it}>{ir.writeCorrectNumberPrefix} <strong><em>{romanRange}</em></strong>{ir.writeCorrectNumberSuffix(range)}</span>
         {options && options.length > 0 && (
           <div style={box}>
-            <div style={{ fontWeight: 700, color, textAlign: 'center', marginBottom: 10 }}>List of Headings</div>
+            <div style={{ fontWeight: 700, color, textAlign: 'center', marginBottom: 10 }}>{ir.listOfHeadings}</div>
             {options.map((opt, i) => (
               <div key={i} style={{ color, marginBottom: 5, display: 'flex', gap: 12 }}>
                 <span style={{ fontStyle: 'italic', minWidth: 28 }}>{romans[i]}</span>
@@ -104,6 +106,13 @@ function QuestionInstruction({ type, start, end, passageId, color, paragraphLabe
     }
 
     case 'matching_features': {
+      // featureListTitle is never actually set by content data today (always
+      // falls back to 'List of People' below) — the noun/listLabel derivation
+      // strips the literal English "List of " prefix and singularizes by
+      // trimming a trailing "s", which only works against that English
+      // string shape. Translating the default would silently break this
+      // derivation, so this case stays English until that logic is reworked
+      // to not depend on English string structure.
       const n = options?.length ?? 3;
       const ll = letterList(n);
       const noun = featureListTitle ? featureListTitle.replace('List of ', '').toLowerCase().replace(/s$/, '') : 'person';
@@ -131,33 +140,33 @@ function QuestionInstruction({ type, start, end, passageId, color, paragraphLabe
       const endRange = `A–${LETTERS[n - 1]}`;
       return <div style={{ fontSize: 13, lineHeight: 1.6 }}>
         {head}
-        <span style={it}>Complete each sentence with the correct ending, <strong>{endRange}</strong>, below.</span>
-        <span style={it}>Write the correct letter in boxes {range} on your answer sheet.</span>
+        <span style={it}>{ir.completeEachSentenceEndingPrefix} <strong>{endRange}</strong>, {ir.completeEachSentenceEndingSuffix}</span>
+        <span style={it}>{ir.writeCorrectLetterInBoxes(range)}</span>
       </div>;
     }
 
     case 'sentence_completion':
       return <div style={{ fontSize: 13, lineHeight: 1.6 }}>
         {head}
-        <span style={it}>Complete the sentences below.</span>
-        <span style={it}>Choose <strong>ONE WORD ONLY</strong> from the passage for each answer.</span>
-        <span style={it}>Write your answers in boxes {range} on your answer sheet.</span>
+        <span style={it}>{ir.completeSentencesBelow}</span>
+        <span style={it}>{ir.chooseWord} <strong>{ir.oneWordOnlyWord}</strong> {ir.fromPassageForEachAnswerSuffix}</span>
+        <span style={it}>{ir.writeAnswersInBoxes(range)}</span>
       </div>;
 
     case 'summary_completion':
       return <div style={{ fontSize: 13, lineHeight: 1.6 }}>
         {head}
-        <span style={it}>Complete the summary below.</span>
-        <span style={it}>Choose <strong>ONE WORD ONLY</strong> from the passage for each answer.</span>
-        <span style={it}>Write your answers in boxes {range} on your answer sheet.</span>
+        <span style={it}>{ir.completeSummaryBelow}</span>
+        <span style={it}>{ir.chooseWord} <strong>{ir.oneWordOnlyWord}</strong> {ir.fromPassageForEachAnswerSuffix}</span>
+        <span style={it}>{ir.writeAnswersInBoxes(range)}</span>
       </div>;
 
     case 'short_answer':
       return <div style={{ fontSize: 13, lineHeight: 1.6 }}>
         {head}
-        <span style={it}>Answer the questions below.</span>
-        <span style={it}>Choose <strong>NO MORE THAN THREE WORDS</strong> from the passage for each answer.</span>
-        <span style={it}>Write your answers in boxes {range} on your answer sheet.</span>
+        <span style={it}>{ir.answerQuestionsBelow}</span>
+        <span style={it}>{ir.chooseWord} <strong>{ir.noMoreThanThreeWordsWord}</strong> {ir.fromPassageForEachAnswerSuffix}</span>
+        <span style={it}>{ir.writeAnswersInBoxes(range)}</span>
       </div>;
 
     default:
