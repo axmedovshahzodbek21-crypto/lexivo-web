@@ -1,7 +1,8 @@
 'use client';
 import { useTranslation } from '@/lib/useTranslation';
 import { useRouter } from 'next/navigation';
-import { realEnglishSets } from "@/lib/real-english-data";
+import { realEnglishSets, localizedTitle } from "@/lib/real-english-data";
+import { getUILanguage } from '@/lib/storage';
 import BackButton from '@/components/BackButton';
 
 const CARD_COLORS = [
@@ -17,6 +18,7 @@ const CARD_COLORS = [
 
 export default function RealEnglishPage() {
   const t = useTranslation();
+  const lang = getUILanguage();
   const router = useRouter();
 
   const STEPS = [
@@ -96,7 +98,7 @@ export default function RealEnglishPage() {
                     display: '-webkit-box', WebkitLineClamp: 2,
                     WebkitBoxOrient: 'vertical', overflow: 'hidden',
                     textShadow: '0 1px 4px rgba(0,0,0,0.3)',
-                  }}>{set.title}</p>
+                  }}>{localizedTitle(set, lang)}</p>
                   <span style={{
                     fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.9)',
                     background: 'rgba(0,0,0,0.22)', borderRadius: 6, padding: '2px 8px',

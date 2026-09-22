@@ -4,9 +4,9 @@ import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import BackButton from '@/components/BackButton';
 import Link from 'next/link';
-import { realEnglishSets } from "@/lib/real-english-data";
+import { realEnglishSets, localizedTitle } from "@/lib/real-english-data";
 import { loadRealEnglishCollection } from '@/lib/data';
-import { getUnitProgress } from '@/lib/storage';
+import { getUnitProgress, getUILanguage } from '@/lib/storage';
 import type { WordCollection, UnitProgress } from '@/lib/types';
 
 const CARD_COLORS = [
@@ -94,6 +94,7 @@ function UnitCard({ unit, collectionName, accentColor }: {
 
 export default function RealEnglishVideoPage({ params }: { params: Promise<{ id: string; videoId: string }> }) {
   const t = useTranslation();
+  const lang = getUILanguage();
   const { id, videoId } = use(params);
   const router = useRouter();
 
@@ -134,14 +135,14 @@ export default function RealEnglishVideoPage({ params }: { params: Promise<{ id:
     <div className="max-w-2xl mx-auto px-4 py-8 pb-24">
       <button onClick={() => router.back()}
         className="flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors mb-5">
-        ← {set.title}
+        ← {localizedTitle(set, lang)}
       </button>
 
       {/* Hero */}
       <div className="rounded-2xl p-5 mb-6 text-white"
         style={{ background: `linear-gradient(135deg, ${accentColor}bb, ${accentColor})` }}>
         <div className="text-2xl mb-2">🎬</div>
-        <h1 className="text-xl font-black leading-snug mb-3">{video.title}</h1>
+        <h1 className="text-xl font-black leading-snug mb-3">{localizedTitle(video, lang)}</h1>
         <div className="flex flex-wrap gap-2">
           {totalWords > 0 && (
             <span className="text-xs font-semibold bg-black/20 rounded-full px-3 py-1">{t.unitPicker.wordsCount(totalWords)}</span>

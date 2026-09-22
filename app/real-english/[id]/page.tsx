@@ -3,10 +3,10 @@ import { useTranslation } from '@/lib/useTranslation';
 import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import BackButton from '@/components/BackButton';
-import { type RealEnglishVideo } from '@/lib/real-english-data';
+import { type RealEnglishVideo, localizedTitle } from '@/lib/real-english-data';
 import { realEnglishSets } from "@/lib/real-english-data";
 import { loadRealEnglishCollection } from '@/lib/data';
-import { getSRSWords, getReviewLog } from '@/lib/storage';
+import { getSRSWords, getReviewLog, getUILanguage } from '@/lib/storage';
 
 const UNLOCK_INTERVAL = 7;
 
@@ -37,6 +37,7 @@ function VideoCard({ video, index, wordCount, onClick }: {
   onClick: () => void;
 }) {
   const t = useTranslation();
+  const lang = getUILanguage();
   const unlocked = getVideoUnlocked(video.collectionName, wordCount);
   const { color, light, dark } = CARD_COLORS[index % CARD_COLORS.length];
   const numStr = String(index + 1).padStart(2, '0');
@@ -55,7 +56,7 @@ function VideoCard({ video, index, wordCount, onClick }: {
         }}>{numStr}</div>
         <span style={{ fontSize: 20 }}>⏳</span>
         <div>
-          <p style={{ fontSize: 11, fontWeight: 900, color: 'var(--text)', lineHeight: 1.2 }}>{video.title}</p>
+          <p style={{ fontSize: 11, fontWeight: 900, color: 'var(--text)', lineHeight: 1.2 }}>{localizedTitle(video, lang)}</p>
           <p style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 3 }}>{t.realEnglishPage.comingSoon}</p>
         </div>
       </div>
@@ -103,7 +104,7 @@ function VideoCard({ video, index, wordCount, onClick }: {
           display: '-webkit-box', WebkitLineClamp: 2,
           WebkitBoxOrient: 'vertical', overflow: 'hidden',
           textShadow: '0 1px 4px rgba(0,0,0,0.3)',
-        }}>{video.title}</p>
+        }}>{localizedTitle(video, lang)}</p>
         <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', alignItems: 'center' }}>
           <span style={{
             fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.9)',
@@ -126,6 +127,7 @@ function VideoCard({ video, index, wordCount, onClick }: {
 
 export default function RealEnglishSetPage({ params }: { params: Promise<{ id: string }> }) {
   const t = useTranslation();
+  const lang = getUILanguage();
   const { id } = use(params);
   const router = useRouter();
   const set = realEnglishSets.find(s => s.id === id);
@@ -178,7 +180,7 @@ export default function RealEnglishSetPage({ params }: { params: Promise<{ id: s
         <p style={{ fontSize: 11, fontWeight: 900, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: 6 }}>
           {t.realEnglishPage.videoSetEyebrow(set.videos.length)}
         </p>
-        <h1 style={{ fontSize: 32, fontWeight: 900, color: 'var(--text)', lineHeight: 1.1 }}>{set.title}</h1>
+        <h1 style={{ fontSize: 32, fontWeight: 900, color: 'var(--text)', lineHeight: 1.1 }}>{localizedTitle(set, lang)}</h1>
       </div>
 
       {/* Video grid */}
