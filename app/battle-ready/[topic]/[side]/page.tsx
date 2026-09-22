@@ -18,24 +18,24 @@ export default function BattleReadySidePage() {
 
   const sideColor = side === 'for' ? '#22c55e' : '#ef4444';
   const sideEdge = side === 'for' ? '#15803d' : '#b91c1c';
-  const sideLabel = side === 'for' ? 'FOR' : 'AGAINST';
+  const sideLabel = side === 'for' ? t.battleReadyPage.forShort : t.battleReadyPage.againstShort;
 
   const cards = [
-    { key: 'vocabulary', icon: '📖', label: 'Vocabulary', count: content?.vocab.length ?? 0, unit: 'words' },
-    { key: 'phrases', icon: '💬', label: 'Phrases', count: content?.phrases.length ?? 0, unit: 'phrases' },
-    { key: 'idioms', icon: '🎭', label: 'Idioms', count: content?.idioms.length ?? 0, unit: 'idioms' },
-    { key: 'arguments', icon: '⚔️', label: 'Arguments', count: content?.arguments.length ?? 0, unit: 'arguments' },
+    { key: 'vocabulary', icon: '📖', label: t.battleReadyPage.vocabulary, count: content?.vocab.length ?? 0, unit: t.battleReadyPage.unitWords },
+    { key: 'phrases', icon: '💬', label: t.battleReadyPage.phrases, count: content?.phrases.length ?? 0, unit: t.battleReadyPage.unitPhrases },
+    { key: 'idioms', icon: '🎭', label: t.battleReadyPage.idioms, count: content?.idioms.length ?? 0, unit: t.battleReadyPage.unitIdioms },
+    { key: 'arguments', icon: '⚔️', label: t.battleReadyPage.arguments, count: content?.arguments.length ?? 0, unit: t.battleReadyPage.unitArguments },
   ];
 
   return (
     <div className="p-4 space-y-6 animate-fade-in max-w-2xl mx-auto">
-      <BackButton href={`/battle-ready/${slug}`} label="Topic" />
+      <BackButton href={`/battle-ready/${slug}`} label={t.battleReadyPage.topicLabel} />
 
       <div className="flex items-center gap-3">
         <span className="text-3xl">{topic.emoji}</span>
         <div>
           <h1 className="text-xl font-bold text-[var(--text)]">{topic.title}</h1>
-          <p className="text-xs font-semibold" style={{ color: sideColor }}>{sideLabel} side</p>
+          <p className="text-xs font-semibold" style={{ color: sideColor }}>{sideLabel} {t.battleReadyPage.sideSuffix}</p>
         </div>
       </div>
 

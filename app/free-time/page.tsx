@@ -10,14 +10,14 @@ import { getWordOfDay } from '@/lib/data';
 import { SRS_INTERVALS } from '@/lib/types';
 import type { SRSWord, WordItem } from '@/lib/types';
 
-const MAIN_COLLECTIONS = [
-  { slug: '30 Days of Powerful Words', icon: '🏆', color: '#6C63FF', desc: 'IELTS vocabulary' },
-  { slug: '24 Vocabulary Challenge',   icon: '💡', color: '#FF6584', desc: 'Idioms & phrases' },
-  { slug: 'Word Mastery',              icon: '🎯', color: '#2ECC71', desc: 'C1 & B2 collocations' },
-];
-
 export default function FreeTimePage() {
   const t = useTranslation();
+
+  const MAIN_COLLECTIONS = [
+    { slug: '30 Days of Powerful Words', icon: '🏆', color: '#6C63FF', desc: t.freeTime.descIelts },
+    { slug: '24 Vocabulary Challenge',   icon: '💡', color: '#FF6584', desc: t.freeTime.descIdioms },
+    { slug: 'Word Mastery',              icon: '🎯', color: '#2ECC71', desc: t.freeTime.descCollocations },
+  ];
   const router = useRouter();
   const { collections, collectionsLoaded } = useAppStore();
   const [wod, setWod] = useState<WordItem | null>(null);
@@ -52,14 +52,14 @@ export default function FreeTimePage() {
           className="rounded-3xl p-5"
           style={{ background: 'linear-gradient(135deg, #0F3460, #16213E)', boxShadow: '0 4px 0 #091a2e' }}
         >
-          <p className="text-xl font-black text-white">🎉 You&apos;re all caught up!</p>
+          <p className="text-xl font-black text-white">{t.freeTime.allCaughtUp}</p>
           <p className="text-sm text-white/60 mt-1">{t.freeTime.noReviews}</p>
         </div>
 
         {/* Word of the Day */}
         {wod && (
           <div>
-            <h2 className="text-sm font-bold text-[var(--text-muted)] uppercase tracking-wider mb-2">✨ Word of the Day</h2>
+            <h2 className="text-sm font-bold text-[var(--text-muted)] uppercase tracking-wider mb-2">{t.freeTime.wordOfTheDay}</h2>
             <div
               className="rounded-2xl p-5"
               style={{ background: 'linear-gradient(135deg, #1A1A2E, #16213E)' }}
@@ -74,7 +74,7 @@ export default function FreeTimePage() {
                   onClick={() => speak(wod.word)}
                   className="w-9 h-9 rounded-xl flex items-center justify-center text-sm shrink-0"
                   style={{ background: 'rgba(108,99,255,0.3)', color: '#fff' }}
-                  aria-label="Pronounce"
+                  aria-label={t.freeTime.pronounce}
                 >🔊</button>
               </div>
               {wodRevealed ? (
@@ -82,7 +82,7 @@ export default function FreeTimePage() {
                   <p className="text-sm text-white/80 leading-relaxed mb-3">{wod.definition}</p>
                   {wod.example1 && (
                     <div className="rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.07)' }}>
-                      <p className="text-[10px] text-white/40 font-semibold mb-1">💬 Example</p>
+                      <p className="text-[10px] text-white/40 font-semibold mb-1">{t.freeTime.exampleLabel}</p>
                       <p className="text-sm text-white leading-relaxed">{wod.example1}</p>
                     </div>
                   )}
@@ -93,7 +93,7 @@ export default function FreeTimePage() {
                   className="text-xs font-semibold px-3 py-1.5 rounded-xl"
                   style={{ background: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.7)' }}
                 >
-                  Show definition
+                  {t.freeTime.showDefinition}
                 </button>
               )}
             </div>
@@ -102,7 +102,7 @@ export default function FreeTimePage() {
 
         {/* Browse Collections */}
         <div>
-          <h2 className="text-sm font-bold text-[var(--text-muted)] uppercase tracking-wider mb-2">🗂 Browse Collections</h2>
+          <h2 className="text-sm font-bold text-[var(--text-muted)] uppercase tracking-wider mb-2">{t.freeTime.browseCollections}</h2>
           <p className="text-xs text-[var(--text-muted)] mb-3">{t.freeTime.exploreFreely}</p>
           <div className="space-y-2">
             {MAIN_COLLECTIONS.map(col => (
@@ -131,16 +131,16 @@ export default function FreeTimePage() {
         {/* Mastered Words */}
         <div>
           <div className="flex items-center justify-between mb-2">
-            <h2 className="text-sm font-bold text-[var(--text-muted)] uppercase tracking-wider">⭐ Mastered Words</h2>
+            <h2 className="text-sm font-bold text-[var(--text-muted)] uppercase tracking-wider">{t.freeTime.masteredWords}</h2>
             {masteredWords.length > 0 && (
-              <span className="text-xs text-[var(--text-muted)]">{masteredWords.length} words</span>
+              <span className="text-xs text-[var(--text-muted)]">{t.freeTime.wordsCount.replace('{n}', String(masteredWords.length))}</span>
             )}
           </div>
           {masteredWords.length === 0 ? (
             <div className="flex items-center gap-3 p-4 rounded-2xl" style={{ background: 'var(--surface-2)' }}>
               <span className="text-2xl">⭐</span>
               <p className="text-sm text-[var(--text-muted)]">
-                No mastered words yet. Complete 5 review stages to master a word!
+                {t.freeTime.noMasteredWordsYet}
               </p>
             </div>
           ) : (
@@ -162,13 +162,13 @@ export default function FreeTimePage() {
                   <button
                     onClick={() => speak(w.word)}
                     className="text-[var(--primary)] text-lg"
-                    aria-label="Pronounce"
+                    aria-label={t.freeTime.pronounce}
                   >🔊</button>
                 </div>
               ))}
               {masteredWords.length > 10 && (
                 <p className="text-center text-xs text-[var(--text-muted)] pt-1">
-                  + {masteredWords.length - 10} more mastered words
+                  {t.freeTime.moreMasteredWords.replace('{n}', String(masteredWords.length - 10))}
                 </p>
               )}
             </div>

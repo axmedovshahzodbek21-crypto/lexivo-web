@@ -31,18 +31,18 @@ export default function DebateStepPage() {
     router.push(next ? `/debate/${topic}/${side}/${next.key}` : `/debate/${topic}`);
   }
 
-  const sideLabel = side === 'for' ? 'FOR' : 'AGAINST';
+  const sideLabel = side === 'for' ? t.debatePage.sideFor : t.debatePage.sideAgainst;
   const sideColor = side === 'for' ? '#22c55e' : '#ef4444';
 
   return (
     <div className="p-4 max-w-2xl mx-auto space-y-5 animate-fade-in">
-      <BackButton href={`/debate/${topic}`} label="Topic" />
+      <BackButton href={`/debate/${topic}`} label={t.debatePage.topicLabel} />
 
       <div className="flex items-center gap-2">
         <span className="text-xl">{stepMeta.icon}</span>
         <div>
           <h1 className="text-lg font-bold text-[var(--text)]">{stepMeta.label}</h1>
-          <p className="text-xs" style={{ color: sideColor }}>Arguing {sideLabel}</p>
+          <p className="text-xs" style={{ color: sideColor }}>{t.debatePage.arguingSide(sideLabel)}</p>
         </div>
         <div className="ml-auto flex gap-1">
           {DEBATE_STEPS.map((s, i) => (
@@ -78,7 +78,9 @@ export default function DebateStepPage() {
   );
 }
 
-function StepFooter({ color, onDone, label = 'Continue', disabled = false }: { color: string; onDone: () => void; label?: string; disabled?: boolean }) {
+function StepFooter({ color, onDone, label, disabled = false }: { color: string; onDone: () => void; label?: string; disabled?: boolean }) {
+  const t = useTranslation();
+  const resolvedLabel = label ?? t.debatePage.continueLabel;
   return (
     <button
       onClick={onDone}
@@ -86,7 +88,7 @@ function StepFooter({ color, onDone, label = 'Continue', disabled = false }: { c
       className="w-full rounded-xl py-3 font-bold text-white text-sm mt-4 disabled:opacity-40"
       style={{ background: color, boxShadow: disabled ? 'none' : `0 6px 0 ${color}99` }}
     >
-      {label}
+      {resolvedLabel}
     </button>
   );
 }
@@ -119,7 +121,7 @@ function VocabStep({ vocab, idioms, color, onDone }: { vocab: VocabItem[]; idiom
           className="text-[10px] font-bold px-2 py-0.5 rounded-full"
           style={{ background: item.kind === 'idiom' ? '#fce7f3' : '#e0e7ff', color: item.kind === 'idiom' ? '#9d174d' : '#3730a3' }}
         >
-          {item.kind === 'idiom' ? 'IDIOM' : 'VOCAB'}
+          {item.kind === 'idiom' ? t.debatePage.idiomBadge : t.debatePage.vocabBadge}
         </span>
       </div>
       <button
@@ -129,8 +131,8 @@ function VocabStep({ vocab, idioms, color, onDone }: { vocab: VocabItem[]; idiom
         <div className="font-bold text-xl text-[var(--text)]">{flipped ? item.definition : item.term}</div>
         {flipped && <div className="text-sm text-[var(--text-muted)] italic">“{item.example}”</div>}
       </button>
-      <p className="text-center text-xs text-[var(--text-muted)] mt-2">{flipped ? 'tap Next to continue' : 'tap the card to reveal the meaning'}</p>
-      <StepFooter color={color} onDone={next} label={!flipped ? 'Flip' : isLast ? 'Continue: Pick Your Case' : 'Next'} />
+      <p className="text-center text-xs text-[var(--text-muted)] mt-2">{flipped ? t.debatePage.tapNextToContinue : t.debatePage.tapCardToReveal}</p>
+      <StepFooter color={color} onDone={next} label={!flipped ? t.debatePage.flip : isLast ? t.debatePage.continuePickYourCase : t.debatePage.nextLabel} />
     </div>
   );
 }
@@ -166,8 +168,8 @@ function PickYourCaseStep({ topic, side, items, phraseBank, color, onDone }: {
     return (
       <div>
         <p className="text-xs text-[var(--text-muted)] mb-3">
-          Browse the argument bank, then pick your {REQUIRED_ARGS} strongest — the ones you’ll actually build your case from.
-          <span className="font-semibold" style={{ color }}> {sel.argIndices.length}/{REQUIRED_ARGS} selected</span>
+          {t.debatePage.browseArgumentBank(REQUIRED_ARGS)}
+          <span className="font-semibold" style={{ color }}> {t.debatePage.selectedCount(sel.argIndices.length, REQUIRED_ARGS)}</span>
         </p>
         <div className="space-y-2">
           {items.map((it, idx) => {
@@ -198,7 +200,7 @@ function PickYourCaseStep({ topic, side, items, phraseBank, color, onDone }: {
             );
           })}
         </div>
-        <StepFooter color={color} onDone={() => setPhase('pick-phrases')} label="Choose opening & closing lines" disabled={sel.argIndices.length < REQUIRED_ARGS} />
+        <StepFooter color={color} onDone={() => setPhase('pick-phrases')} label={t.debatePage.chooseOpeningClosing} disabled={sel.argIndices.length < REQUIRED_ARGS} />
       </div>
     );
   }
@@ -238,7 +240,7 @@ function PickYourCaseStep({ topic, side, items, phraseBank, color, onDone }: {
           ))}
         </div>
       </div>
-      <StepFooter color={color} onDone={confirm} label="Continue: Build Your Case" disabled={sel.openingIdx === null || sel.closingIdx === null} />
+      <StepFooter color={color} onDone={confirm} label={t.debatePage.continueBuildYourCase} disabled={sel.openingIdx === null || sel.closingIdx === null} />
     </div>
   );
 }
@@ -314,16 +316,16 @@ function BuildStep({ topic, side, arguments: bank, phraseBank, color, onDone }: 
 
       {allPlaced && !checked && (
         <button onClick={() => setChecked(true)} className="w-full rounded-xl py-3 font-bold text-white text-sm mt-2" style={{ background: color }}>
-          Check my case
+          {t.debatePage.checkMyCase}
         </button>
       )}
 
       {checked && (
         <div className="space-y-2 mt-2">
           <button onClick={() => { setPlaced([]); setChecked(false); }} className="w-full rounded-xl py-2.5 font-bold text-sm border border-[var(--border)] text-[var(--text)]">
-            Try again
+            {t.debatePage.tryAgain}
           </button>
-          <StepFooter color={color} onDone={onDone} label="Continue: Rebuttal" />
+          <StepFooter color={color} onDone={onDone} label={t.debatePage.continueRebuttal} />
         </div>
       )}
     </div>
@@ -375,7 +377,7 @@ function RebuttalStep({ items, color, onDone }: { items: RebuttalItem[]; color: 
           );
         })}
       </div>
-      {picked !== null && <StepFooter color={color} onDone={next} label={isLast ? 'Continue: Deliver' : 'Next rebuttal'} />}
+      {picked !== null && <StepFooter color={color} onDone={next} label={isLast ? t.debatePage.continueDeliver : t.debatePage.nextRebuttal} />}
     </div>
   );
 }
@@ -414,28 +416,28 @@ function DeliverStep({ topic, side, arguments: bank, phraseBank, modelCase, colo
 
   return (
     <div>
-      <p className="text-xs text-[var(--text-muted)] mb-3">Deliver the case you built out loud, cold. {DURATION}s on the clock.</p>
+      <p className="text-xs text-[var(--text-muted)] mb-3">{t.debatePage.deliverInstructions(DURATION)}</p>
 
       <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 text-sm text-[var(--text)] leading-relaxed transition-all" style={{ filter: hideText ? 'blur(6px)' : 'none' }}>
-        {myCase ?? 'Go back and finish Pick Your Case + Build first.'}
+        {myCase ?? t.debatePage.finishCaseFirst}
       </div>
 
       <div className="flex items-center justify-between mt-3">
         <div className="text-2xl font-extrabold tabular-nums" style={{ color }}>{seconds}s</div>
         {!running && !finished && myCase && (
           <button onClick={() => { setRunning(true); setHideText(true); }} className="rounded-xl px-4 py-2 text-sm font-bold text-white" style={{ background: color }}>
-            Start delivery
+            {t.debatePage.startDelivery}
           </button>
         )}
         {running && (
           <button onClick={() => setHideText(h => !h)} className="rounded-xl px-4 py-2 text-sm font-bold border border-[var(--border)] text-[var(--text)]">
-            {hideText ? 'Peek at text' : 'Hide text'}
+            {hideText ? t.debatePage.peekAtText : t.debatePage.hideTextLabel}
           </button>
         )}
       </div>
 
       <button onClick={() => setShowModel(s => !s)} className="text-xs mt-4 underline text-[var(--text-muted)]">
-        {showModel ? 'Hide model case' : 'Compare with a model case'}
+        {showModel ? t.debatePage.hideModelCase : t.debatePage.compareModelCase}
       </button>
       {showModel && (
         <div className="rounded-xl mt-2 p-3 text-xs italic text-[var(--text-muted)]" style={{ background: 'var(--surface-2)' }}>
@@ -444,7 +446,7 @@ function DeliverStep({ topic, side, arguments: bank, phraseBank, modelCase, colo
       )}
 
       {(finished || !running) && (
-        <StepFooter color={color} onDone={onDone} label={finished ? 'Mark this side complete' : 'Skip timer, mark complete'} />
+        <StepFooter color={color} onDone={onDone} label={finished ? t.debatePage.markSideComplete : t.debatePage.skipTimerMarkComplete} />
       )}
     </div>
   );

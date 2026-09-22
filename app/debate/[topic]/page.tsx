@@ -4,11 +4,13 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import BackButton from '@/components/BackButton';
+import { useTranslation } from '@/lib/useTranslation';
 import { getDebateTopic, isBattleReady, DEBATE_STEPS, type DebateSide } from '@/lib/debateMock';
 import { DEBATE_CONTENT } from '@/lib/debateContent';
 import { getStepIndex } from '@/lib/debateProgress';
 
 export default function DebateTopicPage() {
+  const t = useTranslation();
   const params = useParams();
   const slug = String(params.topic);
   const topic = getDebateTopic(slug);
@@ -34,14 +36,14 @@ export default function DebateTopicPage() {
 
   return (
     <div className="p-4 space-y-6 animate-fade-in max-w-2xl mx-auto">
-      <BackButton href="/debate" label="Topics" />
+      <BackButton href="/debate" label={t.debatePage.topics} />
 
       <div className="flex items-center gap-3">
         <span className="text-3xl">{topic.emoji}</span>
         <h1 className="text-2xl font-bold text-[var(--text)]">{topic.title}</h1>
         {ready && (
           <span className="ml-auto text-xs font-bold px-2.5 py-1 rounded-full bg-amber-100 text-amber-700 border border-amber-300">
-            🏅 Battle-Ready
+            🏅 {t.debatePage.battleReadyBadge}
           </span>
         )}
       </div>
@@ -49,20 +51,26 @@ export default function DebateTopicPage() {
       {/* Side selector */}
       <div className="grid grid-cols-2 gap-3">
         <SideCard
-          label="FOR"
+          label={t.debatePage.forLabel}
           color="#22c55e"
           edge="#15803d"
           pct={forPct}
           active={side === 'for'}
           onClick={() => setSide('for')}
+          statusStart={t.debatePage.statusStart}
+          statusMastered={t.debatePage.statusMastered}
+          statusContinue={t.debatePage.statusContinue}
         />
         <SideCard
-          label="AGAINST"
+          label={t.debatePage.againstLabel}
           color="#ef4444"
           edge="#b91c1c"
           pct={againstPct}
           active={side === 'against'}
           onClick={() => setSide('against')}
+          statusStart={t.debatePage.statusStart}
+          statusMastered={t.debatePage.statusMastered}
+          statusContinue={t.debatePage.statusContinue}
         />
       </div>
 
@@ -70,7 +78,7 @@ export default function DebateTopicPage() {
       {side && (
         <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4">
           <div className="text-xs font-bold text-[var(--text-muted)] mb-3 uppercase tracking-wide">
-            {side === 'for' ? 'Arguing FOR' : 'Arguing AGAINST'} — your path
+            {side === 'for' ? t.debatePage.arguingForPath : t.debatePage.arguingAgainstPath}
           </div>
           <div className="flex items-center justify-between mb-4">
             {DEBATE_STEPS.map((step, i) => {
@@ -106,17 +114,17 @@ export default function DebateTopicPage() {
               style={{ background: 'linear-gradient(135deg, #4338ca, #818cf8)', boxShadow: '0 6px 0 #312e81' }}
             >
               {activeStepsDone >= DEBATE_STEPS.length
-                ? 'Review this side'
-                : `Continue: ${DEBATE_STEPS[activeStepsDone].label}`}
+                ? t.debatePage.reviewThisSide
+                : t.debatePage.continueStep(DEBATE_STEPS[activeStepsDone].label)}
             </Link>
           ) : (
             <button
               disabled
               className="w-full rounded-xl py-3 font-bold text-white text-sm opacity-50 cursor-not-allowed"
               style={{ background: 'linear-gradient(135deg, #4338ca, #818cf8)' }}
-              title="Content not written for this topic yet"
+              title={t.debatePage.contentNotWrittenTooltip}
             >
-              Content coming soon
+              {t.debatePage.contentComingSoonBtn}
             </button>
           )}
         </div>
@@ -124,15 +132,16 @@ export default function DebateTopicPage() {
 
       {!side && (
         <p className="text-sm text-[var(--text-muted)] text-center py-4">
-          Choose a side to see your path for this topic.
+          {t.debatePage.chooseASide}
         </p>
       )}
     </div>
   );
 }
 
-function SideCard({ label, color, edge, pct, active, onClick }: {
+function SideCard({ label, color, edge, pct, active, onClick, statusStart, statusMastered, statusContinue }: {
   label: string; color: string; edge: string; pct: number; active: boolean; onClick: () => void;
+  statusStart: string; statusMastered: string; statusContinue: string;
 }) {
   return (
     <button
@@ -150,7 +159,7 @@ function SideCard({ label, color, edge, pct, active, onClick }: {
         <div className="h-full rounded-full" style={{ width: `${pct}%`, background: active ? 'white' : color }} />
       </div>
       <div className={`text-[10px] mt-1.5 ${active ? 'text-white/80' : 'text-[var(--text-muted)]'}`}>
-        {pct === 0 ? 'Start' : pct >= 100 ? 'Mastered' : 'Continue'}
+        {pct === 0 ? statusStart : pct >= 100 ? statusMastered : statusContinue}
       </div>
     </button>
   );

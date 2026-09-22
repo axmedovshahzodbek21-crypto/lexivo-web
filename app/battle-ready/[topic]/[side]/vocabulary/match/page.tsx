@@ -53,7 +53,7 @@ export default function VocabMatchPage() {
 
   return (
     <div className="p-4 space-y-5 animate-fade-in max-w-xl mx-auto">
-      <BackButton href={`/battle-ready/${slug}/${side}/vocabulary`} label="Vocabulary" />
+      <BackButton href={`/battle-ready/${slug}/${side}/vocabulary`} label={t.battleReadyPage.vocabulary} />
       <h1 className="text-lg font-bold text-[var(--text)]">{t.battleReadyPage.match}</h1>
       <p className="text-xs text-[var(--text-muted)]">{t.battleReadyPage.tapWordMeaning}</p>
 
@@ -104,7 +104,7 @@ export default function VocabMatchPage() {
         </div>
       </div>
 
-      {done && <p className="text-center text-sm font-bold" style={{ color: sideColor }}>All matched! 🎉</p>}
+      {done && <p className="text-center text-sm font-bold" style={{ color: sideColor }}>{t.battleReadyPage.allMatched}</p>}
     </div>
   );
 }

@@ -17,10 +17,10 @@ export default function IdiomsPage() {
 
   return (
     <div className="p-4 space-y-5 animate-fade-in max-w-2xl mx-auto">
-      <BackButton href={`/battle-ready/${slug}/${side}`} label="Categories" />
+      <BackButton href={`/battle-ready/${slug}/${side}`} label={t.battleReadyPage.categories} />
       <div>
         <h1 className="text-lg font-bold text-[var(--text)]">{t.battleReadyPage.idioms}</h1>
-        <p className="text-xs text-[var(--text-muted)]">{content.idioms.length} natural expressions, each with examples.</p>
+        <p className="text-xs text-[var(--text-muted)]">{t.battleReadyPage.idiomsCount(content.idioms.length)}</p>
       </div>
 
       <div className="space-y-3">

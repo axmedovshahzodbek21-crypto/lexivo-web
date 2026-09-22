@@ -93,7 +93,7 @@ export default function BattleReadyHubPage() {
           <div className="w-full max-w-xs flex flex-col items-center gap-4">
             <p className="text-sm font-bold uppercase tracking-wider text-white flex items-center gap-2">
               <span className="inline-block animate-spin" style={{ animationDuration: '0.9s' }}>🎲</span>
-              Finding a topic for you…
+              {t.battleReadyPage.findingTopic}
             </p>
             <div className="w-full rounded-2xl p-8 text-center bg-white/10 border border-white/20">
               <div className="text-4xl mb-2">{surpriseShown.emoji}</div>
@@ -117,7 +117,7 @@ export default function BattleReadyHubPage() {
           className="text-xs font-bold px-3.5 py-2 rounded-xl text-white shrink-0 disabled:opacity-50"
           style={{ background: 'linear-gradient(135deg, #a78bfa, #6C63FF, #4C1D95)', boxShadow: '0 3px 0 #3D1F9E, 0 6px 14px rgba(108,99,255,0.35)' }}
         >
-          🎲 Surprise Me
+          🎲 {t.battleReadyPage.surpriseMe}
         </button>
       </div>
 
@@ -129,22 +129,22 @@ export default function BattleReadyHubPage() {
       />
 
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        {filtered.map(t => {
-          const hasContent = !!getBRSideContent(t.slug, 'for') || !!getBRSideContent(t.slug, 'against');
-          const done = doneSet.has(t.slug);
+        {filtered.map(topic => {
+          const hasContent = !!getBRSideContent(topic.slug, 'for') || !!getBRSideContent(topic.slug, 'against');
+          const done = doneSet.has(topic.slug);
           return (
             <Link
-              key={t.slug}
-              href={`/battle-ready/${t.slug}`}
+              key={topic.slug}
+              href={`/battle-ready/${topic.slug}`}
               className="relative rounded-2xl p-3 border border-[var(--border)] bg-[var(--surface)] hover:-translate-y-0.5 transition-transform flex flex-col items-center text-center gap-1.5"
             >
               {done ? (
-                <span className="absolute top-2 right-2 text-xs" title="Done">✅</span>
+                <span className="absolute top-2 right-2 text-xs" title={t.battleReadyPage.doneTooltip}>✅</span>
               ) : hasContent ? (
-                <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-green-500" title="Has content" />
+                <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-green-500" title={t.battleReadyPage.hasContentTooltip} />
               ) : null}
-              <span className="text-2xl">{t.emoji}</span>
-              <div className="font-semibold text-xs text-[var(--text)] leading-tight">{t.title}</div>
+              <span className="text-2xl">{topic.emoji}</span>
+              <div className="font-semibold text-xs text-[var(--text)] leading-tight">{topic.title}</div>
             </Link>
           );
         })}

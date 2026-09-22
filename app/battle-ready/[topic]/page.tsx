@@ -24,7 +24,7 @@ export default function BattleReadyTopicPage() {
 
   return (
     <div className="p-4 space-y-6 animate-fade-in max-w-2xl mx-auto">
-      <BackButton href="/battle-ready" label="Topics" />
+      <BackButton href="/battle-ready" label={t.battleReadyPage.topicsLabel} />
 
       <div className="flex items-center gap-3">
         <span className="text-3xl">{topic.emoji}</span>
@@ -36,13 +36,13 @@ export default function BattleReadyTopicPage() {
             ? { background: '#22c55e', borderColor: '#15803d', color: 'white' }
             : { background: 'var(--surface)', borderColor: 'var(--border)', color: 'var(--text-muted)' }}
         >
-          {done ? '✓ Done' : 'Mark as Done'}
+          {done ? `✓ ${t.battleReadyPage.doneLabel}` : t.battleReadyPage.markAsDone}
         </button>
       </div>
 
       <div className="grid grid-cols-2 gap-4 pt-2">
-        <SideCard slug={slug} side="for" label="FOR Side" color="#22c55e" edge="#15803d" />
-        <SideCard slug={slug} side="against" label="AGAINST Side" color="#ef4444" edge="#b91c1c" />
+        <SideCard slug={slug} side="for" label={t.battleReadyPage.forSide} color="#22c55e" edge="#15803d" />
+        <SideCard slug={slug} side="against" label={t.battleReadyPage.againstSide} color="#ef4444" edge="#b91c1c" />
       </div>
     </div>
   );

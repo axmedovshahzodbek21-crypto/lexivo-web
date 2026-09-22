@@ -20,10 +20,10 @@ export default function ArgumentsPage() {
 
   return (
     <div className="p-4 space-y-5 animate-fade-in max-w-2xl mx-auto">
-      <BackButton href={`/battle-ready/${slug}/${side}`} label="Categories" />
+      <BackButton href={`/battle-ready/${slug}/${side}`} label={t.battleReadyPage.categories} />
       <div>
         <h1 className="text-lg font-bold text-[var(--text)]">{t.battleReadyPage.arguments}</h1>
-        <p className="text-xs text-[var(--text-muted)]">{content.arguments.length} arguments. Tap one to read the full explanation.</p>
+        <p className="text-xs text-[var(--text-muted)]">{t.battleReadyPage.argumentsCount(content.arguments.length)}</p>
       </div>
 
       <div className="space-y-2">
@@ -58,7 +58,7 @@ export default function ArgumentsPage() {
               className="w-full rounded-xl py-2.5 font-bold text-white text-sm mt-5"
               style={{ background: sideColor }}
             >
-              Close
+              {t.battleReadyPage.close}
             </button>
           </div>
         </div>

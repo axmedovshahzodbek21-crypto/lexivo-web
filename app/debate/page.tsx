@@ -88,7 +88,7 @@ export default function DebateArenaPage() {
         >
           <div className="text-2xl mb-1">⚔️</div>
           <div className="font-bold text-sm">{t.debatePage.battleDrills}</div>
-          <div className="text-xs text-white/70">{battleReadyCount} topics unlocked</div>
+          <div className="text-xs text-white/70">{t.debatePage.topicsUnlocked(battleReadyCount)}</div>
         </Link>
         <Link
           href="/debate/progress"
@@ -97,7 +97,7 @@ export default function DebateArenaPage() {
         >
           <div className="text-2xl mb-1">📊</div>
           <div className="font-bold text-sm">{t.debatePage.myProgress}</div>
-          <div className="text-xs text-white/70">{battleReadyCount}/{DEBATE_TOPICS.length} battle-ready</div>
+          <div className="text-xs text-white/70">{t.debatePage.battleReadyRatio(battleReadyCount, DEBATE_TOPICS.length)}</div>
         </Link>
       </div>
 
@@ -121,21 +121,21 @@ export default function DebateArenaPage() {
 
       {/* Topics */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        {filtered.map(t => {
-          const ready = isBattleReady(t);
+        {filtered.map(topic => {
+          const ready = isBattleReady(topic);
           return (
             <Link
-              key={t.slug}
-              href={`/debate/${t.slug}`}
+              key={topic.slug}
+              href={`/debate/${topic.slug}`}
               className="relative rounded-2xl p-3 border border-[var(--border)] bg-[var(--surface)] hover:-translate-y-0.5 transition-transform flex flex-col items-center text-center gap-1.5"
             >
-              {ready && <span className="absolute top-2 right-2 text-base" title="Battle-Ready">🏅</span>}
-              <span className="text-2xl">{t.emoji}</span>
-              <ProgressRing forP={t.progress.for} againstP={t.progress.against} />
-              <div className="font-semibold text-xs text-[var(--text)] leading-tight">{t.title}</div>
+              {ready && <span className="absolute top-2 right-2 text-base" title={t.debatePage.battleReadyBadge}>🏅</span>}
+              <span className="text-2xl">{topic.emoji}</span>
+              <ProgressRing forP={topic.progress.for} againstP={topic.progress.against} />
+              <div className="font-semibold text-xs text-[var(--text)] leading-tight">{topic.title}</div>
               <div className="text-[10px] text-[var(--text-muted)] flex gap-2">
-                <span className="text-green-500">FOR {t.progress.for}%</span>
-                <span className="text-red-500">AGN {t.progress.against}%</span>
+                <span className="text-green-500">{t.debatePage.forPct(topic.progress.for)}</span>
+                <span className="text-red-500">{t.debatePage.againstPctShort(topic.progress.against)}</span>
               </div>
             </Link>
           );

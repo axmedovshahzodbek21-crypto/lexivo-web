@@ -9,10 +9,10 @@ import type { SpeakingQuestion, SpeakingCueCard } from '@/lib/speaking-data';
 
 type Part = 1 | 2 | 3;
 
-const PART_INFO: Record<Part, { label: string; sub: string; icon: string; color: string; light: string; dark: string; count: number }> = {
-  1: { label: 'Part 1', sub: 'Introduction & Interview', icon: '💬', color: '#6C63FF', light: '#8B83FF', dark: '#4338CA', count: part1Pool.length },
-  2: { label: 'Part 2', sub: 'The Long Turn (cue card)', icon: '🎴', color: '#FF6584', light: '#FF8FA3', dark: '#C2410C', count: part2Cards.length },
-  3: { label: 'Part 3', sub: 'Discussion', icon: '🧠', color: '#2ECC71', light: '#34D399', dark: '#0F6634', count: part3Pool.length },
+const PART_INFO: Record<Part, { icon: string; color: string; light: string; dark: string; count: number }> = {
+  1: { icon: '💬', color: '#6C63FF', light: '#8B83FF', dark: '#4338CA', count: part1Pool.length },
+  2: { icon: '🎴', color: '#FF6584', light: '#FF8FA3', dark: '#C2410C', count: part2Cards.length },
+  3: { icon: '🧠', color: '#2ECC71', light: '#34D399', dark: '#0F6634', count: part3Pool.length },
 };
 
 const SPIN_TICKS = 14;
@@ -194,7 +194,13 @@ export default function SpeakingPage() {
     }, 1000);
   }
 
-  const info = part ? PART_INFO[part] : null;
+  const PART_META: Record<Part, { label: string; sub: string }> = {
+    1: { label: t.speaking.part1Label, sub: t.speaking.part1Sub },
+    2: { label: t.speaking.part2Label, sub: t.speaking.part2Sub },
+    3: { label: t.speaking.part3Label, sub: t.speaking.part3Sub },
+  };
+
+  const info = part ? { ...PART_INFO[part], ...PART_META[part] } : null;
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -207,11 +213,11 @@ export default function SpeakingPage() {
         {!part && (
           <>
             <p className="text-sm text-[var(--text-muted)] mb-4">
-              Every question here has appeared in a real IELTS Speaking exam. Pick a part, hit the button, and answer out loud — just for fun. No answers or vocab given, no scoring.
+              {t.speaking.introText}
             </p>
             <div className="space-y-3">
               {([1, 2, 3] as Part[]).map(p => {
-                const i = PART_INFO[p];
+                const i = { ...PART_INFO[p], ...PART_META[p] };
                 return (
                   <button
                     key={p}
@@ -233,7 +239,7 @@ export default function SpeakingPage() {
                       <p className="text-xs text-white/75">{i.sub}</p>
                     </div>
                     <span className="text-[11px] font-bold px-2 py-1 rounded-lg text-white/90" style={{ background: 'rgba(0,0,0,0.2)' }}>
-                      {i.count} qs
+                      {t.speaking.questionsCount.replace('{n}', String(i.count))}
                     </span>
                   </button>
                 );
@@ -258,9 +264,9 @@ export default function SpeakingPage() {
               <div className="flex-1 flex flex-col items-center justify-center gap-5 py-10 text-center">
                 <div className="text-5xl">{info.icon}</div>
                 <p className="text-sm text-[var(--text-muted)] max-w-xs">
-                  Tap the button below to get a random {info.label.toLowerCase()} question.
+                  {t.speaking.tapForRandom.replace('{part}', info.label.toLowerCase())}
                 </p>
-                <SpinButton color={info.color} dark={info.dark} onClick={runSpin} label="Get a random question" />
+                <SpinButton color={info.color} dark={info.dark} onClick={runSpin} label={t.speaking.getRandomQuestion} />
               </div>
             )}
 
@@ -269,7 +275,7 @@ export default function SpeakingPage() {
               <div className="flex-1 flex flex-col items-center justify-center gap-5 py-10">
                 <p className="text-sm font-bold uppercase tracking-wider flex items-center gap-2" style={{ color: info.color }}>
                   <span className="inline-block animate-spin" style={{ animationDuration: '0.9s' }}>🎲</span>
-                  Shuffling through questions…
+                  {t.speaking.shuffling}
                 </p>
                 <div
                   className="rounded-3xl p-8 md:p-10 w-full min-h-[220px] flex flex-col items-center justify-center text-center"
@@ -299,8 +305,8 @@ export default function SpeakingPage() {
                   </div>
                   <p className="text-xl font-bold text-[var(--text)] leading-snug">{question.question}</p>
                 </div>
-                <p className="text-xs text-[var(--text-muted)] text-center">Answer out loud, then get another one whenever you’re ready.</p>
-                <SpinButton color={info.color} dark={info.dark} onClick={runSpin} label="Next question" />
+                <p className="text-xs text-[var(--text-muted)] text-center">{t.speaking.answerOutLoud}</p>
+                <SpinButton color={info.color} dark={info.dark} onClick={runSpin} label={t.speaking.nextQuestion} />
               </div>
             )}
 
@@ -343,14 +349,14 @@ export default function SpeakingPage() {
                       className="flex-1 py-3 rounded-2xl font-bold text-white text-sm"
                       style={{ background: info.color, boxShadow: `0 4px 0 ${info.dark}` }}
                     >
-                      ⏱ Start 1-min prep
+                      {t.speaking.startPrep}
                     </button>
                     <button
                       onClick={skipToSpeaking}
                       className="px-4 py-3 rounded-2xl font-semibold text-sm"
                       style={{ background: 'var(--surface-2)', color: 'var(--text-muted)' }}
                     >
-                      Skip to speaking
+                      {t.speaking.skipToSpeakingBtn}
                     </button>
                   </div>
                 )}
@@ -361,7 +367,7 @@ export default function SpeakingPage() {
                     style={{ background: 'var(--surface-2)' }}
                   >
                     <p className="text-[11px] font-bold uppercase tracking-wide mb-1" style={{ color: info.color }}>
-                      {phase === 'prep' ? 'Preparing… (1 min)' : 'Speaking now… (up to 2 min)'}
+                      {phase === 'prep' ? t.speaking.preparing : t.speaking.speakingNow}
                     </p>
                     <p className="text-4xl font-black text-[var(--text)] tabular-nums">{formatTime(secondsLeft)}</p>
                     <div className="flex gap-2 mt-3">
@@ -371,7 +377,7 @@ export default function SpeakingPage() {
                           className="flex-1 py-2 rounded-xl text-xs font-semibold"
                           style={{ background: `${info.color}22`, color: info.color }}
                         >
-                          Skip prep, start speaking now
+                          {t.speaking.skipPrepStartSpeaking}
                         </button>
                       )}
                       <button
@@ -379,7 +385,7 @@ export default function SpeakingPage() {
                         className="flex-1 py-2 rounded-xl text-xs font-semibold"
                         style={{ background: 'var(--surface)', color: 'var(--text-muted)' }}
                       >
-                        {phase === 'prep' ? 'End early' : 'Done, I’m finished'}
+                        {phase === 'prep' ? t.speaking.endEarly : t.speaking.doneFinished}
                       </button>
                     </div>
                   </div>
@@ -390,11 +396,11 @@ export default function SpeakingPage() {
                     className="rounded-2xl p-4 text-center"
                     style={{ background: `${info.color}18` }}
                   >
-                    <p className="text-sm font-bold" style={{ color: info.color }}>🎉 Nice work!</p>
+                    <p className="text-sm font-bold" style={{ color: info.color }}>{t.speaking.niceWork}</p>
                   </div>
                 )}
 
-                <SpinButton color={info.color} dark={info.dark} onClick={runSpin} label="Next cue card" />
+                <SpinButton color={info.color} dark={info.dark} onClick={runSpin} label={t.speaking.nextCueCard} />
               </div>
             )}
           </div>

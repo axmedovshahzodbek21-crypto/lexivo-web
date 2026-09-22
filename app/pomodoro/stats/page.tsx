@@ -38,7 +38,7 @@ export default function PomodoroStatsPage() {
   const last7 = Array.from({ length: 7 }, (_, i) => {
     const d = new Date(Date.now() - (6 - i) * 86400000);
     const dateStr = localDateStr(d);
-    const label = i === 6 ? 'Today' : d.toLocaleDateString('default', { weekday: 'short' }).slice(0, 3);
+    const label = i === 6 ? t.pomodoro.statToday : d.toLocaleDateString('default', { weekday: 'short' }).slice(0, 3);
     return { dateStr, label, seconds: days[dateStr] ?? 0 };
   });
   const maxSeconds = Math.max(...last7.map(d => d.seconds), 60);
@@ -53,9 +53,9 @@ export default function PomodoroStatsPage() {
 
       <div className="p-5 flex flex-col gap-4">
         <div className="grid grid-cols-3 gap-3">
-          <StatTile icon="🎯" label="Today" value={fmtDuration(today)} light="#a78bfa" bg="#7c3aed" shadow="#4c1d95" />
-          <StatTile icon="📅" label="This Week" value={fmtDuration(week)} light="#818cf8" bg="#4338ca" shadow="#312e81" />
-          <StatTile icon="🏆" label="Total" value={fmtDuration(total)} light="#34d399" bg="#059669" shadow="#064e3b" />
+          <StatTile icon="🎯" label={t.pomodoro.statToday} value={fmtDuration(today)} light="#a78bfa" bg="#7c3aed" shadow="#4c1d95" />
+          <StatTile icon="📅" label={t.pomodoro.statThisWeek} value={fmtDuration(week)} light="#818cf8" bg="#4338ca" shadow="#312e81" />
+          <StatTile icon="🏆" label={t.pomodoro.statTotal} value={fmtDuration(total)} light="#34d399" bg="#059669" shadow="#064e3b" />
         </div>
 
         <div className="card">
@@ -83,7 +83,7 @@ export default function PomodoroStatsPage() {
 
         {total === 0 && (
           <p className="text-sm text-center py-6" style={{ color: 'var(--text-muted)' }}>
-            Start a focus session to begin tracking your time. ⏱️
+            {t.pomodoro.startSessionToTrack}
           </p>
         )}
       </div>

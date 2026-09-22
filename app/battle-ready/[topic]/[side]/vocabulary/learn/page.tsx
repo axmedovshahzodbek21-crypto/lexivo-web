@@ -29,7 +29,7 @@ export default function VocabLearnPage() {
 
   return (
     <div className="p-4 space-y-5 animate-fade-in max-w-xl mx-auto">
-      <BackButton href={`/battle-ready/${slug}/${side}/vocabulary`} label="Vocabulary" />
+      <BackButton href={`/battle-ready/${slug}/${side}/vocabulary`} label={t.battleReadyPage.vocabulary} />
       <h1 className="text-lg font-bold text-[var(--text)]">{t.battleReadyPage.learn}</h1>
 
       <div className="text-xs text-[var(--text-muted)]">{i + 1} / {content.vocab.length}</div>
@@ -49,7 +49,7 @@ export default function VocabLearnPage() {
         className="w-full rounded-xl py-3 font-bold text-white text-sm disabled:opacity-40"
         style={{ background: sideColor }}
       >
-        {!revealed ? 'Reveal meaning' : isLast ? 'All words learned' : 'Next word'}
+        {!revealed ? t.battleReadyPage.revealMeaning : isLast ? t.battleReadyPage.allWordsLearned : t.battleReadyPage.nextWord}
       </button>
     </div>
   );

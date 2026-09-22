@@ -26,7 +26,7 @@ export default function VocabFlashcardsPage() {
 
   return (
     <div className="p-4 space-y-5 animate-fade-in max-w-xl mx-auto">
-      <BackButton href={`/battle-ready/${slug}/${side}/vocabulary`} label="Vocabulary" />
+      <BackButton href={`/battle-ready/${slug}/${side}/vocabulary`} label={t.battleReadyPage.vocabulary} />
       <h1 className="text-lg font-bold text-[var(--text)]">{t.battleReadyPage.flashcards}</h1>
       <div className="text-xs text-[var(--text-muted)] text-center">{i + 1} / {content.vocab.length}</div>
 
@@ -39,7 +39,7 @@ export default function VocabFlashcardsPage() {
       </button>
 
       <div className="flex gap-2">
-        <button onClick={() => go(-1)} className="flex-1 rounded-xl py-2.5 font-bold text-sm border border-[var(--border)] text-[var(--text)]">← Prev</button>
+        <button onClick={() => go(-1)} className="flex-1 rounded-xl py-2.5 font-bold text-sm border border-[var(--border)] text-[var(--text)]">{t.battleReadyPage.prev}</button>
         <button onClick={() => setFlipped(f => !f)} className="flex-1 rounded-xl py-2.5 font-bold text-sm text-white" style={{ background: sideColor }}>{t.battleReadyPage.flip}</button>
         <button onClick={() => go(1)} className="flex-1 rounded-xl py-2.5 font-bold text-sm border border-[var(--border)] text-[var(--text)]">{t.battleReadyPage.next}</button>
       </div>

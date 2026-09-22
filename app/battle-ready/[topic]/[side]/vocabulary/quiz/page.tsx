@@ -46,7 +46,7 @@ export default function VocabQuizPage() {
 
   return (
     <div className="p-4 space-y-5 animate-fade-in max-w-xl mx-auto">
-      <BackButton href={`/battle-ready/${slug}/${side}/vocabulary`} label="Vocabulary" />
+      <BackButton href={`/battle-ready/${slug}/${side}/vocabulary`} label={t.battleReadyPage.vocabulary} />
       <h1 className="text-lg font-bold text-[var(--text)]">{t.battleReadyPage.quiz}</h1>
       <div className="text-xs text-[var(--text-muted)]">{i + 1} / {questions.length}</div>
 
@@ -80,7 +80,7 @@ export default function VocabQuizPage() {
 
       {picked !== null && !isLast && (
         <button onClick={next} className="w-full rounded-xl py-3 font-bold text-white text-sm" style={{ background: sideColor }}>
-          Next question
+          {t.battleReadyPage.nextQuestion}
         </button>
       )}
       {picked !== null && isLast && (

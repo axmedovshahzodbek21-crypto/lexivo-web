@@ -18,19 +18,19 @@ export default function VocabularyHubPage() {
 
   const sideColor = side === 'for' ? '#22c55e' : '#ef4444';
   const modes = [
-    { key: 'learn', icon: '📖', label: 'Learn' },
-    { key: 'flashcards', icon: '🃏', label: 'Flashcards' },
-    { key: 'quiz', icon: '❓', label: 'Quiz' },
-    { key: 'match', icon: '🎯', label: 'Match' },
+    { key: 'learn', icon: '📖', label: t.battleReadyPage.learn },
+    { key: 'flashcards', icon: '🃏', label: t.battleReadyPage.flashcards },
+    { key: 'quiz', icon: '❓', label: t.battleReadyPage.quiz },
+    { key: 'match', icon: '🎯', label: t.battleReadyPage.match },
   ];
 
   return (
     <div className="p-4 space-y-6 animate-fade-in max-w-2xl mx-auto">
-      <BackButton href={`/battle-ready/${slug}/${side}`} label="Categories" />
+      <BackButton href={`/battle-ready/${slug}/${side}`} label={t.battleReadyPage.categories} />
 
       <div>
         <h1 className="text-xl font-bold text-[var(--text)]">{t.battleReadyPage.vocabulary}</h1>
-        <p className="text-xs text-[var(--text-muted)]">{content?.vocab.length ?? 0} words · {topic.title}</p>
+        <p className="text-xs text-[var(--text-muted)]">{t.battleReadyPage.wordsCountTopic(content?.vocab.length ?? 0, topic.title)}</p>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
