@@ -27,6 +27,20 @@ const DEFAULT_HERO = {
   glow: 'rgba(108,99,255,0.45)',
 };
 
+// The *_collection.json / word_data.json files ship only an English
+// description — this overrides it per UI language for the known curated
+// collections, falling back to the raw JSON description for anything else
+// (custom/imported collections have no translated copy to fall back to).
+const KNOWN_DESCRIPTIONS: Record<string, (t: ReturnType<typeof useTranslation>) => string> = {
+  A1: t => t.collectionsPage.descA1,
+  A2: t => t.collectionsPage.descA2,
+  B1: t => t.collectionsPage.descB1,
+  Advanced: t => t.collectionsPage.descAdvanced,
+  '30 Days of Powerful Words': t => t.collectionsPage.desc30Days,
+  '24 Vocabulary Challenge': t => t.collectionsPage.desc24Challenge,
+  'Word Mastery': t => t.collectionsPage.descWordMastery,
+};
+
 interface UnitRow {
   dayNumber: number;
   topic: string;
@@ -135,7 +149,7 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
           return { word: w.word, srsScore, gateScore, combined };
         });
         const avgScore = words.length > 0 ? words.reduce((s, w) => s + w.combined, 0) / words.length : 0;
-        return { dayNumber: day.dayNumber, topic: day.topic ?? `Unit ${day.dayNumber}`, words, avgScore };
+        return { dayNumber: day.dayNumber, topic: day.topic ?? t.collections.unit(day.dayNumber), words, avgScore };
       });
 
       if (cancelled) return;
@@ -194,7 +208,7 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
           <p
             className="text-sm text-white mb-4"
             style={{ textShadow: '0 1px 6px rgba(0,0,0,0.35)' }}
-          >{collection.description}</p>
+          >{KNOWN_DESCRIPTIONS[collection.name]?.(t) ?? collection.description}</p>
         )}
 
         {/* Stat pills */}
@@ -317,7 +331,7 @@ function MasteryHeatmap({
         <div>
           <h3 className="font-bold text-sm text-[var(--text)]">{t.collectionsPage.wordMasteryHeatmap}</h3>
           <p className="text-[10px] text-[var(--text-muted)] mt-0.5">
-            {totalStudied}/{totalWords} words studied · avg {Math.round(avgMastery * 100)}% mastery
+            {t.collections.wordsStudiedAvgMastery(totalStudied, totalWords, Math.round(avgMastery * 100))}
           </p>
         </div>
         {drillUnit && (
@@ -334,7 +348,9 @@ function MasteryHeatmap({
         /* ── Per-word drill-down ── */
         <div className="space-y-2">
           <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">
-            {t.wordPage.unitTopic.replace('{n}', String(drillUnit.dayNumber)).replace('{topic}', drillUnit.topic)}
+            {/^Unit \d+$/.test(drillUnit.topic)
+              ? t.collections.unit(drillUnit.dayNumber)
+              : t.wordPage.unitTopic.replace('{n}', String(drillUnit.dayNumber)).replace('{topic}', drillUnit.topic)}
           </p>
           <div className="grid grid-cols-2 gap-2">
             {drillUnit.words.map((w, i) => {
@@ -490,15 +506,22 @@ function UnitCard({
                 className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full text-white"
                 style={{ background: isComplete ? '#22c55e' : 'var(--primary)' }}
               >
-                Unit {unit.dayNumber}
+                {t.collections.unit(unit.dayNumber)}
               </span>
-              <span className="text-[10px] text-[var(--text-muted)]">{unit.wordCount} words</span>
+              <span className="text-[10px] text-[var(--text-muted)]">{t.collections.unitWordsLabel(unit.wordCount)}</span>
               {isComplete && <span className="text-[10px] font-bold text-green-500">{t.collectionsPage.doneCheckmark}</span>}
               {storyInfo.anyUnlocked && (
                 <span className="text-[10px] font-bold text-amber-500">📚 {storyInfo.unlockedCount}</span>
               )}
             </div>
-            <h3 className="font-bold text-[var(--text)] text-sm leading-tight truncate">{unit.topic}</h3>
+            {/* Some collections (word_data.json) give units real topics like
+                "Ageing Population" — genuine content, shown as-is. Others
+                (a1/a2/b1/advanced_collection.json) just set topic to the
+                literal string "Unit N", which would duplicate the badge
+                above once that badge is localized, so it's skipped here. */}
+            {!/^Unit \d+$/.test(unit.topic) && (
+              <h3 className="font-bold text-[var(--text)] text-sm leading-tight truncate">{unit.topic}</h3>
+            )}
           </div>
           <button
             onClick={() => setShowInfo(true)}

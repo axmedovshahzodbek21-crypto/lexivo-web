@@ -2,6 +2,7 @@
 import { useTranslation } from '@/lib/useTranslation';
 import { useRouter } from 'next/navigation';
 import { realEnglishSets } from "@/lib/real-english-data";
+import BackButton from '@/components/BackButton';
 
 const CARD_COLORS = [
   { color: '#EC4899', light: '#F472B6', dark: '#BE185D' },
@@ -27,6 +28,7 @@ export default function RealEnglishPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 pb-24">
+      <BackButton />
 
       {/* Editorial header */}
       <div style={{ marginBottom: 32 }}>

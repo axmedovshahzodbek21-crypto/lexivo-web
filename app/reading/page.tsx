@@ -450,6 +450,7 @@ export default function ReadingPage() {
         </div>
       )}
     <div className="max-w-5xl mx-auto px-4 py-8 pb-24">
+      <BackButton />
       {/* Editorial header */}
       <div className="flex items-end justify-between mb-8">
         <div>
@@ -527,12 +528,12 @@ export default function ReadingPage() {
 
       {/* Topic filter — scrollable row with gradient active pill */}
       <div className="flex gap-2 overflow-x-auto pb-3 mb-6" style={{ scrollbarWidth: 'none' }}>
-        {allTopics.map(t => {
-          const active = topic === t;
+        {allTopics.map(topicName => {
+          const active = topic === topicName;
           return (
             <button
-              key={t}
-              onClick={() => setTopic(t)}
+              key={topicName}
+              onClick={() => setTopic(topicName)}
               className="shrink-0 text-xs font-bold px-3 py-2 rounded-xl transition-all duration-200"
               style={active ? {
                 background: 'linear-gradient(135deg, #FDE047, #EAB308, #A16207)',
@@ -545,7 +546,7 @@ export default function ReadingPage() {
                 border: '1px solid var(--border)',
               }}
             >
-              {t}
+              {topicName === 'All' ? t.readingPage.allTopicsFilter : topicName}
             </button>
           );
         })}

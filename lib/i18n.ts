@@ -22,6 +22,10 @@ const en = {
     desc30Days: 'Essential IELTS vocabulary by topic',
     desc24Challenge: 'Idioms and phrases for fluent speakers',
     descWordMastery: 'High-level C1 & B2 collocations',
+    descA1: 'Beginner — Basic everyday words and phrases',
+    descA2: 'Elementary — Common vocabulary for simple situations',
+    descB1: 'Intermediate — Everyday topics and familiar situations',
+    descAdvanced: 'B2 · C1 · C2 — Upper-Intermediate to Mastery vocabulary',
     leveledWordsDesc: 'A1 → C2 vocabulary by CEFR level',
     myWordsDescCount: (n: number) => `${n} words · your personal list`,
     myWordsDescEmpty: 'Your personal word list — add your first word',
@@ -1496,6 +1500,7 @@ const en = {
   },
   readingPage: {
     ideas: 'Ideas',
+    allTopicsFilter: 'All',
     searchPassages: 'Search passages…',
     noPassagesMatch: 'No passages match your search.',
     // Wave C additions (reading/structures/IELTS)
@@ -2205,6 +2210,8 @@ const en = {
     markingFlash: 'Flashcards — Marked ✓ only when there are zero hard words left at the end.',
     markingQuiz: 'Quiz — Marked ✓ after one full run — even if some answers were wrong.',
     markingUnit: 'Unit Complete — All three sections must be ✓ for the unit to be fully done.',
+    unitWordsLabel: (n: number) => `${n} words`,
+    wordsStudiedAvgMastery: (studied: number, total: number, pct: number) => `${studied}/${total} words studied · avg ${pct}% mastery`,
   },
   onboarding: {
     welcome: 'Welcome to',
@@ -2366,6 +2373,10 @@ const uz: typeof en = {
     desc30Days: 'Mavzular bo\'yicha IELTS uchun zarur lug\'at',
     desc24Challenge: 'Ravon so\'zlashuvchilar uchun idiomalar va iboralar',
     descWordMastery: 'Yuqori daraja C1 va B2 so\'z birikmalari',
+    descA1: "Boshlang'ich — kundalik oddiy so'zlar va iboralar",
+    descA2: "Elementar — oddiy vaziyatlar uchun umumiy lug'at",
+    descB1: "O'rta daraja — kundalik va tanish mavzular",
+    descAdvanced: "B2 · C1 · C2 — yuqori o'rta darajadan mahoratgacha lug'at",
     leveledWordsDesc: 'CEFR darajalari bo\'yicha A1 → C2 lug\'at',
     myWordsDescCount: (n: number) => `${n} ta so'z · shaxsiy ro'yxatingiz`,
     myWordsDescEmpty: 'Shaxsiy so\'zlar ro\'yxatingiz — birinchi so\'zingizni qo\'shing',
@@ -3828,6 +3839,7 @@ const uz: typeof en = {
   },
   readingPage: {
     ideas: 'Ideas',
+    allTopicsFilter: 'Hammasi',
     searchPassages: 'Matnlarni qidirish…',
     noPassagesMatch: "Qidiruvingizga mos matn yo'q.",
     // Wave C additions (reading/structures/IELTS)
@@ -4535,6 +4547,8 @@ const uz: typeof en = {
     markingFlash: "Kartochkalar — oxirida qiyin so'z qolmasa ✓ belgilanadi.",
     markingQuiz: "Test — bir marta to'liq o'tgandan so'ng ✓ belgilanadi.",
     markingUnit: "Birlik yakunlandi — Uchala bo'lim ham ✓ bo'lishi kerak.",
+    unitWordsLabel: (n: number) => `${n} ta so'z`,
+    wordsStudiedAvgMastery: (studied: number, total: number, pct: number) => `${studied}/${total} ta so'z o'rganildi · o'rtacha ${pct}% o'zlashtirilgan`,
   },
   onboarding: {
     welcome: 'Lexivoga xush kelibsiz',
@@ -4696,6 +4710,10 @@ const ru: typeof en = {
     desc30Days: 'Важнейшая лексика для IELTS по темам',
     desc24Challenge: 'Идиомы и фразы для свободного владения языком',
     descWordMastery: 'Продвинутые словосочетания уровня C1 и B2',
+    descA1: 'Начальный — базовые повседневные слова и фразы',
+    descA2: 'Элементарный — общая лексика для простых ситуаций',
+    descB1: 'Средний — повседневные и знакомые темы',
+    descAdvanced: 'B2 · C1 · C2 — лексика от продвинутого уровня до мастерства',
     leveledWordsDesc: 'Лексика по уровням CEFR от A1 до C2',
     myWordsDescCount: (n: number) => `${n} слов · ваш личный список`,
     myWordsDescEmpty: 'Ваш личный список слов — добавьте первое слово',
@@ -6170,6 +6188,7 @@ const ru: typeof en = {
   },
   readingPage: {
     ideas: 'Идеи',
+    allTopicsFilter: 'Все',
     searchPassages: 'Поиск текстов…',
     noPassagesMatch: 'По вашему запросу текстов не найдено.',
     // Wave C additions (reading/structures/IELTS)
@@ -6879,6 +6898,8 @@ const ru: typeof en = {
     markingFlash: 'Карточки — отмечается ✓ только если в конце не осталось сложных слов.',
     markingQuiz: 'Викторина — отмечается ✓ после одного полного прохождения — даже если были неверные ответы.',
     markingUnit: 'Юнит завершён — чтобы юнит считался полностью пройденным, все три раздела должны быть отмечены ✓.',
+    unitWordsLabel: (n: number) => `${n} слов`,
+    wordsStudiedAvgMastery: (studied: number, total: number, pct: number) => `${studied}/${total} слов изучено · в среднем ${pct}% освоено`,
   },
   onboarding: {
     welcome: 'Добро пожаловать в',

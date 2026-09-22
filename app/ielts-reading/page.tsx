@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { useTranslation } from '@/lib/useTranslation';
+import BackButton from '@/components/BackButton';
 
 const PASSAGES = [
   {
@@ -304,6 +305,7 @@ export default function IeltsReadingPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 pb-24">
+      <BackButton />
       <div className="mb-10">
         <p style={{ fontSize: 11, fontWeight: 900, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: 6 }}>
           {t.ieltsPage.practiceEyebrow}

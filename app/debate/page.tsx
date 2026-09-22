@@ -47,7 +47,7 @@ export default function DebateArenaPage() {
 
   return (
     <div className="p-4 space-y-6 animate-fade-in max-w-3xl mx-auto">
-      <BackButton href="/" />
+      <BackButton />
 
       <div>
         <div className="flex items-center gap-3">

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { achievementCount, getCategoryMeta, CATEGORY_ORDER, getAchievementProgress, groupAchievementsByCategory, computeAchievementXp } from '@/lib/gamification';
 import { getUnlockedAchievements, getLearnedWords, getStreak, getXP, getGraduatedCount, getTotalStudyDays, getFlashcardTotalDays, getFlashcardStreak, getQuizTotalDays, getQuizStreak, getAchievementDate } from '@/lib/storage';
 import type { Achievement } from '@/lib/types';
+import BackButton from '@/components/BackButton';
 
 interface Stats {
   learnedCount: number; streak: number; xp: number; masteredCount: number;
@@ -75,6 +76,7 @@ export default function AchievementsPage() {
 
   return (
     <div className="animate-fade-in" style={{ paddingBottom: 48 }}>
+      <div style={{ padding: '16px 16px 0' }}><BackButton className="mb-0" /></div>
 
       {/* ── Hero banner ─────────────────────────────────────────── */}
       <div style={{

@@ -103,7 +103,7 @@ export default function BattleReadyHubPage() {
         </div>
       )}
 
-      <BackButton href="/" />
+      <BackButton />
 
       <div className="flex items-center gap-3">
         <span className="text-3xl">🛡️</span>

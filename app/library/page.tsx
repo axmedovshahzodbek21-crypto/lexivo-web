@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { folderListCache as _cache } from '@/lib/teacher-library-cache';
+import BackButton from '@/components/BackButton';
 
 interface Folder {
   id: string;
@@ -151,6 +152,7 @@ export default function LibraryPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6">
+      <BackButton />
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
