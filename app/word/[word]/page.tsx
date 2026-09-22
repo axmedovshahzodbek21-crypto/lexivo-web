@@ -251,7 +251,7 @@ export default function WordDetailPage({ params }: { params: Promise<{ word: str
                 <div
                   className="text-xs font-semibold"
                   style={{ color: stageColor(srsInfo.completedCount) }}
-                >{stageLabel(srsInfo.completedCount)}</div>
+                >{stageLabel(srsInfo.completedCount, t.progress.srsStageLabels)}</div>
                 <div className="text-xs text-[var(--text-muted)] mt-0.5">
                   {t.wordPage.reviewLabel.replace('{nextReview}', srsInfo.nextReview)}
                 </div>

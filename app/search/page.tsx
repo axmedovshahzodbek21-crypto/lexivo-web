@@ -85,11 +85,11 @@ export default function SearchPage() {
       {/* Editorial header */}
       <div style={{ marginBottom: 28 }}>
         <p style={{ fontSize: 11, fontWeight: 900, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: 6 }}>
-          Vocabulary · 2,500+ words
+          {t.search.vocabularyLabel}
         </p>
-        <h1 style={{ fontSize: 40, fontWeight: 900, color: 'var(--text)', lineHeight: 1 }}>Search</h1>
+        <h1 style={{ fontSize: 40, fontWeight: 900, color: 'var(--text)', lineHeight: 1 }}>{t.search.heading}</h1>
         <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 8 }}>
-          Find any word across all your collections.
+          {t.search.subtitle}
         </p>
       </div>
 
@@ -248,7 +248,7 @@ export default function SearchPage() {
                 transition: 'transform 0.1s',
               }}
             >
-              Shuffle ↻
+              {t.search.shuffle}
             </button>
           </div>
 

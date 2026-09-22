@@ -374,7 +374,7 @@ export default function ClassReviewPage() {
             className="badge text-xs"
             style={{ background: `${stageColor(stage)}20`, color: stageColor(stage) }}
           >
-            {stageLabel(stage)}
+            {stageLabel(stage, t.progress.srsStageLabels)}
           </div>
         </div>
 

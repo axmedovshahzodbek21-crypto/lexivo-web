@@ -77,7 +77,7 @@ export default function XpModal({ xp, onClose }: Props) {
                 </div>
                 <div className="flex justify-between mt-1 text-[11px]" style={{ color: 'var(--text-muted)' }}>
                   <span>{displayXP(cur.min)} XP</span>
-                  <span className="font-semibold" style={{ color: 'var(--primary)' }}>{Math.round(levelInfo.progress)}% there</span>
+                  <span className="font-semibold" style={{ color: 'var(--primary)' }}>{t.xpModal.percentThere(Math.round(levelInfo.progress))}</span>
                   <span>{displayXP(nxt.min)} XP</span>
                 </div>
               </div>

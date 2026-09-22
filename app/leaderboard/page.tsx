@@ -225,7 +225,7 @@ export default function LeaderboardPage() {
                 {selectedBio !== undefined && (
                   <div className="w-full bg-[var(--surface-2)] rounded-xl px-4 py-3">
                     <p className="text-sm text-[var(--text-muted)] italic leading-relaxed text-center">
-                      {selectedBio || 'No bio yet'}
+                      {selectedBio || t.leaderboardPage.noBioYet}
                     </p>
                   </div>
                 )}
@@ -233,8 +233,8 @@ export default function LeaderboardPage() {
               {/* Stats grid */}
               <div className="grid grid-cols-2 gap-2">
                 {[
-                  { emoji: '📖', value: selected.total_learned, label: 'Words learned', color: '#3498DB' },
-                  { emoji: '🔥', value: selected.streak,        label: 'Day streak',    color: '#E67E22' },
+                  { emoji: '📖', value: selected.total_learned, label: t.leaderboardPage.wordsLearnedStat, color: '#3498DB' },
+                  { emoji: '🔥', value: selected.streak,        label: t.leaderboardPage.dayStreakStat,    color: '#E67E22' },
                 ].map(s => (
                   <div key={s.label} className="flex flex-col items-center py-3 px-2 rounded-xl border" style={{ background: `${s.color}14`, borderColor: `${s.color}33` }}>
                     <span className="text-xl">{s.emoji}</span>
@@ -245,8 +245,8 @@ export default function LeaderboardPage() {
               </div>
               <div className="grid grid-cols-2 gap-2">
                 {[
-                  { emoji: '📊', value: selectedHistory ? `~${avgPerDay}` : '…', label: 'Words / day',      color: '#9B59B6' },
-                  { emoji: '📅', value: selectedHistory ? `${activeDays}/${daysInCMonth}` : '…', label: 'Days this month', color: '#E67E22' },
+                  { emoji: '📊', value: selectedHistory ? `~${avgPerDay}` : '…', label: t.leaderboardPage.wordsPerDayStat,      color: '#9B59B6' },
+                  { emoji: '📅', value: selectedHistory ? `${activeDays}/${daysInCMonth}` : '…', label: t.leaderboardPage.daysThisMonthStat, color: '#E67E22' },
                 ].map(s => (
                   <div key={s.label} className="flex flex-col items-center py-3 px-2 rounded-xl border" style={{ background: `${s.color}14`, borderColor: `${s.color}33` }}>
                     <span className="text-xl">{s.emoji}</span>
@@ -264,7 +264,7 @@ export default function LeaderboardPage() {
                     aria-label={t.leaderboardPage.prevMonth}
                   >‹</button>
                   <p className="text-xs font-bold text-[var(--text-muted)]">
-                    {new Date(cYear, cMonth).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                    {t.classesPage.monthNames[cMonth]} {cYear}
                   </p>
                   <button
                     onClick={() => setCalMonth(m => { const d = new Date(m.year, m.month + 1); return { year: d.getFullYear(), month: d.getMonth() }; })}
@@ -273,7 +273,7 @@ export default function LeaderboardPage() {
                   >›</button>
                 </div>
                 <div className="grid grid-cols-7 mb-1">
-                  {['Su','Mo','Tu','We','Th','Fr','Sa'].map(d => (
+                  {t.leaderboardPage.weekDaysShort.map(d => (
                     <div key={d} className="text-center text-[9px] font-semibold text-[var(--text-muted)]">{d}</div>
                   ))}
                 </div>
@@ -332,7 +332,7 @@ export default function LeaderboardPage() {
             className="w-9 h-9 rounded-full flex items-center justify-center text-white text-lg transition-all active:scale-95"
             style={{ background: 'rgba(255,255,255,0.2)' }}>←</button>
           <div className="flex-1">
-            <h1 className="font-bold text-white text-lg leading-tight">🏆 Leaderboard</h1>
+            <h1 className="font-bold text-white text-lg leading-tight">{t.leaderboardPage.title}</h1>
             <p className="text-xs" style={{ color: 'rgba(255,255,255,0.75)' }}>{t.leaderboardPage.topLearners}</p>
           </div>
           <button onClick={load} aria-label={t.leaderboardPage.refresh}
@@ -347,7 +347,7 @@ export default function LeaderboardPage() {
               style={filter === f
                 ? { background: 'rgba(255,255,255,0.95)', color: '#b45309' }
                 : { background: 'rgba(255,255,255,0.18)', color: 'rgba(255,255,255,0.9)' }}>
-              {f === 'all' ? 'All' : '⭐ Starred'}
+              {f === 'all' ? t.leaderboardPage.filterAll : t.leaderboardPage.filterStarred}
             </button>
           ))}
         </div>

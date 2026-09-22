@@ -726,7 +726,7 @@ function LearnInner() {
     });
     setMarks(m => { const n = [...m]; n[index] = outcome; return n; });
     if (!sourceClassHW && !sourceClass) {
-      const newAch = checkAchievements();
+      const newAch = checkAchievements(t);
       newAch.forEach(pushAchievement);
     }
     if (index + 1 >= words.length) {

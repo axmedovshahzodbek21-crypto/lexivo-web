@@ -14,7 +14,7 @@ import {
 } from '@/lib/storage';
 import type { XpEntry } from '@/lib/storage';
 import { useAppStore } from '@/lib/store';
-import { getLevelInfo, ALL_ACHIEVEMENTS, CATEGORY_ORDER, CATEGORY_META, getAchievementProgress, groupAchievementsByCategory, computeAchievementXp } from '@/lib/gamification';
+import { getLevelInfo, achievementCount, CATEGORY_ORDER, getCategoryMeta, getAchievementProgress, groupAchievementsByCategory, computeAchievementXp } from '@/lib/gamification';
 import { getUnlockedAchievements } from '@/lib/storage';
 import { stageLabel, stageColor } from '@/lib/srs';
 import type { SRSWord } from '@/lib/types';
@@ -337,10 +337,10 @@ function ProgressPage() {
                 <div key={completedCount} className="mb-3">
                   <div className="flex justify-between text-sm mb-1">
                     <span style={{ color: stageColor(completedCount) }} className="font-medium">
-                      {stageLabel(completedCount)}
+                      {stageLabel(completedCount, t.progress.srsStageLabels)}
                       <span className="text-[var(--text-muted)] font-normal ml-1 text-xs">({completedCount}/{SRS_INTERVALS.length})</span>
                     </span>
-                    <span className="text-[var(--text-muted)]">{count} words</span>
+                    <span className="text-[var(--text-muted)]">{t.srs.wordsCount(count)}</span>
                   </div>
                   <div className="progress-bar">
                     <div
@@ -379,13 +379,14 @@ function ProgressPage() {
             flashDays: getFlashcardTotalDays(), flashStreak: getFlashcardStreak(),
             quizDays: getQuizTotalDays(), quizStreak: getQuizStreak() };
           const { earned: xpEarned, total: xpTotal } = computeAchievementXp(unlockedIds);
-          const byCategory = groupAchievementsByCategory();
+          const byCategory = groupAchievementsByCategory(t);
+          const categoryMeta = getCategoryMeta(t);
           return (
             <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
               {/* Summary row */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>
-                  {unlockedIds.length} / {ALL_ACHIEVEMENTS.length} unlocked
+                  {t.achievements.unlockedOf(unlockedIds.length, achievementCount())}
                 </p>
                 <p style={{ fontSize: 12, color: 'var(--primary)', fontWeight: 700 }}>✨ {xpEarned} / {xpTotal} XP</p>
               </div>
@@ -394,7 +395,7 @@ function ProgressPage() {
               {CATEGORY_ORDER.map(cat => {
                 const achs = byCategory[cat] ?? [];
                 if (!achs.length) return null;
-                const meta = CATEGORY_META[cat];
+                const meta = categoryMeta[cat];
                 const catUnlocked = achs.filter(a => unlockedIds.includes(a.id)).length;
                 return (
                   <div key={cat}>
@@ -417,7 +418,7 @@ function ProgressPage() {
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                       {achs.map(a => {
                         const isUnlocked = unlockedIds.includes(a.id);
-                        const prog = !isUnlocked ? getAchievementProgress(a.id, stats) : null;
+                        const prog = !isUnlocked ? getAchievementProgress(a.id, stats, t) : null;
                         const pct = prog && prog.target > 0 ? prog.current / prog.target : 0;
                         return (
                           <div key={a.id} style={{

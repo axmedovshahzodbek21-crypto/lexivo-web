@@ -3,8 +3,6 @@ import { useState, type ReactNode } from 'react';
 import { displayXP, type XpEntry } from '@/lib/storage';
 import { useTranslation } from '@/lib/useTranslation';
 
-const DAY_LABELS = ['M','T','W','T','F','S','S'];
-
 interface Props {
   history: XpEntry[];
   // Lifetime per-day totals (see storage.ts's getXPByDate) — unlike
@@ -87,7 +85,7 @@ export default function XpCalendar({
       </div>
       {/* Day labels */}
       <div className="grid grid-cols-7 px-2 pb-1">
-        {DAY_LABELS.map((d,i) => (
+        {t.classesPage.dayLabels.map((d,i) => (
           <div key={i} className="text-center text-[10px] font-bold py-1" style={{ color: 'var(--text-muted)' }}>{d}</div>
         ))}
       </div>

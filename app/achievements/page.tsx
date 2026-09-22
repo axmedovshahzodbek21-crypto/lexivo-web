@@ -1,7 +1,7 @@
 'use client';
 import { useTranslation } from '@/lib/useTranslation';
 import { useEffect, useState } from 'react';
-import { ALL_ACHIEVEMENTS, CATEGORY_META, CATEGORY_ORDER, getAchievementProgress, groupAchievementsByCategory, computeAchievementXp } from '@/lib/gamification';
+import { achievementCount, getCategoryMeta, CATEGORY_ORDER, getAchievementProgress, groupAchievementsByCategory, computeAchievementXp } from '@/lib/gamification';
 import { getUnlockedAchievements, getLearnedWords, getStreak, getXP, getGraduatedCount, getTotalStudyDays, getFlashcardTotalDays, getFlashcardStreak, getQuizTotalDays, getQuizStreak, getAchievementDate } from '@/lib/storage';
 import type { Achievement } from '@/lib/types';
 
@@ -18,10 +18,10 @@ interface AchDetail extends Omit<Achievement, 'unlockedAt'> {
 function fmtDate(iso: string | null): string {
   if (!iso) return '';
   const d = new Date(iso);
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-function RingProgress({ pct }: { pct: number }) {
+function RingProgress({ pct, completeLabel }: { pct: number; completeLabel: string }) {
   const r = 44, circ = 2 * Math.PI * r, dash = circ * pct;
   return (
     <svg width="110" height="110" viewBox="0 0 110 110">
@@ -33,7 +33,7 @@ function RingProgress({ pct }: { pct: number }) {
         {Math.round(pct * 100)}%
       </text>
       <text x="55" y="68" textAnchor="middle" fontSize="9" fill="rgba(255,255,255,0.6)" dominantBaseline="middle">
-        complete
+        {completeLabel}
       </text>
     </svg>
   );
@@ -63,10 +63,11 @@ export default function AchievementsPage() {
     return () => window.removeEventListener('lexivo-stats-change', load);
   }, []);
 
-  const total    = ALL_ACHIEVEMENTS.length;
+  const total    = achievementCount();
   const unlocked = unlockedIds.length;
   const { earned: xpEarned, total: totalXpAvailable } = computeAchievementXp(unlockedIds);
-  const byCategory = groupAchievementsByCategory();
+  const byCategory = groupAchievementsByCategory(t);
+  const categoryMeta = getCategoryMeta(t);
 
   function openDetail(a: Achievement) {
     setSelected({ ...a, unlocked: unlockedIds.includes(a.id), unlockedAt: getAchievementDate(a.id) });
@@ -85,7 +86,7 @@ export default function AchievementsPage() {
         <div style={{ position:'absolute', top:-30, right:-30, width:140, height:140, borderRadius:'50%', background:'rgba(255,255,255,0.08)' }} />
         <div style={{ position:'absolute', bottom:-20, left:-20, width:100, height:100, borderRadius:'50%', background:'rgba(255,255,255,0.06)' }} />
         <div style={{ display:'flex', alignItems:'center', gap:20, position:'relative' }}>
-          <RingProgress pct={total > 0 ? unlocked / total : 0} />
+          <RingProgress pct={total > 0 ? unlocked / total : 0} completeLabel={t.achievementsPage.complete} />
           <div>
             <p style={{ color:'rgba(255,255,255,0.7)', fontSize:11, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', margin:0 }}>{t.achievementsPage.title}</p>
             <p style={{ color:'white', fontSize:28, fontWeight:800, lineHeight:1.1, margin:'4px 0 2px' }}>
@@ -93,8 +94,8 @@ export default function AchievementsPage() {
             </p>
             <p style={{ color:'rgba(255,255,255,0.65)', fontSize:12, margin:0 }}>{t.achievementsPage.badgesUnlocked}</p>
             <div style={{ marginTop:10, display:'flex', alignItems:'center', gap:6 }}>
-              <span style={{ fontSize:12, color:'rgba(255,255,255,0.8)', fontWeight:600 }}>✨ {xpEarned} XP earned</span>
-              <span style={{ fontSize:11, color:'rgba(255,255,255,0.45)' }}>/ {totalXpAvailable} total</span>
+              <span style={{ fontSize:12, color:'rgba(255,255,255,0.8)', fontWeight:600 }}>{t.achievementsPage.xpEarnedLabel(xpEarned)}</span>
+              <span style={{ fontSize:11, color:'rgba(255,255,255,0.45)' }}>{t.achievementsPage.totalOf(totalXpAvailable)}</span>
             </div>
           </div>
         </div>
@@ -105,7 +106,7 @@ export default function AchievementsPage() {
         {CATEGORY_ORDER.map(cat => {
           const achs = byCategory[cat] ?? [];
           if (achs.length === 0) return null;
-          const meta = CATEGORY_META[cat];
+          const meta = categoryMeta[cat];
           const catUnlocked = achs.filter(a => unlockedIds.includes(a.id)).length;
           return (
             <div key={cat}>
@@ -129,7 +130,7 @@ export default function AchievementsPage() {
               <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>
                 {achs.map(a => {
                   const isUnlocked = unlockedIds.includes(a.id);
-                  const prog = !isUnlocked ? getAchievementProgress(a.id, stats) : null;
+                  const prog = !isUnlocked ? getAchievementProgress(a.id, stats, t) : null;
                   const pct = prog && prog.target > 0 ? prog.current / prog.target : 0;
                   return (
                     <button
@@ -231,17 +232,17 @@ export default function AchievementsPage() {
                 border: `1px solid ${selected.unlocked ? 'color-mix(in srgb, var(--primary) 20%, transparent)' : 'var(--border)'}`,
               }}>
                 <span style={{ fontSize:16 }}>✨</span>
-                <span style={{ fontSize:14, fontWeight:700, color: selected.unlocked ? 'var(--primary)' : 'var(--text-muted)' }}>+{selected.xp} XP reward</span>
+                <span style={{ fontSize:14, fontWeight:700, color: selected.unlocked ? 'var(--primary)' : 'var(--text-muted)' }}>{t.achievementsPage.xpReward(selected.xp)}</span>
               </div>
 
               {/* Status */}
               {selected.unlocked ? (
                 <div style={{ padding:'10px 24px', borderRadius:12, textAlign:'center', background:'color-mix(in srgb, var(--success) 10%, transparent)', border:'1px solid color-mix(in srgb, var(--success) 25%, transparent)' }}>
-                  <p style={{ fontSize:13, fontWeight:700, color:'var(--success)', margin:0 }}>✓ Achieved</p>
+                  <p style={{ fontSize:13, fontWeight:700, color:'var(--success)', margin:0 }}>✓ {t.achievementsPage.achieved}</p>
                   {selected.unlockedAt && <p style={{ fontSize:11, color:'var(--text-muted)', marginTop:3 }}>{fmtDate(selected.unlockedAt)}</p>}
                 </div>
               ) : (() => {
-                const prog = getAchievementProgress(selected.id, stats);
+                const prog = getAchievementProgress(selected.id, stats, t);
                 if (!prog) return null;
                 const pct = prog.target > 0 ? prog.current / prog.target : 0;
                 return (
@@ -253,7 +254,7 @@ export default function AchievementsPage() {
                     <div style={{ height:10, borderRadius:5, background:'var(--border)', overflow:'hidden' }}>
                       <div style={{ height:'100%', borderRadius:5, width:`${pct*100}%`, background:'linear-gradient(90deg, var(--primary), var(--primary-light))', transition:'width 0.6s ease' }} />
                     </div>
-                    <p style={{ textAlign:'center', marginTop:7, fontSize:11, color:'var(--text-muted)' }}>{Math.round(pct*100)}% complete</p>
+                    <p style={{ textAlign:'center', marginTop:7, fontSize:11, color:'var(--text-muted)' }}>{t.achievementsPage.percentComplete(Math.round(pct*100))}</p>
                   </div>
                 );
               })()}

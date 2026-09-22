@@ -322,7 +322,7 @@ function QuizInner() {
           if (markMyQuizComplete(myFolder, myCollection)) { setMyUnitCompleted(true); fireConfetti(); }
         }
         recordQuizSession();
-        const newAchievements = checkAchievements();
+        const newAchievements = checkAchievements(t);
         newAchievements.forEach(pushAchievement);
       }
       // Class sessions touch nothing in the personal Lexivo store — no sync.

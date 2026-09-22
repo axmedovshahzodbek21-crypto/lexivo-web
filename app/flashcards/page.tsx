@@ -250,7 +250,7 @@ function FlashcardsInner() {
     if (!sourceClassHW && !sourceClass) {
       recordStudySession();
       recordFlashcardSession();
-      const newAchievements = checkAchievements();
+      const newAchievements = checkAchievements(t);
       newAchievements.forEach(pushAchievement);
     }
     if (index + 1 >= deck.length) {

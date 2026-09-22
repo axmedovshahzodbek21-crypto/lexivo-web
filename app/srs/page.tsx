@@ -223,7 +223,7 @@ export default function SRSReviewPage() {
     unlockAchievement('srs_first', 50); // 5 XP
     recordStudySession();
     if (getDueWords().length === 0) recordReviewDay();
-    const newAchievements = checkAchievements();
+    const newAchievements = checkAchievements(t);
     newAchievements.forEach(pushAchievement);
     pushLists();
     pushStats();

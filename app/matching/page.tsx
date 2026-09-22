@@ -243,7 +243,7 @@ function MatchingInner() {
       if (next.size === roundWords.length) {
         // Round complete
         setTimerActive(false);
-        if (!sourceClassHW && !sourceClass) checkAchievements();
+        if (!sourceClassHW && !sourceClass) checkAchievements(t);
         setTotalMistakes(prev => prev + mistakes);
         setTotalTime(prev => prev + elapsed);
         const isLast = roundIndex + 1 >= Math.ceil(words.length / BATCH_SIZE);

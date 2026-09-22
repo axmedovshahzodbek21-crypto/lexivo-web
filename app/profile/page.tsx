@@ -9,7 +9,7 @@ import {
   getUnitProgress, getProfilePic, saveProfilePic, removeProfilePic,
   getProfilePicUrl, saveProfilePicUrl, removeProfilePicUrl, displayXP,
 } from '@/lib/storage';
-import { getLevelInfo, ALL_ACHIEVEMENTS } from '@/lib/gamification';
+import { getLevelInfo, getAllAchievements, achievementCount } from '@/lib/gamification';
 import { pushSettings } from '@/lib/sync';
 import type { UserSettings } from '@/lib/types';
 import { useRef } from 'react';
@@ -397,11 +397,11 @@ export default function ProfilePage() {
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-bold text-[var(--text)] text-sm">{t.profile.achievements}</h3>
             <span className="text-xs font-semibold text-[var(--primary)]">
-              {unlockedCount} / {ALL_ACHIEVEMENTS.length}
+              {unlockedCount} / {achievementCount()}
             </span>
           </div>
           <div className="grid grid-cols-3 gap-2">
-            {ALL_ACHIEVEMENTS.map(a => {
+            {getAllAchievements(t).map(a => {
               const unlocked = unlockedIds.includes(a.id);
               return (
                 <div

@@ -30,9 +30,11 @@ export function pickByStage<T>(stage: number, values: T[]): T {
 // completedCount = number of intervals done (0–5); 5 = graduated.
 // Re-exported as-is from class-srs.ts, which uses the exact same labels for
 // class SRS review — unlike stageColor below, there's no reason for these
-// two surfaces to disagree on wording.
-export function stageLabel(completedCount: number): string {
-  return pickByStage(completedCount, ['New', '+1 done', '+3 done', '+7 done', '+14 done', 'Graduated']);
+// two surfaces to disagree on wording. `labels` comes from the caller's
+// t.progress.srsStageLabels so this stays localized without this file
+// needing access to the translation system itself.
+export function stageLabel(completedCount: number, labels: string[]): string {
+  return pickByStage(completedCount, labels);
 }
 
 export function stageColor(completedCount: number): string {

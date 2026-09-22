@@ -1,5 +1,6 @@
 import type { Achievement } from './types';
 import { LEVEL_THRESHOLDS } from './types';
+import type { Translations } from './i18n';
 import { getXP, getLearnedWords, getStreak, getTotalStudyDays, unlockAchievement, getGraduatedCount, getFlashcardTotalDays, getFlashcardStreak, getQuizTotalDays, getQuizStreak } from './storage';
 
 export function getLevelInfo(xp: number) {
@@ -18,12 +19,10 @@ export function getLevelInfo(xp: number) {
 
 const M = [3, 5, 7, 10, 15, 20, 25, 30, 33, 40, 45, 50, 57, 60, 65, 68, 71, 77, 81, 86, 90, 95, 99, 100, 101, 107, 111, 118, 123];
 
-const SD: Record<number, string> = { 3: 'First Steps', 7: 'One Week', 10: 'Double Digits', 30: 'One Month', 50: 'Half Century', 90: 'Three Months', 100: 'Century', 111: 'Triple One', 123: 'One-Two-Three' };
-const SS: Record<number, string> = { 3: 'On Fire', 7: 'Week Warrior', 10: 'Unstoppable', 30: 'Monthly Flame', 50: 'Inferno', 90: 'Eternal Flame', 100: 'Century Streak', 111: 'Triple Streak', 123: 'Endless Fire' };
-const FD: Record<number, string> = { 3: 'Card Curious', 7: 'Card Week', 10: 'Card Habit', 30: 'Card Month', 50: 'Card Addict', 100: 'Card Century', 111: 'Card Triple', 123: 'Card Master' };
-const FS: Record<number, string> = { 3: 'Flash Spark', 7: 'Flash Week', 10: 'Flash Habit', 30: 'Flash Month', 50: 'Flash Inferno', 100: 'Flash Century', 111: 'Flash Triple', 123: 'Flash Legend' };
-const QD: Record<number, string> = { 3: 'Quiz Curious', 7: 'Quiz Week', 10: 'Quiz Habit', 30: 'Quiz Month', 50: 'Quiz Addict', 100: 'Quiz Century', 111: 'Quiz Triple', 123: 'Quiz Master' };
-const QS: Record<number, string> = { 3: 'Quiz Spark', 7: 'Quiz Warrior', 10: 'Quiz Machine', 30: 'Quiz Marathoner', 50: 'Quiz Inferno', 100: 'Quiz Legend', 111: 'Quiz Triple', 123: 'Quiz God' };
+// Language-independent achievement metadata (id/icon/category/xp) — the
+// title and description come from t.achievements at display time, via
+// achievementTitle/achievementDescription below.
+interface AchievementMeta { id: string; icon: string; category: string; xp: number }
 
 function icon(n: number, base: string): string {
   if (n >= 100) return '🏆';
@@ -41,86 +40,115 @@ function milestoneXp(n: number): number {
   return 3;
 }
 
-function gen(prefix: string, cat: string, baseIcon: string, names: Record<number, string>, descFn: (n: number) => string): Achievement[] {
-  return M.map(n => ({
-    id: `${prefix}_${n}`,
-    title: names[n] ?? `${n}`,
-    description: descFn(n),
-    icon: icon(n, baseIcon),
-    category: cat,
-    xp: milestoneXp(n),
-  }));
+function genMeta(prefix: string, cat: string, baseIcon: string): AchievementMeta[] {
+  return M.map(n => ({ id: `${prefix}_${n}`, icon: icon(n, baseIcon), category: cat, xp: milestoneXp(n) }));
 }
 
-const studyDayAchs   = gen('sd', 'study_days',    '📅', SD, n => `Study on ${n} different days`);
-const studyStreakAchs = gen('ss', 'study_streak',  '🔥', SS, n => `Study ${n} days in a row`);
-const flashDayAchs   = gen('fd', 'flash_days',    '🃏', FD, n => `Do flashcards on ${n} different days`);
-const flashStreakAchs = gen('fs', 'flash_streak',  '⚡', FS, n => `Do flashcards ${n} days in a row`);
-const quizDayAchs    = gen('qd', 'quiz_days',     '❓', QD, n => `Do a quiz on ${n} different days`);
-const quizStreakAchs  = gen('qs', 'quiz_streak',   '🧠', QS, n => `Do a quiz ${n} days in a row`);
+const studyDayMeta    = genMeta('sd', 'study_days',    '📅');
+const studyStreakMeta = genMeta('ss', 'study_streak',  '🔥');
+const flashDayMeta    = genMeta('fd', 'flash_days',    '🃏');
+const flashStreakMeta = genMeta('fs', 'flash_streak',  '⚡');
+const quizDayMeta     = genMeta('qd', 'quiz_days',     '❓');
+const quizStreakMeta  = genMeta('qs', 'quiz_streak',   '🧠');
 
-export const ALL_ACHIEVEMENTS: Achievement[] = [
-  // Words
-  { id: 'first_word',   title: 'First Step',         description: 'Learn your first word',   icon: '🌱', category: 'words',      xp: 2  },
-  { id: 'words_10',     title: 'Getting Started',    description: 'Learn 10 words',           icon: '📚', category: 'words',      xp: 5  },
-  { id: 'words_50',     title: 'Word Collector',     description: 'Learn 50 words',           icon: '📖', category: 'words',      xp: 10 },
-  { id: 'words_100',    title: 'Centurion',          description: 'Learn 100 words',          icon: '💯', category: 'words',      xp: 15 },
-  { id: 'words_250',    title: 'Word Master',        description: 'Learn 250 words',          icon: '🏆', category: 'words',      xp: 25 },
-  { id: 'words_500',    title: 'Lexicon Master',     description: 'Learn 500 words',          icon: '👑', category: 'words',      xp: 40 },
-  { id: 'words_1000',   title: 'Lexivo Legend',      description: 'Learn 1000 words',         icon: '🌍', category: 'words',      xp: 75 },
-  // XP
-  { id: 'xp_100',       title: 'XP Earner',          description: 'Earn 100 XP',              icon: '✨', category: 'xp',         xp: 5  },
-  { id: 'xp_500',       title: 'XP Hunter',          description: 'Earn 500 XP',              icon: '💎', category: 'xp',         xp: 10 },
-  { id: 'xp_1000',      title: 'XP Legend',          description: 'Earn 1000 XP',             icon: '🚀', category: 'xp',         xp: 20 },
-  { id: 'xp_2000',      title: 'XP Master',          description: 'Earn 2000 XP',             icon: '🏆', category: 'xp',         xp: 35 },
-  // SRS
-  { id: 'srs_first',        title: 'Reviewer',        description: 'Complete your first SRS review', icon: '🔄', category: 'srs', xp: 5  },
-  { id: 'srs_mastered_10',  title: 'Memory Champion', description: 'Master 10 words in SRS',         icon: '🧠', category: 'srs', xp: 10 },
-  // Milestones
-  { id: 'flashcard_first',  title: 'Flashcard Fan',   description: 'Complete a flashcard session',   icon: '🃏', category: 'milestones', xp: 3  },
-  { id: 'quiz_first',       title: 'Quiz Taker',      description: 'Complete a quiz',                icon: '❓', category: 'milestones', xp: 3  },
-  { id: 'quiz_perfect',     title: 'Perfect Score',   description: 'Score 100% on a quiz',           icon: '🎯', category: 'milestones', xp: 10 },
-  // Milestone categories
-  ...studyDayAchs,
-  ...studyStreakAchs,
-  ...flashDayAchs,
-  ...flashStreakAchs,
-  ...quizDayAchs,
-  ...quizStreakAchs,
+export const ACHIEVEMENT_META: AchievementMeta[] = [
+  { id: 'first_word',       icon: '🌱', category: 'words',      xp: 2  },
+  { id: 'words_10',         icon: '📚', category: 'words',      xp: 5  },
+  { id: 'words_50',         icon: '📖', category: 'words',      xp: 10 },
+  { id: 'words_100',        icon: '💯', category: 'words',      xp: 15 },
+  { id: 'words_250',        icon: '🏆', category: 'words',      xp: 25 },
+  { id: 'words_500',        icon: '👑', category: 'words',      xp: 40 },
+  { id: 'words_1000',       icon: '🌍', category: 'words',      xp: 75 },
+  { id: 'xp_100',           icon: '✨', category: 'xp',         xp: 5  },
+  { id: 'xp_500',           icon: '💎', category: 'xp',         xp: 10 },
+  { id: 'xp_1000',          icon: '🚀', category: 'xp',         xp: 20 },
+  { id: 'xp_2000',          icon: '🏆', category: 'xp',         xp: 35 },
+  { id: 'srs_first',        icon: '🔄', category: 'srs',        xp: 5  },
+  { id: 'srs_mastered_10',  icon: '🧠', category: 'srs',        xp: 10 },
+  { id: 'flashcard_first',  icon: '🃏', category: 'milestones', xp: 3  },
+  { id: 'quiz_first',       icon: '❓', category: 'milestones', xp: 3  },
+  { id: 'quiz_perfect',     icon: '🎯', category: 'milestones', xp: 10 },
+  ...studyDayMeta,
+  ...studyStreakMeta,
+  ...flashDayMeta,
+  ...flashStreakMeta,
+  ...quizDayMeta,
+  ...quizStreakMeta,
 ];
 
-export const CATEGORY_META: Record<string, { label: string; icon: string }> = {
-  words:         { label: 'Words Learned',     icon: '📚' },
-  xp:            { label: 'XP Earned',         icon: '✨' },
-  study_days:    { label: 'Study Days',        icon: '📅' },
-  study_streak:  { label: 'Study Streak',      icon: '🔥' },
-  flash_days:    { label: 'Flashcard Days',    icon: '🃏' },
-  flash_streak:  { label: 'Flashcard Streak',  icon: '⚡' },
-  quiz_days:     { label: 'Quiz Days',         icon: '❓' },
-  quiz_streak:   { label: 'Quiz Streak',       icon: '🧠' },
-  srs:           { label: 'SRS & Memory',      icon: '🔄' },
-  milestones:    { label: 'Milestones',        icon: '🏆' },
-};
+function parseMilestone(id: string): { prefix: string; n: number } | null {
+  const m = id.match(/^(sd|ss|fd|fs|qd|qs)_(\d+)$/);
+  return m ? { prefix: m[1], n: +m[2] } : null;
+}
+
+export function achievementTitle(t: Translations, id: string): string {
+  const fixed = t.achievements.items[id];
+  if (fixed) return fixed.title;
+  const ms = parseMilestone(id);
+  if (!ms) return id;
+  const names = {
+    sd: t.achievements.studyDayNames, ss: t.achievements.studyStreakNames,
+    fd: t.achievements.flashDayNames, fs: t.achievements.flashStreakNames,
+    qd: t.achievements.quizDayNames,  qs: t.achievements.quizStreakNames,
+  }[ms.prefix as 'sd' | 'ss' | 'fd' | 'fs' | 'qd' | 'qs'];
+  return names[ms.n] ?? `${ms.n}`;
+}
+
+export function achievementDescription(t: Translations, id: string): string {
+  const fixed = t.achievements.items[id];
+  if (fixed) return fixed.description;
+  const ms = parseMilestone(id);
+  if (!ms) return '';
+  const descFn = {
+    sd: t.achievements.studyDayDesc, ss: t.achievements.studyStreakDesc,
+    fd: t.achievements.flashDayDesc, fs: t.achievements.flashStreakDesc,
+    qd: t.achievements.quizDayDesc,  qs: t.achievements.quizStreakDesc,
+  }[ms.prefix as 'sd' | 'ss' | 'fd' | 'fs' | 'qd' | 'qs'];
+  return descFn(ms.n);
+}
+
+function localize(t: Translations, meta: AchievementMeta): Achievement {
+  return { id: meta.id, icon: meta.icon, category: meta.category, xp: meta.xp,
+    title: achievementTitle(t, meta.id), description: achievementDescription(t, meta.id) };
+}
+
+export function getAllAchievements(t: Translations): Achievement[] {
+  return ACHIEVEMENT_META.map(m => localize(t, m));
+}
+
+export function getCategoryMeta(t: Translations): Record<string, { label: string; icon: string }> {
+  const icons: Record<string, string> = {
+    words: '📚', xp: '✨', study_days: '📅', study_streak: '🔥',
+    flash_days: '🃏', flash_streak: '⚡', quiz_days: '❓', quiz_streak: '🧠',
+    srs: '🔄', milestones: '🏆',
+  };
+  const labels = t.achievements.categoryLabels;
+  return Object.fromEntries(Object.keys(icons).map(cat => [cat, { label: labels[cat], icon: icons[cat] }]));
+}
 
 export const CATEGORY_ORDER = ['words', 'xp', 'study_days', 'study_streak', 'flash_days', 'flash_streak', 'quiz_days', 'quiz_streak', 'srs', 'milestones'];
 
 // Shared by app/achievements/page.tsx and the achievements tab in
-// app/progress/page.tsx — both independently grouped ALL_ACHIEVEMENTS by
+// app/progress/page.tsx — both independently grouped achievements by
 // category and summed unlocked/total XP the same way, just with different
 // card layouts (a dedicated full page vs. a compact in-tab summary).
-export function groupAchievementsByCategory(): Record<string, Achievement[]> {
+export function groupAchievementsByCategory(t: Translations): Record<string, Achievement[]> {
   const byCategory: Record<string, Achievement[]> = {};
-  for (const a of ALL_ACHIEVEMENTS) (byCategory[a.category] ??= []).push(a);
+  for (const a of getAllAchievements(t)) (byCategory[a.category] ??= []).push(a);
   return byCategory;
 }
 
 export function computeAchievementXp(unlockedIds: string[]): { earned: number; total: number } {
-  const earned = ALL_ACHIEVEMENTS.filter(a => unlockedIds.includes(a.id)).reduce((s, a) => s + a.xp, 0);
-  const total = ALL_ACHIEVEMENTS.reduce((s, a) => s + a.xp, 0);
+  const earned = ACHIEVEMENT_META.filter(a => unlockedIds.includes(a.id)).reduce((s, a) => s + a.xp, 0);
+  const total = ACHIEVEMENT_META.reduce((s, a) => s + a.xp, 0);
   return { earned, total };
 }
 
-export function checkAchievements(): Achievement[] {
+export function achievementCount(): number {
+  return ACHIEVEMENT_META.length;
+}
+
+export function checkAchievements(t: Translations): Achievement[] {
   const newlyUnlocked: Achievement[] = [];
   const xp            = getXP();
   const learnedCount  = getLearnedWords().length;
@@ -156,9 +184,9 @@ export function checkAchievements(): Achievement[] {
 
   for (const [id, condition] of checks) {
     if (condition) {
-      const achievement = ALL_ACHIEVEMENTS.find(a => a.id === id);
-      const justUnlocked = unlockAchievement(id, (achievement?.xp ?? 0) * 10);
-      if (justUnlocked && achievement) newlyUnlocked.push(achievement);
+      const meta = ACHIEVEMENT_META.find(a => a.id === id);
+      const justUnlocked = unlockAchievement(id, (meta?.xp ?? 0) * 10);
+      if (justUnlocked && meta) newlyUnlocked.push(localize(t, meta));
     }
   }
 
@@ -168,16 +196,17 @@ export function checkAchievements(): Achievement[] {
 export function getAchievementProgress(id: string, stats: {
   learnedCount: number; streak: number; totalDays: number; xp: number;
   masteredCount: number; flashDays: number; flashStreak: number; quizDays: number; quizStreak: number;
-}): { current: number; target: number; label: string } | null {
-  if (id === 'first_word')     return { current: Math.min(stats.learnedCount, 1), target: 1, label: 'words' };
-  if (id.startsWith('words_')) { const t = parseInt(id.split('_')[1]); return { current: Math.min(stats.learnedCount, t), target: t, label: 'words' }; }
-  if (id.startsWith('xp_'))    { const t = parseInt(id.split('_')[1]) * 10; return { current: Math.min(stats.xp, t), target: t, label: 'XP' }; }
-  if (id === 'srs_mastered_10') return { current: Math.min(stats.masteredCount, 10), target: 10, label: 'mastered' };
-  const sdm = id.match(/^sd_(\d+)$/); if (sdm) { const t = +sdm[1]; return { current: Math.min(stats.totalDays, t), target: t, label: 'days' }; }
-  const ssm = id.match(/^ss_(\d+)$/); if (ssm) { const t = +ssm[1]; return { current: Math.min(stats.streak, t), target: t, label: 'days' }; }
-  const fdm = id.match(/^fd_(\d+)$/); if (fdm) { const t = +fdm[1]; return { current: Math.min(stats.flashDays, t), target: t, label: 'days' }; }
-  const fsm = id.match(/^fs_(\d+)$/); if (fsm) { const t = +fsm[1]; return { current: Math.min(stats.flashStreak, t), target: t, label: 'days' }; }
-  const qdm = id.match(/^qd_(\d+)$/); if (qdm) { const t = +qdm[1]; return { current: Math.min(stats.quizDays, t), target: t, label: 'days' }; }
-  const qsm = id.match(/^qs_(\d+)$/); if (qsm) { const t = +qsm[1]; return { current: Math.min(stats.quizStreak, t), target: t, label: 'days' }; }
+}, t: Translations): { current: number; target: number; label: string } | null {
+  const L = t.achievements.progressLabels;
+  if (id === 'first_word')     return { current: Math.min(stats.learnedCount, 1), target: 1, label: L.words };
+  if (id.startsWith('words_')) { const tgt = parseInt(id.split('_')[1]); return { current: Math.min(stats.learnedCount, tgt), target: tgt, label: L.words }; }
+  if (id.startsWith('xp_'))    { const tgt = parseInt(id.split('_')[1]) * 10; return { current: Math.min(stats.xp, tgt), target: tgt, label: L.xp }; }
+  if (id === 'srs_mastered_10') return { current: Math.min(stats.masteredCount, 10), target: 10, label: L.mastered };
+  const sdm = id.match(/^sd_(\d+)$/); if (sdm) { const tgt = +sdm[1]; return { current: Math.min(stats.totalDays, tgt), target: tgt, label: L.days }; }
+  const ssm = id.match(/^ss_(\d+)$/); if (ssm) { const tgt = +ssm[1]; return { current: Math.min(stats.streak, tgt), target: tgt, label: L.days }; }
+  const fdm = id.match(/^fd_(\d+)$/); if (fdm) { const tgt = +fdm[1]; return { current: Math.min(stats.flashDays, tgt), target: tgt, label: L.days }; }
+  const fsm = id.match(/^fs_(\d+)$/); if (fsm) { const tgt = +fsm[1]; return { current: Math.min(stats.flashStreak, tgt), target: tgt, label: L.days }; }
+  const qdm = id.match(/^qd_(\d+)$/); if (qdm) { const tgt = +qdm[1]; return { current: Math.min(stats.quizDays, tgt), target: tgt, label: L.days }; }
+  const qsm = id.match(/^qs_(\d+)$/); if (qsm) { const tgt = +qsm[1]; return { current: Math.min(stats.quizStreak, tgt), target: tgt, label: L.days }; }
   return null;
 }
