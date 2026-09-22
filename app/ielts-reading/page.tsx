@@ -291,7 +291,7 @@ export default function IeltsReadingPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 pb-24">
-      <BackButton />
+      <BackButton href="/more" />
       <div className="mb-10">
         <p style={{ fontSize: 11, fontWeight: 900, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: 6 }}>
           {t.ieltsPage.practiceEyebrow}

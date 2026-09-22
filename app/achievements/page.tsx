@@ -76,7 +76,7 @@ export default function AchievementsPage() {
 
   return (
     <div className="animate-fade-in" style={{ paddingBottom: 48 }}>
-      <div style={{ padding: '16px 16px 0' }}><BackButton className="mb-0" /></div>
+      <div style={{ padding: '16px 16px 0' }}><BackButton href="/more" className="mb-0" /></div>
 
       {/* ── Hero banner ─────────────────────────────────────────── */}
       <div style={{

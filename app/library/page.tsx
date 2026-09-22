@@ -152,7 +152,7 @@ export default function LibraryPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6">
-      <BackButton />
+      <BackButton href="/more" />
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>

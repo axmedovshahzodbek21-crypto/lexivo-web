@@ -28,7 +28,7 @@ export default function RealEnglishPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 pb-24">
-      <BackButton />
+      <BackButton href="/more" />
 
       {/* Editorial header */}
       <div style={{ marginBottom: 32 }}>
