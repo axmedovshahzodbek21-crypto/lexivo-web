@@ -3977,7 +3977,7 @@ const uz: typeof en = {
     lookingUp: 'Qidirilmoqda…',
   },
   readingPage: {
-    ideas: 'Ideas',
+    ideas: "G'oyalar",
     allTopicsFilter: 'Hammasi',
     searchPassages: 'Matnlarni qidirish…',
     noPassagesMatch: "Qidiruvingizga mos matn yo'q.",
