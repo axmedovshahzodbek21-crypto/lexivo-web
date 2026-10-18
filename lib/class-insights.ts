@@ -195,8 +195,20 @@ export function changeOf(s: StudentInsight, prev: PrevRow | undefined): Change {
   return d < 0 ? 'worse' : d > 0 ? 'better' : null;
 }
 
-// The saved day before `date` — for "what changed since yesterday".
+// The saved day before `date` — for "what changed since yesterday". A past
+// day never changes, so it's loaded once per tab.
+const prevCache = new Map<string, Record<string, PrevRow>>();
+
 export async function loadPrevRows(classId: string, date: string): Promise<Record<string, PrevRow>> {
+  const key = `${classId}|${date}`;
+  const hit = prevCache.get(key);
+  if (hit) return hit;
+  const rows = await fetchPrevRows(classId, date);
+  prevCache.set(key, rows);
+  return rows;
+}
+
+async function fetchPrevRows(classId: string, date: string): Promise<Record<string, PrevRow>> {
   const { data: cls } = await supabase
     .from('class_insight_class_snapshots')
     .select('snapshot_date')
