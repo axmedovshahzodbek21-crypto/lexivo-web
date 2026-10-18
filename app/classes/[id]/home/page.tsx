@@ -9,6 +9,7 @@ import { localDateStr, addDaysToDateStr, displayXP } from '@/lib/storage';
 import { avatarColor } from '@/lib/class-gradient';
 
 interface Announcement { id: string; message: string; created_at: string; }
+interface Note { id: string; message: string; created_at: string; read_at: string | null; }
 interface Target { id: string; title: string; due_date: string | null; completed_at: string | null; }
 interface StudentProfile {
   id: string; name: string; avatar_url: string | null;
@@ -91,6 +92,7 @@ export default function ClassHomePage() {
   const [pendingHwCount, setPendingHwCount] = useState(0);
   const memberIdsRef = useRef<string[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [notes, setNotes] = useState<Note[]>([]);
   const [targets, setTargets] = useState<Target[]>([]);
 const [memberCount, setMemberCount] = useState(0);
   const [activeToday, setActiveToday] = useState(0);
@@ -150,7 +152,7 @@ const [memberCount, setMemberCount] = useState(0);
       memberIdsRef.current = memberIds;
       const annIds = ((anns ?? []) as Announcement[]).map(a => a.id);
 
-      const [{ data: studyDays }, { data: reads }, { data: tgts }, { data: tProfile }] = await Promise.all([
+      const [{ data: studyDays }, { data: reads }, { data: tgts }, { data: tProfile }, { data: myNotes }] = await Promise.all([
         memberCount > 0
           ? supabase.from('class_study_days').select('student_id, study_date').eq('class_id', id).in('student_id', memberIds)
           : Promise.resolve({ data: [] as { student_id: string; study_date: string }[] }),
@@ -164,7 +166,22 @@ const [memberCount, setMemberCount] = useState(0);
         !teacher
           ? supabase.from('profiles').select('name, bio, avatar_url').eq('id', cls.teacher_id).maybeSingle()
           : Promise.resolve({ data: null as { name?: string; bio?: string; avatar_url?: string | null } | null }),
+        // Teacher notes to this student, so a note push (which opens this
+        // page) lands where the note is shown.
+        !teacher
+          ? supabase.from('class_notes').select('id, message, created_at, read_at')
+              .eq('class_id', id).eq('student_id', user.id).order('created_at', { ascending: false }).limit(5)
+          : Promise.resolve({ data: [] as Note[] }),
       ]);
+
+      if (!teacher) {
+        const noteRows = (myNotes ?? []) as Note[];
+        setNotes(noteRows);
+        const unread = noteRows.filter(n => !n.read_at).map(n => n.id);
+        if (unread.length > 0) {
+          void supabase.from('class_notes').update({ read_at: new Date().toISOString() }).in('id', unread);
+        }
+      }
 
       const today = localDateStr();
       const threeDaysAgo = addDaysToDateStr(today, -3);
@@ -734,6 +751,28 @@ const [memberCount, setMemberCount] = useState(0);
           </section>
         )}
 
+
+        {/* Notes from the teacher (student only) */}
+        {!isTeacher && notes.length > 0 && (
+          <section>
+            <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--text-muted)] mb-3">{tx.classesPage.notesFromTeacherLabel}</h2>
+            <div className="space-y-2">
+              {notes.map(n => {
+                const isNew = !n.read_at;
+                return (
+                  <div key={n.id} className={`p-3 rounded-xl border flex gap-3 ${isNew ? 'bg-[var(--primary-bg)] border-l-4 border-l-[var(--primary)] border-[var(--border)]' : 'bg-[var(--surface)] border-[var(--border)]'}`}>
+                    <span className="text-base mt-0.5">✉️</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-[var(--text)] whitespace-pre-wrap">{n.message}</p>
+                      <p className="text-xs text-[var(--text-muted)] mt-0.5">{timeAgo(n.created_at, tx)}</p>
+                    </div>
+                    {isNew && <span className="text-[10px] font-bold text-[var(--primary)] self-start pt-0.5">{tx.classesPage.new}</span>}
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
 
         {/* Announcements */}
         <section>

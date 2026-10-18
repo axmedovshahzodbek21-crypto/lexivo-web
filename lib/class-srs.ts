@@ -280,6 +280,14 @@ export async function addClassHardWord(userId: string, classId: string, word: st
   );
 }
 
+// A student taking a word off their class Hard list once it's no longer hard
+// — it then also drops off the teacher's class Hard words page.
+export async function removeClassHardWord(userId: string, classId: string, word: string): Promise<void> {
+  const { error } = await supabase.from('class_hard_words').delete()
+    .eq('user_id', userId).eq('class_id', classId).eq('word', word);
+  if (error) throw error;
+}
+
 // ── Raw class word shape returned from Supabase (used by study-mode pages) ───
 export interface ClassWordRaw {
   id: string;

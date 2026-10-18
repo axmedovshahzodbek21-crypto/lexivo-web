@@ -35,6 +35,8 @@ export default function ClassShellNav({ classId }: { classId: string }) {
     { seg: 'words',       icon: '📖', label: t.classNav.words        },
     { seg: 'leaderboard', icon: '🏆', label: t.classNav.ranks        },
     { seg: '',            icon: '📊', label: t.classNav.dashboard    },
+    { seg: 'insights',    icon: '✨', label: t.classNav.insights     },
+    { seg: 'hard-words',  icon: '😓', label: t.classNav.hardWords    },
     { seg: '__curriculum__', icon: '📋', label: t.classNav.curriculum },
     { seg: POMODORO_SEG,  icon: '🍅', label: t.nav.pomodoro          },
   ];

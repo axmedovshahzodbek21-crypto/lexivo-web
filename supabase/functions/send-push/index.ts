@@ -6,8 +6,8 @@
 // Called by the `notify_push()` Postgres trigger (see
 // supabase/migrations/20260820_push_notifications.sql and
 // 20260914_notify_join_request.sql) whenever a row is inserted into
-// class_homework, class_targets, class_announcements, or class_members
-// (join requests). Resolves the recipients (class students, or the
+// class_homework, class_targets, class_announcements, class_notes (teacher
+// notes, one student), or class_members (join requests). Resolves the recipients (class students, or the
 // teacher for a join request), filters to those who opted into push, and
 // sends via the OneSignal REST API using external_id = Supabase auth user id.
 //
@@ -24,7 +24,7 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
 interface Payload {
-  kind: 'homework' | 'target' | 'announcement' | 'join_request';
+  kind: 'homework' | 'target' | 'announcement' | 'join_request' | 'note';
   class_id: string;
   student_ids?: string[] | null;
   student_id?: string;
@@ -42,6 +42,8 @@ function buildNotificationText(payload: Payload, className: string, studentName?
       return { heading: '📢 New announcement', content: `${className}: ${payload.message ?? ''}` };
     case 'join_request':
       return { heading: '🙋 New join request', content: `${studentName ?? 'A student'} wants to join ${className}` };
+    case 'note':
+      return { heading: '✉️ Message from your teacher', content: `${className}: ${payload.message ?? ''}` };
   }
 }
 

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useMemo } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
-import { getClassSRSAll, countDueClassWords, getClassStarredWordIds, addClassStarredWord, removeClassStarredWord } from '@/lib/class-srs';
+import { getClassSRSAll, countDueClassWords, getClassStarredWordIds, addClassStarredWord, removeClassStarredWord, getClassHardWordIds, removeClassHardWord } from '@/lib/class-srs';
 import { classGradientColors } from '@/lib/class-gradient';
 import { buildAiImportPrompt, parseAiImportOutput } from '@/lib/ai-import';
 
@@ -213,6 +213,25 @@ export default function ClassWordsPage() {
       setStarredCount(starIds.size);
     })();
   }, [user, id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Student's own class Hard list, with a way to take a word off it once it's
+  // no longer hard (it then also leaves the teacher's class Hard words page).
+  const [hardList, setHardList] = useState<string[] | null>(null);
+  const openHardWords = async () => {
+    if (!user) return;
+    const ids = await getClassHardWordIds(user.id, id);
+    setHardList([...ids].sort((a, b) => a.localeCompare(b)));
+  };
+  const removeHard = async (word: string) => {
+    if (!user) return;
+    try {
+      await removeClassHardWord(user.id, id, word);
+      setHardList(prev => (prev ?? []).filter(w => w !== word));
+      setHardCount(c => Math.max(0, c - 1));
+    } catch (e) {
+      console.error('[removeClassHardWord]', e);
+    }
+  };
 
   const toggleStar = async (word: string) => {
     if (!user) return;
@@ -646,19 +665,48 @@ export default function ClassWordsPage() {
                   <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">{t.classesPage.myStatsSectionHeader}</p>
                   <div className="grid grid-cols-3 gap-2">
                     {[
-                      { value: `${learnedCount}/${words.length}`, label: t.classesPage.learnedStat, color: 'var(--primary)' },
-                      { value: hardCount,    label: t.classesPage.hardStat,    color: '#ef4444' },
-                      { value: starredCount, label: t.classesPage.starredStat, color: '#f59e0b' },
-                    ].map(({ value, label, color }) => (
-                      <div key={label} className="card text-center py-3 space-y-0.5">
+                      { value: `${learnedCount}/${words.length}`, label: t.classesPage.learnedStat, color: 'var(--primary)', onClick: undefined },
+                      { value: hardCount,    label: t.classesPage.hardStat,    color: '#ef4444', onClick: openHardWords },
+                      { value: starredCount, label: t.classesPage.starredStat, color: '#f59e0b', onClick: undefined },
+                    ].map(({ value, label, color, onClick }) => (
+                      <button key={label} type="button" onClick={onClick} disabled={!onClick} className="card text-center py-3 space-y-0.5 disabled:cursor-default">
                         <p className="text-lg font-black" style={{ color }}>{value}</p>
                         <p className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-wide">{label}</p>
-                      </div>
+                      </button>
                     ))}
                   </div>
                   <button onClick={() => router.push(`/classes/${id}/progress`)} className="w-full flex items-center justify-between px-4 py-3 rounded-2xl bg-[var(--surface-2)] text-sm font-semibold text-[var(--text)] active:scale-95 transition-transform">
                     <span>{t.classesPage.myProgress}</span><span className="text-[var(--text-muted)] text-xs">→</span>
                   </button>
+                  {hardList && (
+                    <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-4 bg-black/50" onClick={() => setHardList(null)}>
+                      <div className="w-full max-w-md max-h-[75vh] overflow-y-auto rounded-2xl p-5 space-y-3"
+                        style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+                        onClick={e => e.stopPropagation()}>
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <p className="font-bold text-[var(--text)]">{t.classesPage.myHardWordsTitle}</p>
+                            <p className="text-xs text-[var(--text-muted)] mt-0.5">{t.classesPage.myHardWordsSub}</p>
+                          </div>
+                          <button onClick={() => setHardList(null)} className="text-sm text-[var(--text-muted)] hover:text-[var(--text)]" aria-label={t.classesPage.close}>✕</button>
+                        </div>
+                        {hardList.length === 0 ? (
+                          <p className="text-sm text-[var(--text-muted)] text-center py-6">{t.classInsights.noHard}</p>
+                        ) : (
+                          <ul className="space-y-1.5">
+                            {hardList.map(w => (
+                              <li key={w} className="flex items-center gap-2 pl-3 rounded-xl" style={{ background: 'var(--surface-2)' }}>
+                                <span className="flex-1 text-sm text-[var(--text)]">{w}</span>
+                                <button onClick={() => removeHard(w)} className="text-xs font-semibold px-3 py-2" style={{ color: 'var(--danger)' }}>
+                                  {t.classesPage.removeHardWord}
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </>
               )}
             </div>

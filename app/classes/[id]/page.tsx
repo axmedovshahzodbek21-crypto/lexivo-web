@@ -11,6 +11,7 @@ import { classifyReview, REVIEW_LABEL_META, REVIEW_WINDOW_DAYS, type ReviewEntry
 import { localDateStr, addDaysToDateStr, displayXP } from '@/lib/storage';
 import { isHomeworkDone, fetchCollectionByName } from './homework/_shared';
 import { classGradientColors } from '@/lib/class-gradient';
+import ClassInsightsBanner from '@/components/insights/ClassInsightsBanner';
 
 interface CollectionMeta {
   collection_name: string;
@@ -2546,6 +2547,11 @@ export default function ClassDashboardPage() {
             </div>
           ))}
         </div>
+      )}
+
+      {/* Smart insights — students tab only */}
+      {!loading && tab === 'students' && (
+        <ClassInsightsBanner classId={id} />
       )}
 
       {/* Class stats bar — students tab only */}
