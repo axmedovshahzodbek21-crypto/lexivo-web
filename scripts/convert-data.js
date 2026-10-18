@@ -75,20 +75,49 @@ function extractField(block, fieldName) {
     .trim();
 }
 
+/**
+ * Extract a named list-of-strings field, e.g. `extraExamples: ['a', 'b'],`
+ */
+function extractArrayField(block, fieldName) {
+  const re = new RegExp(fieldName + '\\s*:\\s*\\[([\\s\\S]*?)\\]');
+  const m = re.exec(block);
+  if (!m) return [];
+  const itemRe = /'((?:[^'\\]|\\[\s\S])*)'|"((?:[^"\\]|\\[\s\S])*)"/g;
+  const items = [];
+  let im;
+  while ((im = itemRe.exec(m[1])) !== null) {
+    const val = im[1] !== undefined ? im[1] : im[2];
+    items.push(
+      val
+        .replace(/\\n/g, ' ')
+        .replace(/\\'/g, "'")
+        .replace(/\\"/g, '"')
+        .replace(/\s+/g, ' ')
+        .trim()
+    );
+  }
+  return items;
+}
+
 function parseWordItem(block) {
   return {
-    word:                extractField(block, 'word'),
-    partOfSpeech:        extractField(block, 'partOfSpeech'),
-    pronunciation:       extractField(block, 'pronunciation'),
-    translation:         extractField(block, 'translation'),
-    definition:          extractField(block, 'definition'),
-    example1:            extractField(block, 'example1'),
-    example1Situation:   extractField(block, 'example1Situation'),
-    example2:            extractField(block, 'example2'),
-    example2Situation:   extractField(block, 'example2Situation'),
-    example3:            extractField(block, 'example3'),
-    example3Translation: extractField(block, 'example3Translation'),
-    example3Situation:   extractField(block, 'example3Situation'),
+    word:                     extractField(block, 'word'),
+    partOfSpeech:             extractField(block, 'partOfSpeech'),
+    pronunciation:            extractField(block, 'pronunciation'),
+    translation:              extractField(block, 'translation'),
+    definition:               extractField(block, 'definition'),
+    definitionUz:             extractField(block, 'definitionUz'),
+    example1:                 extractField(block, 'example1'),
+    example1Situation:        extractField(block, 'example1Situation'),
+    example1Translation:      extractField(block, 'example1Translation'),
+    example2:                 extractField(block, 'example2'),
+    example2Situation:        extractField(block, 'example2Situation'),
+    example2Translation:      extractField(block, 'example2Translation'),
+    example3:                 extractField(block, 'example3'),
+    example3Situation:        extractField(block, 'example3Situation'),
+    example3Translation:      extractField(block, 'example3Translation'),
+    extraExamples:            extractArrayField(block, 'extraExamples'),
+    extraExampleTranslations: extractArrayField(block, 'extraExampleTranslations'),
   };
 }
 
