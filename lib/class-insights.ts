@@ -170,6 +170,91 @@ export function trendArrow(trend: StudentInsight['trend']): string {
   return trend === 'rising' ? '↑' : trend === 'falling' ? '↓' : trend === 'steady' ? '→' : '';
 }
 
+// ── Triage ──────────────────────────────────────────────────────────────────
+
+// needs = skipper or level 1–3; watch = level 4, or any level that's
+// falling; fine = level 5–6 not falling, and students with nothing due.
+export type Group = 'needs' | 'watch' | 'fine';
+const GROUP_RANK: Record<Group, number> = { needs: 0, watch: 1, fine: 2 };
+
+export function groupOf(s: Pick<StudentInsight, 'kind' | 'level' | 'trend'>): Group {
+  if (s.kind === 'skipper' || (s.level !== null && s.level <= 3)) return 'needs';
+  if (s.kind === 'level' && (s.level === 4 || s.trend === 'falling')) return 'watch';
+  return 'fine';
+}
+
+export type PrevRow = Pick<StudentInsight, 'student_id' | 'kind' | 'level' | 'trend'>;
+export type Change = 'worse' | 'better' | 'back' | null;
+
+// Compared with the previous saved day: moved to a worse/better group, or
+// stopped skipping. Null when nothing changed or there's no previous day.
+export function changeOf(s: StudentInsight, prev: PrevRow | undefined): Change {
+  if (!prev) return null;
+  if (prev.kind === 'skipper' && s.kind !== 'skipper') return 'back';
+  const d = GROUP_RANK[groupOf(s)] - GROUP_RANK[groupOf(prev)];
+  return d < 0 ? 'worse' : d > 0 ? 'better' : null;
+}
+
+// The saved day before `date` — for "what changed since yesterday".
+export async function loadPrevRows(classId: string, date: string): Promise<Record<string, PrevRow>> {
+  const { data: cls } = await supabase
+    .from('class_insight_class_snapshots')
+    .select('snapshot_date')
+    .eq('class_id', classId)
+    .lt('snapshot_date', date)
+    .order('snapshot_date', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (!cls) return {};
+  const { data } = await supabase
+    .from('class_insight_snapshots')
+    .select('student_id, kind, level, trend')
+    .eq('class_id', classId)
+    .eq('snapshot_date', cls.snapshot_date);
+  return Object.fromEntries(((data as PrevRow[]) ?? []).map(r => [r.student_id, r]));
+}
+
+export type MessageKind = 'reminder' | 'checkin' | 'praise' | 'message';
+
+export function suggestedAction(s: StudentInsight): MessageKind {
+  const g = groupOf(s);
+  if (g === 'fine') return 'praise';
+  if (s.kind === 'skipper') return 'checkin';
+  if (g === 'needs' && (s.tasks?.this_week.learn ?? []).some(t => t.status === 'open')) return 'reminder';
+  return 'message';
+}
+
+// ── Notes the teacher sent (closing the loop) ───────────────────────────────
+
+export interface SentNote { student_id: string; created_at: string; read_at: string | null; }
+
+// Days are Asia/Tashkent (UTC+5, no DST), same as the nightly job.
+export const tashkentDate = (ts: string | number | Date = Date.now()) =>
+  new Date(new Date(ts).getTime() + 5 * 3600_000).toISOString().slice(0, 10);
+
+// Latest note per student over the last 8 days.
+export async function loadLatestNotes(classId: string): Promise<Record<string, SentNote>> {
+  const since = new Date(Date.now() - 8 * 86400_000).toISOString();
+  const { data } = await supabase
+    .from('class_notes')
+    .select('student_id, created_at, read_at')
+    .eq('class_id', classId)
+    .gte('created_at', since)
+    .order('created_at', { ascending: false });
+  const map: Record<string, SentNote> = {};
+  for (const n of (data as SentNote[]) ?? []) if (!map[n.student_id]) map[n.student_id] = n;
+  return map;
+}
+
+// Did the student do their due work on the days after the note? Read from
+// the snapshot's days (7 days ending yesterday). Null = no due day since.
+export function noteOutcome(s: StudentInsight, note: SentNote): 'did' | 'not' | null {
+  const sentOn = tashkentDate(note.created_at);
+  const due = (s.days ?? []).filter(d => !d.before_join && d.date > sentOn && ((d.learn_due ?? 0) > 0 || d.review_due));
+  if (due.length === 0) return null;
+  return due.some(d => !d.missed) ? 'did' : 'not';
+}
+
 // ── Dates ───────────────────────────────────────────────────────────────────
 
 const WEEKDAYS: Record<Lang, string[]> = {

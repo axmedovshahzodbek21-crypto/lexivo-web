@@ -16,7 +16,9 @@ const STATUS_ICON: Record<string, string> = { done: '✅', late: '⏰', open: '�
 // Ready-made text the teacher can send as is, edit, or replace with their
 // own. Sends through class_notes — the same teacher notes the dashboard's
 // Notes button writes, which students see on their Classes page.
-function MessageComposer({ draft, classId, studentId }: { draft: string; classId: string; studentId: string }) {
+export function MessageComposer({ draft, classId, studentId, onSent }: {
+  draft: string; classId: string; studentId: string; onSent?: () => void;
+}) {
   const { user } = useAuth();
   const t = useTranslation().classInsights;
   const [text, setText] = useState(draft);
@@ -29,6 +31,7 @@ function MessageComposer({ draft, classId, studentId }: { draft: string; classId
       class_id: classId, student_id: studentId, teacher_id: user.id, message: text.trim(),
     });
     setState(error ? 'failed' : 'sent');
+    if (!error) onSent?.();
   };
 
   if (state === 'sent') {

@@ -1,20 +1,178 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/lib/auth-context';
 import { useClassInsights } from '@/components/insights/useClassInsights';
 import InsightText from '@/components/insights/InsightText';
+import { MessageComposer } from '@/components/insights/InsightPopup';
+import WeekDots from '@/components/insights/WeekDots';
+import LessonCard from '@/components/insights/LessonCard';
 import {
-  type StudentInsight, dotColor, fillPlain, needsAttention, renderParagraph, templateText, trendArrow,
+  type Change, type Lang, type MessageKind, type PrevRow, type SentNote, type StudentInsight,
+  changeOf, dotColor, groupOf, loadLatestNotes, loadPrevRows, noteOutcome, renderParagraph,
+  suggestedAction, tashkentDate, weekdayName,
 } from '@/lib/class-insights';
 
-type Filter = 'all' | 'attention' | 'well';
+type T = ReturnType<typeof useClassInsights>['tt']['classInsights'];
+
+// "Skip for today" lives in this browser only; sending a note is what
+// marks a card done everywhere (read back from class_notes).
+const skipKey = (classId: string, date: string) => `lexivo_insights_skip_${classId}_${date}`;
+function readSkips(key: string): string[] {
+  try { return JSON.parse(localStorage.getItem(key) ?? '[]'); } catch { return []; }
+}
+function writeSkips(key: string, ids: string[]) {
+  try { localStorage.setItem(key, JSON.stringify(ids)); } catch { /* private mode */ }
+}
+
+const actionTitle = (t: T, k: MessageKind) =>
+  ({ reminder: t.actionReminder, checkin: t.actionCheckin, praise: t.actionPraise, message: t.actionMessage })[k];
+const actionDraft = (t: T, k: MessageKind, name: string) =>
+  ({ reminder: t.draftReminder, checkin: t.draftCheckin, praise: t.draftPraise, message: t.draftMessage })[k].replace('{name}', name);
+
+function ChangeBadge({ change, t }: { change: Change; t: T }) {
+  if (!change) return null;
+  const [label, color] = change === 'worse' ? [t.changeWorse, 'var(--danger)']
+    : change === 'better' ? [t.changeBetter, 'var(--success)'] : [t.changeBack, 'var(--success)'];
+  return (
+    <span className="text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-md shrink-0"
+      style={{ color, border: `1px solid ${color}` }}>
+      {label}
+    </span>
+  );
+}
+
+function LoopLine({ s, note, lang, t }: { s: StudentInsight; note: SentNote | undefined; lang: Lang; t: T }) {
+  if (!note) return null;
+  const outcome = noteOutcome(s, note);
+  const parts = [
+    t.loopSent.replace('{day}', weekdayName(tashkentDate(note.created_at), lang)),
+    note.read_at ? `${t.loopRead} ✓` : t.loopUnread,
+    outcome === 'did' ? t.loopDid : outcome === 'not' ? t.loopNot : null,
+  ].filter(Boolean);
+  return <p className="text-xs text-[var(--text-muted)]">📨 {parts.join(' · ')}</p>;
+}
+
+function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
+  return (
+    <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-4 bg-black/50" onClick={onClose}>
+      <div
+        className="w-full max-w-md max-h-[80vh] overflow-y-auto rounded-2xl p-5 space-y-4"
+        style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="flex items-start justify-between gap-3">
+          <p className="font-bold text-[var(--text)]">{title}</p>
+          <button onClick={onClose} className="text-sm text-[var(--text-muted)] hover:text-[var(--text)]">✕</button>
+        </div>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// One personal note per student, each with its own ready text, sent together.
+function BatchComposer({ students, classId, nameOf, t, onSent }: {
+  students: StudentInsight[]; classId: string; nameOf: (id: string) => string; t: T; onSent: (ids: string[]) => void;
+}) {
+  const { user } = useAuth();
+  const [texts, setTexts] = useState<Record<string, string>>(() =>
+    Object.fromEntries(students.map(s => [s.student_id, actionDraft(t, suggestedAction(s), nameOf(s.student_id))])));
+  const [picked, setPicked] = useState<Set<string>>(() => new Set(students.map(s => s.student_id)));
+  const [editing, setEditing] = useState<string | null>(null);
+  const [state, setState] = useState<'idle' | 'sending' | 'sent' | 'failed'>('idle');
+  const [sentCount, setSentCount] = useState(0);
+  const ids = students.map(s => s.student_id).filter(id => picked.has(id) && texts[id]?.trim());
+
+  const send = async () => {
+    if (!user || ids.length === 0) return;
+    setState('sending');
+    const { error } = await supabase.from('class_notes').insert(
+      ids.map(id => ({ class_id: classId, student_id: id, teacher_id: user.id, message: texts[id].trim() })));
+    if (error) { setState('failed'); return; }
+    setSentCount(ids.length);
+    setState('sent');
+    onSent(ids);
+  };
+
+  if (state === 'sent') {
+    return <p className="text-sm font-semibold" style={{ color: 'var(--success)' }}>{t.batchSent.replace('{n}', String(sentCount))}</p>;
+  }
+
+  return (
+    <div className="space-y-3">
+      <ul className="space-y-3">
+        {students.map(s => {
+          const id = s.student_id;
+          return (
+            <li key={id} className="space-y-1.5">
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={picked.has(id)}
+                  onChange={e => setPicked(p => { const n = new Set(p); if (e.target.checked) n.add(id); else n.delete(id); return n; })}
+                  className="accent-[var(--primary)]"
+                />
+                <span className="flex-1 text-sm font-bold text-[var(--text)] truncate">{nameOf(id)}</span>
+                <button type="button" onClick={() => setEditing(editing === id ? null : id)} className="text-xs font-semibold text-[var(--primary)]">
+                  {t.edit}
+                </button>
+              </div>
+              {editing === id ? (
+                <textarea
+                  value={texts[id]}
+                  onChange={e => setTexts(x => ({ ...x, [id]: e.target.value }))}
+                  rows={3}
+                  className="w-full text-sm rounded-xl p-3 resize-y text-[var(--text)] outline-none focus:ring-2 focus:ring-[var(--primary)]"
+                  style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}
+                />
+              ) : (
+                <p className={`text-xs text-[var(--text-muted)] line-clamp-2 pl-6 ${picked.has(id) ? '' : 'opacity-50'}`}>{texts[id]}</p>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={send}
+          disabled={state === 'sending' || ids.length === 0}
+          className="text-sm font-bold text-white px-4 py-2 rounded-xl disabled:opacity-50"
+          style={{ background: 'var(--primary)' }}
+        >
+          {state === 'sending' ? t.sending : t.batchSend.replace('{n}', String(ids.length))}
+        </button>
+      </div>
+      {state === 'failed' && <p className="text-xs" style={{ color: 'var(--danger)' }}>{t.sendFailed}</p>}
+    </div>
+  );
+}
 
 export default function ClassInsightsListPage() {
   const { id } = useParams<{ id: string }>();
   const { loading, notTeacher, className, data, sorted, lang, nameOf, tt, query } = useClassInsights(id);
   const t = tt.classInsights;
-  const [filter, setFilter] = useState<Filter>('all');
+
+  const [prev, setPrev] = useState<Record<string, PrevRow>>({});
+  const [notes, setNotes] = useState<Record<string, SentNote>>({});
+  const [skips, setSkips] = useState<string[]>([]);
+  const [compose, setCompose] = useState<StudentInsight | null>(null);
+  const [batch, setBatch] = useState(false);
+  const [open, setOpen] = useState({ handled: false, watch: true, fine: false });
+
+  const snapshotDate = data?.classRow.snapshot_date;
+  useEffect(() => {
+    if (!snapshotDate) return;
+    let cancelled = false;
+    setSkips(readSkips(skipKey(id, snapshotDate)));
+    Promise.all([loadPrevRows(id, snapshotDate), loadLatestNotes(id)]).then(([p, n]) => {
+      if (!cancelled) { setPrev(p); setNotes(n); }
+    });
+    return () => { cancelled = true; };
+  }, [id, snapshotDate]);
 
   if (loading) {
     return <div className="flex justify-center py-16"><div className="text-4xl animate-bounce">✨</div></div>;
@@ -42,86 +200,171 @@ export default function ClassInsightsListPage() {
     );
   }
 
-  const { classRow, templates } = data;
-  const tplText = (tid: number | null) => templateText(tid !== null ? templates[tid] : undefined, lang);
-  const names = (pred: (r: StudentInsight) => boolean) => sorted.filter(pred).map(r => nameOf(r.student_id)).join(', ');
+  const today = tashkentDate();
+  const isHandled = (s: StudentInsight) =>
+    skips.includes(s.student_id) || (notes[s.student_id] && tashkentDate(notes[s.student_id].created_at) === today);
+  const change = (s: StudentInsight) => changeOf(s, prev[s.student_id]);
 
-  const summary = tplText(classRow.summary_template_id);
-  const classLines = ([
-    { tid: classRow.skipper_template_id, vars: { count: sorted.filter(r => r.kind === 'skipper').length, names: names(r => r.kind === 'skipper') } },
-    { tid: classRow.behind_template_id, vars: { count: sorted.filter(r => (r.level ?? 9) <= 3).length, names: names(r => (r.level ?? 9) <= 3) } },
-    { tid: classRow.hard_template_id, vars: { count: classRow.hard_words.length, words: classRow.hard_words.map(h => h.word).join(', ') } },
-    { tid: classRow.well_template_id, vars: { count: sorted.filter(r => (r.level ?? 0) >= 5).length, names: names(r => (r.level ?? 0) >= 5) } },
-  ] as { tid: number | null; vars: Record<string, string | number> }[])
-    .map(l => { const text = tplText(l.tid); return text ? fillPlain(text, l.vars) : null; })
-    .filter((v): v is string => v !== null);
+  // Within "needs you": what changed since yesterday first, then the usual urgency order.
+  const needs = sorted.filter(s => groupOf(s) === 'needs');
+  const needsOpen = needs.filter(s => !isHandled(s)).sort((a, b) => Number(change(b) === 'worse') - Number(change(a) === 'worse'));
+  const needsDone = needs.filter(isHandled);
+  const watch = sorted.filter(s => groupOf(s) === 'watch');
+  const fine = sorted.filter(s => groupOf(s) === 'fine');
 
-  const visible = sorted.filter(r =>
-    filter === 'all' ? true : filter === 'attention' ? needsAttention(r) : (r.level ?? 0) >= 5);
+  const markSent = (ids: string[]) => {
+    const now = new Date().toISOString();
+    setNotes(n => ({ ...n, ...Object.fromEntries(ids.map(sid => [sid, { student_id: sid, created_at: now, read_at: null }])) }));
+  };
+  const skip = (sid: string) => {
+    const next = [...skips, sid];
+    setSkips(next);
+    writeSkips(skipKey(id, data.classRow.snapshot_date), next);
+  };
 
-  const FILTERS: { key: Filter; label: string }[] = [
-    { key: 'all', label: t.filterAll },
-    { key: 'attention', label: t.filterAttention },
-    { key: 'well', label: t.filterWell },
-  ];
+  const headline = (s: StudentInsight) => renderParagraph(s, data.templates, nameOf(s.student_id), lang)[0];
+  const detailHref = (s: StudentInsight) => `/classes/${id}/insights/${s.student_id}${query}`;
+
+  const nameLine = (s: StudentInsight) => (
+    <div className="flex items-center gap-2 min-w-0">
+      <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: dotColor(s) }} />
+      <p className="font-bold text-[var(--text)] truncate">{nameOf(s.student_id)}</p>
+      <ChangeBadge change={change(s)} t={t} />
+      <span className="flex-1" />
+      <WeekDots days={s.days} lang={lang} />
+    </div>
+  );
+
+  const needsCard = (s: StudentInsight) => {
+    const h = headline(s);
+    const action = suggestedAction(s);
+    return (
+      <li key={s.student_id} className="card space-y-2" style={{ padding: 14 }}>
+        {nameLine(s)}
+        {h && <p className="text-sm text-[var(--text)] leading-snug"><InsightText segments={h} /></p>}
+        <LoopLine s={s} note={notes[s.student_id]} lang={lang} t={t} />
+        <div className="flex items-center gap-3 pt-1">
+          <button
+            type="button"
+            onClick={() => setCompose(s)}
+            className="text-sm font-bold text-white px-4 py-2 rounded-xl"
+            style={{ background: 'var(--primary)' }}
+          >
+            {actionTitle(t, action)}
+          </button>
+          <button type="button" onClick={() => skip(s.student_id)} className="text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text)]">
+            {t.skip}
+          </button>
+          <span className="flex-1" />
+          <Link href={detailHref(s)} className="text-xs font-semibold text-[var(--primary)]">{t.details} ›</Link>
+        </div>
+      </li>
+    );
+  };
+
+  const compactRow = (s: StudentInsight, withAction: boolean) => {
+    const h = headline(s);
+    const sentToday = notes[s.student_id] && tashkentDate(notes[s.student_id].created_at) === today;
+    return (
+      <li key={s.student_id} className="px-4 py-3 space-y-1">
+        <Link href={detailHref(s)} className="block space-y-1 hover:opacity-80">
+          {nameLine(s)}
+          {h && <p className="text-sm text-[var(--text-muted)] truncate"><InsightText segments={h} /></p>}
+        </Link>
+        <LoopLine s={s} note={notes[s.student_id]} lang={lang} t={t} />
+        {withAction && !sentToday && (
+          <button type="button" onClick={() => setCompose(s)} className="text-xs font-bold text-[var(--primary)]">
+            {actionTitle(t, suggestedAction(s))} →
+          </button>
+        )}
+      </li>
+    );
+  };
+
+  const section = (title: string, count: number, key: keyof typeof open, body: React.ReactNode) => (
+    <section className="space-y-2">
+      <button
+        type="button"
+        onClick={() => setOpen(o => ({ ...o, [key]: !o[key] }))}
+        className="w-full flex items-center justify-between text-left"
+      >
+        <h2 className="text-xs font-black uppercase tracking-widest text-[var(--text-muted)]">{title} · {count}</h2>
+        <span className="text-xs font-semibold text-[var(--primary)]">{open[key] ? t.hide : t.show}</span>
+      </button>
+      {open[key] && body}
+    </section>
+  );
+
+  const triage = needs.length === 0 ? t.triageNone
+    : needsOpen.length === 0 ? t.triageAllDone
+    : t.triageNeeds.replace('{n}', String(needsOpen.length));
 
   return (
-    <div className="max-w-3xl mx-auto p-4 space-y-4 animate-fade-in">
+    <div className="max-w-3xl mx-auto p-4 space-y-5 animate-fade-in">
       {header}
 
-      {(summary || classLines.length > 0) && (
-        <div className="card space-y-2" style={{ padding: 16 }}>
-          {summary && (
-            <p className="text-base font-bold text-[var(--text)] leading-snug">
-              {fillPlain(summary, { count: classRow.attention_count, total_students: classRow.student_count })}
-            </p>
-          )}
-          {classLines.map((line, i) => <p key={i} className="text-sm text-[var(--text)] leading-snug">{line}</p>)}
-        </div>
-      )}
-
-      <div className="flex gap-2 overflow-x-auto">
-        {FILTERS.map(f => (
+      <div className="card flex items-center justify-between gap-3 flex-wrap" style={{ padding: 16 }}>
+        <p className="text-lg font-black text-[var(--text)] leading-snug">{triage}</p>
+        {needsOpen.length >= 2 && (
           <button
-            key={f.key}
-            onClick={() => setFilter(f.key)}
-            className={`shrink-0 text-xs px-3 py-1.5 rounded-full font-semibold transition-all ${filter === f.key ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--text)]'}`}
+            type="button"
+            onClick={() => setBatch(true)}
+            className="text-sm font-bold px-4 py-2 rounded-xl"
+            style={{ background: 'var(--primary-bg)', color: 'var(--primary)', border: '1px solid var(--primary)' }}
           >
-            {f.label}
+            {t.messageAll.replace('{n}', String(needsOpen.length))}
           </button>
-        ))}
+        )}
       </div>
 
-      {visible.length === 0 ? (
-        <p className="text-sm text-[var(--text-muted)] text-center py-8">{t.noStudents}</p>
-      ) : (
-        <ul className="card divide-y divide-[var(--border)]" style={{ padding: 0 }}>
-          {visible.map(r => {
-            const headline = renderParagraph(r, templates, nameOf(r.student_id), lang)[0];
-            return (
-              <li key={r.student_id}>
-                <Link
-                  href={`/classes/${id}/insights/${r.student_id}${query}`}
-                  className="flex items-center gap-3 px-4 py-3 hover:bg-[var(--surface-2)] transition-colors"
-                >
-                  <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: dotColor(r) }} />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-baseline gap-2">
-                      <p className="font-bold text-[var(--text)] truncate">{nameOf(r.student_id)}</p>
-                      <p className="text-xs text-[var(--text-muted)] shrink-0">
-                        {r.score !== null ? `${r.score}%` : '—'} {trendArrow(r.trend)}
-                      </p>
-                    </div>
-                    {headline && (
-                      <p className="text-sm text-[var(--text-muted)] truncate"><InsightText segments={headline} /></p>
-                    )}
-                  </div>
-                  <span className="text-[var(--text-muted)] shrink-0">›</span>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
+      {needs.length > 0 && (
+        <section className="space-y-2">
+          <h2 className="text-xs font-black uppercase tracking-widest" style={{ color: 'var(--danger)' }}>{t.groupNeeds} · {needs.length}</h2>
+          {needsOpen.length > 0 && <ul className="space-y-3">{needsOpen.map(needsCard)}</ul>}
+          {needsDone.length > 0 && (
+            <div>
+              <button type="button" onClick={() => setOpen(o => ({ ...o, handled: !o.handled }))} className="text-xs font-semibold text-[var(--text-muted)]">
+                {open.handled ? '▾' : '▸'} {t.handledToday.replace('{n}', String(needsDone.length))}
+              </button>
+              {open.handled && (
+                <ul className="card divide-y divide-[var(--border)] mt-2" style={{ padding: 0 }}>
+                  {needsDone.map(s => compactRow(s, false))}
+                </ul>
+              )}
+            </div>
+          )}
+        </section>
+      )}
+
+      <LessonCard classId={id} words={data.classRow.hard_words} />
+
+      {watch.length > 0 && section(t.groupWatch, watch.length, 'watch',
+        <ul className="card divide-y divide-[var(--border)]" style={{ padding: 0 }}>{watch.map(s => compactRow(s, true))}</ul>)}
+
+      {fine.length > 0 && section(t.groupFine, fine.length, 'fine',
+        <ul className="card divide-y divide-[var(--border)]" style={{ padding: 0 }}>{fine.map(s => compactRow(s, s.kind === 'level'))}</ul>)}
+
+      {compose && (
+        <Modal title={`${actionTitle(t, suggestedAction(compose))} — ${nameOf(compose.student_id)}`} onClose={() => setCompose(null)}>
+          <MessageComposer
+            draft={actionDraft(t, suggestedAction(compose), nameOf(compose.student_id))}
+            classId={id}
+            studentId={compose.student_id}
+            onSent={() => { markSent([compose.student_id]); setTimeout(() => setCompose(null), 900); }}
+          />
+        </Modal>
+      )}
+
+      {batch && (
+        <Modal title={t.batchTitle} onClose={() => setBatch(false)}>
+          <BatchComposer
+            students={needsOpen}
+            classId={id}
+            nameOf={nameOf}
+            t={t}
+            onSent={ids => { markSent(ids); setTimeout(() => setBatch(false), 900); }}
+          />
+        </Modal>
       )}
     </div>
   );
