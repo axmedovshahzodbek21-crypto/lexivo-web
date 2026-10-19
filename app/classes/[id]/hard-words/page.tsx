@@ -110,6 +110,8 @@ export default function ClassHardWordsPage() {
   const key = `${user?.id ?? ''}|${id}`;
   const [loaded, setLoaded] = useState<Loaded | null>(() => lastLoaded.get(key) ?? null);
   const [teaching, setTeaching] = useState(teachParam);
+  // Taught words live behind the Archive button at the top, not under the list.
+  const [showArchive, setShowArchive] = useState(false);
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
@@ -234,19 +236,30 @@ export default function ClassHardWordsPage() {
 
   return (
     <div className="max-w-3xl mx-auto p-4 space-y-5 animate-fade-in">
-      <div>
-        <h1 className="text-2xl font-black text-[var(--text)]">😓 {t.hardPageTitle}</h1>
-        <p className="text-sm text-[var(--text-muted)] truncate">{className}</p>
-        <p className="text-sm text-[var(--text-muted)] mt-2">{t.hardPageSub}</p>
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h1 className="text-2xl font-black text-[var(--text)]">😓 {showArchive ? t.archiveView : t.hardPageTitle}</h1>
+          <p className="text-sm text-[var(--text-muted)] truncate">{className}</p>
+        </div>
+        {(archivedWords.length > 0 || showArchive) && (
+          <button
+            type="button"
+            onClick={() => setShowArchive(s => !s)}
+            className="text-sm font-bold px-4 py-2 rounded-xl shrink-0"
+            style={{ background: 'var(--primary-bg)', color: 'var(--primary)', border: '1px solid var(--primary)' }}
+          >
+            {showArchive ? `← ${t.toTeach} · ${toTeach.length}` : `📦 ${t.archiveView} · ${archivedWords.length}`}
+          </button>
+        )}
       </div>
+      <p className="text-sm text-[var(--text-muted)]">{showArchive ? t.watchingHint : t.hardPageSub}</p>
 
       {failed && <p className="text-sm" style={{ color: 'var(--danger)' }}>{t.archiveFailed}</p>}
 
-      {rows.length === 0 && archivedWords.length === 0 ? (
-        <div className="card"><p className="text-sm text-[var(--text-muted)]">{t.hardPageEmpty}</p></div>
-      ) : (
-        <>
-          <section className="space-y-2">
+      {!showArchive && toTeach.length === 0 ? (
+        <div className="card"><p className="text-sm text-[var(--text-muted)]">{archivedWords.length > 0 ? t.teachDone : t.hardPageEmpty}</p></div>
+      ) : !showArchive ? (
+        <section className="space-y-2">
             <div className="flex items-center justify-between gap-3">
               <h2 className="text-xs font-black uppercase tracking-widest text-[var(--text-muted)]">{t.toTeach} · {toTeach.length}</h2>
               {toTeach.length > 0 && (
@@ -285,11 +298,14 @@ export default function ClassHardWordsPage() {
               </ul>
             )}
           </section>
-
+      ) : archivedWords.length === 0 ? (
+        <div className="card"><p className="text-sm text-[var(--text-muted)]">{t.archiveEmpty}</p></div>
+      ) : (
+        <>
           {watching.length > 0 && (
             <section className="space-y-2">
               <h2 className="text-xs font-black uppercase tracking-widest text-[var(--text-muted)]">{t.watching} · {watching.length}</h2>
-              <p className="text-xs text-[var(--text-muted)]">{t.watchingHint} {t.statusLegend}</p>
+              <p className="text-xs text-[var(--text-muted)]">{t.statusLegend}</p>
               <ul className="card divide-y divide-[var(--border)]" style={{ padding: 0 }}>{watching.map(archivedRow)}</ul>
             </section>
           )}
