@@ -93,6 +93,7 @@ export default function ClassHomePage() {
   const memberIdsRef = useRef<string[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [notes, setNotes] = useState<Note[]>([]);
+  const [showAllNotes, setShowAllNotes] = useState(false);
   const [targets, setTargets] = useState<Target[]>([]);
 const [memberCount, setMemberCount] = useState(0);
   const [activeToday, setActiveToday] = useState(0);
@@ -170,16 +171,22 @@ const [memberCount, setMemberCount] = useState(0);
         // page) lands where the note is shown.
         !teacher
           ? supabase.from('class_notes').select('id, message, created_at, read_at')
-              .eq('class_id', id).eq('student_id', user.id).order('created_at', { ascending: false }).limit(5)
+              .eq('class_id', id).eq('student_id', user.id).order('created_at', { ascending: false }).limit(30)
           : Promise.resolve({ data: [] as Note[] }),
       ]);
 
       if (!teacher) {
         const noteRows = (myNotes ?? []) as Note[];
         setNotes(noteRows);
+        // Shown as new this once; read_at is set now so next time they're
+        // only behind the "Notes from teacher" button. The RPC sets read_at
+        // only (a plain student UPDATE was silently refused); the old update
+        // stays as a fallback until migration 20261019000002 is applied.
         const unread = noteRows.filter(n => !n.read_at).map(n => n.id);
         if (unread.length > 0) {
-          void supabase.from('class_notes').update({ read_at: new Date().toISOString() }).in('id', unread);
+          void supabase.rpc('mark_class_notes_read', { p_class_id: id }).then(({ error }) => {
+            if (error) void supabase.from('class_notes').update({ read_at: new Date().toISOString() }).in('id', unread);
+          });
         }
       }
 
@@ -752,27 +759,58 @@ const [memberCount, setMemberCount] = useState(0);
         )}
 
 
-        {/* Notes from the teacher (student only) */}
-        {!isTeacher && notes.length > 0 && (
-          <section>
-            <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--text-muted)] mb-3">{tx.classesPage.notesFromTeacherLabel}</h2>
-            <div className="space-y-2">
-              {notes.map(n => {
-                const isNew = !n.read_at;
-                return (
-                  <div key={n.id} className={`p-3 rounded-xl border flex gap-3 ${isNew ? 'bg-[var(--primary-bg)] border-l-4 border-l-[var(--primary)] border-[var(--border)]' : 'bg-[var(--surface)] border-[var(--border)]'}`}>
-                    <span className="text-base mt-0.5">✉️</span>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm text-[var(--text)] whitespace-pre-wrap">{n.message}</p>
-                      <p className="text-xs text-[var(--text-muted)] mt-0.5">{timeAgo(n.created_at, tx)}</p>
+        {/* Notes from the teacher (student only): only new ones are shown
+            here, once; the rest are behind the button. */}
+        {!isTeacher && notes.length > 0 && (() => {
+          const noteRow = (n: Note) => {
+            const isNew = !n.read_at;
+            return (
+              <div key={n.id} className={`p-3 rounded-xl border flex gap-3 ${isNew ? 'bg-[var(--primary-bg)] border-l-4 border-l-[var(--primary)] border-[var(--border)]' : 'bg-[var(--surface)] border-[var(--border)]'}`}>
+                <span className="text-base mt-0.5">✉️</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-[var(--text)] whitespace-pre-wrap">{n.message}</p>
+                  <p className="text-xs text-[var(--text-muted)] mt-0.5">{timeAgo(n.created_at, tx)}</p>
+                </div>
+                {isNew && <span className="text-[10px] font-bold text-[var(--primary)] self-start pt-0.5">{tx.classesPage.new}</span>}
+              </div>
+            );
+          };
+          const fresh = notes.filter(n => !n.read_at);
+          return (
+            <section className="space-y-2">
+              {fresh.length > 0 && (
+                <>
+                  <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--text-muted)] mb-1">{tx.classesPage.notesFromTeacherLabel}</h2>
+                  {fresh.map(noteRow)}
+                </>
+              )}
+              <button
+                type="button"
+                onClick={() => setShowAllNotes(true)}
+                className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-left hover:bg-[var(--surface-2)] transition-colors"
+              >
+                <span>✉️</span>
+                <span className="flex-1 text-sm font-semibold text-[var(--text)]">{tx.classesPage.notesFromTeacherLabel}</span>
+                <span className="text-xs text-[var(--text-muted)]">{notes.length} ›</span>
+              </button>
+              {showAllNotes && (
+                <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-4 bg-black/50" onClick={() => setShowAllNotes(false)}>
+                  <div
+                    className="w-full max-w-md max-h-[80vh] overflow-y-auto rounded-2xl p-5 space-y-3"
+                    style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+                    onClick={e => e.stopPropagation()}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <p className="font-bold text-[var(--text)]">✉️ {tx.classesPage.notesFromTeacherLabel}</p>
+                      <button onClick={() => setShowAllNotes(false)} className="text-sm text-[var(--text-muted)] hover:text-[var(--text)]" aria-label={tx.classInsights.close}>✕</button>
                     </div>
-                    {isNew && <span className="text-[10px] font-bold text-[var(--primary)] self-start pt-0.5">{tx.classesPage.new}</span>}
+                    {notes.map(noteRow)}
                   </div>
-                );
-              })}
-            </div>
-          </section>
-        )}
+                </div>
+              )}
+            </section>
+          );
+        })()}
 
         {/* Announcements */}
         <section>
