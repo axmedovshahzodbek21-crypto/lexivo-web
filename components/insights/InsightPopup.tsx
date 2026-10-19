@@ -6,7 +6,7 @@ import { useAuth } from '@/lib/auth-context';
 import { useTranslation } from '@/lib/useTranslation';
 import {
   type ChipAction, type Lang, type LearnTask, type ReviewDay, type StudentInsight,
-  fmtDate, homeworkName, weekdayName,
+  fmtDate, homeworkName, studentsLabel, weekdayName,
 } from '@/lib/class-insights';
 
 interface ReviewEvent { word: string; knew: boolean; response_ms: number | null; }
@@ -244,7 +244,7 @@ export default function InsightPopup({ action, student, name, lang, classId, cla
           {own.map(w => (
             <li key={w} className="text-sm px-2.5 py-1 rounded-lg italic"
               style={{ background: shared.has(w) ? 'var(--primary-bg)' : 'var(--surface-2)', border: shared.has(w) ? '1px solid var(--primary)' : '1px solid transparent' }}>
-              {w}{shared.has(w) && classHard[w] ? ` · ${t.studentsCount.replace('{n}', String(classHard[w]))}` : ''}
+              {w}{shared.has(w) && classHard[w] ? ` · ${studentsLabel(t, classHard[w])}` : ''}
             </li>
           ))}
         </ul>

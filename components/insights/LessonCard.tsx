@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useTranslation } from '@/lib/useTranslation';
+import { studentsLabel } from '@/lib/class-insights';
 
 // The class's most common Hard words as something to teach, with a
 // full-screen view to put on the projector — one word at a time.
@@ -29,7 +30,7 @@ export default function LessonCard({ classId, words }: { classId: string; words:
       <ul className="flex flex-wrap gap-1.5">
         {top.map(h => (
           <li key={h.word} className="text-sm italic px-2.5 py-1 rounded-lg" style={{ background: 'var(--primary-bg)' }}>
-            {h.word} <span className="not-italic text-xs text-[var(--text-muted)]">· {t.studentsCount.replace('{n}', String(h.students))}</span>
+            {h.word} <span className="not-italic text-xs text-[var(--text-muted)]">· {studentsLabel(t, h.students)}</span>
           </li>
         ))}
       </ul>

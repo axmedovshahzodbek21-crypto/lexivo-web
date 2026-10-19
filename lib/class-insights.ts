@@ -136,6 +136,9 @@ export async function loadStudentMeta(classId: string): Promise<Record<string, S
   return map;
 }
 
+export const studentsLabel = (t: { studentsCount: string; studentsCountOne: string }, n: number) =>
+  n === 1 ? t.studentsCountOne : t.studentsCount.replace('{n}', String(n));
+
 export function templateText(t: Template | undefined, lang: Lang): string | null {
   if (!t) return null;
   return lang === 'uz' ? t.text_uz : (t.text_en ?? t.text_uz);
