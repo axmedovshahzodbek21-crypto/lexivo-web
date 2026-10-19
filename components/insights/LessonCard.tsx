@@ -1,27 +1,16 @@
 'use client';
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useTranslation } from '@/lib/useTranslation';
 import { studentsLabel } from '@/lib/class-insights';
 
-// The class's most common Hard words as something to teach, with a
-// full-screen view to put on the projector — one word at a time.
-export default function LessonCard({ classId, words }: { classId: string; words: { word: string; students: number }[] }) {
+// The class's most common Hard words as something to teach. "Show to class"
+// opens the Hard words page's big-screen view, where each word can be
+// marked taught. Words already taught (and not hard again) are left out.
+export default function LessonCard({ classId, words, taught }: {
+  classId: string; words: { word: string; students: number }[]; taught: Set<string>;
+}) {
   const t = useTranslation().classInsights;
-  const top = words.slice(0, 5);
-  const [index, setIndex] = useState<number | null>(null);
-
-  useEffect(() => {
-    if (index === null) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setIndex(null);
-      else if (e.key === 'ArrowRight' || e.key === ' ') setIndex(i => (i === null ? i : Math.min(i + 1, top.length - 1)));
-      else if (e.key === 'ArrowLeft') setIndex(i => (i === null ? i : Math.max(i - 1, 0)));
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [index, top.length]);
-
+  const top = words.filter(h => !taught.has(h.word)).slice(0, 5);
   if (top.length === 0) return null;
 
   return (
@@ -35,37 +24,15 @@ export default function LessonCard({ classId, words }: { classId: string; words:
         ))}
       </ul>
       <div className="flex items-center gap-3">
-        <button
-          type="button"
-          onClick={() => setIndex(0)}
+        <Link
+          href={`/classes/${classId}/hard-words?teach=1`}
           className="text-sm font-bold text-white px-4 py-2 rounded-xl"
           style={{ background: 'var(--primary)' }}
         >
-          {t.lessonShow}
-        </button>
+          📺 {t.lessonShow}
+        </Link>
         <Link href={`/classes/${classId}/hard-words`} className="text-sm font-semibold text-[var(--primary)]">{t.hardPageLink}</Link>
       </div>
-
-      {index !== null && (
-        <div
-          className="fixed inset-0 z-[70] flex flex-col items-center justify-center p-6 select-none"
-          style={{ background: 'var(--background)' }}
-          onClick={() => setIndex(index < top.length - 1 ? index + 1 : null)}
-        >
-          <button
-            type="button"
-            onClick={e => { e.stopPropagation(); setIndex(null); }}
-            className="absolute top-4 right-5 text-2xl text-[var(--text-muted)]"
-            aria-label={t.close}
-          >
-            ✕
-          </button>
-          <p className="font-black text-[var(--text)] text-center break-words" style={{ fontSize: 'clamp(3rem, 12vw, 9rem)' }}>
-            {top[index].word}
-          </p>
-          <p className="mt-6 text-lg text-[var(--text-muted)]">{index + 1} / {top.length}</p>
-        </div>
-      )}
     </div>
   );
 }

@@ -14,6 +14,7 @@ import {
   changeOf, dotColor, groupOf, loadLatestNotes, loadPrevRows, noteOutcome, renderParagraph,
   suggestedAction, tashkentDate, weekdayName,
 } from '@/lib/class-insights';
+import { loadArchiveStates } from '@/lib/class-hard-words';
 
 type T = ReturnType<typeof useClassInsights>['tt']['classInsights'];
 
@@ -163,16 +164,24 @@ export default function ClassInsightsListPage() {
   const [batch, setBatch] = useState(false);
   const [open, setOpen] = useState({ handled: false, watch: true, fine: false });
 
+  const [taught, setTaught] = useState<Set<string>>(new Set());
+
   const snapshotDate = data?.classRow.snapshot_date;
   useEffect(() => {
-    if (!snapshotDate) return;
+    if (!data || !snapshotDate) return;
     let cancelled = false;
     setSkips(readSkips(skipKey(id, snapshotDate)));
-    Promise.all([loadPrevRows(id, snapshotDate), loadLatestNotes(id)]).then(([p, n]) => {
-      if (!cancelled) { setPrev(p); setNotes(n); }
+    // Who has each word on their Hard list, for the taught-words check.
+    const hardBy = new Map<string, string[]>();
+    for (const r of data.rows) for (const w of r.hard_words?.own ?? []) hardBy.set(w, [...(hardBy.get(w) ?? []), r.student_id]);
+    Promise.all([loadPrevRows(id, snapshotDate), loadLatestNotes(id), loadArchiveStates(id, hardBy)]).then(([p, n, a]) => {
+      if (cancelled) return;
+      setPrev(p);
+      setNotes(n);
+      setTaught(new Set([...a].filter(([, v]) => v.state !== 'again').map(([w]) => w)));
     });
     return () => { cancelled = true; };
-  }, [id, snapshotDate]);
+  }, [id, data, snapshotDate]);
 
   if (loading) {
     return <div className="flex justify-center py-16"><div className="text-4xl animate-bounce">✨</div></div>;
@@ -336,7 +345,7 @@ export default function ClassInsightsListPage() {
         </section>
       )}
 
-      <LessonCard classId={id} words={data.classRow.hard_words} />
+      <LessonCard classId={id} words={data.classRow.hard_words} taught={taught} />
 
       {watch.length > 0 && section(t.groupWatch, watch.length, 'watch',
         <ul className="card divide-y divide-[var(--border)]" style={{ padding: 0 }}>{watch.map(s => compactRow(s, true))}</ul>)}
