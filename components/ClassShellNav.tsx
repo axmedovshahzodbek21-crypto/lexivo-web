@@ -38,7 +38,6 @@ export default function ClassShellNav({ classId }: { classId: string }) {
     { seg: 'insights',    icon: '✨', label: t.classNav.insights     },
     { seg: 'hard-words',  icon: '😓', label: t.classNav.hardWords    },
     { seg: '__curriculum__', icon: '📋', label: t.classNav.curriculum },
-    { seg: POMODORO_SEG,  icon: '🍅', label: t.nav.pomodoro          },
   ];
 
   const [isTeacher, setIsTeacher] = useState(false);
