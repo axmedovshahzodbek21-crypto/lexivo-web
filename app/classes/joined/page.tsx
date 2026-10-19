@@ -119,8 +119,15 @@ export default function JoinedClassesPage() {
       ]);
 
       for (const t of teachers ?? []) newTeacherProfiles[t.id] = { name: t.name, avatar_url: t.avatar_url };
-      const unreadIds = (notesData ?? []).filter((n: Note) => !n.read_at).map((n: Note) => n.id);
-      if (unreadIds.length > 0) supabase.from('class_notes').update({ read_at: new Date().toISOString() }).in('id', unreadIds).then(() => {});
+      // Mark read per class via the RPC (a plain student UPDATE is refused —
+      // see migration 20261019000002); the old update is the fallback.
+      const unread = (notesData ?? []).filter((n: Note) => !n.read_at) as (Note & { class_id: string })[];
+      for (const classId of new Set(unread.map(n => n.class_id))) {
+        void supabase.rpc('mark_class_notes_read', { p_class_id: classId }).then(({ error }) => {
+          if (error) void supabase.from('class_notes').update({ read_at: new Date().toISOString() })
+            .in('id', unread.filter(n => n.class_id === classId).map(n => n.id));
+        });
+      }
       for (const n of notesData ?? []) { if (!newNotes[n.class_id]) newNotes[n.class_id] = []; newNotes[n.class_id].push(n); }
       for (const t of targetsData ?? []) { if (!newTargets[t.class_id]) newTargets[t.class_id] = []; newTargets[t.class_id].push(t); }
       for (const a of announcementsData ?? []) { if (!newAnnouncements[a.class_id]) newAnnouncements[a.class_id] = []; newAnnouncements[a.class_id].push(a); }
