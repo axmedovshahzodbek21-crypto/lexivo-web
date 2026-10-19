@@ -8,6 +8,11 @@ import { REASON_ICON } from '@/lib/xp-reason-icons';
 import { getAudioCtx, playTone } from '@/lib/web-audio';
 import { useTranslation } from '@/lib/useTranslation';
 import XpCalendar from './XpCalendar';
+import { MessageComposer } from './insights/InsightPopup';
+
+const fill = (s: string, vars: Record<string, string | number>) =>
+  s.replace(/\{(\w+)\}/g, (m, k) => (vars[k] !== undefined ? String(vars[k]) : m));
+const fmtYmd = (ymd: string) => ymd.split('-').reverse().join('.');
 
 interface XpEntry { id: string; amount: number; reason: string; created_at: string; }
 
@@ -83,6 +88,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
   const [loading, setLoading] = useState(true);
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [showReviewDetail, setShowReviewDetail] = useState(false);
+  const [composing, setComposing] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -134,6 +140,23 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
   const reviewOnly = history.filter(e => e.reason === 'SRS Review');
   const reviewPattern = classifyReview(reviewOnly, overdueCount);
   const reviewMeta = REVIEW_LABEL_META[reviewPattern.label];
+  const h = t.classXpHistory;
+
+  // One plain sentence instead of a label: when they last reviewed and how
+  // many words are waiting. A student viewing themself gets a nudge, not a
+  // red "Inactive".
+  const isSelf = user?.id === userId;
+  const name = studentName ?? t.classesPage.defaultStudentName;
+  const ds = reviewPattern.daysSinceLast;
+  const lastLine = ds === null ? (isSelf ? h.sumNeverSelf : fill(h.sumNeverOther, { name }))
+    : ds === 0 ? (isSelf ? h.sumTodaySelf : fill(h.sumTodayOther, { name }))
+    : ds === 1 ? (isSelf ? h.sumYesterdaySelf : fill(h.sumYesterdayOther, { name }))
+    : fill(isSelf ? h.sumDaysSelf : h.sumDaysOther, { name, n: ds });
+  const waitingLine = overdueCount > 0
+    ? (overdueCount === dueCount ? fill(h.waitingAllOverdue, { n: dueCount }) : fill(h.waitingSomeOverdue, { n: dueCount, m: overdueCount }))
+    : dueCount > 0 ? fill(h.waitingToday, { n: dueCount }) : '';
+  const summary = [lastLine, waitingLine, isSelf && dueCount > 0 ? h.selfNudge : ''].filter(Boolean).join(' ');
+  const pillColor = isSelf ? accentColor : reviewMeta.color;
 
   const reviewCountByDay = new Map<string, number>();
   for (const e of reviewOnly) {
@@ -177,18 +200,16 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
               <button
                 onClick={() => setShowReviewDetail(true)}
                 className="flex items-center gap-2 px-3 py-2 rounded-xl text-left hover:opacity-85 transition-opacity"
-                style={{ background: `color-mix(in srgb, ${reviewMeta.color} 12%, transparent)`, border: `1px solid color-mix(in srgb, ${reviewMeta.color} 30%, transparent)` }}
-                title={reviewMeta.blurb}
+                style={{ background: `color-mix(in srgb, ${pillColor} 12%, transparent)`, border: `1px solid color-mix(in srgb, ${pillColor} 30%, transparent)` }}
               >
-                <span>{reviewMeta.emoji}</span>
+                <span>{isSelf ? '🔄' : reviewMeta.emoji}</span>
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs font-bold truncate" style={{ color: reviewMeta.color }}>{t.classXpHistory.reviewLabel} {reviewMeta.text}</p>
-                  <p className="text-[10px] text-[var(--text-muted)] truncate">
-                    {reviewPattern.daysReviewed}/30 days · {reviewPattern.streak}d streak
-                    {overdueCount > 0 ? ` · ${overdueCount} overdue` : dueCount > 0 ? ` · ${dueCount} due` : ''}
-                  </p>
+                  {!isSelf && (
+                    <p className="text-xs font-bold truncate" style={{ color: reviewMeta.color }}>{h.reviewLabel} {h.patternText[reviewPattern.label]}</p>
+                  )}
+                  <p className="text-xs leading-snug" style={{ color: 'var(--text)' }}>{summary}</p>
                 </div>
-                <span className="text-xs shrink-0" style={{ color: reviewMeta.color }}>ⓘ</span>
+                <span className="text-xs shrink-0" style={{ color: pillColor }}>›</span>
               </button>
             )}
 
@@ -272,25 +293,44 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
                   <span className="text-xl">{reviewMeta.emoji}</span>
                   <div>
                     <p className="text-xs font-bold" style={{ color: 'var(--text-muted)' }}>{t.classXpHistory.reviewPatternLabel}</p>
-                    <p className="text-sm font-black" style={{ color: reviewMeta.color }}>{reviewMeta.text}</p>
+                    <p className="text-sm font-black" style={{ color: reviewMeta.color }}>{h.patternText[reviewPattern.label]}</p>
                   </div>
                 </div>
                 <button onClick={() => setShowReviewDetail(false)} className="text-lg" style={{ color: 'var(--text-muted)' }}>✕</button>
               </div>
 
               <div className="overflow-y-auto overscroll-contain px-5 py-4 space-y-5">
-                <p className="text-sm" style={{ color: 'var(--text)' }}>{reviewMeta.blurb}</p>
+                <div className="space-y-1">
+                  <p className="text-base font-bold leading-snug" style={{ color: 'var(--text)' }}>{summary}</p>
+                  <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{h.patternBlurb[reviewPattern.label]}</p>
+                </div>
+
+                {!isSelf && (
+                  composing ? (
+                    <MessageComposer draft={fill(h.draftReview, { name, n: dueCount })} classId={classId} studentId={userId} />
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setComposing(true)}
+                      className="text-sm font-bold text-white px-4 py-2 rounded-xl"
+                      style={{ background: accentColor }}
+                    >
+                      {h.sendReminder}
+                    </button>
+                  )
+                )}
 
                 {/* Stat breakdown */}
                 <div className="rounded-xl divide-y" style={{ background: 'var(--surface-2)', borderColor: 'var(--border)' }}>
                   {[
-                    { label: t.classXpHistory.statDaysReviewed, value: `${reviewPattern.daysReviewed}/30 (${Math.round(reviewPattern.coverage * 100)}%)` },
-                    { label: t.classXpHistory.statCurrentStreak, value: `${reviewPattern.streak} day${reviewPattern.streak === 1 ? '' : 's'}` },
-                    { label: t.classXpHistory.statLongestGap, value: `${reviewPattern.longestGap} day${reviewPattern.longestGap === 1 ? '' : 's'}` },
-                    { label: t.classXpHistory.statAvgWordsPerDay, value: reviewPattern.totalReviews > 0 ? reviewPattern.avgPerActiveDay.toFixed(1) : '—' },
-                    { label: t.classXpHistory.statTotalReviews, value: `${reviewPattern.totalReviews}` },
-                    { label: t.classXpHistory.statCurrentlyDue, value: `${dueCount}` },
-                    { label: t.classXpHistory.statCurrentlyOverdue, value: `${overdueCount}` },
+                    { label: h.statLastReview, value: reviewPattern.lastReviewDate === null || ds === null ? '—'
+                      : `${fmtYmd(reviewPattern.lastReviewDate)} (${ds === 0 ? h.statToday : fill(h.statDaysAgo, { n: ds })})` },
+                    { label: h.statDaysReviewed, value: `${reviewPattern.daysReviewed}/30 (${Math.round(reviewPattern.coverage * 100)}%)` },
+                    { label: h.statCurrentStreak, value: fill(h.statDays, { n: reviewPattern.streak }) },
+                    { label: h.statLongestGap, value: fill(h.statDays, { n: reviewPattern.longestGap }) },
+                    { label: h.statAvgWordsPerDay, value: reviewPattern.totalReviews > 0 ? reviewPattern.avgPerActiveDay.toFixed(1) : '—' },
+                    { label: h.statTotalReviews, value: `${reviewPattern.totalReviews}` },
+                    { label: h.statWaiting, value: overdueCount > 0 ? fill(h.statWaitingValue, { n: dueCount, m: overdueCount }) : `${dueCount}` },
                   ].map(row => (
                     <div key={row.label} className="flex items-center justify-between px-4 py-2.5 text-xs">
                       <span style={{ color: 'var(--text-muted)' }}>{row.label}</span>

@@ -854,7 +854,7 @@ function ReviewPatternTab({
                 <Avatar name={r.student.name} url={r.student.avatar_url} size={32} />
                 <div className="min-w-0">
                   <p className="font-bold text-sm text-[var(--text)] truncate">{r.student.name}</p>
-                  <p className="text-[11px]" style={{ color: meta.color }}>{meta.emoji} {meta.text}</p>
+                  <p className="text-[11px]" style={{ color: meta.color }}>{meta.emoji} {tt.classXpHistory.patternText[r.label]}</p>
                 </div>
               </div>
               {r.overdue > 0 ? (
@@ -867,7 +867,7 @@ function ReviewPatternTab({
                 </span>
               ) : null}
             </div>
-            <p className="text-[11px] text-[var(--text-muted)]">{meta.blurb}</p>
+            <p className="text-[11px] text-[var(--text-muted)]">{tt.classXpHistory.patternBlurb[r.label]}</p>
             <div className="flex flex-wrap gap-x-4 gap-y-1 text-[10px] text-[var(--text-muted)]">
               <span><b className="text-[var(--text)]">{r.daysReviewed}</b>/{REVIEW_WINDOW_DAYS} {tt.classesPage.daysReviewedSuffix}</span>
               <span><b className="text-[var(--text)]">{r.streak}</b> {tt.classesPage.dayStreakLc}</span>
