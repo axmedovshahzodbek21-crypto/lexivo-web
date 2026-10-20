@@ -36,6 +36,7 @@ export default function ClassShellNav({ classId }: { classId: string }) {
     { seg: 'leaderboard', icon: '🏆', label: t.classNav.ranks        },
     { seg: '',            icon: '📊', label: t.classNav.dashboard    },
     { seg: 'insights',    icon: '✨', label: t.classNav.insights     },
+    { seg: 'messages',    icon: '💬', label: t.classNav.messages     },
     { seg: 'hard-words',  icon: '😓', label: t.classNav.hardWords    },
     { seg: '__curriculum__', icon: '📋', label: t.classNav.curriculum },
   ];

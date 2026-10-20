@@ -7,8 +7,9 @@
 // supabase/migrations/20260820_push_notifications.sql and
 // 20260914_notify_join_request.sql) whenever a row is inserted into
 // class_homework, class_targets, class_announcements, class_notes (teacher
-// notes, one student), or class_members (join requests). Resolves the recipients (class students, or the
-// teacher for a join request), filters to those who opted into push, and
+// notes, one student), class_members (join requests) or class_replies (a
+// student's chat message). Resolves the recipients (class students, or the
+// teacher for a join request / reply), filters to those who opted into push, and
 // sends via the OneSignal REST API using external_id = Supabase auth user id.
 //
 // Deploy: supabase functions deploy send-push
@@ -24,7 +25,7 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
 interface Payload {
-  kind: 'homework' | 'target' | 'announcement' | 'join_request' | 'note';
+  kind: 'homework' | 'target' | 'announcement' | 'join_request' | 'note' | 'reply';
   class_id: string;
   student_ids?: string[] | null;
   student_id?: string;
@@ -44,6 +45,8 @@ function buildNotificationText(payload: Payload, className: string, studentName?
       return { heading: '🙋 New join request', content: `${studentName ?? 'A student'} wants to join ${className}` };
     case 'note':
       return { heading: '✉️ Message from your teacher', content: `${className}: ${payload.message ?? ''}` };
+    case 'reply':
+      return { heading: `💬 ${studentName ?? 'A student'}`, content: `${className}: ${payload.message ?? ''}` };
   }
 }
 
@@ -63,14 +66,14 @@ Deno.serve(async (req) => {
     .maybeSingle();
   const className = classRow?.name ?? 'Your class';
 
-  // join_request is the one kind sent to the teacher, not the class's
-  // students — everything else below (recipient list, is_teacher flag)
-  // branches on that.
-  const isJoinRequest = payload.kind === 'join_request';
+  // join_request and reply (a student's chat message) are sent to the
+  // teacher, not the class's students — everything else below (recipient
+  // list, is_teacher flag) branches on that.
+  const toTeacher = payload.kind === 'join_request' || payload.kind === 'reply';
 
   let studentName: string | undefined;
   let recipientIds: string[];
-  if (isJoinRequest) {
+  if (toTeacher) {
     if (!classRow?.teacher_id) {
       return new Response(JSON.stringify({ sent: 0, reason: 'no teacher' }), { status: 200 });
     }
@@ -125,9 +128,9 @@ Deno.serve(async (req) => {
       // Read by the client's notification-click handler (Flutter's
       // onesignal_service.dart, web's OneSignalProvider) to jump straight
       // to the class instead of just opening the app to Home. is_teacher
-      // reflects who the recipient actually is: true only for join_request,
-      // which is the one kind sent to the teacher rather than students.
-      data: { class_id: payload.class_id, class_name: className, is_teacher: isJoinRequest },
+      // reflects who the recipient actually is: true only for join_request
+      // and reply, the kinds sent to the teacher rather than students.
+      data: { class_id: payload.class_id, class_name: className, is_teacher: toTeacher },
     }),
   });
 

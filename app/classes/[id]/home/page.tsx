@@ -1,6 +1,7 @@
 'use client';
 import { useTranslation } from '@/lib/useTranslation';
 import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
@@ -93,7 +94,7 @@ export default function ClassHomePage() {
   const memberIdsRef = useRef<string[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [notes, setNotes] = useState<Note[]>([]);
-  const [showAllNotes, setShowAllNotes] = useState(false);
+  const [chatEnabled, setChatEnabled] = useState(false);
   const [targets, setTargets] = useState<Target[]>([]);
 const [memberCount, setMemberCount] = useState(0);
   const [activeToday, setActiveToday] = useState(0);
@@ -132,8 +133,9 @@ const [memberCount, setMemberCount] = useState(0);
 
     (async () => {
       const { data: cls } = await supabase
-        .from('classes').select('name, teacher_id').eq('id', id).maybeSingle();
+        .from('classes').select('*').eq('id', id).maybeSingle();
       if (!cls) { router.replace('/classes'); return; }
+      setChatEnabled(Boolean((cls as { chat_enabled?: boolean }).chat_enabled));
 
       const teacher = cls.teacher_id === user.id;
 
@@ -760,8 +762,9 @@ const [memberCount, setMemberCount] = useState(0);
 
 
         {/* Notes from the teacher (student only): only new ones are shown
-            here, once; the rest are behind the button. */}
-        {!isTeacher && notes.length > 0 && (() => {
+            here, once; the rest are behind the button, which opens the
+            class chat (notes are the teacher's side of it). */}
+        {!isTeacher && (notes.length > 0 || chatEnabled) && (() => {
           const noteRow = (n: Note) => {
             const isNew = !n.read_at;
             return (
@@ -784,30 +787,14 @@ const [memberCount, setMemberCount] = useState(0);
                   {fresh.map(noteRow)}
                 </>
               )}
-              <button
-                type="button"
-                onClick={() => setShowAllNotes(true)}
+              <Link
+                href={`/classes/${id}/chat`}
                 className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-left hover:bg-[var(--surface-2)] transition-colors"
               >
-                <span>✉️</span>
-                <span className="flex-1 text-sm font-semibold text-[var(--text)]">{tx.classesPage.notesFromTeacherLabel}</span>
-                <span className="text-xs text-[var(--text-muted)]">{notes.length} ›</span>
-              </button>
-              {showAllNotes && (
-                <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-4 bg-black/50" onClick={() => setShowAllNotes(false)}>
-                  <div
-                    className="w-full max-w-md max-h-[80vh] overflow-y-auto rounded-2xl p-5 space-y-3"
-                    style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
-                    onClick={e => e.stopPropagation()}
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <p className="font-bold text-[var(--text)]">✉️ {tx.classesPage.notesFromTeacherLabel}</p>
-                      <button onClick={() => setShowAllNotes(false)} className="text-sm text-[var(--text-muted)] hover:text-[var(--text)]" aria-label={tx.classInsights.close}>✕</button>
-                    </div>
-                    {notes.map(noteRow)}
-                  </div>
-                </div>
-              )}
+                <span>{chatEnabled ? '💬' : '✉️'}</span>
+                <span className="flex-1 text-sm font-semibold text-[var(--text)]">{chatEnabled ? tx.classChat.chatWithTeacher : tx.classesPage.notesFromTeacherLabel}</span>
+                <span className="text-xs text-[var(--text-muted)]">{notes.length > 0 ? `${notes.length} ` : ''}›</span>
+              </Link>
             </section>
           );
         })()}
