@@ -17,6 +17,7 @@ import { exportData, importData } from '@/lib/backup';
 import type { UserSettings } from '@/lib/types';
 import { translations } from '@/lib/i18n';
 import { APK_DOWNLOAD_URL } from '@/lib/constants';
+import { usePhoneMode } from '@/lib/phone-mode';
 
 type PushPrefs = { class_activity: boolean; due_reviews: boolean; streak_risk: boolean; homework_reminders: boolean; class_idle: boolean };
 const DEFAULT_PUSH_PREFS: PushPrefs = { class_activity: true, due_reviews: true, streak_risk: true, homework_reminders: true, class_idle: true };
@@ -50,6 +51,7 @@ export default function SettingsPage() {
   const [pushPrefs, setPushPrefs] = useState<PushPrefs>(DEFAULT_PUSH_PREFS);
   const [pushSupported, setPushSupported] = useState(false);
   const [isTeacher, setIsTeacher] = useState(false);
+  const [phoneMode, setPhoneMode] = usePhoneMode();
 
   useEffect(() => {
     setThemeState(getTheme());
@@ -573,6 +575,20 @@ export default function SettingsPage() {
         </div>
 
         <div className="divide-y divide-[var(--border)]">
+          <div className="flex items-center justify-between gap-4 py-3">
+            <div>
+              <p className="text-sm font-medium">📱 {t.phoneMode.title}</p>
+              <p className="text-xs text-[var(--text-muted)] mt-0.5">{t.phoneMode.settingHelper}</p>
+            </div>
+            <button
+              onClick={() => setPhoneMode(!phoneMode)}
+              className={`relative w-14 h-7 rounded-full transition-colors duration-300 focus:outline-none shrink-0 ${phoneMode ? 'bg-[var(--primary)]' : 'bg-[var(--surface-2)]'}`}
+              aria-label={phoneMode ? t.phoneMode.turnOff : t.phoneMode.turnOn}
+            >
+              <span className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-300 ${phoneMode ? 'translate-x-7' : 'translate-x-0'}`} />
+            </button>
+          </div>
+
           <div className="flex items-center justify-between py-3">
             <div>
               <p className="text-sm font-medium">{t.settings.reduceMotion}</p>

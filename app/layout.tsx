@@ -16,6 +16,7 @@ import { AuthProvider } from '@/lib/auth-context';
 import OneSignalProvider from '@/components/OneSignalProvider';
 import HomeworkNotify from '@/components/HomeworkNotify';
 import OfflineQueueFlusher from '@/components/OfflineQueueFlusher';
+import { PhoneModeSuggest } from '@/components/PhoneMode';
 
 export const dynamic = 'force-dynamic';
 
@@ -69,6 +70,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <PomodoroWidget />
         <OneSignalProvider />
         <HomeworkNotify />
+        <Suspense fallback={null}><PhoneModeSuggest /></Suspense>
         <AchievementToast />
         <LevelUpOverlay />
         <KeyboardHelp />

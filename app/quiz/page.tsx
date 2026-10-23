@@ -17,6 +17,7 @@ import Link from 'next/link';
 import UnitPicker from '@/components/UnitPicker';
 import TiltCard from '@/components/TiltCard';
 import { useTranslation } from '@/lib/useTranslation';
+import { PhoneStudyFrame, PhoneModeToggle } from '@/components/PhoneMode';
 
 interface QuizWord extends WordItem {
   collectionName: string;
@@ -507,7 +508,10 @@ function QuizInner() {
           <div className="font-semibold text-sm">{t.quiz.title}</div>
           <div className="text-xs text-[var(--text-muted)]">{index + 1} / {questions.length}</div>
         </div>
-        <div className="badge">{correct} ✓</div>
+        <div className="flex items-center gap-2">
+          <div className="badge">{correct} ✓</div>
+          <PhoneModeToggle />
+        </div>
       </div>
 
       {/* Progress */}
@@ -578,7 +582,7 @@ function QuizInner() {
           </button>
         )}
 
-        <div className="text-center text-xs text-[var(--text-muted)]">
+        <div className="phone-hide text-center text-xs text-[var(--text-muted)]">
           {t.quiz.pressKeys}
         </div>
       </div>
@@ -601,7 +605,9 @@ function Loading() {
 export default function QuizPage() {
   return (
     <Suspense fallback={<PageLoader />}>
-      <QuizInner />
+      <PhoneStudyFrame>
+        <QuizInner />
+      </PhoneStudyFrame>
     </Suspense>
   );
 }

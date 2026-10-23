@@ -118,6 +118,38 @@ body.focus-mode .focus-container {
   height: 100vh;
 }
 
+/* Phone mode (components/PhoneMode.tsx) — a study page as a full-screen layer
+   above the site nav (z-40/50), below toasts/overlays (z-200+). 100dvh tracks
+   iOS Safari's collapsing toolbars, where 100vh overshoots. */
+.phone-frame {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100dvh;
+  z-index: 60;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background-color: var(--background);
+  background-image: var(--bg-mesh);
+  background-size: cover;
+  background-position: center;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+.phone-frame-inner {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+}
+/* The page's own root (min-h-screen) fills the frame instead of 100vh. */
+.phone-frame-inner > * { flex: 1 0 auto; }
+.phone-frame .min-h-screen { min-height: 0; }
+/* Keyboard shortcut hints mean nothing on a touch screen. */
+.phone-frame kbd,
+.phone-frame .phone-hide { display: none !important; }
+
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }

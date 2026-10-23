@@ -11,6 +11,8 @@ import {
   recordClassReviewEvent, stageLabel, stageColor, type ClassSRSEntry,
 } from '@/lib/class-srs';
 import { shuffleArray } from '@/lib/shuffleArray';
+import { PhoneStudyFrame, PhoneModeToggle, PhoneSwipeHint } from '@/components/PhoneMode';
+import { usePhoneMode, useSwipe } from '@/lib/phone-mode';
 
 const TILE_COLORS = [
   { bg: '#e21b3c', shadow: '#a01328', shape: '▲' },
@@ -36,6 +38,14 @@ const OPTIONS_BEAT_MS = 450;
 const CARD_LOCKOUT_MS = 350;
 
 export default function ClassReviewPage() {
+  return (
+    <PhoneStudyFrame>
+      <ClassReviewInner />
+    </PhoneStudyFrame>
+  );
+}
+
+function ClassReviewInner() {
   const t = useTranslation();
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
@@ -241,6 +251,16 @@ export default function ClassReviewPage() {
     return () => window.removeEventListener('keydown', handler);
   }, [current, reveal, showOptions, gradeUnlocked, cardLocked, grade, choices, tappedChoice]);
 
+  // Phone mode swipe, as in the app: before the answer shows, a swipe reveals
+  // it (the tiles in MCQ mode); after, right = Knew it, left = Not yet. grade()
+  // keeps its anti-mash gates.
+  const [phoneMode] = usePhoneMode();
+  const swipe = useSwipe({
+    enabled: phoneMode,
+    onRight: () => revealed ? grade(true) : choices === null ? reveal() : showOptions(),
+    onLeft: () => revealed ? grade(false) : choices === null ? reveal() : showOptions(),
+  });
+
   const handleChoiceTap = (choice: string) => {
     if (tappedChoice || !current || cardLocked || !optionsUnlocked) return;
     setTappedChoice(choice);
@@ -319,10 +339,10 @@ export default function ClassReviewPage() {
   const gradeButtons = (
     <div className="flex gap-2 animate-slide-up">
       <button onClick={() => grade(false)} disabled={!gradeUnlocked} className="flex-1 py-4 rounded-xl border-2 border-[var(--danger)] text-[var(--danger)] font-bold text-sm hover:bg-red-50 transition-colors flex flex-col items-center gap-1 disabled:opacity-40 disabled:hover:bg-transparent">
-        <span>✗</span><span className="text-xs font-normal">{t.classesPage.notYet} <span className="opacity-50">J</span></span>
+        <span>✗</span><span className="text-xs font-normal">{t.classesPage.notYet} <span className="phone-hide opacity-50">J</span></span>
       </button>
       <button onClick={() => grade(true)} disabled={!gradeUnlocked} className="flex-1 py-4 rounded-xl border-2 border-[var(--success)] text-[var(--success)] font-bold text-sm hover:bg-green-50 transition-colors flex flex-col items-center gap-1 disabled:opacity-40 disabled:hover:bg-transparent">
-        <span>✓</span><span className="text-xs font-normal">{t.classesPage.knewIt} <span className="opacity-50">K</span></span>
+        <span>✓</span><span className="text-xs font-normal">{t.classesPage.knewIt} <span className="phone-hide opacity-50">K</span></span>
       </button>
     </div>
   );
@@ -352,6 +372,7 @@ export default function ClassReviewPage() {
             className="btn-icon text-base"
             title={autoPlay ? t.srs.autoPlayOn : t.srs.autoPlayOff}
           >{autoPlay ? '🔊' : '🔇'}</button>
+          <PhoneModeToggle />
         </div>
       </div>
 
@@ -381,9 +402,10 @@ export default function ClassReviewPage() {
         {/* Word card — in MCQ mode the whole card is the recall-first tap target */}
         <div
           className={`card animate-slide-up flex flex-col gap-3${choices !== null && !optionsShown && !cardLocked ? ' cursor-pointer' : ''}`}
-          style={{ minHeight: choices !== null ? 'auto' : 280 }}
+          style={{ minHeight: choices !== null ? 'auto' : 280, ...swipe.style }}
           onClick={choices !== null && !optionsShown && !cardLocked ? showOptions : undefined}
           role={choices !== null && !optionsShown ? 'button' : undefined}
+          {...swipe.handlers}
         >
           <div className="flex items-center justify-between">
             <span className="badge text-xs">{t.classesPage.classWord}</span>
@@ -460,6 +482,7 @@ export default function ClassReviewPage() {
         ) : (
           revealed && gradeButtons
         )}
+        <PhoneSwipeHint />
       </div>
     </div>
   );

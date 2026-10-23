@@ -29,6 +29,8 @@ import Link from 'next/link';
 import UnitPicker from '@/components/UnitPicker';
 import TiltCard from '@/components/TiltCard';
 import { useTranslation } from '@/lib/useTranslation';
+import { PhoneStudyFrame, PhoneModeToggle, PhoneSwipeHint } from '@/components/PhoneMode';
+import { usePhoneMode, useSwipe } from '@/lib/phone-mode';
 
 interface StudyWord extends WordItem {
   collectionName: string;
@@ -930,6 +932,23 @@ function LearnInner() {
     return () => window.removeEventListener('keydown', handler);
   }, [current, done, focusMode, revealed, marks, index, tryAdvanceCard, markTooHard, skipWord, dismissSkipTip, inQuizGate, inSpotCheck]);
 
+  // Phone mode swipe, as in the app: right reveals, then "Got it"; left = Too hard
+  // once revealed. On an already-marked card, right just moves to the next one.
+  const [phoneMode] = usePhoneMode();
+  const swipe = useSwipe({
+    enabled: phoneMode,
+    onRight: () => {
+      if (inQuizGate || inSpotCheck) return;
+      if (marks[index] != null) { setIndex(i => Math.min(words.length - 1, i + 1)); setRevealed(false); }
+      else if (!revealed) { setRevealed(true); dismissSkipTip(); }
+      else tryAdvanceCard();
+    },
+    onLeft: () => {
+      if (inQuizGate || inSpotCheck) return;
+      if (marks[index] == null && revealed) markTooHard();
+    },
+  });
+
   // No unit selected → show picker
   if (!collectionName && !hardOnly && !sourceMyWords && !sourceStarred && !sourceClass && !sourceClassHW) return <UnitPicker mode="learn" />;
 
@@ -1099,14 +1118,16 @@ function LearnInner() {
           <button onClick={handleStar} className="btn-icon text-lg" aria-label={starred ? t.extra.removeFromStarred : t.extra.addToStarred}>
             {starred ? '⭐' : '☆'}
           </button>
-          <button onClick={() => setFocusMode(!focusMode)} className="btn-icon text-base" aria-label={focusMode ? t.extra.exitFocusMode : t.extra.enterFocusMode}>
+          <button onClick={() => setFocusMode(!focusMode)} className="btn-icon text-base phone-hide" aria-label={focusMode ? t.extra.exitFocusMode : t.extra.enterFocusMode}>
             {focusMode ? '⊠' : '⛶'}
           </button>
+          <PhoneModeToggle />
         </div>
       </div>
 
       <div className="flex-1 p-4 flex flex-col gap-4">
         {/* Word card */}
+        <div className="flex-1 flex flex-col" style={swipe.style} {...swipe.handlers}>
         <TiltCard className="flex-1 animate-slide-up" intensity={5} glare={false}>
         <div
           className={`card h-full transition-all ${!showBack ? 'cursor-pointer hover:border-[var(--primary)]' : ''}`}
@@ -1246,6 +1267,8 @@ function LearnInner() {
           )}
         </div>
         </TiltCard>
+        </div>
+        <PhoneSwipeHint />
 
         {/* Hint — only before reveal on unvisited cards */}
         {!showBack && !isMarked && (
@@ -1307,7 +1330,7 @@ function LearnInner() {
           </div>
         )}
 
-        <div className="no-focus text-center text-xs text-[var(--text-muted)]">
+        <div className="no-focus phone-hide text-center text-xs text-[var(--text-muted)]">
           {t.learn.remaining(words.length - index - 1)} · <kbd>S</kbd> {t.learn.listenShort} · <kbd>H</kbd> {revealed ? t.learn.tooHardShort : t.learn.hintShort}{!revealed ? <> · <kbd>K</kbd> {t.learn.skipShort}</> : null}
         </div>
       </div>
@@ -1380,7 +1403,9 @@ function LearnInner() {
 export default function LearnPage() {
   return (
     <Suspense>
-      <LearnInner />
+      <PhoneStudyFrame>
+        <LearnInner />
+      </PhoneStudyFrame>
     </Suspense>
   );
 }

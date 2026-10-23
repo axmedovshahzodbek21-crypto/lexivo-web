@@ -16,6 +16,8 @@ import type { DueSRSWord, SRSWord } from '@/lib/types';
 import { shuffleArray } from '@/lib/shuffleArray';
 import Link from 'next/link';
 import { useTranslation } from '@/lib/useTranslation';
+import { PhoneStudyFrame, PhoneModeToggle, PhoneSwipeHint } from '@/components/PhoneMode';
+import { usePhoneMode, useSwipe } from '@/lib/phone-mode';
 
 const TILE_COLORS = [
   { bg: '#e21b3c', shadow: '#a01328', shape: '▲' },
@@ -31,6 +33,14 @@ const TILE_COLORS = [
 const OPTIONS_BEAT_MS = 450;
 
 export default function SRSReviewPage() {
+  return (
+    <PhoneStudyFrame>
+      <SRSReviewInner />
+    </PhoneStudyFrame>
+  );
+}
+
+function SRSReviewInner() {
   const router = useRouter();
   const t = useTranslation();
   const { pushAchievement, setPendingLevelUp } = useAppStore();
@@ -295,6 +305,15 @@ export default function SRSReviewPage() {
     return () => window.removeEventListener('keydown', handler);
   }, [current, revealed, managing, grade, goBack, choices, showOptions]);
 
+  // Phone mode swipe, as in the app: before the answer shows, a swipe reveals
+  // it (the tiles in MCQ mode); after, right = Knew it, left = Not yet.
+  const [phoneMode] = usePhoneMode();
+  const swipe = useSwipe({
+    enabled: phoneMode,
+    onRight: () => revealed ? grade('knew') : choices !== null ? showOptions() : setRevealed(true),
+    onLeft: () => revealed ? grade('notYet') : choices !== null ? showOptions() : setRevealed(true),
+  });
+
   const handleRemove = (id: string) => {
     removeSRSWord(id);
     setAllWords(prev => prev.filter(w => w.id !== id));
@@ -433,6 +452,7 @@ export default function SRSReviewPage() {
           >
             ⚙️
           </button>
+          <PhoneModeToggle />
         </div>
       </div>
 
@@ -462,9 +482,10 @@ export default function SRSReviewPage() {
         {/* Word card — in MCQ mode it's the recall-first tap target that reveals the tiles */}
         <div
           className={`card animate-slide-up flex flex-col gap-3 relative overflow-hidden${choices !== null && !optionsShown ? ' cursor-pointer' : ''}`}
-          style={{ minHeight: choices !== null ? 'auto' : 280, borderLeft: '3px solid var(--primary)' }}
+          style={{ minHeight: choices !== null ? 'auto' : 280, borderLeft: '3px solid var(--primary)', ...swipe.style }}
           onClick={choices !== null && !optionsShown ? showOptions : undefined}
           role={choices !== null && !optionsShown ? 'button' : undefined}
+          {...swipe.handlers}
         >
           {/* Watermark letter */}
           <div style={{
@@ -608,7 +629,7 @@ export default function SRSReviewPage() {
               >
                 <span className="text-2xl leading-none">✗</span>
                 <span className="text-sm font-black">{t.srs.notYet}</span>
-                <span className="text-xs opacity-60">← J</span>
+                <span className="phone-hide text-xs opacity-60">← J</span>
               </button>
               <button
                 onClick={() => grade('knew')}
@@ -621,11 +642,13 @@ export default function SRSReviewPage() {
               >
                 <span className="text-2xl leading-none">✓</span>
                 <span className="text-sm font-black">{t.srs.knewIt}</span>
-                <span className="text-xs opacity-60">K →</span>
+                <span className="phone-hide text-xs opacity-60">K →</span>
               </button>
             </div>
           )
         )}
+
+        <PhoneSwipeHint />
 
         {/* Info bar */}
         <div className="card p-3 flex justify-between text-xs text-[var(--text-muted)]">

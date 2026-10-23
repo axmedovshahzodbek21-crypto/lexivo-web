@@ -17,6 +17,8 @@ import type { WordItem, WordCollection } from '@/lib/types';
 import Link from 'next/link';
 import UnitPicker from '@/components/UnitPicker';
 import { useTranslation } from '@/lib/useTranslation';
+import { PhoneStudyFrame, PhoneModeToggle, PhoneSwipeHint } from '@/components/PhoneMode';
+import { usePhoneMode, useSwipe } from '@/lib/phone-mode';
 
 interface StudyWord extends WordItem {
   collectionName: string;
@@ -315,6 +317,15 @@ function FlashcardsInner() {
   const markKnown = () => advance(true);
   const markUnknown = () => advance(false);
 
+  // Phone mode: swipe flips the front; on the back, right = know it, left = again (as in the app).
+  const [phoneMode] = usePhoneMode();
+  const flip = () => setSide(s => s === 'front' ? 'back' : 'front');
+  const swipe = useSwipe({
+    enabled: phoneMode,
+    onRight: () => side === 'front' ? flip() : markKnown(),
+    onLeft: () => side === 'front' ? flip() : markUnknown(),
+  });
+
   if (!collectionName && !starredOnly && !hardOnly && !listId && !sourceMyWords && !sourceClassHW && !sourceClass) return <UnitPicker mode="flashcards" />;
 
   if (gateUrl) {
@@ -430,9 +441,10 @@ function FlashcardsInner() {
           <div className="font-semibold text-sm">{t.flashcards.title}</div>
           <div className="text-xs text-[var(--text-muted)]">{index + 1} / {deck.length}</div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
           <span className="text-xs font-medium text-[var(--success)]">✓{known}</span>
           <span className="text-xs font-medium text-[var(--danger)]">✗{unknown}</span>
+          <PhoneModeToggle />
         </div>
       </div>
 
@@ -447,8 +459,9 @@ function FlashcardsInner() {
       <div className="flex-1 p-4 flex flex-col gap-4">
         <div
           className="flip-card cursor-pointer flex-1"
-          style={{ minHeight: 320 }}
-          onClick={() => setSide(s => s === 'front' ? 'back' : 'front')}
+          style={{ minHeight: 320, ...swipe.style }}
+          onClick={flip}
+          {...swipe.handlers}
         >
           <div className={`flip-card-inner w-full h-full ${side === 'back' ? 'flipped' : ''}`} style={{ minHeight: 320 }}>
             {/* Front */}
@@ -499,6 +512,7 @@ function FlashcardsInner() {
             {t.flashcards.tapToReveal}
           </div>
         )}
+        <PhoneSwipeHint />
       </div>
     </div>
   );
@@ -519,7 +533,9 @@ function Loading() {
 export default function FlashcardsPage() {
   return (
     <Suspense fallback={<PageLoader />}>
-      <FlashcardsInner />
+      <PhoneStudyFrame>
+        <FlashcardsInner />
+      </PhoneStudyFrame>
     </Suspense>
   );
 }

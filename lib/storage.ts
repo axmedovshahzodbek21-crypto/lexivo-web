@@ -1869,13 +1869,16 @@ export function getStoryUnlockInfo(
 }
 
 // Clear all user-specific data from localStorage on sign-out.
-// Preserves lexivo_ui_lang (device UI preference, not tied to a user account).
+// Preserves lexivo_ui_lang and the phone-mode keys (device preferences, not
+// tied to a user account).
 export function clearUserData(): void {
   if (typeof window === 'undefined') return;
+  // Phone-mode keys mirror lib/phone-mode.ts (not imported: that module pulls in React).
+  const keep = new Set(['lexivo_ui_lang', 'lexivo_phone_mode', 'lexivo_phone_mode_prompts']);
   const toRemove: string[] = [];
   for (let i = 0; i < localStorage.length; i++) {
     const k = localStorage.key(i)!;
-    if (k.startsWith('lexivo_') && k !== 'lexivo_ui_lang') toRemove.push(k);
+    if (k.startsWith('lexivo_') && !keep.has(k)) toRemove.push(k);
   }
   toRemove.forEach(k => localStorage.removeItem(k));
 }

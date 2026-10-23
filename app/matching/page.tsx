@@ -16,6 +16,7 @@ import { shuffleArray as shuffle } from '@/lib/shuffleArray';
 import UnitPicker from '@/components/UnitPicker';
 import type { WordItem, WordCollection } from '@/lib/types';
 import { useTranslation } from '@/lib/useTranslation';
+import { PhoneStudyFrame, PhoneModeToggle } from '@/components/PhoneMode';
 
 interface MatchWord extends WordItem {
   collectionName: string;
@@ -427,7 +428,10 @@ function MatchingInner() {
     <div className="flex flex-col min-h-screen">
       {/* Header */}
       <div className="p-4 border-b border-[var(--border)] flex-shrink-0">
-        <BackButton className="mb-2" />
+        <div className="flex items-center justify-between mb-2">
+          <BackButton className="" />
+          <PhoneModeToggle />
+        </div>
         <div className="flex items-center justify-between">
           <h1 className="text-lg font-bold text-[var(--text)]">{t.matching.matchThePairs}</h1>
           <span className="text-sm text-[var(--text-muted)]">
@@ -529,7 +533,9 @@ export default function MatchingPage() {
         <SectionLoader />
       </div>
     }>
-      <MatchingInner />
+      <PhoneStudyFrame>
+        <MatchingInner />
+      </PhoneStudyFrame>
     </Suspense>
   );
 }
