@@ -80,7 +80,13 @@ function ImportPageInner() {
       language: wordLangCode,
       addedAt: Date.now(),
     }));
-    addImportedWords(rows, name, folder);
+    try {
+      addImportedWords(rows, name, folder);
+    } catch (e) {
+      console.error('[import] save failed', e);
+      alert(t.import.saveFailed);
+      return;
+    }
     pushLists();
     setAdded(true);
     setTimeout(() => router.push(`/my-words/${encodeURIComponent(folder)}/${encodeURIComponent(name)}`), 1200);

@@ -2372,6 +2372,7 @@ const en = {
     tutorialGotIt: 'Got it!',
     // Wave C additions (bugs + shared components)
     folderNameRequired: 'Please enter a folder name before saving.',
+    saveFailed: "Couldn't save — this browser's storage is full. Reload the page and try again.",
     showHelpAria: 'Show import help',
     folderLabel: '📁 Folder',
     collectionLabel: '📖 Collection',
@@ -4993,6 +4994,7 @@ const uz: typeof en = {
     tutorialGotIt: "Tushunarli!",
     // Wave C additions (bugs + shared components)
     folderNameRequired: 'Saqlashdan oldin papka nomini kiriting.',
+    saveFailed: "Saqlab bo'lmadi — brauzer xotirasi to'lgan. Sahifani yangilab, qayta urinib ko'ring.",
     showHelpAria: 'Import yordamini ko\'rsatish',
     folderLabel: '📁 Papka',
     collectionLabel: '📖 To\'plam',
@@ -7628,6 +7630,7 @@ const ru: typeof en = {
     tutorialGotIt: 'Понятно!',
     // Wave C additions (bugs + shared components)
     folderNameRequired: 'Прежде чем сохранить, введите название папки.',
+    saveFailed: 'Не удалось сохранить — хранилище браузера переполнено. Обновите страницу и попробуйте снова.',
     showHelpAria: 'Показать справку по импорту',
     folderLabel: '📁 Папка',
     collectionLabel: '📖 Подборка',

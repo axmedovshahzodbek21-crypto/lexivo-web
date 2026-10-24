@@ -1,7 +1,7 @@
 import { supabase } from './supabase';
 import type { UserSettings, LearnedWord, SRSWord, UnitProgress, MyUnitProgress, CustomList } from './types';
-import { getSettings, saveSettings, getLearnedWords, getLearnedWordsRaw, getSRSWordsRaw, getImportedWordsRaw, getCustomListsRaw, localDateStr, getProfilePicUrl, saveProfilePicUrl, resetMyWordsProgress, PROGRESS_RESET_KEYS, PROGRESS_RESET_PREFIXES, getDueWords } from './storage';
-import type { HardWordEntry } from './storage';
+import { getSettings, saveSettings, getLearnedWords, getLearnedWordsRaw, getSRSWordsRaw, getImportedWordsRaw, getCustomListsRaw, localDateStr, getProfilePicUrl, saveProfilePicUrl, resetMyWordsProgress, PROGRESS_RESET_KEYS, PROGRESS_RESET_PREFIXES, getDueWords, starredEntryKey, starredEntryWord } from './storage';
+import type { HardWordEntry, StarredEntry } from './storage';
 import { getNotifSettings, saveNotifSettings } from './notifications';
 
 const S = {
@@ -231,7 +231,7 @@ export async function pushLists(): Promise<void> {
         id: uid,
         learned_words:    getLearnedWordsRaw(), // includes tombstones so unlearning propagates
         srs_words:        getSRSWordsRaw(),     // includes tombstones so unlearning propagates
-        starred_words:    lsJSON<string[]>('lexivo_starred', []),
+        starred_words:    lsJSON<StarredEntry[]>('lexivo_starred', []),
         hard_words:       lsJSON<HardWordEntry[]>('lexivo_hard_words', []),
         study_days:       lsJSON<string[]>('lexivo_study_days', []),
         review_days:      lsJSON<string[]>('lexivo_review_days', []),
@@ -465,15 +465,25 @@ function mergeListsFromCloudRow(row: Record<string, unknown>): void {
       if (changed) lsSet('lexivo_srs_words', JSON.stringify([...localMap.values()]));
     }
 
-    // starred_words (web stores as string[], cloud pushes as string[])
-    if (Array.isArray(row.starred_words) && row.starred_words.length > 0) {
-      const local = lsJSON<string[]>('lexivo_starred', []);
-      const localSet = new Set(local);
+    // starred_words — web pushes plain strings, Flutter pushes full records
+    // ({word, collectionName, ...}). Dedupe by key, not by Set identity:
+    // record objects never compare equal, so the old Set check re-appended
+    // every Flutter record on every pull, and pushLists sent the duplicates
+    // back up — doubling the list each round until localStorage overflowed.
+    // Rebuilding from scratch also collapses duplicates already stored.
+    if (Array.isArray(row.starred_words)) {
+      const local = lsJSON<StarredEntry[]>('lexivo_starred', []);
+      const byKey = new Map<string, StarredEntry>();
       let changed = false;
-      for (const w of row.starred_words as string[]) {
-        if (!localSet.has(w)) { local.push(w); localSet.add(w); changed = true; }
+      for (const e of local) {
+        const k = starredEntryKey(e);
+        if (byKey.has(k)) changed = true; else byKey.set(k, e);
       }
-      if (changed) lsSet('lexivo_starred', JSON.stringify(local));
+      for (const e of row.starred_words as StarredEntry[]) {
+        const k = starredEntryKey(e);
+        if (starredEntryWord(e) && !byKey.has(k)) { byKey.set(k, e); changed = true; }
+      }
+      if (changed) lsSet('lexivo_starred', JSON.stringify([...byKey.values()]));
     }
 
     // hard_words (HardWordEntry[]) — per-word last-write-wins by the entry's

@@ -1236,20 +1236,32 @@ export function resetMyWordsProgress(): void {
 
 // ─── Starred words ───────────────────────────────────────────────────────────
 
+// The stored list mixes web's plain word strings with the full records
+// ({word, collectionName, ...}) the Flutter app syncs up — those records are
+// kept as-is so pushing them back doesn't strip their details in the cloud.
+export type StarredEntry = string | { word: string; collectionName?: string };
+
+export function starredEntryWord(e: StarredEntry): string {
+  return typeof e === 'string' ? e : e?.word ?? '';
+}
+
+export function starredEntryKey(e: StarredEntry): string {
+  return typeof e === 'string' ? e : `${e?.word ?? ''}::${e?.collectionName ?? ''}`;
+}
+
 export function getStarredWords(): string[] {
-  return get<string[]>(KEYS.starred, []);
+  return [...new Set(get<StarredEntry[]>(KEYS.starred, []).map(starredEntryWord).filter(Boolean))];
 }
 
 export function toggleStarred(word: string): boolean {
-  const starred = getStarredWords();
-  const idx = starred.indexOf(word);
-  if (idx === -1) {
-    starred.push(word);
-    set(KEYS.starred, starred);
+  const starred = get<StarredEntry[]>(KEYS.starred, []);
+  const kept = starred.filter(e => starredEntryWord(e) !== word);
+  if (kept.length === starred.length) {
+    kept.push(word);
+    set(KEYS.starred, kept);
     return true;
   } else {
-    starred.splice(idx, 1);
-    set(KEYS.starred, starred);
+    set(KEYS.starred, kept);
     return false;
   }
 }
