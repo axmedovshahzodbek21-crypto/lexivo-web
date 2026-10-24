@@ -2349,6 +2349,9 @@ const en = {
     deleteCollectionAria: 'Delete collection',
     selectedCount: (n: number) => `${n} selected`,
     pendingNewBadge: (n: number) => `${n} new`,
+    examplesCount: (n: number) => `${n} examples`,
+    moreExamples: (n: number) => `+ ${n} more examples`,
+    activitiesDone: (n: number) => `${n}/4 activities done`,
   },
   import: {
     title: 'Import Words',
@@ -4971,6 +4974,9 @@ const uz: typeof en = {
     deleteCollectionAria: 'To\'plamni o\'chirish',
     selectedCount: (n: number) => `${n} ta tanlandi`,
     pendingNewBadge: (n: number) => `${n} ta yangi`,
+    examplesCount: (n: number) => `${n} ta misol`,
+    moreExamples: (n: number) => `+ yana ${n} ta misol`,
+    activitiesDone: (n: number) => `${n}/4 mashq bajarildi`,
   },
   import: {
     title: "So'z import qilish",
@@ -7607,6 +7613,9 @@ const ru: typeof en = {
     deleteCollectionAria: 'Удалить подборку',
     selectedCount: (n: number) => `Выбрано: ${n}`,
     pendingNewBadge: (n: number) => `${n} новых`,
+    examplesCount: (n: number) => `Примеров: ${n}`,
+    moreExamples: (n: number) => `+ ещё примеров: ${n}`,
+    activitiesDone: (n: number) => `Выполнено упражнений: ${n}/4`,
   },
   import: {
     title: 'Импорт слов',

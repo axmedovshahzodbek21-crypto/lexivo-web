@@ -8,6 +8,16 @@ import { pushLists, pullAll } from '@/lib/sync';
 import { speakText } from '@/lib/speech';
 import type { ImportedWord } from '@/lib/types';
 
+const PREVIEW_EXAMPLES = 3;
+
+function toggleIn(setter: (fn: (prev: Set<string>) => Set<string>) => void, id: string) {
+  setter(prev => {
+    const next = new Set(prev);
+    if (next.has(id)) next.delete(id); else next.add(id);
+    return next;
+  });
+}
+
 interface Props {
   params: Promise<{ collection: string; sub: string }>;
 }
@@ -26,6 +36,10 @@ export default function FolderCollectionPage({ params }: Props) {
   const [pendingByActivity, setPendingByActivity] = useState({ learn: 0, flashcard: 0, quiz: 0, match: 0 });
   const [selectMode, setSelectMode] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  // Word rows are compact; tapping one expands its definition + examples
+  // (a word with 10 examples used to fill the whole screen on its own).
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const [allExamples, setAllExamples] = useState<Set<string>>(new Set());
   const [confirmModal, setConfirmModal] = useState<
     | { type: 'word'; id: string; message: string }
     | { type: 'collection'; message: string }
@@ -177,7 +191,19 @@ export default function FolderCollectionPage({ params }: Props) {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-2 gap-2">
+            {(() => {
+              const done = [progress.learnDone, progress.flashcardDone, progress.quizDone, progress.matchDone].filter(Boolean).length;
+              return (
+                <div className="space-y-1.5">
+                  <div className="h-2 rounded-full bg-[var(--surface-2)] overflow-hidden">
+                    <div className="h-full rounded-full bg-[var(--primary)] transition-all duration-500" style={{ width: `${(done / 4) * 100}%` }} />
+                  </div>
+                  <p className="text-xs font-medium text-[var(--text-muted)]">{t.myWords.activitiesDone(done)}</p>
+                </div>
+              );
+            })()}
+
+            <div className="grid grid-cols-4 gap-2">
               <StudyButton
                 href={`/learn?${studyParam}`}
                 onlyNewHref={`/learn?${studyParam}&onlyNew=1`}
@@ -215,40 +241,59 @@ export default function FolderCollectionPage({ params }: Props) {
             <div className="space-y-2">
               {words.map((w) => {
                 const isSelected = selected.has(w.id);
+                const open = !selectMode && expanded.has(w.id);
+                const showAll = allExamples.has(w.id);
+                const examples = showAll ? w.examples : w.examples.slice(0, PREVIEW_EXAMPLES);
+                const hidden = w.examples.length - examples.length;
                 return (
                   <div
                     key={w.id}
-                    className={`card space-y-2 transition-colors ${selectMode ? 'cursor-pointer' : ''} ${isSelected ? 'ring-2 ring-[var(--primary)]' : ''}`}
-                    onClick={selectMode ? () => toggleSelected(w.id) : undefined}
+                    className={`rounded-2xl border px-3.5 py-3 cursor-pointer transition-colors ${open ? 'border-[var(--primary)] bg-[var(--primary-bg)]' : 'border-[var(--border)] bg-[var(--surface)]'} ${isSelected ? 'ring-2 ring-[var(--primary)]' : ''}`}
+                    onClick={() => selectMode ? toggleSelected(w.id) : toggleIn(setExpanded, w.id)}
                   >
-                    <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2">
                       {selectMode && (
                         <div
-                          className={`w-5 h-5 rounded-md border-2 shrink-0 mt-0.5 flex items-center justify-center ${isSelected ? 'bg-[var(--primary)] border-[var(--primary)]' : 'border-[var(--border)]'}`}
+                          className={`w-5 h-5 rounded-md border-2 shrink-0 flex items-center justify-center ${isSelected ? 'bg-[var(--primary)] border-[var(--primary)]' : 'border-[var(--border)]'}`}
                         >
                           {isSelected && <span className="text-white text-xs leading-none">✓</span>}
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-[var(--text)]">{w.word}</span>
-                          {!selectMode && (
-                            <button onClick={e => { e.stopPropagation(); speakText(w.word, w.language); }} className="w-6 h-6 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-xs hover:bg-[var(--primary)] hover:text-white transition-colors shrink-0" aria-label={t.home.listen}>🔊</button>
-                          )}
-                        </div>
-                        <p className="text-sm font-medium text-[var(--primary)] mt-0.5">{w.translation}</p>
-                        {w.definition && <p className="text-xs text-[var(--text-muted)] mt-1">{w.definition}</p>}
-                        {w.examples.map((ex, exIdx) => (
-                          <div key={exIdx}>
-                            <p className="text-xs italic text-[var(--text)] mt-0.5">&quot;{ex.sentence}&quot;</p>
-                            {ex.translation && <p className="text-xs text-[var(--text-muted)] pl-2">↳ {ex.translation}</p>}
-                          </div>
-                        ))}
+                        <p className="font-bold text-[var(--text)]">{w.word}</p>
+                        <p className={`text-sm font-medium text-[var(--primary)] ${open ? '' : 'truncate'}`}>{w.translation}</p>
                       </div>
                       {!selectMode && (
-                        <button onClick={() => requestDelete(w.id)} className="text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors text-sm shrink-0 mt-0.5" aria-label={t.classesPage.deleteWord}>🗑️</button>
+                        <>
+                          {w.examples.length > 0 && !open && (
+                            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[var(--primary-bg)] text-[var(--primary)] shrink-0">
+                              {t.myWords.examplesCount(w.examples.length)}
+                            </span>
+                          )}
+                          <button onClick={e => { e.stopPropagation(); speakText(w.word, w.language); }} className="w-8 h-8 rounded-full flex items-center justify-center text-sm hover:bg-[var(--primary-bg)] transition-colors shrink-0" aria-label={t.home.listen}>🔊</button>
+                          <span className={`text-[var(--text-muted)] text-lg leading-none shrink-0 transition-transform duration-200 ${open ? 'rotate-90' : ''}`}>›</span>
+                        </>
                       )}
                     </div>
+                    {open && (
+                      <div className="mt-2.5 ml-0.5 pl-3 border-l-[3px] border-[var(--primary)] space-y-2 animate-fade-in" onClick={e => e.stopPropagation()}>
+                        {w.definition && <p className="text-sm text-[var(--text-muted)] leading-snug">{w.definition}</p>}
+                        {examples.map((ex, exIdx) => (
+                          <div key={exIdx}>
+                            <p className="text-sm italic text-[var(--text)]">&quot;{ex.sentence}&quot;</p>
+                            {ex.translation && <p className="text-xs text-[var(--text-muted)] mt-0.5">↳ {ex.translation}</p>}
+                          </div>
+                        ))}
+                        <div className="flex items-center">
+                          {hidden > 0 && (
+                            <button onClick={() => toggleIn(setAllExamples, w.id)} className="text-xs font-semibold text-[var(--primary)]">
+                              {t.myWords.moreExamples(hidden)}
+                            </button>
+                          )}
+                          <button onClick={() => requestDelete(w.id)} className="ml-auto text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors text-sm" aria-label={t.classesPage.deleteWord}>🗑️</button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -321,12 +366,12 @@ function StudyButton({
   return (
     <Link
       href={target}
-      className="relative flex flex-col items-center gap-1.5 py-3 rounded-2xl text-center transition-colors"
+      className="relative flex flex-col items-center gap-1 py-3 px-1 rounded-2xl text-center transition-colors min-w-0"
       style={{ background: bg, border: `1.5px solid ${border}` }}
     >
-      {done && <span className="absolute top-1.5 right-1.5 text-sm">✅</span>}
+      {done && <span className="absolute top-1 right-1 text-xs">✅</span>}
       <span className="text-2xl">{icon}</span>
-      <span className="text-xs font-semibold" style={{ color }}>{label}</span>
+      <span className="text-[11px] font-semibold truncate max-w-full" style={{ color }}>{label}</span>
       {done && pendingNew > 0 && (
         <span
           className="absolute -top-1.5 -left-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full text-white"
