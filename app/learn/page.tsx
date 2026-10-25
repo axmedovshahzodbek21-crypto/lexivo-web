@@ -1500,13 +1500,11 @@ function ExtraExampleCard({
       <div className="bg-[var(--surface-2)] px-3 pt-2.5 pb-2">
         <div className="flex items-start justify-between gap-2 mb-1">
           <span className="text-xs text-[var(--text-muted)]">{t.learn.extraExampleLabel(index + 1)}</span>
-          {language && (
-            <button
-              onClick={e => { e.stopPropagation(); speakText(example, language); }}
-              className="w-5 h-5 rounded-full flex items-center justify-center text-xs hover:bg-[var(--primary-bg)] transition-colors shrink-0"
-              aria-label={t.extra.listen}
-            >🔊</button>
-          )}
+          <button
+            onClick={e => { e.stopPropagation(); if (language) speakText(example, language); else speakAccent(example, getSettings().defaultAccent); }}
+            className="w-5 h-5 rounded-full flex items-center justify-center text-xs hover:bg-[var(--primary-bg)] transition-colors shrink-0"
+            aria-label={t.extra.listen}
+          >🔊</button>
         </div>
         <p className="text-sm italic text-[var(--text)]">&ldquo;{example}&rdquo;</p>
       </div>
