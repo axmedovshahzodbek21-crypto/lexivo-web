@@ -6,6 +6,7 @@ import { useTranslation } from '@/lib/useTranslation';
 import { getImportedFolders, getImportedCollections, addImportedWords, generateImportedWordId, getCollectionsByFolder, getMyUnitProgress, resetMyWordsProgress } from '@/lib/storage';
 import { pushLists, pullAll } from '@/lib/sync';
 import type { ImportedFolder, ImportedCollection } from '@/lib/types';
+import BackButton from '@/components/BackButton';
 
 const EXAMPLE_SEEDED_KEY = 'lexivo_mywords_example_seeded';
 
@@ -53,6 +54,28 @@ const darken = (hex: string, amt = 0.45) => {
   const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
   return `rgb(${Math.round(r*(1-amt))},${Math.round(g*(1-amt))},${Math.round(b*(1-amt))})`;
 };
+const lighten = (hex: string, amt = 0.3) => {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return `rgb(${Math.round(r+(255-r)*amt)},${Math.round(g+(255-g)*amt)},${Math.round(b+(255-b)*amt)})`;
+};
+
+// Same card as the Library page's folders (app/library/page.tsx).
+function FolderCard({ href, color, icon, name, subtitle }: { href: string; color: string; icon: string; name: string; subtitle: string }) {
+  return (
+    <Link href={href}>
+      <div
+        className="rounded-2xl cursor-pointer animate-heartbeat hover:-translate-y-1 transition-all duration-200 relative overflow-hidden"
+        style={{ background: `linear-gradient(135deg, ${lighten(color)}, ${color})`, boxShadow: `0 12px 0 ${darken(color)}, 0 16px 32px ${color}99`, minHeight: '120px' }}
+      >
+        <div className="p-4 text-2xl">{icon}</div>
+        <div className="absolute bottom-0 left-0 right-0 px-4 py-3" style={{ background: 'rgba(0,0,0,0.18)', backdropFilter: 'blur(8px)' }}>
+          <p className="text-white font-bold text-sm leading-tight line-clamp-2" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>{name}</p>
+          <p className="text-white/70 text-xs mt-0.5">{subtitle}</p>
+        </div>
+      </div>
+    </Link>
+  );
+}
 
 export default function MyWordsPage() {
   const router = useRouter();
@@ -107,11 +130,15 @@ export default function MyWordsPage() {
   const isEmpty = folders.length === 0 && orphaned.length === 0;
 
   return (
-    <div className="flex flex-col min-h-screen animate-fade-in pb-24">
-      <div className="flex items-center justify-between p-4 border-b border-[var(--border)]">
-        <button onClick={() => router.back()} className="btn-icon text-lg" aria-label={t.extra.goBack}>←</button>
-        <h1 className="font-bold text-[var(--text)]">{t.myWords.title}</h1>
-        <div className="flex items-center gap-1.5">
+    <div className="max-w-2xl w-full mx-auto px-4 py-6 pb-24 animate-fade-in">
+      <BackButton />
+      {/* Header — same layout as the Library page */}
+      <div className="flex items-center justify-between gap-3 mb-6">
+        <div className="min-w-0">
+          <h1 className="text-2xl font-black text-[var(--text)]">{t.myWords.title}</h1>
+          <p className="text-sm text-[var(--text-muted)] mt-0.5">{t.libraryPage.folderCount(folders.length)}</p>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
           {!isEmpty && (
             <button
               onClick={() => setResetConfirm(true)}
@@ -122,31 +149,40 @@ export default function MyWordsPage() {
           )}
           <button
             onClick={() => setCreating(true)}
-            className="w-9 h-9 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-lg font-bold text-[var(--primary)]"
-            aria-label={t.extra.createFolderAria}
-          >+</button>
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-white"
+            style={{ background: 'linear-gradient(135deg, var(--primary), var(--primary-light))' }}
+          >
+            + {t.libraryPage.newFolder}
+          </button>
         </div>
       </div>
 
+      {/* Create modal */}
       {creating && (
-        <form onSubmit={handleCreateFolder} className="p-4 border-b border-[var(--border)] flex gap-2">
-          <input
-            ref={inputRef}
-            value={folderName}
-            onChange={e => setFolderName(e.target.value)}
-            placeholder={t.extra.folderNamePlaceholder}
-            className="flex-1 px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] text-sm outline-none focus:border-[var(--primary)]"
-          />
-          <button type="submit" className="btn-primary px-4 py-2 text-sm font-semibold rounded-xl">{t.extra.create}</button>
-          <button
-            type="button"
-            onClick={() => { setCreating(false); setFolderName(''); }}
-            className="px-3 py-2 text-sm text-[var(--text-muted)]"
-          >{t.extra.cancel}</button>
-        </form>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" onClick={() => { setCreating(false); setFolderName(''); }}>
+          <form onSubmit={handleCreateFolder} className="bg-[var(--surface)] rounded-2xl p-6 w-full max-w-sm shadow-2xl" onClick={e => e.stopPropagation()}>
+            <h2 className="text-lg font-bold text-[var(--text)] mb-4">{t.libraryPage.newFolder}</h2>
+            <input
+              ref={inputRef}
+              value={folderName}
+              onChange={e => setFolderName(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Escape') { setCreating(false); setFolderName(''); } }}
+              placeholder={t.extra.folderNamePlaceholder}
+              className="w-full px-3 py-2.5 rounded-xl bg-[var(--surface-2)] text-[var(--text)] text-sm border border-[var(--border)] outline-none focus:border-[var(--primary)] mb-4"
+            />
+            <div className="flex gap-2 justify-end">
+              <button
+                type="button"
+                onClick={() => { setCreating(false); setFolderName(''); }}
+                className="px-4 py-2 rounded-xl text-sm font-medium text-[var(--text-muted)] hover:bg-[var(--surface-2)]"
+              >{t.extra.cancel}</button>
+              <button type="submit" disabled={!folderName.trim()} className="px-4 py-2 rounded-xl text-sm font-bold text-white bg-[var(--primary)] disabled:opacity-50">{t.extra.create}</button>
+            </div>
+          </form>
+        </div>
       )}
 
-      <div className="p-4">
+      <div>
         {isEmpty ? (
           <div className="flex flex-col items-center justify-center gap-4 py-12 text-center">
             <div className="text-6xl">📁</div>
@@ -181,66 +217,39 @@ export default function MyWordsPage() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-3 gap-3">
-              {folders.map((folder, i) => (
-                <Link
-                  key={folder.name}
-                  href={`/my-words/${encodeURIComponent(folder.name)}`}
-                  className="flex flex-col rounded-2xl p-3 min-h-[100px] justify-between transition-all duration-200 hover:-translate-y-1 animate-heartbeat"
-                  style={{
-                    background: cardColor(i),
-                    boxShadow: '0 6px 0 rgba(0,0,0,0.25), 0 10px 24px rgba(0,0,0,0.2)',
-                  }}
-                >
-                  <span className="text-2xl">📁</span>
-                  <div>
-                    <p className="font-bold text-white text-sm leading-tight line-clamp-2">{folder.name}</p>
-                    <p className="text-[11px] mt-0.5" style={{ color: 'rgba(255,255,255,0.75)' }}>
-                      {t.myWords.wordCount(folder.wordCount)}
-                      {(() => {
-                        const done = completedUnitsInFolder(folder.name);
-                        return done > 0 ? ` · ✅ ${done}/${folder.collectionCount}` : '';
-                      })()}
-                    </p>
-                  </div>
-                </Link>
-              ))}
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {folders.map((folder, i) => {
+                const done = completedUnitsInFolder(folder.name);
+                return (
+                  <FolderCard
+                    key={folder.name}
+                    href={`/my-words/${encodeURIComponent(folder.name)}`}
+                    color={cardColor(i)}
+                    icon="📁"
+                    name={folder.name}
+                    subtitle={t.libraryPage.unitCount(folder.collectionCount) + (done > 0 ? ` · ✅ ${done}/${folder.collectionCount}` : '')}
+                  />
+                );
+              })}
             </div>
 
             {orphaned.length > 0 && (
-              <div className="mt-5">
+              <div className="mt-6">
                 <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide px-1 mb-3">{t.extra.unfiled}</p>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {orphaned.map((col, i) => (
-                    <Link
+                    <FolderCard
                       key={col.name}
                       href={`/import?collection=${encodeURIComponent(col.name)}`}
-                      className="flex flex-col rounded-2xl p-3 min-h-[100px] justify-between transition-all duration-200 hover:-translate-y-1 animate-heartbeat"
-                      style={{
-                        background: cardColor(folders.length + i),
-                        boxShadow: '0 6px 0 rgba(0,0,0,0.25), 0 10px 24px rgba(0,0,0,0.2)',
-                      }}
-                    >
-                      <span className="text-2xl">📖</span>
-                      <div>
-                        <p className="font-bold text-white text-sm leading-tight line-clamp-2">{col.name}</p>
-                        <p className="text-[11px] mt-0.5" style={{ color: 'rgba(255,255,255,0.75)' }}>
-                          {t.myWords.wordCount(col.count)}
-                        </p>
-                      </div>
-                    </Link>
+                      color={cardColor(folders.length + i)}
+                      icon="📖"
+                      name={col.name}
+                      subtitle={t.myWords.wordCount(col.count)}
+                    />
                   ))}
                 </div>
               </div>
             )}
-
-            <button
-              onClick={() => setCreating(true)}
-              className="mt-5 flex items-center justify-center gap-2 w-full py-3 rounded-2xl border-2 border-dashed border-[var(--border)] text-sm font-medium text-[var(--text-muted)] hover:border-[var(--primary)] hover:text-[var(--primary)] transition-colors"
-            >
-              <span>+</span>
-              <span>{t.extra.newFolder}</span>
-            </button>
           </>
         )}
       </div>
