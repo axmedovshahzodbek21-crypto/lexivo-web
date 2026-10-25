@@ -5,7 +5,8 @@ import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { unitCache as _cache } from '@/lib/teacher-library-cache';
-import { buildAiImportPrompt, parseAiImportOutput } from '@/lib/ai-import';
+import { type AiParsedWord } from '@/lib/ai-import';
+import AiAddWordsPanel, { UnitTabBar } from '@/components/AiAddWordsPanel';
 
 interface WordExample { sentence: string; translation: string; }
 interface UnitWord {
@@ -18,17 +19,6 @@ interface UnitWord {
   definitionUz: string | null;
   examples: WordExample[];
 }
-interface ParsedWord {
-  word: string;
-  translation: string;
-  definition: string;
-  partOfSpeech: string;
-  pronunciation: string;
-  definitionUz: string;
-  examples: WordExample[];
-}
-
-const LANGUAGES = ['English','Uzbek','Russian','Turkish','German','French','Spanish','Korean','Japanese','Chinese','Arabic'];
 
 export default function UnitPage() {
   const t = useTranslation();
@@ -44,15 +34,6 @@ export default function UnitPage() {
   const [words, setWords] = useState<UnitWord[]>(cached?.words ?? []);
   const [loading, setLoading] = useState(cached === null);
   const [tab, setTab] = useState<'words' | 'add'>('words');
-
-  // AI import state
-  const [wordLang, setWordLang] = useState('English');
-  const [transLang, setTransLang] = useState('Uzbek');
-  const [wordsInput, setWordsInput] = useState('');
-  const [pasteText, setPasteText] = useState('');
-  const [parsed, setParsed] = useState<ParsedWord[]>([]);
-  const [importing, setImporting] = useState(false);
-  const [copied, setCopied] = useState(false);
 
   // Word detail modal
   const [detailWord, setDetailWord] = useState<UnitWord | null>(null);
@@ -72,20 +53,6 @@ export default function UnitPage() {
     if (!user) { router.replace('/login'); return; }
     load();
   }, [user, authLoading, unitId]);
-
-  useEffect(() => {
-    setParsed(pasteText.trim()
-      ? parseAiImportOutput(pasteText).words.map(w => ({
-          word: w.word,
-          translation: w.translation,
-          definition: w.definition,
-          partOfSpeech: w.partOfSpeech ?? '',
-          pronunciation: w.pronunciation ?? '',
-          definitionUz: w.definitionUz ?? '',
-          examples: w.examples,
-        }))
-      : []);
-  }, [pasteText]);
 
   async function load() {
     if (!user) return;
@@ -124,14 +91,15 @@ export default function UnitPage() {
     setLoading(false);
   }
 
-  async function importAll() {
-    if (!parsed.length || !user) return;
-    setImporting(true);
+  // onAdd for the shared AiAddWordsPanel. Word language isn't stored for
+  // Library words (no column for it), so langCode is unused here.
+  async function addWords(parsed: AiParsedWord[]) {
+    if (!user) return;
     // Defense-in-depth: confirm this unit is actually the caller's before
     // importing words into it — RLS is the real backstop, but nothing here
     // previously stopped an arbitrary unitId from being trusted outright.
     const { data: unit } = await supabase.from('teacher_units').select('teacher_id').eq('id', unitId).maybeSingle();
-    if (!unit || unit.teacher_id !== user.id) { setImporting(false); return; }
+    if (!unit || unit.teacher_id !== user.id) return;
     // Same dedupe as My Words' addImportedWords: skip words already in this
     // unit, and repeats within the same paste (first occurrence wins).
     const { data: existing } = await supabase.from('teacher_unit_words').select('word').eq('unit_id', unitId);
@@ -142,7 +110,7 @@ export default function UnitPage() {
       seen.add(key);
       return true;
     });
-    if (!fresh.length) { setPasteText(''); setWordsInput(''); setParsed([]); setTab('words'); setImporting(false); return; }
+    if (!fresh.length) return;
     const rows = fresh.map(w => ({
       unit_id: unitId,
       teacher_id: user.id,
@@ -154,20 +122,11 @@ export default function UnitPage() {
       ...(w.definitionUz ? { definition_uz: w.definitionUz } : {}),
       examples: w.examples.slice(0, 10),
     }));
-    try {
-      // supabase-js returns errors rather than throwing — without this a
-      // failed insert looked like success.
-      const { error } = await supabase.from('teacher_unit_words').insert(rows);
-      if (error) throw new Error(error.message);
-    } catch (e) {
-      alert(t.libraryPage.failedToAddWords(e instanceof Error ? e.message : String(e)));
-      setImporting(false);
-      return;
-    }
-    setPasteText(''); setWordsInput(''); setParsed([]);
+    // supabase-js returns errors rather than throwing — without this a
+    // failed insert looked like success.
+    const { error } = await supabase.from('teacher_unit_words').insert(rows);
+    if (error) throw new Error(error.message);
     await load();
-    setTab('words');
-    setImporting(false);
   }
 
   async function deleteWordIds(ids: string[]) {
@@ -216,14 +175,6 @@ export default function UnitPage() {
     setConfirmModal(null);
   }
 
-  function copyPrompt(hasTranslations: boolean) {
-    const words = wordsInput.trim() || (hasTranslations ? 'apple - olma\nbook - kitob' : 'apple, book, water');
-    const prompt = buildAiImportPrompt({ wordLang, translationLang: transLang, words, hasTranslations });
-    navigator.clipboard.writeText(prompt);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2500);
-  }
-
   if (loading) return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="w-8 h-8 border-2 border-[var(--primary)] border-t-transparent rounded-full animate-spin" />
@@ -255,18 +206,7 @@ export default function UnitPage() {
         )}
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-1 p-1 bg-[var(--surface-2)] rounded-xl mb-6">
-        {(['words', 'add'] as const).map(tabOption => (
-          <button
-            key={tabOption}
-            onClick={() => setTab(tabOption)}
-            className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${tab === tabOption ? 'bg-[var(--surface)] text-[var(--primary)] shadow-sm' : 'text-[var(--text-muted)]'}`}
-          >
-            {tabOption === 'words' ? t.libraryPage.wordsTab : t.libraryPage.addWordsTab}
-          </button>
-        ))}
-      </div>
+      <UnitTabBar tab={tab} onChange={setTab} />
 
       {/* Words tab */}
       {tab === 'words' && (
@@ -320,90 +260,8 @@ export default function UnitPage() {
       )}
 
       {/* Add Words tab */}
-      {tab === 'add' && (
-        <div className="space-y-4">
-          {/* Language selectors */}
-          <div className="p-4 bg-[var(--surface)] rounded-2xl">
-            <p className="text-xs font-bold text-[var(--text-muted)] mb-3">{t.libraryPage.wordLangTrLang}</p>
-            <div className="flex items-center gap-3">
-              <select value={wordLang} onChange={e => setWordLang(e.target.value)} className="flex-1 px-3 py-2 rounded-xl bg-[var(--surface-2)] text-[var(--text)] text-sm border border-[var(--border)] outline-none">
-                {LANGUAGES.map(l => <option key={l}>{l}</option>)}
-              </select>
-              <span className="text-[var(--text-muted)] font-bold">→</span>
-              <select value={transLang} onChange={e => setTransLang(e.target.value)} className="flex-1 px-3 py-2 rounded-xl bg-[var(--surface-2)] text-[var(--text)] text-sm border border-[var(--border)] outline-none">
-                {LANGUAGES.map(l => <option key={l}>{l}</option>)}
-              </select>
-            </div>
-          </div>
-
-          {/* Step 1 */}
-          <div className="p-4 bg-[var(--surface)] rounded-2xl">
-            <p className="text-sm font-bold text-[var(--text)] mb-3">{t.libraryPage.enterWordsStep}</p>
-            <textarea
-              value={wordsInput}
-              onChange={e => setWordsInput(e.target.value)}
-              placeholder={t.libraryPage.wordsInputPlaceholder}
-              rows={4}
-              className="w-full px-3 py-2.5 rounded-xl bg-[var(--surface-2)] text-[var(--text)] text-sm border border-[var(--border)] outline-none focus:border-[var(--primary)] resize-none mb-3"
-            />
-            <div className="space-y-2">
-              <button
-                onClick={() => copyPrompt(false)}
-                className="w-full py-2.5 rounded-xl text-sm font-semibold border border-[var(--primary)] text-[var(--primary)] hover:bg-[var(--primary-bg)] transition-colors"
-              >{t.libraryPage.copyPromptWordsOnly}</button>
-              <button
-                onClick={() => copyPrompt(true)}
-                className="w-full py-2.5 rounded-xl text-sm font-semibold border border-[var(--border)] text-[var(--text-muted)] hover:bg-[var(--surface-2)] transition-colors"
-              >{t.libraryPage.copyPromptWithTranslations}</button>
-            </div>
-          </div>
-
-          {/* Step 2 */}
-          <div className="p-4 bg-[var(--surface)] rounded-2xl">
-            <p className="text-sm font-bold text-[var(--text)] mb-3">{t.libraryPage.pasteAiOutputStep}</p>
-            <textarea
-              value={pasteText}
-              onChange={e => setPasteText(e.target.value)}
-              placeholder={t.libraryPage.pasteAiResponse}
-              rows={6}
-              className="w-full px-3 py-2.5 rounded-xl bg-[var(--surface-2)] text-[var(--text)] text-xs font-mono border border-[var(--border)] outline-none focus:border-[var(--primary)] resize-none"
-            />
-            {parsed.length > 0 && (
-              <div className="mt-3 space-y-2">
-                <p className="text-xs font-bold text-green-500">{t.libraryPage.wordsRecognized(parsed.length)}</p>
-                {parsed.map((w, i) => (
-                  <div key={i} className="p-3 bg-[var(--surface-2)] rounded-xl">
-                    <div className="flex items-start justify-between">
-                      <span className="font-bold text-[var(--text)] text-sm">{w.word}</span>
-                      <span className="text-[10px] font-bold text-[var(--primary)] ml-2 shrink-0">{t.libraryPage.exCount(w.examples.length)}</span>
-                    </div>
-                    <span className="text-[var(--primary)] text-xs font-semibold">{w.translation}</span>
-                    {w.definition && <p className="text-[var(--text-muted)] text-xs mt-0.5 truncate">{w.definition}</p>}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {parsed.length > 0 && (
-            <button
-              onClick={importAll}
-              disabled={importing}
-              className="w-full py-3 rounded-xl text-sm font-bold text-white disabled:opacity-50"
-              style={{ background: 'var(--primary)' }}
-            >
-              {importing ? t.libraryPage.importing : t.libraryPage.importAllBtn(parsed.length)}
-            </button>
-          )}
-        </div>
-      )}
-
-      {/* Copy toast */}
-      {copied && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl text-sm font-semibold text-white shadow-xl pointer-events-none" style={{ background: 'var(--primary)' }}>
-          {t.libraryPage.promptCopiedToast}
-        </div>
-      )}
+      {/* Hidden rather than unmounted so a half-finished paste survives a tab switch. */}
+      <div hidden={tab !== 'add'}><AiAddWordsPanel onAdd={addWords} onAdded={() => setTab('words')} /></div>
 
       {/* Word detail modal */}
       {detailWord && (

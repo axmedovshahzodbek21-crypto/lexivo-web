@@ -3,10 +3,12 @@ import { useEffect, useState, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/lib/useTranslation';
-import { getImportedWordsByCollection, deleteImportedWord, deleteImportedWords, deleteImportedCollection, getMyUnitProgress, getMyUnitPendingNewWords, getMyActivityPendingNewWords } from '@/lib/storage';
+import { getImportedWordsByCollection, deleteImportedWord, deleteImportedWords, deleteImportedCollection, getMyUnitProgress, getMyUnitPendingNewWords, getMyActivityPendingNewWords, addImportedWords, generateImportedWordId } from '@/lib/storage';
 import { pushLists, pullAll } from '@/lib/sync';
 import { speakText } from '@/lib/speech';
 import type { ImportedWord } from '@/lib/types';
+import type { AiParsedWord } from '@/lib/ai-import';
+import AiAddWordsPanel, { UnitTabBar, type UnitTab } from '@/components/AiAddWordsPanel';
 
 const PREVIEW_EXAMPLES = 3;
 
@@ -30,6 +32,7 @@ export default function FolderCollectionPage({ params }: Props) {
   const router = useRouter();
   const t = useTranslation();
   const [words, setWords] = useState<ImportedWord[]>([]);
+  const [tab, setTab] = useState<UnitTab>('words');
   const [completedAt, setCompletedAt] = useState<string | undefined>(undefined);
   const [progress, setProgress] = useState<{ learnDone: boolean; flashcardDone: boolean; quizDone: boolean; matchDone: boolean }>({ learnDone: false, flashcardDone: false, quizDone: false, matchDone: false });
   const [pendingNewWords, setPendingNewWords] = useState<string[]>([]);
@@ -133,7 +136,29 @@ export default function FolderCollectionPage({ params }: Props) {
     setConfirmModal(null);
   }
 
-  const studyParam = `source=my-words&myCollection=${encodeURIComponent(collectionName)}&myFolder=${encodeURIComponent(folder)}`;
+  // onAdd for the shared AiAddWordsPanel (same panel Library units use).
+  async function addWords(parsed: AiParsedWord[], langCode: string) {
+    const rows: ImportedWord[] = parsed.map(w => ({
+      id: generateImportedWordId(),
+      word: w.word,
+      partOfSpeech: w.partOfSpeech,
+      pronunciation: w.pronunciation,
+      translation: w.translation,
+      definition: w.definition,
+      definitionUz: w.definitionUz,
+      examples: w.examples.map(e => ({ sentence: e.sentence, translation: e.translation || undefined })),
+      language: langCode,
+      addedAt: Date.now(),
+      collectionName,
+    }));
+    addImportedWords(rows, collectionName, folder);
+    pushLists();
+    const w = getImportedWordsByCollection(collectionName, folder);
+    setWords(w);
+    loadProgress(w);
+  }
+
+  const studyParam =`source=my-words&myCollection=${encodeURIComponent(collectionName)}&myFolder=${encodeURIComponent(folder)}`;
 
   return (
     <div className="flex flex-col min-h-screen animate-fade-in pb-24">
@@ -145,7 +170,7 @@ export default function FolderCollectionPage({ params }: Props) {
             <span className="text-[var(--primary)]">📁 {folder}</span> · {t.myWords.wordCount(words.length)}
           </p>
         </div>
-        {words.length > 0 && (
+        {tab === 'words' && words.length > 0 && (
           <button
             onClick={toggleSelectMode}
             className={`text-xs font-semibold px-3 py-1.5 rounded-full transition-colors ${selectMode ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface-2)] text-[var(--text-muted)]'}`}
@@ -153,18 +178,25 @@ export default function FolderCollectionPage({ params }: Props) {
             {selectMode ? t.libraryPage.cancel : t.libraryPage.select}
           </button>
         )}
+        {tab === 'words' && (
         <button
           onClick={requestDeleteCollection}
           className="btn-icon text-base text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors"
           aria-label={t.myWords.deleteCollectionAria}
         >🗑️</button>
-        <Link
-          href={`/import?folder=${encodeURIComponent(folder)}&collection=${encodeURIComponent(collectionName)}`}
-          className="w-9 h-9 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-lg font-bold text-[var(--primary)]"
-          aria-label={t.myWords.addWords}
-        >+</Link>
+        )}
       </div>
 
+      <div className="px-4 pt-4 -mb-4">
+        <UnitTabBar tab={tab} onChange={setTab} />
+      </div>
+
+      {/* Hidden rather than unmounted so a half-finished paste survives a tab switch. */}
+      <div hidden={tab !== 'add'} className="p-4">
+        <AiAddWordsPanel onAdd={addWords} onAdded={() => setTab('words')} />
+      </div>
+
+      {tab === 'words' && (<>
       {completedAt && (
         <div className="mx-4 mt-4 rounded-2xl px-4 py-3 flex items-center gap-2 font-bold animate-pop" style={{ background: 'rgba(34,197,94,0.12)', color: 'var(--success)', border: '1.5px solid var(--success)' }}>
           <span className="text-xl">🏆</span>
@@ -179,15 +211,11 @@ export default function FolderCollectionPage({ params }: Props) {
 
       <div className="p-4 space-y-4">
         {words.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-4 py-16 text-center">
-            <div className="text-6xl">✍️</div>
-            <p className="text-[var(--text-muted)] text-sm">{t.myWords.empty}</p>
-            <Link
-              href={`/import?folder=${encodeURIComponent(folder)}&collection=${encodeURIComponent(collectionName)}`}
-              className="btn-primary px-6 py-3 text-sm font-semibold"
-            >
-              {t.myWords.addWords}
-            </Link>
+          <div className="text-center py-20">
+            <div className="text-6xl mb-4">📝</div>
+            <h2 className="text-xl font-bold text-[var(--text)] mb-2">{t.libraryPage.noWordsYet}</h2>
+            <p className="text-sm text-[var(--text-muted)] mb-6">{t.libraryPage.goToAddWords}</p>
+            <button onClick={() => setTab('add')} className="px-6 py-3 rounded-xl text-sm font-bold text-white" style={{ background: 'var(--primary)' }}>{t.libraryPage.addWords}</button>
           </div>
         ) : (
           <>
@@ -300,17 +328,18 @@ export default function FolderCollectionPage({ params }: Props) {
             </div>
 
             {!selectMode && (
-            <Link
-              href={`/import?folder=${encodeURIComponent(folder)}&collection=${encodeURIComponent(collectionName)}`}
+            <button
+              onClick={() => setTab('add')}
               className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl border-2 border-dashed border-[var(--border)] text-sm font-medium text-[var(--text-muted)] hover:border-[var(--primary)] hover:text-[var(--primary)] transition-colors"
             >
               <span>+</span>
               <span>{t.myWords.addWords}</span>
-            </Link>
+            </button>
             )}
           </>
         )}
       </div>
+      </>)}
 
       {selectMode && selected.size > 0 && (
         <div className="fixed bottom-20 sm:bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-3 px-5 py-3 rounded-2xl shadow-xl bg-[var(--surface)] border border-[var(--border)]">
