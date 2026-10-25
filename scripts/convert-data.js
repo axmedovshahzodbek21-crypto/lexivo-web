@@ -155,15 +155,18 @@ if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
 // touches only the Phrases entry of word_data.json and leaves the rest as-is.
 // Usage: node scripts/convert-data.js --phrases-only
 if (process.argv.includes('--phrases-only')) {
+  // One WordCollection per CEFR level ("Phrases A1" … "Phrases C2"); every
+  // existing Phrases* entry is replaced so removed/renamed levels don't linger.
   const src = fs.readFileSync(path.join(dataDir, 'phrases_collection.dart'), 'utf8');
-  const m = /WordCollection\s*\(/.exec(src);
-  const phrases = parseCollection(extractBlock(src, m.index + m[0].length - 1));
+  const phrases = findBlocks(src, 'WordCollection').map(b => parseCollection(b.block));
   const file = path.join(outDir, 'word_data.json');
-  const cols = JSON.parse(fs.readFileSync(file, 'utf8')).filter(c => c.name !== phrases.name);
-  cols.push(phrases);
+  const cols = JSON.parse(fs.readFileSync(file, 'utf8')).filter(c => !c.name.startsWith('Phrases'));
+  cols.push(...phrases);
   fs.writeFileSync(file, JSON.stringify(cols, null, 0));
-  const total = phrases.days.reduce((a, d) => a + d.words.length, 0);
-  console.log(`"${phrases.name}": ${phrases.days.length} days, ${total} words -> word_data.json`);
+  for (const p of phrases) {
+    const total = p.days.reduce((a, d) => a + d.words.length, 0);
+    console.log(`"${p.name}": ${p.days.length} days, ${total} words -> word_data.json`);
+  }
   process.exit(0);
 }
 

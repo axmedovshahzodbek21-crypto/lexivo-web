@@ -7,6 +7,7 @@ import { getUnitProgress, getLearnProgress, getHardWordCount, getFlashcardProgre
 import type { WordCollection, UnitProgress } from '@/lib/types';
 import { useTranslation } from '@/lib/useTranslation';
 import { supabase } from '@/lib/supabase';
+import { PHRASE_LEVELS, phraseCollectionName, isPhraseCollection } from '@/lib/phrases';
 
 const COLLECTION_HERO: Record<string, { gradient: string; glow: string }> = {
   '30 Days of Powerful Words': {
@@ -21,10 +22,11 @@ const COLLECTION_HERO: Record<string, { gradient: string; glow: string }> = {
     gradient: 'linear-gradient(135deg, #1a9a50 0%, #2ECC71 100%)',
     glow: 'rgba(46,204,113,0.45)',
   },
-  'Phrases': {
-    gradient: 'linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)',
-    glow: 'rgba(139,92,246,0.45)',
-  },
+};
+
+const PHRASES_HERO = {
+  gradient: 'linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)',
+  glow: 'rgba(139,92,246,0.45)',
 };
 const DEFAULT_HERO = {
   gradient: 'linear-gradient(135deg, #6c63ff 0%, #9b8fff 100%)',
@@ -43,7 +45,10 @@ const KNOWN_DESCRIPTIONS: Record<string, (t: ReturnType<typeof useTranslation>) 
   '30 Days of Powerful Words': t => t.collectionsPage.desc30Days,
   '24 Vocabulary Challenge': t => t.collectionsPage.desc24Challenge,
   'Word Mastery': t => t.collectionsPage.descWordMastery,
-  'Phrases': t => t.collectionsPage.descPhrases,
+  ...Object.fromEntries(PHRASE_LEVELS.map(l => [
+    phraseCollectionName(l),
+    (t: ReturnType<typeof useTranslation>) => `${l} — ${t.collectionsPage.phrasesLevels[l]}`,
+  ])),
 };
 
 interface UnitRow {
@@ -185,7 +190,7 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
 
   const totalWords = collection.days.reduce((a, d) => a + d.words.length, 0);
   const completedUnits = units.filter(u => u.progress.learnDone && u.progress.flashcardDone && u.progress.quizDone).length;
-  const hero = COLLECTION_HERO[collectionName] ?? DEFAULT_HERO;
+  const hero = COLLECTION_HERO[collectionName] ?? (isPhraseCollection(collectionName) ? PHRASES_HERO : DEFAULT_HERO);
   const progressPct = units.length > 0 ? (completedUnits / units.length) * 100 : 0;
 
   return (

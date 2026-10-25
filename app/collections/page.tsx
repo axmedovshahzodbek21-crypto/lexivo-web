@@ -6,6 +6,7 @@ import { useAppStore } from '@/lib/store';
 import { useShallow } from 'zustand/react/shallow';
 import { getImportedWords } from '@/lib/storage';
 import { useEffect, useState } from 'react';
+import { isPhraseCollection } from '@/lib/phrases';
 
 function collectionMeta(t: ReturnType<typeof useTranslation>): Record<string, { icon: string; gradient: string; edge: string; glow: string; desc: string }> {
   return {
@@ -29,13 +30,6 @@ function collectionMeta(t: ReturnType<typeof useTranslation>): Record<string, { 
       edge: '#0f6634',
       glow: 'rgba(46,204,113,0.45)',
       desc: t.collectionsPage.descWordMastery,
-    },
-    'Phrases': {
-      icon: '💬',
-      gradient: 'linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)',
-      edge: '#5b21b6',
-      glow: 'rgba(139,92,246,0.45)',
-      desc: t.collectionsPage.descPhrases,
     },
   };
 }
@@ -83,9 +77,9 @@ export default function CollectionsPage() {
     setImportedCount(getImportedWords().length);
   }, []);
 
-  const CURATED_ORDER = ['30 Days of Powerful Words', '24 Vocabulary Challenge', 'Word Mastery', 'Phrases'];
+  const CURATED_ORDER = ['30 Days of Powerful Words', '24 Vocabulary Challenge', 'Word Mastery'];
   const mainCollections = collections
-    .filter(c => !LEVELED_NAMES.has(c.name) && !c.youtubeUrl)
+    .filter(c => !LEVELED_NAMES.has(c.name) && !c.youtubeUrl && !isPhraseCollection(c.name))
     .sort((a, b) => {
       const ai = CURATED_ORDER.indexOf(a.name);
       const bi = CURATED_ORDER.indexOf(b.name);
@@ -132,7 +126,16 @@ export default function CollectionsPage() {
           );
         })}
 
-        {/* 5. My Words — personal list last */}
+        {/* 5. Phrases — opens the A1–C2 level picker */}
+        <CollectionCard
+          href="/phrases"
+          icon="💬"
+          title={t.collectionsPage.phrasesTitle}
+          desc={t.collectionsPage.descPhrases}
+          meta={{ gradient: 'linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)', edge: '#5b21b6', glow: 'rgba(139,92,246,0.45)' }}
+        />
+
+        {/* 6. My Words — personal list last */}
         <CollectionCard
           href="/my-words"
           icon="✍️"
