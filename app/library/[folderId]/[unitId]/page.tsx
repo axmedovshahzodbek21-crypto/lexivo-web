@@ -132,7 +132,18 @@ export default function UnitPage() {
     // previously stopped an arbitrary unitId from being trusted outright.
     const { data: unit } = await supabase.from('teacher_units').select('teacher_id').eq('id', unitId).maybeSingle();
     if (!unit || unit.teacher_id !== user.id) { setImporting(false); return; }
-    const rows = parsed.map(w => ({
+    // Same dedupe as My Words' addImportedWords: skip words already in this
+    // unit, and repeats within the same paste (first occurrence wins).
+    const { data: existing } = await supabase.from('teacher_unit_words').select('word').eq('unit_id', unitId);
+    const seen = new Set((existing ?? []).map((e: { word: string }) => e.word.toLowerCase().trim()));
+    const fresh = parsed.filter(w => {
+      const key = w.word.toLowerCase().trim();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+    if (!fresh.length) { setPasteText(''); setWordsInput(''); setParsed([]); setTab('words'); setImporting(false); return; }
+    const rows = fresh.map(w => ({
       unit_id: unitId,
       teacher_id: user.id,
       word: w.word,
@@ -141,10 +152,13 @@ export default function UnitPage() {
       ...(w.partOfSpeech ? { part_of_speech: w.partOfSpeech } : {}),
       ...(w.pronunciation ? { pronunciation: w.pronunciation } : {}),
       ...(w.definitionUz ? { definition_uz: w.definitionUz } : {}),
-      examples: w.examples,
+      examples: w.examples.slice(0, 10),
     }));
     try {
-      await supabase.from('teacher_unit_words').insert(rows);
+      // supabase-js returns errors rather than throwing — without this a
+      // failed insert looked like success.
+      const { error } = await supabase.from('teacher_unit_words').insert(rows);
+      if (error) throw new Error(error.message);
     } catch (e) {
       alert(t.libraryPage.failedToAddWords(e instanceof Error ? e.message : String(e)));
       setImporting(false);
