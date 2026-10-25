@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState, use } from 'react';
 import Link from 'next/link';
+import BackButton from '@/components/BackButton';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/lib/useTranslation';
 import { deleteImportedFolder, getCollectionsByFolder, getMyUnitProgress } from '@/lib/storage';
@@ -68,9 +69,7 @@ export default function FolderPage({ params }: Props) {
   return (
     <div className="max-w-2xl w-full mx-auto px-4 py-6 pb-24 animate-fade-in">
       {/* Header — same layout as the Library folder page */}
-      <div className="flex items-center gap-3 mb-1">
-        <button onClick={() => router.push('/my-words')} className="text-[var(--text-muted)] hover:text-[var(--primary)] text-sm font-medium">← {t.myWords.title}</button>
-      </div>
+      <BackButton href="/my-words" label={t.myWords.title} className="mb-4" />
       <div className="flex items-center justify-between gap-3 mb-6">
         <div className="min-w-0">
           <h1 className="text-2xl font-black text-[var(--text)] truncate">{folder}</h1>

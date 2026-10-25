@@ -3,6 +3,7 @@ import { useTranslation } from '@/lib/useTranslation';
 import { useEffect, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import BackButton from '@/components/BackButton';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { folderCache as _cache } from '@/lib/teacher-library-cache';
@@ -132,9 +133,7 @@ export default function FolderPage() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-6">
       {/* Header */}
-      <div className="flex items-center gap-3 mb-1">
-        <button onClick={() => router.push('/library')} className="text-[var(--text-muted)] hover:text-[var(--primary)] text-sm font-medium">← {t.libraryPage.title}</button>
-      </div>
+      <BackButton href="/library" label={t.libraryPage.title} className="mb-4" />
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-black text-[var(--text)]">{folderName}</h1>
