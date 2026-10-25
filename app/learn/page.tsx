@@ -387,7 +387,10 @@ function LearnInner() {
         definition: w.definition,
         definitionUz: w.definitionUz,
         ...importedWordExampleFields(w),
-        language: w.language,
+        // English words drop their language code so the card shows the
+        // 🇺🇸/🇬🇧 accent buttons like Library words; other languages keep a
+        // single 🔊 in their own voice.
+        language: w.language?.startsWith('en') ? undefined : w.language,
         collectionName: 'my-words',
         topic: myCollection ?? 'My Words',
         dayNumber: 0,
