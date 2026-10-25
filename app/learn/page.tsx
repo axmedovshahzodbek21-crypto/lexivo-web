@@ -27,6 +27,9 @@ import type { WordItem, WordCollection } from '@/lib/types';
 import { getImportedWords, getImportedWordsByCollection, importedWordExampleFields, getMyActivityPendingNewWords, markMyLearnComplete, getMyWordsPendingLearnWords, addMyWordsLearnSeenWords } from '@/lib/storage';
 import Link from 'next/link';
 import UnitPicker from '@/components/UnitPicker';
+import TiltCard from '@/components/TiltCard';
+
+const TILT_KEY = 'lexivo_learn_tilt';
 import { useTranslation } from '@/lib/useTranslation';
 import { PhoneStudyFrame, PhoneModeToggle, PhoneSwipeHint } from '@/components/PhoneMode';
 import { usePhoneMode, useSwipe } from '@/lib/phone-mode';
@@ -165,6 +168,19 @@ function LearnInner() {
       showPomodoroSetup: s.showPomodoroSetup,
     }))
   );
+
+  // Word-card mouse tilt, on by default; the 🎴 header button turns it off
+  // for people who find the moving card distracting. Per-browser only.
+  const [tiltOn, setTiltOn] = useState(true);
+  useEffect(() => {
+    try { if (localStorage.getItem(TILT_KEY) === '0') setTiltOn(false); } catch {}
+  }, []);
+  const toggleTilt = () => {
+    const next = !tiltOn;
+    setTiltOn(next);
+    try { localStorage.setItem(TILT_KEY, next ? '1' : '0'); } catch {}
+  };
+  const CardWrap = tiltOn ? TiltCard : 'div';
 
   // Validate the URL param against known collection names so arbitrary strings
   // cannot corrupt localStorage keys or reach Supabase queries. Before collections
@@ -1120,6 +1136,14 @@ function LearnInner() {
           <button onClick={() => setFocusMode(!focusMode)} className="btn-icon text-base phone-hide" aria-label={focusMode ? t.extra.exitFocusMode : t.extra.enterFocusMode}>
             {focusMode ? '⊠' : '⛶'}
           </button>
+          {/* Mouse-only effect, so hidden in phone mode like focus mode. */}
+          <button
+            onClick={toggleTilt}
+            className="btn-icon text-base phone-hide"
+            style={tiltOn ? { background: 'var(--primary)' } : undefined}
+            aria-label={tiltOn ? t.extra.tiltOff : t.extra.tiltOn}
+            title={tiltOn ? t.extra.tiltOff : t.extra.tiltOn}
+          >🎴</button>
           <PhoneModeToggle />
         </div>
       </div>
@@ -1127,9 +1151,7 @@ function LearnInner() {
       <div className="flex-1 p-4 flex flex-col gap-4">
         {/* Word card */}
         <div className="flex-1 flex flex-col" style={swipe.style} {...swipe.handlers}>
-        {/* No TiltCard here: this card is tall and full-width, so the mouse
-            tilt swung it by many pixels and made the text hard to read. */}
-        <div className="flex-1 animate-slide-up">
+        <CardWrap className="flex-1 animate-slide-up" {...(tiltOn ? { intensity: 5, glare: false } : {})}>
         <div
           className={`card h-full transition-all ${!showBack ? 'cursor-pointer hover:border-[var(--primary)]' : ''}`}
           style={{ minHeight: 300, ...(cardBg ? { background: cardBg, borderColor: 'transparent' } : {}), ...cardCssVars }}
@@ -1267,7 +1289,7 @@ function LearnInner() {
             </div>
           )}
         </div>
-        </div>
+        </CardWrap>
         </div>
         <PhoneSwipeHint />
 

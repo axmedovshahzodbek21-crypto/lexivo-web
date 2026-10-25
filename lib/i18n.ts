@@ -2061,6 +2061,8 @@ const en = {
     removeFromStarred: 'Remove from starred',
     addToStarred: 'Add to starred',
     exitFocusMode: 'Exit focus mode',
+    tiltOn: 'Turn on card tilt',
+    tiltOff: 'Turn off card tilt',
     enterFocusMode: 'Enter focus mode',
     clickToUndoMark: 'Click to undo this mark',
     // Wave C additions (vocab organization)
@@ -4699,6 +4701,8 @@ const uz: typeof en = {
     removeFromStarred: 'Yulduzchalilardan olib tashlash',
     addToStarred: 'Yulduzchalilarga qo\'shish',
     exitFocusMode: 'Diqqat rejimidan chiqish',
+    tiltOn: "Kartaning qiyshayishini yoqish",
+    tiltOff: "Kartaning qiyshayishini o'chirish",
     enterFocusMode: 'Diqqat rejimiga kirish',
     clickToUndoMark: 'Bu belgini bekor qilish uchun bosing',
     // Wave C additions (vocab organization)
@@ -7347,6 +7351,8 @@ const ru: typeof en = {
     removeFromStarred: 'Убрать из избранного',
     addToStarred: 'Добавить в избранное',
     exitFocusMode: 'Выйти из режима концентрации',
+    tiltOn: 'Включить наклон карточки',
+    tiltOff: 'Выключить наклон карточки',
     enterFocusMode: 'Войти в режим концентрации',
     clickToUndoMark: 'Нажмите, чтобы отменить эту отметку',
     // Wave C additions (vocab organization)
