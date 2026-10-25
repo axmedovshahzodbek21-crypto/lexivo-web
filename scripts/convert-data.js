@@ -123,9 +123,9 @@ function parseWordItem(block) {
 
 function parseWordDay(block) {
   const dayNumberM = /dayNumber:\s*(\d+)/.exec(block);
-  const topicM = /topic:\s*'([^']*)'/.exec(block);          // [^']* allows empty
   const dayNumber = dayNumberM ? parseInt(dayNumberM[1]) : 0;
-  const topic = topicM ? topicM[1].trim() : '';
+  // extractField handles escaped quotes (Uzbek topics like 'Bog\'lovchi …').
+  const topic = extractField(block, 'topic');
 
   const wordBlocks = findBlocks(block, 'WordItem');
   const words = wordBlocks.map(b => parseWordItem(b.block)).filter(w => w.word);
