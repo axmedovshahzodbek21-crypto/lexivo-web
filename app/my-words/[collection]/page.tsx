@@ -17,6 +17,15 @@ function cardColor(index: number) {
   return COLORS[index % COLORS.length];
 }
 
+const darken = (hex: string, amt = 0.45) => {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return `rgb(${Math.round(r*(1-amt))},${Math.round(g*(1-amt))},${Math.round(b*(1-amt))})`;
+};
+const lighten = (hex: string, amt = 0.3) => {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return `rgb(${Math.round(r+(255-r)*amt)},${Math.round(g+(255-g)*amt)},${Math.round(b+(255-b)*amt)})`;
+};
+
 interface Props {
   params: Promise<{ collection: string }>;
 }
@@ -57,25 +66,32 @@ export default function FolderPage({ params }: Props) {
   }
 
   return (
-    <div className="flex flex-col min-h-screen animate-fade-in pb-24">
-      <div className="flex items-center gap-3 p-4 border-b border-[var(--border)]">
-        <button onClick={() => router.back()} className="btn-icon text-lg" aria-label={t.extra.goBack}>←</button>
-        <div className="flex-1 min-w-0">
-          <h1 className="font-bold text-[var(--text)] truncate">{folder}</h1>
-          <p className="text-xs text-[var(--text-muted)]">
-            {t.extra.unitCount(collections.length)}
-            {collections.length > 0 && <> · {t.collections.completed(completedUnits, collections.length)}</>}
+    <div className="max-w-2xl w-full mx-auto px-4 py-6 pb-24 animate-fade-in">
+      {/* Header — same layout as the Library folder page */}
+      <div className="flex items-center gap-3 mb-1">
+        <button onClick={() => router.push('/my-words')} className="text-[var(--text-muted)] hover:text-[var(--primary)] text-sm font-medium">← {t.myWords.title}</button>
+      </div>
+      <div className="flex items-center justify-between gap-3 mb-6">
+        <div className="min-w-0">
+          <h1 className="text-2xl font-black text-[var(--text)] truncate">{folder}</h1>
+          <p className="text-sm text-[var(--text-muted)] mt-0.5">
+            {t.libraryPage.unitsCount(collections.length)}
+            {collections.length > 0 && <> · {t.libraryPage.wordsCount(collections.reduce((s, c) => s + c.count, 0))}</>}
+            {completedUnits > 0 && <> · ✅ {completedUnits}/{collections.length}</>}
           </p>
         </div>
-        <button onClick={() => { setNewName(''); setShowCreate(true); }}
-          className="w-9 h-9 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-lg font-bold text-[var(--primary)]"
-          aria-label={t.extra.addWordsToFolderAria}
-        >+</button>
-        <button
-          onClick={handleDeleteFolder}
-          className="btn-icon text-base text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors"
-          aria-label={t.extra.deleteFolderAria}
-        >🗑️</button>
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            onClick={handleDeleteFolder}
+            className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-base text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors"
+            aria-label={t.extra.deleteFolderAria}
+          >🗑️</button>
+          <button
+            onClick={() => { setNewName(''); setShowCreate(true); }}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-white"
+            style={{ background: 'linear-gradient(135deg, var(--primary), var(--primary-light))' }}
+          >+ {t.libraryPage.newUnit}</button>
+        </div>
       </div>
 
       {/* Create modal */}
@@ -101,7 +117,7 @@ export default function FolderPage({ params }: Props) {
         </div>
       )}
 
-      <div className="p-4">
+      <div>
         {collections.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-4 py-16 text-center">
             <div className="text-6xl">📂</div>
@@ -113,36 +129,29 @@ export default function FolderPage({ params }: Props) {
             </button>
           </div>
         ) : (
-          <>
-            <div className="grid grid-cols-3 gap-3">
-              {collections.map((col, i) => (
-                <Link
-                  key={col.name}
-                  href={`/my-words/${encodeURIComponent(folder)}/${encodeURIComponent(col.name)}`}
-                  className="relative flex flex-col rounded-2xl p-3 min-h-[100px] justify-between active:scale-95 transition-transform"
-                  style={{ background: cardColor(i) }}
-                >
-                  {getMyUnitProgress(folder, col.name).completedAt && (
-                    <span className="absolute top-2 right-2 text-sm" title={t.myWords.completedBadge}>✅</span>
-                  )}
-                  <span className="text-2xl">📖</span>
-                  <div>
-                    <p className="font-bold text-white text-sm leading-tight line-clamp-2">{col.name}</p>
-                    <p className="text-[11px] mt-0.5" style={{ color: 'rgba(255,255,255,0.75)' }}>
-                      {t.myWords.wordCount(col.count)}
-                    </p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {collections.map((col, i) => {
+              const color = cardColor(i);
+              return (
+                // Same card as the Library's units (app/library/[folderId]).
+                <Link key={col.name} href={`/my-words/${encodeURIComponent(folder)}/${encodeURIComponent(col.name)}`}>
+                  <div
+                    className="rounded-2xl cursor-pointer animate-heartbeat hover:-translate-y-1 transition-all duration-200 relative overflow-hidden"
+                    style={{ background: `linear-gradient(135deg, ${lighten(color)}, ${color})`, boxShadow: `0 12px 0 ${darken(color)}, 0 16px 32px ${color}99`, minHeight: '120px' }}
+                  >
+                    {getMyUnitProgress(folder, col.name).completedAt && (
+                      <span className="absolute top-3 right-3 text-sm" title={t.myWords.completedBadge}>✅</span>
+                    )}
+                    <div className="p-4 text-2xl">📖</div>
+                    <div className="absolute bottom-0 left-0 right-0 px-4 py-3" style={{ background: 'rgba(0,0,0,0.18)', backdropFilter: 'blur(8px)' }}>
+                      <p className="text-white font-bold text-sm leading-tight line-clamp-2" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>{col.name}</p>
+                      <p className="text-white/70 text-xs mt-0.5">{t.libraryPage.wordsCount(col.count)}</p>
+                    </div>
                   </div>
                 </Link>
-              ))}
-            </div>
-
-            <button onClick={() => { setNewName(''); setShowCreate(true); }}
-              className="mt-5 flex items-center justify-center gap-2 w-full py-3 rounded-2xl border-2 border-dashed border-[var(--border)] text-sm font-medium text-[var(--text-muted)] hover:border-[var(--primary)] hover:text-[var(--primary)] transition-colors"
-            >
-              <span>+</span>
-              <span>{t.extra.newUnit}</span>
-            </button>
-          </>
+              );
+            })}
+          </div>
         )}
       </div>
     </div>
