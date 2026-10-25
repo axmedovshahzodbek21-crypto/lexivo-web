@@ -149,6 +149,24 @@ const dataDir = 'C:/Users/User/lexivo/lib/data';
 const outDir  = 'C:/Users/User/lexivo-web/public/data';
 if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
 
+// ── --phrases-only: upsert phrases_collection.dart into word_data.json ───────
+// The full conversion below is stale — the deployed a1/a2/b1 JSON has more
+// units than the Dart files, so a full run would delete content. This mode
+// touches only the Phrases entry of word_data.json and leaves the rest as-is.
+// Usage: node scripts/convert-data.js --phrases-only
+if (process.argv.includes('--phrases-only')) {
+  const src = fs.readFileSync(path.join(dataDir, 'phrases_collection.dart'), 'utf8');
+  const m = /WordCollection\s*\(/.exec(src);
+  const phrases = parseCollection(extractBlock(src, m.index + m[0].length - 1));
+  const file = path.join(outDir, 'word_data.json');
+  const cols = JSON.parse(fs.readFileSync(file, 'utf8')).filter(c => c.name !== phrases.name);
+  cols.push(phrases);
+  fs.writeFileSync(file, JSON.stringify(cols, null, 0));
+  const total = phrases.days.reduce((a, d) => a + d.words.length, 0);
+  console.log(`"${phrases.name}": ${phrases.days.length} days, ${total} words -> word_data.json`);
+  process.exit(0);
+}
+
 // ── word_data.dart: 3 collections ────────────────────────────────────────────
 console.log('Converting word_data.dart...');
 const mainSrc = fs.readFileSync(path.join(dataDir, 'word_data.dart'), 'utf8');

@@ -30,6 +30,13 @@ function collectionMeta(t: ReturnType<typeof useTranslation>): Record<string, { 
       glow: 'rgba(46,204,113,0.45)',
       desc: t.collectionsPage.descWordMastery,
     },
+    'Phrases': {
+      icon: '💬',
+      gradient: 'linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)',
+      edge: '#5b21b6',
+      glow: 'rgba(139,92,246,0.45)',
+      desc: t.collectionsPage.descPhrases,
+    },
   };
 }
 
@@ -76,7 +83,7 @@ export default function CollectionsPage() {
     setImportedCount(getImportedWords().length);
   }, []);
 
-  const CURATED_ORDER = ['30 Days of Powerful Words', '24 Vocabulary Challenge', 'Word Mastery'];
+  const CURATED_ORDER = ['30 Days of Powerful Words', '24 Vocabulary Challenge', 'Word Mastery', 'Phrases'];
   const mainCollections = collections
     .filter(c => !LEVELED_NAMES.has(c.name) && !c.youtubeUrl)
     .sort((a, b) => {

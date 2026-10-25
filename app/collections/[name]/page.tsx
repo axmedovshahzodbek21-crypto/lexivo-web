@@ -21,6 +21,10 @@ const COLLECTION_HERO: Record<string, { gradient: string; glow: string }> = {
     gradient: 'linear-gradient(135deg, #1a9a50 0%, #2ECC71 100%)',
     glow: 'rgba(46,204,113,0.45)',
   },
+  'Phrases': {
+    gradient: 'linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)',
+    glow: 'rgba(139,92,246,0.45)',
+  },
 };
 const DEFAULT_HERO = {
   gradient: 'linear-gradient(135deg, #6c63ff 0%, #9b8fff 100%)',
@@ -39,6 +43,7 @@ const KNOWN_DESCRIPTIONS: Record<string, (t: ReturnType<typeof useTranslation>) 
   '30 Days of Powerful Words': t => t.collectionsPage.desc30Days,
   '24 Vocabulary Challenge': t => t.collectionsPage.desc24Challenge,
   'Word Mastery': t => t.collectionsPage.descWordMastery,
+  'Phrases': t => t.collectionsPage.descPhrases,
 };
 
 interface UnitRow {
