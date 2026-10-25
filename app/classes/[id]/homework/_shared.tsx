@@ -5,6 +5,7 @@ import { loadCollections, loadCEFRCollection } from '@/lib/data';
 import type { WordCollection } from '@/lib/types';
 import { useTranslation } from '@/lib/useTranslation';
 import type { Translations } from '@/lib/i18n';
+import { isPhraseCollection } from '@/lib/phrases';
 
 // Looks up one of the six built-in word collections by its exact display
 // name, as stored in class_homework.collection_name. Previously
@@ -17,7 +18,7 @@ import type { Translations } from '@/lib/i18n';
 // silently matched the wrong collection to a homework row. Matches by name
 // now, same as the CEFR levels below and Flutter's collectionByName().
 export async function fetchCollectionByName(name: string): Promise<WordCollection | null> {
-  if (['30 Days of Powerful Words', '24 Vocabulary Challenge', 'Word Mastery'].includes(name)) {
+  if (['30 Days of Powerful Words', '24 Vocabulary Challenge', 'Word Mastery'].includes(name) || isPhraseCollection(name)) {
     const collections = await loadCollections();
     return collections.find(c => c.name === name) ?? null;
   }

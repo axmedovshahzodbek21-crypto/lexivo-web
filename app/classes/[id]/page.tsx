@@ -896,6 +896,12 @@ const COLLECTION_META = [
   { name: 'A1',                        emoji: '🟢', totalDays: 23 },
   { name: 'A2',                        emoji: '🔵', totalDays: 30 },
   { name: 'B1',                        emoji: '🟡', totalDays: 26 },
+  { name: 'Phrases A1',                emoji: '💬', totalDays: 3 },
+  { name: 'Phrases A2',                emoji: '💬', totalDays: 6 },
+  { name: 'Phrases B1',                emoji: '💬', totalDays: 10 },
+  { name: 'Phrases B2',                emoji: '💬', totalDays: 20 },
+  { name: 'Phrases C1',                emoji: '💬', totalDays: 10 },
+  { name: 'Phrases C2',                emoji: '💬', totalDays: 10 },
 ];
 
 function CurriculumTab({
