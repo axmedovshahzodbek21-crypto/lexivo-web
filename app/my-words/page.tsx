@@ -142,10 +142,11 @@ export default function MyWordsPage() {
           {!isEmpty && (
             <button
               onClick={() => setResetConfirm(true)}
-              className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-base text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-bold border-[1.5px] transition-colors hover:bg-[rgba(245,158,11,0.12)]"
+              style={{ borderColor: 'var(--warning)', color: 'var(--warning)' }}
               aria-label={t.extra.resetMyWordsAria}
               title={t.extra.resetMyWordsAria}
-            >↺</button>
+            >↺ <span className="hidden sm:inline">{t.extra.reset}</span></button>
           )}
           <button
             onClick={() => setCreating(true)}

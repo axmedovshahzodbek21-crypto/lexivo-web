@@ -83,9 +83,11 @@ export default function FolderPage({ params }: Props) {
         <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={handleDeleteFolder}
-            className="w-9 h-9 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-base text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-bold border-[1.5px] transition-colors hover:bg-[rgba(239,68,68,0.12)]"
+            style={{ borderColor: 'var(--danger)', color: 'var(--danger)' }}
             aria-label={t.extra.deleteFolderAria}
-          >🗑️</button>
+            title={t.extra.deleteFolderAria}
+          >🗑 <span className="hidden sm:inline">{t.libraryPage.delete}</span></button>
           <button
             onClick={() => { setNewName(''); setShowCreate(true); }}
             className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-white"
