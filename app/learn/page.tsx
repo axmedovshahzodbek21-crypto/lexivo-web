@@ -27,7 +27,6 @@ import type { WordItem, WordCollection } from '@/lib/types';
 import { getImportedWords, getImportedWordsByCollection, importedWordExampleFields, getMyActivityPendingNewWords, markMyLearnComplete, getMyWordsPendingLearnWords, addMyWordsLearnSeenWords } from '@/lib/storage';
 import Link from 'next/link';
 import UnitPicker from '@/components/UnitPicker';
-import TiltCard from '@/components/TiltCard';
 import { useTranslation } from '@/lib/useTranslation';
 import { PhoneStudyFrame, PhoneModeToggle, PhoneSwipeHint } from '@/components/PhoneMode';
 import { usePhoneMode, useSwipe } from '@/lib/phone-mode';
@@ -1128,7 +1127,9 @@ function LearnInner() {
       <div className="flex-1 p-4 flex flex-col gap-4">
         {/* Word card */}
         <div className="flex-1 flex flex-col" style={swipe.style} {...swipe.handlers}>
-        <TiltCard className="flex-1 animate-slide-up" intensity={5} glare={false}>
+        {/* No TiltCard here: this card is tall and full-width, so the mouse
+            tilt swung it by many pixels and made the text hard to read. */}
+        <div className="flex-1 animate-slide-up">
         <div
           className={`card h-full transition-all ${!showBack ? 'cursor-pointer hover:border-[var(--primary)]' : ''}`}
           style={{ minHeight: 300, ...(cardBg ? { background: cardBg, borderColor: 'transparent' } : {}), ...cardCssVars }}
@@ -1266,7 +1267,7 @@ function LearnInner() {
             </div>
           )}
         </div>
-        </TiltCard>
+        </div>
         </div>
         <PhoneSwipeHint />
 
