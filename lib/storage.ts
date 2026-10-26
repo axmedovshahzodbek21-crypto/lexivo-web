@@ -61,6 +61,7 @@ const KEYS = {
   srsLockedDays:     'lexivo_srs_locked_days',
   myUnitProgress:    'lexivo_my_unit_progress',
   myWordsLearnSeen:  'lexivo_my_words_learn_seen',
+  myFolderLocks:     'lexivo_my_folder_locks',
   focusDays:         'lexivo_focus_days',
   focusUpdatedAt:    'lexivo_focus_updated_at',
   structuresSrs:            'lexivo_structures_srs',
@@ -1186,6 +1187,26 @@ export function getMyUnitPendingNewWords(folderName: string | undefined, collect
   return currentWords.filter(w => pending.has(w));
 }
 
+// ─── My Words folder "in order" lock ──────────────────────────────────────────
+// Off by default. When on, Cards / Quiz / Match in that folder's units stay
+// locked until Learn is done — the pre-built collections' rule. Keyed by
+// folder name; `at` is for last-write-wins merging in sync.ts, so an
+// unlock on one device isn't undone by a stale lock from another.
+
+export type MyFolderLock = { locked: boolean; at: number };
+
+export function getMyFolderLocks(): Record<string, MyFolderLock> {
+  return get<Record<string, MyFolderLock>>(KEYS.myFolderLocks, {});
+}
+
+export function isMyFolderLocked(folderName: string | undefined): boolean {
+  return !!folderName && !!getMyFolderLocks()[folderName]?.locked;
+}
+
+export function setMyFolderLocked(folderName: string, locked: boolean) {
+  set(KEYS.myFolderLocks, { ...getMyFolderLocks(), [folderName]: { locked, at: Date.now() } });
+}
+
 // ─── My Words flat-list Learn rotation ────────────────────────────────────────
 // The aggregate "My Words" list (no specific unit selected) has no per-unit
 // progress record to hang "already learned" tracking off of, so Learn always
@@ -1722,6 +1743,8 @@ export function deleteImportedCollection(collectionName: string, folderName?: st
 export function deleteImportedFolder(folderName: string) {
   const now = Date.now();
   set(IMPORTED_KEY, getImportedWordsRaw().map(w => w.folderName === folderName ? { ...w, deletedAt: now } : w));
+  // A new folder reusing this name later shouldn't inherit the lock.
+  if (isMyFolderLocked(folderName)) setMyFolderLocked(folderName, false);
 }
 
 export function saveImportedWords(words: ImportedWord[]) {

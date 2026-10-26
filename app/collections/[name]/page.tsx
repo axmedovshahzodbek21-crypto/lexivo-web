@@ -9,6 +9,7 @@ import { useTranslation } from '@/lib/useTranslation';
 import { supabase } from '@/lib/supabase';
 import { PHRASE_LEVELS, phraseCollectionName, isPhraseCollection } from '@/lib/phrases';
 import { CopyFolderWordListButton, CopyWordListButton } from '@/components/CopyWordList';
+import { UnitCardFrame, ModeButton } from '@/components/UnitStudyCard';
 
 const COLLECTION_HERO: Record<string, { gradient: string; glow: string }> = {
   '30 Days of Powerful Words': {
@@ -503,69 +504,39 @@ function UnitCard({
   const matchUrl  = `/matching?collection=${enc}&day=${unit.dayNumber}`;
 
   return (
-    <div
-      className="rounded-2xl overflow-hidden flex flex-col"
-      style={{
-        background: 'var(--surface)',
-        border: isComplete ? '1.5px solid #22c55e' : '1.5px solid var(--border)',
-        boxShadow: isComplete
-          ? '0 0 0 3px rgba(34,197,94,0.1), 0 4px 16px rgba(0,0,0,0.08)'
-          : '0 4px 16px rgba(0,0,0,0.08)',
-      }}
+    <>
+    <UnitCardFrame
+      badge={t.collections.unit(unit.dayNumber)}
+      isComplete={isComplete}
+      accent={heroGradient}
+      progressPct={(stagesComplete / 3) * 100}
+      badges={<>
+        <span className="text-[10px] text-[var(--text-muted)]">{t.collections.unitWordsLabel(unit.wordCount)}</span>
+        {isComplete && <span className="text-[10px] font-bold text-green-500">{t.collectionsPage.doneCheckmark}</span>}
+        {storyInfo.anyUnlocked && (
+          <span className="text-[10px] font-bold text-amber-500">📚 {storyInfo.unlockedCount}</span>
+        )}
+      </>}
+      // Some collections (word_data.json) give units real topics like
+      // "Ageing Population" — genuine content, shown as-is. Others
+      // (a1/a2/b1/advanced_collection.json) just set topic to the literal
+      // string "Unit N", which would duplicate the badge above once that
+      // badge is localized, so it's skipped here.
+      title={!/^Unit \d+$/.test(unit.topic) && (
+        <h3 className="font-bold text-[var(--text)] text-sm leading-tight truncate">{unit.topic}</h3>
+      )}
+      actions={<>
+        <CopyWordListButton
+          words={unit.words}
+          className="text-sm opacity-50 hover:opacity-90 transition-opacity"
+        />
+        <button
+          onClick={() => setShowInfo(true)}
+          className="text-sm opacity-40 hover:opacity-80 transition-opacity"
+          aria-label={t.collections.howMarking}
+        >🕯️</button>
+      </>}
     >
-      {/* Colored top accent strip */}
-      <div className="h-1.5" style={{ background: isComplete ? '#22c55e' : heroGradient }} />
-
-      <div className="p-4 flex flex-col gap-3 flex-1">
-
-        {/* Unit header */}
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap mb-1">
-              <span
-                className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full text-white"
-                style={{ background: isComplete ? '#22c55e' : 'var(--primary)' }}
-              >
-                {t.collections.unit(unit.dayNumber)}
-              </span>
-              <span className="text-[10px] text-[var(--text-muted)]">{t.collections.unitWordsLabel(unit.wordCount)}</span>
-              {isComplete && <span className="text-[10px] font-bold text-green-500">{t.collectionsPage.doneCheckmark}</span>}
-              {storyInfo.anyUnlocked && (
-                <span className="text-[10px] font-bold text-amber-500">📚 {storyInfo.unlockedCount}</span>
-              )}
-            </div>
-            {/* Some collections (word_data.json) give units real topics like
-                "Ageing Population" — genuine content, shown as-is. Others
-                (a1/a2/b1/advanced_collection.json) just set topic to the
-                literal string "Unit N", which would duplicate the badge
-                above once that badge is localized, so it's skipped here. */}
-            {!/^Unit \d+$/.test(unit.topic) && (
-              <h3 className="font-bold text-[var(--text)] text-sm leading-tight truncate">{unit.topic}</h3>
-            )}
-          </div>
-          <div className="flex items-center gap-2 shrink-0 mt-0.5">
-            <CopyWordListButton
-              words={unit.words}
-              className="text-sm opacity-50 hover:opacity-90 transition-opacity"
-            />
-            <button
-              onClick={() => setShowInfo(true)}
-              className="text-sm opacity-40 hover:opacity-80 transition-opacity"
-              aria-label={t.collections.howMarking}
-            >🕯️</button>
-          </div>
-        </div>
-
-        {/* Progress bar */}
-        <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
-          <div
-            className="h-full rounded-full transition-all duration-500"
-            style={{
-              width: `${(stagesComplete / 3) * 100}%`,
-              background: isComplete ? '#22c55e' : heroGradient,
-            }}
-          />
-        </div>
 
         {/* Resume banners */}
         {!learnDone && resumeUrl && (
@@ -653,7 +624,7 @@ function UnitCard({
             </div>
           </div>
         )}
-      </div>
+    </UnitCardFrame>
 
       {/* Story reader modal */}
       {activeStory && (
@@ -760,65 +731,6 @@ function UnitCard({
           </div>
         </div>
       )}
-    </div>
-  );
-}
-
-function ModeButton({
-  href, icon, label, done, color, locked, lockReason, softLocked, softLockReason, wide,
-}: {
-  href: string; icon: string; label: string; done: boolean; color: string;
-  locked?: boolean; lockReason?: string;
-  softLocked?: boolean; softLockReason?: string;
-  wide?: boolean;
-}) {
-  const base = `flex items-center justify-center ${wide ? 'flex-row gap-2 py-2.5 px-4' : 'flex-col gap-1.5 py-3'} rounded-xl text-xs font-bold transition-all`;
-
-  if (locked) {
-    return (
-      <div
-        title={lockReason}
-        className={`${base} cursor-not-allowed select-none`}
-        style={{ background: 'var(--surface-2)', border: '1.5px dashed var(--border)', opacity: 0.4 }}
-      >
-        <span className={wide ? 'text-base' : 'text-xl'}>🔒</span>
-        <span className="text-[var(--text-muted)]">{label}</span>
-      </div>
-    );
-  }
-  if (softLocked) {
-    return (
-      <Link
-        href={href}
-        title={softLockReason}
-        className={`${base} active:scale-95`}
-        style={{ background: 'rgba(234,179,8,0.1)', border: '1.5px solid rgba(234,179,8,0.45)', color: '#ca8a04' }}
-      >
-        <span className={wide ? 'text-base' : 'text-xl'}>⚠️</span>
-        <span>{label}</span>
-      </Link>
-    );
-  }
-  if (done) {
-    return (
-      <Link
-        href={href}
-        className={`${base} active:scale-95`}
-        style={{ background: 'rgba(34,197,94,0.12)', border: '1.5px solid rgba(34,197,94,0.35)', color: '#16a34a' }}
-      >
-        <span className={wide ? 'text-base' : 'text-xl'}>✓</span>
-        <span>{label}</span>
-      </Link>
-    );
-  }
-  return (
-    <Link
-      href={href}
-      className={`${base} text-white active:scale-95 hover:opacity-90`}
-      style={{ background: color, boxShadow: `0 3px 12px ${color}66` }}
-    >
-      <span className={wide ? 'text-base' : 'text-xl'}>{icon}</span>
-      <span>{label}</span>
-    </Link>
+    </>
   );
 }

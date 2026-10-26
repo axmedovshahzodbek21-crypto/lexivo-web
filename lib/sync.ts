@@ -1,7 +1,7 @@
 import { supabase } from './supabase';
 import type { UserSettings, LearnedWord, SRSWord, UnitProgress, MyUnitProgress, CustomList } from './types';
-import { getSettings, saveSettings, getLearnedWords, getLearnedWordsRaw, getSRSWordsRaw, getImportedWordsRaw, getCustomListsRaw, localDateStr, getProfilePicUrl, saveProfilePicUrl, resetMyWordsProgress, PROGRESS_RESET_KEYS, PROGRESS_RESET_PREFIXES, getDueWords, starredEntryKey, starredEntryWord } from './storage';
-import type { HardWordEntry, StarredEntry } from './storage';
+import { getSettings, saveSettings, getLearnedWords, getLearnedWordsRaw, getSRSWordsRaw, getImportedWordsRaw, getCustomListsRaw, localDateStr, getProfilePicUrl, saveProfilePicUrl, resetMyWordsProgress, PROGRESS_RESET_KEYS, PROGRESS_RESET_PREFIXES, getDueWords, starredEntryKey, starredEntryWord, getMyFolderLocks } from './storage';
+import type { HardWordEntry, StarredEntry, MyFolderLock } from './storage';
 import { getNotifSettings, saveNotifSettings } from './notifications';
 
 const S = {
@@ -220,7 +220,7 @@ export async function pushLists(): Promise<void> {
     // conversion given how many independently-merged fields are involved,
     // left as a deliberate follow-up rather than rushed here.
     const { data: cloudRow } = await supabase.from('user_data')
-      .select('learned_words, srs_words, starred_words, hard_words, study_days, review_days, word_goal_days, unit_done_days, xp_history, unit_progress, my_unit_progress, review_log, last_review, achievements, imported_words, custom_lists, focus_days')
+      .select('learned_words, srs_words, starred_words, hard_words, study_days, review_days, word_goal_days, unit_done_days, xp_history, unit_progress, my_unit_progress, review_log, last_review, achievements, imported_words, custom_lists, focus_days, my_folder_locks')
       .eq('id', uid).maybeSingle();
     if (cloudRow) mergeListsFromCloudRow(cloudRow);
 
@@ -245,6 +245,7 @@ export async function pushLists(): Promise<void> {
         focus_days:       lsJSON<Record<string, number>>('lexivo_focus_days', {}),
         imported_words:   getImportedWordsRaw(), // includes tombstones so deletions propagate
         custom_lists:     getCustomListsRaw(),   // includes tombstones so deletions propagate
+        my_folder_locks:  getMyFolderLocks(),
         achievements:     Object.entries(lsJSON<Record<string, string>>('lexivo_achievement_dates', {})).map(([id, date]) => ({ id, date })),
         lists_updated_at: ts,
       }),
@@ -695,6 +696,16 @@ function mergeListsFromCloudRow(row: Record<string, unknown>): void {
       if (changed || merged.length !== local.length) {
         lsSet('lexivo_custom_lists', JSON.stringify(merged));
       }
+    }
+
+    // my_folder_locks — per-folder last-write-wins by `at`.
+    if (row.my_folder_locks && typeof row.my_folder_locks === 'object') {
+      const local = getMyFolderLocks();
+      let changed = false;
+      for (const [folder, lock] of Object.entries(row.my_folder_locks as Record<string, MyFolderLock>)) {
+        if (!local[folder] || lock.at > local[folder].at) { local[folder] = lock; changed = true; }
+      }
+      if (changed) lsSet('lexivo_my_folder_locks', JSON.stringify(local));
     }
   } catch (e) {
     console.error('[sync] mergeListsFromCloudRow failed:', e);

@@ -3,7 +3,7 @@ import { useEffect, useState, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/lib/useTranslation';
-import { getImportedWordsByCollection, deleteImportedWord, deleteImportedWords, deleteImportedCollection, getMyUnitProgress, getMyUnitPendingNewWords, getMyActivityPendingNewWords, addImportedWords, generateImportedWordId } from '@/lib/storage';
+import { getImportedWordsByCollection, deleteImportedWord, deleteImportedWords, deleteImportedCollection, getMyUnitProgress, getMyUnitPendingNewWords, getMyActivityPendingNewWords, addImportedWords, generateImportedWordId, isMyFolderLocked } from '@/lib/storage';
 import { pushLists, pullAll } from '@/lib/sync';
 import { speakText } from '@/lib/speech';
 import type { ImportedWord } from '@/lib/types';
@@ -38,6 +38,7 @@ export default function FolderCollectionPage({ params }: Props) {
   const [progress, setProgress] = useState<{ learnDone: boolean; flashcardDone: boolean; quizDone: boolean; matchDone: boolean }>({ learnDone: false, flashcardDone: false, quizDone: false, matchDone: false });
   const [pendingNewWords, setPendingNewWords] = useState<string[]>([]);
   const [pendingByActivity, setPendingByActivity] = useState({ learn: 0, flashcard: 0, quiz: 0, match: 0 });
+  const [folderLocked, setFolderLocked] = useState(false);
   const [selectMode, setSelectMode] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   // Word rows are compact; tapping one expands its definition + examples
@@ -55,6 +56,7 @@ export default function FolderCollectionPage({ params }: Props) {
     const p = getMyUnitProgress(folder, collectionName);
     const wordList = currentWords.map(w => w.word);
     setCompletedAt(p.completedAt);
+    setFolderLocked(isMyFolderLocked(folder));
     setProgress({ learnDone: p.learnDone, flashcardDone: p.flashcardDone, quizDone: p.quizDone, matchDone: p.matchDone });
     setPendingNewWords(getMyUnitPendingNewWords(folder, collectionName, wordList));
     setPendingByActivity({
@@ -251,6 +253,7 @@ export default function FolderCollectionPage({ params }: Props) {
                 bg="rgba(255,107,53,0.1)" border="rgba(255,107,53,0.3)"
                 done={progress.flashcardDone} pendingNew={pendingByActivity.flashcard}
                 newBadgeLabel={t.myWords.pendingNewBadge(pendingByActivity.flashcard)}
+                locked={folderLocked && !progress.learnDone} lockReason={t.collections.completeLearnFirst}
               />
               <StudyButton
                 href={`/quiz?${studyParam}`}
@@ -259,6 +262,7 @@ export default function FolderCollectionPage({ params }: Props) {
                 bg="rgba(245,158,11,0.1)" border="rgba(245,158,11,0.3)"
                 done={progress.quizDone} pendingNew={pendingByActivity.quiz}
                 newBadgeLabel={t.myWords.pendingNewBadge(pendingByActivity.quiz)}
+                locked={folderLocked && !progress.learnDone} lockReason={t.collections.completeLearnFirst}
               />
               <StudyButton
                 href={`/matching?${studyParam}`}
@@ -267,6 +271,7 @@ export default function FolderCollectionPage({ params }: Props) {
                 bg="rgba(16,185,129,0.1)" border="rgba(16,185,129,0.3)"
                 done={progress.matchDone} pendingNew={pendingByActivity.match}
                 newBadgeLabel={t.myWords.pendingNewBadge(pendingByActivity.match)}
+                locked={folderLocked && !progress.learnDone} lockReason={t.collections.completeLearnFirst}
               />
             </div>
 
@@ -389,12 +394,26 @@ export default function FolderCollectionPage({ params }: Props) {
 // there are pending new words, tapping jumps straight into a session with
 // just those words instead of the full set.
 function StudyButton({
-  href, onlyNewHref, icon, label, color, bg, border, done, pendingNew, newBadgeLabel,
+  href, onlyNewHref, icon, label, color, bg, border, done, pendingNew, newBadgeLabel, locked, lockReason,
 }: {
   href: string; onlyNewHref: string; icon: string; label: string;
   color: string; bg: string; border: string; done: boolean; pendingNew: number;
   newBadgeLabel: string;
+  // The folder's "in order" lock, while Learn isn't done yet.
+  locked?: boolean; lockReason?: string;
 }) {
+  if (locked) {
+    return (
+      <div
+        title={lockReason}
+        className="flex flex-col items-center gap-1 py-3 px-1 rounded-2xl text-center min-w-0 cursor-not-allowed select-none"
+        style={{ background: 'var(--surface-2)', border: '1.5px dashed var(--border)', opacity: 0.5 }}
+      >
+        <span className="text-2xl">🔒</span>
+        <span className="text-[11px] font-semibold truncate max-w-full text-[var(--text-muted)]">{label}</span>
+      </div>
+    );
+  }
   const target = done && pendingNew > 0 ? onlyNewHref : href;
   return (
     <Link

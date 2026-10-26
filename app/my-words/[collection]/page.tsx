@@ -1,32 +1,47 @@
 'use client';
 import { useEffect, useState, use } from 'react';
 import Link from 'next/link';
-import BackButton from '@/components/BackButton';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/lib/useTranslation';
-import { deleteImportedFolder, getCollectionsByFolder, getMyUnitProgress, getImportedWordsByCollection } from '@/lib/storage';
-import { CopyFolderWordListButton } from '@/components/CopyWordList';
+import { deleteImportedFolder, getCollectionsByFolder, getMyUnitProgress, getMyActivityPendingNewWords, getImportedWordsByCollection, isMyFolderLocked, setMyFolderLocked } from '@/lib/storage';
+import { CopyFolderWordListButton, CopyWordListButton } from '@/components/CopyWordList';
+import { UnitCardFrame, ModeButton } from '@/components/UnitStudyCard';
 import { pushLists, pullAll } from '@/lib/sync';
-import type { ImportedCollection } from '@/lib/types';
+import type { MyUnitProgress } from '@/lib/types';
 
-const COLORS = [
-  '#5B8AF0', '#FF6B6B', '#06D6A0', '#FFD166',
-  '#A78BFA', '#FF9F43', '#F72585', '#4ECDC4',
-  '#3D8BFF', '#FF5E57', '#00C9A7', '#FFC75F',
-];
+// Same purple hero as the pre-built collections' default (app/collections/[name]).
+const HERO = {
+  gradient: 'linear-gradient(135deg, #6c63ff 0%, #9b8fff 100%)',
+  glow: 'rgba(108,99,255,0.45)',
+};
 
-function cardColor(index: number) {
-  return COLORS[index % COLORS.length];
+type Activity = 'learn' | 'flashcard' | 'quiz' | 'match';
+
+interface UnitRow {
+  name: string;
+  words: string[];
+  progress: MyUnitProgress;
+  pending: Record<Activity, number>;
 }
 
-const darken = (hex: string, amt = 0.45) => {
-  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
-  return `rgb(${Math.round(r*(1-amt))},${Math.round(g*(1-amt))},${Math.round(b*(1-amt))})`;
-};
-const lighten = (hex: string, amt = 0.3) => {
-  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
-  return `rgb(${Math.round(r+(255-r)*amt)},${Math.round(g+(255-g)*amt)},${Math.round(b+(255-b)*amt)})`;
-};
+// Oldest first, so Unit 1 is the first unit made — the order pre-built
+// collections number theirs in.
+function loadRows(folder: string): UnitRow[] {
+  return getCollectionsByFolder(folder)
+    .sort((a, b) => a.addedAt - b.addedAt)
+    .map(c => {
+      const words = getImportedWordsByCollection(c.name, folder).map(w => w.word);
+      const pendingOf = (a: Activity) => getMyActivityPendingNewWords(folder, c.name, a, words).length;
+      return {
+        name: c.name,
+        words,
+        progress: getMyUnitProgress(folder, c.name),
+        pending: { learn: pendingOf('learn'), flashcard: pendingOf('flashcard'), quiz: pendingOf('quiz'), match: pendingOf('match') },
+      };
+    });
+}
+
+const isUnitComplete = (p: MyUnitProgress) => p.learnDone && p.flashcardDone && p.quizDone && p.matchDone;
 
 interface Props {
   params: Promise<{ collection: string }>;
@@ -37,18 +52,40 @@ export default function FolderPage({ params }: Props) {
   const folder = decodeURIComponent(encodedSlug);
   const router = useRouter();
   const t = useTranslation();
-  const [collections, setCollections] = useState<ImportedCollection[]>([]);
+  const [units, setUnits] = useState<UnitRow[]>([]);
+  const [locked, setLocked] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState('');
 
   useEffect(() => {
-    setCollections(getCollectionsByFolder(folder));
-    pullAll().then(() => {
-      setCollections(getCollectionsByFolder(folder));
-    });
+    const load = () => {
+      setUnits(loadRows(folder));
+      setLocked(isMyFolderLocked(folder));
+    };
+    load();
+    pullAll().then(load);
+    // Refresh when coming back from a study session, so its ✓ shows up.
+    window.addEventListener('focus', load);
+    document.addEventListener('visibilitychange', load);
+    return () => {
+      window.removeEventListener('focus', load);
+      document.removeEventListener('visibilitychange', load);
+    };
   }, [folder]);
 
-  const completedUnits = collections.filter(c => !!getMyUnitProgress(folder, c.name).completedAt).length;
+  const totalWords = units.reduce((s, u) => s + u.words.length, 0);
+  const completedUnits = units.filter(u => isUnitComplete(u.progress)).length;
+  const progressPct = units.length > 0 ? (completedUnits / units.length) * 100 : 0;
+
+  function toggleLock() {
+    const next = !locked;
+    setMyFolderLocked(folder, next);
+    pushLists();
+    setLocked(next);
+    setToast(next ? t.myWords.orderLockedToast : t.myWords.orderFreeToast);
+    setTimeout(() => setToast(null), 2000);
+  }
 
   function handleDeleteFolder() {
     if (!confirm(t.extra.deleteEntireFolderConfirm(folder))) return;
@@ -67,38 +104,68 @@ export default function FolderPage({ params }: Props) {
     router.push(`/my-words/${encodeURIComponent(folder)}/${encodeURIComponent(name)}`);
   }
 
+  const heroIconBtn = 'w-9 h-9 rounded-full bg-black/20 hover:bg-black/30 flex items-center justify-center text-base transition-colors';
+
   return (
-    <div className="max-w-2xl w-full mx-auto px-4 py-6 pb-24 animate-fade-in">
-      {/* Header — same layout as the Library folder page */}
-      <BackButton href="/my-words" label={t.myWords.title} className="mb-4" />
-      <div className="flex items-center justify-between gap-3 mb-6">
-        <div className="min-w-0">
-          <h1 className="text-2xl font-black text-[var(--text)] truncate">{folder}</h1>
-          <p className="text-sm text-[var(--text-muted)] mt-0.5">
-            {t.libraryPage.unitsCount(collections.length)}
-            {collections.length > 0 && <> · {t.libraryPage.wordsCount(collections.reduce((s, c) => s + c.count, 0))}</>}
-            {completedUnits > 0 && <> · ✅ {completedUnits}/{collections.length}</>}
-          </p>
+    <div className="flex flex-col min-h-screen pb-24 animate-fade-in">
+
+      {/* ── Hero banner ── */}
+      <div className="relative px-5 pt-5 pb-8" style={{ background: HERO.gradient, boxShadow: `0 8px 32px ${HERO.glow}` }}>
+        <div className="flex items-center justify-between gap-2 mb-4">
+          <Link href="/my-words" className="flex items-center gap-1.5 text-sm text-white/80 hover:text-white transition-colors">
+            ← {t.myWords.title}
+          </Link>
+          <div className="flex items-center gap-2">
+            {units.length > 0 && (
+              <CopyFolderWordListButton
+                units={units.map(u => ({ name: u.name, count: u.words.length }))}
+                loadWords={() => units.map(u => u.words)}
+                className={heroIconBtn}
+              />
+            )}
+            <button
+              onClick={handleDeleteFolder}
+              className={heroIconBtn}
+              aria-label={t.extra.deleteFolderAria}
+              title={t.extra.deleteFolderAria}
+            >🗑</button>
+          </div>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
-          {collections.length > 0 && (
-            <CopyFolderWordListButton
-              units={collections.map(c => ({ name: c.name, count: c.count }))}
-              loadWords={() => collections.map(c => getImportedWordsByCollection(c.name, folder).map(w => w.word))}
-            />
-          )}
-          <button
-            onClick={handleDeleteFolder}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-bold border-[1.5px] transition-colors hover:bg-[rgba(239,68,68,0.12)]"
-            style={{ borderColor: 'var(--danger)', color: 'var(--danger)' }}
-            aria-label={t.extra.deleteFolderAria}
-            title={t.extra.deleteFolderAria}
-          >🗑 <span className="hidden sm:inline">{t.libraryPage.delete}</span></button>
+
+        <h1 className="text-2xl font-black text-white leading-tight mb-3 break-words" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
+          {folder}
+        </h1>
+
+        {/* Stat pills */}
+        <div className="flex flex-wrap gap-2 mb-4">
+          {[
+            t.collections.unitsCount(units.length),
+            t.collections.wordsCount(totalWords),
+            t.collections.completed(completedUnits, units.length),
+          ].map(label => (
+            <span key={label} className="flex items-center gap-1 text-xs font-semibold bg-black/25 text-white rounded-full px-3 py-1">
+              {label}
+            </span>
+          ))}
+        </div>
+
+        {/* Progress bar */}
+        <div className="h-2 rounded-full bg-white/25 overflow-hidden mb-4">
+          <div className="h-full rounded-full bg-white transition-all duration-700" style={{ width: `${progressPct}%` }} />
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={() => { setNewName(''); setShowCreate(true); }}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-white"
-            style={{ background: 'linear-gradient(135deg, var(--primary), var(--primary-light))' }}
+            className="px-4 py-2 rounded-xl text-sm font-bold bg-white hover:bg-white/90 transition-colors"
+            style={{ color: '#6c63ff' }}
           >+ {t.libraryPage.newUnit}</button>
+          <button
+            onClick={toggleLock}
+            title={t.myWords.orderToggleHint}
+            aria-pressed={locked}
+            className={`px-3.5 py-2 rounded-xl text-sm font-bold transition-colors ${locked ? 'bg-black/35 text-white' : 'bg-white/15 text-white/90 hover:bg-white/25'}`}
+          >{locked ? `🔒 ${t.myWords.orderLocked}` : `🔓 ${t.myWords.orderFree}`}</button>
         </div>
       </div>
 
@@ -125,43 +192,91 @@ export default function FolderPage({ params }: Props) {
         </div>
       )}
 
-      <div>
-        {collections.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-4 py-16 text-center">
-            <div className="text-6xl">📂</div>
-            <p className="text-[var(--text-muted)] text-sm">{t.extra.noUnitsTapPlus}</p>
-            <button onClick={() => { setNewName(''); setShowCreate(true); }}
-              className="btn-primary px-6 py-3 text-sm font-semibold"
-            >
-              {t.libraryPage.newUnit}
-            </button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {collections.map((col, i) => {
-              const color = cardColor(i);
-              return (
-                // Same card as the Library's units (app/library/[folderId]).
-                <Link key={col.name} href={`/my-words/${encodeURIComponent(folder)}/${encodeURIComponent(col.name)}`}>
-                  <div
-                    className="rounded-2xl cursor-pointer animate-heartbeat hover:-translate-y-1 transition-all duration-200 relative overflow-hidden"
-                    style={{ background: `linear-gradient(135deg, ${lighten(color)}, ${color})`, boxShadow: `0 12px 0 ${darken(color)}, 0 16px 32px ${color}99`, minHeight: '120px' }}
-                  >
-                    {getMyUnitProgress(folder, col.name).completedAt && (
-                      <span className="absolute top-3 right-3 text-sm" title={t.myWords.completedBadge}>✅</span>
-                    )}
-                    <div className="p-4 text-2xl">📖</div>
-                    <div className="absolute bottom-0 left-0 right-0 px-4 py-3" style={{ background: 'rgba(0,0,0,0.18)', backdropFilter: 'blur(8px)' }}>
-                      <p className="text-white font-bold text-sm leading-tight line-clamp-2" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>{col.name}</p>
-                      <p className="text-white/70 text-xs mt-0.5">{t.libraryPage.wordsCount(col.count)}</p>
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        )}
-      </div>
+      {/* ── Units grid ── */}
+      {units.length === 0 ? (
+        <div className="flex flex-col items-center justify-center gap-4 py-16 text-center">
+          <div className="text-6xl">📂</div>
+          <p className="text-[var(--text-muted)] text-sm">{t.extra.noUnitsTapPlus}</p>
+          <button onClick={() => { setNewName(''); setShowCreate(true); }} className="btn-primary px-6 py-3 text-sm font-semibold">
+            {t.libraryPage.newUnit}
+          </button>
+        </div>
+      ) : (
+        <div className="p-3 grid gap-3" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))' }}>
+          {units.map((unit, i) => (
+            <MyUnitCard key={unit.name} unit={unit} index={i} folder={folder} folderLocked={locked} />
+          ))}
+        </div>
+      )}
+
+      {toast && (
+        <div className="fixed bottom-20 sm:bottom-6 left-1/2 -translate-x-1/2 z-[60] px-4 py-2 rounded-xl text-sm font-semibold shadow-xl bg-[var(--surface)] text-[var(--text)] border border-[var(--border)] animate-fade-in">
+          {toast}
+        </div>
+      )}
     </div>
+  );
+}
+
+function MyUnitCard({ unit, index, folder, folderLocked }: {
+  unit: UnitRow; index: number; folder: string; folderLocked: boolean;
+}) {
+  const t = useTranslation();
+  const { learnDone, flashcardDone, quizDone, matchDone } = unit.progress;
+  const done = [learnDone, flashcardDone, quizDone, matchDone].filter(Boolean).length;
+  const isComplete = done === 4;
+  const unitHref = `/my-words/${encodeURIComponent(folder)}/${encodeURIComponent(unit.name)}`;
+  const studyParam = `source=my-words&myCollection=${encodeURIComponent(unit.name)}&myFolder=${encodeURIComponent(folder)}`;
+  // Activity already done + words added since → jump to just the new ones.
+  const hrefFor = (path: string, activity: Activity, activityDone: boolean) =>
+    `/${path}?${studyParam}${activityDone && unit.pending[activity] > 0 ? '&onlyNew=1' : ''}`;
+  const badgeFor = (activity: Activity, activityDone: boolean) =>
+    activityDone && unit.pending[activity] > 0 ? t.myWords.pendingNewBadge(unit.pending[activity]) : undefined;
+  // Only when the learner turned "in order" on for this folder; new words
+  // added after Learn don't re-lock a unit (the "N new" badge covers them).
+  const gated = folderLocked && !learnDone;
+
+  return (
+    <UnitCardFrame
+      badge={t.collections.unit(index + 1)}
+      isComplete={isComplete}
+      accent={HERO.gradient}
+      progressPct={(done / 4) * 100}
+      badges={<>
+        <span className="text-[10px] text-[var(--text-muted)]">{t.collections.unitWordsLabel(unit.words.length)}</span>
+        {isComplete && <span className="text-[10px] font-bold text-green-500">{t.collectionsPage.doneCheckmark}</span>}
+      </>}
+      title={
+        <Link href={unitHref} className="block font-bold text-[var(--text)] text-sm leading-tight truncate hover:text-[var(--primary)] transition-colors">
+          {unit.name}
+        </Link>
+      }
+      actions={<>
+        <CopyWordListButton words={unit.words} className="text-sm opacity-50 hover:opacity-90 transition-opacity" />
+        <Link
+          href={unitHref}
+          className="text-[11px] font-bold px-2 py-1 rounded-lg bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--primary)] transition-colors"
+        >✏️ {t.myWords.wordsBtn}</Link>
+      </>}
+    >
+      <div className="grid grid-cols-3 gap-2">
+        <ModeButton href={hrefFor('learn', 'learn', learnDone)} newBadge={badgeFor('learn', learnDone)} icon="📖" label={t.nav.learn} done={learnDone} color="#4f46e5" />
+        <ModeButton
+          href={hrefFor('flashcards', 'flashcard', flashcardDone)} newBadge={badgeFor('flashcard', flashcardDone)}
+          icon="🃏" label={t.collectionsPage.cardsLabel} done={flashcardDone} color="#ea580c"
+          locked={gated} lockReason={t.collections.completeLearnFirst}
+        />
+        <ModeButton
+          href={hrefFor('quiz', 'quiz', quizDone)} newBadge={badgeFor('quiz', quizDone)}
+          icon="❓" label={t.nav.quiz} done={quizDone} color="#d97706"
+          locked={gated} lockReason={t.collections.completeLearnFirst}
+        />
+      </div>
+      <ModeButton
+        href={hrefFor('matching', 'match', matchDone)} newBadge={badgeFor('match', matchDone)}
+        icon="🎯" label={t.collectionsPage.matchLabel} done={matchDone} color="#db2777" wide
+        locked={gated} lockReason={t.collections.completeLearnFirst}
+      />
+    </UnitCardFrame>
   );
 }
