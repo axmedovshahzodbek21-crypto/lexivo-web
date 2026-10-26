@@ -8,7 +8,7 @@ import type { WordCollection, UnitProgress } from '@/lib/types';
 import { useTranslation } from '@/lib/useTranslation';
 import { supabase } from '@/lib/supabase';
 import { PHRASE_LEVELS, phraseCollectionName, isPhraseCollection } from '@/lib/phrases';
-import { CopyFolderWordListButton } from '@/components/CopyWordList';
+import { CopyFolderWordListButton, CopyWordListButton } from '@/components/CopyWordList';
 
 const COLLECTION_HERO: Record<string, { gradient: string; glow: string }> = {
   '30 Days of Powerful Words': {
@@ -56,6 +56,7 @@ interface UnitRow {
   dayNumber: number;
   topic: string;
   wordCount: number;
+  words: string[];
   progress: UnitProgress;
 }
 
@@ -106,6 +107,7 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
         dayNumber: day.dayNumber,
         topic: day.topic || `Unit ${day.dayNumber}`,
         wordCount: day.words.length,
+        words: day.words.map(w => w.word),
         progress: getUnitProgress(collectionName, day.dayNumber),
       }));
     const rows = doneOnly
@@ -211,7 +213,7 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
           </button>
           <CopyFolderWordListButton
             units={units.map(u => ({ name: u.topic, count: u.wordCount }))}
-            loadWords={() => units.map(u => collection.days.find(d => d.dayNumber === u.dayNumber)?.words.map(w => w.word) ?? [])}
+            loadWords={() => units.map(u => u.words)}
             className="w-9 h-9 rounded-full bg-black/20 hover:bg-black/30 flex items-center justify-center text-base transition-colors"
           />
         </div>
@@ -541,11 +543,17 @@ function UnitCard({
               <h3 className="font-bold text-[var(--text)] text-sm leading-tight truncate">{unit.topic}</h3>
             )}
           </div>
-          <button
-            onClick={() => setShowInfo(true)}
-            className="text-sm opacity-40 hover:opacity-80 transition-opacity shrink-0 mt-0.5"
-            aria-label={t.collections.howMarking}
-          >🕯️</button>
+          <div className="flex items-center gap-2 shrink-0 mt-0.5">
+            <CopyWordListButton
+              words={unit.words}
+              className="text-sm opacity-50 hover:opacity-90 transition-opacity"
+            />
+            <button
+              onClick={() => setShowInfo(true)}
+              className="text-sm opacity-40 hover:opacity-80 transition-opacity"
+              aria-label={t.collections.howMarking}
+            >🕯️</button>
+          </div>
         </div>
 
         {/* Progress bar */}
