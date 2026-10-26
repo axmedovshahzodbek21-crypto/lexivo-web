@@ -12,8 +12,9 @@ import {
   getHardWords, removeHardWord, getSettings, getStreak, getTodayLearnedCount,
   saveLearnProgress, clearLearnProgress, getLearnProgress,
   saveLearnMarks, getLearnMarks, getStarredWords, getLearnXPAmount, displayXP,
-  getClassHWTemp,
+  getClassHWTemp, getUILanguage,
 } from '@/lib/storage';
+import { buildExplainPrompt } from '@/lib/explain-prompt';
 import { pushLists, pushStats } from '@/lib/sync';
 import { supabase } from '@/lib/supabase';
 import { createSRSWord } from '@/lib/srs';
@@ -203,6 +204,7 @@ function LearnInner() {
   const [showEx3Translation, setShowEx3Translation] = useState(false);
   const [showUzDefinition, setShowUzDefinition] = useState(false);
   const [showMoreExamples, setShowMoreExamples] = useState(false);
+  const [explainCopied, setExplainCopied] = useState(false);
   const [skipped, setSkipped] = useState<StudyWord[]>([]);
   const [pureSkipped, setPureSkipped] = useState<StudyWord[]>([]);
   const [marks, setMarks] = useState<('learned' | 'skipped' | 'too-hard' | null)[]>([]);
@@ -1291,6 +1293,25 @@ function LearnInner() {
                   )}
                 </div>
               )}
+
+              {/* Last rung of the ladder: a prompt the student pastes into any
+                  AI chat for a spoken-style explanation. English words only —
+                  the prompt asks about "the English phrase/word". */}
+              {!current.language && (
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(buildExplainPrompt(current.word, current.definition, getUILanguage()))
+                      .then(() => {
+                        setExplainCopied(true);
+                        setTimeout(() => setExplainCopied(false), 2500);
+                      })
+                      .catch(() => {});
+                  }}
+                  className="w-full py-2.5 rounded-xl border border-dashed border-[var(--primary)] text-sm font-medium text-[var(--primary)] hover:bg-[var(--primary-bg)] transition-colors"
+                >
+                  {t.learn.explainWithAI}
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -1372,6 +1393,12 @@ function LearnInner() {
           >
             +{displayXP(xpFlash.amount)} XP
           </span>
+        </div>
+      )}
+
+      {explainCopied && (
+        <div className="no-focus fixed bottom-20 sm:bottom-6 left-1/2 -translate-x-1/2 z-[60] px-4 py-2 rounded-xl text-sm font-semibold shadow-xl bg-[var(--surface)] text-[var(--text)] border border-[var(--border)] animate-fade-in text-center max-w-[90vw]">
+          {t.learn.explainCopied}
         </div>
       )}
 
