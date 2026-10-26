@@ -4,7 +4,8 @@ import Link from 'next/link';
 import BackButton from '@/components/BackButton';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/lib/useTranslation';
-import { deleteImportedFolder, getCollectionsByFolder, getMyUnitProgress } from '@/lib/storage';
+import { deleteImportedFolder, getCollectionsByFolder, getMyUnitProgress, getImportedWordsByCollection } from '@/lib/storage';
+import { CopyFolderWordListButton } from '@/components/CopyWordList';
 import { pushLists, pullAll } from '@/lib/sync';
 import type { ImportedCollection } from '@/lib/types';
 
@@ -80,6 +81,12 @@ export default function FolderPage({ params }: Props) {
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
+          {collections.length > 0 && (
+            <CopyFolderWordListButton
+              units={collections.map(c => ({ name: c.name, count: c.count }))}
+              loadWords={() => collections.map(c => getImportedWordsByCollection(c.name, folder).map(w => w.word))}
+            />
+          )}
           <button
             onClick={handleDeleteFolder}
             className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-bold border-[1.5px] transition-colors hover:bg-[rgba(239,68,68,0.12)]"

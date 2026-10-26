@@ -281,6 +281,9 @@ const en = {
     again: '🔁 Again',
     // Wave C additions (bugs + shared components)
     backLabel: 'Back',
+    copyWordList: 'Copy word list',
+    copyAllUnits: 'All units',
+    copiedToast: '✓ Copied!',
   },
   home: {
     readyToLearn: 'Ready to learn today?',
@@ -2925,6 +2928,9 @@ const uz: typeof en = {
     again: '🔁 Qayta',
     // Wave C additions (bugs + shared components)
     backLabel: 'Orqaga',
+    copyWordList: "So'zlar ro'yxatini nusxalash",
+    copyAllUnits: "Barcha bo'limlar",
+    copiedToast: '✓ Nusxalandi!',
   },
   home: {
     readyToLearn: "Bugun o'rganishga tayyormisiz?",
@@ -5555,6 +5561,9 @@ const ru: typeof en = {
     again: '🔁 Ещё раз',
     // Wave C additions (bugs + shared components)
     backLabel: 'Назад',
+    copyWordList: 'Скопировать список слов',
+    copyAllUnits: 'Все юниты',
+    copiedToast: '✓ Скопировано!',
   },
   home: {
     readyToLearn: 'Готовы учиться сегодня?',

@@ -7,6 +7,7 @@ import BackButton from '@/components/BackButton';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { folderCache as _cache } from '@/lib/teacher-library-cache';
+import { CopyFolderWordListButton } from '@/components/CopyWordList';
 
 interface Unit {
   id: string;
@@ -142,11 +143,30 @@ export default function FolderPage() {
             {units.length > 0 && (() => { const total = units.reduce((s, u) => s + u.word_count, 0); return ` · ${t.libraryPage.wordsCount(total)}`; })()}
           </p>
         </div>
-        <button
-          onClick={() => setShowCreate(true)}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-white"
-          style={{ background: 'linear-gradient(135deg, var(--primary), var(--primary-light))' }}
-        >+ {t.libraryPage.newUnit}</button>
+        <div className="flex items-center gap-2 shrink-0">
+          {units.length > 0 && (
+            <CopyFolderWordListButton
+              units={units.map(u => ({ name: u.name, count: u.word_count }))}
+              loadWords={async () => {
+                const { data, error } = await supabase
+                  .from('teacher_unit_words')
+                  .select('unit_id, word')
+                  .in('unit_id', units.map(u => u.id))
+                  .order('position')
+                  .order('created_at');
+                if (error) throw new Error(error.message);
+                const byUnit: Record<string, string[]> = {};
+                for (const row of data ?? []) (byUnit[row.unit_id] ??= []).push(row.word);
+                return units.map(u => byUnit[u.id] ?? []);
+              }}
+            />
+          )}
+          <button
+            onClick={() => setShowCreate(true)}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-white"
+            style={{ background: 'linear-gradient(135deg, var(--primary), var(--primary-light))' }}
+          >+ {t.libraryPage.newUnit}</button>
+        </div>
       </div>
 
       {/* Create modal */}

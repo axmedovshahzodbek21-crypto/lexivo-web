@@ -8,6 +8,7 @@ import type { WordCollection, UnitProgress } from '@/lib/types';
 import { useTranslation } from '@/lib/useTranslation';
 import { supabase } from '@/lib/supabase';
 import { PHRASE_LEVELS, phraseCollectionName, isPhraseCollection } from '@/lib/phrases';
+import { CopyFolderWordListButton } from '@/components/CopyWordList';
 
 const COLLECTION_HERO: Record<string, { gradient: string; glow: string }> = {
   '30 Days of Powerful Words': {
@@ -201,12 +202,19 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
         className="relative px-5 pt-5 pb-8"
         style={{ background: hero.gradient, boxShadow: `0 8px 32px ${hero.glow}` }}
       >
-        <button
-          onClick={() => router.back()}
-          className="flex items-center gap-1.5 text-sm text-white/80 mb-4 hover:text-white transition-colors"
-        >
-          {t.collections.back}
-        </button>
+        <div className="flex items-center justify-between mb-4">
+          <button
+            onClick={() => router.back()}
+            className="flex items-center gap-1.5 text-sm text-white/80 hover:text-white transition-colors"
+          >
+            {t.collections.back}
+          </button>
+          <CopyFolderWordListButton
+            units={units.map(u => ({ name: u.topic, count: u.wordCount }))}
+            loadWords={() => units.map(u => collection.days.find(d => d.dayNumber === u.dayNumber)?.words.map(w => w.word) ?? [])}
+            className="w-9 h-9 rounded-full bg-black/20 hover:bg-black/30 flex items-center justify-center text-base transition-colors"
+          />
+        </div>
 
         <h1
           className="text-2xl font-black text-white leading-tight mb-1"

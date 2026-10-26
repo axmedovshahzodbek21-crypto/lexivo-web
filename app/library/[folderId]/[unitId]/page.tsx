@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/auth-context';
 import { unitCache as _cache } from '@/lib/teacher-library-cache';
 import { type AiParsedWord } from '@/lib/ai-import';
 import AiAddWordsPanel, { UnitTabBar } from '@/components/AiAddWordsPanel';
+import { CopyWordListButton } from '@/components/CopyWordList';
 
 interface WordExample { sentence: string; translation: string; }
 interface UnitWord {
@@ -197,12 +198,15 @@ export default function UnitPage() {
           <p className="text-sm text-[var(--text-muted)] mt-0.5">{t.libraryPage.wordsCount(words.length)}</p>
         </div>
         {tab === 'words' && words.length > 0 && (
+          <div className="flex items-center gap-2">
+          {!selectMode && <CopyWordListButton words={words.map(w => w.word)} />}
           <button
             onClick={toggleSelectMode}
             className={`text-xs font-semibold px-3 py-1.5 rounded-full transition-colors ${selectMode ? 'bg-[var(--primary)] text-white' : 'bg-[var(--surface-2)] text-[var(--text-muted)]'}`}
           >
             {selectMode ? t.libraryPage.cancel : t.libraryPage.select}
           </button>
+          </div>
         )}
       </div>
 

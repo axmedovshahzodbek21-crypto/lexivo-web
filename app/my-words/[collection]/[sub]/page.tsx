@@ -9,6 +9,7 @@ import { speakText } from '@/lib/speech';
 import type { ImportedWord } from '@/lib/types';
 import type { AiParsedWord } from '@/lib/ai-import';
 import AiAddWordsPanel, { UnitTabBar, type UnitTab } from '@/components/AiAddWordsPanel';
+import { CopyWordListButton } from '@/components/CopyWordList';
 
 const PREVIEW_EXAMPLES = 3;
 
@@ -177,6 +178,9 @@ export default function FolderCollectionPage({ params }: Props) {
           >
             {selectMode ? t.libraryPage.cancel : t.libraryPage.select}
           </button>
+        )}
+        {tab === 'words' && words.length > 0 && !selectMode && (
+          <CopyWordListButton words={words.map(w => w.word)} />
         )}
         {tab === 'words' && (
         <button
