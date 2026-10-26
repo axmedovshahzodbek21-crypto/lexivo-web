@@ -35,7 +35,8 @@ export default function MorePage() {
         { label: t.hub.items.starred.title,    sub: t.more.starredSub,   href: '/starred',    icon: '⭐', gradient: 'linear-gradient(135deg, #b45309, #fcd34d)', edge: '#78350f', glow: 'rgba(180,83,9,0.4)' },
         { label: t.hub.items.hard_words.title,  sub: t.more.hardWordsSub, href: '/hard-words', icon: '😓', gradient: 'linear-gradient(135deg, #dc2626, #f87171)', edge: '#991b1b', glow: 'rgba(220,38,38,0.4)' },
         { label: t.hub.items.lists.title,       sub: t.more.listsSub,     href: '/lists',      icon: '📋', gradient: 'linear-gradient(135deg, #7c3aed, #a78bfa)', edge: '#4c1d95', glow: 'rgba(124,58,237,0.4)' },
-        { label: t.hub.items.library.title,     sub: t.more.librarySub,   href: '/library',    icon: '📚', gradient: 'linear-gradient(135deg, #4d7c0f, #a3e635)', edge: '#365314', glow: 'rgba(77,124,15,0.4)' },
+        { label: t.wordsPage.title,             sub: t.more.learnedWordsSub, href: '/words', icon: '✅', gradient: 'linear-gradient(135deg, #0369a1, #38bdf8)', edge: '#0c4a6e', glow: 'rgba(3,105,161,0.4)' },
+        { label: t.hub.items.library.title,    sub: t.more.librarySub,   href: '/library',    icon: '📚', gradient: 'linear-gradient(135deg, #4d7c0f, #a3e635)', edge: '#365314', glow: 'rgba(77,124,15,0.4)' },
       ],
     },
     {
