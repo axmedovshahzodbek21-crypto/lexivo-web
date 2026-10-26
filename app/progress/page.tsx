@@ -1,4 +1,5 @@
 ﻿'use client';
+import PageTip from '@/components/PageTip';
 import { PageLoader } from '@/components/Loader';
 import { Suspense } from 'react';
 import { useEffect, useState } from 'react';
@@ -146,7 +147,7 @@ function ProgressPage() {
     <div className="flex flex-col min-h-screen">
       <div className="p-4">
         <BackButton className="mb-3" />
-        <h1 className="text-2xl font-bold mb-4">{t.progress.title}</h1>
+        <h1 className="text-2xl font-bold mb-4">{t.progress.title} <PageTip id="progress" inline /></h1>
 
         {/* Tabs */}
         <div className="flex gap-2 mb-4 overflow-x-auto pb-1">

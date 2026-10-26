@@ -1,4 +1,5 @@
 'use client';
+import PageTip from '@/components/PageTip';
 import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -135,7 +136,7 @@ export default function MyWordsPage() {
       {/* Header — same layout as the Library page */}
       <div className="flex items-center justify-between gap-3 mb-6">
         <div className="min-w-0">
-          <h1 className="text-2xl font-black text-[var(--text)]">{t.myWords.title}</h1>
+          <h1 className="text-2xl font-black text-[var(--text)]">{t.myWords.title} <PageTip id="my_words" inline /></h1>
           <p className="text-sm text-[var(--text-muted)] mt-0.5">{t.libraryPage.folderCount(folders.length)}</p>
         </div>
         <div className="flex items-center gap-2 shrink-0">

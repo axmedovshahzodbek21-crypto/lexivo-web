@@ -1,4 +1,5 @@
 'use client';
+import PageTip from '@/components/PageTip';
 import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
@@ -452,6 +453,7 @@ function SRSReviewInner() {
           >
             ⚙️
           </button>
+          <PageTip id="srs" />
           <PhoneModeToggle />
         </div>
       </div>

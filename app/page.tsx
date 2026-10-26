@@ -1,4 +1,5 @@
 'use client';
+import PageTip from '@/components/PageTip';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -236,6 +237,7 @@ export default function HomePage() {
         <h1 className="text-2xl font-bold text-[var(--text)]">Hi, {settings.name}! 👋</h1>
       </div>
       <div className="flex items-center gap-2">
+        <PageTip id="home" className="w-10 h-10 rounded-full bg-[var(--surface-2)] flex items-center justify-center hover:bg-[var(--primary-bg)] transition-colors" />
         <button
           onClick={() => { const next = toggleTheme(); setThemeState(next); }}
           className="w-10 h-10 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-lg hover:bg-[var(--primary-bg)] transition-colors"

@@ -1,4 +1,5 @@
 'use client';
+import PageTip from '@/components/PageTip';
 import { useTranslation } from '@/lib/useTranslation';
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
@@ -50,7 +51,7 @@ export default function StructuresPage() {
     <div className="flex flex-col min-h-screen animate-fade-in">
       <div className="p-4 border-b border-[var(--border)]">
         <BackButton />
-        <h1 className="text-xl font-bold text-[var(--text)]">🧩 {t.structuresPage.title}</h1>
+        <h1 className="text-xl font-bold text-[var(--text)]">🧩 {t.structuresPage.title} <PageTip id="structures" inline /></h1>
         <p className="text-sm text-[var(--text-muted)] mt-0.5">
           {t.structuresPage.learnedProgress(learnedIds.size, STRUCTURES.length)}
         </p>

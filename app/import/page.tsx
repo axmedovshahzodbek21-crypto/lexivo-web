@@ -1,14 +1,13 @@
 ﻿'use client';
 import { PageLoader, SectionLoader } from '@/components/Loader';
-import { useState, useMemo, useEffect, Suspense } from 'react';
+import { useState, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslation } from '@/lib/useTranslation';
 import { addImportedWords, generateImportedWordId } from '@/lib/storage';
 import { pushLists } from '@/lib/sync';
 import { buildAiImportPrompt, parseAiImportOutput } from '@/lib/ai-import';
 import type { ImportedWord } from '@/lib/types';
-
-const TUTORIAL_ICONS = ['🌐', '🤖', '📋'] as const;
+import PageTip from '@/components/PageTip';
 
 const LANGUAGES = [
   { label: 'English', code: 'en-US' },
@@ -41,14 +40,6 @@ function ImportPageInner() {
   const [pasted, setPasted] = useState('');
   const [copied, setCopied] = useState(false);
   const [added, setAdded] = useState(false);
-  const [showHelp, setShowHelp] = useState(false);
-
-  useEffect(() => {
-    if (!localStorage.getItem('import_tutorial_seen')) {
-      setShowHelp(true);
-      localStorage.setItem('import_tutorial_seen', '1');
-    }
-  }, []);
 
   const parseResult = useMemo(() => parseAiImportOutput(pasted), [pasted]);
   const parsed = parseResult.words;
@@ -94,39 +85,10 @@ function ImportPageInner() {
 
   return (
     <div className={`flex flex-col min-h-screen animate-fade-in ${parsed.length > 0 ? 'pb-36' : 'pb-24'}`}>
-      {/* Tutorial modal */}
-      {showHelp && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center p-4 pb-8" style={{ background: 'rgba(0,0,0,0.5)' }} onClick={() => setShowHelp(false)}>
-          <div className="w-full max-w-md bg-[var(--surface)] rounded-3xl p-6 space-y-5 animate-slide-up" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center gap-2">
-              <h2 className="flex-1 text-lg font-bold text-[var(--text)]">{t.import.tutorialTitle}</h2>
-            </div>
-            <div className="space-y-4">
-              {[
-                { icon: TUTORIAL_ICONS[0], title: t.import.tutorialStep1Title, desc: t.import.tutorialStep1Desc },
-                { icon: TUTORIAL_ICONS[1], title: t.import.tutorialStep2Title, desc: t.import.tutorialStep2Desc },
-                { icon: TUTORIAL_ICONS[2], title: t.import.tutorialStep3Title, desc: t.import.tutorialStep3Desc },
-              ].map(({ icon, title, desc }) => (
-                <div key={title} className="flex gap-3">
-                  <div className="w-10 h-10 rounded-2xl flex items-center justify-center text-xl flex-shrink-0" style={{ background: 'var(--primary-bg)' }}>{icon}</div>
-                  <div>
-                    <p className="font-semibold text-sm text-[var(--text)]">{title}</p>
-                    <p className="text-xs text-[var(--text-muted)] mt-0.5 leading-relaxed">{desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <button onClick={() => setShowHelp(false)} className="btn-primary w-full py-3 text-sm rounded-2xl">
-              {t.import.tutorialGotIt}
-            </button>
-          </div>
-        </div>
-      )}
-
       <div className="flex items-center gap-3 p-4 border-b border-[var(--border)]">
         <button onClick={() => router.back()} className="btn-icon text-lg" aria-label={t.extra.goBack}>←</button>
         <h1 className="font-bold text-[var(--text)] flex-1">{t.import.title}</h1>
-        <button onClick={() => setShowHelp(true)} className="btn-icon text-lg" aria-label={t.import.showHelpAria}>💡</button>
+        <PageTip id="import" />
       </div>
 
       <div className="p-4 space-y-4">

@@ -1,4 +1,5 @@
 ﻿'use client';
+import PageTip from '@/components/PageTip';
 import { useTranslation } from '@/lib/useTranslation';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -67,7 +68,7 @@ export default function PomodoroPage() {
         >
           ←
         </button>
-        <h1 className="font-bold text-[var(--text)]">{t.pomodoro.focusMode}</h1>
+        <h1 className="font-bold text-[var(--text)]">{t.pomodoro.focusMode} <PageTip id="pomodoro" inline /></h1>
         <button
           onClick={() => router.push('/pomodoro/stats')}
           className="btn-icon text-lg"

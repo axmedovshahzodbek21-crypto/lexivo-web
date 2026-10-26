@@ -18,6 +18,7 @@ import type { UserSettings } from '@/lib/types';
 import { translations } from '@/lib/i18n';
 import { APK_DOWNLOAD_URL } from '@/lib/constants';
 import { usePhoneMode } from '@/lib/phone-mode';
+import { PAGE_TIPS_UI, getTipsEnabled, pullTips, setTipsEnabled, resetTips } from '@/lib/page-tips';
 
 type PushPrefs = { class_activity: boolean; due_reviews: boolean; streak_risk: boolean; homework_reminders: boolean; class_idle: boolean };
 const DEFAULT_PUSH_PREFS: PushPrefs = { class_activity: true, due_reviews: true, streak_risk: true, homework_reminders: true, class_idle: true };
@@ -52,8 +53,11 @@ export default function SettingsPage() {
   const [pushSupported, setPushSupported] = useState(false);
   const [isTeacher, setIsTeacher] = useState(false);
   const [phoneMode, setPhoneMode] = usePhoneMode();
+  const [tipsOn, setTipsOn] = useState(true);
+  const [tipsReset, setTipsReset] = useState(false);
 
   useEffect(() => {
+    setTipsOn(getTipsEnabled());
     setThemeState(getTheme());
     setNotif(getNotifSettings());
     setPermission(getNotifPermission());
@@ -70,6 +74,7 @@ export default function SettingsPage() {
           });
         supabase.from('classes').select('id', { count: 'exact', head: true }).eq('teacher_id', user.id)
           .then(({ count }) => setIsTeacher(!!count));
+        pullTips(user.id).then(() => setTipsOn(getTipsEnabled()), () => {});
       }
     });
   }, []);
@@ -614,6 +619,29 @@ export default function SettingsPage() {
               aria-label={t.extra.toggleLeaderboardVisibility}
             >
               <span className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-300 ${settings.showOnLeaderboard ?? true ? 'translate-x-7' : 'translate-x-0'}`} />
+            </button>
+          </div>
+
+          <div className="py-3 space-y-2">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-sm font-medium">{PAGE_TIPS_UI[settings.uiLanguage ?? 'en'].setting}</p>
+                <p className="text-xs text-[var(--text-muted)] mt-0.5">{PAGE_TIPS_UI[settings.uiLanguage ?? 'en'].settingHelper}</p>
+              </div>
+              <button
+                onClick={() => { setTipsOn(!tipsOn); setTipsEnabled(!tipsOn, userId ?? undefined); }}
+                className={`relative w-14 h-7 rounded-full transition-colors duration-300 focus:outline-none shrink-0 ${tipsOn ? 'bg-[var(--primary)]' : 'bg-[var(--surface-2)]'}`}
+                aria-label={PAGE_TIPS_UI[settings.uiLanguage ?? 'en'].setting}
+              >
+                <span className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-300 ${tipsOn ? 'translate-x-7' : 'translate-x-0'}`} />
+              </button>
+            </div>
+            <button
+              onClick={() => { resetTips(userId ?? undefined); setTipsOn(true); setTipsReset(true); }}
+              disabled={tipsReset}
+              className="text-xs font-semibold text-[var(--primary)] disabled:text-[var(--text-muted)]"
+            >
+              {tipsReset ? PAGE_TIPS_UI[settings.uiLanguage ?? 'en'].shownAgain : PAGE_TIPS_UI[settings.uiLanguage ?? 'en'].showAgain}
             </button>
           </div>
         </div>

@@ -1,4 +1,5 @@
 'use client';
+import PageTip from '@/components/PageTip';
 import { useTranslation } from '@/lib/useTranslation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -108,7 +109,7 @@ export default function BattleReadyHubPage() {
       <div className="flex items-center gap-3">
         <span className="text-3xl">🛡️</span>
         <div className="flex-1">
-          <h1 className="text-2xl font-bold text-[var(--text)]">{t.battleReadyPage.title}</h1>
+          <h1 className="text-2xl font-bold text-[var(--text)]">{t.battleReadyPage.title} <PageTip id="battle_ready" inline /></h1>
           <p className="text-sm text-[var(--text-muted)]">{withContent.length}/{DEBATE_TOPICS.length} topics filled in</p>
         </div>
         <button

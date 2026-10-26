@@ -1,4 +1,5 @@
 'use client';
+import PageTip from '@/components/PageTip';
 import { useTranslation } from '@/lib/useTranslation';
 import Link from 'next/link';
 import BackButton from '@/components/BackButton';
@@ -24,7 +25,7 @@ export default function PhrasesPage() {
   return (
     <div className="px-6 py-8 pb-28">
       <BackButton href="/collections" />
-      <h1 className="text-3xl font-black text-[var(--text)] mb-8">💬 {t.collectionsPage.phrasesTitle}</h1>
+      <h1 className="text-3xl font-black text-[var(--text)] mb-8">💬 {t.collectionsPage.phrasesTitle} <PageTip id="phrases" inline /></h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
         {PHRASE_LEVELS.map(level => {

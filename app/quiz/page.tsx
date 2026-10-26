@@ -1,4 +1,5 @@
 ﻿'use client';
+import PageTip from '@/components/PageTip';
 import { PageLoader, SectionLoader } from '@/components/Loader';
 import { useEffect, useState, useCallback, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -510,6 +511,7 @@ function QuizInner() {
         </div>
         <div className="flex items-center gap-2">
           <div className="badge">{correct} ✓</div>
+          <PageTip id="quiz" />
           <PhoneModeToggle />
         </div>
       </div>

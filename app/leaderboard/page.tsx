@@ -1,4 +1,5 @@
 ﻿'use client';
+import PageTip from '@/components/PageTip';
 import { useTranslation } from '@/lib/useTranslation';
 import { SectionLoader } from '@/components/Loader';
 import { useEffect, useState } from 'react';
@@ -332,7 +333,7 @@ export default function LeaderboardPage() {
             className="w-9 h-9 rounded-full flex items-center justify-center text-white text-lg transition-all active:scale-95"
             style={{ background: 'rgba(255,255,255,0.2)' }}>←</button>
           <div className="flex-1">
-            <h1 className="font-bold text-white text-lg leading-tight">{t.leaderboardPage.title}</h1>
+            <h1 className="font-bold text-white text-lg leading-tight">{t.leaderboardPage.title} <PageTip id="leaderboard" inline /></h1>
             <p className="text-xs" style={{ color: 'rgba(255,255,255,0.75)' }}>{t.leaderboardPage.topLearners}</p>
           </div>
           <button onClick={load} aria-label={t.leaderboardPage.refresh}

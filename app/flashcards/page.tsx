@@ -1,4 +1,5 @@
 ﻿'use client';
+import PageTip from '@/components/PageTip';
 import { PageLoader, SectionLoader } from '@/components/Loader';
 import { useEffect, useState, useCallback, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -444,6 +445,7 @@ function FlashcardsInner() {
         <div className="flex items-center gap-2">
           <span className="text-xs font-medium text-[var(--success)]">✓{known}</span>
           <span className="text-xs font-medium text-[var(--danger)]">✗{unknown}</span>
+          <PageTip id="flashcards" />
           <PhoneModeToggle />
         </div>
       </div>

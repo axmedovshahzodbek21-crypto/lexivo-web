@@ -1,4 +1,5 @@
 'use client';
+import PageTip from '@/components/PageTip';
 import { useTranslation } from '@/lib/useTranslation';
 import { fmtMonthDay } from '@/lib/i18n';
 import { SectionLoader } from '@/components/Loader';
@@ -201,7 +202,7 @@ export default function JoinedClassesPage() {
           <div>
             <p className="text-xs font-black text-white/50 uppercase tracking-widest mb-0.5">{t.classesPage.joinedClasses}</p>
             <h1 className="text-2xl font-black text-white leading-tight" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.25)' }}>
-              {t.classesPage.joinedClassesCountTitle(joinedClasses.length)}
+              {t.classesPage.joinedClassesCountTitle(joinedClasses.length)} <PageTip id="classes_joined" inline />
             </h1>
           </div>
         </div>

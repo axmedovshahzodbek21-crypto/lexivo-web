@@ -1,4 +1,5 @@
 'use client';
+import PageTip from '@/components/PageTip';
 import { useTranslation } from '@/lib/useTranslation';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -206,7 +207,8 @@ export default function SpeakingPage() {
     <div className="flex flex-col min-h-screen">
       <div className="flex items-center gap-3 p-4 border-b border-[var(--border)]">
         <button onClick={() => (part ? backToParts() : router.back())} className="btn-icon text-lg" aria-label={t.speaking.goBack}>←</button>
-        <h1 className="font-bold text-[var(--text)]">{t.speaking.title}</h1>
+        <h1 className="font-bold text-[var(--text)] flex-1">{t.speaking.title}</h1>
+        <PageTip id="speaking" />
       </div>
 
       <div className="p-4 max-w-lg mx-auto w-full flex-1 flex flex-col">

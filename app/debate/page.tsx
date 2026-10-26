@@ -1,4 +1,5 @@
 'use client';
+import PageTip from '@/components/PageTip';
 import { useTranslation } from '@/lib/useTranslation';
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
@@ -53,7 +54,7 @@ export default function DebateArenaPage() {
         <div className="flex items-center gap-3">
           <span className="text-3xl">🗣️</span>
           <div>
-            <h1 className="text-2xl font-bold text-[var(--text)]">{t.debatePage.title}</h1>
+            <h1 className="text-2xl font-bold text-[var(--text)]">{t.debatePage.title} <PageTip id="debate" inline /></h1>
             <p className="text-sm text-[var(--text-muted)]">{t.debatePage.subtitle}</p>
           </div>
         </div>

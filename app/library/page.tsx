@@ -1,4 +1,5 @@
 'use client';
+import PageTip from '@/components/PageTip';
 import { useTranslation } from '@/lib/useTranslation';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -156,7 +157,7 @@ export default function LibraryPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-black text-[var(--text)]">{t.libraryPage.myLibraryTitle}</h1>
+          <h1 className="text-2xl font-black text-[var(--text)]">{t.libraryPage.myLibraryTitle} <PageTip id="library" inline /></h1>
           <p className="text-sm text-[var(--text-muted)] mt-0.5">{t.libraryPage.folderCount(folders.length)}</p>
         </div>
         <button

@@ -1,4 +1,5 @@
 'use client';
+import PageTip from '@/components/PageTip';
 import { useTranslation } from '@/lib/useTranslation';
 import { useRouter } from 'next/navigation';
 import { realEnglishSets, localizedTitle } from "@/lib/real-english-data";
@@ -37,7 +38,7 @@ export default function RealEnglishPage() {
         <p style={{ fontSize: 11, fontWeight: 900, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: 6 }}>
           {t.realEnglishPage.eyebrow}
         </p>
-        <h1 style={{ fontSize: 40, fontWeight: 900, color: 'var(--text)', lineHeight: 1 }}>{t.realEnglishPage.title}</h1>
+        <h1 style={{ fontSize: 40, fontWeight: 900, color: 'var(--text)', lineHeight: 1 }}>{t.realEnglishPage.title} <PageTip id="real_english" inline /></h1>
         <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 8 }}>
           {t.realEnglishPage.intro}
         </p>

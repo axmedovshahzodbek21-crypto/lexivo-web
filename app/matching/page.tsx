@@ -1,4 +1,5 @@
 ﻿'use client';
+import PageTip from '@/components/PageTip';
 import { SectionLoader } from '@/components/Loader';
 import BackButton from '@/components/BackButton';
 import { Suspense } from 'react';
@@ -430,7 +431,10 @@ function MatchingInner() {
       <div className="p-4 border-b border-[var(--border)] flex-shrink-0">
         <div className="flex items-center justify-between mb-2">
           <BackButton className="" />
-          <PhoneModeToggle />
+          <div className="flex items-center gap-2">
+            <PageTip id="matching" />
+            <PhoneModeToggle />
+          </div>
         </div>
         <div className="flex items-center justify-between">
           <h1 className="text-lg font-bold text-[var(--text)]">{t.matching.matchThePairs}</h1>

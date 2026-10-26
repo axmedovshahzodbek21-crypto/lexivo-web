@@ -1,4 +1,5 @@
 ﻿'use client';
+import PageTip from '@/components/PageTip';
 import { PageLoader, SectionLoader } from '@/components/Loader';
 import { useEffect, useRef, useState, useCallback, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -1147,6 +1148,7 @@ function LearnInner() {
             aria-label={tiltOn ? t.extra.tiltOff : t.extra.tiltOn}
             title={tiltOn ? t.extra.tiltOff : t.extra.tiltOn}
           >🎴</button>
+          <PageTip id="learn" />
           <PhoneModeToggle />
         </div>
       </div>

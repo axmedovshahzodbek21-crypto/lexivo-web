@@ -1,4 +1,5 @@
 'use client';
+import PageTip from '@/components/PageTip';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useTranslation } from '@/lib/useTranslation';
@@ -297,7 +298,7 @@ export default function IeltsReadingPage() {
           {t.ieltsPage.practiceEyebrow}
         </p>
         <h1 style={{ fontSize: 40, fontWeight: 900, color: 'var(--text)', lineHeight: 1 }}>
-          {t.ieltsPage.title}
+          {t.ieltsPage.title} <PageTip id="ielts_reading" inline />
         </h1>
         <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 8 }}>
           {t.ieltsPage.chooseAPassage}
