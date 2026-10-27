@@ -128,7 +128,15 @@ export const useAppStore = create<AppState>((set, get) => {
   clearLevelUp: () => set({ pendingLevelUp: null }),
 
   focusMode: false,
-  setFocusMode: (focusMode) => set({ focusMode }),
+  // Fullscreen is requested here, synchronously inside the click/keypress, because
+  // Chrome refuses it from a later effect. Rejections (iOS Safari) are harmless.
+  setFocusMode: (focusMode) => {
+    if (typeof document !== 'undefined') {
+      if (focusMode && !document.fullscreenElement) document.documentElement.requestFullscreen?.().catch(() => {});
+      if (!focusMode && document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
+    }
+    set({ focusMode });
+  },
 
   showShortcuts: false,
   setShowShortcuts: (showShortcuts) => set({ showShortcuts }),

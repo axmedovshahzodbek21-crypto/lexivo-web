@@ -107,9 +107,8 @@ html, body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Focus mode */
-body.focus-mode nav,
-body.focus-mode .no-focus {
+/* Focus mode = browser fullscreen (GlobalKeyboardHandler); study controls stay. */
+body.focus-mode nav {
   display: none !important;
 }
 
