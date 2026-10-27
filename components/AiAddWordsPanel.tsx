@@ -151,7 +151,9 @@ export default function AiAddWordsPanel({ onAdd, onAdded }: {
         <button
           onClick={importAll}
           disabled={importing}
-          className="w-full py-3 rounded-xl text-sm font-bold text-white disabled:opacity-50"
+          // Sticky so a long preview list doesn't push it off-screen; bottom-20
+          // clears the mobile bottom nav.
+          className="sticky bottom-20 sm:bottom-4 z-30 w-full py-3 rounded-xl text-sm font-bold text-white shadow-lg disabled:opacity-50"
           style={{ background: 'var(--primary)' }}
         >
           {importing ? t.libraryPage.importing : t.libraryPage.importAllBtn(parsed.length)}
