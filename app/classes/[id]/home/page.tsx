@@ -142,7 +142,7 @@ const [memberCount, setMemberCount] = useState(0);
       const [{ data: anns }, { data: members }, { data: myMembership }] = await Promise.all([
         supabase.from('class_announcements').select('id, message, created_at')
           .eq('class_id', id).order('created_at', { ascending: false }).limit(5),
-        supabase.from('class_members').select('student_id').eq('class_id', id).eq('status', 'approved'),
+        supabase.from('class_members').select('student_id, joined_at').eq('class_id', id).eq('status', 'approved'),
         !teacher
           ? supabase.from('class_members').select('class_xp').eq('class_id', id).eq('student_id', user.id).maybeSingle()
           : Promise.resolve({ data: null }),
@@ -200,8 +200,14 @@ const [memberCount, setMemberCount] = useState(0);
         if (!current || row.study_date > current) lastStudyByStudent.set(row.student_id, row.study_date);
       }
       const activeToday = memberIds.filter(id => lastStudyByStudent.get(id) === today).length;
+      // A student who hasn't studied yet counts from their join date, so a
+      // fresh joiner isn't flagged as "3+ days inactive" on day one.
+      const joinedByStudent = new Map<string, string>();
+      for (const m of (members ?? []) as { student_id: string; joined_at: string | null }[]) {
+        if (m.joined_at) joinedByStudent.set(m.student_id, localDateStr(new Date(m.joined_at)));
+      }
       const needsAttention = memberIds.filter(id => {
-        const date = lastStudyByStudent.get(id);
+        const date = lastStudyByStudent.get(id) ?? joinedByStudent.get(id);
         return !date || date < threeDaysAgo;
       }).length;
 

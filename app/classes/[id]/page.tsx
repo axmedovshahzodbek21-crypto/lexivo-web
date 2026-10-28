@@ -80,6 +80,7 @@ interface StudentRow {
   xp: number;
   streak: number;
   last_study_date: string | null;
+  joined_date?: string; // local yyyy-mm-dd, from class_members.joined_at
   total_words: number;
   collection_progress: Record<string, number>;
   total_units_sum: number;
@@ -174,7 +175,10 @@ function dueDateLabel(tt: ReturnType<typeof useTranslation>, due: string | null)
   return { text: tt.classesPage.dueDate(fmtMonthDay(tt, new Date(due + 'T00:00:00'))), overdue: false };
 }
 
-function isInactive(date: string | null): boolean {
+// joinedDate is the fallback for a student who hasn't studied yet, so a fresh
+// joiner isn't flagged inactive on day one.
+function isInactive(lastStudy: string | null, joinedDate?: string): boolean {
+  const date = lastStudy ?? joinedDate;
   if (!date) return true;
   const threeDaysAgo = addDaysToDateStr(localDateStr(), -3);
   return date < threeDaysAgo;
@@ -2285,14 +2289,19 @@ export default function ClassDashboardPage() {
     const [{ data }, { data: colData }, { data: approvedRows }] = await Promise.all([
       supabase.rpc('get_class_dashboard', { p_class_id: id }),
       supabase.from('collections').select('*').order('display_order'),
-      supabase.from('class_members').select('student_id').eq('class_id', id).eq('status', 'approved'),
+      supabase.from('class_members').select('student_id, joined_at').eq('class_id', id).eq('status', 'approved'),
     ]);
     // get_class_dashboard's own definition isn't reconstructible from this
     // repo's migrations (created directly via the Supabase dashboard), so
     // whether it excludes pending members server-side can't be verified —
     // cross-check against class_members.status here instead of trusting it.
-    const approvedIds = new Set((approvedRows ?? []).map(r => r.student_id as string));
-    const approvedStudents = ((data as StudentRow[]) ?? []).filter(s => approvedIds.has(s.student_id));
+    const joinedById = new Map((approvedRows ?? []).map(r => [
+      r.student_id as string,
+      r.joined_at ? localDateStr(new Date(r.joined_at as string)) : undefined,
+    ]));
+    const approvedStudents = ((data as StudentRow[]) ?? [])
+      .filter(s => joinedById.has(s.student_id))
+      .map(s => ({ ...s, joined_date: joinedById.get(s.student_id) }));
     setStudents(approvedStudents);
     setCollections((colData as CollectionMeta[]) ?? []);
     const { data: hwData } = await supabase.rpc('get_hard_words', { p_class_id: id });
@@ -2781,14 +2790,14 @@ export default function ClassDashboardPage() {
                 const activeTargets = targets.filter(t => !t.completed_at).length;
                 const totalProgress = Object.values(s.collection_progress).reduce((sum, v) => sum + v, 0);
                 return (
-                  <div key={s.student_id} className="card space-y-3" style={isInactive(s.last_study_date) ? { borderLeft: '3px solid var(--danger)', background: 'color-mix(in srgb, var(--danger) 4%, var(--surface))' } : {}}>
+                  <div key={s.student_id} className="card space-y-3" style={isInactive(s.last_study_date, s.joined_date) ? { borderLeft: '3px solid var(--danger)', background: 'color-mix(in srgb, var(--danger) 4%, var(--surface))' } : {}}>
                     <div className="flex items-center gap-3">
                       <span className="text-xs font-bold text-[var(--text-muted)] w-5 text-center shrink-0">{i + 1}</span>
                       <Avatar name={s.name} url={s.avatar_url} />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5">
                           <p className="font-bold text-sm text-[var(--text)] truncate">{s.name}</p>
-                          {isInactive(s.last_study_date) && <span className="text-[10px] font-bold text-[var(--danger)] shrink-0">⚠️ {tt.classesPage.inactiveLabel}</span>}
+                          {isInactive(s.last_study_date, s.joined_date) && <span className="text-[10px] font-bold text-[var(--danger)] shrink-0">⚠️ {tt.classesPage.inactiveLabel}</span>}
                         </div>
                         <p className="text-xs text-[var(--text-muted)]">{tt.classesPage.lastActivePrefix} {lastActiveLabel(tt, s.last_study_date)}</p>
                       </div>
