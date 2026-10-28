@@ -163,6 +163,13 @@ body.focus-mode .focus-container {
   box-shadow: 0 8px 40px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.10);
 }
 
+/* Content beside the class sidebar. ClassShellNav sets data-class-sidebar
+   on <html> when hidden, so the server-rendered class layout can follow it. */
+@media (min-width: 640px) {
+  .class-shell-content { padding-left: 14rem; transition: padding-left 300ms; }
+  html[data-class-sidebar="hidden"] .class-shell-content { padding-left: 0; }
+}
+
 /* Word card flip animation */
 .flip-card {
   perspective: 1000px;

@@ -25,7 +25,7 @@ export default function AppNav({ children }: { children: React.ReactNode }) {
     return (
       <div className="sm:min-h-screen">
         <ClassShellNav classId={classId} />
-        <div className="pb-16 sm:pb-0 sm:pl-56">
+        <div className="pb-16 sm:pb-0 class-shell-content">
           {children}
         </div>
       </div>

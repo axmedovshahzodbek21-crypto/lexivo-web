@@ -45,6 +45,24 @@ export default function ClassShellNav({ classId }: { classId: string }) {
   const [className, setClassName] = useState('');
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [dueCount, setDueCount] = useState(0);
+  // Shares the main sidebar's key, so hiding one hides both.
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  useEffect(() => {
+    if (localStorage.getItem('lexivo_sidebar_open') === 'false') setSidebarOpen(false);
+  }, []);
+
+  useEffect(() => {
+    if (sidebarOpen) delete document.documentElement.dataset.classSidebar;
+    else document.documentElement.dataset.classSidebar = 'hidden';
+    return () => { delete document.documentElement.dataset.classSidebar; };
+  }, [sidebarOpen]);
+
+  const toggleSidebar = () => {
+    const next = !sidebarOpen;
+    setSidebarOpen(next);
+    try { localStorage.setItem('lexivo_sidebar_open', String(next)); } catch {}
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -145,11 +163,21 @@ export default function ClassShellNav({ classId }: { classId: string }) {
         })}
       </nav>
 
+      {/* Desktop: floating expand button (visible only when sidebar is hidden) */}
+      <button
+        onClick={toggleSidebar}
+        aria-label={t.sidebar.showSidebar}
+        tabIndex={sidebarOpen ? -1 : 0}
+        className={`hidden sm:flex fixed top-4 left-2 z-50 w-7 h-7 items-center justify-center rounded-full bg-[var(--surface)] border border-[var(--border)] shadow-sm text-[var(--text-muted)] hover:text-white hover:bg-[var(--primary)] hover:border-[var(--primary)] transition-all duration-200 ${sidebarOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+      >
+        ›
+      </button>
+
       {/* Desktop sidebar — styled like main Navigation */}
-      <aside className="hidden sm:flex fixed left-0 top-0 bottom-0 w-56 z-50 flex-col p-3">
+      <aside className={`hidden sm:flex fixed left-0 top-0 bottom-0 w-56 z-50 flex-col p-3 transition-transform duration-300 ${sidebarOpen ? '' : '-translate-x-full pointer-events-none'}`}>
         <div className="sidebar-glass flex flex-col w-full h-full rounded-2xl overflow-y-auto">
 
-          {/* Header: back arrow + class name */}
+          {/* Header: back arrow + class name + collapse button */}
           <div className="px-5 pt-6 pb-4 flex items-start gap-3">
             <button
               onClick={handleBackClick}
@@ -158,7 +186,7 @@ export default function ClassShellNav({ classId }: { classId: string }) {
             >
               ←
             </button>
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <span
                 className="text-2xl font-black tracking-tight"
                 style={{
@@ -176,6 +204,13 @@ export default function ClassShellNav({ classId }: { classId: string }) {
                 </div>
               )}
             </div>
+            <button
+              onClick={toggleSidebar}
+              aria-label={t.sidebar.hideSidebar}
+              className="mt-1 shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs text-[var(--text-muted)] hover:text-white hover:bg-[var(--primary)] transition-all duration-200"
+            >
+              ‹
+            </button>
           </div>
 
           {/* Nav links with icon + label */}
