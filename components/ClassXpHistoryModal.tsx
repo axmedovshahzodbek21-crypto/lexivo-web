@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
-import { classifyReview, REVIEW_LABEL_META } from '@/lib/reviewPattern';
+import { classifyReview, reviewVerdict, REVIEW_VERDICT_META, REVIEW_WINDOW_DAYS } from '@/lib/reviewPattern';
 import { localDateStr, addDaysToDateStr, displayXP } from '@/lib/storage';
 import { REASON_ICON } from '@/lib/xp-reason-icons';
 import { getAudioCtx, playTone } from '@/lib/web-audio';
@@ -89,6 +89,8 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [showReviewDetail, setShowReviewDetail] = useState(false);
   const [composing, setComposing] = useState(false);
+  const [joinDate, setJoinDate] = useState<string | null>(null);
+  const [showDetails, setShowDetails] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -96,14 +98,17 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
       setLoading(true);
       const isSelf = user?.id === userId;
       const today = localDateStr();
-      const [{ data }, { data: srs }] = await Promise.all([
+      const [{ data }, { data: srs }, { data: member }] = await Promise.all([
         isSelf
           ? supabase.from('class_xp_history').select('id, amount, reason, created_at').eq('user_id', userId).eq('class_id', classId).order('created_at', { ascending: false })
           : supabase.rpc('get_student_xp_history', { p_class_id: classId, p_student_id: userId }),
         supabase.from('class_srs_states').select('stage, next_due').eq('user_id', userId).eq('class_id', classId).lte('next_due', today),
+        supabase.from('class_members').select('joined_at').eq('class_id', classId).eq('student_id', userId).maybeSingle(),
       ]);
       if (!cancelled) {
         setHistory((data ?? []) as XpEntry[]);
+        const joinedAt = (member as { joined_at: string | null } | null)?.joined_at;
+        setJoinDate(joinedAt ? localDateStr(new Date(joinedAt)) : null);
         const pending = ((srs ?? []) as { stage: number; next_due: string }[]).filter(r => r.stage < 5);
         setDueCount(pending.length);
         setOverdueCount(pending.filter(r => r.next_due < today).length);
@@ -138,17 +143,19 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
     : [];
   const dayTotal = dayEntries.reduce((s, e) => s + e.amount, 0);
   const reviewOnly = history.filter(e => e.reason === 'SRS Review');
-  const reviewPattern = classifyReview(reviewOnly, overdueCount);
-  const reviewMeta = REVIEW_LABEL_META[reviewPattern.label];
+  const reviewPattern = classifyReview(reviewOnly, overdueCount, joinDate);
   const h = t.classXpHistory;
 
-  // One plain sentence instead of a label: when they last reviewed and how
-  // many words are waiting. A student viewing themself gets a nudge, not a
-  // red "Inactive".
+  // Verdict first (is this student OK?), then one plain sentence: when they
+  // last reviewed and how many words are waiting. A student viewing themself
+  // gets a nudge, not a red label.
   const isSelf = user?.id === userId;
   const name = studentName ?? t.classesPage.defaultStudentName;
   const ds = reviewPattern.daysSinceLast;
-  const lastLine = ds === null ? (isSelf ? h.sumNeverSelf : fill(h.sumNeverOther, { name }))
+  const verdict = reviewVerdict(reviewOnly.length, ds, dueCount, overdueCount);
+  const verdictMeta = REVIEW_VERDICT_META[verdict];
+  const lastLine = verdict === 'new' ? (isSelf ? h.verdictNewSelf : fill(h.verdictNewOther, { name }))
+    : ds === null ? (isSelf ? h.sumNeverSelf : fill(h.sumNeverOther, { name }))
     : ds === 0 ? (isSelf ? h.sumTodaySelf : fill(h.sumTodayOther, { name }))
     : ds === 1 ? (isSelf ? h.sumYesterdaySelf : fill(h.sumYesterdayOther, { name }))
     : fill(isSelf ? h.sumDaysSelf : h.sumDaysOther, { name, n: ds });
@@ -156,7 +163,12 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
     ? (overdueCount === dueCount ? fill(h.waitingAllOverdue, { n: dueCount }) : fill(h.waitingSomeOverdue, { n: dueCount, m: overdueCount }))
     : dueCount > 0 ? fill(h.waitingToday, { n: dueCount }) : '';
   const summary = [lastLine, waitingLine, isSelf && dueCount > 0 ? h.selfNudge : ''].filter(Boolean).join(' ');
-  const pillColor = isSelf ? accentColor : reviewMeta.color;
+  const pillColor = isSelf ? accentColor : verdictMeta.color;
+  const lastReviewValue = reviewPattern.lastReviewDate === null || ds === null ? '—'
+    : `${fmtYmd(reviewPattern.lastReviewDate)} (${ds === 0 ? h.statToday : fill(h.statDaysAgo, { n: ds })})`;
+  const daysInClass = joinDate ? Math.round((new Date(todayStr).getTime() - new Date(joinDate).getTime()) / 86400000) : null;
+  const inClassSinceValue = joinDate === null || daysInClass === null ? '—'
+    : `${fmtYmd(joinDate)} (${daysInClass <= 0 ? h.statToday : fill(h.statDaysAgo, { n: daysInClass })})`;
 
   const reviewCountByDay = new Map<string, number>();
   for (const e of reviewOnly) {
@@ -167,6 +179,17 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
   for (let i = 29; i >= 0; i--) {
     last30Days.push(addDaysToDateStr(todayStr, -i));
   }
+
+  const statTable = (rows: { label: string; value: string; color?: string }[]) => (
+    <div className="rounded-xl divide-y" style={{ background: 'var(--surface-2)', borderColor: 'var(--border)' }}>
+      {rows.map(row => (
+        <div key={row.label} className="flex items-center justify-between px-4 py-2.5 text-xs">
+          <span style={{ color: 'var(--text-muted)' }}>{row.label}</span>
+          <span className="font-bold" style={{ color: row.color ?? 'var(--text)' }}>{row.value}</span>
+        </div>
+      ))}
+    </div>
+  );
 
   return (
     <div className="fixed inset-0 z-[70] flex items-end justify-center" onClick={onClose}>
@@ -202,10 +225,10 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
                 className="flex items-center gap-2 px-3 py-2 rounded-xl text-left hover:opacity-85 transition-opacity"
                 style={{ background: `color-mix(in srgb, ${pillColor} 12%, transparent)`, border: `1px solid color-mix(in srgb, ${pillColor} 30%, transparent)` }}
               >
-                <span>{isSelf ? '🔄' : reviewMeta.emoji}</span>
+                <span>{isSelf ? '🔄' : verdictMeta.emoji}</span>
                 <div className="min-w-0 flex-1">
                   {!isSelf && (
-                    <p className="text-xs font-bold truncate" style={{ color: reviewMeta.color }}>{h.reviewLabel} {h.patternText[reviewPattern.label]}</p>
+                    <p className="text-xs font-bold truncate" style={{ color: verdictMeta.color }}>{h.verdictTitle[verdict]}</p>
                   )}
                   <p className="text-xs leading-snug" style={{ color: 'var(--text)' }}>{summary}</p>
                 </div>
@@ -290,20 +313,61 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
             <div className="flex-1 flex flex-col min-w-0 border-l overflow-y-auto animate-slide-in-right" style={{ borderColor: 'var(--border)', order: 3 }}>
               <div className="flex items-center justify-between px-5 py-4 shrink-0 border-b" style={{ borderColor: 'var(--border)' }}>
                 <div className="flex items-center gap-2">
-                  <span className="text-xl">{reviewMeta.emoji}</span>
+                  <span className="text-xl">{verdictMeta.emoji}</span>
                   <div>
                     <p className="text-xs font-bold" style={{ color: 'var(--text-muted)' }}>{t.classXpHistory.reviewPatternLabel}</p>
-                    <p className="text-sm font-black" style={{ color: reviewMeta.color }}>{h.patternText[reviewPattern.label]}</p>
+                    <p className="text-sm font-black" style={{ color: verdictMeta.color }}>{h.verdictTitle[verdict]}</p>
                   </div>
                 </div>
                 <button onClick={() => setShowReviewDetail(false)} className="text-lg" style={{ color: 'var(--text-muted)' }}>✕</button>
               </div>
 
               <div className="overflow-y-auto overscroll-contain px-5 py-4 space-y-5">
-                <div className="space-y-1">
-                  <p className="text-base font-bold leading-snug" style={{ color: 'var(--text)' }}>{summary}</p>
-                  <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{h.patternBlurb[reviewPattern.label]}</p>
-                </div>
+                <p className="text-base font-bold leading-snug" style={{ color: 'var(--text)' }}>{summary}</p>
+
+                {/* 30-day review strip — days before joining are faded out */}
+                {verdict !== 'new' && (
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--text-muted)' }}>{t.classXpHistory.last30Days}</p>
+                    <div className="grid grid-cols-10 gap-1">
+                      {last30Days.map(d => {
+                        const count = reviewCountByDay.get(d) ?? 0;
+                        const isToday = d === todayStr;
+                        const beforeJoin = d < reviewPattern.windowStart;
+                        return (
+                          <div
+                            key={d}
+                            title={`${d}${beforeJoin ? ` · ${h.legendBeforeJoin}` : count > 0 ? t.classXpHistory.tooltipReviewedCount(count) : t.classXpHistory.tooltipNoReview}`}
+                            className="aspect-square rounded"
+                            style={{
+                              background: count > 0 ? verdictMeta.color : 'var(--surface-2)',
+                              border: count > 0 ? 'none' : beforeJoin ? '1px dashed var(--border)' : '1px solid var(--border)',
+                              outline: isToday ? `1.5px solid ${accentColor}` : 'none',
+                              outlineOffset: 1,
+                              opacity: beforeJoin ? 0.3 : count > 0 ? Math.min(1, 0.45 + count * 0.15) : 1,
+                            }}
+                          />
+                        );
+                      })}
+                    </div>
+                    <div className="flex flex-wrap items-center gap-3 mt-2 text-[10px]" style={{ color: 'var(--text-muted)' }}>
+                      <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm inline-block" style={{ background: verdictMeta.color }} />{t.classXpHistory.legendReviewed}</span>
+                      <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm inline-block" style={{ border: '1px solid var(--border)' }} />{t.classXpHistory.legendNoReview}</span>
+                      {reviewPattern.windowDays < REVIEW_WINDOW_DAYS && (
+                        <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm inline-block" style={{ border: '1px dashed var(--border)', opacity: 0.5 }} />{h.legendBeforeJoin}</span>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* The three numbers a teacher acts on */}
+                {statTable(verdict === 'new'
+                  ? [{ label: h.statInClassSince, value: inClassSinceValue }]
+                  : [
+                    { label: h.statLastReview, value: lastReviewValue },
+                    { label: h.statWaiting, value: overdueCount > 0 ? fill(h.statWaitingValue, { n: dueCount, m: overdueCount }) : `${dueCount}`, color: overdueCount > 0 ? REVIEW_VERDICT_META.stopped.color : undefined },
+                    { label: h.statDaysPracticed, value: fill(h.statDaysPracticedValue, { n: reviewPattern.daysReviewed, w: reviewPattern.windowDays }) },
+                  ])}
 
                 {!isSelf && (
                   composing ? (
@@ -320,53 +384,31 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
                   )
                 )}
 
-                {/* Stat breakdown */}
-                <div className="rounded-xl divide-y" style={{ background: 'var(--surface-2)', borderColor: 'var(--border)' }}>
-                  {[
-                    { label: h.statLastReview, value: reviewPattern.lastReviewDate === null || ds === null ? '—'
-                      : `${fmtYmd(reviewPattern.lastReviewDate)} (${ds === 0 ? h.statToday : fill(h.statDaysAgo, { n: ds })})` },
-                    { label: h.statDaysReviewed, value: `${reviewPattern.daysReviewed}/30 (${Math.round(reviewPattern.coverage * 100)}%)` },
-                    { label: h.statCurrentStreak, value: fill(h.statDays, { n: reviewPattern.streak }) },
-                    { label: h.statLongestGap, value: reviewPattern.lastReviewDate === null ? '—' : fill(h.statDays, { n: reviewPattern.longestGap }) },
-                    { label: h.statAvgWordsPerDay, value: reviewPattern.totalReviews > 0 ? reviewPattern.avgPerActiveDay.toFixed(1) : '—' },
-                    { label: h.statTotalReviews, value: `${reviewPattern.totalReviews}` },
-                    { label: h.statWaiting, value: overdueCount > 0 ? fill(h.statWaitingValue, { n: dueCount, m: overdueCount }) : `${dueCount}` },
-                  ].map(row => (
-                    <div key={row.label} className="flex items-center justify-between px-4 py-2.5 text-xs">
-                      <span style={{ color: 'var(--text-muted)' }}>{row.label}</span>
-                      <span className="font-bold" style={{ color: 'var(--text)' }}>{row.value}</span>
-                    </div>
-                  ))}
-                </div>
-
-                {/* 30-day review strip */}
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--text-muted)' }}>{t.classXpHistory.last30Days}</p>
-                  <div className="grid grid-cols-10 gap-1">
-                    {last30Days.map(d => {
-                      const count = reviewCountByDay.get(d) ?? 0;
-                      const isToday = d === todayStr;
-                      return (
-                        <div
-                          key={d}
-                          title={`${d}${count > 0 ? t.classXpHistory.tooltipReviewedCount(count) : t.classXpHistory.tooltipNoReview}`}
-                          className="aspect-square rounded"
-                          style={{
-                            background: count > 0 ? reviewMeta.color : 'var(--surface-2)',
-                            border: count > 0 ? 'none' : '1px solid var(--border)',
-                            outline: isToday ? `1.5px solid ${accentColor}` : 'none',
-                            outlineOffset: 1,
-                            opacity: count > 0 ? Math.min(1, 0.45 + count * 0.15) : 1,
-                          }}
-                        />
-                      );
-                    })}
+                {/* Everything else stays one tap away */}
+                {verdict !== 'new' && (
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() => setShowDetails(v => !v)}
+                      className="text-xs font-bold"
+                      style={{ color: 'var(--text-muted)' }}
+                    >
+                      {showDetails ? h.hideDetails : h.moreDetails} {showDetails ? '▴' : '▾'}
+                    </button>
+                    {showDetails && (
+                      <div className="mt-2">
+                        {statTable([
+                          { label: h.statCurrentStreak, value: fill(h.statDays, { n: reviewPattern.streak }) },
+                          { label: h.statLongestGap, value: reviewPattern.lastReviewDate === null ? '—' : fill(h.statDays, { n: reviewPattern.longestGap }) },
+                          { label: h.statAvgWordsPerDay, value: reviewPattern.totalReviews > 0 ? reviewPattern.avgPerActiveDay.toFixed(1) : '—' },
+                          { label: h.statTotalReviews, value: `${reviewPattern.totalReviews}` },
+                          { label: h.statPattern, value: h.patternText[reviewPattern.label] },
+                          { label: h.statInClassSince, value: inClassSinceValue },
+                        ])}
+                      </div>
+                    )}
                   </div>
-                  <div className="flex items-center gap-3 mt-2 text-[10px]" style={{ color: 'var(--text-muted)' }}>
-                    <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm inline-block" style={{ background: reviewMeta.color }} />{t.classXpHistory.legendReviewed}</span>
-                    <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm inline-block" style={{ border: '1px solid var(--border)' }} />{t.classXpHistory.legendNoReview}</span>
-                  </div>
-                </div>
+                )}
               </div>
             </div>
           )}
