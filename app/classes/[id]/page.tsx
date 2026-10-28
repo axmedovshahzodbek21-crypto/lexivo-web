@@ -875,7 +875,7 @@ function ReviewPatternTab({
             <div className="flex flex-wrap gap-x-4 gap-y-1 text-[10px] text-[var(--text-muted)]">
               <span><b className="text-[var(--text)]">{r.daysReviewed}</b>/{REVIEW_WINDOW_DAYS} {tt.classesPage.daysReviewedSuffix}</span>
               <span><b className="text-[var(--text)]">{r.streak}</b> {tt.classesPage.dayStreakLc}</span>
-              <span>{tt.classesPage.longestGapPrefix} <b className="text-[var(--text)]">{r.longestGap}</b>d</span>
+              {r.label !== 'never' && <span>{tt.classesPage.longestGapPrefix} <b className="text-[var(--text)]">{r.longestGap}</b>d</span>}
               {r.totalReviews > 0 && <span>{tt.classesPage.avgLc} <b className="text-[var(--text)]">{r.avgPerActiveDay.toFixed(1)}</b> {tt.classesPage.wordsPerActiveDay}</span>}
             </div>
           </div>

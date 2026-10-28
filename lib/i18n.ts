@@ -183,6 +183,7 @@ const en = {
     statWaitingValue: '{n} ({m} overdue)',
     sendReminder: 'Send a reminder',
     draftReview: 'Hi {name}! {n} words are waiting for review. Could you spend 10 minutes on them today?',
+    draftReviewNoDue: 'Hi {name}! Could you spend 10 minutes studying today?',
   },
   classNav: {
     words: 'Words',
@@ -2838,6 +2839,7 @@ const uz: typeof en = {
     statWaitingValue: "{n} ({m} tasi muddati o'tgan)",
     sendReminder: 'Eslatma yuborish',
     draftReview: "Salom, {name}! {n} ta so'z takrorlashni kutmoqda. Bugun 10 daqiqa ajrata olasizmi?",
+    draftReviewNoDue: "Salom, {name}! Bugun o'qishga 10 daqiqa ajrata olasizmi?",
   },
   classNav: {
     words: 'So\'zlar',
@@ -5479,6 +5481,7 @@ const ru: typeof en = {
     statWaitingValue: '{n} (просрочено {m})',
     sendReminder: 'Отправить напоминание',
     draftReview: 'Здравствуйте, {name}! {n} слов ждут повторения. Найдёте сегодня 10 минут?',
+    draftReviewNoDue: 'Здравствуйте, {name}! Найдёте сегодня 10 минут на занятия?',
   },
   classNav: {
     words: 'Слова',

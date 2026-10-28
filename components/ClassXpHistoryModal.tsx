@@ -307,7 +307,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
 
                 {!isSelf && (
                   composing ? (
-                    <MessageComposer draft={fill(h.draftReview, { name, n: dueCount })} classId={classId} studentId={userId} />
+                    <MessageComposer draft={fill(dueCount > 0 ? h.draftReview : h.draftReviewNoDue, { name, n: dueCount })} classId={classId} studentId={userId} />
                   ) : (
                     <button
                       type="button"
@@ -327,7 +327,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
                       : `${fmtYmd(reviewPattern.lastReviewDate)} (${ds === 0 ? h.statToday : fill(h.statDaysAgo, { n: ds })})` },
                     { label: h.statDaysReviewed, value: `${reviewPattern.daysReviewed}/30 (${Math.round(reviewPattern.coverage * 100)}%)` },
                     { label: h.statCurrentStreak, value: fill(h.statDays, { n: reviewPattern.streak }) },
-                    { label: h.statLongestGap, value: fill(h.statDays, { n: reviewPattern.longestGap }) },
+                    { label: h.statLongestGap, value: reviewPattern.lastReviewDate === null ? '—' : fill(h.statDays, { n: reviewPattern.longestGap }) },
                     { label: h.statAvgWordsPerDay, value: reviewPattern.totalReviews > 0 ? reviewPattern.avgPerActiveDay.toFixed(1) : '—' },
                     { label: h.statTotalReviews, value: `${reviewPattern.totalReviews}` },
                     { label: h.statWaiting, value: overdueCount > 0 ? fill(h.statWaitingValue, { n: dueCount, m: overdueCount }) : `${dueCount}` },
