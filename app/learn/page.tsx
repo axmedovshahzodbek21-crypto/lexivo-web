@@ -132,6 +132,8 @@ function buildStudyList(
 // real collection/day of its own, but reusing saveLearnProgress/getLearnProgress
 // lets it share the same resume mechanism Library units already use.
 const MY_WORDS_PROGRESS_KEY = 'my-words-aggregate';
+// sessionStorage: URL of the Learn session currently open in this tab.
+const LEARN_LIVE_KEY = 'lexivo_learn_live';
 
 function LearnInner() {
   const router = useRouter();
@@ -344,9 +346,23 @@ function LearnInner() {
     }
   }, []);
 
+  // A page refresh mid-session should land back on the same card, not on the
+  // "Resume where you left off?" prompt (that's for leaving and re-entering).
+  // sessionStorage survives a reload but not a closed tab, and the unmount
+  // cleanup below clears it on in-app navigation away — a reload skips it.
+  const reloadedLiveRef = useRef<boolean | null>(null);
+  const isLiveReload = () => {
+    if (reloadedLiveRef.current === null) {
+      try { reloadedLiveRef.current = sessionStorage.getItem(LEARN_LIVE_KEY) === location.href; }
+      catch { reloadedLiveRef.current = false; }
+    }
+    return reloadedLiveRef.current;
+  };
+
   // Show Pomodoro widget whenever Learn is entered (collection picker or unit session)
   // setTimeout defers past the hydration window to avoid React Error #310
   useEffect(() => {
+    if (isLiveReload()) return;
     const t = setTimeout(() => showPomodoroSetup(), 0);
     return () => clearTimeout(t);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -572,6 +588,41 @@ function LearnInner() {
   }, [sourceClassHW]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const current = words[index];
+
+  const applyResume = (p: NonNullable<typeof resumePrompt>) => {
+    const tooHardSet = new Set(p.tooHard);
+    const skippedSet = new Set(p.skipped);
+    setSkipped(words.filter(w => tooHardSet.has(w.word)));
+    setPureSkipped(words.filter(w => skippedSet.has(w.word)));
+    const newMarks: ('learned' | 'skipped' | 'too-hard' | null)[] = new Array(words.length).fill(null);
+    words.forEach((w, i) => {
+      if (i < p.savedIndex) {
+        if (tooHardSet.has(w.word)) newMarks[i] = 'too-hard';
+        else if (skippedSet.has(w.word)) newMarks[i] = 'skipped';
+        else newMarks[i] = 'learned';
+      }
+    });
+    setMarks(newMarks);
+    setIndex(p.savedIndex);
+    setMaxReached(p.savedIndex);
+    setResumePrompt(null);
+  };
+
+  useEffect(() => {
+    if (resumePrompt && words.length > 0 && isLiveReload()) applyResume(resumePrompt);
+  }, [resumePrompt, words]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (words.length === 0 || resumePrompt) return;
+    try { sessionStorage.setItem(LEARN_LIVE_KEY, location.href); } catch {}
+    // The reload has been honoured; a later unit opened in this same mounted
+    // page must get the normal prompt.
+    reloadedLiveRef.current = false;
+  }, [words, resumePrompt]);
+
+  useEffect(() => () => {
+    try { sessionStorage.removeItem(LEARN_LIVE_KEY); } catch {}
+  }, []);
 
   useEffect(() => {
     if (current) {
@@ -1016,6 +1067,9 @@ function LearnInner() {
   if (!current) return null;
 
   if (resumePrompt) {
+    // Auto-resuming after a refresh — render nothing for the one frame
+    // before the effect applies it, instead of flashing the prompt.
+    if (isLiveReload()) return null;
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-6 text-center gap-5 animate-fade-in">
         <div className="text-5xl">📖</div>
@@ -1028,24 +1082,7 @@ function LearnInner() {
         <div className="flex flex-col gap-3 w-full max-w-xs">
           <button
             className="btn-primary"
-            onClick={() => {
-              const tooHardSet = new Set(resumePrompt.tooHard);
-              const skippedSet = new Set(resumePrompt.skipped);
-              setSkipped(words.filter(w => tooHardSet.has(w.word)));
-              setPureSkipped(words.filter(w => skippedSet.has(w.word)));
-              const newMarks: ('learned' | 'skipped' | 'too-hard' | null)[] = new Array(words.length).fill(null);
-              words.forEach((w, i) => {
-                if (i < resumePrompt.savedIndex) {
-                  if (tooHardSet.has(w.word)) newMarks[i] = 'too-hard';
-                  else if (skippedSet.has(w.word)) newMarks[i] = 'skipped';
-                  else newMarks[i] = 'learned';
-                }
-              });
-              setMarks(newMarks);
-              setIndex(resumePrompt.savedIndex);
-              setMaxReached(resumePrompt.savedIndex);
-              setResumePrompt(null);
-            }}
+            onClick={() => applyResume(resumePrompt)}
           >
             {t.extra.resumeFromWord(resumePrompt.savedIndex + 1)}
           </button>
