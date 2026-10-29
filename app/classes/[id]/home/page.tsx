@@ -187,7 +187,7 @@ const [memberCount, setMemberCount] = useState(0);
         const unread = noteRows.filter(n => !n.read_at).map(n => n.id);
         if (unread.length > 0) {
           void supabase.rpc('mark_class_notes_read', { p_class_id: id }).then(({ error }) => {
-            if (error) void supabase.from('class_notes').update({ read_at: new Date().toISOString() }).in('id', unread);
+            if (error) supabase.from('class_notes').update({ read_at: new Date().toISOString() }).in('id', unread).then(() => {});
           });
         }
       }
@@ -218,8 +218,10 @@ const [memberCount, setMemberCount] = useState(0);
 
       // Mark announcements read (student side effect — fire and forget)
       if (!teacher && annIds.length > 0) {
-        void supabase.from('class_announcement_reads')
-          .upsert(annIds.map(aid => ({ announcement_id: aid, student_id: user.id })), { onConflict: 'announcement_id,student_id' });
+        // .then() is what actually sends it — postgrest builders are lazy.
+        supabase.from('class_announcement_reads')
+          .upsert(annIds.map(aid => ({ announcement_id: aid, student_id: user.id })), { onConflict: 'announcement_id,student_id' })
+          .then(({ error }) => { if (error) console.error('[class_announcement_reads]', error); });
       }
 
       const tProfileData = tProfile as { name?: string; bio?: string; avatar_url?: string | null } | null;

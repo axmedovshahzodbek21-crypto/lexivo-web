@@ -125,8 +125,8 @@ export default function JoinedClassesPage() {
       const unread = (notesData ?? []).filter((n: Note) => !n.read_at) as (Note & { class_id: string })[];
       for (const classId of new Set(unread.map(n => n.class_id))) {
         void supabase.rpc('mark_class_notes_read', { p_class_id: classId }).then(({ error }) => {
-          if (error) void supabase.from('class_notes').update({ read_at: new Date().toISOString() })
-            .in('id', unread.filter(n => n.class_id === classId).map(n => n.id));
+          if (error) supabase.from('class_notes').update({ read_at: new Date().toISOString() })
+            .in('id', unread.filter(n => n.class_id === classId).map(n => n.id)).then(() => {});
         });
       }
       for (const n of notesData ?? []) { if (!newNotes[n.class_id]) newNotes[n.class_id] = []; newNotes[n.class_id].push(n); }

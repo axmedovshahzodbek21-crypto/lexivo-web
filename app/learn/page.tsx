@@ -20,7 +20,7 @@ import { supabase } from '@/lib/supabase';
 import { createSRSWord } from '@/lib/srs';
 import { addSRSWord as storeSRSWord } from '@/lib/storage';
 import { recordClassWordLearned, addClassHardWord, addClassStarredWord, removeClassStarredWord, getClassStarredWordIds } from '@/lib/class-srs';
-import { recordClassStudyDay } from '@/lib/class-xp';
+import { recordClassStudyDay, recordHomeworkProgress } from '@/lib/class-xp';
 import type { Accent } from '@/lib/speech';
 import { checkAchievements } from '@/lib/gamification';
 import { fireConfetti } from '@/lib/confetti';
@@ -277,19 +277,22 @@ function LearnInner() {
         };
         supabase.auth.getUser().then(({ data: { user } }) => {
           if (!user) return;
-          void supabase.from('class_learn_progress').upsert({
+          // .then() is what actually sends it — postgrest builders are lazy.
+          supabase.from('class_learn_progress').upsert({
             user_id: user.id, class_id: classIdParam, scope: classScope,
             word_index: index, total: words.length, marks: marksPayload,
             updated_at: new Date().toISOString(),
-          }, { onConflict: 'user_id,class_id,scope' });
+          }, { onConflict: 'user_id,class_id,scope' })
+            .then(({ error }) => { if (error) console.error('[class_learn_progress save]', error); });
         });
       },
       clear: () => {
         if (!classIdParam || !classScope) return;
         supabase.auth.getUser().then(({ data: { user } }) => {
           if (!user) return;
-          void supabase.from('class_learn_progress').delete()
-            .eq('user_id', user.id).eq('class_id', classIdParam).eq('scope', classScope);
+          supabase.from('class_learn_progress').delete()
+            .eq('user_id', user.id).eq('class_id', classIdParam).eq('scope', classScope)
+            .then(({ error }) => { if (error) console.error('[class_learn_progress clear]', error); });
         });
       },
     };
@@ -838,9 +841,7 @@ function LearnInner() {
         // Learn and then abandons before finishing Flashcards would
         // otherwise never have Learn recorded at all (it previously only
         // rode along as Flashcards' ?alsoCompleted=learn).
-        void supabase.rpc('record_class_homework_progress', {
-          p_homework_id: sp.get('hwId'), p_mode: 'learn', p_client_word_count: words.length,
-        });
+        void recordHomeworkProgress(sp.get('hwId')!, 'learn', words.length);
       }
       // Session finished — drop the cross-device resume bookmark too.
       if (sourceClass || sourceClassHW) classBookmarkRef.current.clear();

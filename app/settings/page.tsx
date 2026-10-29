@@ -310,11 +310,13 @@ export default function SettingsPage() {
     pushSettings();
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (user) {
+        // .then() is what actually sends it — postgrest builders are lazy.
         supabase.from('profiles').upsert({
           id: user.id,
           ...(settings.name.trim() && { name: settings.name.trim() }),
           bio,
-        }, { onConflict: 'id' });
+        }, { onConflict: 'id' })
+          .then(({ error }) => { if (error) console.error('[settings profile save]', error); });
       }
     });
     setSaved(true);
