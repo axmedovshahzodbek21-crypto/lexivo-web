@@ -108,6 +108,25 @@ function EvidenceCard({ evidence, classId, accentColor, reasonLabel }: {
         </div>
       ));
       break;
+    case 'weeks':
+      body = evidence.items.map((w, i) => (
+        <div key={w.from} className={row}>
+          <p style={{ color: 'var(--text)' }}>
+            <span className="font-bold">{i === 0 ? t.thisWeek : `${fmtYmd(w.from).slice(0, 5)} – ${fmtYmd(w.to).slice(0, 5)}`}</span>
+            {' · '}+{displayXP(w.xp)} XP · {t.activeDays(w.activeDays)}
+          </p>
+        </div>
+      ));
+      break;
+    case 'sessions':
+      body = evidence.items.map(s => (
+        <div key={s.from} className={row}>
+          <p style={{ color: 'var(--text)' }}>
+            🕐 <span className="font-bold">{fmtYmd(s.date)}</span> · {fmtTime(s.from) === fmtTime(s.to) ? fmtTime(s.from) : `${fmtTime(s.from)} – ${fmtTime(s.to)}`}
+          </p>
+        </div>
+      ));
+      break;
     case 'review':
       body = evidence.items.map(r => (
         <div key={r.from} className={row}>

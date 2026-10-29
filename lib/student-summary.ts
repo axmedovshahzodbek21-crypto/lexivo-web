@@ -33,12 +33,16 @@ export interface HwEvidence {
 export interface NoteEvidence { sentAt: string; readAt: string | null; practisedAt: string | null; }
 export interface DayEvidence { date: string; xp: number; reasons: string[]; }
 export interface ReviewEvidence { date: string; words: number; from: string; to: string; }
+export interface WeekEvidence { from: string; to: string; xp: number; activeDays: number; } // from/to yyyy-mm-dd; [0] = this week
+export interface SessionEvidence { date: string; from: string; to: string; } // from/to ISO
 export type Evidence =
   | { kind: 'homework'; items: HwEvidence[] }
   | { kind: 'timing'; items: HwEvidence[] }
   | { kind: 'reminders'; items: NoteEvidence[] }
   | { kind: 'days'; items: DayEvidence[] }
-  | { kind: 'review'; items: ReviewEvidence[] };
+  | { kind: 'review'; items: ReviewEvidence[] }
+  | { kind: 'weeks'; items: WeekEvidence[] }
+  | { kind: 'sessions'; items: SessionEvidence[] };
 export type EvidenceKind = Evidence['kind'];
 export interface Segment { text: string; evidence?: Evidence; }
 export type SummarySentence = Segment[];
@@ -46,7 +50,10 @@ export type SummarySentence = Segment[];
 interface Pick {
   code: string;
   vars?: Record<string, string | number>;
-  ev?: { homework?: HwEvidence[]; timing?: HwEvidence[]; reminders?: NoteEvidence[]; days?: DayEvidence[]; review?: ReviewEvidence[] };
+  ev?: {
+    homework?: HwEvidence[]; timing?: HwEvidence[]; reminders?: NoteEvidence[]; days?: DayEvidence[];
+    review?: ReviewEvidence[]; weeks?: WeekEvidence[]; sessions?: SessionEvidence[];
+  };
 }
 
 const HOUR = 3600_000;
@@ -220,6 +227,114 @@ function reviewPick(history: HistoryEntry[], today: string, dueCount: number, ov
   return { code: 'rev_waiting', vars: { n: dueCount } };
 }
 
+// ── This week vs their own usual ────────────────────────────────────────────
+// Weeks are rolling 7-day windows ending today; "usual" = average XP of the
+// 3 weeks before this one. Only weeks that start on/after the join day (or
+// the first activity) count, so a new student isn't compared with empty weeks.
+function weekItems(history: HistoryEntry[], today: string, joinDate: string | null): WeekEvidence[] {
+  const dates = history.map(e => localDate(e.created_at)).sort();
+  const earliest = joinDate ?? dates[0];
+  if (!earliest) return [];
+  const out: WeekEvidence[] = [];
+  for (let k = 0; k < 26; k++) {
+    const from = addDays(today, -6 - 7 * k), to = addDays(today, -7 * k);
+    if (k > 0 && from < earliest) break;
+    const es = history.filter(e => { const d = localDate(e.created_at); return d >= from && d <= to; });
+    out.push({ from, to, xp: es.reduce((s, e) => s + e.amount, 0), activeDays: new Set(es.map(e => localDate(e.created_at))).size });
+  }
+  return out;
+}
+
+function trendPick(history: HistoryEntry[], today: string, joinDate: string | null): Pick | null {
+  const weeks = weekItems(history, today, joinDate);
+  const [cur, ...prev] = weeks;
+  if (!cur || prev.length < 2 || cur.xp === 0) return null;
+  const ev = { weeks: weeks.slice(0, 4) };
+  if (prev[0].xp === 0 && prev.slice(1).some(w => w.xp > 0)) return { code: 'trd_back', ev };
+  const usual = prev.slice(0, 3).reduce((s, w) => s + w.xp, 0) / Math.min(3, prev.length);
+  if (usual === 0) return null;
+  const ratio = cur.xp / usual;
+  if (prev.length >= 3 && ratio >= 1.3 && cur.xp > Math.max(...prev.map(w => w.xp))) return { code: 'trd_record', ev };
+  if (ratio >= 2) return { code: 'trd_up_strong', vars: { pct: Math.round((ratio - 1) * 100) }, ev };
+  if (ratio >= 1.3) return { code: 'trd_up', vars: { pct: Math.round((ratio - 1) * 100) }, ev };
+  if (ratio > 0.7) return { code: 'trd_steady', ev };
+  if (ratio > 0.3) return { code: 'trd_down', vars: { pct: Math.round((1 - ratio) * 100) }, ev };
+  return { code: 'trd_down_strong', vars: { pct: Math.round((1 - ratio) * 100) }, ev };
+}
+
+// ── Streaks ──────────────────────────────────────────────────────────────────
+// Skipped in the first week — "every day since joining" already says it.
+function streakPick(history: HistoryEntry[], today: string, joinDate: string | null): Pick | null {
+  if (joinDate && dayDiff(joinDate, today) < 7) return null;
+  const set = new Set(history.map(e => localDate(e.created_at)));
+  const dates = Array.from(set).sort();
+  if (dates.length === 0) return null;
+  // Longest run (oldest → newest).
+  let longest: string[] = [], run: string[] = [];
+  for (const d of dates) {
+    run = run.length && addDays(run[run.length - 1], 1) === d ? [...run, d] : [d];
+    if (run.length > longest.length) longest = run;
+  }
+  // Current run ends today or yesterday.
+  const current: string[] = [];
+  for (let d = set.has(today) ? today : addDays(today, -1); set.has(d); d = addDays(d, -1)) current.push(d);
+  const n = current.length;
+  if (n >= 5 && n === longest.length && dates.length > n) return { code: 'str_record', vars: { streak: n }, ev: { days: dayItems(history, current) } };
+  if (n >= 7) return { code: 'str_long', vars: { streak: n }, ev: { days: dayItems(history, current) } };
+  if (n >= 3) return { code: 'str_mid', vars: { streak: n }, ev: { days: dayItems(history, current) } };
+  if (n === 0 && longest.length >= 5) {
+    const since = dayDiff(dates[dates.length - 1], today);
+    if (since >= 2 && since <= 7) return { code: 'str_broken', vars: { longest: longest.length, days: since }, ev: { days: dayItems(history, [...longest].reverse()) } };
+  }
+  return null;
+}
+
+// ── Study habits (last 30 days) ─────────────────────────────────────────────
+// Any class activity rows less than 30 min apart are one session. Newest first.
+function sessionItems(history: HistoryEntry[]): SessionEvidence[] {
+  const rows = [...history].sort((a, b) => b.created_at.localeCompare(a.created_at));
+  const out: SessionEvidence[] = [];
+  for (const e of rows) {
+    const s = out[out.length - 1];
+    if (s && Date.parse(s.from) - Date.parse(e.created_at) < 30 * 60_000) s.from = e.created_at;
+    else out.push({ date: localDate(e.created_at), from: e.created_at, to: e.created_at });
+  }
+  return out;
+}
+
+const PERIOD = (h: number) => (h >= 5 && h < 12 ? 'morning' : h < 17 && h >= 12 ? 'afternoon' : h >= 17 && h < 22 ? 'evening' : 'night');
+
+// One habit sentence at most: a fixed hour, else a time of day, else
+// weekends, else several sessions a day, else "varied".
+function habitPick(history: HistoryEntry[], today: string): Pick | null {
+  const sessions = sessionItems(history).filter(s => s.date > addDays(today, -30));
+  if (sessions.length < 8) return null;
+  const hours = sessions.map(s => new Date(s.from).getHours());
+  // Busiest ±1h window; ties go to the hour that itself has the most starts.
+  let bestH = 0, best = 0, bestExact = 0;
+  for (let h = 0; h < 24; h++) {
+    const c = hours.filter(x => x === h || x === (h + 1) % 24 || x === (h + 23) % 24).length;
+    const exact = hours.filter(x => x === h).length;
+    if (c > best || (c === best && exact > bestExact)) { best = c; bestH = h; bestExact = exact; }
+  }
+  const ev = (filter: (s: SessionEvidence) => boolean) => ({ sessions: sessions.filter(filter).slice(0, 10) });
+  if (best / sessions.length >= 0.6) {
+    const near = (s: SessionEvidence) => Math.min(Math.abs(new Date(s.from).getHours() - bestH), 24 - Math.abs(new Date(s.from).getHours() - bestH)) <= 1;
+    return { code: 'tim_same_hour', vars: { hour: `${String(bestH).padStart(2, '0')}:00` }, ev: ev(near) };
+  }
+  for (const p of ['morning', 'afternoon', 'evening', 'night']) {
+    if (hours.filter(h => PERIOD(h) === p).length / sessions.length >= 0.6) {
+      return { code: `tim_${p}`, ev: ev(s => PERIOD(new Date(s.from).getHours()) === p) };
+    }
+  }
+  const days = Array.from(new Set(sessions.map(s => s.date)));
+  const weekend = days.filter(d => [0, 6].includes(new Date(d + 'T00:00:00').getDay()));
+  if (days.length >= 6 && weekend.length / days.length >= 0.6) return { code: 'wk_weekend', ev: { days: dayItems(history, weekend) } };
+  const perDay = sessions.length / days.length;
+  if (days.length >= 5 && perDay >= 2) return { code: 'ses_multi', vars: { x: Math.round(perDay) }, ev: ev(() => true) };
+  return { code: 'tim_varied', ev: ev(() => true) };
+}
+
 // ── Reminders ────────────────────────────────────────────────────────────────
 // A teacher message counts only if the student hadn't studied in the 24h
 // before it (otherwise they'd have practised anyway). R studied within 24h,
@@ -326,11 +441,17 @@ export function buildStudentSummary(input: {
   const w = SUMMARY_WORDS[input.lang];
   const hw = homeworkPicks(input.homework, input.today, w);
   const act = activityPicks(input.history, input.homework, hw.named, input.today, input.dueCount, w);
+  const streak = streakPick(input.history, input.today, input.joinDate);
+  const trend = trendPick(input.history, input.today, input.joinDate);
   const picks = [
     contextPick(input.history, input.today, input.joinDate, w),
+    // "Steady" only adds something when no streak sentence is there.
+    trend?.code === 'trd_steady' && streak ? null : trend,
+    streak,
     ...act.picks,
     act.cleared ? null : reviewPick(input.history, input.today, input.dueCount, input.overdueCount),
     ...hw.picks,
+    habitPick(input.history, input.today),
     reminderPick(input.notes, input.history, input.now, input.today, input.joinDate),
   ].filter((p): p is Pick => p !== null);
   if (picks.length === 0) picks.push({ code: 'not_enough_data' });

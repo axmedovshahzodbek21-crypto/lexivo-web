@@ -212,6 +212,7 @@ const en = {
     left: (m: string) => `${m} left`,
     sent: 'Sent', read: 'Read', unread: 'Not opened',
     practised: (h: number) => `Practised ${h} h later`, notPractised: 'No practice after it',
+    thisWeek: 'This week', activeDays: (n: number) => `${n} active ${n === 1 ? 'day' : 'days'}`,
   },
   missedHomework: {
     title: 'Missed deadlines',
@@ -2908,6 +2909,7 @@ const uz: typeof en = {
     left: (m: string) => `${m} qolgan`,
     sent: 'Yuborildi', read: "O'qildi", unread: 'Ochilmagan',
     practised: (h: number) => `${h} soatdan keyin mashq qildi`, notPractised: 'Keyin mashq qilmagan',
+    thisWeek: 'Bu hafta', activeDays: (n: number) => `${n} faol kun`,
   },
   missedHomework: {
     title: "Muddati o'tgan vazifalar",
@@ -5590,6 +5592,7 @@ const ru: typeof en = {
     left: (m: string) => `осталось: ${m}`,
     sent: 'Отправлено', read: 'Прочитано', unread: 'Не открыто',
     practised: (h: number) => `Занимался через ${h} ч`, notPractised: 'После этого не занимался',
+    thisWeek: 'Эта неделя', activeDays: (n: number) => `${n} акт. дн.`,
   },
   missedHomework: {
     title: 'Просроченные задания',
