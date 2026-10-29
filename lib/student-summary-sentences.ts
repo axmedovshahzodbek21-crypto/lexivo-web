@@ -2259,3 +2259,480 @@ export const SUMMARY_SENTENCES: Record<string, { uz: string[]; en: string[] }> =
     ],
   },
 };
+
+// ── Extra versions (batch 6), appended to the cases above ──────────────────
+// Same rules as above; kept as one block so a top-up is easy to review.
+const EXTRA_VERSIONS: Record<string, { uz: string[]; en: string[] }> = {
+  not_enough_data: {
+    uz: [
+      "Xulosa uchun yetarli faollik hali to'planmagan — bir-ikki kundan keyin qaytib ko'ring.",
+      "O'quvchi hali endi boshlamoqda; xulosa ma'lumot ko'paygan sari aniqlashadi.",
+      "Hozircha aytish uchun gap kam — birinchi mashq va vazifalar xulosani boyitadi.",
+      "Ma'lumot yig'ilmoqda: tez orada bu yerda batafsil xulosa paydo bo'ladi.",
+    ],
+    en: [
+      "Not enough activity has built up for a summary yet — check back in a day or two.",
+      "The student is only just starting; the summary sharpens as more data comes in.",
+      "There is little to say for now — the first practice and homework will fill it in.",
+      "Data is being collected: a detailed summary will appear here soon.",
+    ],
+  },
+  ctx_joined_today_active: {
+    uz: ["{name} bugun qo'shildi va [[ilk mashqini allaqachon bajardi|days]].", "Birinchi kunidayoq {name} [[sinfda faol bo'ldi|days]]."],
+    en: ["{name} joined today and [[{has} already done the first practice|days]].", "On day one {name} [[{was} already active in the class|days]]."],
+  },
+  ctx_joined_today: {
+    uz: ["{name} bugundan boshlab sinf a'zosi.", "{name} bugun sinfga qo'shildi; hali mashqlar yo'q."],
+    en: ["{name} became a member of the class today.", "{name} joined the class today; no practice yet."],
+  },
+  ctx_new_all_active: {
+    uz: ["{name} {since} kelganidan beri [[har kuni sinfga qaytmoqda|days]].", "Qo'shilganidan buyon {name} [[mashqsiz kun qoldirmadi|days]]."],
+    en: ["Since arriving {since}, {name} [[{has} come back every day|days]].", "Since joining, {name} [[{hasnt} had a day without practice|days]]."],
+  },
+  ctx_new_some_active: {
+    uz: [
+      "{name} {since} qo'shilgan va [[{active} kun mashq qilgan|days]]; hammasi bo'lib {days} kun o'tdi.",
+      "Sinfdagi dastlabki {days} kunda {name} [[{active} kun faol bo'ldi|days]].",
+    ],
+    en: [
+      "{name} joined {since} and [[{has} practised on {active} days|days]]; {days} days have passed in total.",
+      "In the first {days} days in the class, {name} [[{was} active on {active}|days]].",
+    ],
+  },
+  ctx_new_inactive: {
+    uz: ["{name} {since} qo'shilgan; birinchi qadam uchun kichik turtki foydali bo'lishi mumkin.", "{since} sinfga kelgan {name} hali birorta mashq bajarmagan."],
+    en: ["{name} joined {since}; a small nudge could help with the first step.", "Having joined {since}, {name} {hasnt} done any practice yet."],
+  },
+  ctx_week_high: {
+    uz: ["{name} bir haftadan beri [[deyarli to'xtovsiz|days]] shug'ullanmoqda.", "So'nggi 7 kunning [[{active} kunida|days]] {name} mashq qildi — a'lo ritm."],
+    en: ["{name} {has} practised [[almost non-stop|days]] for a week.", "On [[{active} of the last 7 days|days]] {name} practised — an excellent rhythm."],
+  },
+  ctx_week_mid: {
+    uz: [
+      "{name} haftaning [[{active} kunini|days]] mashqqa ajratdi.",
+      "So'nggi 7 kun ichida {name} [[{active} marta|days]] sinfga kirdi.",
+      "{name} bu hafta [[{active} kun|days]] sinf bilan ishladi.",
+    ],
+    en: [
+      "{name} set aside [[{active} days|days]] of the week for practice.",
+      "In the last 7 days {name} came to the class [[on {active} days|days]].",
+      "{name} worked with the class on [[{active} days|days]] this week.",
+    ],
+  },
+  ctx_week_low: {
+    uz: ["Oxirgi hafta {name} uchun [[{active} kunlik|days]] mashq bilan o'tdi.", "{name} so'nggi 7 kunda [[{active} kun|days]] faol bo'ldi — ko'proq kunlar yordam beradi."],
+    en: ["The last week brought [[{active} practice {dayWord}|days]] for {nameObj}.", "{name} {was} active on [[{active} {dayWord}|days]] in the last 7 days — more days would help."],
+  },
+  ctx_week_none: {
+    uz: ["{name} uchun oxirgi faol kun — [[{last}|days]]; o'shandan beri mashq yo'q.", "Bir haftadan ko'proq vaqt mashqsiz o'tdi; oxirgisi — [[{last}|days]]."],
+    en: ["The last active day for {nameObj} was [[{last}|days]]; no practice since.", "More than a week has passed without practice; the last was [[{last}|days]]."],
+  },
+  ctx_never: {
+    uz: ["{name} hali sinf mashqlarini boshlamagan.", "{name} tomonidan hali hech qanday faollik bo'lmagan."],
+    en: ["{name} {hasnt} begun the class practice yet.", "There has been no activity from {nameObj} yet."],
+  },
+  trd_up_strong: {
+    uz: ["Bu hafta {name} [[ancha ko'p ishladi|weeks]] — odatiy haftadan {pct}% ortiq.", "{name} uchun bu hafta [[kuchli sakrash|weeks]] bo'ldi: +{pct}%."],
+    en: ["This week {name} [[worked a lot more|weeks]] — {pct}% above a usual week.", "This week was [[a big jump|weeks]] for {nameObj}: +{pct}%."],
+  },
+  trd_up: {
+    uz: ["{name} bu hafta [[odatdagidan bir oz ko'proq|weeks]] mashq qildi (+{pct}%).", "Bu hafta {name} uchun [[ijobiy o'zgarish|weeks]]: faollik {pct}% oshdi."],
+    en: ["{name} practised [[a bit more than usual|weeks]] this week (+{pct}%).", "This week brought [[a positive change|weeks]] for {nameObj}: activity up {pct}%."],
+  },
+  trd_record: {
+    uz: ["{name} bu hafta [[shu vaqtgacha bo'lmagan natija|weeks]] ko'rsatdi.", "Bu hafta {name} uchun [[eng samarali hafta|weeks]] bo'ldi."],
+    en: ["{name} showed [[a result never seen before|weeks]] this week.", "This week was [[the most productive week|weeks]] for {nameObj}."],
+  },
+  trd_steady: {
+    uz: ["{name} [[odatiy sur'atda|weeks]] davom etmoqda.", "Bu hafta ham {name} [[o'z me'yorida|weeks]] ishladi."],
+    en: ["{name} {is} carrying on [[at the usual pace|weeks]].", "This week too {name} worked [[at their normal level|weeks]]."],
+  },
+  trd_down: {
+    uz: ["{name} bu hafta [[odatdagidan sekinroq|weeks]] ishladi (-{pct}%).", "Bu hafta faollik [[{pct}% kamroq|weeks]] — {name} uchun kichik eslatma foydali."],
+    en: ["{name} worked [[more slowly than usual|weeks]] this week (-{pct}%).", "Activity this week is [[{pct}% lower|weeks]] — a small reminder could help {nameObj}."],
+  },
+  trd_down_strong: {
+    uz: ["Bu hafta {name} [[deyarli shug'ullanmadi|weeks]] — odatdagidan {pct}% kam.", "{name} uchun bu hafta [[keskin sustlashuv|weeks]] bo'ldi (-{pct}%); sababini bilish foydali."],
+    en: ["This week {name} [[hardly practised|weeks]] — {pct}% less than usual.", "This week brought [[a sharp slowdown|weeks]] for {nameObj} (-{pct}%); finding out why would help."],
+  },
+  trd_back: {
+    uz: ["{name} tanaffusdan so'ng [[sinfga qaytib keldi|weeks]].", "Bir hafta jim turgan {name} [[yana mashq qilmoqda|weeks]]."],
+    en: ["{name} [[came back to the class|weeks]] after a break.", "After a quiet week, {name} {is} [[practising again|weeks]]."],
+  },
+  str_record: {
+    uz: ["{name} [[{streak} kunlik rekord seriyada|days]].", "Hech qachon bunchalik uzoq emas: {name} [[{streak} kun ketma-ket|days]] faol."],
+    en: ["{name} {is} on [[a record {streak}-day streak|days]].", "Never this long before: {name} {has} been active [[{streak} days in a row|days]]."],
+  },
+  str_long: {
+    uz: ["{name} [[{streak} kundan beri to'xtamay|days]] shug'ullanmoqda.", "[[{streak} kun ketma-ket|days]] mashq — {name} uchun mustahkam odat."],
+    en: ["{name} {has} been practising [[non-stop for {streak} days|days]].", "[[{streak} days in a row|days]] of practice — a solid habit for {nameObj}."],
+  },
+  str_mid: {
+    uz: ["{name} [[{streak} kun uzluksiz|days]] mashq qilmoqda.", "Kichik seriya shakllanmoqda: [[{streak} kun|days]]."],
+    en: ["{name} {has} practised [[{streak} days without a break|days]].", "A small streak is forming: [[{streak} days|days]]."],
+  },
+  str_broken: {
+    uz: ["{name} oldin [[{longest} kun|days]] uzluksiz ishlagan edi; hozir {days} kunlik tanaffus.", "[[{longest} kunlik seriya|days]] tugagach, {days} kun mashq bo'lmadi."],
+    en: ["{name} once practised [[{longest} days straight|days]]; now there is a {days}-day break.", "After [[the {longest}-day streak|days]] ended, {days} days passed without practice."],
+  },
+  tim_same_hour: {
+    uz: ["{name} uchun mashq soati deyarli o'zgarmaydi — [[{hour} atrofida|sessions]].", "{name} [[har kuni {hour} ga yaqin|sessions]] mashq qilishga odatlangan."],
+    en: ["The practice hour for {nameObj} hardly changes — [[around {hour}|sessions]].", "{name} {is} used to practising [[close to {hour} every day|sessions]]."],
+  },
+  tim_morning: {
+    uz: ["{name} [[ertalabki soatlarda|sessions]] eng faol.", "{name} uchun o'qish vaqti — [[kunning boshi|sessions]]."],
+    en: ["{name} {is} most active [[in the morning hours|sessions]].", "For {nameObj}, study time is [[the start of the day|sessions]]."],
+  },
+  tim_afternoon: {
+    uz: ["{name} [[tushlikdan keyingi vaqtda|sessions]] eng faol.", "{name} uchun o'qish vaqti — [[kunning o'rtasi|sessions]]."],
+    en: ["{name} {is} most active [[after lunch|sessions]].", "For {nameObj}, study time is [[the middle of the day|sessions]]."],
+  },
+  tim_evening: {
+    uz: ["{name} [[kechki soatlarda|sessions]] eng faol.", "{name} uchun o'qish vaqti — [[kunning oxiri|sessions]]."],
+    en: ["{name} {is} most active [[in the evening hours|sessions]].", "For {nameObj}, study time is [[the end of the day|sessions]]."],
+  },
+  tim_night: {
+    uz: ["{name} [[tungi soatlarda|sessions]] eng faol.", "{name} uchun o'qish vaqti — [[kech tun|sessions]]; dam olish yetarli ekanini so'rab qo'yish mumkin."],
+    en: ["{name} {is} most active [[in the night hours|sessions]].", "For {nameObj}, study time is [[late at night|sessions]]; it may be worth checking there is enough rest."],
+  },
+  tim_varied: {
+    uz: ["{name} [[turli soatlarda|sessions]] mashq qiladi — moslashuvchan tartib.", "{name} uchun mashq vaqti [[har kuni boshqacha|sessions]]."],
+    en: ["{name} practise{s} [[at different hours|sessions]] — a flexible routine.", "Practice time for {nameObj} [[differs from day to day|sessions]]."],
+  },
+  wk_weekend: {
+    uz: ["{name} uchun asosiy o'qish kunlari — [[shanba va yakshanba|days]].", "Hafta ichida kamroq, [[hafta oxirida|days]] ko'proq — {name} shunday ishlaydi."],
+    en: ["The main study days for {nameObj} are [[Saturday and Sunday|days]].", "Less on weekdays, more [[at the weekend|days]] — that is how {name} work{s}."],
+  },
+  ses_multi: {
+    uz: ["{name} kun davomida [[o'rtacha {x} marta|sessions]] mashqqa qaytadi.", "{name} mashqni [[kun bo'yi bir necha qismga|sessions]] bo'ladi."],
+    en: ["{name} return{s} to practice [[about {x} times through the day|sessions]].", "{name} split{s} practice into [[several parts across the day|sessions]]."],
+  },
+  rq_strong: {
+    uz: ["{name} so'zlarni [[juda yaxshi eslaydi|accuracy]] — {pct}%.", "[[{total} ta javobning {pct} foizi|accuracy]] to'g'ri — {name} uchun a'lo natija."],
+    en: ["{name} remember{s} words [[very well|accuracy]] — {pct}%.", "[[{pct}% of {total} answers|accuracy]] correct — an excellent result for {nameObj}."],
+  },
+  rq_good: {
+    uz: ["{name} so'zlarni [[yaxshi eslaydi|accuracy]] — {pct}%.", "[[{total} ta javobning {pct} foizi|accuracy]] to'g'ri — yaxshi natija."],
+    en: ["{name} remember{s} words [[well|accuracy]] — {pct}%.", "[[{pct}% of {total} answers|accuracy]] correct — a good result."],
+  },
+  rq_mixed: {
+    uz: ["{name} so'zlarning bir qismini [[hali chalkashtiradi|accuracy]] ({pct}% to'g'ri).", "[[{total} ta javobning {pct} foizi|accuracy]] to'g'ri — mustahkamlash kerak bo'lgan so'zlar bor."],
+    en: ["{name} still [[mix{es} up some of the words|accuracy]] ({pct}% correct).", "[[{pct}% of {total} answers|accuracy]] correct — some words need strengthening."],
+  },
+  rq_hard: {
+    uz: [
+      "{name} uchun so'zlarni eslash [[hozircha qiyin|accuracy]] ({pct}%); qisqa, tez-tez takrorlash yordam beradi.",
+      "[[{total} ta javobning faqat {pct} foizi|accuracy]] to'g'ri — so'zlarni qayta o'rganish foydali.",
+    ],
+    en: [
+      "Recalling words is [[hard for now|accuracy]] for {nameObj} ({pct}%); short, frequent review would help.",
+      "[[Only {pct}% of {total} answers|accuracy]] correct — relearning the words would help.",
+    ],
+  },
+  rq_improving: {
+    uz: ["{name} so'zlarni [[tobora yaxshiroq|accuracy]] eslamoqda: {from}% → {to}%.", "Aniqlik [[ikki hafta ichida {to}% gacha|accuracy]] o'sdi ({from}% dan)."],
+    en: ["{name} {is} remembering words [[better and better|accuracy]]: {from}% → {to}%.", "Accuracy [[grew to {to}% in two weeks|accuracy]] (from {from}%)."],
+  },
+  rq_dropping: {
+    uz: ["{name} so'zlarni [[avvalgidek eslay olmayapti|accuracy]]: {from}% → {to}%.", "Aniqlik [[ikki hafta ichida {to}% gacha|accuracy]] pasaydi ({from}% dan)."],
+    en: ["{name} {is} [[not recalling words as well as before|accuracy]]: {from}% → {to}%.", "Accuracy [[fell to {to}% in two weeks|accuracy]] (from {from}%)."],
+  },
+  rq_hard_words: {
+    uz: ["[[{words}|words]] so'zlari {name} uchun eng ko'p xato bo'lyapti.", "Diqqat talab qiladigan so'zlar: [[{words}|words]]."],
+    en: ["[[{words}|words]] are the words {name} get{s} wrong most.", "Words that need attention: [[{words}|words]]."],
+  },
+  rq_recovered: {
+    uz: ["{name} [[{words}|words]] so'zlarini yengdi — endi xato qilmayapti.", "Oldingi qiyin so'zlar — [[{words}|words]] — endi o'zlashtirildi."],
+    en: ["{name} {has} conquered [[{words}|words]] — no more mistakes there.", "The earlier hard words — [[{words}|words]] — are now learned."],
+  },
+  mst_hw_streak: {
+    uz: ["{name} [[{n} ta vazifani|timing]] ketma-ket muddatida topshirdi.", "Ketma-ket [[{n} ta vazifa|timing]] — birortasi kechikmagan."],
+    en: ["{name} handed in [[{n} assignments|timing]] on time in a row.", "[[{n} assignments|timing]] in a row — not one was late."],
+  },
+  mst_mastered_first: {
+    uz: ["{name} uchun birinchi {n} ta so'z to'liq o'zlashtirildi.", "Ilk natija ko'rindi: {n} ta so'z butunlay o'rganilgan."],
+    en: ["The first {n} words are fully mastered for {nameObj}.", "A first result is visible: {n} words completely learned."],
+  },
+  mst_mastered_small: {
+    uz: ["{name} {n} ta so'zni butunlay o'zlashtirgan; yana ko'plari yo'lda.", "{learned} ta so'zdan {n} tasi to'liq o'rganilgan — yaxshi boshlanish."],
+    en: ["{name} {has} fully mastered {n} words; many more are on the way.", "{n} of {learned} words are fully learned — a good start."],
+  },
+  mst_mastered_mid: {
+    uz: ["Lug'at o'smoqda: {name} {n} ta so'zni to'liq o'zlashtirgan.", "{learned} ta so'zdan {n} tasi — to'liq o'zlashtirilgan."],
+    en: ["The vocabulary is growing: {name} {has} fully mastered {n} words.", "{n} out of {learned} words — fully mastered."],
+  },
+  mst_mastered_big: {
+    uz: ["{name} {n} ta so'zni mustahkam o'zlashtirgan — bu ulkan ish.", "{learned} ta so'zdan {n} tasi butunlay mustahkam — ajoyib."],
+    en: ["{name} {has} solidly mastered {n} words — a huge amount of work.", "{n} of {learned} words are completely secure — excellent."],
+  },
+  mst_reviews_total: {
+    uz: ["{name} {n} martadan ortiq so'z takrorlagan — izchil mehnat.", "Takrorlashlar {n} tadan oshdi — {name} uchun katta yutuq."],
+    en: ["{name} {has} reviewed words more than {n} times — steady work.", "Reviews have gone past {n} — a big achievement for {nameObj}."],
+  },
+  mode_skips: {
+    uz: ["{name} [[{mode} mashqini|timing]] {m} ta vazifadan {n} tasida qilmagan.", "Vazifalardagi eng ko'p bajarilmagan qism — [[{mode}|timing]] ({n} marta)."],
+    en: ["{name} {hasnt} done [[{mode}|timing]] in {n} of {m} assignments.", "The part most often left undone in homework is [[{mode}|timing]] ({n} times)."],
+  },
+  mode_favourite: {
+    uz: ["{name} uchun eng qulay mashq turi — [[{mode}|modes]].", "Qo'shimcha mashqda {name} ko'pincha [[{mode} mashqiga|modes]] murojaat qiladi."],
+    en: ["The most comfortable activity for {nameObj} is [[{mode}|modes]].", "For extra practice {name} often turn{s} to [[{mode}|modes]]."],
+  },
+  mode_review_only: {
+    uz: ["{name} ko'p [[takrorlaydi|modes]], lekin yangi so'zlar kam qo'shilmoqda.", "Faollik [[asosan takrorlashdan|modes]] iborat — yangi bo'lim foydali bo'ladi."],
+    en: ["{name} [[review{s} a lot|modes]], but few new words are being added.", "Activity is [[mostly review|modes]] — a new unit would be useful."],
+  },
+  mode_learn_heavy: {
+    uz: ["{name} [[yangi so'zlarga|modes]] ko'p e'tibor beradi; takrorlash ortda qolmasin.", "Faollik [[asosan yangi so'z o'rganishdan|modes]] iborat — takrorlash kerak."],
+    en: ["{name} focus{es} on [[new words|modes]]; review should not fall behind.", "Activity is [[mostly learning new words|modes]] — review is needed."],
+  },
+  cls_review_top: {
+    uz: ["Bu hafta takrorlashda {name} [[{total} kishilik sinfda {rank}-o'rinda|ranking]].", "{name} [[takrorlash bo'yicha oldingi qatorda|ranking]] — {rank}-o'rin."],
+    en: ["In review this week, {name} {is} [[place {rank} in a class of {total}|ranking]].", "{name} {is} [[at the front for review|ranking]] — place {rank}."],
+  },
+  cls_review_above: {
+    uz: ["{name} takrorlashda [[sinfdoshlarining ko'pchiligidan oldinda|ranking]].", "Bu hafta {name} [[o'rtacha o'quvchidan ko'proq|ranking]] takrorladi."],
+    en: ["{name} {is} [[ahead of most classmates|ranking]] in review.", "This week {name} reviewed [[more than the average student|ranking]]."],
+  },
+  cls_review_below: {
+    uz: [
+      "{name} takrorlashda [[sinfning ko'pchiligidan kamroq|ranking]] faol — kichik kundalik odat yordam beradi.",
+      "Bu hafta {name} [[o'rtacha o'quvchidan kamroq|ranking]] takrorladi; qisqa eslatma foydali.",
+    ],
+    en: [
+      "{name} {is} [[less active than most of the class|ranking]] in review — a small daily habit would help.",
+      "This week {name} reviewed [[less than the average student|ranking]]; a short reminder could help.",
+    ],
+  },
+  cls_accuracy_top: {
+    uz: ["{name} [[sinfdagi eng aniq javob beruvchilardan|ranking]] — {pct}%.", "Aniqlik bo'yicha {name} [[{total} kishidan {rank}-o'rinni|ranking]] egalladi."],
+    en: ["{name} {is} [[one of the most accurate in the class|ranking]] — {pct}%.", "For accuracy, {name} took [[place {rank} of {total}|ranking]]."],
+  },
+  cls_accuracy_above: {
+    uz: ["{name} uchun to'g'ri javoblar [[sinfdagidan ko'proq|ranking]]: {pct}% (o'rtacha {avg}%).", "{name} so'zlarni [[o'rtachadan aniqroq|ranking]] eslaydi."],
+    en: ["Correct answers for {nameObj} are [[above the class level|ranking]]: {pct}% (average {avg}%).", "{name} recall{s} words [[more accurately than average|ranking]]."],
+  },
+  cls_accuracy_below: {
+    uz: [
+      "{name} uchun to'g'ri javoblar [[sinfdagidan kamroq|ranking]]: {pct}% (o'rtacha {avg}%) — qayta takrorlash foydali.",
+      "{name} so'zlarni [[o'rtachadan kamroq aniqlik|ranking]] bilan eslaydi; qo'shimcha yordam kerak bo'lishi mumkin.",
+    ],
+    en: [
+      "Correct answers for {nameObj} are [[below the class level|ranking]]: {pct}% (average {avg}%) — more review would help.",
+      "{name} recall{s} words [[less accurately than average|ranking]]; some extra support may be needed.",
+    ],
+  },
+  sug_overdue_hw: {
+    uz: ["[[{hw}|homework]] vazifasini bugun tugatishni taklif qilish mumkin.", "Yakunlanmagan [[{hw}|homework]] haqida qisqa xabar yaxshi boshlanish bo'ladi."],
+    en: ["Suggesting to finish [[{hw}|homework]] today could help.", "A short message about the unfinished [[{hw}|homework]] would be a good start."],
+  },
+  sug_inactive: {
+    uz: ["Bugun bitta kichik mashq taklif qilish {name} uchun qaytishning eng oson yo'li.", "Sinf uni kutayotganini bildiruvchi qisqa xabar yordam berishi mumkin."],
+    en: ["Suggesting one small practice today is the easiest way back for {nameObj}.", "A short message saying the class is waiting could help."],
+  },
+  sug_review_restart: {
+    uz: ["{n} ta so'zni bir necha kunga bo'lib takrorlash rejasini taklif qilish mumkin.", "Bugungi kichik takrorlash ro'yxatni qisqartirishni boshlaydi."],
+    en: ["Suggesting a plan to review the {n} words over several days could help.", "A small review today would start shrinking the list."],
+  },
+  sug_hard: {
+    uz: ["Qiyin so'zlar uchun rasm yoki misol bilan eslatma tayyorlash foydali.", "Bugun yangi so'z o'rniga eski so'zlarni takrorlashni taklif qilish mumkin."],
+    en: ["Preparing a picture or example for the hard words would be useful.", "Suggesting old words instead of new ones today could help."],
+  },
+  sug_skipped_mode: {
+    uz: ["{mode} mashqini bajarish uchun qo'shimcha vaqt berish mumkin.", "{mode} mashqi bo'yicha qisqa ko'rsatma yordam berishi mumkin."],
+    en: ["Extra time for {mode} could be given.", "Short instructions on {mode} could help."],
+  },
+  sug_low_activity: {
+    uz: ["Haftaning qolgan kunlari uchun kichik maqsad belgilash mumkin.", "Har kuni bitta qisqa mashq — {name} uchun yaxshi qadam bo'ladi."],
+    en: ["A small goal for the rest of the week could be set.", "One short practice a day would be a good step for {nameObj}."],
+  },
+  sug_new_student: {
+    uz: ["Birinchi haftada qisqa maqtov xabari {name} uchun kuchli motivatsiya bo'ladi.", "Yangi o'quvchiga birinchi vazifani tushuntirib berish foydali."],
+    en: ["A short message of praise in the first week would be strong motivation for {nameObj}.", "Explaining the first homework to a new student would be useful."],
+  },
+  sug_praise: {
+    uz: ["Shu sur'atni saqlash uchun qisqa rag'bat so'zi yetarli.", "Bu mehnatni darsda e'tirof etish mumkin."],
+    en: ["A short word of encouragement is enough to keep this pace.", "This effort could be recognised in class."],
+  },
+  sug_new_unit: {
+    uz: ["Keyingi bo'limni tayyorlash vaqti keldi.", "Yangi so'zlar {name} uchun keyingi qadam bo'ladi."],
+    en: ["It is time to prepare the next unit.", "New words would be the next step for {nameObj}."],
+  },
+  act_review_cleared: {
+    uz: ["{when} {name} [[{n} ta so'z bilan|review]] takrorlashni yakunladi — hech narsa qolmadi.", "{when} ro'yxatdagi barcha so'zlar takrorlandi: [[{n} ta|review]]."],
+    en: ["{when} {name} finished review with [[{n} words|review]] — nothing is left.", "{when} every word on the list got reviewed: [[{n} of them|review]]."],
+  },
+  act_review_hw: {
+    uz: ["{when} {name} [[{n} ta so'zni|review]] takrorlab, [[{hw}|homework]] vazifasini ham tugatdi.", "{when} [[{hw}|homework]] tayyor bo'ldi, [[{n} ta so'z|review]] esa takrorlandi."],
+    en: ["{when} {name} reviewed [[{n} words|review]] and also finished [[{hw}|homework]].", "{when} [[{hw}|homework]] got done and [[{n} words|review]] were reviewed."],
+  },
+  act_review: {
+    uz: [
+      "{when} {name} [[{n} ta so'zni|review]] takrorlab chiqdi.",
+      "{when} [[{n} ta so'z|review]] ustida takrorlash bo'ldi.",
+      "{when} {name} [[{n} ta so'zni|review]] yana bir bor eslab ko'rdi.",
+    ],
+    en: [
+      "{when} {name} went through [[{n} words|review]] in review.",
+      "{when} a review of [[{n} words|review]] took place.",
+      "{when} {name} refreshed [[{n} words|review]].",
+    ],
+  },
+  act_hw: {
+    uz: ["{when} [[{hw}|homework]] vazifasi to'liq topshirildi.", "{when} {name} [[{hw}|homework]] vazifasini nihoyasiga yetkazdi."],
+    en: ["{when} [[{hw}|homework]] was handed in in full.", "{when} {name} brought [[{hw}|homework]] to completion."],
+  },
+  act_hw_partial: {
+    uz: ["{when} {name} [[{hw}|homework]] vazifasini boshlab qo'ydi; [[{left} hali kutmoqda|timing]].", "{when} [[{hw}|homework]] bo'yicha ish bo'ldi — [[{left} qolgan|timing]]."],
+    en: ["{when} {name} got [[{hw}|homework]] started; [[{left} still waiting|timing]].", "{when} there was work on [[{hw}|homework]] — [[{left} left|timing]]."],
+  },
+  act_other: {
+    uz: ["{when} {name} [[sinfda biroz ishladi|days]].", "{when} [[mashg'ulot bo'ldi|days]]."],
+    en: ["{when} {name} [[did some work in the class|days]].", "{when} [[a practice session took place|days]]."],
+  },
+  rev_waiting: {
+    uz: ["{n} ta so'z takrorlanishga navbatda.", "Takrorlash uchun tayyor so'zlar: {n} ta.", "Kutayotgan so'zlar soni — {n} ta."],
+    en: ["{n} words are in line for review.", "Words ready for review: {n}.", "Words waiting: {n}."],
+  },
+  rev_overdue: {
+    uz: ["{n} ta kutayotgan so'zning {m} tasi kechikmoqda.", "Ro'yxatda {n} ta so'z; ularning {m} tasi vaqtida takrorlanmagan."],
+    en: ["{m} of the {n} waiting words are running late.", "{n} words on the list; {m} of them were not reviewed on time."],
+  },
+  rev_stopped: {
+    uz: ["{name} [[{days} kun|review]] takrorlamay qo'ydi; {n} ta so'z to'plandi.", "[[{days} kundan beri|review]] takrorlash yo'q — ro'yxatda {n} ta so'z."],
+    en: ["{name} {has} gone [[{days} days|review]] without reviewing; {n} words have built up.", "No review [[for {days} days|review]] — {n} words on the list."],
+  },
+  rev_never: {
+    uz: ["{n} ta so'z birinchi takrorlashni kutyapti — {name} hali boshlamagan.", "Takrorlash ro'yxati tayyor ({n} ta so'z), lekin hali ochilmagan."],
+    en: ["{n} words are waiting for a first review — {name} {hasnt} started yet.", "The review list is ready ({n} words), but has not been opened yet."],
+  },
+  hw_few_early: {
+    uz: ["[[{hw}|homework]] vazifasini {name} [[muddatidan {early}|timing]] yopdi.", "{name} [[{hw}|homework]] vazifasini oldindan bajardi — [[muddatidan {early}|timing]]."],
+    en: ["{name} closed [[{hw}|homework]] [[{early} before the deadline|timing]].", "{name} did [[{hw}|homework]] ahead of time — [[{early} early|timing]]."],
+  },
+  hw_few_on_time: {
+    uz: [
+      "{name} [[{hw}|homework]] vazifasini [[o'z muddatida|timing]] yakunladi.",
+      "[[{hw}|homework]]: [[muddat buzilmagan|timing]].",
+      "{name} [[{hw}|homework]] vazifasini [[o'z vaqtida|timing]] topshirib, yaxshi boshladi.",
+    ],
+    en: [
+      "{name} completed [[{hw}|homework]] [[within the deadline|timing]].",
+      "[[{hw}|homework]]: [[deadline kept|timing]].",
+      "{name} handed [[{hw}|homework]] in [[on time|timing]] — a good start.",
+    ],
+  },
+  hw_few_late: {
+    uz: ["[[{hw}|homework]] [[{late}|timing]] topshirildi, lekin hech bir qismi qolmadi.", "{name} [[{hw}|homework]] vazifasida biroz ortda qoldi ([[{late}|timing]]), ammo hammasini bajardi."],
+    en: ["[[{hw}|homework]] came in [[{late}|timing]], but no part was left out.", "{name} fell a little behind on [[{hw}|homework]] ([[{late}|timing]]), but did all of it."],
+  },
+  hw_few_open: {
+    uz: ["[[{hw}|homework]] vazifasida [[{left} hali bajarilishi kerak|timing]].", "{name} uchun [[{hw}|homework]] tugallanmagan — [[{left} qolgan|timing]]."],
+    en: ["[[{hw}|homework]] still needs [[{left}|timing]] to be done.", "[[{hw}|homework]] is unfinished for {nameObj} — [[{left} left|timing]]."],
+  },
+  hw_few_open_many: {
+    uz: ["[[{hw}|homework]] hali [[topshirilmagan|timing]].", "{name} [[{hw}|homework]] vazifalarini [[hali yakunlamagan|timing]]."],
+    en: ["[[{hw}|homework]] have [[not been handed in yet|timing]].", "{name} {hasnt} [[completed|timing]] [[{hw}|homework]] yet."],
+  },
+  hw_few_mixed: {
+    uz: ["[[{hw}|homework]]: biri topshirildi, [[ikkinchisi hali kutmoqda|timing]].", "{name} ikki vazifadan birini yakunladi; [[biri qoldi|timing]] ([[{hw}|homework]])."],
+    en: ["[[{hw}|homework]]: one handed in, [[the second still waiting|timing]].", "{name} completed one of the two; [[one is left|timing]] ([[{hw}|homework]])."],
+  },
+  hw_early: {
+    uz: ["{name} [[vazifalarni|homework]] [[muddatni kutmasdan|timing]] topshiradi.", "[[Vazifalar|homework]] {name} tomonidan [[odatda erta|timing]] yakunlanadi."],
+    en: ["{name} hand{s} in [[homework|homework]] [[without waiting for the deadline|timing]].", "[[Homework|homework]] is [[usually finished early|timing]] by {nameObj}."],
+  },
+  hw_last_day: {
+    uz: [
+      "{name} uchun [[muddat kuni — ish kuni|timing]], ammo [[vazifalar|homework]] doim topshiriladi.",
+      "[[Vazifalar|homework]] odatda [[so'nggi kunda|timing]] yakunlanadi, lekin hech biri kechikmaydi.",
+    ],
+    en: [
+      "For {nameObj}, [[the due day is the working day|timing]], but [[homework|homework]] is always handed in.",
+      "[[Homework|homework]] is usually finished [[on the final day|timing]], but none of it is late.",
+    ],
+  },
+  hw_on_time: {
+    uz: ["{name} [[vazifalarni|homework]] [[doimo vaqtida|timing]] topshiradi.", "[[{total} ta vazifa|homework]] — [[birortasi ham kechikmagan|timing]]."],
+    en: ["{name} always hand{s} in [[homework|homework]] [[on time|timing]].", "[[{total} assignments|homework]] — [[not a single one late|timing]]."],
+  },
+  hw_same_day: {
+    uz: ["{name} [[vazifani|homework]] [[olgan kuniyoq|timing]] tugatadi.", "[[Vazifa|homework]] berilgan zahoti {name} [[uni bajarib qo'yadi|timing]]."],
+    en: ["{name} finish{es} [[homework|homework]] [[the same day it arrives|timing]].", "As soon as [[homework|homework]] is set, {name} [[get{s} it done|timing]]."],
+  },
+  hw_late_finishes: {
+    uz: ["{name} [[{freq} muddatdan o'tib ketadi|timing]], lekin [[vazifalar|homework]] tashlab ketilmaydi.", "[[Kechikish {freq} uchraydi|timing]], ammo {name} [[har bir vazifani|homework]] tugatadi."],
+    en: ["{name} [[{freq} go{es} past the deadline|timing]], but [[the homework|homework]] is never dropped.", "[[Lateness happens {freq}|timing]], but {name} finish{es} [[every assignment|homework]]."],
+  },
+  hw_some_missing: {
+    uz: ["[[{total} ta vazifaning|homework]] ko'pi bajarilgan; [[{missed} tasi qolgan|timing]].", "{name} {done} ta vazifani yopgan, [[{missed} tasi hali ochiq|timing]] — eslatma yordam beradi."],
+    en: ["Most of [[{total} assignments|homework]] are done; [[{missed} left|timing]].", "{name} {has} closed {done} assignments, with [[{missed} still open|timing]] — a reminder would help."],
+  },
+  hw_many_missing: {
+    uz: [
+      "[[{missed} ta vazifa|timing]] hali ochiq; {name} bilan birga reja tuzish foydali bo'lishi mumkin.",
+      "{name} [[{total} ta vazifadan|homework]] faqat {done} tasini yopgan; [[qolganlari|timing]] uchun yordam kerak bo'lishi mumkin.",
+    ],
+    en: [
+      "[[{missed} assignments|timing]] are still open; making a plan with {nameObj} could help.",
+      "{name} {has} closed only {done} of [[{total} assignments|homework]]; [[the rest|timing]] may need support.",
+    ],
+  },
+  hw_none_done: {
+    uz: ["[[{total} ta vazifa|timing]] hali kutmoqda — qayerdan boshlashni birga hal qilish mumkin.", "{name} uchun [[so'nggi vazifalar|timing]] hali ochiq; qisqa suhbat yordam beradi."],
+    en: ["[[{total} assignments|timing]] are still waiting — deciding together where to start could help.", "[[The recent assignments|timing]] are still open for {nameObj}; a short chat would help."],
+  },
+  hw_improving: {
+    uz: ["[[So'nggi vazifalarda|timing]] muddatga rioya qilish sezilarli yaxshilandi.", "{name} [[vazifalarni avvalgidan tezroq|timing]] topshirmoqda."],
+    en: ["Keeping to deadlines [[improved noticeably in recent homework|timing]].", "{name} {is} handing in [[homework faster than before|timing]]."],
+  },
+  hw_slipping: {
+    uz: ["[[Oxirgi vazifalarda|timing]] kechikishlar biroz oshdi.", "{name} [[vazifalarni avvalgidan sekinroq|timing]] topshirmoqda."],
+    en: ["[[Recent homework|timing]] shows a few more delays.", "{name} {is} handing in [[homework more slowly than before|timing]]."],
+  },
+  rem_quick: {
+    uz: ["{name} [[eslatma olishi bilan|reminders]] mashqqa o'tadi.", "[[Eslatmalarga javob|reminders]] tez — odatda bir kun ichida."],
+    en: ["{name} move{s} to practice [[as soon as a reminder arrives|reminders]].", "[[Replies to reminders|reminders]] are quick — usually within a day."],
+  },
+  rem_slow: {
+    uz: ["{name} [[eslatmalarga|reminders]] bir-ikki kunda javob beradi.", "[[Eslatmadan keyin|reminders]] {name} biroz o'tib, lekin ishonchli tarzda qaytadi."],
+    en: ["{name} answer{s} [[reminders|reminders]] within a day or two.", "[[After a reminder|reminders]] {name} come{s} back a bit later, but reliably."],
+  },
+  rem_mixed: {
+    uz: ["{name} [[eslatmalarning bir qismiga|reminders]] javob beradi.", "[[Eslatmalar natijasi|reminders]] {name} uchun bir xil emas."],
+    en: ["{name} respond{s} to [[some of the reminders|reminders]].", "[[The result of reminders|reminders]] varies for {nameObj}."],
+  },
+  rem_read_no_action: {
+    uz: [
+      "{name} [[xabarlarni ko'rib chiqadi|reminders]], lekin mashq keyin kelmaydi — boshqacha usul sinab ko'rish mumkin.",
+      "[[Eslatmalar o'qilyapti|reminders]], ammo natija hali yo'q; darsda gaplashib olish foydali.",
+    ],
+    en: [
+      "{name} [[look{s} at the messages|reminders]], but practice does not follow — another approach could be tried.",
+      "[[The reminders are read|reminders]], but no result yet; talking in class would help.",
+    ],
+  },
+  rem_unread: {
+    uz: ["[[Yuborilgan eslatmalar|reminders]] hali ochilmagan — darsda og'zaki aytish yaxshiroq bo'lishi mumkin.", "{name} [[xabarlarni ko'rmayapti|reminders]] shekilli; bildirishnomalarni tekshirish foydali."],
+    en: ["[[The reminders sent|reminders]] have not been opened — saying it in class may work better.", "{name} seem{s} [[not to see the messages|reminders]]; checking notifications could help."],
+  },
+  rem_not_needed: {
+    uz: ["{name} [[eslatmalarsiz ham|days]] o'z vaqtida shug'ullanadi.", "{name} uchun tashqi turtki kerak emas — [[o'zi muntazam|days]]."],
+    en: ["{name} practise{s} [[on time even without reminders|days]].", "No outside push is needed — {name} {is} [[regular on their own|days]]."],
+  },
+  rem_single_responded: {
+    uz: ["[[Oxirgi xabardan|reminders]] keyin {name} {hours} soatda mashq qildi.", "{name} [[eslatmani|reminders]] tez qabul qildi — {hours} soatdan keyin mashq."],
+    en: ["After [[the last message|reminders]], {name} practised within {hours} h.", "{name} acted on [[the reminder|reminders]] — practice {hours} h later."],
+  },
+  rem_single_read: {
+    uz: ["{name} [[xabarni o'qidi|reminders]]; mashq hali kutilmoqda.", "[[Eslatma|reminders]] ko'rildi, lekin hali mashq qilinmadi."],
+    en: ["{name} [[read the message|reminders]]; practice is still to come.", "[[The reminder|reminders]] was seen, but no practice yet."],
+  },
+  rem_single_unread: {
+    uz: ["{name} [[oxirgi xabarni|reminders]] hali ko'rmadi.", "[[Eslatma|reminders]] hali ochilmagan — darsda aytib qo'yish mumkin."],
+    en: ["{name} {hasnt} seen [[the last message|reminders]] yet.", "[[The reminder|reminders]] is still unopened — it could be mentioned in class."],
+  },
+};
+for (const [code, v] of Object.entries(EXTRA_VERSIONS)) {
+  SUMMARY_SENTENCES[code].uz.push(...v.uz);
+  SUMMARY_SENTENCES[code].en.push(...v.en);
+}
