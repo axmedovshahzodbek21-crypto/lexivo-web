@@ -512,6 +512,45 @@ function classPick(classAnswers: ClassAnswer[], names: Record<string, string>, s
   return null;
 }
 
+// ── Closing suggestion: one next step for the biggest issue ─────────────────
+// First match wins: unfinished past-due homework, a week without activity,
+// stalled review, hard words, a skipped mode, a slow week, a new student,
+// something worth praising, nothing left to do.
+const PRAISE = ['ctx_week_high', 'ctx_new_all_active', 'str_record', 'str_long', 'trd_up', 'trd_up_strong', 'trd_record',
+  'rq_strong', 'rq_improving', 'cls_review_top', 'cls_accuracy_top', 'mst_hw_streak'];
+
+function suggestionPick(picks: Pick[], records: HomeworkTiming[], history: HistoryEntry[], today: string, joinDate: string | null, dueCount: number): Pick | null {
+  const has = (...codes: string[]) => picks.some(p => codes.includes(p.code));
+  const open = records.filter(r => !r.finishedDate && r.dueDate < today).sort((a, b) => b.dueDate.localeCompare(a.dueDate));
+  if (open.length) return { code: 'sug_overdue_hw', vars: { hw: open[0].title }, ev: { homework: [hwEvidence(open[0], today)] } };
+  const activeWeek = history.some(e => localDate(e.created_at) > addDays(today, -7));
+  const newStudent = joinDate !== null && dayDiff(joinDate, today) < 7;
+  if (!activeWeek && history.length > 0 && !newStudent) return { code: 'sug_inactive' };
+  if (has('rev_stopped', 'rev_never') && dueCount > 0) return { code: 'sug_review_restart', vars: { n: dueCount } };
+  if (has('rq_hard', 'rq_dropping', 'cls_accuracy_below')) return { code: 'sug_hard' };
+  const skip = picks.find(p => p.code === 'mode_skips');
+  if (skip) return { code: 'sug_skipped_mode', vars: { mode: skip.vars!.mode } };
+  if (has('ctx_week_low', 'trd_down', 'trd_down_strong', 'cls_review_below')) return { code: 'sug_low_activity' };
+  if (newStudent) return { code: 'sug_new_student' };
+  if (has(...PRAISE)) return { code: 'sug_praise' };
+  const pending = records.some(r => !r.finishedDate && r.dueDate >= today);
+  if (dueCount === 0 && !pending && activeWeek) return { code: 'sug_new_unit' };
+  return null;
+}
+
+// Which sentences stay visible when there are many: the rest go behind
+// "Batafsil". Lower = more important.
+function importance(code: string): number {
+  if (code.startsWith('ctx_') || code === 'not_enough_data') return 1;
+  if (code === 'hw_improving' || code === 'hw_slipping') return 14;
+  if (code.startsWith('hw_')) return 2;
+  if (code === 'rq_hard_words') return 3;
+  const order = ['rq_', 'rev_', 'act_', 'trd_', 'cls_', 'mode_', 'str_', 'rem_', 'mst_'];
+  const i = order.findIndex(p => code.startsWith(p));
+  return i >= 0 ? 4 + i : 13; // habits (tim_/wk_/ses_) = 13
+}
+const VISIBLE = 6;
+
 // ── Reminders ────────────────────────────────────────────────────────────────
 // A teacher message counts only if the student hadn't studied in the 24h
 // before it (otherwise they'd have practised anyway). R studied within 24h,
@@ -619,7 +658,7 @@ export function buildStudentSummary(input: {
   learned: number;         // class_srs_states rows
   classAnswers: ClassAnswer[];        // whole class, last 30 days
   classNames: Record<string, string>; // approved members: id -> name
-}): SummarySentence[] {
+}): { main: SummarySentence[]; more: SummarySentence[] } {
   const w = SUMMARY_WORDS[input.lang];
   const hw = homeworkPicks(input.homework, input.today, w);
   const act = activityPicks(input.history, input.homework, hw.named, input.today, input.dueCount, w);
@@ -641,13 +680,21 @@ export function buildStudentSummary(input: {
     reminderPick(input.notes, input.history, input.now, input.today, input.joinDate),
   ].filter((p): p is Pick => p !== null);
   if (picks.length === 0) picks.push({ code: 'not_enough_data' });
+  const suggestion = suggestionPick(picks, input.homework, input.history, input.today, input.joinDate, input.dueCount);
+  // Keep the VISIBLE most important in paragraph order; the rest go under
+  // "Batafsil". The suggestion always closes the visible paragraph.
+  const keep = new Set([...picks].map((p, i) => ({ p, i })).sort((a, b) => importance(a.p.code) - importance(b.p.code) || a.i - b.i)
+    .slice(0, VISIBLE).map(x => x.p));
+  const ordered = [...picks.filter(p => keep.has(p)), ...(suggestion ? [suggestion] : []), ...picks.filter(p => !keep.has(p))];
   const seed = `${input.studentId}:${input.today}`;
   // The paragraph names the student once; later sentences say "u" (Uzbek
   // has no gendered pronoun) or "they" / "them".
   let named = false;
-  return picks.map(p => {
+  const sentences = ordered.map(p => {
     const r = render(p, input.lang, input.name, seed, named);
     named ||= r.usesName;
     return r.sentence;
   });
+  const split = keep.size + (suggestion ? 1 : 0);
+  return { main: sentences.slice(0, split), more: sentences.slice(split) };
 }

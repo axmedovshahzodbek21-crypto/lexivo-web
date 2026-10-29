@@ -13,19 +13,23 @@ const fmtDateTime = (iso: string) => `${fmtYmd(new Date(iso).toLocaleDateString(
 // The teacher's per-student summary (lib/student-summary.ts), as one
 // paragraph. Phrases that make a claim are tappable; tapping one shows the
 // facts behind it under the paragraph.
-export default function StudentSummary({ sentences, classId, accentColor, reasonLabel }: {
+export default function StudentSummary({ sentences, more, classId, accentColor, reasonLabel }: {
   sentences: SummarySentence[];
+  more: SummarySentence[]; // shown after "Batafsil"
   classId: string;
   accentColor: string;
   reasonLabel: (reason: string) => string;
 }) {
+  const tt = useTranslation();
   const [open, setOpen] = useState<{ s: number; g: number } | null>(null);
+  const [showMore, setShowMore] = useState(false);
+  const all = showMore ? [...sentences, ...more] : sentences;
   const toggle = (s: number, g: number) => setOpen(open?.s === s && open.g === g ? null : { s, g });
-  const ev = open ? sentences[open.s]?.[open.g]?.evidence : undefined;
+  const ev = open ? all[open.s]?.[open.g]?.evidence : undefined;
   return (
     <div>
       <p className="text-sm leading-relaxed" style={{ color: 'var(--text)' }}>
-        {sentences.map((sentence, s) => (
+        {all.map((sentence, s) => (
           <span key={s}>
             {s > 0 && ' '}
             {sentence.map((seg, g) => seg.evidence ? (
@@ -45,6 +49,12 @@ export default function StudentSummary({ sentences, classId, accentColor, reason
           </span>
         ))}
       </p>
+      {more.length > 0 && (
+        <button type="button" onClick={() => { setShowMore(v => !v); if (showMore && open && open.s >= sentences.length) setOpen(null); }}
+          className="mt-2 text-xs font-bold" style={{ color: 'var(--text-muted)' }}>
+          {showMore ? tt.classXpHistory.hideDetails : tt.classXpHistory.moreDetails} {showMore ? '▴' : '▾'}
+        </button>
+      )}
       {ev && <EvidenceCard evidence={ev} classId={classId} accentColor={accentColor} reasonLabel={reasonLabel} />}
     </div>
   );

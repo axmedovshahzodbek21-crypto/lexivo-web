@@ -243,7 +243,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
     today: todayStr, now: Date.now(), joinDate,
     homework: hwRecords, notes, history, dueCount, overdueCount,
     answers, mastered: srsCounts.mastered, learned: srsCounts.learned, classAnswers, classNames,
-  }) : [];
+  }) : { main: [], more: [] };
   const pillColor = isSelf ? accentColor : verdictMeta.color;
   const lastReviewValue = reviewPattern.lastReviewDate === null || ds === null ? '—'
     : `${fmtYmd(reviewPattern.lastReviewDate)} (${ds === 0 ? h.statToday : fill(h.statDaysAgo, { n: ds })})`;
@@ -441,7 +441,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
                 <button onClick={() => setShowSummary(false)} className="text-lg" style={{ color: 'var(--text-muted)' }}>✕</button>
               </div>
               <div className="overflow-y-auto overscroll-contain px-5 py-4">
-                <StudentSummary sentences={smart} classId={classId} accentColor={accentColor} reasonLabel={reasonLabel} />
+                <StudentSummary sentences={smart.main} more={smart.more} classId={classId} accentColor={accentColor} reasonLabel={reasonLabel} />
               </div>
             </div>
           )}

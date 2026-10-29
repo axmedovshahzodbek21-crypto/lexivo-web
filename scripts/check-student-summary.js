@@ -52,6 +52,8 @@ const SPEC = {
   cls_review_top: [['rank', 'total'], ['ranking']], cls_review_above: [[], ['ranking']], cls_review_below: [[], ['ranking']],
   cls_accuracy_top: [['rank', 'total', 'pct'], ['ranking']], cls_accuracy_above: [['pct', 'avg'], ['ranking']],
   cls_accuracy_below: [['pct', 'avg'], ['ranking']],
+  sug_overdue_hw: [['hw'], ['homework']], sug_inactive: [[], []], sug_review_restart: [['n'], []], sug_hard: [[], []],
+  sug_skipped_mode: [['mode'], []], sug_low_activity: [[], []], sug_new_student: [[], []], sug_praise: [[], []], sug_new_unit: [[], []],
   rem_quick: [[], ['reminders']], rem_slow: [[], ['reminders']], rem_mixed: [[], ['reminders']],
   rem_read_no_action: [[], ['reminders']], rem_unread: [[], ['reminders']], rem_not_needed: [[], ['days']],
   rem_single_responded: [['hours'], ['reminders']], rem_single_read: [[], ['reminders']], rem_single_unread: [[], ['reminders']],
