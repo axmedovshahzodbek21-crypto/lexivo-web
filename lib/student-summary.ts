@@ -176,7 +176,7 @@ function contextPick(history: HistoryEntry[], today: string, joinDate: string | 
   const ev = { days: dayItems(history, week) };
   if (week.length >= 6) return { code: 'ctx_week_high', vars: { active: week.length }, ev };
   if (week.length >= 3) return { code: 'ctx_week_mid', vars: { active: week.length }, ev };
-  if (week.length >= 1) return { code: 'ctx_week_low', vars: { active: week.length }, ev };
+  if (week.length >= 1) return { code: 'ctx_week_low', vars: { active: week.length, dayWord: week.length === 1 ? w.day1 : w.dayN }, ev };
   return { code: 'ctx_week_none', vars: { last: fmtLong(active[0]) }, ev: { days: dayItems(history, [active[0]]) } };
 }
 
@@ -278,14 +278,22 @@ function variantIndex(seed: string, n: number): number {
 
 // Splits [[label|key]] markup before filling placeholders, so a homework
 // title containing "|" or "]]" can't break the parse.
-function render(p: Pick, lang: Lang, name: string, seed: string): { sentence: SummarySentence; usesName: boolean } {
+// English verb endings after {name}: singular for "Student 1", plural for "they".
+const AGREE_ONE = { s: 's', es: 'es', has: 'has', hasnt: "hasn't", is: 'is', was: 'was', doesnt: "doesn't" };
+const AGREE_THEY = { s: '', es: '', has: 'have', hasnt: "haven't", is: 'are', was: 'were', doesnt: "don't" };
+
+function render(p: Pick, lang: Lang, name: string, seed: string, pronoun: boolean): { sentence: SummarySentence; usesName: boolean } {
   const versions = SUMMARY_SENTENCES[p.code][lang];
   const text = versions[variantIndex(`${seed}:${p.code}`, versions.length)];
-  return { sentence: renderText(text, p, name), usesName: text.includes('{name}') };
+  const w = SUMMARY_WORDS[lang];
+  const who = pronoun
+    ? { name: w.pronoun, nameObj: w.pronounObj, ...AGREE_THEY }
+    : { name, nameObj: name, ...AGREE_ONE };
+  return { sentence: renderText(text, p, who), usesName: /\{name(Obj)?\}/.test(text) };
 }
 
-function renderText(text: string, p: Pick, name: string): SummarySentence {
-  const vars: Record<string, string | number> = { name, ...p.vars };
+function renderText(text: string, p: Pick, who: Record<string, string>): SummarySentence {
+  const vars: Record<string, string | number> = { ...who, ...p.vars };
   const out: SummarySentence = [];
   const re = /\[\[(.+?)\|(\w+)\]\]/g;
   let at = 0;
@@ -327,12 +335,11 @@ export function buildStudentSummary(input: {
   ].filter((p): p is Pick => p !== null);
   if (picks.length === 0) picks.push({ code: 'not_enough_data' });
   const seed = `${input.studentId}:${input.today}`;
-  // The paragraph names the student once; in Uzbek later sentences say "u"
-  // (he/she — Uzbek has no gendered pronoun). English keeps the name, since
-  // "they" would need different verb forms ("they have", not "they has").
+  // The paragraph names the student once; later sentences say "u" (Uzbek
+  // has no gendered pronoun) or "they" / "them".
   let named = false;
   return picks.map(p => {
-    const r = render(p, input.lang, input.lang === 'uz' && named ? w.pronoun : input.name, seed);
+    const r = render(p, input.lang, input.name, seed, named);
     named ||= r.usesName;
     return r.sentence;
   });
