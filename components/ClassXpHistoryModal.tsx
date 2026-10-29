@@ -142,9 +142,25 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
     ? (byDate[selectedDay] ?? []).slice().sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
     : [];
   const dayTotal = dayEntries.reduce((s, e) => s + e.amount, 0);
+
+  // Review and Learn write one history row per word, so a session showed up
+  // as dozens of identical "+0.2 XP" lines. Collapse back-to-back rows with
+  // the same reason (less than GROUP_GAP_MS apart) into one row per session.
+  const GROUP_GAP_MS = 30 * 60 * 1000;
+  const dayGroups: { id: string; reason: string; amount: number; count: number; from: string; to: string }[] = [];
+  for (const e of dayEntries) { // newest first
+    const g = dayGroups[dayGroups.length - 1];
+    if (g && g.reason === e.reason && new Date(g.from).getTime() - new Date(e.created_at).getTime() < GROUP_GAP_MS) {
+      g.amount += e.amount; g.count += 1; g.from = e.created_at;
+    } else {
+      dayGroups.push({ id: e.id, reason: e.reason, amount: e.amount, count: 1, from: e.created_at, to: e.created_at });
+    }
+  }
   const reviewOnly = history.filter(e => e.reason === 'SRS Review');
   const reviewPattern = classifyReview(reviewOnly, overdueCount, joinDate);
   const h = t.classXpHistory;
+  const reasonLabel = (r: string) =>
+    h.reasonLabels[r] ?? (r.startsWith('Reading: ') ? `${h.readingPrefix}: ${r.slice('Reading: '.length)}` : r);
 
   // Verdict first (is this student OK?), then one plain sentence: when they
   // last reviewed and how many words are waiting. A student viewing themself
@@ -291,19 +307,26 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
                 <button onClick={() => setSelectedDay(null)} className="text-lg" style={{ color: 'var(--text-muted)' }}>✕</button>
               </div>
               <div className="overflow-y-auto overscroll-contain pb-6">
-                {dayEntries.map((e, j) => (
-                  <div key={e.id}>
-                    {j > 0 && <div style={{ height: 1, background: 'var(--border)', marginLeft: 52 }} />}
-                    <div className="flex items-center gap-3 px-5 py-3">
-                      <span className="text-xl shrink-0">{REASON_ICON[e.reason] ?? '⚡'}</span>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold" style={{ color: 'var(--text)' }}>{e.reason}</p>
-                        <p className="text-[11px] truncate" style={{ color: 'var(--text-muted)' }}>{exactTime(e.created_at)}</p>
+                {dayGroups.map((g, j) => {
+                  const fromTime = exactTime(g.from);
+                  const toTime = exactTime(g.to);
+                  const time = fromTime === toTime ? fromTime : `${fromTime} – ${toTime}`;
+                  const perWord = g.reason === 'SRS Review' || g.reason === 'Learn';
+                  const countText = g.count > 1 ? (perWord ? h.wordsCount(g.count) : `×${g.count}`) : '';
+                  return (
+                    <div key={g.id}>
+                      {j > 0 && <div style={{ height: 1, background: 'var(--border)', marginLeft: 52 }} />}
+                      <div className="flex items-center gap-3 px-5 py-3">
+                        <span className="text-xl shrink-0">{REASON_ICON[g.reason] ?? REASON_ICON[g.reason.split(/[ :(]/)[0]] ?? '⚡'}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold" style={{ color: 'var(--text)' }}>{reasonLabel(g.reason)}</p>
+                          <p className="text-[11px] truncate" style={{ color: 'var(--text-muted)' }}>{countText ? `${countText} · ${time}` : time}</p>
+                        </div>
+                        <span className="text-sm font-black shrink-0" style={{ color: accentColor }}>+{displayXP(g.amount)} XP</span>
                       </div>
-                      <span className="text-sm font-black shrink-0" style={{ color: accentColor }}>+{displayXP(e.amount)} XP</span>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}

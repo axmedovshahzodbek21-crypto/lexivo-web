@@ -194,6 +194,14 @@ const en = {
     moreDetails: 'More details',
     hideDetails: 'Hide details',
     legendBeforeJoin: 'before joining',
+    // class_xp_history.reason is a raw DB constant — these are its display names.
+    // Lowercase keys are homework completions (record_class_homework_progress).
+    reasonLabels: {
+      'SRS Review': 'Review', Learn: 'Learn', Flashcard: 'Cards', Quiz: 'Quiz', 'Quiz (perfect)': 'Quiz (perfect)', Match: 'Match',
+      learn: 'Learn (homework)', flashcard: 'Cards (homework)', quiz: 'Quiz (homework)', match: 'Match (homework)', read: 'Reading (homework)',
+    } as Record<string, string>,
+    readingPrefix: 'Reading',
+    wordsCount: (n: number) => `${n} words`,
   },
   classNav: {
     words: 'Words',
@@ -2863,6 +2871,12 @@ const uz: typeof en = {
     moreDetails: 'Batafsil',
     hideDetails: 'Yashirish',
     legendBeforeJoin: "qo'shilishdan oldin",
+    reasonLabels: {
+      'SRS Review': 'Takrorlash', Learn: "O'rganish", Flashcard: 'Kartochkalar', Quiz: 'Test', 'Quiz (perfect)': "Test (a'lo)", Match: 'Moslashtirish',
+      learn: "O'rganish (uyga vazifa)", flashcard: 'Kartochkalar (uyga vazifa)', quiz: 'Test (uyga vazifa)', match: 'Moslashtirish (uyga vazifa)', read: "O'qish (uyga vazifa)",
+    } as Record<string, string>,
+    readingPrefix: "O'qish",
+    wordsCount: (n: number) => `${n} ta so'z`,
   },
   classNav: {
     words: 'So\'zlar',
@@ -5518,6 +5532,12 @@ const ru: typeof en = {
     moreDetails: 'Подробнее',
     hideDetails: 'Скрыть',
     legendBeforeJoin: 'до вступления',
+    reasonLabels: {
+      'SRS Review': 'Повторение', Learn: 'Изучение', Flashcard: 'Карточки', Quiz: 'Тест', 'Quiz (perfect)': 'Тест (идеально)', Match: 'Сопоставление',
+      learn: 'Изучение (д/з)', flashcard: 'Карточки (д/з)', quiz: 'Тест (д/з)', match: 'Сопоставление (д/з)', read: 'Чтение (д/з)',
+    } as Record<string, string>,
+    readingPrefix: 'Чтение',
+    wordsCount: (n: number) => `${n} слов`,
   },
   classNav: {
     words: 'Слова',
