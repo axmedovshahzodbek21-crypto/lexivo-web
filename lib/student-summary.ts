@@ -99,10 +99,10 @@ function homeworkPicks(records: HomeworkTiming[], today: string, w: Record<strin
         ? { code: 'hw_few_open', vars: { hw: N[0].title, left: modeList(N[0].missingModes, w) }, ev: { homework: N, timing: N } }
         : { code: 'hw_few_open_many', vars: { hw: names(N, w) }, ev: { homework: N, timing: N } };
     } else if (K.length > 0) {
-      const late = K.length === 1 ? fill(w.daysLate, { n: K[0].days }) : w.aLittleLate;
+      const late = K.length !== 1 ? w.aLittleLate : K[0].days === 1 ? w.daysLate1 : fill(w.daysLate, { n: K[0].days });
       p = { code: 'hw_few_late', vars: { hw: names(K, w), late }, ev: { homework: K, timing: K } };
     } else if (total === 1 && E.length === 1) {
-      p = { code: 'hw_few_early', vars: { hw: E[0].title, early: fill(w.daysEarly, { n: E[0].days }) }, ev: { homework: E, timing: E } };
+      p = { code: 'hw_few_early', vars: { hw: E[0].title, early: E[0].days === 1 ? w.daysEarly1 : fill(w.daysEarly, { n: E[0].days }) }, ev: { homework: E, timing: E } };
     } else p = { code: 'hw_few_on_time', vars: { hw: names(all, w) }, ev: { homework: all, timing: all } };
     return { picks: [p], named: new Set(all.map(e => e.homeworkId)) };
   }
