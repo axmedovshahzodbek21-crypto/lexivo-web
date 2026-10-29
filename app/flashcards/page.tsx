@@ -9,7 +9,7 @@ import { speak, speakText } from '@/lib/speech';
 import { recordStudySession, markFlashcardComplete, getStarredWords, getHardWords, getCustomListWords, getUnitProgress, saveFlashcardProgress, getFlashcardProgress, clearFlashcardProgress, getImportedWords, getImportedWordsByCollection, importedWordExampleFields, getClassHWTemp, recordFlashcardSession, addXP, hasFlashcardXPAwarded, markFlashcardXPAwarded, hasMyWordsXPAwarded, markMyWordsXPAwarded, getMyActivityPendingNewWords, markMyFlashcardComplete, displayXP } from '@/lib/storage';
 import { supabase } from '@/lib/supabase';
 import { getClassWordsFull } from '@/lib/class-srs';
-import { recordClassXP } from '@/lib/class-xp';
+import { recordClassXP, recordHomeworkProgress } from '@/lib/class-xp';
 import { pushLists, pushStats } from '@/lib/sync';
 import { checkAchievements } from '@/lib/gamification';
 import { fireConfetti } from '@/lib/confetti';
@@ -305,9 +305,8 @@ function FlashcardsInner() {
         // gated behind the "Back" link's ?completed= query param — that path
         // was skipped entirely by browser-back, closing the tab, or Retry,
         // silently losing the student's progress and XP.
-        void supabase.rpc('record_class_homework_progress', {
-          p_homework_id: sp.get('hwId'), p_mode: 'flashcard', p_client_word_count: deck.length,
-        });
+        // Homework XP is computed server-side; show what it actually awarded.
+        void recordHomeworkProgress(sp.get('hwId')!, 'flashcard', deck.length).then(setSessionXP);
       }
       setDone(true);
     } else {
@@ -380,7 +379,8 @@ function FlashcardsInner() {
           <div className="card text-center"><div className="text-2xl font-bold text-[var(--danger)]">{unknown}</div><div className="text-xs text-[var(--text-muted)]">{t.flashcards.review}</div></div>
           <div className="card text-center"><div className="text-2xl font-bold text-[var(--primary)]">{score}%</div><div className="text-xs text-[var(--text-muted)]">{t.flashcards.score}</div></div>
         </div>
-        <div className="w-full card mb-6 flex items-center justify-center gap-2">
+        {/* Homework pays once — a repeat run awards 0, so don't show "+0.0 XP". */}
+        {!(sourceClassHW && sessionXP === 0) && <div className="w-full card mb-6 flex items-center justify-center gap-2">
           <span className="text-xl">⚡</span>
           <span className="font-bold" style={{ color: 'var(--warning)' }}>+{displayXP(sessionXP)} XP</span>
           {sessionXP === 0 && unknown > 0 && !practiceXpDone && (
@@ -389,7 +389,7 @@ function FlashcardsInner() {
           {practiceXpDone && (
             <span className="text-xs text-[var(--text-muted)]">{t.classesPage.practiceXpDoneToday}</span>
           )}
-        </div>
+        </div>}
         <div className="flex flex-col gap-3 w-full">
           {collectionName && dayNumber !== undefined && (
             <Link

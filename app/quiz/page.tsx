@@ -11,7 +11,7 @@ import { fireConfetti } from '@/lib/confetti';
 import { checkAchievements } from '@/lib/gamification';
 import { supabase } from '@/lib/supabase';
 import { getClassWordsFull, addClassHardWord } from '@/lib/class-srs';
-import { recordClassXP } from '@/lib/class-xp';
+import { recordClassXP, recordHomeworkProgress } from '@/lib/class-xp';
 import { shuffleArray } from '@/lib/shuffleArray';
 import type { WordItem, WordCollection, QuizType } from '@/lib/types';
 import Link from 'next/link';
@@ -353,9 +353,8 @@ function QuizInner() {
         // gated behind the "Back" link's ?completed= query param — that path
         // was skipped entirely by browser-back, closing the tab, or Retry,
         // silently losing the student's progress and XP.
-        void supabase.rpc('record_class_homework_progress', {
-          p_homework_id: sp.get('hwId'), p_mode: 'quiz', p_client_word_count: questions.length,
-        });
+        // Homework XP is computed server-side; show what it actually awarded.
+        void recordHomeworkProgress(sp.get('hwId')!, 'quiz', questions.length).then(setSessionXP);
       }
       setDone(true);
     } else {

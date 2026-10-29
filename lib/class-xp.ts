@@ -26,6 +26,18 @@ export async function recordClassStudyDay(studentId: string, classId: string): P
   await enqueueOfflineWrite('record_class_study_day', { studentId, classId } satisfies StudyDayPayload);
 }
 
+// Records a finished homework mode; the server re-validates everything and
+// computes the class XP itself. Resolves to the XP it awarded — 0 when this
+// mode was already completed before (homework pays once) or on error.
+export async function recordHomeworkProgress(hwId: string, mode: string, clientWordCount: number): Promise<number> {
+  const { data, error } = await supabase.rpc('record_class_homework_progress', {
+    p_homework_id: hwId, p_mode: mode, p_client_word_count: clientWordCount,
+  });
+  if (error) { console.error('[recordHomeworkProgress]', error); return 0; }
+  const row = (Array.isArray(data) ? data[0] : data) as { xp_awarded?: number } | null;
+  return row?.xp_awarded ?? 0;
+}
+
 interface ClassXPPayload { studentId: string; classId: string; xp: number; reason: string }
 
 // Increments class_members.class_xp via the record_class_xp RPC rather than

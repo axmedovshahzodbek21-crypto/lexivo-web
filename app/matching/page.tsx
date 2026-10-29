@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
 import { getHardWords, getStarredWords, getCustomListWords, getImportedWords, getImportedWordsByCollection, importedWordExampleFields, getClassHWTemp, addXP, hasMatchXPAwarded, markMatchXPAwarded, hasMyWordsXPAwarded, markMyWordsXPAwarded, markMatchComplete, getMyActivityPendingNewWords, markMyMatchComplete, displayXP } from '@/lib/storage';
 import { getClassWordsFull, addClassHardWord } from '@/lib/class-srs';
-import { recordClassXP } from '@/lib/class-xp';
+import { recordClassXP, recordHomeworkProgress } from '@/lib/class-xp';
 import { supabase } from '@/lib/supabase';
 import { checkAchievements } from '@/lib/gamification';
 import { fireConfetti } from '@/lib/confetti';
@@ -289,9 +289,8 @@ function MatchingInner() {
           // gated behind the "Back" link's ?completed= query param — that
           // path was skipped entirely by browser-back, closing the tab, or
           // the cross-promo link, silently losing the student's progress/XP.
-          void supabase.rpc('record_class_homework_progress', {
-            p_homework_id: searchParams.get('hwId'), p_mode: 'match', p_client_word_count: words.length,
-          });
+          // Homework XP is computed server-side; show what it actually awarded.
+          void recordHomeworkProgress(searchParams.get('hwId')!, 'match', words.length).then(setSessionXP);
         }
         setPhase(isLast ? 'done' : 'round_done');
       }
