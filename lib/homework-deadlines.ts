@@ -3,12 +3,26 @@ import { localDateStr } from './storage';
 import { readingPassages } from './reading-data';
 import type { Translations } from './i18n';
 
-// One row per (past-due homework × assigned student) that wasn't fully done
-// by its due date. Every mode counts (not just Learn, unlike the Smart
-// Insights score), and partly-done homework is missed — same rule as the
-// student "overdue" push in send-scheduled-push. Computed client-side from
-// class_homework + class_homework_progress, which the teacher can already
-// read. Keep in sync with lexivo/lib/screens/missed_homework.dart.
+// One (homework × assigned student) with a due date: when it was set, when
+// it's due, and how far the student got. Feeds both the missed-deadline
+// tracker below and the per-student summary (lib/student-summary.ts).
+// Computed client-side from class_homework + class_homework_progress, which
+// the teacher can already read. Keep in sync with
+// lexivo/lib/screens/missed_homework.dart.
+export interface HomeworkRecord {
+  homeworkId: string;
+  studentId: string;
+  title: string;
+  dueDate: string;             // yyyy-mm-dd
+  assignedDate: string;        // yyyy-mm-dd
+  finishedDate: string | null; // day the last mode was done; null = not fully done
+  missingModes: string[];
+}
+
+// A past-due homework that wasn't fully done by its due date. Every mode
+// counts (not just Learn, unlike the Smart Insights score), and partly-done
+// homework is missed — same rule as the student "overdue" push in
+// send-scheduled-push.
 export interface MissedHomework {
   homeworkId: string;
   studentId: string;
@@ -20,21 +34,20 @@ export interface MissedHomework {
 
 const PAGE = 1000; // PostgREST row cap — a truncated progress list would show done homework as missed
 
-export async function loadMissedHomework(
+export async function loadHomeworkRecords(
   classId: string,
   students: { id: string; joinDate: string | null | undefined }[],
   t: Translations,
-): Promise<{ items: MissedHomework[]; checked: number }> { // checked = past-due (homework × student) pairs looked at
-  if (students.length === 0) return { items: [], checked: 0 };
-  const today = localDateStr();
+): Promise<HomeworkRecord[]> {
+  if (students.length === 0) return [];
   const { data: hwRows, error } = await supabase
     .from('class_homework')
-    .select('id, unit_id, class_unit_id, collection_name, day_number, passage_id, modes, due_date, student_ids, teacher_units(name), class_word_units(name)')
+    .select('id, unit_id, class_unit_id, collection_name, day_number, passage_id, modes, due_date, created_at, student_ids, teacher_units(name), class_word_units(name)')
     .eq('class_id', classId)
-    .lt('due_date', today);
+    .not('due_date', 'is', null);
   if (error) throw error;
   const hws = (hwRows ?? []) as any[];
-  if (hws.length === 0) return { items: [], checked: 0 };
+  if (hws.length === 0) return [];
 
   const studentIds = students.map(s => s.id);
   const doneOn = new Map<string, string>(); // `${hw}:${student}:${mode}` -> local yyyy-mm-dd
@@ -51,8 +64,7 @@ export async function loadMissedHomework(
     if ((prog ?? []).length < PAGE) break;
   }
 
-  const out: MissedHomework[] = [];
-  let checked = 0;
+  const out: HomeworkRecord[] = [];
   for (const h of hws) {
     const due = h.due_date as string;
     const modes = (h.modes ?? []) as string[];
@@ -67,17 +79,44 @@ export async function loadMissedHomework(
       if (assigned && !assigned.includes(s.id)) continue;
       // Due on or before the join day — never had a fair chance (same rule as the insights score).
       if (s.joinDate && due <= s.joinDate) continue;
-      checked++;
       const missingModes: string[] = [];
-      let lateDays = 0;
+      let last = '';
       for (const m of modes) {
         const d = doneOn.get(`${h.id}:${s.id}:${m}`);
         if (!d) missingModes.push(m);
-        else if (d > due) lateDays = Math.max(lateDays, Math.round((Date.parse(d) - Date.parse(due)) / 86400000));
+        else if (d > last) last = d;
       }
-      if (missingModes.length === 0 && lateDays === 0) continue;
-      out.push({ homeworkId: h.id, studentId: s.id, title, dueDate: due, missingModes, lateDays: missingModes.length ? 0 : lateDays });
+      out.push({
+        homeworkId: h.id, studentId: s.id, title, dueDate: due,
+        assignedDate: localDateStr(new Date(h.created_at)),
+        finishedDate: missingModes.length ? null : last,
+        missingModes,
+      });
     }
   }
-  return { items: out.sort((a, b) => b.dueDate.localeCompare(a.dueDate)), checked };
+  return out;
+}
+
+// checked = past-due records looked at (lets the UI say "all on time" vs "nothing due yet").
+export function missedFromRecords(records: HomeworkRecord[]): { items: MissedHomework[]; checked: number } {
+  const today = localDateStr();
+  const past = records.filter(r => r.dueDate < today);
+  const items: MissedHomework[] = [];
+  for (const r of past) {
+    if (r.missingModes.length > 0) {
+      items.push({ homeworkId: r.homeworkId, studentId: r.studentId, title: r.title, dueDate: r.dueDate, missingModes: r.missingModes, lateDays: 0 });
+    } else if (r.finishedDate! > r.dueDate) {
+      const lateDays = Math.round((Date.parse(r.finishedDate!) - Date.parse(r.dueDate)) / 86400000);
+      items.push({ homeworkId: r.homeworkId, studentId: r.studentId, title: r.title, dueDate: r.dueDate, missingModes: [], lateDays });
+    }
+  }
+  return { items: items.sort((a, b) => b.dueDate.localeCompare(a.dueDate)), checked: past.length };
+}
+
+export async function loadMissedHomework(
+  classId: string,
+  students: { id: string; joinDate: string | null | undefined }[],
+  t: Translations,
+): Promise<{ items: MissedHomework[]; checked: number }> {
+  return missedFromRecords(await loadHomeworkRecords(classId, students, t));
 }

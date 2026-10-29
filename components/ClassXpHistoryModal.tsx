@@ -10,7 +10,9 @@ import { useTranslation } from '@/lib/useTranslation';
 import XpCalendar from './XpCalendar';
 import { MessageComposer } from './insights/InsightPopup';
 import { MissedHomeworkRows } from './MissedHomework';
-import { loadMissedHomework, type MissedHomework } from '@/lib/homework-deadlines';
+import { loadHomeworkRecords, missedFromRecords, type HomeworkRecord } from '@/lib/homework-deadlines';
+import { buildStudentSummary, type SentNote } from '@/lib/student-summary';
+import { translations } from '@/lib/i18n';
 
 const fill = (s: string, vars: Record<string, string | number>) =>
   s.replace(/\{(\w+)\}/g, (m, k) => (vars[k] !== undefined ? String(vars[k]) : m));
@@ -93,7 +95,8 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
   const [composing, setComposing] = useState(false);
   const [joinDate, setJoinDate] = useState<string | null>(null);
   const [showDetails, setShowDetails] = useState(false);
-  const [missed, setMissed] = useState<{ items: MissedHomework[]; checked: number } | null>(null);
+  const [hwRecords, setHwRecords] = useState<HomeworkRecord[] | null>(null);
+  const [notes, setNotes] = useState<SentNote[]>([]);
 
   // Teacher viewing a student only — a student can't read a classmate's
   // homework progress, so every past-due assignment would look missed.
@@ -101,11 +104,20 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
   useEffect(() => {
     if (!teacherView || loading) return;
     let cancelled = false;
-    loadMissedHomework(classId, [{ id: userId, joinDate }], t)
-      .then(r => { if (!cancelled) setMissed(r); })
-      .catch(e => console.error('[ClassXpHistoryModal] missed homework', e));
+    Promise.all([
+      loadHomeworkRecords(classId, [{ id: userId, joinDate }], t),
+      supabase.from('class_notes').select('created_at, read_at').eq('class_id', classId).eq('student_id', userId)
+        .order('created_at', { ascending: false }).limit(20),
+    ])
+      .then(([records, { data: n }]) => {
+        if (cancelled) return;
+        setHwRecords(records);
+        setNotes((n ?? []) as SentNote[]);
+      })
+      .catch(e => console.error('[ClassXpHistoryModal] homework/notes', e));
     return () => { cancelled = true; };
   }, [teacherView, loading, classId, userId, joinDate, t]);
+  const missed = hwRecords ? missedFromRecords(hwRecords) : null;
 
   useEffect(() => {
     let cancelled = false;
@@ -194,6 +206,17 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
     ? (overdueCount === dueCount ? fill(h.waitingAllOverdue, { n: dueCount }) : fill(h.waitingSomeOverdue, { n: dueCount, m: overdueCount }))
     : dueCount > 0 ? fill(h.waitingToday, { n: dueCount }) : '';
   const summary = [lastLine, waitingLine, isSelf && dueCount > 0 ? h.selfNudge : ''].filter(Boolean).join(' ');
+  // Teacher card: review lines + the homework/reminder sentences (lib/student-summary.ts).
+  const activity = history.map(e => new Date(e.created_at).getTime());
+  const activeDays7 = new Set(history.filter(e => e.created_at && localDateStr(new Date(e.created_at)) > addDaysToDateStr(todayStr, -7))
+    .map(e => localDateStr(new Date(e.created_at)))).size;
+  const smart = teacherView && hwRecords ? buildStudentSummary({
+    studentId: userId, name, lang: t === translations.uz ? 'uz' : 'en',
+    today: todayStr, now: Date.now(),
+    homework: hwRecords, notes, activity, activeDays7,
+    daysInClass: joinDate ? Math.round((new Date(todayStr).getTime() - new Date(joinDate).getTime()) / 86400000) : null,
+  }) : [];
+  const cardText = [summary, ...smart].join(' ');
   const pillColor = isSelf ? accentColor : verdictMeta.color;
   const lastReviewValue = reviewPattern.lastReviewDate === null || ds === null ? '—'
     : `${fmtYmd(reviewPattern.lastReviewDate)} (${ds === 0 ? h.statToday : fill(h.statDaysAgo, { n: ds })})`;
@@ -261,7 +284,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
                   {!isSelf && (
                     <p className="text-xs font-bold truncate" style={{ color: verdictMeta.color }}>{h.verdictTitle[verdict]}</p>
                   )}
-                  <p className="text-xs leading-snug" style={{ color: 'var(--text)' }}>{summary}</p>
+                  <p className="text-xs leading-snug" style={{ color: 'var(--text)' }}>{cardText}</p>
                 </div>
                 <span className="text-xs shrink-0" style={{ color: pillColor }}>›</span>
               </button>
