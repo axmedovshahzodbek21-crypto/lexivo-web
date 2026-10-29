@@ -11,7 +11,7 @@ import XpCalendar from './XpCalendar';
 import { MessageComposer } from './insights/InsightPopup';
 import { MissedHomeworkRows } from './MissedHomework';
 import { loadHomeworkRecords, missedFromRecords, type HomeworkRecord } from '@/lib/homework-deadlines';
-import { buildStudentSummary, type SentNote } from '@/lib/student-summary';
+import { buildStudentSummary, type SentNote, type ReviewAnswer } from '@/lib/student-summary';
 import { translations } from '@/lib/i18n';
 import StudentSummary from './StudentSummary';
 
@@ -99,6 +99,8 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
   const [showDetails, setShowDetails] = useState(false);
   const [hwRecords, setHwRecords] = useState<HomeworkRecord[] | null>(null);
   const [notes, setNotes] = useState<SentNote[]>([]);
+  const [answers, setAnswers] = useState<ReviewAnswer[]>([]);
+  const [srsCounts, setSrsCounts] = useState({ mastered: 0, learned: 0 });
 
   // Teacher viewing a student only — a student can't read a classmate's
   // homework progress, so every past-due assignment would look missed.
@@ -110,11 +112,17 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
       loadHomeworkRecords(classId, [userId], t),
       supabase.from('class_notes').select('created_at, read_at').eq('class_id', classId).eq('student_id', userId)
         .order('created_at', { ascending: false }).limit(20),
+      supabase.from('class_review_events').select('word, knew, created_at').eq('class_id', classId).eq('user_id', userId)
+        .order('created_at', { ascending: false }).limit(5000),
+      supabase.from('class_srs_states').select('stage').eq('class_id', classId).eq('user_id', userId),
     ])
-      .then(([records, { data: n }]) => {
+      .then(([records, { data: n }, { data: ans }, { data: srsAll }]) => {
         if (cancelled) return;
         setHwRecords(records);
         setNotes((n ?? []) as SentNote[]);
+        setAnswers((ans ?? []) as ReviewAnswer[]);
+        const stages = ((srsAll ?? []) as { stage: number }[]);
+        setSrsCounts({ mastered: stages.filter(s => s.stage >= 5).length, learned: stages.length });
       })
       .catch(e => console.error('[ClassXpHistoryModal] homework/notes', e));
     return () => { cancelled = true; };
@@ -213,6 +221,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
     studentId: userId, name, lang: t === translations.uz ? 'uz' : 'en',
     today: todayStr, now: Date.now(), joinDate,
     homework: hwRecords, notes, history, dueCount, overdueCount,
+    answers, mastered: srsCounts.mastered, learned: srsCounts.learned,
   }) : [];
   const pillColor = isSelf ? accentColor : verdictMeta.color;
   const lastReviewValue = reviewPattern.lastReviewDate === null || ds === null ? '—'

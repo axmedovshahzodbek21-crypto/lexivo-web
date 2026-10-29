@@ -35,6 +35,9 @@ export interface DayEvidence { date: string; xp: number; reasons: string[]; }
 export interface ReviewEvidence { date: string; words: number; from: string; to: string; }
 export interface WeekEvidence { from: string; to: string; xp: number; activeDays: number; } // from/to yyyy-mm-dd; [0] = this week
 export interface SessionEvidence { date: string; from: string; to: string; } // from/to ISO
+export interface ReviewAnswer { word: string; knew: boolean; created_at: string; } // class_review_events row
+export interface AccuracyEvidence { from: string; to: string; right: number; total: number; }
+export interface WordEvidence { word: string; right: number; wrong: number; }
 export type Evidence =
   | { kind: 'homework'; items: HwEvidence[] }
   | { kind: 'timing'; items: HwEvidence[] }
@@ -42,7 +45,9 @@ export type Evidence =
   | { kind: 'days'; items: DayEvidence[] }
   | { kind: 'review'; items: ReviewEvidence[] }
   | { kind: 'weeks'; items: WeekEvidence[] }
-  | { kind: 'sessions'; items: SessionEvidence[] };
+  | { kind: 'sessions'; items: SessionEvidence[] }
+  | { kind: 'accuracy'; items: AccuracyEvidence[] }
+  | { kind: 'words'; items: WordEvidence[] };
 export type EvidenceKind = Evidence['kind'];
 export interface Segment { text: string; evidence?: Evidence; }
 export type SummarySentence = Segment[];
@@ -53,6 +58,7 @@ interface Pick {
   ev?: {
     homework?: HwEvidence[]; timing?: HwEvidence[]; reminders?: NoteEvidence[]; days?: DayEvidence[];
     review?: ReviewEvidence[]; weeks?: WeekEvidence[]; sessions?: SessionEvidence[];
+    accuracy?: AccuracyEvidence[]; words?: WordEvidence[];
   };
 }
 
@@ -68,7 +74,11 @@ function fill(s: string, vars: Record<string, string | number>) {
 }
 
 function names(items: { title: string }[], w: Record<string, string>): string {
-  const t = Array.from(new Set(items.map(i => i.title)));
+  return joinList(items.map(i => i.title), w);
+}
+
+function joinList(list: string[], w: Record<string, string>): string {
+  const t = Array.from(new Set(list));
   if (t.length === 1) return t[0];
   if (t.length === 2) return `${t[0]} ${w.and} ${t[1]}`;
   return fill(w.andMore, { a: t[0], b: t[1], n: t.length - 2 });
@@ -335,6 +345,75 @@ function habitPick(history: HistoryEntry[], today: string): Pick | null {
   return { code: 'tim_varied', ev: ev(() => true) };
 }
 
+// ── Review quality ───────────────────────────────────────────────────────────
+// From class_review_events (one row per graded card). Accuracy needs 20+
+// answers in the last 30 days; a trend needs 15+ in each of the last two
+// fortnights and a 10-point move. Then the words: still hard (2+ misses in
+// 30 days and the latest answer wrong or more misses than hits), else
+// recovered (2+ misses in 60 days, last two answers right).
+function accuracyItem(answers: ReviewAnswer[], from: string, to: string): AccuracyEvidence {
+  const a = answers.filter(x => { const d = localDate(x.created_at); return d >= from && d <= to; });
+  return { from, to, right: a.filter(x => x.knew).length, total: a.length };
+}
+const pctOf = (a: AccuracyEvidence) => Math.round((a.right / a.total) * 100);
+
+function reviewQualityPicks(answers: ReviewAnswer[], today: string, w: Record<string, string>): Pick[] {
+  const picks: Pick[] = [];
+  const acc30 = accuracyItem(answers, addDays(today, -29), today);
+  if (acc30.total >= 20) {
+    const recent = accuracyItem(answers, addDays(today, -13), today);
+    const prior = accuracyItem(answers, addDays(today, -27), addDays(today, -14));
+    const diff = recent.total >= 15 && prior.total >= 15 ? pctOf(recent) - pctOf(prior) : 0;
+    if (diff >= 10) picks.push({ code: 'rq_improving', vars: { from: pctOf(prior), to: pctOf(recent) }, ev: { accuracy: [prior, recent] } });
+    else if (diff <= -10) picks.push({ code: 'rq_dropping', vars: { from: pctOf(prior), to: pctOf(recent) }, ev: { accuracy: [prior, recent] } });
+    else {
+      const pct = pctOf(acc30);
+      const code = pct >= 90 ? 'rq_strong' : pct >= 75 ? 'rq_good' : pct >= 55 ? 'rq_mixed' : 'rq_hard';
+      picks.push({ code, vars: { pct, total: acc30.total }, ev: { accuracy: [acc30] } });
+    }
+  }
+  const byWord = new Map<string, ReviewAnswer[]>(); // oldest first, last 60 days
+  for (const a of [...answers].sort((x, y) => x.created_at.localeCompare(y.created_at))) {
+    if (localDate(a.created_at) <= addDays(today, -60)) continue;
+    const list = byWord.get(a.word) ?? [];
+    list.push(a);
+    byWord.set(a.word, list);
+  }
+  const stat = (word: string, list: ReviewAnswer[]): WordEvidence => ({ word, right: list.filter(a => a.knew).length, wrong: list.filter(a => !a.knew).length });
+  const from30 = addDays(today, -29);
+  const hard: WordEvidence[] = [], recovered: WordEvidence[] = [];
+  byWord.forEach((list, word) => {
+    const recent = list.filter(a => localDate(a.created_at) >= from30);
+    const r = stat(word, recent);
+    const last = list[list.length - 1];
+    if (r.wrong >= 2 && (!last.knew || r.wrong > r.right)) hard.push(r);
+    else if (stat(word, list).wrong >= 2 && list.length >= 2 && list.slice(-2).every(a => a.knew)) recovered.push(stat(word, list));
+  });
+  hard.sort((a, b) => b.wrong - a.wrong);
+  recovered.sort((a, b) => b.wrong - a.wrong);
+  if (hard.length) picks.push({ code: 'rq_hard_words', vars: { words: joinList(hard.slice(0, 3).map(x => x.word), w) }, ev: { words: hard.slice(0, 5) } });
+  else if (recovered.length) picks.push({ code: 'rq_recovered', vars: { words: joinList(recovered.slice(0, 3).map(x => x.word), w) }, ev: { words: recovered.slice(0, 5) } });
+  return picks;
+}
+
+// ── Milestones: one sentence at most ────────────────────────────────────────
+// A run of on-time homework (only when the homework sentence isn't already
+// an "always on time" one), else mastered words (SRS stage 5 — every
+// interval done), else total review answers.
+const ON_TIME_CODES = ['hw_on_time', 'hw_early', 'hw_last_day', 'hw_same_day', 'hw_few_on_time', 'hw_few_early'];
+function milestonePick(records: HomeworkTiming[], hwCodes: string[], today: string, mastered: number, learned: number, reviews: number): Pick | null {
+  const judged = records.map(r => hwEvidence(r, today)).filter(e => e.status !== null).sort((a, b) => b.dueDate.localeCompare(a.dueDate));
+  const run: HwEvidence[] = [];
+  for (const e of judged) { if (e.status === 'E' || e.status === 'L') run.push(e); else break; }
+  if (run.length >= 5 && !hwCodes.some(c => ON_TIME_CODES.includes(c))) return { code: 'mst_hw_streak', vars: { n: run.length }, ev: { timing: run } };
+  if (mastered > 100) return { code: 'mst_mastered_big', vars: { n: mastered, learned } };
+  if (mastered >= 25) return { code: 'mst_mastered_mid', vars: { n: mastered, learned } };
+  if (mastered >= 5) return { code: 'mst_mastered_small', vars: { n: mastered, learned } };
+  if (mastered >= 1) return { code: 'mst_mastered_first', vars: { n: mastered } };
+  const mark = [2000, 1000, 500, 250, 100].find(m => reviews > m);
+  return mark ? { code: 'mst_reviews_total', vars: { n: mark } } : null;
+}
+
 // ── Reminders ────────────────────────────────────────────────────────────────
 // A teacher message counts only if the student hadn't studied in the 24h
 // before it (otherwise they'd have practised anyway). R studied within 24h,
@@ -437,6 +516,9 @@ export function buildStudentSummary(input: {
   history: HistoryEntry[]; // class XP history (any order)
   dueCount: number;        // words waiting for review now
   overdueCount: number;
+  answers: ReviewAnswer[]; // class_review_events, newest first is fine
+  mastered: number;        // class_srs_states at stage 5
+  learned: number;         // class_srs_states rows
 }): SummarySentence[] {
   const w = SUMMARY_WORDS[input.lang];
   const hw = homeworkPicks(input.homework, input.today, w);
@@ -450,7 +532,9 @@ export function buildStudentSummary(input: {
     streak,
     ...act.picks,
     act.cleared ? null : reviewPick(input.history, input.today, input.dueCount, input.overdueCount),
+    ...reviewQualityPicks(input.answers, input.today, w),
     ...hw.picks,
+    milestonePick(input.homework, hw.picks.map(p => p.code), input.today, input.mastered, input.learned, input.answers.length),
     habitPick(input.history, input.today),
     reminderPick(input.notes, input.history, input.now, input.today, input.joinDate),
   ].filter((p): p is Pick => p !== null);

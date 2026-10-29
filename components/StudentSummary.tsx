@@ -127,6 +127,27 @@ function EvidenceCard({ evidence, classId, accentColor, reasonLabel }: {
         </div>
       ));
       break;
+    case 'accuracy':
+      body = evidence.items.map(a => (
+        <div key={a.from} className={row}>
+          <p style={{ color: 'var(--text)' }}>
+            <span className="font-bold">{fmtYmd(a.from).slice(0, 5)} – {fmtYmd(a.to).slice(0, 5)}</span>
+            {' · '}{t.correctOf(a.right, a.total)} ({a.total ? Math.round((a.right / a.total) * 100) : 0}%)
+          </p>
+        </div>
+      ));
+      break;
+    case 'words':
+      body = evidence.items.map(x => (
+        <div key={x.word} className={row}>
+          <p style={{ color: 'var(--text)' }}>
+            <span className="font-bold">{x.word}</span>
+            <span style={{ color: 'var(--success, #22c55e)' }}> · ✓ {x.right}</span>
+            <span style={{ color: 'var(--danger)' }}> · ✗ {x.wrong}</span>
+          </p>
+        </div>
+      ));
+      break;
     case 'review':
       body = evidence.items.map(r => (
         <div key={r.from} className={row}>
