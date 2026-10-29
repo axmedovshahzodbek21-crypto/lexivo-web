@@ -912,9 +912,11 @@ const COLLECTION_META = [
 function CurriculumTab({
   classId,
   students,
+  openHwId,
 }: {
   classId: string;
   students: { studentId: string; name: string }[];
+  openHwId?: string | null; // ?hw=<id> — open that homework's sheet once loaded (Open homework links)
 }) {
   const tt = useTranslation();
   const { user } = useAuth();
@@ -1052,6 +1054,12 @@ function CurriculumTab({
   };
 
   useEffect(() => { loadCurriculum(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const [openedHwId, setOpenedHwId] = useState<string | null>(null);
+  useEffect(() => {
+    if (!openHwId || openedHwId === openHwId) return;
+    const hw = homework.find(h => h.id === openHwId);
+    if (hw) { setOpenedHwId(openHwId); openHwDetail(hw); }
+  }, [openHwId, homework]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const openFolderPicker = async () => {
     if (!user) return;
@@ -2767,6 +2775,7 @@ export default function ClassDashboardPage() {
           <CurriculumTab
             classId={id ?? ''}
             students={students.map(s => ({ studentId: s.student_id, name: s.name }))}
+            openHwId={searchParams.get('hw')}
           />
 
         ) : (

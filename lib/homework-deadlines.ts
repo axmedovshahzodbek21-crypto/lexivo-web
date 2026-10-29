@@ -13,10 +13,12 @@ export interface HomeworkRecord {
   homeworkId: string;
   studentId: string;
   title: string;
+  modes: string[];
   dueDate: string;             // yyyy-mm-dd
   assignedDate: string;        // yyyy-mm-dd
   finishedDate: string | null; // day the last mode was done; null = not fully done
   missingModes: string[];
+  doneModes: Record<string, string>; // mode -> yyyy-mm-dd it was done
 }
 
 // A past-due homework that wasn't fully done by its due date. Every mode
@@ -86,17 +88,19 @@ export async function loadHomeworkRecords(
       const joined = joinedAt.get(sid);
       if (joined && Date.parse(h.created_at) < Date.parse(joined) && due <= localDateStr(new Date(joined))) continue;
       const missingModes: string[] = [];
+      const doneModes: Record<string, string> = {};
       let last = '';
       for (const m of modes) {
         const d = doneOn.get(`${h.id}:${sid}:${m}`);
-        if (!d) missingModes.push(m);
-        else if (d > last) last = d;
+        if (!d) { missingModes.push(m); continue; }
+        doneModes[m] = d;
+        if (d > last) last = d;
       }
       out.push({
-        homeworkId: h.id, studentId: sid, title, dueDate: due,
+        homeworkId: h.id, studentId: sid, title, modes, dueDate: due,
         assignedDate: localDateStr(new Date(h.created_at)),
         finishedDate: missingModes.length ? null : last,
-        missingModes,
+        missingModes, doneModes,
       });
     }
   }

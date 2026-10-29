@@ -205,6 +205,14 @@ const en = {
     readingPrefix: 'Reading',
     wordsCount: (n: number) => `${n} words`,
   },
+  studentSummary: {
+    openHomework: 'Open homework →',
+    due: 'Due', done: 'Done', notDone: 'Not done yet', inProgress: 'In progress',
+    early: (n: number) => `${n} day(s) early`, onLastDay: 'on the last day', lateBy: (n: number) => `${n} day(s) late`,
+    left: (m: string) => `${m} left`,
+    sent: 'Sent', read: 'Read', unread: 'Not opened',
+    practised: (h: number) => `Practised ${h} h later`, notPractised: 'No practice after it',
+  },
   missedHomework: {
     title: 'Missed deadlines',
     header: 'Homework deadlines',
@@ -2893,6 +2901,14 @@ const uz: typeof en = {
     readingPrefix: "O'qish",
     wordsCount: (n: number) => `${n} ta so'z`,
   },
+  studentSummary: {
+    openHomework: 'Vazifani ochish →',
+    due: 'Muddat', done: 'Bajarildi', notDone: 'Hali bajarilmagan', inProgress: 'Jarayonda',
+    early: (n: number) => `${n} kun oldin`, onLastDay: 'oxirgi kuni', lateBy: (n: number) => `${n} kun kech`,
+    left: (m: string) => `${m} qolgan`,
+    sent: 'Yuborildi', read: "O'qildi", unread: 'Ochilmagan',
+    practised: (h: number) => `${h} soatdan keyin mashq qildi`, notPractised: 'Keyin mashq qilmagan',
+  },
   missedHomework: {
     title: "Muddati o'tgan vazifalar",
     header: 'Vazifa muddatlari',
@@ -5566,6 +5582,14 @@ const ru: typeof en = {
     } as Record<string, string>,
     readingPrefix: 'Чтение',
     wordsCount: (n: number) => `${n} слов`,
+  },
+  studentSummary: {
+    openHomework: 'Открыть задание →',
+    due: 'Срок', done: 'Выполнено', notDone: 'Ещё не выполнено', inProgress: 'В процессе',
+    early: (n: number) => `на ${n} дн. раньше`, onLastDay: 'в последний день', lateBy: (n: number) => `опоздание ${n} дн.`,
+    left: (m: string) => `осталось: ${m}`,
+    sent: 'Отправлено', read: 'Прочитано', unread: 'Не открыто',
+    practised: (h: number) => `Занимался через ${h} ч`, notPractised: 'После этого не занимался',
   },
   missedHomework: {
     title: 'Просроченные задания',

@@ -13,6 +13,7 @@ import { MissedHomeworkRows } from './MissedHomework';
 import { loadHomeworkRecords, missedFromRecords, type HomeworkRecord } from '@/lib/homework-deadlines';
 import { buildStudentSummary, type SentNote } from '@/lib/student-summary';
 import { translations } from '@/lib/i18n';
+import StudentSummary from './StudentSummary';
 
 const fill = (s: string, vars: Record<string, string | number>) =>
   s.replace(/\{(\w+)\}/g, (m, k) => (vars[k] !== undefined ? String(vars[k]) : m));
@@ -207,15 +208,11 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
     ? (overdueCount === dueCount ? fill(h.waitingAllOverdue, { n: dueCount }) : fill(h.waitingSomeOverdue, { n: dueCount, m: overdueCount }))
     : dueCount > 0 ? fill(h.waitingToday, { n: dueCount }) : '';
   const summary = [lastLine, waitingLine, isSelf && dueCount > 0 ? h.selfNudge : ''].filter(Boolean).join(' ');
-  // Teacher card: review lines + the homework/reminder sentences (lib/student-summary.ts).
-  const activity = history.map(e => new Date(e.created_at).getTime());
-  const activeDays7 = new Set(history.filter(e => e.created_at && localDateStr(new Date(e.created_at)) > addDaysToDateStr(todayStr, -7))
-    .map(e => localDateStr(new Date(e.created_at)))).size;
+  // Teacher's Summary panel (lib/student-summary.ts).
   const smart = teacherView && hwRecords ? buildStudentSummary({
     studentId: userId, name, lang: t === translations.uz ? 'uz' : 'en',
-    today: todayStr, now: Date.now(),
-    homework: hwRecords, notes, activity, activeDays7,
-    daysInClass: joinDate ? Math.round((new Date(todayStr).getTime() - new Date(joinDate).getTime()) / 86400000) : null,
+    today: todayStr, now: Date.now(), joinDate,
+    homework: hwRecords, notes, history, dueCount, overdueCount,
   }) : [];
   const pillColor = isSelf ? accentColor : verdictMeta.color;
   const lastReviewValue = reviewPattern.lastReviewDate === null || ds === null ? '—'
@@ -413,10 +410,8 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
                 </div>
                 <button onClick={() => setShowSummary(false)} className="text-lg" style={{ color: 'var(--text-muted)' }}>✕</button>
               </div>
-              <div className="overflow-y-auto overscroll-contain px-5 py-4 space-y-3">
-                {[summary, ...smart].map((s, i) => (
-                  <p key={i} className="text-sm leading-relaxed" style={{ color: 'var(--text)' }}>{s}</p>
-                ))}
+              <div className="overflow-y-auto overscroll-contain px-5 py-4">
+                <StudentSummary sentences={smart} classId={classId} accentColor={accentColor} reasonLabel={reasonLabel} />
               </div>
             </div>
           )}
