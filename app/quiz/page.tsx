@@ -44,6 +44,13 @@ function buildDistractorOptions(correct: string, pool: string[]): string[] {
   return shuffleArray([correct, ...wrongs]);
 }
 
+// A definition question needs a definition. Without one the old fallback
+// prompted with the English word itself and asked for the English word —
+// a question that answers itself. Ask translation -> word instead.
+function questionTypeFor(type: QuizType, word: QuizWord): QuizType {
+  return type === 'definition_to_word' && !word.definition?.trim() ? 'translation_to_word' : type;
+}
+
 function buildQuiz(
   collections: WordCollection[],
   collectionName?: string,
@@ -76,7 +83,7 @@ function buildQuiz(
     : ['word_to_translation', 'translation_to_word', 'definition_to_word'];
 
   return words.map((word, i): QuizQuestion => {
-    const type = types[i % 3];
+    const type = questionTypeFor(types[i % 3], word);
     let prompt = '';
     let correct = '';
 
@@ -179,7 +186,7 @@ function QuizInner() {
       const types: ['word_to_translation', 'translation_to_word', 'definition_to_word'] =
         ['word_to_translation', 'translation_to_word', 'definition_to_word'];
       const qs: QuizQuestion[] = words.map((word, i): QuizQuestion => {
-        const type = types[i % 3];
+        const type = questionTypeFor(types[i % 3], word);
         let prompt = '';
         let correct = '';
         if (type === 'word_to_translation') { prompt = word.word; correct = word.translation; }
@@ -208,7 +215,7 @@ function QuizInner() {
       const words = shuffleArray(allWords);
       const types: QuizType[] = ['word_to_translation', 'translation_to_word', 'definition_to_word'];
       const qs: QuizQuestion[] = words.map((word, i): QuizQuestion => {
-        const type = types[i % 3];
+        const type = questionTypeFor(types[i % 3], word);
         let prompt = '';
         let correct = '';
         if (type === 'word_to_translation') { prompt = word.word; correct = word.translation; }
@@ -237,7 +244,7 @@ function QuizInner() {
       const words = shuffleArray(allWords);
       const types: QuizType[] = ['word_to_translation', 'translation_to_word', 'definition_to_word'];
       const qs: QuizQuestion[] = words.map((word, i): QuizQuestion => {
-        const type = types[i % 3];
+        const type = questionTypeFor(types[i % 3], word);
         let prompt = '';
         let correct = '';
         if (type === 'word_to_translation') { prompt = word.word; correct = word.translation; }
