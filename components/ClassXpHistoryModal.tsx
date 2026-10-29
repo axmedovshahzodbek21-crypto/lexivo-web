@@ -12,21 +12,7 @@ import { MessageComposer } from './insights/InsightPopup';
 import { MissedHomeworkRows } from './MissedHomework';
 import { loadHomeworkRecords, missedFromRecords, type HomeworkRecord } from '@/lib/homework-deadlines';
 import { buildStudentSummary, type SentNote, type ReviewAnswer, type ClassAnswer } from '@/lib/student-summary';
-
-// Whole class's review answers for the last 30 days (for the class comparison
-// sentence). Paged — PostgREST returns at most 1000 rows per request.
-async function loadClassAnswers(classId: string): Promise<ClassAnswer[]> {
-  const since = new Date(Date.now() - 30 * 86400_000).toISOString();
-  const out: ClassAnswer[] = [];
-  for (let from = 0; from < 20_000; from += 1000) {
-    const { data, error } = await supabase.from('class_review_events').select('user_id, knew, created_at')
-      .eq('class_id', classId).gte('created_at', since).order('created_at', { ascending: false }).range(from, from + 999);
-    if (error) throw error;
-    out.push(...((data ?? []) as ClassAnswer[]));
-    if ((data ?? []).length < 1000) break;
-  }
-  return out;
-}
+import { loadClassAnswers } from '@/lib/class-summaries';
 import { translations } from '@/lib/i18n';
 import StudentSummary from './StudentSummary';
 

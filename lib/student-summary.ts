@@ -664,7 +664,7 @@ export function buildStudentSummary(input: {
   learned: number;         // class_srs_states rows
   classAnswers: ClassAnswer[];        // whole class, last 30 days
   classNames: Record<string, string>; // approved members: id -> name
-}): { main: SummarySentence[]; more: SummarySentence[] } {
+}): { main: SummarySentence[]; more: SummarySentence[]; headline: SummarySentence | null; suggestion: SummarySentence | null } {
   const w = SUMMARY_WORDS[input.lang];
   const hw = homeworkPicks(input.homework, input.today, w);
   const act = activityPicks(input.history, input.homework, hw.named, input.today, input.dueCount, w);
@@ -707,5 +707,16 @@ export function buildStudentSummary(input: {
     return r.sentence;
   });
   const split = keep.size + (suggestion ? 1 : 0);
-  return { main: sentences.slice(0, split), more: sentences.slice(split) };
+  // For one-line places (Insights cards): the most important sentence that
+  // isn't just neutral context (inactive / barely active context does lead),
+  // and the suggestion.
+  const LEAD_CTX = ['ctx_week_none', 'ctx_never', 'ctx_new_inactive', 'ctx_week_low'];
+  const top = ordered.slice(0, keep.size).map((p, i) => ({ p, i }))
+    .filter(x => (!x.p.code.startsWith('ctx_') || LEAD_CTX.includes(x.p.code)) && x.p.code !== 'not_enough_data')
+    .sort((a, b) => importance(a.p.code) - importance(b.p.code) || a.i - b.i)[0];
+  return {
+    main: sentences.slice(0, split), more: sentences.slice(split),
+    headline: sentences[top ? top.i : 0] ?? null,
+    suggestion: suggestion ? sentences[keep.size] : null,
+  };
 }

@@ -1,20 +1,25 @@
 'use client';
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { useClassInsights } from '@/components/insights/useClassInsights';
-import InsightText from '@/components/insights/InsightText';
 import { MessageComposer } from '@/components/insights/InsightPopup';
 import WeekDots from '@/components/insights/WeekDots';
 import LessonCard from '@/components/insights/LessonCard';
+import StudentSummary from '@/components/StudentSummary';
 import {
   type Change, type Lang, type MessageKind, type PrevRow, type SentNote, type StudentInsight,
-  changeOf, dotColor, groupOf, loadLatestNotes, loadPrevRows, noteOutcome, renderParagraph,
+  changeOf, dotColor, groupOf, loadLatestNotes, loadPrevRows, noteOutcome,
   suggestedAction, tashkentDate, weekdayName,
 } from '@/lib/class-insights';
 import { loadArchiveStates } from '@/lib/class-hard-words';
+import { loadClassSummaries, type StudentSummaryResult } from '@/lib/class-summaries';
+import type { SummarySentence } from '@/lib/student-summary';
+
+// Card text comes from the per-student summary engine (lib/student-summary.ts);
+// the nightly snapshot only decides the grouping (needs / watch / fine).
+const plain = (s: SummarySentence | null | undefined) => (s ?? []).map(g => g.text).join('');
 
 type T = ReturnType<typeof useClassInsights>['tt']['classInsights'];
 
@@ -154,7 +159,7 @@ function BatchComposer({ students, classId, nameOf, t, onSent }: {
 
 export default function ClassInsightsListPage() {
   const { id } = useParams<{ id: string }>();
-  const { loading, notTeacher, className, data, sorted, lang, nameOf, tt, query } = useClassInsights(id);
+  const { loading, notTeacher, className, data, sorted, lang, nameOf, tt } = useClassInsights(id);
   const t = tt.classInsights;
 
   const [prev, setPrev] = useState<Record<string, PrevRow>>({});
@@ -165,6 +170,18 @@ export default function ClassInsightsListPage() {
   const [open, setOpen] = useState({ handled: false, watch: true, fine: false });
 
   const [taught, setTaught] = useState<Set<string>>(new Set());
+  const [summaries, setSummaries] = useState<Record<string, StudentSummaryResult> | null>(null);
+  const [summaryFor, setSummaryFor] = useState<StudentInsight | null>(null);
+
+  const studentKey = sorted.map(s => s.student_id).join(',');
+  useEffect(() => {
+    if (!studentKey) return;
+    let cancelled = false;
+    loadClassSummaries(id, sorted.map(s => ({ id: s.student_id, name: nameOf(s.student_id) })), lang, tt)
+      .then(r => { if (!cancelled) setSummaries(r); })
+      .catch(e => console.error('[insights] summaries', e));
+    return () => { cancelled = true; };
+  }, [id, studentKey, lang, tt]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const snapshotDate = data?.classRow.snapshot_date;
   useEffect(() => {
@@ -231,8 +248,11 @@ export default function ClassInsightsListPage() {
     writeSkips(skipKey(id, data.classRow.snapshot_date), next);
   };
 
-  const headline = (s: StudentInsight) => renderParagraph(s, data.templates, nameOf(s.student_id), lang)[0];
-  const detailHref = (s: StudentInsight) => `/classes/${id}/insights/${s.student_id}${query}`;
+  const headline = (s: StudentInsight) => plain(summaries?.[s.student_id]?.headline);
+  const suggestion = (s: StudentInsight) => plain(summaries?.[s.student_id]?.suggestion);
+  const h = tt.classXpHistory;
+  const reasonLabel = (r: string) =>
+    h.reasonLabels[r] ?? (r.startsWith('Reading: ') ? `${h.readingPrefix}: ${r.slice('Reading: '.length)}` : r);
 
   const nameLine = (s: StudentInsight) => (
     <div className="flex items-center gap-2 min-w-0">
@@ -245,12 +265,18 @@ export default function ClassInsightsListPage() {
   );
 
   const needsCard = (s: StudentInsight) => {
-    const h = headline(s);
+    const line = headline(s);
+    const next = suggestion(s);
     const action = suggestedAction(s);
     return (
       <li key={s.student_id} className="card space-y-2" style={{ padding: 14 }}>
         {nameLine(s)}
-        {h && <p className="text-sm text-[var(--text)] leading-snug"><InsightText segments={h} /></p>}
+        {summaries === null ? <p className="text-sm text-[var(--text-muted)]">…</p> : (
+          <>
+            {line && <p className="text-sm text-[var(--text)] leading-snug">{line}</p>}
+            {next && <p className="text-xs text-[var(--text-muted)] leading-snug">💡 {next}</p>}
+          </>
+        )}
         <LoopLine s={s} note={notes[s.student_id]} lang={lang} t={t} />
         <div className="flex items-center gap-3 pt-1">
           <button
@@ -265,21 +291,21 @@ export default function ClassInsightsListPage() {
             {t.skip}
           </button>
           <span className="flex-1" />
-          <Link href={detailHref(s)} className="text-xs font-semibold text-[var(--primary)]">{t.details} ›</Link>
+          <button type="button" onClick={() => setSummaryFor(s)} className="text-xs font-semibold text-[var(--primary)]">{h.summaryTitle} ›</button>
         </div>
       </li>
     );
   };
 
   const compactRow = (s: StudentInsight, withAction: boolean) => {
-    const h = headline(s);
+    const line = headline(s);
     const sentToday = notes[s.student_id] && tashkentDate(notes[s.student_id].created_at) === today;
     return (
       <li key={s.student_id} className="px-4 py-3 space-y-1">
-        <Link href={detailHref(s)} className="block space-y-1 hover:opacity-80">
+        <button type="button" onClick={() => setSummaryFor(s)} className="block w-full text-left space-y-1 hover:opacity-80">
           {nameLine(s)}
-          {h && <p className="text-sm text-[var(--text-muted)] truncate"><InsightText segments={h} /></p>}
-        </Link>
+          {line && <p className="text-sm text-[var(--text-muted)] truncate">{line}</p>}
+        </button>
         <LoopLine s={s} note={notes[s.student_id]} lang={lang} t={t} />
         {withAction && !sentToday && (
           <button type="button" onClick={() => setCompose(s)} className="text-xs font-bold text-[var(--primary)]">
@@ -361,6 +387,20 @@ export default function ClassInsightsListPage() {
             studentId={compose.student_id}
             onSent={() => { markSent([compose.student_id]); setTimeout(() => setCompose(null), 900); }}
           />
+        </Modal>
+      )}
+
+      {summaryFor && (
+        <Modal title={`${nameOf(summaryFor.student_id)} — ${h.summaryTitle}`} onClose={() => setSummaryFor(null)}>
+          {summaries?.[summaryFor.student_id] ? (
+            <StudentSummary
+              sentences={summaries[summaryFor.student_id].main}
+              more={summaries[summaryFor.student_id].more}
+              classId={id}
+              accentColor="var(--primary)"
+              reasonLabel={reasonLabel}
+            />
+          ) : <p className="text-sm text-[var(--text-muted)]">…</p>}
         </Modal>
       )}
 
