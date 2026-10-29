@@ -9,6 +9,7 @@ import { speak } from '@/lib/speech';
 import {
   getClassDueWords, getClassSRSAll, countDueClassWords, advanceClassSRSWord, addClassHardWord,
   recordClassReviewEvent, stageLabel, stageColor, type ClassSRSEntry,
+  NEW_WORDS_PER_SESSION, NEW_WORDS_CAP_OPTIONS, getClassReviewNewCap, setClassReviewNewCap,
 } from '@/lib/class-srs';
 import { shuffleArray } from '@/lib/shuffleArray';
 import { PhoneStudyFrame, PhoneModeToggle, PhoneSwipeHint } from '@/components/PhoneMode';
@@ -67,6 +68,7 @@ function ClassReviewInner() {
   const [authChecked, setAuthChecked] = useState(false);
   const [className,  setClassName]  = useState('');
   const [loading,    setLoading]    = useState(true);
+  const [newCap,     setNewCap]     = useState(getClassReviewNewCap); // max never-reviewed words per session, 0 = all
 
   // Guards grade() against a double-tap re-entering with the same card before
   // React commits the index advance. Mirrors Flutter's _answering flag.
@@ -108,7 +110,7 @@ function ClassReviewInner() {
     if (!userId) return;
     try {
       const [due, all] = await Promise.all([
-        getClassDueWords(userId, id),
+        getClassDueWords(userId, id, newCap),
         getClassSRSAll(userId, id),
       ]);
       setQueue(due);
@@ -123,7 +125,16 @@ function ClassReviewInner() {
     } finally {
       setLoading(false);
     }
-  }, [userId, id]);
+  }, [userId, id, newCap]);
+
+  // Changing the cap mid-session is safe: grades are persisted per card, so the
+  // reload just re-fetches whatever is still due under the new cap.
+  const changeNewCap = (cap: number) => {
+    if (cap === newCap) return;
+    setClassReviewNewCap(cap);
+    setLoading(true);
+    setNewCap(cap); // loadQueue's identity changes → the effect below reloads
+  };
 
   useEffect(() => {
     if (!authChecked || !id || !userId) return;
@@ -282,6 +293,22 @@ function ClassReviewInner() {
   const totalDue = countDueClassWords(allPool);
   const remaining = Math.max(0, totalDue - queue.length);
 
+  // New-words-per-session picker. Only shown when it would change something:
+  // words are being held back, or the student already moved off the default.
+  const showCapPicker = remaining > 0 || newCap !== NEW_WORDS_PER_SESSION;
+  const capPicker = (
+    <div className="flex items-center justify-center gap-2 flex-wrap text-xs">
+      <span className="text-[var(--text-muted)]">{t.classesPage.newWordsPerSession}:</span>
+      {NEW_WORDS_CAP_OPTIONS.map(cap => (
+        <button
+          key={cap}
+          onClick={() => changeNewCap(cap)}
+          className={`px-3 py-1 rounded-full font-semibold transition-colors ${cap === newCap ? 'bg-[var(--primary)] text-white' : 'bg-[var(--primary-bg)] text-[var(--primary)]'}`}
+        >{cap === 0 ? t.classesPage.allOption : cap}</button>
+      ))}
+    </div>
+  );
+
   // ── No due words ─────────────────────────────────────────────────────────────
   if (done && queue.length === 0) {
     return (
@@ -308,7 +335,10 @@ function ClassReviewInner() {
         <h2 className="text-2xl font-bold mb-2">{t.classesPage.reviewComplete}</h2>
         <p className="text-[var(--text-muted)] mb-1">{knewCount}/{results.length} knew · +{displayXP(sessionXP)} XP</p>
         {remaining > 0 && (
-          <p className="text-sm text-[var(--text-muted)] mb-6">{t.classesPage.moreWaiting(remaining)}</p>
+          <>
+            <p className="text-sm text-[var(--text-muted)] mb-3">{t.classesPage.moreWaiting(remaining)}</p>
+            <div className="mb-6">{capPicker}</div>
+          </>
         )}
         <div className={`grid grid-cols-3 gap-2 w-full ${remaining > 0 ? 'mb-6' : 'mb-6 mt-5'}`}>
           <div className="card text-center"><div className="text-xl font-bold text-[var(--success)]">{knewCount}</div><div className="text-xs text-[var(--text-muted)]">{t.classesPage.correct}</div></div>
@@ -381,6 +411,7 @@ function ClassReviewInner() {
         <div className="progress-bar">
           <div className="progress-bar-fill" style={{ width: `${progress}%` }} />
         </div>
+        {showCapPicker && <div className="mt-3">{capPicker}</div>}
       </div>
 
       <div className="flex-1 p-4 flex flex-col gap-4">

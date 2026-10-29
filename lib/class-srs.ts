@@ -8,7 +8,25 @@ const INTERVALS = [1, 3, 7, 14, 30]; // days, same as personal SRS
 // freshly-learned batch of 40 doesn't land as one wall. Genuine spaced
 // repetitions (last_reviewed set) are never capped. Keep in sync with Flutter's
 // _newWordsPerSession.
-const NEW_WORDS_PER_SESSION = 10;
+export const NEW_WORDS_PER_SESSION = 10;
+
+// The student can pick their own per-session cap (0 = no cap) on the review
+// page. Stored per device, not synced. Keep in sync with Flutter's
+// getClassReviewNewCap.
+export const NEW_WORDS_CAP_OPTIONS = [10, 20, 30, 0];
+const NEW_WORDS_CAP_KEY = 'lexivo_class_review_new_cap';
+
+export function getClassReviewNewCap(): number {
+  try {
+    const raw = localStorage.getItem(NEW_WORDS_CAP_KEY);
+    const v = Number(raw);
+    return raw !== null && NEW_WORDS_CAP_OPTIONS.includes(v) ? v : NEW_WORDS_PER_SESSION;
+  } catch { return NEW_WORDS_PER_SESSION; }
+}
+
+export function setClassReviewNewCap(cap: number): void {
+  try { localStorage.setItem(NEW_WORDS_CAP_KEY, String(cap)); } catch { /* storage blocked — choice just won't persist */ }
+}
 
 // Grace period (days overdue) a word gets at each stage before it demotes one
 // stage — indexed by stage 0-4. A fresh Stage 0 word is fragile and gets a
@@ -128,11 +146,12 @@ export async function checkAndDemoteClassSRS(
 }
 
 // Returns the words to review now: every due spaced repetition, plus at most
-// NEW_WORDS_PER_SESSION never-reviewed words (oldest first) so a big fresh batch
+// newCap never-reviewed words (oldest first; 0 = no cap) so a big fresh batch
 // is paced instead of dumped all at once.
 export async function getClassDueWords(
   userId: string,
   classId: string,
+  newCap: number = NEW_WORDS_PER_SESSION,
 ): Promise<ClassSRSEntry[]> {
   await checkAndDemoteClassSRS(userId, classId);
   const { data, error } = await supabase
@@ -147,7 +166,7 @@ export async function getClassDueWords(
   const rows = (data ?? []) as ClassSRSEntry[];
   const review = rows.filter(r => r.last_reviewed !== null);
   const fresh  = rows.filter(r => r.last_reviewed === null);
-  return [...review, ...fresh.slice(0, NEW_WORDS_PER_SESSION)];
+  return [...review, ...(newCap > 0 ? fresh.slice(0, newCap) : fresh)];
 }
 
 // True count of words due right now, ignoring getClassDueWords' per-session
