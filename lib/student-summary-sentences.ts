@@ -164,7 +164,7 @@ export const SUMMARY_SENTENCES: Record<string, { uz: string[]; en: string[] }> =
     ],
     en: [
       '{name} has done homework so far, if a little late.',
-      'So far homework has come in a bit late, but done.',
+      'So far homework has been a little late, but always done.',
     ],
   },
   hw_few_open: {
