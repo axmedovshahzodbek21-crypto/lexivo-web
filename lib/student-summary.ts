@@ -86,6 +86,7 @@ function joinList(list: string[], w: Record<string, string>): string {
   const t = Array.from(new Set(list));
   if (t.length === 1) return t[0];
   if (t.length === 2) return `${t[0]} ${w.and} ${t[1]}`;
+  if (t.length === 3) return `${t[0]}, ${t[1]} ${w.and} ${t[2]}`;
   return fill(w.andMore, { a: t[0], b: t[1], n: t.length - 2 });
 }
 
@@ -270,12 +271,17 @@ function trendPick(history: HistoryEntry[], today: string, joinDate: string | nu
   if (prev.slice(0, 3).filter(w => w.xp > 0).length < 2) return null;
   const usual = prev.slice(0, 3).reduce((s, w) => s + w.xp, 0) / Math.min(3, prev.length);
   const ratio = cur.xp / usual;
-  if (prev.length >= 3 && ratio >= 1.3 && cur.xp > Math.max(...prev.map(w => w.xp))) return { code: 'trd_record', ev };
-  if (ratio >= 2) return { code: 'trd_up_strong', vars: { pct: Math.round((ratio - 1) * 100) }, ev };
-  if (ratio >= 1.3) return { code: 'trd_up', vars: { pct: Math.round((ratio - 1) * 100) }, ev };
-  if (ratio > 0.7) return { code: 'trd_steady', ev };
-  if (ratio > 0.3) return { code: 'trd_down', vars: { pct: Math.round((1 - ratio) * 100) }, ev };
-  return { code: 'trd_down_strong', vars: { pct: Math.round((1 - ratio) * 100) }, ev };
+  // XP and active days must agree: one long session isn't a "better week"
+  // if there were fewer days than usual (and vice versa).
+  const usualDays = Math.round(prev.slice(0, 3).reduce((s, w) => s + w.activeDays, 0) / Math.min(3, prev.length));
+  const up = cur.activeDays >= usualDays, down = cur.activeDays <= usualDays;
+  if (up && prev.length >= 3 && ratio >= 1.3 && cur.xp > Math.max(...prev.map(w => w.xp))) return { code: 'trd_record', ev };
+  if (up && ratio >= 2) return { code: 'trd_up_strong', vars: { pct: Math.round((ratio - 1) * 100) }, ev };
+  if (up && ratio >= 1.3) return { code: 'trd_up', vars: { pct: Math.round((ratio - 1) * 100) }, ev };
+  if (ratio > 0.7 && ratio < 1.3) return { code: 'trd_steady', ev };
+  if (down && ratio <= 0.7 && ratio > 0.3) return { code: 'trd_down', vars: { pct: Math.round((1 - ratio) * 100) }, ev };
+  if (down && ratio <= 0.3) return { code: 'trd_down_strong', vars: { pct: Math.round((1 - ratio) * 100) }, ev };
+  return null;
 }
 
 // ── Streaks ──────────────────────────────────────────────────────────────────
@@ -662,6 +668,9 @@ export function buildStudentSummary(input: {
   const w = SUMMARY_WORDS[input.lang];
   const hw = homeworkPicks(input.homework, input.today, w);
   const act = activityPicks(input.history, input.homework, hw.named, input.today, input.dueCount, w);
+  const activeWeek = input.history.some(e => localDate(e.created_at) > addDays(input.today, -7));
+  const onlySkips = (p: Pick | null) => (p?.code === 'mode_skips' ? p : null);
+  const pref = preferencePick(input.history, input.homework, input.today, w);
   const streak = streakPick(input.history, input.today, input.joinDate);
   const trend = trendPick(input.history, input.today, input.joinDate);
   const picks = [
@@ -674,9 +683,11 @@ export function buildStudentSummary(input: {
     ...reviewQualityPicks(input.answers, input.today, w),
     classPick(input.classAnswers, input.classNames, input.studentId, input.today),
     ...hw.picks,
-    preferencePick(input.history, input.homework, input.today, w),
+    // Habits and preferences are noise for someone who has stopped; only a
+    // skipped homework mode is still worth saying.
+    activeWeek ? pref : onlySkips(pref),
     milestonePick(input.homework, hw.picks.map(p => p.code), input.today, input.mastered, input.learned, input.answers.length),
-    habitPick(input.history, input.today),
+    activeWeek ? habitPick(input.history, input.today) : null,
     reminderPick(input.notes, input.history, input.now, input.today, input.joinDate),
   ].filter((p): p is Pick => p !== null);
   if (picks.length === 0) picks.push({ code: 'not_enough_data' });
