@@ -9,6 +9,8 @@ import { getAudioCtx, playTone } from '@/lib/web-audio';
 import { useTranslation } from '@/lib/useTranslation';
 import XpCalendar from './XpCalendar';
 import { MessageComposer } from './insights/InsightPopup';
+import { MissedHomeworkRows } from './MissedHomework';
+import { loadMissedHomework, type MissedHomework } from '@/lib/homework-deadlines';
 
 const fill = (s: string, vars: Record<string, string | number>) =>
   s.replace(/\{(\w+)\}/g, (m, k) => (vars[k] !== undefined ? String(vars[k]) : m));
@@ -91,6 +93,19 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
   const [composing, setComposing] = useState(false);
   const [joinDate, setJoinDate] = useState<string | null>(null);
   const [showDetails, setShowDetails] = useState(false);
+  const [missed, setMissed] = useState<MissedHomework[]>([]);
+
+  // Teacher viewing a student only — a student can't read a classmate's
+  // homework progress, so every past-due assignment would look missed.
+  const teacherView = studentName !== undefined && user?.id !== userId;
+  useEffect(() => {
+    if (!teacherView || loading) return;
+    let cancelled = false;
+    loadMissedHomework(classId, [{ id: userId, joinDate }], t)
+      .then(rows => { if (!cancelled) setMissed(rows); })
+      .catch(e => console.error('[ClassXpHistoryModal] missed homework', e));
+    return () => { cancelled = true; };
+  }, [teacherView, loading, classId, userId, joinDate, t]);
 
   useEffect(() => {
     let cancelled = false;
@@ -285,6 +300,13 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
                   </span>
                 }
               />
+            )}
+
+            {missed.length > 0 && (
+              <div className="rounded-xl px-3 py-2.5 space-y-2" style={{ background: 'var(--surface-2)' }}>
+                <p className="text-xs font-bold" style={{ color: 'var(--text-muted)' }}>⏰ {t.missedHomework.title} ({missed.length})</p>
+                <MissedHomeworkRows items={missed} />
+              </div>
             )}
 
             <button

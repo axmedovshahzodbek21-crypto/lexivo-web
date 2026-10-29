@@ -203,6 +203,14 @@ const en = {
     readingPrefix: 'Reading',
     wordsCount: (n: number) => `${n} words`,
   },
+  missedHomework: {
+    title: 'Missed deadlines',
+    due: (d: string) => `due ${d}`,
+    left: (modes: string) => `${modes} left`,
+    late: (n: number) => `done ${n} ${n === 1 ? 'day' : 'days'} late`,
+    showAll: (n: number) => `Show all (${n})`,
+    showLess: 'Show less',
+  },
   classNav: {
     words: 'Words',
     ranks: 'Ranks',
@@ -2878,6 +2886,14 @@ const uz: typeof en = {
     readingPrefix: "O'qish",
     wordsCount: (n: number) => `${n} ta so'z`,
   },
+  missedHomework: {
+    title: "Muddati o'tgan vazifalar",
+    due: (d: string) => `muddat ${d}`,
+    left: (modes: string) => `${modes} qolgan`,
+    late: (n: number) => `${n} kun kech bajarilgan`,
+    showAll: (n: number) => `Hammasini ko'rsatish (${n})`,
+    showLess: 'Yig\'ish',
+  },
   classNav: {
     words: 'So\'zlar',
     ranks: 'Reytinglar',
@@ -5538,6 +5554,14 @@ const ru: typeof en = {
     } as Record<string, string>,
     readingPrefix: 'Чтение',
     wordsCount: (n: number) => `${n} слов`,
+  },
+  missedHomework: {
+    title: 'Просроченные задания',
+    due: (d: string) => `срок ${d}`,
+    left: (modes: string) => `осталось: ${modes}`,
+    late: (n: number) => `сдано с опозданием на ${n} дн.`,
+    showAll: (n: number) => `Показать все (${n})`,
+    showLess: 'Свернуть',
   },
   classNav: {
     words: 'Слова',

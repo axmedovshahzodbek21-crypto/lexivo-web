@@ -33,12 +33,13 @@ export const MODE_COLOR: Record<string, string> = { learn: '#4f46e5', flashcard:
 // Translated mode labels — MODE_LABEL above stays as the untranslated
 // fallback for callers outside this file's own components (e.g.
 // homework/[hwId]/page.tsx), which isn't in scope for this pass.
-function modeLabel(t: Translations, mode: string): string {
+export function modeLabel(t: Translations, mode: string): string {
   switch (mode) {
     case 'learn': return t.nav.learn;
     case 'flashcard': return t.classesPage.modeCards;
     case 'quiz': return t.nav.quiz;
     case 'match': return t.home.matchTitle;
+    case 'read': return t.classXpHistory.readingPrefix;
     default: return mode;
   }
 }

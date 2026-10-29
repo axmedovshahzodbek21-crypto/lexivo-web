@@ -12,6 +12,7 @@ import { localDateStr, addDaysToDateStr, displayXP } from '@/lib/storage';
 import { isHomeworkDone, fetchCollectionByName } from './homework/_shared';
 import { classGradientColors } from '@/lib/class-gradient';
 import ClassInsightsBanner from '@/components/insights/ClassInsightsBanner';
+import { MissedHomeworkCard } from '@/components/MissedHomework';
 
 interface CollectionMeta {
   collection_name: string;
@@ -2567,6 +2568,11 @@ export default function ClassDashboardPage() {
       {/* Smart insights — students tab only */}
       {!loading && tab === 'students' && (
         <ClassInsightsBanner classId={id} />
+      )}
+
+      {/* Missed homework deadlines — students tab only */}
+      {!loading && tab === 'students' && students.length > 0 && (
+        <MissedHomeworkCard classId={id} students={students} />
       )}
 
       {/* Class stats bar — students tab only */}
