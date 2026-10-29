@@ -278,9 +278,13 @@ function variantIndex(seed: string, n: number): number {
 
 // Splits [[label|key]] markup before filling placeholders, so a homework
 // title containing "|" or "]]" can't break the parse.
-function render(p: Pick, lang: Lang, name: string, seed: string): SummarySentence {
+function render(p: Pick, lang: Lang, name: string, seed: string): { sentence: SummarySentence; usesName: boolean } {
   const versions = SUMMARY_SENTENCES[p.code][lang];
   const text = versions[variantIndex(`${seed}:${p.code}`, versions.length)];
+  return { sentence: renderText(text, p, name), usesName: text.includes('{name}') };
+}
+
+function renderText(text: string, p: Pick, name: string): SummarySentence {
   const vars: Record<string, string | number> = { name, ...p.vars };
   const out: SummarySentence = [];
   const re = /\[\[(.+?)\|(\w+)\]\]/g;
@@ -323,5 +327,13 @@ export function buildStudentSummary(input: {
   ].filter((p): p is Pick => p !== null);
   if (picks.length === 0) picks.push({ code: 'not_enough_data' });
   const seed = `${input.studentId}:${input.today}`;
-  return picks.map(p => render(p, input.lang, input.name, seed));
+  // The paragraph names the student once; in Uzbek later sentences say "u"
+  // (he/she — Uzbek has no gendered pronoun). English keeps the name, since
+  // "they" would need different verb forms ("they have", not "they has").
+  let named = false;
+  return picks.map(p => {
+    const r = render(p, input.lang, input.lang === 'uz' && named ? w.pronoun : input.name, seed);
+    named ||= r.usesName;
+    return r.sentence;
+  });
 }

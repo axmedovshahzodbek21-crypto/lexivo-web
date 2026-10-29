@@ -22,7 +22,7 @@ export const SUMMARY_WORDS = {
   uz: {
     today: 'Bugun', yesterday: 'Kecha', onDate: '{d} kuni',
     sinceToday: 'bugun', sinceYesterday: 'kecha', sinceDays: '{n} kun oldin',
-    and: 'va', andMore: '{a}, {b} va yana {n} ta',
+    pronoun: 'u', and: 'va', andMore: '{a}, {b} va yana {n} ta',
     daysLate: '{n} kun kech', daysLate1: '1 kun kech', aLittleLate: 'biroz kech', daysEarly: '{n} kun oldin', daysEarly1: '1 kun oldin',
     rarely: 'kamdan-kam', sometimes: "ba'zan", often: "ko'pincha",
     learn: "O'rganish", flashcard: 'Kartochkalar', quiz: 'Test', match: 'Moslashtirish', read: "O'qish",
@@ -30,7 +30,7 @@ export const SUMMARY_WORDS = {
   en: {
     today: 'Today', yesterday: 'Yesterday', onDate: 'On {d}',
     sinceToday: 'today', sinceYesterday: 'yesterday', sinceDays: '{n} days ago',
-    and: 'and', andMore: '{a}, {b} and {n} more',
+    pronoun: 'they', and: 'and', andMore: '{a}, {b} and {n} more',
     daysLate: '{n} days late', daysLate1: '1 day late', aLittleLate: 'a little late', daysEarly: '{n} days', daysEarly1: '1 day',
     rarely: 'rarely', sometimes: 'sometimes', often: 'often',
     learn: 'Learn', flashcard: 'Cards', quiz: 'Quiz', match: 'Match', read: 'Reading',
