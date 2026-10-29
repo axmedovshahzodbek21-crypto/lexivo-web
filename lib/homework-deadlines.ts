@@ -24,8 +24,8 @@ export async function loadMissedHomework(
   classId: string,
   students: { id: string; joinDate: string | null | undefined }[],
   t: Translations,
-): Promise<MissedHomework[]> {
-  if (students.length === 0) return [];
+): Promise<{ items: MissedHomework[]; checked: number }> { // checked = past-due (homework × student) pairs looked at
+  if (students.length === 0) return { items: [], checked: 0 };
   const today = localDateStr();
   const { data: hwRows, error } = await supabase
     .from('class_homework')
@@ -34,7 +34,7 @@ export async function loadMissedHomework(
     .lt('due_date', today);
   if (error) throw error;
   const hws = (hwRows ?? []) as any[];
-  if (hws.length === 0) return [];
+  if (hws.length === 0) return { items: [], checked: 0 };
 
   const studentIds = students.map(s => s.id);
   const doneOn = new Map<string, string>(); // `${hw}:${student}:${mode}` -> local yyyy-mm-dd
@@ -52,6 +52,7 @@ export async function loadMissedHomework(
   }
 
   const out: MissedHomework[] = [];
+  let checked = 0;
   for (const h of hws) {
     const due = h.due_date as string;
     const modes = (h.modes ?? []) as string[];
@@ -66,6 +67,7 @@ export async function loadMissedHomework(
       if (assigned && !assigned.includes(s.id)) continue;
       // Due on or before the join day — never had a fair chance (same rule as the insights score).
       if (s.joinDate && due <= s.joinDate) continue;
+      checked++;
       const missingModes: string[] = [];
       let lateDays = 0;
       for (const m of modes) {
@@ -77,5 +79,5 @@ export async function loadMissedHomework(
       out.push({ homeworkId: h.id, studentId: s.id, title, dueDate: due, missingModes, lateDays: missingModes.length ? 0 : lateDays });
     }
   }
-  return out.sort((a, b) => b.dueDate.localeCompare(a.dueDate));
+  return { items: out.sort((a, b) => b.dueDate.localeCompare(a.dueDate)), checked };
 }

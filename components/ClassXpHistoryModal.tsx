@@ -93,7 +93,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
   const [composing, setComposing] = useState(false);
   const [joinDate, setJoinDate] = useState<string | null>(null);
   const [showDetails, setShowDetails] = useState(false);
-  const [missed, setMissed] = useState<MissedHomework[]>([]);
+  const [missed, setMissed] = useState<{ items: MissedHomework[]; checked: number } | null>(null);
 
   // Teacher viewing a student only — a student can't read a classmate's
   // homework progress, so every past-due assignment would look missed.
@@ -102,7 +102,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
     if (!teacherView || loading) return;
     let cancelled = false;
     loadMissedHomework(classId, [{ id: userId, joinDate }], t)
-      .then(rows => { if (!cancelled) setMissed(rows); })
+      .then(r => { if (!cancelled) setMissed(r); })
       .catch(e => console.error('[ClassXpHistoryModal] missed homework', e));
     return () => { cancelled = true; };
   }, [teacherView, loading, classId, userId, joinDate, t]);
@@ -267,6 +267,21 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
               </button>
             )}
 
+            {/* Homework deadlines — always shown to the teacher, even when nothing is missed */}
+            {teacherView && missed && (() => {
+              const bad = missed.items.some(m => m.missingModes.length > 0);
+              const c = bad ? 'var(--danger)' : missed.items.length > 0 ? '#d97706' : REVIEW_VERDICT_META.ontrack.color;
+              return (
+                <div className="px-3 py-2 rounded-xl space-y-2"
+                  style={{ background: `color-mix(in srgb, ${c} 12%, transparent)`, border: `1px solid color-mix(in srgb, ${c} 30%, transparent)` }}>
+                  <p className="text-xs font-bold" style={{ color: c }}>⏰ {t.missedHomework.header}</p>
+                  {missed.items.length > 0
+                    ? <MissedHomeworkRows items={missed.items} />
+                    : <p className="text-xs" style={{ color: 'var(--text)' }}>{missed.checked > 0 ? t.missedHomework.allOnTime : t.missedHomework.noneDue}</p>}
+                </div>
+              );
+            })()}
+
             {loading ? (
               <div className="flex justify-center py-10">
                 <div className="w-6 h-6 border-2 border-[var(--primary)] border-t-transparent rounded-full animate-spin" />
@@ -300,13 +315,6 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
                   </span>
                 }
               />
-            )}
-
-            {missed.length > 0 && (
-              <div className="rounded-xl px-3 py-2.5 space-y-2" style={{ background: 'var(--surface-2)' }}>
-                <p className="text-xs font-bold" style={{ color: 'var(--text-muted)' }}>⏰ {t.missedHomework.title} ({missed.length})</p>
-                <MissedHomeworkRows items={missed} />
-              </div>
             )}
 
             <button

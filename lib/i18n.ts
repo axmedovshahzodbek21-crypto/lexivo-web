@@ -205,6 +205,9 @@ const en = {
   },
   missedHomework: {
     title: 'Missed deadlines',
+    header: 'Homework deadlines',
+    allOnTime: 'All homework done on time.',
+    noneDue: 'No homework has passed its deadline yet.',
     due: (d: string) => `due ${d}`,
     left: (modes: string) => `${modes} left`,
     late: (n: number) => `done ${n} ${n === 1 ? 'day' : 'days'} late`,
@@ -2888,6 +2891,9 @@ const uz: typeof en = {
   },
   missedHomework: {
     title: "Muddati o'tgan vazifalar",
+    header: 'Vazifa muddatlari',
+    allOnTime: "Barcha vazifalar o'z vaqtida bajarilgan.",
+    noneDue: "Hali muddati o'tgan vazifa yo'q.",
     due: (d: string) => `muddat ${d}`,
     left: (modes: string) => `${modes} qolgan`,
     late: (n: number) => `${n} kun kech bajarilgan`,
@@ -5557,6 +5563,9 @@ const ru: typeof en = {
   },
   missedHomework: {
     title: 'Просроченные задания',
+    header: 'Сроки заданий',
+    allOnTime: 'Все задания сданы вовремя.',
+    noneDue: 'Пока ни у одного задания не истёк срок.',
     due: (d: string) => `срок ${d}`,
     left: (modes: string) => `осталось: ${modes}`,
     late: (n: number) => `сдано с опозданием на ${n} дн.`,

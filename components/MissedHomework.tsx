@@ -53,7 +53,7 @@ export function MissedHomeworkCard({ classId, students }: {
   useEffect(() => {
     let cancelled = false;
     loadMissedHomework(classId, students.map(s => ({ id: s.student_id, joinDate: s.joined_date })), tt)
-      .then(rows => { if (!cancelled) setItems(rows.filter(r => r.missingModes.length > 0)); })
+      .then(r => { if (!cancelled) setItems(r.items.filter(m => m.missingModes.length > 0)); })
       .catch(e => console.error('[MissedHomeworkCard]', e));
     return () => { cancelled = true; };
   }, [classId, students, tt]);
