@@ -10,9 +10,9 @@ const fmtYmd = (ymd: string) => ymd.split('-').reverse().join('.');
 const fmtTime = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 const fmtDateTime = (iso: string) => `${fmtYmd(new Date(iso).toLocaleDateString('en-CA'))} ${fmtTime(iso)}`;
 
-// The teacher's per-student summary (lib/student-summary.ts). Phrases that
-// make a claim are tappable; tapping one shows the facts behind it under
-// that sentence.
+// The teacher's per-student summary (lib/student-summary.ts), as one
+// paragraph. Phrases that make a claim are tappable; tapping one shows the
+// facts behind it under the paragraph.
 export default function StudentSummary({ sentences, classId, accentColor, reasonLabel }: {
   sentences: SummarySentence[];
   classId: string;
@@ -20,29 +20,32 @@ export default function StudentSummary({ sentences, classId, accentColor, reason
   reasonLabel: (reason: string) => string;
 }) {
   const [open, setOpen] = useState<{ s: number; g: number } | null>(null);
+  const toggle = (s: number, g: number) => setOpen(open?.s === s && open.g === g ? null : { s, g });
+  const ev = open ? sentences[open.s]?.[open.g]?.evidence : undefined;
   return (
-    <div className="space-y-3">
-      {sentences.map((sentence, s) => {
-        const ev = open?.s === s ? sentence[open.g]?.evidence : undefined;
-        return (
-          <div key={s}>
-            <p className="text-sm leading-relaxed" style={{ color: 'var(--text)' }}>
-              {sentence.map((seg, g) => seg.evidence ? (
-                <span
-                  key={g}
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => setOpen(open?.s === s && open.g === g ? null : { s, g })}
-                  onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setOpen(open?.s === s && open.g === g ? null : { s, g }); } }}
-                  className="cursor-pointer font-semibold"
-                  style={{ color: accentColor, borderBottom: `1.5px dotted ${accentColor}` }}
-                >{seg.text}</span>
-              ) : <span key={g}>{seg.text}</span>)}
-            </p>
-            {ev && <EvidenceCard evidence={ev} classId={classId} accentColor={accentColor} reasonLabel={reasonLabel} />}
-          </div>
-        );
-      })}
+    <div>
+      <p className="text-sm leading-relaxed" style={{ color: 'var(--text)' }}>
+        {sentences.map((sentence, s) => (
+          <span key={s}>
+            {s > 0 && ' '}
+            {sentence.map((seg, g) => seg.evidence ? (
+              <span
+                key={g}
+                role="button"
+                tabIndex={0}
+                onClick={() => toggle(s, g)}
+                onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(s, g); } }}
+                className="cursor-pointer font-semibold"
+                style={{
+                  color: accentColor, borderBottom: `1.5px dotted ${accentColor}`,
+                  background: open?.s === s && open.g === g ? `color-mix(in srgb, ${accentColor} 15%, transparent)` : undefined,
+                }}
+              >{seg.text}</span>
+            ) : <span key={g}>{seg.text}</span>)}
+          </span>
+        ))}
+      </p>
+      {ev && <EvidenceCard evidence={ev} classId={classId} accentColor={accentColor} reasonLabel={reasonLabel} />}
     </div>
   );
 }
@@ -117,7 +120,7 @@ function EvidenceCard({ evidence, classId, accentColor, reasonLabel }: {
   }
 
   return (
-    <div className="mt-2 rounded-xl divide-y overflow-hidden animate-fade-in"
+    <div className="mt-3 rounded-xl divide-y overflow-hidden animate-fade-in"
       style={{ background: 'var(--surface-2)', borderColor: 'var(--border)', border: `1px solid color-mix(in srgb, ${accentColor} 25%, transparent)` }}>
       {body}
     </div>
