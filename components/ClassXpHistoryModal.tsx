@@ -92,6 +92,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
   const [loading, setLoading] = useState(true);
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [showReviewDetail, setShowReviewDetail] = useState(false);
+  const [showSummary, setShowSummary] = useState(false); // shares the right column with Review Pattern
   const [composing, setComposing] = useState(false);
   const [joinDate, setJoinDate] = useState<string | null>(null);
   const [showDetails, setShowDetails] = useState(false);
@@ -151,8 +152,8 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
   }, []);
 
   useEffect(() => {
-    if (selectedDay || showReviewDetail) playPanelOpenSound();
-  }, [selectedDay, showReviewDetail]);
+    if (selectedDay || showReviewDetail || showSummary) playPanelOpenSound();
+  }, [selectedDay, showReviewDetail, showSummary]);
 
   const byDate: Record<string, XpEntry[]> = {};
   for (const e of history) {
@@ -216,7 +217,6 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
     homework: hwRecords, notes, activity, activeDays7,
     daysInClass: joinDate ? Math.round((new Date(todayStr).getTime() - new Date(joinDate).getTime()) / 86400000) : null,
   }) : [];
-  const cardText = [summary, ...smart].join(' ');
   const pillColor = isSelf ? accentColor : verdictMeta.color;
   const lastReviewValue = reviewPattern.lastReviewDate === null || ds === null ? '—'
     : `${fmtYmd(reviewPattern.lastReviewDate)} (${ds === 0 ? h.statToday : fill(h.statDaysAgo, { n: ds })})`;
@@ -275,7 +275,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
 
             {!loading && (
               <button
-                onClick={() => setShowReviewDetail(true)}
+                onClick={() => { setShowSummary(false); setShowReviewDetail(true); }}
                 className="flex items-center gap-2 px-3 py-2 rounded-xl text-left hover:opacity-85 transition-opacity"
                 style={{ background: `color-mix(in srgb, ${pillColor} 12%, transparent)`, border: `1px solid color-mix(in srgb, ${pillColor} 30%, transparent)` }}
               >
@@ -284,9 +284,25 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
                   {!isSelf && (
                     <p className="text-xs font-bold truncate" style={{ color: verdictMeta.color }}>{h.verdictTitle[verdict]}</p>
                   )}
-                  <p className="text-xs leading-snug" style={{ color: 'var(--text)' }}>{cardText}</p>
+                  <p className="text-xs leading-snug" style={{ color: 'var(--text)' }}>{summary}</p>
                 </div>
                 <span className="text-xs shrink-0" style={{ color: pillColor }}>›</span>
+              </button>
+            )}
+
+            {/* Summary — one tap away, opens in the right column */}
+            {teacherView && hwRecords && (
+              <button
+                onClick={() => { setShowReviewDetail(false); setShowSummary(true); }}
+                className="flex items-center gap-2 px-3 py-2 rounded-xl text-left hover:opacity-85 transition-opacity"
+                style={{ background: `color-mix(in srgb, ${accentColor} 12%, transparent)`, border: `1px solid color-mix(in srgb, ${accentColor} 30%, transparent)` }}
+              >
+                <span>✨</span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-bold" style={{ color: accentColor }}>{h.summaryTitle}</p>
+                  <p className="text-xs leading-snug" style={{ color: 'var(--text-muted)' }}>{h.summarySub}</p>
+                </div>
+                <span className="text-xs shrink-0" style={{ color: accentColor }}>›</span>
               </button>
             )}
 
@@ -380,6 +396,27 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
                     </div>
                   );
                 })}
+              </div>
+            </div>
+          )}
+
+          {/* Summary detail (right column) */}
+          {showSummary && (
+            <div className="flex-1 flex flex-col min-w-0 border-l overflow-y-auto animate-slide-in-right" style={{ borderColor: 'var(--border)', order: 3 }}>
+              <div className="flex items-center justify-between px-5 py-4 shrink-0 border-b" style={{ borderColor: 'var(--border)' }}>
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">✨</span>
+                  <div>
+                    <p className="text-xs font-bold" style={{ color: 'var(--text-muted)' }}>{name}</p>
+                    <p className="text-sm font-black" style={{ color: accentColor }}>{h.summaryTitle}</p>
+                  </div>
+                </div>
+                <button onClick={() => setShowSummary(false)} className="text-lg" style={{ color: 'var(--text-muted)' }}>✕</button>
+              </div>
+              <div className="overflow-y-auto overscroll-contain px-5 py-4 space-y-3">
+                {[summary, ...smart].map((s, i) => (
+                  <p key={i} className="text-sm leading-relaxed" style={{ color: 'var(--text)' }}>{s}</p>
+                ))}
               </div>
             </div>
           )}
