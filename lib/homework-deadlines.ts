@@ -36,20 +36,24 @@ const PAGE = 1000; // PostgREST row cap — a truncated progress list would show
 
 export async function loadHomeworkRecords(
   classId: string,
-  students: { id: string; joinDate: string | null | undefined }[],
+  studentIds: string[],
   t: Translations,
 ): Promise<HomeworkRecord[]> {
-  if (students.length === 0) return [];
-  const { data: hwRows, error } = await supabase
-    .from('class_homework')
-    .select('id, unit_id, class_unit_id, collection_name, day_number, passage_id, modes, due_date, created_at, student_ids, teacher_units(name), class_word_units(name)')
-    .eq('class_id', classId)
-    .not('due_date', 'is', null);
+  if (studentIds.length === 0) return [];
+  const [{ data: hwRows, error }, { data: members, error: memErr }] = await Promise.all([
+    supabase
+      .from('class_homework')
+      .select('id, unit_id, class_unit_id, collection_name, day_number, passage_id, modes, due_date, created_at, student_ids, teacher_units(name), class_word_units(name)')
+      .eq('class_id', classId)
+      .not('due_date', 'is', null),
+    supabase.from('class_members').select('student_id, joined_at').eq('class_id', classId).in('student_id', studentIds),
+  ]);
   if (error) throw error;
+  if (memErr) throw memErr;
   const hws = (hwRows ?? []) as any[];
   if (hws.length === 0) return [];
+  const joinedAt = new Map(((members ?? []) as { student_id: string; joined_at: string | null }[]).map(m => [m.student_id, m.joined_at]));
 
-  const studentIds = students.map(s => s.id);
   const doneOn = new Map<string, string>(); // `${hw}:${student}:${mode}` -> local yyyy-mm-dd
   for (let from = 0; ; from += PAGE) {
     const { data: prog, error: progErr } = await supabase
@@ -75,19 +79,21 @@ export async function loadHomeworkRecords(
       : h.class_unit_id ? (h.class_word_units?.name ?? t.classesPage.defaultUnitName)
       : (h.teacher_units?.name ?? t.classesPage.defaultUnitName);
     const assigned = h.student_ids as string[] | null;
-    for (const s of students) {
-      if (assigned && !assigned.includes(s.id)) continue;
-      // Due on or before the join day — never had a fair chance (same rule as the insights score).
-      if (s.joinDate && due <= s.joinDate) continue;
+    for (const sid of studentIds) {
+      if (assigned && !assigned.includes(sid)) continue;
+      // Set before the student joined and due by their join day — they never
+      // had a fair chance. Homework set after joining always counts.
+      const joined = joinedAt.get(sid);
+      if (joined && Date.parse(h.created_at) < Date.parse(joined) && due <= localDateStr(new Date(joined))) continue;
       const missingModes: string[] = [];
       let last = '';
       for (const m of modes) {
-        const d = doneOn.get(`${h.id}:${s.id}:${m}`);
+        const d = doneOn.get(`${h.id}:${sid}:${m}`);
         if (!d) missingModes.push(m);
         else if (d > last) last = d;
       }
       out.push({
-        homeworkId: h.id, studentId: s.id, title, dueDate: due,
+        homeworkId: h.id, studentId: sid, title, dueDate: due,
         assignedDate: localDateStr(new Date(h.created_at)),
         finishedDate: missingModes.length ? null : last,
         missingModes,
@@ -115,8 +121,8 @@ export function missedFromRecords(records: HomeworkRecord[]): { items: MissedHom
 
 export async function loadMissedHomework(
   classId: string,
-  students: { id: string; joinDate: string | null | undefined }[],
+  studentIds: string[],
   t: Translations,
 ): Promise<{ items: MissedHomework[]; checked: number }> {
-  return missedFromRecords(await loadHomeworkRecords(classId, students, t));
+  return missedFromRecords(await loadHomeworkRecords(classId, studentIds, t));
 }

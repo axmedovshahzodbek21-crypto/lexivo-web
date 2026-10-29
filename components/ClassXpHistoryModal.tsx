@@ -106,7 +106,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
     if (!teacherView || loading) return;
     let cancelled = false;
     Promise.all([
-      loadHomeworkRecords(classId, [{ id: userId, joinDate }], t),
+      loadHomeworkRecords(classId, [userId], t),
       supabase.from('class_notes').select('created_at, read_at').eq('class_id', classId).eq('student_id', userId)
         .order('created_at', { ascending: false }).limit(20),
     ])
