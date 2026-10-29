@@ -11,7 +11,22 @@ import XpCalendar from './XpCalendar';
 import { MessageComposer } from './insights/InsightPopup';
 import { MissedHomeworkRows } from './MissedHomework';
 import { loadHomeworkRecords, missedFromRecords, type HomeworkRecord } from '@/lib/homework-deadlines';
-import { buildStudentSummary, type SentNote, type ReviewAnswer } from '@/lib/student-summary';
+import { buildStudentSummary, type SentNote, type ReviewAnswer, type ClassAnswer } from '@/lib/student-summary';
+
+// Whole class's review answers for the last 30 days (for the class comparison
+// sentence). Paged — PostgREST returns at most 1000 rows per request.
+async function loadClassAnswers(classId: string): Promise<ClassAnswer[]> {
+  const since = new Date(Date.now() - 30 * 86400_000).toISOString();
+  const out: ClassAnswer[] = [];
+  for (let from = 0; from < 20_000; from += 1000) {
+    const { data, error } = await supabase.from('class_review_events').select('user_id, knew, created_at')
+      .eq('class_id', classId).gte('created_at', since).order('created_at', { ascending: false }).range(from, from + 999);
+    if (error) throw error;
+    out.push(...((data ?? []) as ClassAnswer[]));
+    if ((data ?? []).length < 1000) break;
+  }
+  return out;
+}
 import { translations } from '@/lib/i18n';
 import StudentSummary from './StudentSummary';
 
@@ -101,6 +116,8 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
   const [notes, setNotes] = useState<SentNote[]>([]);
   const [answers, setAnswers] = useState<ReviewAnswer[]>([]);
   const [srsCounts, setSrsCounts] = useState({ mastered: 0, learned: 0 });
+  const [classAnswers, setClassAnswers] = useState<ClassAnswer[]>([]);
+  const [classNames, setClassNames] = useState<Record<string, string>>({});
 
   // Teacher viewing a student only — a student can't read a classmate's
   // homework progress, so every past-due assignment would look missed.
@@ -115,14 +132,18 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
       supabase.from('class_review_events').select('word, knew, created_at').eq('class_id', classId).eq('user_id', userId)
         .order('created_at', { ascending: false }).limit(5000),
       supabase.from('class_srs_states').select('stage').eq('class_id', classId).eq('user_id', userId),
+      loadClassAnswers(classId),
+      supabase.rpc('get_class_dashboard', { p_class_id: classId }),
     ])
-      .then(([records, { data: n }, { data: ans }, { data: srsAll }]) => {
+      .then(([records, { data: n }, { data: ans }, { data: srsAll }, classAns, { data: members }]) => {
         if (cancelled) return;
         setHwRecords(records);
         setNotes((n ?? []) as SentNote[]);
         setAnswers((ans ?? []) as ReviewAnswer[]);
         const stages = ((srsAll ?? []) as { stage: number }[]);
         setSrsCounts({ mastered: stages.filter(s => s.stage >= 5).length, learned: stages.length });
+        setClassAnswers(classAns);
+        setClassNames(Object.fromEntries(((members ?? []) as { student_id: string; name: string | null }[]).map(m => [m.student_id, m.name ?? '—'])));
       })
       .catch(e => console.error('[ClassXpHistoryModal] homework/notes', e));
     return () => { cancelled = true; };
@@ -221,7 +242,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
     studentId: userId, name, lang: t === translations.uz ? 'uz' : 'en',
     today: todayStr, now: Date.now(), joinDate,
     homework: hwRecords, notes, history, dueCount, overdueCount,
-    answers, mastered: srsCounts.mastered, learned: srsCounts.learned,
+    answers, mastered: srsCounts.mastered, learned: srsCounts.learned, classAnswers, classNames,
   }) : [];
   const pillColor = isSelf ? accentColor : verdictMeta.color;
   const lastReviewValue = reviewPattern.lastReviewDate === null || ds === null ? '—'

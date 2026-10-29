@@ -148,6 +148,25 @@ function EvidenceCard({ evidence, classId, accentColor, reasonLabel }: {
         </div>
       ));
       break;
+    case 'modes':
+      body = evidence.items.map(x => (
+        <div key={x.mode} className={row}>
+          <p style={{ color: 'var(--text)' }}>
+            <span className="font-bold">{x.mode === 'review' ? reasonLabel('SRS Review') : modeLabel(tt, x.mode)}</span> · {x.count}
+          </p>
+        </div>
+      ));
+      break;
+    case 'ranking':
+      body = evidence.items.map(x => (
+        <div key={`${x.place}:${x.name}`} className={row} style={x.me ? { background: `color-mix(in srgb, ${accentColor} 12%, transparent)` } : undefined}>
+          <p style={{ color: 'var(--text)' }}>
+            <span className="font-bold">{x.place}.</span> <span className={x.me ? 'font-bold' : ''}>{x.name}</span>
+            {' · '}{x.unit === 'pct' ? `${x.value}%` : tt.classXpHistory.wordsCount(x.value)}
+          </p>
+        </div>
+      ));
+      break;
     case 'review':
       body = evidence.items.map(r => (
         <div key={r.from} className={row}>

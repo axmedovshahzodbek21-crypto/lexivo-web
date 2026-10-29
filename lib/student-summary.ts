@@ -38,6 +38,9 @@ export interface SessionEvidence { date: string; from: string; to: string; } // 
 export interface ReviewAnswer { word: string; knew: boolean; created_at: string; } // class_review_events row
 export interface AccuracyEvidence { from: string; to: string; right: number; total: number; }
 export interface WordEvidence { word: string; right: number; wrong: number; }
+export interface ModeEvidence { mode: string; count: number; } // mode: learn | flashcard | quiz | match | read | review
+export interface RankEvidence { place: number; name: string; value: number; unit: 'words' | 'pct'; me: boolean; }
+export interface ClassAnswer { user_id: string; knew: boolean; created_at: string; } // whole-class class_review_events row
 export type Evidence =
   | { kind: 'homework'; items: HwEvidence[] }
   | { kind: 'timing'; items: HwEvidence[] }
@@ -47,7 +50,9 @@ export type Evidence =
   | { kind: 'weeks'; items: WeekEvidence[] }
   | { kind: 'sessions'; items: SessionEvidence[] }
   | { kind: 'accuracy'; items: AccuracyEvidence[] }
-  | { kind: 'words'; items: WordEvidence[] };
+  | { kind: 'words'; items: WordEvidence[] }
+  | { kind: 'modes'; items: ModeEvidence[] }
+  | { kind: 'ranking'; items: RankEvidence[] };
 export type EvidenceKind = Evidence['kind'];
 export interface Segment { text: string; evidence?: Evidence; }
 export type SummarySentence = Segment[];
@@ -58,7 +63,7 @@ interface Pick {
   ev?: {
     homework?: HwEvidence[]; timing?: HwEvidence[]; reminders?: NoteEvidence[]; days?: DayEvidence[];
     review?: ReviewEvidence[]; weeks?: WeekEvidence[]; sessions?: SessionEvidence[];
-    accuracy?: AccuracyEvidence[]; words?: WordEvidence[];
+    accuracy?: AccuracyEvidence[]; words?: WordEvidence[]; modes?: ModeEvidence[]; ranking?: RankEvidence[];
   };
 }
 
@@ -261,8 +266,9 @@ function trendPick(history: HistoryEntry[], today: string, joinDate: string | nu
   if (!cur || prev.length < 2 || cur.xp === 0) return null;
   const ev = { weeks: weeks.slice(0, 4) };
   if (prev[0].xp === 0 && prev.slice(1).some(w => w.xp > 0)) return { code: 'trd_back', ev };
+  // "Usual" needs a real baseline: activity in at least 2 of the 3 weeks before.
+  if (prev.slice(0, 3).filter(w => w.xp > 0).length < 2) return null;
   const usual = prev.slice(0, 3).reduce((s, w) => s + w.xp, 0) / Math.min(3, prev.length);
-  if (usual === 0) return null;
   const ratio = cur.xp / usual;
   if (prev.length >= 3 && ratio >= 1.3 && cur.xp > Math.max(...prev.map(w => w.xp))) return { code: 'trd_record', ev };
   if (ratio >= 2) return { code: 'trd_up_strong', vars: { pct: Math.round((ratio - 1) * 100) }, ev };
@@ -414,6 +420,98 @@ function milestonePick(records: HomeworkTiming[], hwCodes: string[], today: stri
   return mark ? { code: 'mst_reviews_total', vars: { n: mark } } : null;
 }
 
+// ── Activity preferences: one sentence at most ──────────────────────────────
+// A homework mode left undone in 2+ past-due assignments (half or more of
+// those that had it, with other modes done), else nearly-only review, else
+// mostly new words with little review, else a favourite practice mode
+// (counted in days used, not rows — Cards writes a row per word).
+const PRACTICE_MODE: Record<string, string> = { Flashcard: 'flashcard', Cards: 'flashcard', Quiz: 'quiz', 'Quiz (perfect)': 'quiz', Match: 'match' };
+
+function preferencePick(history: HistoryEntry[], records: HomeworkTiming[], today: string, w: Record<string, string>): Pick | null {
+  const past = records.filter(r => r.dueDate < today && Object.keys(r.doneModes).length > 0);
+  const skip: Record<string, { missing: number; total: number }> = {};
+  for (const r of past) for (const m of r.modes) {
+    const s = (skip[m] ??= { missing: 0, total: 0 });
+    s.total++;
+    if (r.missingModes.includes(m)) s.missing++;
+  }
+  const skipped = Object.entries(skip).filter(([, s]) => s.missing >= 2 && s.missing / s.total >= 0.5).sort((a, b) => b[1].missing - a[1].missing)[0];
+  if (skipped) {
+    const [mode, s] = skipped;
+    const ev = past.filter(r => r.missingModes.includes(mode)).map(r => hwEvidence(r, today));
+    return { code: 'mode_skips', vars: { mode: w[mode] ?? mode, n: s.missing, m: s.total }, ev: { timing: ev } };
+  }
+  const rows = history.filter(e => localDate(e.created_at) > addDays(today, -30));
+  if (rows.length >= 20) {
+    const review = rows.filter(e => e.reason === 'SRS Review').length;
+    const learn = rows.filter(e => e.reason === 'Learn' || e.reason === 'learn').length;
+    const modes: ModeEvidence[] = [
+      { mode: 'review', count: review }, { mode: 'learn', count: learn },
+      ...['flashcard', 'quiz', 'match'].map(m => ({ mode: m, count: rows.filter(e => PRACTICE_MODE[e.reason] === m || e.reason === m).length })),
+    ].filter(x => x.count > 0);
+    if (review / rows.length >= 0.85 && learn === 0) return { code: 'mode_review_only', ev: { modes } };
+    if (learn / rows.length >= 0.5 && review / rows.length < 0.15) return { code: 'mode_learn_heavy', ev: { modes } };
+  }
+  const days: Record<string, Set<string>> = {};
+  for (const e of rows) { const m = PRACTICE_MODE[e.reason]; if (m) (days[m] ??= new Set()).add(localDate(e.created_at)); }
+  const used = Object.entries(days).map(([mode, s]) => ({ mode, count: s.size })).sort((a, b) => b.count - a.count);
+  const total = used.reduce((s, x) => s + x.count, 0);
+  if (total >= 5 && used[0].count / total >= 0.6) return { code: 'mode_favourite', vars: { mode: w[used[0].mode] }, ev: { modes: used } };
+  return null;
+}
+
+// ── Compared with the class: one sentence at most ──────────────────────────
+// From the whole class's class_review_events: words reviewed in the last 7
+// days, and accuracy over 30 days (students with 20+ answers). Needs 3+
+// comparable students. "Top" = place 1–3 in a class of 5+ (or place 1 in
+// 3–4); otherwise above / below the median.
+function rankItems(values: Map<string, number>, studentId: string, names: Record<string, string>, unit: 'words' | 'pct'): RankEvidence[] {
+  const sorted = Array.from(values.entries()).sort((a, b) => b[1] - a[1]);
+  const place = (v: number) => 1 + sorted.filter(([, x]) => x > v).length;
+  const items = sorted.map(([id, v]) => ({ place: place(v), name: names[id] ?? '—', value: v, unit, me: id === studentId }));
+  const top = items.slice(0, 5);
+  const me = items.find(x => x.me);
+  return me && !top.includes(me) ? [...top, me] : top;
+}
+
+const median = (xs: number[]) => { const s = [...xs].sort((a, b) => a - b); const m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
+
+function classPick(classAnswers: ClassAnswer[], names: Record<string, string>, studentId: string, today: string): Pick | null {
+  const from7 = addDays(today, -6), from30 = addDays(today, -29);
+  const week = new Map<string, number>(), right = new Map<string, number>(), total = new Map<string, number>();
+  for (const a of classAnswers) {
+    if (!(a.user_id in names)) continue; // approved members only
+    const d = localDate(a.created_at);
+    if (d >= from7) week.set(a.user_id, (week.get(a.user_id) ?? 0) + 1);
+    if (d >= from30) {
+      total.set(a.user_id, (total.get(a.user_id) ?? 0) + 1);
+      if (a.knew) right.set(a.user_id, (right.get(a.user_id) ?? 0) + 1);
+    }
+  }
+  const acc = new Map<string, number>();
+  total.forEach((t, id) => { if (t >= 20) acc.set(id, Math.round(((right.get(id) ?? 0) / t) * 100)); });
+  const isTop = (place: number, n: number) => (n >= 5 && place <= 3) || (n >= 3 && place === 1);
+
+  const myWeek = week.get(studentId) ?? 0;
+  const weekOk = week.size >= 3 && myWeek > 0;
+  const weekPlace = 1 + Array.from(week.values()).filter(v => v > myWeek).length;
+  const myAcc = acc.get(studentId);
+  const accOk = acc.size >= 3 && myAcc !== undefined;
+  const accPlace = myAcc === undefined ? 0 : 1 + Array.from(acc.values()).filter(v => v > myAcc).length;
+  const weekEv = () => ({ ranking: rankItems(week, studentId, names, 'words') });
+  const accEv = () => ({ ranking: rankItems(acc, studentId, names, 'pct') });
+
+  if (weekOk && isTop(weekPlace, week.size)) return { code: 'cls_review_top', vars: { rank: weekPlace, total: week.size }, ev: weekEv() };
+  if (accOk && isTop(accPlace, acc.size)) return { code: 'cls_accuracy_top', vars: { rank: accPlace, total: acc.size, pct: myAcc! }, ev: accEv() };
+  const weekMed = weekOk ? median(Array.from(week.values())) : 0;
+  const accMed = accOk ? Math.round(median(Array.from(acc.values()))) : 0;
+  if (weekOk && myWeek >= 1.25 * weekMed) return { code: 'cls_review_above', ev: weekEv() };
+  if (accOk && myAcc! >= accMed + 10) return { code: 'cls_accuracy_above', vars: { pct: myAcc!, avg: accMed }, ev: accEv() };
+  if (weekOk && myWeek <= 0.5 * weekMed) return { code: 'cls_review_below', ev: weekEv() };
+  if (accOk && myAcc! <= accMed - 15) return { code: 'cls_accuracy_below', vars: { pct: myAcc!, avg: accMed }, ev: accEv() };
+  return null;
+}
+
 // ── Reminders ────────────────────────────────────────────────────────────────
 // A teacher message counts only if the student hadn't studied in the 24h
 // before it (otherwise they'd have practised anyway). R studied within 24h,
@@ -519,6 +617,8 @@ export function buildStudentSummary(input: {
   answers: ReviewAnswer[]; // class_review_events, newest first is fine
   mastered: number;        // class_srs_states at stage 5
   learned: number;         // class_srs_states rows
+  classAnswers: ClassAnswer[];        // whole class, last 30 days
+  classNames: Record<string, string>; // approved members: id -> name
 }): SummarySentence[] {
   const w = SUMMARY_WORDS[input.lang];
   const hw = homeworkPicks(input.homework, input.today, w);
@@ -533,7 +633,9 @@ export function buildStudentSummary(input: {
     ...act.picks,
     act.cleared ? null : reviewPick(input.history, input.today, input.dueCount, input.overdueCount),
     ...reviewQualityPicks(input.answers, input.today, w),
+    classPick(input.classAnswers, input.classNames, input.studentId, input.today),
     ...hw.picks,
+    preferencePick(input.history, input.homework, input.today, w),
     milestonePick(input.homework, hw.picks.map(p => p.code), input.today, input.mastered, input.learned, input.answers.length),
     habitPick(input.history, input.today),
     reminderPick(input.notes, input.history, input.now, input.today, input.joinDate),
