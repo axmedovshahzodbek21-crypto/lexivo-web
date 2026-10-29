@@ -4,7 +4,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
-import { getClassDueWords } from '@/lib/class-srs';
+import { getClassSRSAll, countDueClassWords } from '@/lib/class-srs';
 import { useAppStore } from '@/lib/store';
 import { useTranslation } from '@/lib/useTranslation';
 
@@ -90,7 +90,8 @@ export default function ClassShellNav({ classId }: { classId: string }) {
   // (so it updates right after finishing a review session).
   useEffect(() => {
     if (!user || isTeacher) return;
-    getClassDueWords(user.id, classId).then(due => setDueCount(due.length)).catch(() => {});
+    // True due count, not getClassDueWords' per-session-capped size.
+    getClassSRSAll(user.id, classId).then(all => setDueCount(countDueClassWords(all))).catch(() => {});
   }, [user, classId, isTeacher, pathname]);
 
   const items = isTeacher ? TEACHER_ITEMS : STUDENT_ITEMS;
