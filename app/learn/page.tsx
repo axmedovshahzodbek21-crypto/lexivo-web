@@ -42,6 +42,11 @@ interface StudyWord extends WordItem {
   dayNumber: number;
 }
 
+// Class Learn XP per new word: a flat 10 (1.0 XP), same as Flutter's
+// learning.dart. Not getLearnXPAmount() — that tiers by the student's
+// *personal* learned-word count, which must not leak into class XP.
+const CLASS_LEARN_XP = 10;
+
 // Shared by both "Got it" and "Too Hard" — a word marked Too Hard earns the
 // same XP and goes into SRS exactly like a word marked Learned. This is
 // deliberate: if Too Hard didn't reward like Learned, students under peer
@@ -78,8 +83,7 @@ async function grantLearnReward(
           // is the sole class-XP source for homework Learn. Crediting per word
           // means a student who leaves mid-list keeps the XP for the words
           // they already learned instead of forfeiting the whole session.
-          const xp = getLearnXPAmount();
-          isNew = await recordClassWordLearned(user.id, opts.classIdParam, word.word, word.translation, xp);
+          isNew = await recordClassWordLearned(user.id, opts.classIdParam, word.word, word.translation, CLASS_LEARN_XP);
         } catch {
           // Sync failed (network/RPC) — don't strand the student on this
           // card; the lesson still advances, just without server credit.
@@ -783,9 +787,8 @@ function LearnInner() {
       // inside grantLearnReward's recordClassWordLearned call; here we only
       // reflect it in this session's own "+N XP" display. Matches the
       // Flutter app and lib/class-xp.ts's "intentionally isolated" contract.
-      const learnXP = getLearnXPAmount();
-      setSessionXP(prev => prev + learnXP);
-      flashXp(learnXP);
+      setSessionXP(prev => prev + CLASS_LEARN_XP);
+      flashXp(CLASS_LEARN_XP);
     }
     // Personal Lexivo study streak — class work is its own world and must not
     // keep the personal streak alive (the class has its own study-day streak).
