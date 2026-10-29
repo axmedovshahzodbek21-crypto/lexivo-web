@@ -109,6 +109,7 @@ function MatchingInner() {
   const [totalTime,     setTotalTime]     = useState(0);
   const [myUnitCompleted, setMyUnitCompleted] = useState(false);
   const [sessionXP, setSessionXP] = useState(0);
+  const [practiceXpDone, setPracticeXpDone] = useState(false); // class practice XP already earned today
 
   const wrongTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const timerInterval = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -277,7 +278,10 @@ function MatchingInner() {
           const xpAmount = words.length * 4;
           setSessionXP(xpAmount);
           supabase.auth.getUser().then(({ data: { user } }) => {
-            if (user) void recordClassXP(user.id, classId, xpAmount, 'Match');
+            // 0 = already earned today (server rule) — show that instead of a fake +N.
+            if (user) void recordClassXP(user.id, classId, xpAmount, 'Match').then(a => {
+              if (a === 0) { setSessionXP(0); setPracticeXpDone(true); }
+            });
           });
         }
         if (isLast && sourceClassHW && searchParams.get('hwId')) {
@@ -369,6 +373,9 @@ function MatchingInner() {
               <span className="text-xl">⚡</span>
               <span className="font-bold" style={{ color: 'var(--warning)' }}>+{displayXP(sessionXP)} XP</span>
             </div>
+          )}
+          {practiceXpDone && (
+            <p className="card text-center text-xs text-[var(--text-muted)]">{t.classesPage.practiceXpDoneToday}</p>
           )}
           <div className="flex gap-3">
             <button

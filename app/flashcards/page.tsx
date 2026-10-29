@@ -110,6 +110,7 @@ function FlashcardsInner() {
   const [done, setDone] = useState(false);
   const [myUnitCompleted, setMyUnitCompleted] = useState(false);
   const [sessionXP, setSessionXP] = useState(0);
+  const [practiceXpDone, setPracticeXpDone] = useState(false); // class practice XP already earned today
   const [unknownWords, setUnknownWords] = useState<StudyWord[]>([]);
   const cardsSinceLastPush = useRef(0);
   const advancing = useRef(false);
@@ -293,7 +294,10 @@ function FlashcardsInner() {
         const xpAmount = Math.round(originalWordCount.current * 3);
         setSessionXP(xpAmount);
         supabase.auth.getUser().then(({ data: { user } }) => {
-          if (user) void recordClassXP(user.id, classId, xpAmount, 'Flashcard');
+          // 0 = already earned today (server rule) — show that instead of a fake +N.
+          if (user) void recordClassXP(user.id, classId, xpAmount, 'Flashcard').then(a => {
+            if (a === 0) { setSessionXP(0); setPracticeXpDone(true); }
+          });
         });
       }
       if (sourceClassHW && sp.get('hwId')) {
@@ -379,8 +383,11 @@ function FlashcardsInner() {
         <div className="w-full card mb-6 flex items-center justify-center gap-2">
           <span className="text-xl">⚡</span>
           <span className="font-bold" style={{ color: 'var(--warning)' }}>+{displayXP(sessionXP)} XP</span>
-          {sessionXP === 0 && unknown > 0 && (
+          {sessionXP === 0 && unknown > 0 && !practiceXpDone && (
             <span className="text-xs text-[var(--text-muted)]">{t.flashcards.markAllKnownHint}</span>
+          )}
+          {practiceXpDone && (
+            <span className="text-xs text-[var(--text-muted)]">{t.classesPage.practiceXpDoneToday}</span>
           )}
         </div>
         <div className="flex flex-col gap-3 w-full">

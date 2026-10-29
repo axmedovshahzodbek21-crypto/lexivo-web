@@ -132,6 +132,7 @@ function QuizInner() {
   const [done, setDone] = useState(false);
   const [myUnitCompleted, setMyUnitCompleted] = useState(false);
   const [sessionXP, setSessionXP] = useState(0);
+  const [practiceXpDone, setPracticeXpDone] = useState(false); // class practice XP already earned today
   const [wrongQuestions, setWrongQuestions] = useState<QuizQuestion[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
   const selecting = useRef(false);
@@ -341,7 +342,10 @@ function QuizInner() {
         const reason = isPerfect ? 'Quiz (perfect)' : 'Quiz';
         setSessionXP(xpAmount);
         supabase.auth.getUser().then(({ data: { user } }) => {
-          if (user) void recordClassXP(user.id, classId, xpAmount, reason);
+          // 0 = already earned today (server rule) — show that instead of a fake +N.
+          if (user) void recordClassXP(user.id, classId, xpAmount, reason).then(a => {
+            if (a === 0) { setSessionXP(0); setPracticeXpDone(true); }
+          });
         });
       }
       if (sourceClassHW && sp.get('hwId')) {
@@ -441,6 +445,9 @@ function QuizInner() {
             <span className="text-xl">⚡</span>
             <span className="font-bold" style={{ color: 'var(--warning)' }}>+{displayXP(sessionXP)} XP</span>
           </div>
+        )}
+        {practiceXpDone && (
+          <p className="w-full card mb-6 text-center text-xs text-[var(--text-muted)]">{t.classesPage.practiceXpDoneToday}</p>
         )}
         <div className="flex flex-col gap-3 w-full">
           {sourceMyWords && myCollection ? (

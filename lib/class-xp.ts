@@ -44,10 +44,29 @@ registerOfflineWriter('record_class_xp', writeClassXP);
 // independently (rather than bundled in one Promise.all) so one succeeding
 // while the other fails doesn't lose or duplicate either — each retries on
 // its own until it lands.
-export async function recordClassXP(studentId: string, classId: string, xp: number, reason: string): Promise<void> {
-  if (xp <= 0) return;
+//
+// Resolves to the XP the server actually awarded — 0 when a server rule
+// skipped it (Words-tab practice pays once per activity per day, Review has
+// a daily cap; see 20261029000003_class_practice_xp_daily.sql) — or null
+// when unknown (queued offline, or an older server that returns nothing), in
+// which case callers keep showing the amount they asked for.
+export async function recordClassXP(studentId: string, classId: string, xp: number, reason: string): Promise<number | null> {
+  if (xp <= 0) return 0;
+  const payload = { studentId, classId, xp, reason } satisfies ClassXPPayload;
+  let awarded: number | null = null;
   await Promise.all([
-    enqueueOfflineWrite('record_class_xp', { studentId, classId, xp, reason } satisfies ClassXPPayload),
+    (async () => {
+      try {
+        const { data, error } = await supabase.rpc('record_class_xp', {
+          p_student_id: studentId, p_class_id: classId, p_xp: xp, p_reason: reason,
+        });
+        if (error) throw error;
+        awarded = typeof data === 'number' ? data : null;
+      } catch {
+        await enqueueOfflineWrite('record_class_xp', payload);
+      }
+    })(),
     recordClassStudyDay(studentId, classId),
   ]);
+  return awarded;
 }
