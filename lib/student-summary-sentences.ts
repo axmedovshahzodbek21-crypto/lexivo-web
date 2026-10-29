@@ -16,6 +16,16 @@ export const SUMMARY_FREQ = {
 } as Record<'uz' | 'en', Record<string, string>>;
 
 export const SUMMARY_SENTENCES: Record<string, { uz: string[]; en: string[] }> = {
+  // Nothing else fits yet (new student, no finished or past-due homework).
+  not_enough_data: {
+    uz: [
+      "Batafsil xulosa uchun hali ma'lumot kam — vazifalar bajarilgani yoki muddati o'tgani sari paydo bo'ladi.",
+    ],
+    en: [
+      'Not enough data yet for a fuller summary — it grows as homework gets done or passes its deadline.',
+    ],
+  },
+
   // ── Homework timing ──────────────────────────────────────────────────────
   hw_early: {
     uz: [

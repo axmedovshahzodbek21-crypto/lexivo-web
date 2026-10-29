@@ -139,6 +139,7 @@ export function buildStudentSummary(input: {
     ...homeworkPicks(input.homework, input.today),
     reminderPick(input.notes, input.activity, input.now, input.activeDays7, input.daysInClass),
   ].filter((p): p is Pick => p !== null);
+  if (picks.length === 0) picks.push({ code: 'not_enough_data' });
   const seed = `${input.studentId}:${input.today}`;
   return picks.map(p => render(p, input.lang, input.name, seed));
 }
