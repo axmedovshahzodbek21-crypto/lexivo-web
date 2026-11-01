@@ -12,10 +12,10 @@ import {
   getHardWords, removeHardWord, getSettings, getStreak, getTodayLearnedCount,
   saveLearnProgress, clearLearnProgress, getLearnProgress,
   saveLearnMarks, getLearnMarks, getStarredWords, getLearnXPAmount, displayXP,
-  getClassHWTemp, getUILanguage,
+  getClassHWTemp, getUILanguage, saveSettings, saveSettingsUpdatedAt,
 } from '@/lib/storage';
 import { buildExplainPrompt } from '@/lib/explain-prompt';
-import { pushLists, pushStats } from '@/lib/sync';
+import { pushLists, pushStats, pushSettings } from '@/lib/sync';
 import { supabase } from '@/lib/supabase';
 import { createSRSWord } from '@/lib/srs';
 import { addSRSWord as storeSRSWord } from '@/lib/storage';
@@ -110,6 +110,9 @@ async function grantLearnReward(
 // the collection / unit data). No shuffle — so a card is at the same position
 // every time, which keeps the resume bookmark meaningful and stops a
 // hard-refresh from reshuffling mid-unit.
+// Learn header size picker choices; 0 = Full (whole list).
+const SESSION_SIZES = [10, 15, 20, 30, 50, 0];
+
 function buildStudyList(
   collections: WordCollection[],
   collectionName?: string,
@@ -239,7 +242,11 @@ function LearnInner() {
   const [classStarred, setClassStarred] = useState<Set<string>>(new Set());
   const [defaultAccent, setDefaultAccent] = useState<Accent>('us');
   const [autoPlayOnReveal, setAutoPlayOnReveal] = useState(true);
+  // 0 = Full (no cap). fullList holds the uncapped list for the sessions the
+  // header size picker applies to (My Words + whole-collection Library Learn);
+  // null hides the picker.
   const [sessionSize, setSessionSize] = useState(20);
+  const [fullList, setFullList] = useState<StudyWord[] | null>(null);
   const [showSkipTip, setShowSkipTip] = useState(false);
   const [classWordsLoaded, setClassWordsLoaded] = useState(false);
 
@@ -347,11 +354,24 @@ function LearnInner() {
     const s = getSettings();
     setDefaultAccent(s.defaultAccent);
     setAutoPlayOnReveal(s.autoPlayOnReveal);
-    setSessionSize(s.sessionSize);
     if (!localStorage.getItem('lexivo_seen_skip_tip')) {
       setShowSkipTip(true);
     }
   }, []);
+
+  // Header size picker: re-cut the session from the uncapped list without
+  // losing marks. The list order is stable, so the old session is a prefix of
+  // (or extends) the new one. Saved as the user's default for next time.
+  const changeSessionSize = (n: number) => {
+    if (!fullList) return;
+    const next = n > 0 ? fullList.slice(0, n) : fullList;
+    setSessionSize(n);
+    setWords(next);
+    setMarks(m => next.map((_, i) => m[i] ?? null));
+    saveSettings({ ...getSettings(), sessionSize: n });
+    saveSettingsUpdatedAt(new Date().toISOString());
+    pushSettings();
+  };
 
   // A page refresh mid-session should land back on the same card, not on the
   // "Resume where you left off?" prompt (that's for leaving and re-entering).
@@ -421,7 +441,12 @@ function LearnInner() {
         topic: myCollection ?? 'My Words',
         dayNumber: 0,
       }));
-      const mySlice = list.slice(0, sessionSize);
+      // Read the setting directly — the sessionSize state may not be set yet
+      // on the first run of this effect.
+      const size = getSettings().sessionSize;
+      setSessionSize(size);
+      setFullList(list);
+      const mySlice = size > 0 ? list.slice(0, size) : list;
       setWords(mySlice);
       setMarks(new Array(mySlice.length).fill(null));
       if (!myCollection && !startIndexApplied) {
@@ -441,7 +466,11 @@ function LearnInner() {
     }
     if (collectionsLoaded && collections.length > 0) {
       const list = buildStudyList(collections, collectionName, dayNumber, hardOnly);
-      const sliced = (dayNumber !== undefined || hardOnly) ? list : list.slice(0, sessionSize);
+      const size = getSettings().sessionSize;
+      const resizable = dayNumber === undefined && !hardOnly;
+      setSessionSize(size);
+      setFullList(resizable ? list : null);
+      const sliced = (!resizable || size <= 0) ? list : list.slice(0, size);
       setWords(sliced);
       setMarks(new Array(sliced.length).fill(null));
       if (startIndex > 0 && !startIndexApplied) {
@@ -1153,6 +1182,26 @@ function LearnInner() {
                 className="w-6 h-6 flex items-center justify-center text-[var(--primary)] disabled:opacity-30 text-lg font-bold"
                 aria-label={t.extra.nextCard}
               >›</button>
+              {fullList && (() => {
+                // Can't cut the session below a card already reached or marked.
+                const lastTouched = marks.reduce((acc, m, i) => (m ? i : acc), index);
+                return (
+                  <select
+                    value={sessionSize}
+                    onChange={e => changeSessionSize(Number(e.target.value))}
+                    className="ml-1 px-1.5 py-0.5 rounded-lg text-xs font-bold bg-[var(--surface-2)] text-[var(--primary)] border border-[var(--border)] outline-none cursor-pointer"
+                    aria-label={t.settings.sessionSize}
+                    title={t.settings.sessionSizeHelper}
+                  >
+                    {!SESSION_SIZES.includes(sessionSize) && <option value={sessionSize}>{sessionSize}</option>}
+                    {SESSION_SIZES.map(n => (
+                      <option key={n} value={n} disabled={n > 0 && n <= lastTouched}>
+                        {n > 0 ? n : t.settings.sessionSizeFull}
+                      </option>
+                    ))}
+                  </select>
+                );
+              })()}
             </div>
           </div>
           <div className="flex gap-0.5">

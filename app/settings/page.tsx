@@ -355,9 +355,7 @@ export default function SettingsPage() {
                 style={{ background: 'rgba(255,255,255,0.22)', backdropFilter: 'blur(8px)' }}>
                 {settings.languageLevel}
               </span>
-              <span className="text-xs" style={{ color: 'rgba(255,255,255,0.75)' }}>🎯 {settings.dailyGoal} words/day</span>
-              <span className="text-xs" style={{ color: 'rgba(255,255,255,0.75)' }}>📚 {settings.sessionSize}/session</span>
-            </div>
+              <span className="text-xs" style={{ color: 'rgba(255,255,255,0.75)' }}>🎯 {settings.dailyGoal} words/day</span>            </div>
           </div>
         </div>
       </div>
@@ -398,26 +396,6 @@ export default function SettingsPage() {
             onChange={e => updateSettings({ dailyGoal: parseInt(e.target.value) || 10 })}
             className="w-full px-4 py-3 rounded-xl bg-[var(--surface-2)] border-2 border-transparent focus:border-[var(--primary)] outline-none transition-colors"
           />
-        </div>
-
-        <div>
-          <label className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide block mb-2">{t.settings.sessionSize}</label>
-          <div className="grid grid-cols-3 gap-2">
-            {[5, 10, 15, 20, 30, 50].map(n => (
-              <button
-                key={n}
-                onClick={() => updateSettings({ sessionSize: n })}
-                className={`py-2.5 rounded-xl text-sm font-semibold transition-colors ${
-                  settings.sessionSize === n
-                    ? 'bg-[var(--primary)] text-white'
-                    : 'bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--text)]'
-                }`}
-              >
-                {n}
-              </button>
-            ))}
-          </div>
-          <p className="text-xs text-[var(--text-muted)] mt-1.5">{t.settings.sessionSizeHelper}</p>
         </div>
 
         <div>
