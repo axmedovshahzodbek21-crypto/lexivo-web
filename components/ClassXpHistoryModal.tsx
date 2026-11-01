@@ -277,7 +277,7 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
 
         <div className="flex flex-1 min-h-0 justify-center">
           {/* Calendar (right column once a day is selected) */}
-          <div className="flex flex-col overflow-y-auto px-6 pb-6 space-y-4" style={{ width: '300px', flexShrink: 0, order: 2 }}>
+          <div className="overflow-y-auto px-6 pb-6 space-y-4" style={{ width: '300px', flexShrink: 0, order: 2 }}>
             <div className="flex items-center justify-between">
               <h3 className="text-xl font-black" style={{ color: 'var(--text)' }}>{t.classXpHistory.title}</h3>
               <div className="text-right min-w-0">

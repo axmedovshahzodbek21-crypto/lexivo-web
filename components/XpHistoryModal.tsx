@@ -49,7 +49,7 @@ export default function XpHistoryModal({ xp, onClose }: Props) {
 
         <div className="flex flex-1 min-h-0">
           {/* Left column: calendar */}
-          <div className="flex flex-col overflow-y-auto px-6 pb-6 space-y-4" style={{ width: selectedDay ? '360px' : '100%', flexShrink: 0 }}>
+          <div className="overflow-y-auto px-6 pb-6 space-y-4" style={{ width: selectedDay ? '360px' : '100%', flexShrink: 0 }}>
             {/* Header */}
             <div className="flex items-center justify-between">
               <h3 className="text-xl font-black" style={{ color: 'var(--text)' }}>{t.xpModal.historyTitle}</h3>
