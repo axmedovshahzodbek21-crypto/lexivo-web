@@ -347,7 +347,7 @@ export default function JoinedClassesPage() {
                         style={{ background: note.read_at ? 'var(--surface-2)' : 'var(--primary-bg)', borderLeft: note.read_at ? 'none' : '3px solid var(--primary)' }}>
                         <div className="flex items-start gap-2">
                           <div className="flex-1 min-w-0">
-                            <p className="text-[var(--text)] leading-snug">{note.message}</p>
+                            <p className="text-[var(--text)] leading-snug">{note.message || `📷 ${t.classChat.photo}`}</p>
                             <p className="text-[10px] text-[var(--text-muted)] mt-1">{timeAgo(note.created_at, t)}</p>
                           </div>
                           {!note.read_at && <span className="text-[10px] font-bold text-[var(--primary)] shrink-0 mt-0.5">{t.classesPage.new}</span>}

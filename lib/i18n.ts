@@ -828,6 +828,10 @@ const en = {
     seen: 'seen',
     back: 'All students',
     updatesHint: 'New messages appear within about 10 seconds.',
+    sendPhoto: 'Send a photo',
+    photo: 'Photo',
+    photoExpired: 'Photo expired (kept for 30 days)',
+    photoLimitReached: "You've sent today's 10 photos. You can send more tomorrow.",
   },
   classInsights: {
     title: 'Smart insights',
@@ -3527,6 +3531,10 @@ const uz: typeof en = {
     seen: "ko'rildi",
     back: "Barcha o'quvchilar",
     updatesHint: 'Yangi xabarlar taxminan 10 soniyada chiqadi.',
+    sendPhoto: 'Rasm yuborish',
+    photo: 'Rasm',
+    photoExpired: "Rasm o'chirildi (30 kun saqlanadi)",
+    photoLimitReached: "Bugungi 10 ta rasm yuborildi. Ertaga yana yuborishingiz mumkin.",
   },
   classInsights: {
     title: 'Aqlli xulosalar',
@@ -6212,6 +6220,10 @@ const ru: typeof en = {
     seen: 'прочитано',
     back: 'Все ученики',
     updatesHint: 'Новые сообщения появляются примерно через 10 секунд.',
+    sendPhoto: 'Отправить фото',
+    photo: 'Фото',
+    photoExpired: 'Фото удалено (хранится 30 дней)',
+    photoLimitReached: 'Сегодня уже отправлено 10 фото. Завтра можно снова.',
   },
   classInsights: {
     title: 'Умные выводы',

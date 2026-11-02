@@ -779,7 +779,7 @@ const [memberCount, setMemberCount] = useState(0);
               <div key={n.id} className={`p-3 rounded-xl border flex gap-3 ${isNew ? 'bg-[var(--primary-bg)] border-l-4 border-l-[var(--primary)] border-[var(--border)]' : 'bg-[var(--surface)] border-[var(--border)]'}`}>
                 <span className="text-base mt-0.5">✉️</span>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-[var(--text)] whitespace-pre-wrap">{n.message}</p>
+                  <p className="text-sm text-[var(--text)] whitespace-pre-wrap">{n.message || `📷 ${tx.classChat.photo}`}</p>
                   <p className="text-xs text-[var(--text-muted)] mt-0.5">{timeAgo(n.created_at, tx)}</p>
                 </div>
                 {isNew && <span className="text-[10px] font-bold text-[var(--primary)] self-start pt-0.5">{tx.classesPage.new}</span>}

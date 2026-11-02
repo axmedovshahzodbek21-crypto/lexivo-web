@@ -2891,7 +2891,7 @@ export default function ClassDashboardPage() {
                 <p className="text-xs font-semibold text-[var(--text-muted)]">{tt.classesPage.previousNotes}</p>
                 {(studentNotes[noteTarget.student_id] ?? []).map(n => (
                   <div key={n.id} className="rounded-xl px-3 py-2.5 text-sm" style={{ background: 'var(--surface-2)' }}>
-                    <p className="text-[var(--text)]">{n.message}</p>
+                    <p className="text-[var(--text)]">{n.message || `📷 ${tt.classChat.photo}`}</p>
                     <p className="text-[10px] text-[var(--text-muted)] mt-1">{timeAgo(tt, n.created_at)} {n.read_at ? `· ${tt.classesPage.seenCheckmark}` : `· ${tt.classesPage.notSeenYet}`}</p>
                   </div>
                 ))}

@@ -109,7 +109,7 @@ export default function ClassMessagesPage() {
                     <p className={`text-[var(--text)] truncate ${e?.unread ? 'font-black' : 'font-bold'}`}>{nameOf(sid)}</p>
                     {e?.last && (
                       <p className="text-sm text-[var(--text-muted)] truncate">
-                        {e.last.from === 'teacher' ? `${t.you}: ` : ''}{e.last.message}
+                        {e.last.from === 'teacher' ? `${t.you}: ` : ''}{e.last.message || `📷 ${t.photo}`}
                       </p>
                     )}
                   </div>

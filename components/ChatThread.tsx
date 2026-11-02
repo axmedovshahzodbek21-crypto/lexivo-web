@@ -3,8 +3,29 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from '@/lib/useTranslation';
 import {
   type ChatMessage, STUDENT_MESSAGE_MAX, TEACHER_MESSAGE_MAX,
-  loadReadAt, loadThread, markThreadRead, pollWhileVisible, sendStudentMessage, sendTeacherMessage,
+  loadReadAt, loadThread, markThreadRead, photoExpired, photoUrl, pollWhileVisible,
+  sendPhoto, sendStudentMessage, sendTeacherMessage,
 } from '@/lib/class-chat';
+
+// A chat photo: signed link from the private bucket; tap opens it full size.
+function ChatPhoto({ m, expiredLabel }: { m: ChatMessage; expiredLabel: string }) {
+  const [url, setUrl] = useState<string | null>(null);
+  const expired = photoExpired(m);
+  useEffect(() => {
+    if (!m.image_path || expired) return;
+    let cancelled = false;
+    photoUrl(m.image_path).then(u => { if (!cancelled) setUrl(u); });
+    return () => { cancelled = true; };
+  }, [m.image_path, expired]);
+  if (expired) return <p className="text-sm italic opacity-70">📷 {expiredLabel}</p>;
+  if (!url) return <div className="w-48 h-32 rounded-xl animate-pulse" style={{ background: 'rgba(127,127,127,0.25)' }} />;
+  return (
+    <a href={url} target="_blank" rel="noreferrer">
+      {/* eslint-disable-next-line @next/next/no-img-element -- signed private-bucket URL, not optimizable */}
+      <img src={url} alt="" className="rounded-xl max-h-72 max-w-full object-contain" />
+    </a>
+  );
+}
 
 function timeLabel(iso: string) {
   const d = new Date(iso);
@@ -21,7 +42,8 @@ export default function ChatThread({ classId, studentId, as, myId, canSend, othe
   const t = useTranslation().classChat;
   const [messages, setMessages] = useState<ChatMessage[] | null>(null);
   const [text, setText] = useState('');
-  const [state, setState] = useState<'idle' | 'sending' | 'limit' | 'failed'>('idle');
+  const [state, setState] = useState<'idle' | 'sending' | 'limit' | 'photo_limit' | 'failed'>('idle');
+  const fileRef = useRef<HTMLInputElement>(null);
   const lastRef = useRef<string | undefined>(undefined);
   const bottomRef = useRef<HTMLDivElement>(null);
   const messagesRef = useRef<ChatMessage[] | null>(null);
@@ -74,6 +96,19 @@ export default function ChatThread({ classId, studentId, as, myId, canSend, othe
     if (res !== 'ok') { setState(res); return; }
     setText('');
     setState('idle');
+    await refresh();
+  };
+
+  const sendPicked = async (file: File | undefined) => {
+    if (!file || state === 'sending') return;
+    setState('sending');
+    const res = await sendPhoto(classId, studentId, as, myId, file);
+    if (res !== 'ok') { setState(res); return; }
+    setState('idle');
+    await refresh();
+  };
+
+  const refresh = async () => {
     const fresh = await loadThread(classId, studentId, lastRef.current);
     if (fresh.length > 0) {
       lastRef.current = fresh[fresh.length - 1].created_at;
@@ -102,7 +137,8 @@ export default function ChatThread({ classId, studentId, as, myId, canSend, othe
                   : { background: 'var(--surface-2)', color: 'var(--text)', borderBottomLeftRadius: 6 }}
               >
                 {!mine && <p className="text-[10px] font-bold opacity-70 mb-0.5">{otherName}</p>}
-                <p className="text-sm whitespace-pre-wrap break-words">{m.message}</p>
+                {m.image_path && <ChatPhoto m={m} expiredLabel={t.photoExpired} />}
+                {m.message && <p className="text-sm whitespace-pre-wrap break-words">{m.message}</p>}
                 <p className={`text-[10px] mt-0.5 text-right ${mine ? 'text-white/70' : 'text-[var(--text-muted)]'}`}>
                   {timeLabel(m.created_at)}{mine && m.read_at ? ` · ${t.seen}` : ''}
                 </p>
@@ -116,6 +152,24 @@ export default function ChatThread({ classId, studentId, as, myId, canSend, othe
       {canSend && (
         <div className="border-t border-[var(--border)] p-3 space-y-1.5">
           <div className="flex items-end gap-2">
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={e => { void sendPicked(e.target.files?.[0]); e.target.value = ''; }}
+            />
+            <button
+              type="button"
+              onClick={() => fileRef.current?.click()}
+              disabled={state === 'sending'}
+              className="text-lg px-2.5 py-1.5 rounded-xl disabled:opacity-50"
+              style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}
+              aria-label={t.sendPhoto}
+              title={t.sendPhoto}
+            >
+              📷
+            </button>
             <textarea
               value={text}
               onChange={e => { setText(e.target.value.slice(0, max)); if (state !== 'sending') setState('idle'); }}
@@ -138,6 +192,7 @@ export default function ChatThread({ classId, studentId, as, myId, canSend, othe
           <div className="flex justify-between text-[10px] text-[var(--text-muted)]">
             <span>
               {state === 'limit' ? <span style={{ color: 'var(--danger)' }}>{t.limitReached}</span>
+                : state === 'photo_limit' ? <span style={{ color: 'var(--danger)' }}>{t.photoLimitReached}</span>
                 : state === 'failed' ? <span style={{ color: 'var(--danger)' }}>{t.sendFailed}</span>
                 : t.updatesHint}
             </span>
