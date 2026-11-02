@@ -8,8 +8,9 @@
 // 20260914_notify_join_request.sql) whenever a row is inserted into
 // class_homework, class_targets, class_announcements, class_notes (teacher
 // notes, one student), class_members (join requests) or class_replies (a
-// student's chat message). Resolves the recipients (class students, or the
-// teacher for a join request / reply), filters to those who opted into push, and
+// student's chat message), plus the 8:00 insights_morning cron job.
+// Resolves the recipients (class students, or the teacher for a join
+// request / reply / insights_morning), filters to those who opted into push, and
 // sends via the OneSignal REST API using external_id = Supabase auth user id.
 //
 // Deploy: supabase functions deploy send-push
@@ -25,12 +26,13 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
 interface Payload {
-  kind: 'homework' | 'target' | 'announcement' | 'join_request' | 'note' | 'reply';
+  kind: 'homework' | 'target' | 'announcement' | 'join_request' | 'note' | 'reply' | 'insights_morning';
   class_id: string;
   student_ids?: string[] | null;
   student_id?: string;
   title?: string;
   message?: string;
+  count?: number; // insights_morning: students needing attention
 }
 
 function buildNotificationText(payload: Payload, className: string, studentName?: string): { heading: string; content: string } {
@@ -47,6 +49,9 @@ function buildNotificationText(payload: Payload, className: string, studentName?
       return { heading: '✉️ Message from your teacher', content: `${className}: ${payload.message ?? ''}` };
     case 'reply':
       return { heading: `💬 ${studentName ?? 'A student'}`, content: `${className}: ${payload.message ?? ''}` };
+    case 'insights_morning':
+      // Daily 8:00 (migration 20261102000001), sent only when count > 0.
+      return { heading: '💡 Xulosalar', content: `${className}: ${payload.count ?? 0} o'quvchi e'tibor talab qiladi` };
   }
 }
 
@@ -66,10 +71,10 @@ Deno.serve(async (req) => {
     .maybeSingle();
   const className = classRow?.name ?? 'Your class';
 
-  // join_request and reply (a student's chat message) are sent to the
-  // teacher, not the class's students — everything else below (recipient
-  // list, is_teacher flag) branches on that.
-  const toTeacher = payload.kind === 'join_request' || payload.kind === 'reply';
+  // join_request, reply (a student's chat message) and insights_morning are
+  // sent to the teacher, not the class's students — everything else below
+  // (recipient list, is_teacher flag) branches on that.
+  const toTeacher = payload.kind === 'join_request' || payload.kind === 'reply' || payload.kind === 'insights_morning';
 
   let studentName: string | undefined;
   let recipientIds: string[];
