@@ -383,6 +383,24 @@ export function markIntervalDone(wordId: string, interval: number) {
   // getDueWords already skips them (no nextInterval found), so they won't resurface as due.
 }
 
+// "Not yet": the word counts as reviewed today and drops one stage — its last
+// completed interval comes off the log, and that interval is spaced from
+// today (a stage-0 word just comes back tomorrow). Stamping the review date
+// also restarts the unlearn countdown, so only words never opened drift
+// toward unlearning. Mirrors class Review and Flutter's failSRSWord.
+export function markIntervalFailed(wordId: string) {
+  const log = getReviewLog();
+  const completed = log[wordId] ?? [];
+  if (completed.length > 0) {
+    const top = Math.max(...completed);
+    log[wordId] = completed.filter(i => i !== top);
+    set(KEYS.reviewLog, log);
+  }
+  const dates = getSRSLastReview();
+  dates[wordId] = localDateStr();
+  saveSRSLastReview(dates);
+}
+
 // Recomputes whether a unit's learnDone flag still holds, given the words
 // currently tombstoned out of the SRS pool for that specific unit — instead
 // of a blanket reset, this only demotes a unit that's actually missing a
@@ -1880,7 +1898,14 @@ export function getStoryUnlockInfo(
   const stage4Count = srsWords.filter(w => (log[w.id] ?? []).includes(14)).length;
   const stage5Count = srsWords.filter(w => (log[w.id] ?? []).includes(30)).length;
 
-  const story1 = stage4Count >= threshold;
+  // Story 1 stays open once earned: a "Not yet" can drop words back below
+  // stage 4, and a story the learner already read shouldn't lock again.
+  const story1Key = `lexivo_story1_unlock_${collectionName}_${dayNumber}`;
+  const story1Saved = typeof window !== 'undefined' && localStorage.getItem(story1Key) !== null;
+  const story1 = stage4Count >= threshold || story1Saved;
+  if (story1 && !story1Saved && typeof window !== 'undefined') {
+    localStorage.setItem(story1Key, localDateStr());
+  }
   const story2 = stage5Count >= threshold;
 
   let story3 = false;

@@ -594,14 +594,28 @@ function mergeListsFromCloudRow(row: Record<string, unknown>): void {
       }
     }
 
-    // review_log: per-word union merge
+    // review_log: per word, the side that reviewed it more recently
+    // (last_review) wins outright — a "Not yet" removes an interval, and a
+    // plain union would put it straight back. Same date (or no dates) →
+    // union, as before. Must run before the last_review merge below so
+    // localLR still holds this device's dates. Keep in sync with Flutter's
+    // _mergeListsFromCloudRow.
     if (row.review_log && typeof row.review_log === 'object') {
       const local = lsJSON<Record<string, number[]>>('lexivo_review_log', {});
+      const cloudLR = (row.last_review && typeof row.last_review === 'object')
+        ? row.last_review as Record<string, unknown> : {};
+      const localLR = lsJSON<Record<string, string>>('lexivo_srs_last_review', {});
       let changed = false;
       for (const [wordKey, intervals] of Object.entries(row.review_log as Record<string, number[]>)) {
         const localIntervals = local[wordKey] ?? [];
-        const merged = [...new Set([...localIntervals, ...intervals])];
-        if (merged.length > localIntervals.length) { local[wordKey] = merged; changed = true; }
+        const cloudDate = typeof cloudLR[wordKey] === 'string' ? cloudLR[wordKey] as string : '';
+        const localDate = typeof localLR[wordKey] === 'string' ? localLR[wordKey] : '';
+        if (cloudDate < localDate) continue; // this device reviewed it more recently
+        const merged = cloudDate > localDate
+          ? [...new Set(intervals)]
+          : [...new Set([...localIntervals, ...intervals])];
+        const same = merged.length === localIntervals.length && merged.every(i => localIntervals.includes(i));
+        if (!same) { local[wordKey] = merged; changed = true; }
       }
       if (changed) lsSet('lexivo_review_log', JSON.stringify(local));
     }

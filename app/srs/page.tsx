@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { speak, speakText } from '@/lib/speech';
 import {
-  getDueWords, markIntervalDone, addXP, displayXP, recordStudySession, recordReviewDay,
+  getDueWords, markIntervalDone, markIntervalFailed, addXP, displayXP, recordStudySession, recordReviewDay,
   unlockAchievement, getSRSWords, getLearnedWords, removeSRSWord, getReviewLog,
   recordSRSLockedDay,
 } from '@/lib/storage';
@@ -187,6 +187,8 @@ function SRSReviewInner() {
       if (results[i].grade === 'knew') {
         markIntervalDone(queue[i].id, queue[i].dueInterval);
         xpGained += REVIEW_XP[queue[i].dueInterval] ?? 2;
+      } else {
+        markIntervalFailed(queue[i].id);
       }
     }
     if (results.length > 0) {
@@ -218,10 +220,13 @@ function SRSReviewInner() {
     sessionStorage.removeItem('srs_session');
     if (finalResults.length === 0) return;
 
-    // Only mark interval done for words the user knew — matches Flutter failSRSWord no-op
+    // Knew → next interval done; Not yet → drops one stage, due again from
+    // today (matches Flutter reviewSRSWord/failSRSWord). Both count as reviewed.
     for (let i = 0; i < finalResults.length; i++) {
       if (finalResults[i].grade === 'knew') {
         markIntervalDone(queue[i].id, queue[i].dueInterval);
+      } else {
+        markIntervalFailed(queue[i].id);
       }
     }
 
