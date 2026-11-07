@@ -10,6 +10,7 @@ import { readingPassages } from '@/lib/reading-data';
 import { classifyReview, REVIEW_LABEL_META, REVIEW_WINDOW_DAYS, type ReviewEntry, type ReviewLabel } from '@/lib/reviewPattern';
 import { localDateStr, addDaysToDateStr, displayXP } from '@/lib/storage';
 import { isHomeworkDone, fetchCollectionByName } from './homework/_shared';
+import AutoHomeworkModal, { AUTO_SELECT, autoStatusLine, autoT, type AutoSchedule } from '@/components/AutoHomeworkModal';
 import { classGradientColors } from '@/lib/class-gradient';
 import ClassInsightsBanner from '@/components/insights/ClassInsightsBanner';
 import { MissedHomeworkCard } from '@/components/MissedHomework';
@@ -131,7 +132,7 @@ interface HardWordRaw { user_id: string; word: string; }
 interface CurrFolder { id: string; assignmentId: string; name: string; units: CurrUnit[]; }
 interface CurrUnit { id: string; name: string; wordCount: number; }
 interface CurrWordUnit { id: string; name: string; wordCount: number; }
-interface CurrHW { id: string; unitId: string | null; classUnitId: string | null; collectionName: string | null; dayNumber: number | null; passageId: number | null; source: 'library' | 'class' | 'collection' | 'passage'; unitName: string; modes: string[]; dueDate: string | null; studentIds: string[] | null; progressByMode: Record<string, number>; }
+interface CurrHW { isReview?: boolean; id: string; unitId: string | null; classUnitId: string | null; collectionName: string | null; dayNumber: number | null; passageId: number | null; source: 'library' | 'class' | 'collection' | 'passage'; unitName: string; modes: string[]; dueDate: string | null; studentIds: string[] | null; progressByMode: Record<string, number>; }
 
 function Avatar({ name, url, size = 38 }: { name: string; url: string | null; size?: number }) {
   if (url) return <img src={url} alt={name} style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />;
@@ -924,6 +925,8 @@ function CurriculumTab({
   const [folders, setFolders] = useState<CurrFolder[]>([]);
   const [cwUnits, setCwUnits] = useState<CurrWordUnit[]>([]);
   const [homework, setHomework] = useState<CurrHW[]>([]);
+  const [autos, setAutos] = useState<AutoSchedule[]>([]);
+  const [autoTarget, setAutoTarget] = useState<{ title: string; collectionName?: string; dayNumbers?: number[]; folderId?: string; remaining: string[]; existing?: AutoSchedule } | null>(null);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [expandedCW, setExpandedCW] = useState<Set<string>>(new Set());
 
@@ -1009,11 +1012,16 @@ function CurriculumTab({
     }));
 
     // Homework
-    const { data: hwData, error: hwErr } = await supabase
-      .from('class_homework')
-      .select('id, unit_id, class_unit_id, collection_name, day_number, passage_id, modes, due_date, student_ids, teacher_units(name), class_word_units(name)')
-      .eq('class_id', classId).order('created_at', { ascending: false });
+    const [{ data: hwData, error: hwErr }, autoRes] = await Promise.all([
+      supabase
+        .from('class_homework')
+        .select('id, unit_id, class_unit_id, collection_name, day_number, passage_id, modes, due_date, student_ids, is_review, teacher_units(name), class_word_units(name)')
+        .eq('class_id', classId).order('created_at', { ascending: false }),
+      supabase.from('class_auto_homework').select(AUTO_SELECT).eq('class_id', classId),
+    ]);
     if (hwErr) { console.error('[loadCurriculum]', hwErr); alert(tt.classesPage.failedToLoadHomework(hwErr.message)); setLoading(false); return; }
+    if (autoRes.error) console.error('[loadCurriculum] auto homework', autoRes.error);
+    setAutos((autoRes.data ?? []) as AutoSchedule[]);
 
     let parsedHw: CurrHW[] = [];
     if (hwData && hwData.length > 0) {
@@ -1039,9 +1047,10 @@ function CurriculumTab({
           : isCollection ? `${collName} · Day ${dayNum}`
           : isClass ? (h.class_word_units?.name ?? tt.classesPage.defaultUnitName) : (h.teacher_units?.name ?? tt.classesPage.defaultUnitName);
         return {
+          isReview: h.is_review === true,
           id: h.id, unitId: h.unit_id ?? null, classUnitId: h.class_unit_id ?? null,
           collectionName: collName, dayNumber: dayNum, passageId,
-          source, unitName,
+          source, unitName: h.is_review ? `${unitName} · ${autoT('reviewLabel')}` : unitName,
           modes: h.modes ?? [], dueDate: h.due_date, studentIds: h.student_ids, progressByMode,
         };
       });
@@ -1152,6 +1161,30 @@ function CurriculumTab({
     setHwCollectionName(collPickerCollName);
     setHwDayNumber(dayNumber);
     openHwModal({ id: 'collection', name: `${collPickerCollName} · Day ${dayNumber}: ${topic}` });
+  };
+
+  const wholeClassAssigned = (match: (h: CurrHW) => boolean) =>
+    homework.some(h => !h.isReview && h.studentIds == null && match(h));
+
+  const openAutoForCollection = async (name: string) => {
+    const col = await fetchCollectionByName(name);
+    if (!col) return;
+    const days = col.days.filter(d => d.words.length > 0).map(d => d.dayNumber);
+    setCollPickerOpen(false);
+    setCollPickerStep(1);
+    setAutoTarget({
+      title: name, collectionName: name, dayNumbers: days,
+      remaining: days.filter(d => !wholeClassAssigned(h => h.collectionName === name && h.dayNumber === d)).map(d => `U${d}`),
+      existing: autos.find(a => a.collection_name === name),
+    });
+  };
+
+  const openAutoForFolder = (folder: CurrFolder) => {
+    setAutoTarget({
+      title: folder.name, folderId: folder.id,
+      remaining: folder.units.filter(u => !wholeClassAssigned(h => h.source === 'library' && h.unitId === u.id)).map(u => u.name),
+      existing: autos.find(a => a.folder_id === folder.id),
+    });
   };
 
   const createCWUnit = async () => {
@@ -1303,7 +1336,14 @@ function CurriculumTab({
                     <div className="flex-1 min-w-0">
                       <p className="font-black text-sm truncate" style={{ color: 'white', textShadow: '0 1px 3px rgba(0,0,0,0.35)' }}>{folder.name}</p>
                       <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)' }}>{tt.classesPage.unitsCount(folder.units.length)}</p>
+                      {(() => { const a = autos.find(x => x.folder_id === folder.id); return a && <p style={{ fontSize: 11, fontWeight: 700, color: 'white' }}>{autoStatusLine(a)}</p>; })()}
                     </div>
+                    <span
+                      role="button"
+                      onClick={e => { e.stopPropagation(); openAutoForFolder(folder); }}
+                      className="text-xs px-2 py-1 rounded-lg transition-colors shrink-0 font-bold"
+                      style={{ color: 'white', background: 'rgba(0,0,0,0.15)' }}
+                    >⚡ {autoT('auto')}</span>
                     <button
                       onClick={e => { e.stopPropagation(); unassignFolder(folder.assignmentId); }}
                       className="text-xs px-2 py-1 rounded-lg transition-colors shrink-0 mr-1"
@@ -1316,7 +1356,7 @@ function CurriculumTab({
                       {folder.units.length === 0 ? (
                         <p className="text-xs text-[var(--text-muted)] text-center py-4">{tt.classesPage.noUnitsInFolder}</p>
                       ) : folder.units.map(unit => {
-                        const hw = homework.find(h => h.source === 'library' && h.unitId === unit.id);
+                        const hw = homework.find(h => h.source === 'library' && h.unitId === unit.id && !h.isReview);
                         return (
                           <div key={unit.id} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[var(--surface-2)] transition-colors">
                             <div className="flex-1 min-w-0">
@@ -1397,6 +1437,7 @@ function CurriculumTab({
       {(() => {
         const collHw = homework.filter(h => h.source === 'collection');
         const groups: Record<string, typeof homework> = {};
+        for (const a of autos) { if (a.collection_name && !groups[a.collection_name]) groups[a.collection_name] = []; }
         for (const h of collHw) { const n = h.collectionName!; if (!groups[n]) groups[n] = []; groups[n].push(h); }
         const groupEntries = Object.entries(groups);
         return (
@@ -1423,8 +1464,15 @@ function CurriculumTab({
                         <span className="text-xl shrink-0">📗</span>
                         <div className="flex-1 min-w-0">
                           <p style={{ fontWeight: 900, fontSize: 14, color: 'white', textShadow: '0 1px 3px rgba(0,0,0,0.4)' }} className="truncate">{collName}</p>
-                          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)' }}>{tt.classesPage.daysAssignedCount(days.length)}</p>
+                          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)' }}>{tt.classesPage.daysAssignedCount(days.filter(d => !d.isReview).length)}</p>
+                          {(() => { const a = autos.find(x => x.collection_name === collName); return a && <p style={{ fontSize: 11, fontWeight: 700, color: 'white' }}>{autoStatusLine(a)}</p>; })()}
                         </div>
+                        <span
+                          role="button"
+                          onClick={e => { e.stopPropagation(); openAutoForCollection(collName); }}
+                          className="text-xs px-2 py-1 rounded-lg shrink-0 font-bold"
+                          style={{ color: 'white', background: 'rgba(0,0,0,0.15)' }}
+                        >⚡ {autoT('auto')}</span>
                         <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 11, fontWeight: 700 }}>{open ? '▲' : '▼'}</span>
                       </button>
                       {open && (
@@ -1665,6 +1713,16 @@ function CurriculumTab({
         </div>
       )}
 
+      {autoTarget && user && (
+        <AutoHomeworkModal
+          classId={classId} teacherId={user.id} sourceTitle={autoTarget.title}
+          collectionName={autoTarget.collectionName} dayNumbers={autoTarget.dayNumbers} folderId={autoTarget.folderId}
+          remaining={autoTarget.remaining} existing={autoTarget.existing}
+          onClose={() => setAutoTarget(null)}
+          onSaved={() => { setAutoTarget(null); loadCurriculum(); }}
+        />
+      )}
+
       {/* ── Collection picker — step 1 (pick collection) ── */}
       {collPickerOpen && collPickerStep === 1 && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setCollPickerOpen(false)}>
@@ -1695,6 +1753,7 @@ function CurriculumTab({
             <div className="flex items-center gap-2 shrink-0">
               <button onClick={() => setCollPickerStep(1)} className="text-xs text-[var(--text-muted)] hover:text-[var(--text)]">← {tt.classesPage.back}</button>
               <p className="font-bold text-[var(--text)] flex-1 truncate">{collPickerCollName}</p>
+              <button onClick={() => openAutoForCollection(collPickerCollName)} className="text-xs font-bold px-3 py-1.5 rounded-lg bg-[var(--primary-bg)] text-[var(--primary)] hover:opacity-80">⚡ {autoT('auto')}</button>
             </div>
             {collPickerLoading ? (
               <div className="flex justify-center py-8"><div className="text-3xl animate-bounce">📗</div></div>

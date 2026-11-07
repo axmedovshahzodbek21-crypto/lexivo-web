@@ -6,6 +6,7 @@ import BackButton from '@/components/BackButton';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { AssignedUnitCard, UnassignedUnitCard, isHomeworkDone, type AssignedUnit } from '../../_shared';
+import { autoT } from '@/components/AutoHomeworkModal';
 
 interface UnassignedUnit {
   id: string;
@@ -58,7 +59,7 @@ export default function ClassFolderHomeworkPage() {
     const { data: hwRows, error: hwErr } = unitIds.length > 0
       ? await supabase
           .from('class_homework')
-          .select('id, unit_id, modes, due_date, student_ids')
+          .select('id, unit_id, modes, due_date, student_ids, is_review')
           .eq('class_id', classId)
           .in('unit_id', unitIds)
       : { data: [] as any[], error: null };
@@ -69,8 +70,11 @@ export default function ClassFolderHomeworkPage() {
       const sids = h.student_ids as string[] | null;
       return sids === null || sids.includes(user!.id);
     });
+    // Auto-homework review days add a quiz-only second row for a unit —
+    // kept apart so it doesn't replace the unit's main row.
     const hwByUnit: Record<string, any> = {};
-    for (const h of applicable) hwByUnit[h.unit_id] = h;
+    const reviewRows: any[] = [];
+    for (const h of applicable) { if (h.is_review) reviewRows.push(h); else hwByUnit[h.unit_id] = h; }
 
     const hwIds = applicable.map((h: any) => h.id as string);
     const modeMap: Record<string, Set<string>> = {};
@@ -106,6 +110,18 @@ export default function ClassFolderHomeworkPage() {
         builtUnassigned.push({ id: u.id as string, badge, title: u.name as string, wordCount });
       }
     });
+    for (const r of reviewRows) {
+      const i = unitRows.findIndex(u => u.id === r.unit_id);
+      if (i < 0) continue;
+      builtAssigned.push({
+        hwId: r.id as string,
+        badge: `Unit ${i + 1}`,
+        title: `${unitRows[i].name} · ${autoT('reviewLabel')}`,
+        wordCount: (unitRows[i].teacher_unit_words as any[])?.[0]?.count ?? 0,
+        modes: (r.modes as string[]) ?? ['quiz'],
+        dueDate: (r.due_date as string | null) ?? null,
+      });
+    }
 
     if (loadIdRef.current !== myLoadId) return;
     setFolderName((folderRes.data as any)?.name ?? 'Folder');
