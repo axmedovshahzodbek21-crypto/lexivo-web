@@ -200,7 +200,7 @@ export default function Navigation() {
 
           {/* External: sibling projects preview site */}
           <a
-            href="https://lexivo-projects.vercel.app"
+            href="https://lexivo-builds.vercel.app"
             target="_blank"
             rel="noopener noreferrer"
             onMouseEnter={() => setHoveredKey('other_projects')}

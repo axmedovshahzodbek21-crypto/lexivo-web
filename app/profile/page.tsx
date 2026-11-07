@@ -451,7 +451,7 @@ export default function ProfilePage() {
           </TiltCard>
           <TiltCard className="card flex items-center gap-3 overflow-hidden hover:border-[var(--primary)] transition-colors depth-in-4" intensity={5}>
             <a
-              href="https://lexivo-projects.vercel.app"
+              href="https://lexivo-builds.vercel.app"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-3 w-full"
