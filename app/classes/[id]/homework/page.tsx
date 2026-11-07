@@ -187,7 +187,7 @@ export default function ClassHomeworkPage() {
       const folderIds = assigns.map((a: any) => a.teacher_folders.id as string);
       const { data: unitsData, error: unitsErr } = await supabase
         .from('teacher_units').select('id, folder_id, name, teacher_unit_words(count)')
-        .in('folder_id', folderIds).order('created_at');
+        .in('folder_id', folderIds).order('position').order('created_at');
       if (unitsErr) throw unitsErr;
       folderUnitsData = (unitsData ?? []) as any[];
     }

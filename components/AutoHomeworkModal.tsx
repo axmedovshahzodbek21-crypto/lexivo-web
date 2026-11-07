@@ -19,6 +19,10 @@ const S = {
   review:      { en: 'Review day (quiz on recent units)', uz: 'Takrorlash kuni (oxirgi unitlardan test)', ru: 'День повторения (тест по недавним)' },
   everyN:      { en: 'Every {n}th', uz: 'Har {n}-kun', ru: 'Каждый {n}-й' },
   modes:       { en: 'Modes', uz: 'Rejimlar', ru: 'Режимы' },
+  order:       { en: 'Order', uz: 'Tartib', ru: 'Порядок' },
+  inOrder:     { en: 'In order', uz: 'Ketma-ket', ru: 'По порядку' },
+  random:      { en: 'Random', uz: 'Tasodifiy', ru: 'Случайно' },
+  randomN:     { en: '{n} random unit(s)', uz: '{n} ta tasodifiy unit', ru: 'Случайных юнитов: {n}' },
   start:       { en: 'Start', uz: 'Boshlash', ru: 'Начало' },
   today:       { en: 'Today', uz: 'Bugundan', ru: 'Сегодня' },
   tomorrow:    { en: 'Tomorrow', uz: 'Ertadan', ru: 'Завтра' },
@@ -71,6 +75,7 @@ export interface AutoSchedule {
   modes: string[];
   due_days: number | null;
   review_every: number | null;
+  random_order: boolean;
   paused: boolean;
   start_date: string;
   last_run_on: string | null;
@@ -79,7 +84,7 @@ export interface AutoSchedule {
   days_since_review: number;
 }
 
-export const AUTO_SELECT = 'id, collection_name, folder_id, units_per_day, weekdays, modes, due_days, review_every, paused, start_date, last_run_on, last_status, last_count, days_since_review';
+export const AUTO_SELECT = 'id, collection_name, folder_id, units_per_day, weekdays, modes, due_days, review_every, random_order, paused, start_date, last_run_on, last_status, last_count, days_since_review';
 
 /** One line for the teacher's card, e.g. "⚡ kuniga 2 ta · Bugun: 2 ta unit berildi". */
 export function autoStatusLine(a: AutoSchedule): string {
@@ -120,6 +125,7 @@ export default function AutoHomeworkModal({
   const [match, setMatch] = useState(existing?.modes.includes('match') ?? false);
   const [dueDays, setDueDays] = useState<number | null>(existing ? existing.due_days : 1);
   const [reviewEvery, setReviewEvery] = useState<number | null>(existing ? existing.review_every : 5);
+  const [randomOrder, setRandomOrder] = useState(existing?.random_order ?? false);
   const [startToday, setStartToday] = useState(true);
   const [busy, setBusy] = useState(false);
 
@@ -149,7 +155,8 @@ export default function AutoHomeworkModal({
           releasedSinceReview = false;
         } else {
           const batch = remaining.slice(idx, idx + perDay);
-          if (lines.length < 6) lines.push(`${wd[dow - 1]} ${short(day)}: ${batch.join(', ')}`);
+          const what = randomOrder ? autoT('randomN').replace('{n}', String(batch.length)) : batch.join(', ');
+          if (lines.length < 6) lines.push(`${wd[dow - 1]} ${short(day)}: ${what}`);
           idx += batch.length;
           sinceReview++;
           releasedSinceReview = true;
@@ -168,6 +175,7 @@ export default function AutoHomeworkModal({
     modes: ['learn', 'flashcard', 'quiz', ...(match ? ['match'] : [])],
     due_days: dueDays,
     review_every: reviewEvery,
+    random_order: randomOrder,
     ...(collectionName ? { day_numbers: dayNumbers } : {}),
   });
 
@@ -222,6 +230,12 @@ export default function AutoHomeworkModal({
           <button disabled={perDay <= 1} onClick={() => setPerDay(p => p - 1)} className="w-9 h-9 rounded-full bg-[var(--surface-2)] text-[var(--text)] font-bold disabled:opacity-40">−</button>
           <span className="text-xl font-black text-[var(--text)] w-6 text-center">{perDay}</span>
           <button disabled={perDay >= 10} onClick={() => setPerDay(p => p + 1)} className="w-9 h-9 rounded-full bg-[var(--surface-2)] text-[var(--text)] font-bold disabled:opacity-40">+</button>
+        </div>
+
+        {label(autoT('order'))}
+        <div className="flex gap-1.5">
+          {chip(autoT('inOrder'), !randomOrder, () => setRandomOrder(false))}
+          {chip(`🎲 ${autoT('random')}`, randomOrder, () => setRandomOrder(true))}
         </div>
 
         {label(autoT('days'))}

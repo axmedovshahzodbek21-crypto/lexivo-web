@@ -41,7 +41,7 @@ export default function ClassFolderHomeworkPage() {
     setLoadError(null);
     const [folderRes, unitsRes, classRes] = await Promise.all([
       supabase.from('teacher_folders').select('id, name').eq('id', folderId).maybeSingle(),
-      supabase.from('teacher_units').select('id, name, teacher_unit_words(count)').eq('folder_id', folderId).order('created_at'),
+      supabase.from('teacher_units').select('id, name, teacher_unit_words(count)').eq('folder_id', folderId).order('position').order('created_at'),
       supabase.from('classes').select('name').eq('id', classId).maybeSingle(),
     ]);
     if (loadIdRef.current !== myLoadId) return;
