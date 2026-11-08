@@ -1730,7 +1730,7 @@ function CurriculumTab({
           <div className="w-full max-w-md bg-[var(--surface)] rounded-t-3xl p-5 space-y-4 max-h-[80vh] flex flex-col" onClick={e => e.stopPropagation()}>
             <div className="w-9 h-1 rounded-full bg-[var(--border)] mx-auto shrink-0" />
             <div className="flex items-center gap-2 shrink-0">
-              <button onClick={() => setCollPickerStep(1)} className="text-xs text-[var(--text-muted)] hover:text-[var(--text)]">← {tt.classesPage.back}</button>
+              <button onClick={() => setCollPickerStep(1)} className="text-xs text-[var(--text-muted)] hover:text-[var(--text)]">{tt.classesPage.back}</button>
               <p className="font-bold text-[var(--text)] flex-1 truncate">{collPickerCollName}</p>
               <button onClick={() => openAutoForCollection(collPickerCollName)} className="text-xs font-bold px-3 py-1.5 rounded-lg bg-[var(--primary-bg)] text-[var(--primary)] hover:opacity-80">⚡ {autoT('auto')}</button>
             </div>
@@ -2542,41 +2542,41 @@ export default function ClassDashboardPage() {
       <div className={`bg-gradient-to-br ${_grad} px-5 pt-5 pb-6 relative`}
         style={{ boxShadow: `0 8px 32px ${_glow}cc` }}>
         <div style={{ position: 'absolute', right: 16, top: 8, fontSize: 80, fontWeight: 900, color: 'rgba(255,255,255,0.06)', lineHeight: 1, userSelect: 'none', pointerEvents: 'none' }}>🏫</div>
-        <button onClick={() => router.push(`/classes/${id}/home`)} className="inline-flex items-center gap-1.5 text-white/70 hover:text-white text-sm font-medium mb-4 transition-colors">← {tt.classesPage.back}</button>
+        <button onClick={() => router.push(`/classes/${id}/home`)} className="inline-flex items-center gap-1.5 text-white hover:opacity-80 text-sm font-medium mb-4 transition-opacity">{tt.classesPage.back}</button>
         <div className="flex items-center gap-4 mb-4">
           <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shrink-0"
             style={{ background: 'rgba(255,255,255,0.18)', boxShadow: '0 4px 0 rgba(0,0,0,0.15)' }}>🏫</div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-black text-white/50 uppercase tracking-widest mb-0.5">{tt.classesPage.teacherDashboard}</p>
+            <p className="text-xs font-black text-white uppercase tracking-widest mb-0.5">{tt.classesPage.teacherDashboard}</p>
             <h1 className="text-2xl font-black text-white leading-tight truncate" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.25)' }}>{classInfo?.name ?? '…'}</h1>
             <div className="flex items-center gap-2 mt-1">
-              <p className="text-xs text-white/60">{tt.classesPage.joinCode}</p>
-              <code className="text-xs font-black text-white/90">{classInfo?.join_code}</code>
+              <p className="text-xs text-white">{tt.classesPage.joinCode}</p>
+              <code className="text-xs font-black text-white">{classInfo?.join_code}</code>
               <button onClick={copyCode} className="text-sm hover:scale-110 transition-transform" aria-label={tt.classesPage.copyJoinCode}>{copied ? '✅' : '📋'}</button>
             </div>
           </div>
           <div className="shrink-0 text-right">
             <p className="text-2xl font-black text-white leading-tight">{students.length}</p>
-            <p className="text-xs text-white/60">{tt.classesPage.students}</p>
+            <p className="text-xs text-white">{tt.classesPage.students}</p>
           </div>
         </div>
         <div className="flex gap-2 flex-wrap">
           <button onClick={() => router.push(`/classes/${id}/words`)} className="text-xs font-bold px-3 py-1.5 rounded-xl text-white transition-opacity hover:opacity-80"
-            style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.25)', backdropFilter: 'blur(8px)' }}>📝 {tt.classesPage.wordsBtnLabel}</button>
+            style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.25)', backdropFilter: 'blur(8px)' }}>{tt.classesPage.wordsBtnLabel}</button>
           <button onClick={() => { setShowAnnounce(true); setAnnounceText(''); }} className="text-xs font-bold px-3 py-1.5 rounded-xl text-white transition-opacity hover:opacity-80"
-            style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.25)', backdropFilter: 'blur(8px)' }}>📢 {tt.classesPage.announceBtnLabel}</button>
+            style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.25)', backdropFilter: 'blur(8px)' }}>{tt.classesPage.announceBtnLabel}</button>
           <button onClick={load} className="text-xs font-bold px-3 py-1.5 rounded-xl text-white transition-opacity hover:opacity-80"
-            style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.25)', backdropFilter: 'blur(8px)' }}>🔄 {tt.classesPage.refreshBtnLabel}</button>
+            style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.25)', backdropFilter: 'blur(8px)' }}>{tt.classesPage.refreshBtnLabel}</button>
           {students.length > 0 && (
             <button onClick={exportCSV} className="text-xs font-bold px-3 py-1.5 rounded-xl text-white transition-opacity hover:opacity-80"
-              style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.25)', backdropFilter: 'blur(8px)' }}>📥 {tt.classesPage.csvBtnLabel}</button>
+              style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.25)', backdropFilter: 'blur(8px)' }}>{tt.classesPage.csvBtnLabel}</button>
           )}
         </div>
       </div>
 
       {/* Tab switcher */}
       {!loading && (
-        <div className="flex overflow-x-auto border-b border-[var(--border)]">
+        <div className="flex overflow-x-auto border-b border-[var(--border)] bg-[var(--surface)]">
           {(['students', 'activity', 'radar', 'analytics', 'srs', 'review', 'curriculum'] as Tab[]).map(t => (
             <button
               key={t}

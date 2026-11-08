@@ -38,7 +38,6 @@ export default function ConfirmDialog() {
   if (!pending) return null;
 
   const answer = (ok: boolean) => {
-    ref.current?.close(); // hands keyboard focus back to the button that opened it
     pending.resolve(ok);
     setPending(null);
   };
