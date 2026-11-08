@@ -10,6 +10,7 @@ import { readingPassages } from '@/lib/reading-data';
 import { classifyReview, REVIEW_LABEL_META, REVIEW_WINDOW_DAYS, type ReviewEntry, type ReviewLabel } from '@/lib/reviewPattern';
 import { localDateStr, addDaysToDateStr, displayXP } from '@/lib/storage';
 import { isHomeworkDone, fetchCollectionByName } from './homework/_shared';
+import { selectInChunks } from '@/lib/fetch-in-chunks';
 import AutoHomeworkModal, { AUTO_SELECT, autoStatusLine, autoT, type AutoSchedule } from '@/components/AutoHomeworkModal';
 import { classGradientColors } from '@/lib/class-gradient';
 import ClassInsightsBanner from '@/components/insights/ClassInsightsBanner';
@@ -285,13 +286,11 @@ function AnalyticsTab({
         .from('teacher_units').select('id, folder_id, name')
         .in('folder_id', folderIds).order('position').order('created_at');
       const unitIds = (unitData ?? []).map((u: any) => u.id);
-      const { data: hwData } = unitIds.length > 0
-        ? await supabase.from('class_homework').select('id, unit_id, modes, student_ids').eq('class_id', classId).in('unit_id', unitIds)
-        : { data: [] };
+      const { data: hwData } = await selectInChunks(unitIds, chunk =>
+        supabase.from('class_homework').select('id, unit_id, modes, student_ids').eq('class_id', classId).in('unit_id', chunk).order('id'));
       const hwIds = (hwData ?? []).map((h: any) => h.id);
-      const { data: progData } = hwIds.length > 0
-        ? await supabase.from('class_homework_progress').select('homework_id, student_id, mode').in('homework_id', hwIds)
-        : { data: [] };
+      const { data: progData } = await selectInChunks(hwIds, chunk =>
+        supabase.from('class_homework_progress').select('homework_id, student_id, mode').in('homework_id', chunk).order('id'));
       const prog = (progData ?? []) as { homework_id: string; student_id: string; mode: string }[];
       const hwMap = new Map<string, { id: string; modes: string[]; studentIds: string[] | null }>();
       for (const h of (hwData ?? []) as any[]) hwMap.set(h.unit_id, { id: h.id, modes: h.modes, studentIds: h.student_ids });
@@ -1026,8 +1025,8 @@ function CurriculumTab({
     let parsedHw: CurrHW[] = [];
     if (hwData && hwData.length > 0) {
       const hwIds = (hwData as any[]).map(h => h.id);
-      const { data: progData, error: progErr } = await supabase
-        .from('class_homework_progress').select('homework_id, student_id, mode').in('homework_id', hwIds);
+      const { data: progData, error: progErr } = await selectInChunks(hwIds, chunk => supabase
+        .from('class_homework_progress').select('homework_id, student_id, mode').in('homework_id', chunk).order('id'));
       if (progErr) { console.error('[loadCurriculum]', progErr); alert(tt.classesPage.failedToLoadHomeworkProgress(progErr.message)); setLoading(false); return; }
       parsedHw = (hwData as any[]).map(h => {
         const rows = (progData ?? []).filter((p: any) => p.homework_id === h.id);

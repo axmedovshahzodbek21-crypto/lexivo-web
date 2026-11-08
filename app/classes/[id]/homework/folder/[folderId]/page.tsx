@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import BackButton from '@/components/BackButton';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
+import { selectInChunks } from '@/lib/fetch-in-chunks';
 import { AssignedUnitCard, UnassignedUnitCard, isHomeworkDone, type AssignedUnit } from '../../_shared';
 
 interface UnassignedUnit {
@@ -55,13 +56,12 @@ export default function ClassFolderHomeworkPage() {
     const unitRows = (unitsRes.data ?? []) as any[];
     const unitIds = unitRows.map(u => u.id as string);
 
-    const { data: hwRows, error: hwErr } = unitIds.length > 0
-      ? await supabase
-          .from('class_homework')
-          .select('id, unit_id, modes, due_date, student_ids')
-          .eq('class_id', classId)
-          .in('unit_id', unitIds)
-      : { data: [] as any[], error: null };
+    const { data: hwRows, error: hwErr } = await selectInChunks(unitIds, chunk => supabase
+      .from('class_homework')
+      .select('id, unit_id, modes, due_date, student_ids')
+      .eq('class_id', classId)
+      .in('unit_id', chunk)
+      .order('id'));
     if (loadIdRef.current !== myLoadId) return;
     if (hwErr) { console.error('folder homework load error', hwErr); setLoadError(hwErr.message); setLoading(false); return; }
 
@@ -75,9 +75,9 @@ export default function ClassFolderHomeworkPage() {
     const hwIds = applicable.map((h: any) => h.id as string);
     const modeMap: Record<string, Set<string>> = {};
     if (hwIds.length > 0) {
-      const { data: prog, error: progErr } = await supabase
+      const { data: prog, error: progErr } = await selectInChunks(hwIds, chunk => supabase
         .from('class_homework_progress').select('homework_id, mode')
-        .eq('student_id', user!.id).in('homework_id', hwIds);
+        .eq('student_id', user!.id).in('homework_id', chunk).order('id'));
       if (loadIdRef.current !== myLoadId) return;
       if (progErr) { console.error('folder homework load error', progErr); setLoadError(progErr.message); setLoading(false); return; }
       for (const p of (prog ?? [])) {

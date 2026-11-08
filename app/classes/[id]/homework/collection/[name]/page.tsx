@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import BackButton from '@/components/BackButton';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
+import { selectInChunks } from '@/lib/fetch-in-chunks';
 import { AssignedUnitCard, isHomeworkDone, fetchCollectionByName, type AssignedUnit } from '../../_shared';
 
 export default function ClassCollectionHomeworkPage() {
@@ -70,9 +71,9 @@ export default function ClassCollectionHomeworkPage() {
     const hwIds = built.map(u => u.hwId);
     const modeMap: Record<string, Set<string>> = {};
     if (hwIds.length > 0) {
-      const { data: prog, error: progErr } = await supabase
+      const { data: prog, error: progErr } = await selectInChunks(hwIds, chunk => supabase
         .from('class_homework_progress').select('homework_id, mode')
-        .eq('student_id', user!.id).in('homework_id', hwIds);
+        .eq('student_id', user!.id).in('homework_id', chunk).order('id'));
       if (loadIdRef.current !== myLoadId) return;
       if (progErr) { console.error('collection homework load error', progErr); setLoadError(progErr.message); setLoading(false); return; }
       for (const p of (prog ?? [])) {

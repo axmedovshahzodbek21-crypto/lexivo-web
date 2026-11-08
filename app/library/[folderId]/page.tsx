@@ -9,6 +9,7 @@ import { useAuth } from '@/lib/auth-context';
 import { folderCache as _cache } from '@/lib/teacher-library-cache';
 import { CopyFolderWordListButton } from '@/components/CopyWordList';
 import BulkImportModal, { bulkT } from '@/components/BulkImportModal';
+import { selectInChunks } from '@/lib/fetch-in-chunks';
 
 interface Unit {
   id: string;
@@ -150,12 +151,14 @@ export default function FolderPage() {
             <CopyFolderWordListButton
               units={units.map(u => ({ name: u.name, count: u.word_count }))}
               loadWords={async () => {
-                const { data, error } = await supabase
+                const { data, error } = await selectInChunks<{ unit_id: string; word: string }>(units.map(u => u.id), chunk => supabase
                   .from('teacher_unit_words')
                   .select('unit_id, word')
-                  .in('unit_id', units.map(u => u.id))
+                  .in('unit_id', chunk)
+                  .order('unit_id')
                   .order('position')
-                  .order('created_at');
+                  .order('created_at')
+                  .order('id'));
                 if (error) throw new Error(error.message);
                 const byUnit: Record<string, string[]> = {};
                 for (const row of data ?? []) (byUnit[row.unit_id] ??= []).push(row.word);

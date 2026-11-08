@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
+import { selectInChunks } from '@/lib/fetch-in-chunks';
 import ClassXpHistoryModal from '@/components/ClassXpHistoryModal';
 import { localDateStr, addDaysToDateStr, displayXP } from '@/lib/storage';
 import { avatarColor } from '@/lib/class-gradient';
@@ -264,11 +265,12 @@ const [memberCount, setMemberCount] = useState(0);
           const myHw = ((hwRows ?? []) as { id: string; modes: string[]; student_ids: string[] | null }[])
             .filter(h => !h.student_ids || h.student_ids.includes(user.id));
           if (myHw.length === 0) { setPendingHwCount(0); return; }
-          const { data: prog, error: progErr } = await supabase
+          const { data: prog, error: progErr } = await selectInChunks(myHw.map(h => h.id), chunk => supabase
             .from('class_homework_progress')
             .select('homework_id, mode')
             .eq('student_id', user.id)
-            .in('homework_id', myHw.map(h => h.id));
+            .in('homework_id', chunk)
+            .order('id'));
           if (cancelled) return;
           if (progErr) { console.error('pending homework count error', progErr); return; }
           const doneMap: Record<string, Set<string>> = {};

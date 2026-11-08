@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { selectInChunks } from './fetch-in-chunks';
 import { localDateStr } from './storage';
 import { readingPassages } from './reading-data';
 import type { Translations } from './i18n';
@@ -34,7 +35,6 @@ export interface MissedHomework {
   lateDays: number;       // days after due the last mode was done (0 if missing)
 }
 
-const PAGE = 1000; // PostgREST row cap — a truncated progress list would show done homework as missed
 
 export async function loadHomeworkRecords(
   classId: string,
@@ -57,18 +57,14 @@ export async function loadHomeworkRecords(
   const joinedAt = new Map(((members ?? []) as { student_id: string; joined_at: string | null }[]).map(m => [m.student_id, m.joined_at]));
 
   const doneOn = new Map<string, string>(); // `${hw}:${student}:${mode}` -> local yyyy-mm-dd
-  for (let from = 0; ; from += PAGE) {
-    const { data: prog, error: progErr } = await supabase
-      .from('class_homework_progress')
-      .select('homework_id, student_id, mode, completed_at')
-      .in('homework_id', hws.map(h => h.id))
-      .in('student_id', studentIds)
-      .order('id')
-      .range(from, from + PAGE - 1);
-    if (progErr) throw progErr;
-    for (const p of prog ?? []) doneOn.set(`${p.homework_id}:${p.student_id}:${p.mode}`, localDateStr(new Date(p.completed_at)));
-    if ((prog ?? []).length < PAGE) break;
-  }
+  const { data: prog, error: progErr } = await selectInChunks(hws.map(h => h.id), chunk => supabase
+    .from('class_homework_progress')
+    .select('homework_id, student_id, mode, completed_at')
+    .in('homework_id', chunk)
+    .in('student_id', studentIds)
+    .order('id'));
+  if (progErr) throw progErr;
+  for (const p of prog) doneOn.set(`${p.homework_id}:${p.student_id}:${p.mode}`, localDateStr(new Date(p.completed_at)));
 
   const out: HomeworkRecord[] = [];
   for (const h of hws) {

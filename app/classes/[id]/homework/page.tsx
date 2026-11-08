@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/auth-context';
 import type { WordCollection } from '@/lib/types';
 import { readingPassages } from '@/lib/reading-data';
 import { isHomeworkDone, dueLabel, fetchCollectionByName, MODE_ICON } from './_shared';
+import { selectInChunks } from '@/lib/fetch-in-chunks';
 import { classGradientColors } from '@/lib/class-gradient';
 
 interface FolderUnit {
@@ -166,9 +167,9 @@ export default function ClassHomeworkPage() {
     const hwIds = applicableHw.map(h => h.id);
     const modeMap: Record<string, Set<string>> = {};
     if (hwIds.length > 0) {
-      const { data: prog, error: progErr } = await supabase
+      const { data: prog, error: progErr } = await selectInChunks(hwIds, chunk => supabase
         .from('class_homework_progress').select('homework_id, mode')
-        .eq('student_id', userId).in('homework_id', hwIds);
+        .eq('student_id', userId).in('homework_id', chunk).order('id'));
       if (progErr) throw progErr;
       for (const p of (prog ?? [])) {
         if (!modeMap[p.homework_id]) modeMap[p.homework_id] = new Set();
