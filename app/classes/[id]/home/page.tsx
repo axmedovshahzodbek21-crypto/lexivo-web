@@ -8,7 +8,7 @@ import { useAuth } from '@/lib/auth-context';
 import { selectInChunks } from '@/lib/fetch-in-chunks';
 import ClassXpHistoryModal from '@/components/ClassXpHistoryModal';
 import { localDateStr, addDaysToDateStr, displayXP } from '@/lib/storage';
-import { avatarColor } from '@/lib/class-gradient';
+import { avatarColor, classGradientColors } from '@/lib/class-gradient';
 
 interface Announcement { id: string; message: string; created_at: string; }
 interface Note { id: string; message: string; created_at: string; read_at: string | null; }
@@ -47,27 +47,6 @@ function dueLabel(due: string | null, t: ReturnType<typeof useTranslation>): { t
   if (due === tomorrow) return { text: t.classesPage.dueTomorrow, overdue: false };
   return { text: t.classesPage.dueDate(due), overdue: false };
 }
-
-const CLASS_COLORS = [
-  'from-indigo-500 to-indigo-400', 'from-pink-500 to-pink-400',
-  'from-emerald-500 to-emerald-400', 'from-blue-500 to-blue-400',
-  'from-amber-500 to-amber-400', 'from-purple-500 to-purple-400',
-  'from-red-500 to-red-400', 'from-cyan-500 to-cyan-400',
-];
-function classGradient(id: string) {
-  const n = id.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
-  return CLASS_COLORS[n % CLASS_COLORS.length];
-}
-const GLOW: Record<string, string> = {
-  'from-indigo-500 to-indigo-400': '#6366f1',
-  'from-pink-500 to-pink-400': '#ec4899',
-  'from-emerald-500 to-emerald-400': '#22c55e',
-  'from-blue-500 to-blue-400': '#3b82f6',
-  'from-amber-500 to-amber-400': '#f59e0b',
-  'from-purple-500 to-purple-400': '#8b5cf6',
-  'from-red-500 to-red-400': '#ef4444',
-  'from-cyan-500 to-cyan-400': '#06b6d4',
-};
 
 export default function ClassHomePage() {
   const tx = useTranslation();
@@ -379,9 +358,8 @@ const [memberCount, setMemberCount] = useState(0);
     );
   }
 
-  const gradient = classGradient(id);
-  const glow = GLOW[gradient] ?? '#6366f1';
-  const classAccent = GLOW[gradient] ?? '#6366f1';
+  const { gradient, glow } = classGradientColors(id);
+  const classAccent = glow;
   const pending = targets.filter(t => !t.completed_at);
 
   const sortedPending = [...pending].sort((a, b) => {
@@ -621,7 +599,7 @@ const [memberCount, setMemberCount] = useState(0);
             <span className="inline-block text-[10px] font-bold bg-white/25 text-white rounded-full px-2.5 py-0.5 mt-0.5 mb-1">
               {isTeacher ? tx.classesPage.teacher : tx.classesPage.studentBadge}
             </span>
-            <p className="text-sm text-white/75">
+            <p className="text-sm text-white">
               {isTeacher ? (
                 <button onClick={openStudentsSheet} className="underline underline-offset-2 hover:opacity-80 transition-opacity active:scale-95">
                   {tx.classesPage.nStudents(memberCount)}
@@ -675,7 +653,7 @@ const [memberCount, setMemberCount] = useState(0);
         </div>
         {memberCount > 0 && (
           <div>
-            <div className="flex justify-between text-xs text-white/80 mb-1.5">
+            <div className="flex justify-between text-xs text-white mb-1.5">
               <span className="font-semibold">
                 {activeToday >= memberCount ? tx.classesPage.everyoneActiveToday : tx.classesPage.classActivity}
               </span>
@@ -731,7 +709,7 @@ const [memberCount, setMemberCount] = useState(0);
         {/* Homework (student) */}
         {!isTeacher && targets.length > 0 && (
           <section>
-            <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--text-muted)] mb-3">{tx.classesPage.homeworkSectionHeader}</h2>
+            <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--text)] mb-3">{tx.classesPage.homeworkSectionHeader}</h2>
             <div className="space-y-2">
               {targets.slice(0, 3).map(t => {
                 const due = dueLabel(t.due_date, tx);
@@ -753,7 +731,7 @@ const [memberCount, setMemberCount] = useState(0);
         {/* Quick stats (teacher) */}
         {isTeacher && (
           <section>
-            <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--text-muted)] mb-3">{tx.classesPage.quickStatsHeader}</h2>
+            <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--text)] mb-3">{tx.classesPage.quickStatsHeader}</h2>
             <div className="flex justify-center gap-3 [&>*]:w-40">
               {[
                 { icon: '👥', value: memberCount, label: tx.classesPage.studentsStatLabel, onClick: openStudentsSheet },
@@ -793,7 +771,7 @@ const [memberCount, setMemberCount] = useState(0);
             <section className="space-y-2">
               {fresh.length > 0 && (
                 <>
-                  <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--text-muted)] mb-1">{tx.classesPage.notesFromTeacherLabel}</h2>
+                  <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--text)] mb-1">{tx.classesPage.notesFromTeacherLabel}</h2>
                   {fresh.map(noteRow)}
                 </>
               )}
@@ -811,9 +789,9 @@ const [memberCount, setMemberCount] = useState(0);
 
         {/* Announcements */}
         <section>
-          <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--text-muted)] mb-3">{tx.classesPage.announcementsHeader}</h2>
+          <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--text)] mb-3">{tx.classesPage.announcementsHeader}</h2>
           {announcements.length === 0 ? (
-            <p className="text-sm text-[var(--text-muted)] text-center py-6">{tx.classesPage.noAnnouncements}</p>
+            <p className="text-sm text-[var(--text-muted)] text-center py-6 bg-[var(--surface)] border border-[var(--border)] rounded-xl">{tx.classesPage.noAnnouncements}</p>
           ) : (
             <div className="space-y-2">
               {announcements.map(a => {

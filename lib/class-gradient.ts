@@ -5,11 +5,12 @@
 // gets tweaked and the others don't" risk that caused the streak page's
 // day-boundary drift bug. Centralized here so there's exactly one copy to
 // fix or extend.
+// These sit behind white text, so keep every stop dark enough to read it on.
 const CLASS_GRADIENTS = [
-  'from-indigo-500 to-purple-500', 'from-pink-500 to-rose-400',
-  'from-emerald-500 to-teal-400', 'from-blue-500 to-cyan-400',
-  'from-amber-500 to-orange-400', 'from-violet-500 to-purple-400',
-  'from-red-500 to-pink-400', 'from-cyan-500 to-blue-400',
+  'from-indigo-600 to-purple-600', 'from-pink-600 to-rose-600',
+  'from-emerald-700 to-teal-700', 'from-blue-600 to-cyan-700',
+  'from-amber-700 to-orange-700', 'from-violet-600 to-purple-600',
+  'from-red-600 to-pink-600', 'from-cyan-700 to-blue-600',
 ];
 const CLASS_GLOWS = ['#818cf8', '#ec4899', '#22c55e', '#3b82f6', '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4'];
 
