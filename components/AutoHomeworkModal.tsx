@@ -155,7 +155,7 @@ export default function AutoHomeworkModal({
     weekdays: [...weekdays].sort(),
     modes: ['learn', 'flashcard', 'quiz', ...(match ? ['match'] : [])],
     due_days: dueDays,
-    random_order: !!folderId && randomOrder,
+    random_order: randomOrder,
     ...(collectionName ? { day_numbers: dayNumbers } : {}),
   });
 
@@ -212,13 +212,11 @@ export default function AutoHomeworkModal({
           <button disabled={perDay >= 10} onClick={() => setPerDay(p => p + 1)} className="w-9 h-9 rounded-full bg-[var(--surface-2)] text-[var(--text)] font-bold disabled:opacity-40">+</button>
         </div>
 
-        {folderId && (<>{/* random order is for the teacher's own folders only */}
-          {label(autoT('order'))}
-          <div className="flex gap-1.5">
-            {chip(autoT('inOrder'), !randomOrder, () => setRandomOrder(false))}
-            {chip(`🎲 ${autoT('random')}`, randomOrder, () => setRandomOrder(true))}
-          </div>
-        </>)}
+        {label(autoT('order'))}
+        <div className="flex gap-1.5">
+          {chip(autoT('inOrder'), !randomOrder, () => setRandomOrder(false))}
+          {chip(`🎲 ${autoT('random')}`, randomOrder, () => setRandomOrder(true))}
+        </div>
 
         {label(autoT('days'))}
         <div className="flex flex-wrap gap-1.5">
