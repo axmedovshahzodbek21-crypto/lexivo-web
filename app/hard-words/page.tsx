@@ -1,4 +1,5 @@
 ﻿'use client';
+import { appConfirm } from '@/components/ConfirmDialog';
 import { useTranslation } from '@/lib/useTranslation';
 import { PageLoader, SectionLoader } from '@/components/Loader';
 import { useEffect, useState, useCallback } from 'react';
@@ -56,8 +57,8 @@ export default function HardWordsPage() {
 
   useEffect(() => { reload(); }, [reload]);
 
-  const handleRemove = (word: string) => {
-    if (!confirm(t.hardWordsPage.confirmRemove(word))) return;
+  const handleRemove = async (word: string) => {
+    if (!(await appConfirm(t.hardWordsPage.confirmRemove(word)))) return;
     removeHardWord(word);
     pushLists();
     reload();

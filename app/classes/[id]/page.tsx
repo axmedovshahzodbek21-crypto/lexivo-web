@@ -1,4 +1,5 @@
 ﻿'use client';
+import { appConfirm } from '@/components/ConfirmDialog';
 import { useTranslation } from '@/lib/useTranslation';
 import { fmtMonthDay, fmtWeekdayMonthDay } from '@/lib/i18n';
 import { PageLoader, SectionLoader } from '@/components/Loader';
@@ -1071,7 +1072,7 @@ function CurriculumTab({
   };
 
   const unassignFolder = async (assignmentId: string) => {
-    if (!confirm(tt.classesPage.confirmUnassignFolder)) return;
+    if (!(await appConfirm(tt.classesPage.confirmUnassignFolder))) return;
     const { error } = await supabase.from('class_library_assignments').delete().eq('id', assignmentId).eq('class_id', classId);
     if (error) { console.error('[unassignFolder]', error); alert(tt.classesPage.failedToRemoveFolder(error.message)); return; }
     await loadCurriculum();
@@ -1192,8 +1193,8 @@ function CurriculumTab({
     const msg = hwCount === 0
       ? tt.classesPage.deleteClassUnitConfirmSimple(unit.name)
       : tt.classesPage.deleteClassUnitConfirmWithHw(unit.name, hwCount);
-    if (!confirm(msg)) return;
-    // confirm() can sit open for a while — the warning above may now be
+    if (!(await appConfirm(msg))) return;
+    // The dialog can sit open for a while — the warning above may now be
     // stale (homework could've been assigned/removed from this unit in the
     // meantime by this teacher in another tab, or a co-teacher). Re-check
     // right before the actual delete so a changed impact count aborts
@@ -2248,7 +2249,7 @@ export default function ClassDashboardPage() {
   };
 
   const deleteAnnouncement = async (announcementId: string) => {
-    if (!confirm(tt.classesPage.deleteAnnouncementConfirm)) return;
+    if (!(await appConfirm(tt.classesPage.deleteAnnouncementConfirm))) return;
     await supabase.from('class_announcements').delete().eq('id', announcementId).eq('class_id', id);
     setAnnouncements(prev => prev.filter(a => a.id !== announcementId));
   };
@@ -2435,7 +2436,7 @@ export default function ClassDashboardPage() {
   };
 
   const removeStudent = async (studentId: string) => {
-    if (!confirm(tt.classesPage.removeStudentConfirm)) return;
+    if (!(await appConfirm(tt.classesPage.removeStudentConfirm))) return;
     const { data, error } = await supabase.from('class_members').delete().eq('class_id', id).eq('student_id', studentId).select();
     if (error || !data || data.length === 0) {
       alert(tt.classesPage.failedToRemoveStudent);
@@ -2498,7 +2499,7 @@ export default function ClassDashboardPage() {
   };
 
   const deleteTarget = async (targetId: string) => {
-    if (!confirm(tt.classesPage.deleteTargetConfirm)) return;
+    if (!(await appConfirm(tt.classesPage.deleteTargetConfirm))) return;
     await supabase.from('class_targets').delete().eq('id', targetId).eq('class_id', id);
     await loadTargets();
   };

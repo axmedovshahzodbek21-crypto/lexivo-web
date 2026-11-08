@@ -1,4 +1,5 @@
 ﻿'use client';
+import { appConfirm } from '@/components/ConfirmDialog';
 import { useTranslation } from '@/lib/useTranslation';
 import { SectionLoader } from '@/components/Loader';
 import { use, useEffect, useState, useCallback, useRef } from 'react';
@@ -90,8 +91,8 @@ export default function ListDetailPage({ params }: { params: Promise<{ id: strin
     setEditingName(false);
   };
 
-  const handleRemove = (word: string) => {
-    if (!confirm(t.listsPage.removeConfirm(word))) return;
+  const handleRemove = async (word: string) => {
+    if (!(await appConfirm(t.listsPage.removeConfirm(word)))) return;
     removeWordFromList(id, word);
     pushLists();
     reload();

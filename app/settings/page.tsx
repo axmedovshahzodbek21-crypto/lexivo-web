@@ -1,4 +1,5 @@
 'use client';
+import { appConfirm } from '@/components/ConfirmDialog';
 import { useTranslation } from '@/lib/useTranslation';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -295,7 +296,7 @@ export default function SettingsPage() {
   };
 
   const handleSignOut = async () => {
-    if (!confirm(t.sidebar.signOutConfirm)) return;
+    if (!(await appConfirm(t.sidebar.signOutConfirm))) return;
     clearUserData();
     await supabase.auth.signOut();
     window.location.replace('/login');

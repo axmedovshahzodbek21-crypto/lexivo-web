@@ -1,4 +1,5 @@
 'use client';
+import { appConfirm } from '@/components/ConfirmDialog';
 import { useTranslation } from '@/lib/useTranslation';
 import { useEffect, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
@@ -118,7 +119,7 @@ export default function FolderPage() {
   }
 
   async function deleteUnit(id: string, name: string) {
-    if (!confirm(t.libraryPage.deleteUnitConfirm(name)) || !user) return;
+    if (!(await appConfirm(t.libraryPage.deleteUnitConfirm(name))) || !user) return;
     try {
       await supabase.from('teacher_units').delete().eq('id', id).eq('teacher_id', user.id);
     } catch (e) {

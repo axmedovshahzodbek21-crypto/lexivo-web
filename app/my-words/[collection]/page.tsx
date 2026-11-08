@@ -1,4 +1,5 @@
 'use client';
+import { appConfirm } from '@/components/ConfirmDialog';
 import { useEffect, useState, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -87,8 +88,8 @@ export default function FolderPage({ params }: Props) {
     setTimeout(() => setToast(null), 2000);
   }
 
-  function handleDeleteFolder() {
-    if (!confirm(t.extra.deleteEntireFolderConfirm(folder))) return;
+  async function handleDeleteFolder() {
+    if (!(await appConfirm(t.extra.deleteEntireFolderConfirm(folder)))) return;
     deleteImportedFolder(folder);
     pushLists();
     router.push('/my-words');

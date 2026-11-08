@@ -3,6 +3,7 @@
 // folder. The nightly job (migration 20261108000001) does the assigning; this
 // only edits the class_auto_homework row. Mirrors lexivo
 // lib/screens/auto_homework_sheet.dart.
+import { appConfirm } from '@/components/ConfirmDialog';
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { getUILanguage } from '@/lib/storage';
@@ -180,7 +181,7 @@ export default function AutoHomeworkModal({
   }
 
   async function turnOff() {
-    if (!existing || !confirm(autoT('turnOffQ'))) return;
+    if (!existing || !(await appConfirm(autoT('turnOffQ')))) return;
     setBusy(true);
     const { error } = await supabase.from('class_auto_homework').delete().eq('id', existing.id);
     if (error) { alert(`${autoT('failed')}: ${error.message}`); setBusy(false); return; }

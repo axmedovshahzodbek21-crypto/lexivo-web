@@ -1,4 +1,5 @@
 ﻿'use client';
+import { appConfirm } from '@/components/ConfirmDialog';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -97,7 +98,7 @@ export default function Navigation() {
   const levelColor = LEVEL_COLORS[levelInfo.level] ?? LEVEL_COLORS_FALLBACK;
 
   const handleSignOut = async () => {
-    if (!confirm(t.sidebar.signOutConfirm)) return;
+    if (!(await appConfirm(t.sidebar.signOutConfirm))) return;
     await signOut();
     router.replace('/login');
   };

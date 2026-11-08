@@ -1,4 +1,5 @@
 ﻿'use client';
+import { appConfirm } from '@/components/ConfirmDialog';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -145,7 +146,7 @@ export default function ProfilePage() {
   }
 
   async function handleRemovePhoto() {
-    if (!confirm(t.profile.removePhotoConfirm)) return;
+    if (!(await appConfirm(t.profile.removePhotoConfirm))) return;
     removeProfilePic();
     removeProfilePicUrl();
     if (user) {
@@ -158,7 +159,7 @@ export default function ProfilePage() {
   }
 
   async function handleSignOut() {
-    if (!confirm(t.sidebar.signOutConfirm)) return;
+    if (!(await appConfirm(t.sidebar.signOutConfirm))) return;
     await signOut();
     router.replace('/login');
   }

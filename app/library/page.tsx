@@ -1,4 +1,5 @@
 'use client';
+import { appConfirm } from '@/components/ConfirmDialog';
 import PageTip from '@/components/PageTip';
 import { useTranslation } from '@/lib/useTranslation';
 import { useEffect, useRef, useState } from 'react';
@@ -135,7 +136,7 @@ export default function LibraryPage() {
   }
 
   async function deleteFolder(id: string, name: string) {
-    if (!confirm(t.libraryPage.deleteFolderConfirm(name)) || !user) return;
+    if (!(await appConfirm(t.libraryPage.deleteFolderConfirm(name))) || !user) return;
     try {
       await supabase.from('teacher_folders').delete().eq('id', id).eq('teacher_id', user.id);
     } catch (e) {

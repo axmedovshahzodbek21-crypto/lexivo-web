@@ -7,6 +7,7 @@ import AppNav from '@/components/AppNav';
 import AchievementToast from '@/components/AchievementToast';
 import LevelUpOverlay from '@/components/LevelUpOverlay';
 import KeyboardHelp from '@/components/KeyboardHelp';
+import ConfirmDialog from '@/components/ConfirmDialog';
 import DataLoader from '@/components/DataLoader';
 import GlobalKeyboardHandler from '@/components/GlobalKeyboardHandler';
 import ThemeProvider from '@/components/ThemeProvider';
@@ -74,6 +75,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <AchievementToast />
         <LevelUpOverlay />
         <KeyboardHelp />
+        <ConfirmDialog />
         </AuthProvider>
       </body>
     </html>

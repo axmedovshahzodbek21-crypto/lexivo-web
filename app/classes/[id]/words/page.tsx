@@ -1,4 +1,5 @@
 'use client';
+import { appConfirm } from '@/components/ConfirmDialog';
 import { useTranslation } from '@/lib/useTranslation';
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { useRouter, useParams } from 'next/navigation';
@@ -397,7 +398,7 @@ export default function ClassWordsPage() {
   };
 
   const deleteWord = async (wordId: string) => {
-    if (!confirm(t.classesPage.deleteThisWordConfirm)) return;
+    if (!(await appConfirm(t.classesPage.deleteThisWordConfirm))) return;
     setWordsError(null);
     // class_id scopes the delete to this class as defense-in-depth — RLS is
     // the real backstop, but a bare .eq('id', wordId) here would let a
