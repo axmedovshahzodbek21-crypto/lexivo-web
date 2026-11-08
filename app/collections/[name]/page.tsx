@@ -3,13 +3,13 @@ import { use, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
-import { getUnitProgress, getLearnProgress, getHardWordCount, getFlashcardProgress, getStoryUnlockInfo, getSRSWords, getReviewLog, getLearnedWords } from '@/lib/storage';
+import { getUnitProgress, getStoryUnlockInfo, getSRSWords, getReviewLog, getLearnedWords } from '@/lib/storage';
 import type { WordCollection, UnitProgress } from '@/lib/types';
 import { useTranslation } from '@/lib/useTranslation';
 import { supabase } from '@/lib/supabase';
 import { PHRASE_LEVELS, phraseCollectionName, isPhraseCollection } from '@/lib/phrases';
-import { CopyFolderWordListButton, CopyWordListButton } from '@/components/CopyWordList';
-import { UnitCardFrame, ModeButton } from '@/components/UnitStudyCard';
+import { CopyFolderWordListButton } from '@/components/CopyWordList';
+import { UnitCardFrame } from '@/components/UnitStudyCard';
 
 const COLLECTION_HERO: Record<string, { gradient: string; glow: string }> = {
   '30 Days of Powerful Words': {
@@ -457,280 +457,47 @@ function UnitCard({
   const { learnDone, flashcardDone, quizDone, matchDone } = unit.progress;
   const stagesComplete = [learnDone, flashcardDone, quizDone].filter(Boolean).length;
   const isComplete = stagesComplete === 3;
-
-  const [learnProgress, setLearnProgress] = useState<number | null>(null);
-  const [hardCount, setHardCount] = useState(0);
-  const [flashcardProgress, setFlashcardProgress] = useState(0);
-  const [showInfo, setShowInfo] = useState(false);
   const [storyInfo] = useState(() =>
     getStoryUnlockInfo(collectionName, unit.dayNumber, unit.wordCount),
   );
-  const [activeStory, setActiveStory] = useState<{ num: number; title: string; content: string } | null>(null);
-  const [storyLoading, setStoryLoading] = useState(false);
-  const [tappedWord, setTappedWord] = useState<string | null>(null);
-
-  useEffect(() => {
-    setLearnProgress(getLearnProgress(collectionName, unit.dayNumber));
-    setHardCount(getHardWordCount(collectionName, unit.dayNumber));
-    const fp = getFlashcardProgress(collectionName, unit.dayNumber);
-    setFlashcardProgress(fp ? fp.length : 0);
-  }, [collectionName, unit.dayNumber]);
-
-  const openStory = async (storyNumber: number) => {
-    setStoryLoading(true);
-    setActiveStory({ num: storyNumber, title: '', content: '' });
-    const { data } = await supabase
-      .from('unit_stories')
-      .select('title, content')
-      .eq('collection_name', collectionName)
-      .eq('unit_number', unit.dayNumber)
-      .eq('story_number', storyNumber)
-      .maybeSingle();
-    setActiveStory({ num: storyNumber, title: data?.title ?? '', content: data?.content ?? '' });
-    setStoryLoading(false);
-  };
-
-  const storyEmojis = ['📖', '📕', '📗'];
-  const storyLabels = [t.collectionsPage.story1Label, t.collectionsPage.story2Label, t.collectionsPage.story3Label];
-  const storyFlags = [storyInfo.story1Unlocked, storyInfo.story2Unlocked, storyInfo.story3Unlocked];
-
-  const enc = encodeURIComponent(collectionName);
-  const resumeUrl = learnProgress && learnProgress > 0
-    ? `/learn?collection=${enc}&day=${unit.dayNumber}&startIndex=${learnProgress}`
-    : null;
-  const learnUrl  = `/learn?collection=${enc}&day=${unit.dayNumber}`;
-  const flashUrl  = `/flashcards?collection=${enc}&day=${unit.dayNumber}`;
-  const quizUrl   = `/quiz?collection=${enc}&day=${unit.dayNumber}`;
-  const matchUrl  = `/matching?collection=${enc}&day=${unit.dayNumber}`;
+  const stages: [string, boolean][] = [['📖', learnDone], ['🃏', flashcardDone], ['❓', quizDone], ['🎯', !!matchDone]];
 
   return (
-    <>
-    <UnitCardFrame
-      badge={t.collections.unit(unit.dayNumber)}
-      isComplete={isComplete}
-      accent={heroGradient}
-      progressPct={(stagesComplete / 3) * 100}
-      badges={<>
-        <span className="text-[10px] text-[var(--text-muted)]">{t.collections.unitWordsLabel(unit.wordCount)}</span>
-        {isComplete && <span className="text-[10px] font-bold text-green-500">{t.collectionsPage.doneCheckmark}</span>}
-        {storyInfo.anyUnlocked && (
-          <span className="text-[10px] font-bold text-amber-500">📚 {storyInfo.unlockedCount}</span>
+    <Link href={`/collections/${encodeURIComponent(collectionName)}/${unit.dayNumber}`} className="block transition-transform active:scale-[0.99]">
+      <UnitCardFrame
+        badge={t.collections.unit(unit.dayNumber)}
+        isComplete={isComplete}
+        accent={heroGradient}
+        progressPct={(stagesComplete / 3) * 100}
+        badges={<>
+          <span className="text-[10px] text-[var(--text-muted)]">{t.collections.unitWordsLabel(unit.wordCount)}</span>
+          {isComplete && <span className="text-[10px] font-bold text-green-500">{t.collectionsPage.doneCheckmark}</span>}
+          {storyInfo.anyUnlocked && (
+            <span className="text-[10px] font-bold text-amber-500">📚 {storyInfo.unlockedCount}</span>
+          )}
+        </>}
+        // Some collections (word_data.json) give units real topics like
+        // "Ageing Population" — genuine content, shown as-is. Others
+        // (a1/a2/b1/advanced_collection.json) just set topic to the literal
+        // string "Unit N", which would duplicate the badge above once that
+        // badge is localized, so it's skipped here.
+        title={!/^Unit \d+$/.test(unit.topic) && (
+          <h3 className="font-bold text-[var(--text)] text-sm leading-tight truncate">{unit.topic}</h3>
         )}
-      </>}
-      // Some collections (word_data.json) give units real topics like
-      // "Ageing Population" — genuine content, shown as-is. Others
-      // (a1/a2/b1/advanced_collection.json) just set topic to the literal
-      // string "Unit N", which would duplicate the badge above once that
-      // badge is localized, so it's skipped here.
-      title={!/^Unit \d+$/.test(unit.topic) && (
-        <h3 className="font-bold text-[var(--text)] text-sm leading-tight truncate">{unit.topic}</h3>
-      )}
-      actions={<>
-        <CopyWordListButton
-          words={unit.words}
-          className="text-sm opacity-50 hover:opacity-90 transition-opacity"
-        />
-        <button
-          onClick={() => setShowInfo(true)}
-          className="text-sm opacity-40 hover:opacity-80 transition-opacity"
-          aria-label={t.collections.howMarking}
-        >🕯️</button>
-      </>}
-    >
-
-        {/* Resume banners */}
-        {!learnDone && resumeUrl && (
-          <div className="flex items-center justify-between gap-2 px-3 py-2 rounded-xl bg-[var(--primary-bg)] border border-[var(--primary)] border-opacity-30">
-            <span className="text-xs text-[var(--primary)]">{t.collections.savedAtWord((learnProgress ?? 0) + 1)}</span>
-            <div className="flex gap-2">
-              <Link href={resumeUrl} className="text-xs font-semibold text-[var(--primary)] hover:underline">{t.collections.continueBtn}</Link>
-              <span className="text-[var(--text-muted)]">·</span>
-              <Link href={learnUrl} className="text-xs text-[var(--text-muted)] hover:underline">{t.collections.restart}</Link>
-            </div>
-          </div>
-        )}
-        {!flashcardDone && flashcardProgress > 0 && (
-          <div
-            className="flex items-center justify-between gap-2 px-3 py-2 rounded-xl"
-            style={{ background: 'rgba(234,88,12,0.08)', border: '1px solid rgba(234,88,12,0.25)' }}
-          >
-            <span className="text-xs font-medium" style={{ color: '#ea580c' }}>{t.collections.cardsRemaining(flashcardProgress)}</span>
-            <div className="flex gap-2">
-              <Link href={flashUrl} className="text-xs font-semibold hover:underline" style={{ color: '#ea580c' }}>{t.collections.continueBtn}</Link>
-              <span className="text-[var(--text-muted)]">·</span>
-              <Link href={`${flashUrl}&fresh=true`} className="text-xs text-[var(--text-muted)] hover:underline">{t.collections.restart}</Link>
-            </div>
-          </div>
-        )}
-
-        {/* Mode buttons */}
-        <div className="grid grid-cols-3 gap-2">
-          <ModeButton href={learnUrl} icon="📖" label={t.nav.learn} done={learnDone} color="#4f46e5" />
-          <ModeButton
-            href={flashUrl}
-            icon="🃏"
-            label={hardCount > 0 ? t.collectionsPage.cardsLabelCount(hardCount) : t.collectionsPage.cardsLabel}
-            done={flashcardDone}
-            color="#ea580c"
-            locked={!learnDone}
-            lockReason={t.collections.completeLearnFirst}
-          />
-          <ModeButton
-            href={quizUrl}
-            icon="❓"
-            label={t.nav.quiz}
-            done={quizDone}
-            color="#d97706"
-            locked={!learnDone}
-            lockReason={t.collections.completeLearnFirst}
-            softLocked={learnDone && !flashcardDone}
-            softLockReason={t.collections.hardWordsRemain}
-          />
+      >
+        <div className="flex items-center gap-1.5">
+          {stages.map(([icon, done]) => (
+            <span
+              key={icon}
+              className="flex-1 text-center py-1.5 rounded-lg text-sm font-bold"
+              style={done
+                ? { background: 'rgba(34,197,94,0.12)', color: '#16a34a' }
+                : { background: 'var(--surface-2)' }}
+            >{done ? '✓' : icon}</span>
+          ))}
+          <span aria-hidden className="pl-1 text-sm text-[var(--text-muted)]">→</span>
         </div>
-
-        {/* Match — full width */}
-        <ModeButton
-          href={matchUrl}
-          icon="🎯"
-          label={t.collectionsPage.matchLabel}
-          done={!!matchDone}
-          color="#db2777"
-          wide
-          locked={!learnDone}
-          lockReason={t.collections.completeLearnFirst}
-        />
-
-        {/* Stories */}
-        {storyInfo.anyUnlocked && (
-          <div className="pt-2 border-t border-[var(--border)]">
-            <p className="text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)] mb-2">{t.collectionsPage.storiesHeader}</p>
-            <div className="flex flex-col gap-1.5">
-              {storyFlags.map((unlocked, i) => (
-                <button
-                  key={i}
-                  disabled={!unlocked}
-                  onClick={() => unlocked && openStory(i + 1)}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-xl text-left transition-all text-xs font-semibold ${
-                    unlocked
-                      ? 'bg-amber-50 border border-amber-200 text-amber-700 hover:bg-amber-100'
-                      : 'bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text-muted)] opacity-40 cursor-not-allowed'
-                  }`}
-                >
-                  <span>{storyEmojis[i]}</span>
-                  <span className="flex-1">{storyLabels[i]}</span>
-                  <span>{unlocked ? '→' : '🔒'}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-    </UnitCardFrame>
-
-      {/* Story reader modal */}
-      {activeStory && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
-          onClick={() => setActiveStory(null)}
-        >
-          <div
-            className="card max-w-lg w-full max-h-[85vh] flex flex-col animate-slide-up"
-            onClick={e => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between mb-3 shrink-0">
-              <span className="text-sm font-bold text-[var(--text)]">
-                {storyEmojis[activeStory.num - 1]} {storyLabels[activeStory.num - 1]}
-              </span>
-              <button
-                onClick={() => setActiveStory(null)}
-                className="text-[var(--text-muted)] hover:text-[var(--text)] text-lg leading-none"
-              >×</button>
-            </div>
-            {storyLoading ? (
-              <div className="flex-1 flex items-center justify-center py-12">
-                <div className="text-2xl animate-bounce">📖</div>
-              </div>
-            ) : activeStory.content.trim() ? (
-              <div className="overflow-y-auto flex flex-col gap-3">
-                {activeStory.title && (
-                  <h2 className="text-lg font-bold text-[var(--text)]">{activeStory.title}</h2>
-                )}
-                <p className="text-sm text-[var(--text)] leading-relaxed whitespace-pre-wrap">
-                  {activeStory.content.split(/\[\[([^\]]+)\]\]/).map((part, i) =>
-                    i % 2 === 1 ? (
-                      <button
-                        key={i}
-                        onClick={() => setTappedWord(part)}
-                        className="inline font-semibold rounded px-0.5 transition-opacity hover:opacity-75"
-                        style={{ color: 'var(--primary)', background: 'color-mix(in srgb, var(--primary) 12%, transparent)' }}
-                      >{part}</button>
-                    ) : <span key={i}>{part}</span>
-                  )}
-                </p>
-                {tappedWord && (
-                  <div
-                    className="shrink-0 rounded-xl p-3 flex items-center gap-3"
-                    style={{ background: 'var(--primary-bg)', border: '1px solid color-mix(in srgb, var(--primary) 25%, transparent)' }}
-                  >
-                    <span className="text-base font-bold flex-1" style={{ color: 'var(--primary)' }}>📖 {tappedWord}</span>
-                    <button
-                      onClick={() => { setTappedWord(null); setActiveStory(null); }}
-                      className="text-xs font-bold px-3 py-1.5 rounded-lg text-white shrink-0"
-                      style={{ background: 'var(--primary)' }}
-                    >{t.extra.goToUnit}</button>
-                    <button
-                      onClick={() => setTappedWord(null)}
-                      className="text-lg leading-none shrink-0"
-                      style={{ color: 'var(--text-muted)' }}
-                    >×</button>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="flex-1 flex flex-col items-center justify-center py-10 text-center">
-                <span className="text-4xl mb-3">{storyEmojis[activeStory.num - 1]}</span>
-                <p className="font-semibold text-[var(--text)] mb-1">{t.extra.storyComingSoon}</p>
-                <p className="text-xs text-[var(--text-muted)]">
-                  {t.collectionsPage.storyUnlockedNotWritten}
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Marking info modal */}
-      {showInfo && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40"
-          onClick={() => setShowInfo(false)}
-        >
-          <div
-            className="card max-w-sm w-full animate-slide-up"
-            onClick={e => e.stopPropagation()}
-          >
-            <h3 className="font-bold text-lg mb-4 text-center">{t.collections.markingModal}</h3>
-            <div className="space-y-3">
-              {[
-                { icon: '📖', label: t.nav.learn, desc: t.collections.markingLearn },
-                { icon: '🃏', label: t.nav.flashcards, desc: t.collections.markingFlash },
-                { icon: '❓', label: t.nav.quiz, desc: t.collections.markingQuiz },
-                { icon: '🏆', label: t.collectionsPage.unitCompleteLabel, desc: t.collections.markingUnit },
-              ].map(({ icon, label, desc }) => (
-                <div key={label} className="flex gap-3 items-start">
-                  <span className="text-xl shrink-0">{icon}</span>
-                  <div>
-                    <p className="text-sm font-semibold text-[var(--text)]">{label}</p>
-                    <p className="text-xs text-[var(--text-muted)]">{desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <button onClick={() => setShowInfo(false)} className="btn-primary w-full mt-4">
-              {t.common.gotIt}
-            </button>
-          </div>
-        </div>
-      )}
-    </>
+      </UnitCardFrame>
+    </Link>
   );
 }

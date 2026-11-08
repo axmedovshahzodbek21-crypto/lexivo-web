@@ -6,7 +6,8 @@ import ClassShellNav from './ClassShellNav';
 // Shared study routes that can be entered either from a personal collection
 // or from inside a class (via ?classId=...). When launched from a class we
 // keep the class sidebar visible instead of swapping to the main app nav,
-// so the session doesn't feel like it left the classroom.
+// so the session doesn't feel like it left the classroom. Homework is the
+// exception: it should look exactly like studying in personal Lexivo.
 const CLASS_STUDY_ROUTES = new Set(['/learn', '/flashcards', '/quiz', '/matching']);
 
 export default function AppNav({ children }: { children: React.ReactNode }) {
@@ -21,7 +22,7 @@ export default function AppNav({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
   }
 
-  if (classId && CLASS_STUDY_ROUTES.has(pathname)) {
+  if (classId && CLASS_STUDY_ROUTES.has(pathname) && searchParams.get('source') !== 'class-hw') {
     return (
       <div className="sm:min-h-screen">
         <ClassShellNav classId={classId} />

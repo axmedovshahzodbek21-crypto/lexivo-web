@@ -1076,7 +1076,7 @@ function LearnInner() {
       : sourceClassHW ? (sp.get('hwId') ? `/classes/${sp.get('classId')}/homework/${sp.get('hwId')}?completed=learn` : '/classes')
       : hardOnly ? '/hard-words'
       : sourceMyWords ? (myCollection ? (myFolder ? `/my-words/${encodeURIComponent(myFolder)}/${encodeURIComponent(myCollection)}` : `/my-words/${encodeURIComponent(myCollection)}`) : '/my-words')
-      : collectionName ? `/collections/${encodeURIComponent(collectionName)}`
+      : collectionName ? `/collections/${encodeURIComponent(collectionName)}${dayNumber !== undefined ? `/${dayNumber}` : ''}`
       : '/';
     return (
       <SessionDone
