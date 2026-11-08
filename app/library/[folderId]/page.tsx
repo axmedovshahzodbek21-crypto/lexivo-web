@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { folderCache as _cache } from '@/lib/teacher-library-cache';
 import { CopyFolderWordListButton } from '@/components/CopyWordList';
+import BulkImportModal, { bulkT } from '@/components/BulkImportModal';
 
 interface Unit {
   id: string;
@@ -42,6 +43,7 @@ export default function FolderPage() {
   const [units, setUnits] = useState<Unit[]>(cached?.units ?? []);
   const [loading, setLoading] = useState(cached === null);
   const [showCreate, setShowCreate] = useState(false);
+  const [showBulk, setShowBulk] = useState(false);
   const [newName, setNewName] = useState('');
   const [creating, setCreating] = useState(false);
   const [renameId, setRenameId] = useState<string | null>(null);
@@ -162,12 +164,20 @@ export default function FolderPage() {
             />
           )}
           <button
+            onClick={() => setShowBulk(true)}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold bg-[var(--primary-bg)] text-[var(--primary)]"
+          >📥 {bulkT('button')}</button>
+          <button
             onClick={() => setShowCreate(true)}
             className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-white"
             style={{ background: 'linear-gradient(135deg, var(--primary), var(--primary-light))' }}
           >+ {t.libraryPage.newUnit}</button>
         </div>
       </div>
+
+      {showBulk && (
+        <BulkImportModal folderId={folderId} onClose={() => setShowBulk(false)} onDone={() => { setShowBulk(false); load(); }} />
+      )}
 
       {/* Create modal */}
       {showCreate && (
