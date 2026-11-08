@@ -7,7 +7,7 @@ import { buildStudentSummary, type ClassAnswer, type HistoryEntry, type Lang, ty
 export type StudentSummaryResult = ReturnType<typeof buildStudentSummary>;
 
 // PostgREST returns at most 1000 rows per request — page through.
-async function paged<T>(query: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: unknown }>, max = 30_000): Promise<T[]> {
+export async function paged<T>(query: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: unknown }>, max = 30_000): Promise<T[]> {
   const out: T[] = [];
   for (let from = 0; from < max; from += 1000) {
     const { data, error } = await query(from, from + 999);

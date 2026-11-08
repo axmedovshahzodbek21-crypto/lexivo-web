@@ -41,6 +41,7 @@ export interface WordEvidence { word: string; right: number; wrong: number; }
 export interface ModeEvidence { mode: string; count: number; } // mode: learn | flashcard | quiz | match | read | review
 export interface RankEvidence { place: number; name: string; value: number; unit: 'words' | 'pct'; me: boolean; }
 export interface ClassAnswer { user_id: string; knew: boolean; created_at: string; } // whole-class class_review_events row
+export interface FactEvidence { title: string; detail?: string; } // a plain row, for the class digest
 export type Evidence =
   | { kind: 'homework'; items: HwEvidence[] }
   | { kind: 'timing'; items: HwEvidence[] }
@@ -52,7 +53,8 @@ export type Evidence =
   | { kind: 'accuracy'; items: AccuracyEvidence[] }
   | { kind: 'words'; items: WordEvidence[] }
   | { kind: 'modes'; items: ModeEvidence[] }
-  | { kind: 'ranking'; items: RankEvidence[] };
+  | { kind: 'ranking'; items: RankEvidence[] }
+  | { kind: 'facts'; items: FactEvidence[] };
 export type EvidenceKind = Evidence['kind'];
 export interface Segment { text: string; evidence?: Evidence; }
 export type SummarySentence = Segment[];
@@ -63,18 +65,18 @@ interface Pick {
   ev?: {
     homework?: HwEvidence[]; timing?: HwEvidence[]; reminders?: NoteEvidence[]; days?: DayEvidence[];
     review?: ReviewEvidence[]; weeks?: WeekEvidence[]; sessions?: SessionEvidence[];
-    accuracy?: AccuracyEvidence[]; words?: WordEvidence[]; modes?: ModeEvidence[]; ranking?: RankEvidence[];
+    accuracy?: AccuracyEvidence[]; words?: WordEvidence[]; modes?: ModeEvidence[]; ranking?: RankEvidence[]; facts?: FactEvidence[];
   };
 }
 
 const HOUR = 3600_000;
-const localDate = (iso: string | number) => new Date(iso).toLocaleDateString('en-CA');
-const dayDiff = (from: string, to: string) => Math.round((Date.parse(to) - Date.parse(from)) / 86400000);
-const addDays = (ymd: string, n: number) => { const d = new Date(ymd + 'T00:00:00'); d.setDate(d.getDate() + n); return localDate(d.getTime()); };
+export const localDate = (iso: string | number) => new Date(iso).toLocaleDateString('en-CA');
+export const dayDiff = (from: string, to: string) => Math.round((Date.parse(to) - Date.parse(from)) / 86400000);
+export const addDays = (ymd: string, n: number) => { const d = new Date(ymd + 'T00:00:00'); d.setDate(d.getDate() + n); return localDate(d.getTime()); };
 const fmtShort = (ymd: string) => ymd.slice(8, 10) + '.' + ymd.slice(5, 7);
 const fmtLong = (ymd: string) => ymd.split('-').reverse().join('.');
 
-function fill(s: string, vars: Record<string, string | number>) {
+export function fill(s: string, vars: Record<string, string | number>) {
   return s.replace(/\{(\w+)\}/g, (m, k) => (vars[k] !== undefined ? String(vars[k]) : m));
 }
 
@@ -82,7 +84,7 @@ function names(items: { title: string }[], w: Record<string, string>): string {
   return joinList(items.map(i => i.title), w);
 }
 
-function joinList(list: string[], w: Record<string, string>): string {
+export function joinList(list: string[], w: Record<string, string>): string {
   const t = Array.from(new Set(list));
   if (t.length === 1) return t[0];
   if (t.length === 2) return `${t[0]} ${w.and} ${t[1]}`;
@@ -607,7 +609,7 @@ function reminderPick(notes: SentNote[], history: HistoryEntry[], now: number, t
 // ── Rendering ────────────────────────────────────────────────────────────────
 
 // Stable per student per day, different across days and cases.
-function variantIndex(seed: string, n: number): number {
+export function variantIndex(seed: string, n: number): number {
   let h = 0;
   for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) | 0;
   return Math.abs(h) % n;

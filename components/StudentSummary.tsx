@@ -177,6 +177,14 @@ function EvidenceCard({ evidence, classId, accentColor, reasonLabel }: {
         </div>
       ));
       break;
+    case 'facts':
+      body = evidence.items.map((x, i) => (
+        <div key={i} className={row}>
+          <p className="font-bold" style={{ color: 'var(--text)' }}>{x.title}</p>
+          {x.detail && <p style={muted}>{x.detail}</p>}
+        </div>
+      ));
+      break;
     case 'review':
       body = evidence.items.map(r => (
         <div key={r.from} className={row}>

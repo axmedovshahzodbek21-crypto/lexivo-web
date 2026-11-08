@@ -1341,8 +1341,8 @@ const en = {
     activeTodayStatLabel: 'Active today',
     announcementsHeader: '📢 Announcements',
     // Wave B additions (class dashboard, part 2)
-    aiDigestSub: 'Generate a personalised coaching summary based on this week\'s data.',
-    aiWeeklyDigest: '🤖 AI Weekly Digest',
+    aiDigestSub: 'A summary of the class over the last 7 days, built from its real data.',
+    aiWeeklyDigest: '📋 Weekly Digest',
     allDoneCheckmark: 'all done ✓',
     allFoldersAssignedOrNone: 'All your library folders are already assigned, or you haven\'t created any yet.',
     announceBtnLabel: '📢 Announce',
@@ -4032,8 +4032,8 @@ const uz: typeof en = {
     activeTodayStatLabel: 'Bugun faol',
     announcementsHeader: '📢 E\'lonlar',
     // Wave B additions (class dashboard, part 2)
-    aiDigestSub: 'Ushbu haftaning ma\'lumotlari asosida shaxsiylashtirilgan murabbiylik xulosasini yarating.',
-    aiWeeklyDigest: '🤖 AI haftalik xulosa',
+    aiDigestSub: 'So\'nggi 7 kundagi sinf ma\'lumotlari asosidagi xulosa.',
+    aiWeeklyDigest: '📋 Haftalik xulosa',
     allDoneCheckmark: 'hammasi bajarildi ✓',
     allFoldersAssignedOrNone: 'Kutubxonangizdagi barcha papkalar allaqachon biriktirilgan, yoki siz hali birortasini yaratmagansiz.',
     announceBtnLabel: '📢 E\'lon qilish',
@@ -6733,8 +6733,8 @@ const ru: typeof en = {
     activeTodayStatLabel: 'Активны сегодня',
     announcementsHeader: '📢 Объявления',
     // Wave B additions (class dashboard, part 2)
-    aiDigestSub: 'Создайте персонализированное тренерское резюме на основе данных за эту неделю.',
-    aiWeeklyDigest: '🤖 Еженедельный AI-дайджест',
+    aiDigestSub: 'Сводка по классу за последние 7 дней на основе реальных данных.',
+    aiWeeklyDigest: '📋 Итоги недели',
     allDoneCheckmark: 'всё готово ✓',
     allFoldersAssignedOrNone: 'Все папки вашей библиотеки уже назначены, либо вы ещё не создали ни одной.',
     announceBtnLabel: '📢 Объявить',

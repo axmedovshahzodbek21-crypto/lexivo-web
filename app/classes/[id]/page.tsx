@@ -15,6 +15,7 @@ import AutoHomeworkModal, { AUTO_SELECT, autoStatusLine, autoT, type AutoSchedul
 import { classGradientColors } from '@/lib/class-gradient';
 import ClassInsightsBanner from '@/components/insights/ClassInsightsBanner';
 import { MissedHomeworkCard } from '@/components/MissedHomework';
+import ClassDigest from '@/components/ClassDigest';
 
 interface CollectionMeta {
   collection_name: string;
@@ -256,7 +257,7 @@ interface FolderHeatUnit { id: string; name: string; hasHw: boolean; pct: number
 interface FolderHeatFolder { id: string; name: string; units: FolderHeatUnit[]; }
 
 function AnalyticsTab({
-  analyticsData, activeStudents, progressPoints, loading, students, collections, classId, digestText, digestLoading, onDigest,
+  analyticsData, activeStudents, progressPoints, loading, students, collections, classId,
 }: {
   analyticsData: AnalyticsRow[];
   activeStudents: ActiveStudent[];
@@ -265,9 +266,6 @@ function AnalyticsTab({
   students: StudentRow[];
   collections: CollectionMeta[];
   classId: string;
-  digestText: string;
-  digestLoading: boolean;
-  onDigest: () => void;
 }) {
   const tt = useTranslation();
   const studentName = (id: string) => students.find(s => s.student_id === id)?.name ?? tt.classesPage.unknownStudent;
@@ -603,25 +601,7 @@ function AnalyticsTab({
         </div>
       )}
 
-      {/* AI Weekly Digest */}
-      <div>
-        <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide mb-2">{tt.classesPage.aiWeeklyDigest}</p>
-        <div className="card space-y-3">
-          <p className="text-xs text-[var(--text-muted)]">{tt.classesPage.aiDigestSub}</p>
-          <button
-            onClick={onDigest}
-            disabled={digestLoading || analyticsData.length === 0}
-            className="w-full btn-primary py-3 disabled:opacity-50"
-          >
-            {digestLoading ? tt.classesPage.generatingDigest : tt.classesPage.generateDigest}
-          </button>
-          {digestText && (
-            <div className="text-sm text-[var(--text)] leading-relaxed whitespace-pre-wrap bg-[var(--surface-2)] rounded-xl p-3 animate-fade-in">
-              {digestText}
-            </div>
-          )}
-        </div>
-      </div>
+      <ClassDigest classId={classId} students={students.map(s => ({ id: s.student_id, name: studentName(s.student_id) }))} />
     </div>
   );
 }
@@ -2147,8 +2127,6 @@ export default function ClassDashboardPage() {
   const [activeStudents, setActiveStudents] = useState<ActiveStudent[]>([]);
   const [progressPoints, setProgressPoints] = useState<ProgressPoint[]>([]);
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
-  const [digestText, setDigestText] = useState('');
-  const [digestLoading, setDigestLoading] = useState(false);
 
   // SRS tab
   const [srsRows, setSrsRows] = useState<SRSRow[]>([]);
@@ -2737,36 +2715,6 @@ export default function ClassDashboardPage() {
             students={students}
             collections={collections}
             classId={id ?? ''}
-            digestText={digestText}
-            digestLoading={digestLoading}
-            onDigest={async () => {
-              setDigestLoading(true);
-              try {
-                const payload = analyticsData.map(r => {
-                  const s = students.find(st => st.student_id === r.student_id);
-                  return {
-                    studentName: s?.name ?? tt.classesPage.unknownStudent,
-                    totalSessions: r.total_sessions,
-                    totalWordsLearned: r.total_words_learned,
-                    avgSessionSeconds: r.avg_session_seconds,
-                    genuineMasteryPct: r.genuine_mastery_pct,
-                    speedFlagSessions: r.speed_flag_sessions,
-                  };
-                });
-                const { data: { session } } = await supabase.auth.getSession();
-                const res = await fetch('/api/digest', {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    ...(session ? { Authorization: `Bearer ${session.access_token}` } : {}),
-                  },
-                  body: JSON.stringify({ classId: id, analytics: payload }),
-                });
-                const json = await res.json();
-                setDigestText(json.digest ?? json.error ?? tt.classesPage.errorGeneratingDigest);
-              } catch { setDigestText(tt.classesPage.errorConnectingToAiService); }
-              setDigestLoading(false);
-            }}
           />
 
         ) : tab === 'radar' ? (
