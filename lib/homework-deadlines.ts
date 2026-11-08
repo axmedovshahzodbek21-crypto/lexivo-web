@@ -45,7 +45,7 @@ export async function loadHomeworkRecords(
   const [{ data: hwRows, error }, { data: members, error: memErr }] = await Promise.all([
     supabase
       .from('class_homework')
-      .select('id, unit_id, class_unit_id, collection_name, day_number, passage_id, modes, due_date, created_at, student_ids, is_review, teacher_units(name), class_word_units(name)')
+      .select('id, unit_id, class_unit_id, collection_name, day_number, passage_id, modes, due_date, created_at, student_ids, teacher_units(name), class_word_units(name)')
       .eq('class_id', classId)
       .not('due_date', 'is', null),
     supabase.from('class_members').select('student_id, joined_at').eq('class_id', classId).in('student_id', studentIds),
@@ -75,11 +75,11 @@ export async function loadHomeworkRecords(
     const due = h.due_date as string;
     const modes = (h.modes ?? []) as string[];
     if (modes.length === 0) continue;
-    const title = (h.passage_id != null
+    const title = h.passage_id != null
       ? (readingPassages.find(p => p.id === h.passage_id)?.title ?? t.classesPage.defaultReadingPassageTitle)
       : h.collection_name ? `${h.collection_name} · ${t.classesPage.dayFallback(h.day_number)}`
       : h.class_unit_id ? (h.class_word_units?.name ?? t.classesPage.defaultUnitName)
-      : (h.teacher_units?.name ?? t.classesPage.defaultUnitName)) + (h.is_review ? ' · 🔁' : '');
+      : (h.teacher_units?.name ?? t.classesPage.defaultUnitName);
     const assigned = h.student_ids as string[] | null;
     for (const sid of studentIds) {
       if (assigned && !assigned.includes(sid)) continue;

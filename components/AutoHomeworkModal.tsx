@@ -16,8 +16,6 @@ const S = {
   deadline:    { en: 'Deadline', uz: 'Muddat', ru: 'Срок' },
   none:        { en: 'None', uz: "Yo'q", ru: 'Нет' },
   nDays:       { en: '{n} d', uz: '{n} kun', ru: '{n} дн' },
-  review:      { en: 'Review day (quiz on recent units)', uz: 'Takrorlash kuni (oxirgi unitlardan test)', ru: 'День повторения (тест по недавним)' },
-  everyN:      { en: 'Every {n}th', uz: 'Har {n}-kun', ru: 'Каждый {n}-й' },
   modes:       { en: 'Modes', uz: 'Rejimlar', ru: 'Режимы' },
   order:       { en: 'Order', uz: 'Tartib', ru: 'Порядок' },
   inOrder:     { en: 'In order', uz: 'Ketma-ket', ru: 'По порядку' },
@@ -27,7 +25,6 @@ const S = {
   today:       { en: 'Today', uz: 'Bugundan', ru: 'Сегодня' },
   tomorrow:    { en: 'Tomorrow', uz: 'Ertadan', ru: 'Завтра' },
   plan:        { en: 'Plan', uz: 'Reja', ru: 'План' },
-  reviewDay:   { en: 'Review day', uz: 'Takrorlash kuni', ru: 'День повторения' },
   lastUnit:    { en: 'Last unit: {d}', uz: 'Oxirgi unit: {d}', ru: 'Последний юнит: {d}' },
   nothingLeft: { en: 'Every unit is already assigned.', uz: 'Hamma unitlar allaqachon berilgan.', ru: 'Все юниты уже назначены.' },
   holdNote:    { en: 'If fewer than half the class finished the previous units, that day is skipped.', uz: "Agar sinfning yarmidan kami oldingi unitlarni tugatmagan bo'lsa, o'sha kun yangi unit berilmaydi.", ru: 'Если меньше половины класса закончили прошлые юниты, день пропускается.' },
@@ -41,13 +38,11 @@ const S = {
   stPaused:    { en: 'Paused', uz: 'Pauzada', ru: 'На паузе' },
   stStarts:    { en: 'Starts {d}', uz: '{d} dan boshlanadi', ru: 'Начнётся {d}' },
   stReleased:  { en: '{n} unit(s) assigned', uz: '{n} ta unit berildi', ru: 'Назначено юнитов: {n}' },
-  stReview:    { en: 'review day', uz: 'takrorlash kuni', ru: 'день повторения' },
   stHeld:      { en: 'held — under half the class finished', uz: "to'xtatildi — sinfning yarmidan kami tugatgan", ru: 'пауза — закончили меньше половины' },
   stDone:      { en: 'All units assigned', uz: 'Hamma unitlar berildi', ru: 'Все юниты назначены' },
   stToday:     { en: 'Today', uz: 'Bugun', ru: 'Сегодня' },
   perDayShort: { en: '{n}/day', uz: 'kuniga {n} ta', ru: '{n} в день' },
   auto:        { en: 'Auto', uz: 'Avto', ru: 'Авто' },
-  reviewLabel: { en: 'Review', uz: 'Takrorlash', ru: 'Повторение' },
 } as const;
 
 export function autoT(key: keyof typeof S): string {
@@ -74,17 +69,15 @@ export interface AutoSchedule {
   weekdays: number[];
   modes: string[];
   due_days: number | null;
-  review_every: number | null;
   random_order: boolean;
   paused: boolean;
   start_date: string;
   last_run_on: string | null;
-  last_status: 'released' | 'review' | 'held' | 'done' | null;
+  last_status: 'released' | 'held' | 'done' | null;
   last_count: number;
-  days_since_review: number;
 }
 
-export const AUTO_SELECT = 'id, collection_name, folder_id, units_per_day, weekdays, modes, due_days, review_every, random_order, paused, start_date, last_run_on, last_status, last_count, days_since_review';
+export const AUTO_SELECT = 'id, collection_name, folder_id, units_per_day, weekdays, modes, due_days, random_order, paused, start_date, last_run_on, last_status, last_count';
 
 /** One line for the teacher's card, e.g. "⚡ kuniga 2 ta · Bugun: 2 ta unit berildi". */
 export function autoStatusLine(a: AutoSchedule): string {
@@ -97,7 +90,6 @@ export function autoStatusLine(a: AutoSchedule): string {
   if (a.last_status === 'done') return `${head} · ${autoT('stDone')}`;
   const when = a.last_run_on === today ? autoT('stToday') : short(new Date(a.last_run_on));
   const what = a.last_status === 'released' ? autoT('stReleased').replace('{n}', String(a.last_count))
-    : a.last_status === 'review' ? autoT('stReview')
     : a.last_status === 'held' ? autoT('stHeld') : '';
   return `${head} · ${when}: ${what}`;
 }
@@ -124,7 +116,6 @@ export default function AutoHomeworkModal({
   const [weekdays, setWeekdays] = useState<Set<number>>(new Set(existing?.weekdays ?? [1, 2, 3, 4, 5, 6]));
   const [match, setMatch] = useState(existing?.modes.includes('match') ?? false);
   const [dueDays, setDueDays] = useState<number | null>(existing ? existing.due_days : 1);
-  const [reviewEvery, setReviewEvery] = useState<number | null>(existing ? existing.review_every : 5);
   const [randomOrder, setRandomOrder] = useState(existing?.random_order ?? false);
   const [startToday, setStartToday] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -143,25 +134,15 @@ export default function AutoHomeworkModal({
       if (existing.last_run_on === iso(t)) day = addDays(day, 1);
     }
     let idx = 0;
-    let sinceReview = existing?.days_since_review ?? 0;
-    let releasedSinceReview = sinceReview > 0;
     let last: Date | null = null;
     for (let guard = 0; idx < remaining.length && guard < 2000; guard++) {
       const dow = isoDow(day);
       if (weekdays.has(dow)) {
-        if (reviewEvery != null && sinceReview >= reviewEvery - 1 && releasedSinceReview) {
-          if (lines.length < 6) lines.push(`${wd[dow - 1]} ${short(day)}: 🔁 ${autoT('reviewDay')}`);
-          sinceReview = 0;
-          releasedSinceReview = false;
-        } else {
-          const batch = remaining.slice(idx, idx + perDay);
-          const what = randomOrder ? autoT('randomN').replace('{n}', String(batch.length)) : batch.join(', ');
-          if (lines.length < 6) lines.push(`${wd[dow - 1]} ${short(day)}: ${what}`);
-          idx += batch.length;
-          sinceReview++;
-          releasedSinceReview = true;
-          last = day;
-        }
+        const batch = remaining.slice(idx, idx + perDay);
+        const what = randomOrder ? autoT('randomN').replace('{n}', String(batch.length)) : batch.join(', ');
+        if (lines.length < 6) lines.push(`${wd[dow - 1]} ${short(day)}: ${what}`);
+        idx += batch.length;
+        last = day;
       }
       day = addDays(day, 1);
     }
@@ -174,7 +155,6 @@ export default function AutoHomeworkModal({
     weekdays: [...weekdays].sort(),
     modes: ['learn', 'flashcard', 'quiz', ...(match ? ['match'] : [])],
     due_days: dueDays,
-    review_every: reviewEvery,
     random_order: !!folderId && randomOrder,
     ...(collectionName ? { day_numbers: dayNumbers } : {}),
   });
@@ -252,11 +232,6 @@ export default function AutoHomeworkModal({
         {label(autoT('deadline'))}
         <div className="flex flex-wrap gap-1.5">
           {[null, 1, 2, 3, 7].map(n => chip(n == null ? autoT('none') : autoT('nDays').replace('{n}', String(n)), dueDays === n, () => setDueDays(n), String(n)))}
-        </div>
-
-        {label(autoT('review'))}
-        <div className="flex flex-wrap gap-1.5">
-          {[null, 3, 5, 7].map(n => chip(n == null ? autoT('none') : autoT('everyN').replace('{n}', String(n)), reviewEvery === n, () => setReviewEvery(n), String(n)))}
         </div>
 
         {label(autoT('modes'))}

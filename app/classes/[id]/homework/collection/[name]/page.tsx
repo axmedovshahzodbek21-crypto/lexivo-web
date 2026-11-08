@@ -6,7 +6,6 @@ import BackButton from '@/components/BackButton';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { AssignedUnitCard, isHomeworkDone, fetchCollectionByName, type AssignedUnit } from '../../_shared';
-import { autoT } from '@/components/AutoHomeworkModal';
 
 export default function ClassCollectionHomeworkPage() {
   const t = useTranslation();
@@ -31,7 +30,7 @@ export default function ClassCollectionHomeworkPage() {
     const myLoadId = ++loadIdRef.current;
     setLoadError(null);
     const [hwRes, clsRes] = await Promise.all([
-      supabase.from('class_homework').select('id, day_number, modes, due_date, student_ids, is_review')
+      supabase.from('class_homework').select('id, day_number, modes, due_date, student_ids')
         .eq('class_id', classId).eq('collection_name', collectionName),
       supabase.from('classes').select('name').eq('id', classId).maybeSingle(),
     ]);
@@ -61,7 +60,7 @@ export default function ClassCollectionHomeworkPage() {
       return {
         hwId: h.id as string,
         badge: `Unit ${h.day_number}`,
-        title: (day?.topic ?? `Day ${h.day_number}`) + (h.is_review ? ` · ${autoT('reviewLabel')}` : ''),
+        title: day?.topic ?? `Day ${h.day_number}`,
         wordCount: day?.words.length ?? 0,
         modes: (h.modes as string[]) ?? [],
         dueDate: (h.due_date as string | null) ?? null,

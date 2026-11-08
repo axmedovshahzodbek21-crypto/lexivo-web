@@ -7,7 +7,6 @@ import { useAuth } from '@/lib/auth-context';
 import type { WordCollection } from '@/lib/types';
 import { readingPassages } from '@/lib/reading-data';
 import { isHomeworkDone, dueLabel, fetchCollectionByName, MODE_ICON } from './_shared';
-import { autoT } from '@/components/AutoHomeworkModal';
 import { classGradientColors } from '@/lib/class-gradient';
 
 interface FolderUnit {
@@ -134,7 +133,7 @@ export default function ClassHomeworkPage() {
     const [assignsRes, cwUnitRes, hwRes] = await Promise.all([
       supabase.from('class_library_assignments').select('id, folder_id, teacher_folders(id, name)').eq('class_id', id),
       supabase.from('class_word_units').select('id, name, class_words(count)').eq('class_id', id).order('created_at'),
-      supabase.from('class_homework').select('id, unit_id, class_unit_id, collection_name, day_number, passage_id, modes, due_date, student_ids, is_review').eq('class_id', id),
+      supabase.from('class_homework').select('id, unit_id, class_unit_id, collection_name, day_number, passage_id, modes, due_date, student_ids').eq('class_id', id),
     ]);
 
     if (assignsRes.error || cwUnitRes.error || hwRes.error) throw (assignsRes.error ?? cwUnitRes.error ?? hwRes.error);
@@ -157,12 +156,8 @@ export default function ClassHomeworkPage() {
     const hwByCWUnit: Record<string, any> = {};
     const collHwRows: any[] = [];
     const passageHwRows: any[] = [];
-    // Auto-homework review days add a quiz-only second row for a unit —
-    // kept apart so it doesn't replace the unit's main row.
-    const reviewLibRows: any[] = [];
     for (const h of applicableHw) {
-      if (h.unit_id && h.is_review) reviewLibRows.push(h);
-      else if (h.unit_id) hwByLibUnit[h.unit_id] = h;
+      if (h.unit_id) hwByLibUnit[h.unit_id] = h;
       else if (h.class_unit_id) hwByCWUnit[h.class_unit_id] = h;
       else if (h.collection_name) collHwRows.push(h);
       else if (h.passage_id != null) passageHwRows.push(h);
@@ -207,11 +202,6 @@ export default function ClassHomeworkPage() {
             hwDue: hw?.due_date ?? null,
           };
         });
-      for (const r of reviewLibRows) {
-        const base = units.find(u => u.id === r.unit_id);
-        if (!base) continue;
-        units.push({ ...base, name: `${base.name} · ${autoT('reviewLabel')}`, homeworkId: r.id, hwModes: (r.modes as string[]) ?? ['quiz'], hwDue: r.due_date ?? null });
-      }
       return { id: folder.id, name: folder.name, units };
     });
 
@@ -242,7 +232,7 @@ export default function ClassHomeworkPage() {
           id: h.id,
           collectionName: name,
           dayNumber: day,
-          topic: (dayData?.topic ?? t.classesPage.dayFallback(day)) + (h.is_review ? ` · ${autoT('reviewLabel')}` : ''),
+          topic: dayData?.topic ?? t.classesPage.dayFallback(day),
           wordCount: dayData?.words.length ?? 0,
           hwModes: (h.modes as string[]) ?? [],
           hwDue: (h.due_date as string | null) ?? null,

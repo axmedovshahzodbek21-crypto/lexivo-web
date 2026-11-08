@@ -132,7 +132,7 @@ interface HardWordRaw { user_id: string; word: string; }
 interface CurrFolder { id: string; assignmentId: string; name: string; units: CurrUnit[]; }
 interface CurrUnit { id: string; name: string; wordCount: number; }
 interface CurrWordUnit { id: string; name: string; wordCount: number; }
-interface CurrHW { isReview?: boolean; id: string; unitId: string | null; classUnitId: string | null; collectionName: string | null; dayNumber: number | null; passageId: number | null; source: 'library' | 'class' | 'collection' | 'passage'; unitName: string; modes: string[]; dueDate: string | null; studentIds: string[] | null; progressByMode: Record<string, number>; }
+interface CurrHW { id: string; unitId: string | null; classUnitId: string | null; collectionName: string | null; dayNumber: number | null; passageId: number | null; source: 'library' | 'class' | 'collection' | 'passage'; unitName: string; modes: string[]; dueDate: string | null; studentIds: string[] | null; progressByMode: Record<string, number>; }
 
 function Avatar({ name, url, size = 38 }: { name: string; url: string | null; size?: number }) {
   if (url) return <img src={url} alt={name} style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />;
@@ -1015,7 +1015,7 @@ function CurriculumTab({
     const [{ data: hwData, error: hwErr }, autoRes] = await Promise.all([
       supabase
         .from('class_homework')
-        .select('id, unit_id, class_unit_id, collection_name, day_number, passage_id, modes, due_date, student_ids, is_review, teacher_units(name), class_word_units(name)')
+        .select('id, unit_id, class_unit_id, collection_name, day_number, passage_id, modes, due_date, student_ids, teacher_units(name), class_word_units(name)')
         .eq('class_id', classId).order('created_at', { ascending: false }),
       supabase.from('class_auto_homework').select(AUTO_SELECT).eq('class_id', classId),
     ]);
@@ -1047,10 +1047,9 @@ function CurriculumTab({
           : isCollection ? `${collName} · Day ${dayNum}`
           : isClass ? (h.class_word_units?.name ?? tt.classesPage.defaultUnitName) : (h.teacher_units?.name ?? tt.classesPage.defaultUnitName);
         return {
-          isReview: h.is_review === true,
           id: h.id, unitId: h.unit_id ?? null, classUnitId: h.class_unit_id ?? null,
           collectionName: collName, dayNumber: dayNum, passageId,
-          source, unitName: h.is_review ? `${unitName} · ${autoT('reviewLabel')}` : unitName,
+          source, unitName,
           modes: h.modes ?? [], dueDate: h.due_date, studentIds: h.student_ids, progressByMode,
         };
       });
@@ -1164,7 +1163,7 @@ function CurriculumTab({
   };
 
   const wholeClassAssigned = (match: (h: CurrHW) => boolean) =>
-    homework.some(h => !h.isReview && h.studentIds == null && match(h));
+    homework.some(h => h.studentIds == null && match(h));
 
   const openAutoForCollection = async (name: string) => {
     const col = await fetchCollectionByName(name);
@@ -1356,7 +1355,7 @@ function CurriculumTab({
                       {folder.units.length === 0 ? (
                         <p className="text-xs text-[var(--text-muted)] text-center py-4">{tt.classesPage.noUnitsInFolder}</p>
                       ) : folder.units.map(unit => {
-                        const hw = homework.find(h => h.source === 'library' && h.unitId === unit.id && !h.isReview);
+                        const hw = homework.find(h => h.source === 'library' && h.unitId === unit.id);
                         return (
                           <div key={unit.id} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[var(--surface-2)] transition-colors">
                             <div className="flex-1 min-w-0">
@@ -1464,7 +1463,7 @@ function CurriculumTab({
                         <span className="text-xl shrink-0">📗</span>
                         <div className="flex-1 min-w-0">
                           <p style={{ fontWeight: 900, fontSize: 14, color: 'white', textShadow: '0 1px 3px rgba(0,0,0,0.4)' }} className="truncate">{collName}</p>
-                          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)' }}>{tt.classesPage.daysAssignedCount(days.filter(d => !d.isReview).length)}</p>
+                          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)' }}>{tt.classesPage.daysAssignedCount(days.length)}</p>
                           {(() => { const a = autos.find(x => x.collection_name === collName); return a && <p style={{ fontSize: 11, fontWeight: 700, color: 'white' }}>{autoStatusLine(a)}</p>; })()}
                         </div>
                         <span
