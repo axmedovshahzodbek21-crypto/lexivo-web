@@ -68,6 +68,50 @@ function buildDeck(
 }
 
 type CardSide = 'front' | 'back';
+type CardMode = 'wordToTranslation' | 'wordToDefinition' | 'translationToWord';
+
+function CardSettingsDialog({ mode, onPick, onClose }: { mode: CardMode; onPick: (m: CardMode) => void; onClose: () => void }) {
+  const t = useTranslation();
+  const ref = useRef<HTMLDialogElement>(null);
+  useEffect(() => { ref.current?.showModal(); }, []);
+  const options: { mode: CardMode; icon: string; title: string; sub: string }[] = [
+    { mode: 'wordToTranslation', icon: '🔤', title: t.flashcards.modeWordToTr, sub: t.flashcards.modeWordToTrSub },
+    { mode: 'wordToDefinition', icon: '📖', title: t.flashcards.modeWordToDef, sub: t.flashcards.modeWordToDefSub },
+    { mode: 'translationToWord', icon: '🔁', title: t.flashcards.modeTrToWord, sub: t.flashcards.modeTrToWordSub },
+  ];
+  return (
+    <dialog
+      ref={ref}
+      aria-label={t.flashcards.settings}
+      className="mx-auto mt-auto mb-4 sm:mb-auto w-[calc(100%-2rem)] max-w-sm rounded-2xl bg-[var(--surface)] text-[var(--text)] shadow-2xl backdrop:bg-black/50"
+      onCancel={onClose}
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}
+      onKeyDown={e => e.stopPropagation()} // keep the card shortcuts (space, arrows) out while open
+    >
+      <div className="p-5 flex flex-col gap-2">
+        <p className="font-bold mb-1">{t.flashcards.cardDirection}</p>
+        {options.map(o => (
+          <button
+            key={o.mode}
+            onClick={() => onPick(o.mode)}
+            aria-pressed={o.mode === mode}
+            className="flex items-center gap-3 p-3 rounded-xl border-2 text-left"
+            style={{
+              borderColor: o.mode === mode ? 'var(--primary)' : 'var(--border)',
+              background: o.mode === mode ? 'var(--primary-bg)' : 'var(--surface)',
+            }}
+          >
+            <span className="text-xl">{o.icon}</span>
+            <span>
+              <span className="block font-bold text-sm" style={{ color: o.mode === mode ? 'var(--primary)' : 'var(--text)' }}>{o.title}</span>
+              <span className="block text-xs text-[var(--text-muted)]">{o.sub}</span>
+            </span>
+          </button>
+        ))}
+      </div>
+    </dialog>
+  );
+}
 
 function FlashcardsInner() {
   const router = useRouter();
@@ -105,6 +149,8 @@ function FlashcardsInner() {
   const [deck, setDeck] = useState<StudyWord[]>([]);
   const [index, setIndex] = useState(0);
   const [side, setSide] = useState<CardSide>('front');
+  const [cardMode, setCardMode] = useState<CardMode>('wordToTranslation');
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [known, setKnown] = useState(0);
   const [unknown, setUnknown] = useState(0);
   const [done, setDone] = useState(false);
@@ -220,13 +266,14 @@ function FlashcardsInner() {
         case ' ': case 'Enter': e.preventDefault(); setSide(s => s === 'front' ? 'back' : 'front'); break;
         case 'ArrowRight': case 'k': case 'K': if (side === 'back') markKnown(); break;
         case 'ArrowLeft': case 'j': case 'J': if (side === 'back') markUnknown(); break;
-        case 's': case 'S': if (current) { current.language ? speakText(current.word, current.language) : speak(current.word); } break;
+        // Translation → Word: the front must not read out the answer.
+        case 's': case 'S': if (current && !(cardMode === 'translationToWord' && current.translation && side === 'front')) { current.language ? speakText(current.word, current.language) : speak(current.word); } break;
         case 'f': case 'F': setFocusMode(!focusMode); break;
       }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [current, side, focusMode]);
+  }, [current, side, focusMode, cardMode]);
 
   // Clear stale progress if user navigates away before finishing
   useEffect(() => {
@@ -436,8 +483,36 @@ function FlashcardsInner() {
 
   if (!current) return null;
 
+  // Class words can lack a translation or definition, so each side falls back
+  // to text the card does have rather than showing a blank.
+  const askTranslation = cardMode === 'translationToWord' && !!current.translation;
+  const showDefinition = cardMode === 'wordToDefinition' && !!current.definition;
+  const wordMeta = [current.partOfSpeech, current.pronunciation].filter(Boolean).join(' · ');
+  const listenButton = (
+    <button
+      onClick={e => { e.stopPropagation(); current.language ? speakText(current.word, current.language) : speak(current.word); }}
+      className="mt-4 w-10 h-10 rounded-full bg-[var(--primary-bg)] flex items-center justify-center"
+      aria-label={t.extra.listen}
+    >
+      🔊
+    </button>
+  );
+
+  // Answered cards stay put, so the progress count holds.
+  const shuffleRemaining = () => {
+    setDeck(d => [...d.slice(0, index), ...shuffleArray(d.slice(index))]);
+    setSide('front');
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
+      {settingsOpen && (
+        <CardSettingsDialog
+          mode={cardMode}
+          onPick={m => { setCardMode(m); setSide('front'); setSettingsOpen(false); }}
+          onClose={() => setSettingsOpen(false)}
+        />
+      )}
       {/* Header */}
       <div className="flex items-center justify-between p-4">
         <button onClick={() => {
@@ -454,6 +529,7 @@ function FlashcardsInner() {
           <span className="text-xs font-medium text-[var(--danger)]">✗{unknown}</span>
           <PageTip id="flashcards" />
           <PhoneModeToggle />
+          <button onClick={() => setSettingsOpen(true)} className="btn-icon" aria-label={t.flashcards.settings}>⚙️</button>
         </div>
       </div>
 
@@ -461,6 +537,9 @@ function FlashcardsInner() {
       <div className="px-4">
         <div className="progress-bar">
           <div className="progress-bar-fill" style={{ width: `${((index + 1) / deck.length) * 100}%` }} />
+        </div>
+        <div className="flex justify-end pt-2">
+          <button onClick={shuffleRemaining} className="text-xs font-semibold text-[var(--primary)]">🔀 {t.flashcards.shuffle}</button>
         </div>
       </div>
 
@@ -476,23 +555,33 @@ function FlashcardsInner() {
             {/* Front */}
             <div className="flip-card-front card flex flex-col items-center justify-center text-center p-6" style={{ minHeight: 320 }}>
               <span className="badge mb-4">{current.topic}</span>
-              <h2 className="text-3xl font-bold text-[var(--text)] mb-2">{current.word}</h2>
-              <p className="text-sm text-[var(--text-muted)]">{current.partOfSpeech} · {current.pronunciation}</p>
-              <button
-                onClick={e => { e.stopPropagation(); current.language ? speakText(current.word, current.language) : speak(current.word); }}
-                className="mt-4 w-10 h-10 rounded-full bg-[var(--primary-bg)] flex items-center justify-center"
-                aria-label={t.extra.listen}
-              >
-                🔊
-              </button>
+              <h2 className="text-3xl font-bold text-[var(--text)] mb-2">{askTranslation ? current.translation : current.word}</h2>
+              {!askTranslation && wordMeta && <p className="text-sm text-[var(--text-muted)]">{wordMeta}</p>}
+              {!askTranslation && listenButton}
               <p className="text-xs text-[var(--text-muted)] mt-4">{t.flashcards.tapToReveal}</p>
             </div>
 
             {/* Back */}
             <div className="flip-card-back card flex flex-col items-center justify-center text-center p-6" style={{ minHeight: 320, background: 'var(--primary-bg)' }}>
-              <p className="text-xs font-semibold text-[var(--primary)] mb-2">🇺🇿 O'zbek tarjimasi</p>
-              <h2 className="text-2xl font-bold text-[var(--primary)] mb-2">{current.translation}</h2>
-              <p className="text-sm text-[var(--text)] mb-3">{current.definition}</p>
+              {askTranslation ? (
+                <>
+                  <h2 className="text-2xl font-bold text-[var(--primary)] mb-2">{current.word}</h2>
+                  {wordMeta && <p className="text-sm text-[var(--text-muted)]">{wordMeta}</p>}
+                  {listenButton}
+                  <div className="mb-3" />
+                </>
+              ) : showDefinition ? (
+                <>
+                  <p className="text-xs font-semibold text-[var(--primary)] mb-2">📖 {t.flashcards.definition}</p>
+                  <h2 className="text-lg font-bold text-[var(--primary)] mb-3">{current.definition}</h2>
+                </>
+              ) : (
+                <>
+                  <p className="text-xs font-semibold text-[var(--primary)] mb-2">🇺🇿 O'zbek tarjimasi</p>
+                  <h2 className="text-2xl font-bold text-[var(--primary)] mb-2">{current.translation}</h2>
+                </>
+              )}
+              {!showDefinition && <p className="text-sm text-[var(--text)] mb-3">{current.definition}</p>}
               <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-3 w-full">
                 <p className="text-xs italic text-[var(--text)]">"{current.example1}"</p>
               </div>
