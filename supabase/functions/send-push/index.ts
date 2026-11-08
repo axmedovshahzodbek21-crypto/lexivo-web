@@ -26,7 +26,7 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
 interface Payload {
-  kind: 'homework' | 'target' | 'announcement' | 'join_request' | 'note' | 'reply' | 'insights_morning';
+  kind: 'homework' | 'target' | 'announcement' | 'join_request' | 'note' | 'reply' | 'insights_morning' | 'auto_held' | 'auto_done';
   class_id: string;
   student_ids?: string[] | null;
   student_id?: string;
@@ -52,6 +52,11 @@ function buildNotificationText(payload: Payload, className: string, studentName?
     case 'insights_morning':
       // Daily 8:00 (migration 20261102000001), sent only when count > 0.
       return { heading: '💡 Xulosalar', content: `${className}: ${payload.count ?? 0} o'quvchi e'tibor talab qiladi` };
+    case 'auto_held':
+      // Auto homework stopped itself: under half the class finished the last units.
+      return { heading: '⚡ Avtomatik uy vazifasi', content: `${className}: ${payload.title ?? ''} — yangi unit berilmadi, sinfning yarmidan kami tugatgan` };
+    case 'auto_done':
+      return { heading: '⚡ Avtomatik uy vazifasi', content: `${className}: ${payload.title ?? ''} — hamma unitlar berildi` };
   }
 }
 
@@ -74,7 +79,8 @@ Deno.serve(async (req) => {
   // join_request, reply (a student's chat message) and insights_morning are
   // sent to the teacher, not the class's students — everything else below
   // (recipient list, is_teacher flag) branches on that.
-  const toTeacher = payload.kind === 'join_request' || payload.kind === 'reply' || payload.kind === 'insights_morning';
+  const toTeacher = payload.kind === 'join_request' || payload.kind === 'reply' || payload.kind === 'insights_morning'
+    || payload.kind === 'auto_held' || payload.kind === 'auto_done';
 
   let studentName: string | undefined;
   let recipientIds: string[];
