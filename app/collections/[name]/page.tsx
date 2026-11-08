@@ -486,15 +486,18 @@ function UnitCard({
         )}
       >
         <div className="flex items-center gap-1.5">
-          {stages.map(([icon, done]) => (
-            <span
-              key={icon}
-              className="flex-1 text-center py-1.5 rounded-lg text-sm font-bold"
-              style={done
-                ? { background: 'rgba(34,197,94,0.12)', color: '#16a34a' }
-                : { background: 'var(--surface-2)' }}
-            >{done ? '✓' : icon}</span>
-          ))}
+          {stages.map(([icon, done], i) => {
+            const locked = i > 0 && !learnDone;
+            return (
+              <span
+                key={icon}
+                className="flex-1 text-center py-1.5 rounded-lg text-sm font-bold"
+                style={done
+                  ? { background: 'rgba(34,197,94,0.12)', color: '#16a34a' }
+                  : { background: 'var(--surface-2)', opacity: locked ? 0.4 : 1 }}
+              >{done ? '✓' : locked ? '🔒' : icon}</span>
+            );
+          })}
           <span aria-hidden className="pl-1 text-sm text-[var(--text-muted)]">→</span>
         </div>
       </UnitCardFrame>
