@@ -5,7 +5,7 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { localDateStr } from '@/lib/storage';
-import { classAccentColor } from '@/lib/class-gradient';
+import { useClassColors } from '@/lib/class-colors';
 
 function calcCurrentStreak(days: string[]): number {
   if (!days.length) return 0;
@@ -55,6 +55,7 @@ function buildMonthGrid(year: number, month: number): (number | null)[] {
 }
 
 export default function ClassStreakPage() {
+  const classGradientColors = useClassColors();
   const t = useTranslation();
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
@@ -75,7 +76,7 @@ export default function ClassStreakPage() {
   const [viewMonth, setViewMonth] = useState(() => new Date().getMonth());
   const [notMember, setNotMember] = useState(false);
 
-  const accent = classAccentColor(id);
+  const accent = classGradientColors(id).glow;
   const DAY_LABELS = t.classesPage.dayLabels;
   const MONTH_NAMES = t.classesPage.monthNames;
 

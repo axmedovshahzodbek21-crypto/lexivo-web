@@ -8,7 +8,9 @@ import { useAuth } from '@/lib/auth-context';
 import { selectInChunks } from '@/lib/fetch-in-chunks';
 import ClassXpHistoryModal from '@/components/ClassXpHistoryModal';
 import { localDateStr, addDaysToDateStr, displayXP } from '@/lib/storage';
-import { avatarColor, classGradientColors } from '@/lib/class-gradient';
+import { avatarColor } from '@/lib/class-gradient';
+import { useClassColors } from '@/lib/class-colors';
+import ClassColorPicker from '@/components/ClassColorPicker';
 
 interface Announcement { id: string; message: string; created_at: string; }
 interface Note { id: string; message: string; created_at: string; read_at: string | null; }
@@ -49,6 +51,7 @@ function dueLabel(due: string | null, t: ReturnType<typeof useTranslation>): { t
 }
 
 export default function ClassHomePage() {
+  const classGradientColors = useClassColors();
   const tx = useTranslation();
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
@@ -607,6 +610,7 @@ const [memberCount, setMemberCount] = useState(0);
               ) : tx.classesPage.taughtBy(teacherName)}
             </p>
           </div>
+          <ClassColorPicker classId={id} />
           {isTeacher && (
             <button
               onClick={() => router.push(`/classes/${id}`)}

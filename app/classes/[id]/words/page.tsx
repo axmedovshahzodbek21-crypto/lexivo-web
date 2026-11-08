@@ -6,7 +6,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { getClassSRSAll, countDueClassWords, getClassStarredWordIds, addClassStarredWord, removeClassStarredWord, getClassHardWordIds, removeClassHardWord } from '@/lib/class-srs';
-import { classGradientColors } from '@/lib/class-gradient';
+import { useClassColors } from '@/lib/class-colors';
 import { buildAiImportPrompt, parseAiImportOutput } from '@/lib/ai-import';
 
 type InputTab = 'manual' | 'ai' | 'collection';
@@ -121,6 +121,7 @@ function WordCard({ w }: { w: ClassWord }) {
 }
 
 export default function ClassWordsPage() {
+  const classGradientColors = useClassColors();
   const t = useTranslation();
   const { id } = useParams<{ id: string }>();
   const router = useRouter();

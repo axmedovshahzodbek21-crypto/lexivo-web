@@ -8,7 +8,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import BackButton from '@/components/BackButton';
 import { createClass as createClassRow } from '@/lib/class-create';
-import { classGradientColors } from '@/lib/class-gradient';
+import { useClassColors } from '@/lib/class-colors';
 
 interface ClassRow {
   id: string;
@@ -23,6 +23,7 @@ interface ClassRow {
 const _cache = new Map<string, ClassRow[]>();
 
 export default function CreatedClassesPage() {
+  const classGradientColors = useClassColors();
   const t = useTranslation();
   const router = useRouter();
   const { user } = useAuth();

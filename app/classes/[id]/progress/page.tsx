@@ -7,7 +7,7 @@ import { useAuth } from '@/lib/auth-context';
 import { getClassSRSAll, getClassStarredWordIds, getClassHardWordIds } from '@/lib/class-srs';
 import type { ClassSRSEntry } from '@/lib/class-srs';
 import { localDateStr, addDaysToDateStr } from '@/lib/storage';
-import { classGradientColors } from '@/lib/class-gradient';
+import { useClassColors } from '@/lib/class-colors';
 
 const STAGE_COLORS = ['#9CA3AF', '#F59E0B', '#3B82F6', '#8B5CF6', '#EC4899', '#10B981'];
 
@@ -23,6 +23,7 @@ function last30Days(): string[] {
 }
 
 export default function ProgressPage() {
+  const classGradientColors = useClassColors();
   const t = useTranslation();
   const { id } = useParams<{ id: string }>();
   const router = useRouter();

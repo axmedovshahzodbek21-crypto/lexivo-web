@@ -5,7 +5,8 @@ import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { displayXP } from '@/lib/storage';
-import { classGradientColors, classAccentColor as avatarColor } from '@/lib/class-gradient';
+import { classAccentColor as avatarColor } from '@/lib/class-gradient';
+import { useClassColors } from '@/lib/class-colors';
 
 interface LeaderboardRow {
   student_id: string;
@@ -39,6 +40,7 @@ const PODIUM_COLORS = ['#f59e0b', '#94a3b8', '#cd7f32']; // gold, silver, bronze
 const PODIUM_ORDER = [1, 0, 2]; // display order: 2nd, 1st, 3rd
 
 export default function ClassLeaderboardPage() {
+  const classGradientColors = useClassColors();
   const t = useTranslation();
   const { id } = useParams<{ id: string }>();
   const router = useRouter();

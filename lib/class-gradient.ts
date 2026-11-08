@@ -1,23 +1,18 @@
-// Deterministic id -> gradient/glow color pair, used to give each class a
-// consistent accent color across pages without storing one server-side.
-// Was independently copy-pasted (identical hash + identical color arrays)
-// into 5 different page files — the same "diverges silently when one copy
-// gets tweaked and the others don't" risk that caused the streak page's
-// day-boundary drift bug. Centralized here so there's exactly one copy to
-// fix or extend.
+// The class header colours a person can pick (lib/class-colors.ts). Keys are
+// stored in class_colors.color and mirrored in Flutter's class_colors.dart.
 // These sit behind white text, so keep every stop dark enough to read it on.
-const CLASS_GRADIENTS = [
-  'from-indigo-600 to-purple-600', 'from-pink-600 to-rose-600',
-  'from-emerald-700 to-teal-700', 'from-blue-600 to-cyan-700',
-  'from-amber-700 to-orange-700', 'from-violet-600 to-purple-600',
-  'from-red-600 to-pink-600', 'from-cyan-700 to-blue-600',
-];
-const CLASS_GLOWS = ['#818cf8', '#ec4899', '#22c55e', '#3b82f6', '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4'];
-
-export function classGradientColors(id: string): { gradient: string; glow: string } {
-  const n = id.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
-  return { gradient: CLASS_GRADIENTS[n % 8], glow: CLASS_GLOWS[n % 8] };
-}
+export const CLASS_COLORS = {
+  orange: { gradient: 'from-amber-700 to-orange-700', glow: '#f59e0b' },
+  indigo: { gradient: 'from-indigo-600 to-purple-600', glow: '#818cf8' },
+  pink: { gradient: 'from-pink-600 to-rose-600', glow: '#ec4899' },
+  green: { gradient: 'from-emerald-700 to-teal-700', glow: '#22c55e' },
+  blue: { gradient: 'from-blue-600 to-cyan-700', glow: '#3b82f6' },
+  violet: { gradient: 'from-violet-600 to-purple-600', glow: '#8b5cf6' },
+  red: { gradient: 'from-red-600 to-pink-600', glow: '#ef4444' },
+  cyan: { gradient: 'from-cyan-700 to-blue-600', glow: '#06b6d4' },
+};
+export type ClassColorKey = keyof typeof CLASS_COLORS;
+export const DEFAULT_CLASS_COLOR: ClassColorKey = 'orange';
 
 // Same id->color hashing pattern, but for a single flat hex color used on
 // avatar circles — was independently copy-pasted (identical palette) into

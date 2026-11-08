@@ -8,7 +8,7 @@ import type { WordCollection } from '@/lib/types';
 import { readingPassages } from '@/lib/reading-data';
 import { isHomeworkDone, dueLabel, fetchCollectionByName, MODE_ICON } from './_shared';
 import { selectInChunks } from '@/lib/fetch-in-chunks';
-import { classGradientColors } from '@/lib/class-gradient';
+import { useClassColors } from '@/lib/class-colors';
 
 interface FolderUnit {
   id: string;
@@ -65,6 +65,7 @@ type CachedHW = {
 const _cache: Record<string, CachedHW> = {};
 
 export default function ClassHomeworkPage() {
+  const classGradientColors = useClassColors();
   const t = useTranslation();
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();

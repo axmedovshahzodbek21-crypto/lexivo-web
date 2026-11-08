@@ -9,7 +9,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import BackButton from '@/components/BackButton';
 import { localDateStr, addDaysToDateStr, displayXP } from '@/lib/storage';
-import { classGradientColors } from '@/lib/class-gradient';
+import { useClassColors } from '@/lib/class-colors';
 interface ClassRow {
   id: string;
   name: string;
@@ -58,6 +58,7 @@ type Cache = {
 const _cache = new Map<string, Cache>();
 
 export default function JoinedClassesPage() {
+  const classGradientColors = useClassColors();
   const t = useTranslation();
   const router = useRouter();
   const { user } = useAuth();

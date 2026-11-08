@@ -13,7 +13,7 @@ import { localDateStr, addDaysToDateStr, displayXP } from '@/lib/storage';
 import { isHomeworkDone, fetchCollectionByName } from './homework/_shared';
 import { selectInChunks } from '@/lib/fetch-in-chunks';
 import AutoHomeworkModal, { AUTO_SELECT, autoStatusLine, autoT, type AutoSchedule } from '@/components/AutoHomeworkModal';
-import { classGradientColors } from '@/lib/class-gradient';
+import { useClassColors } from '@/lib/class-colors';
 import ClassInsightsBanner from '@/components/insights/ClassInsightsBanner';
 import { MissedHomeworkCard } from '@/components/MissedHomework';
 import ClassDigest from '@/components/ClassDigest';
@@ -2070,6 +2070,7 @@ type UnitRow = { day_number: number; learn_done: boolean; flashcard_done: boolea
 type CollectionModal = { student: StudentRow; collectionName: string; label: string; total: number; color: string };
 
 export default function ClassDashboardPage() {
+  const classGradientColors = useClassColors();
   const tt = useTranslation();
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
