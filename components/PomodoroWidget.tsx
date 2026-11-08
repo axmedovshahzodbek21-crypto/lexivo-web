@@ -8,6 +8,7 @@ import { getAudioCtx, playTone } from '@/lib/web-audio';
 import { useTranslation } from '@/lib/useTranslation';
 import { getUILanguage } from '@/lib/storage';
 import { translations, type Translations } from '@/lib/i18n';
+import { shuffleArray } from '@/lib/shuffleArray';
 
 type PomPhase = 'idle' | 'work' | 'break';
 
@@ -50,14 +51,25 @@ function sendNotification(title: string, body: string) {
 // (see BREAK_TIP_ICONS usage below) so tips stay in the user's current
 // language instead of being hardcoded here.
 
-const BREAK_TIP_ICONS = ['🚶', '💧', '👀', '🧘', '🙆', '☀️', '😌', '🍎', '🎵', '✍️'] as const;
+const BREAK_TIP_ICONS = ['🚶', '💧', '👀', '🧘', '🙆', '☀️', '😌', '🍎', '🎵', '✍️', '😊', '🧠'] as const;
 
 function breakTipText(t: Translations, i: number): string {
   const keys: (keyof Translations['pomodoro'])[] = [
     'breakTip1', 'breakTip2', 'breakTip3', 'breakTip4', 'breakTip5',
     'breakTip6', 'breakTip7', 'breakTip8', 'breakTip9', 'breakTip10',
+    'breakTip11', 'breakTip12',
   ];
   return t.pomodoro[keys[i]] as string;
+}
+
+// A break shows 2 tips (3 if longer than 10 minutes), each for an equal share
+// of it, so there is time to actually do what a tip says. The first is always
+// something physical (the first 6 tips). Keep in sync with the app's
+// pomodoro_service.dart.
+function pickBreakTips(breakMins: number): number[] {
+  const first = Math.floor(Math.random() * 6);
+  const rest = shuffleArray(BREAK_TIP_ICONS.map((_, i) => i).filter(i => i !== first));
+  return [first, ...rest.slice(0, (breakMins > 10 ? 3 : 2) - 1)];
 }
 
 const STORAGE_KEY = 'pom-widget-pos';
@@ -136,7 +148,7 @@ export default function PomodoroWidget() {
   const elemRef = useRef<HTMLDivElement>(null);
 
   const prevPhaseRef = useRef<PomPhase>('idle');
-  const [tipIndex, setTipIndex] = useState(0);
+  const [breakTips, setBreakTips] = useState<number[]>([]);
   const [mounted, setMounted] = useState(false);
   const [customMode, setCustomMode] = useState(false);
   const [pipSupported, setPipSupported] = useState(false);
@@ -249,7 +261,7 @@ export default function PomodoroWidget() {
         liveT.pomodoro.notifBreakTitle,
         liveT.pomodoro.notifBreakBody.replace('{n}', String(pomBreakMins)),
       );
-      setTipIndex(Math.floor(Math.random() * BREAK_TIP_ICONS.length));
+      setBreakTips(pickBreakTips(pomBreakMins));
     } else if (pomPhase === 'work') {
       playBeep(false);
       sendNotification(
@@ -258,13 +270,6 @@ export default function PomodoroWidget() {
       );
     }
   }, [pomPhase, pomBreakMins, pomWorkMins]);
-
-  // Cycle tips every 8 s during break
-  useEffect(() => {
-    if (pomPhase !== 'break') return;
-    const id = setInterval(() => setTipIndex(i => (i + 1) % BREAK_TIP_ICONS.length), 8000);
-    return () => clearInterval(id);
-  }, [pomPhase]);
 
   const pipPortal = pipBody ? createPortal(
     <PipTimerContent
@@ -325,9 +330,9 @@ export default function PomodoroWidget() {
 
   // ── Break overlay (portal, full-screen) ───────────────────────────────────
   if (isBreak) {
-    const tipIdx = tipIndex % BREAK_TIP_ICONS.length;
-    const tip = { icon: BREAK_TIP_ICONS[tipIdx], text: breakTipText(t, tipIdx) };
     const breakProgress = 1 - pomSecondsLeft / (pomBreakMins * 60);
+    const tipIdx = breakTips[Math.max(0, Math.min(breakTips.length - 1, Math.floor(breakProgress * breakTips.length)))];
+    const tip = tipIdx === undefined ? null : { icon: BREAK_TIP_ICONS[tipIdx], text: breakTipText(t, tipIdx) };
 
     return <>{createPortal(
       <div className="fixed inset-0 z-[9999] flex items-center justify-center">
@@ -390,8 +395,10 @@ export default function PomodoroWidget() {
               className="rounded-2xl p-4 mb-5 min-h-[84px] flex flex-col items-center justify-center text-center gap-2"
               style={{ background: 'rgba(255,255,255,0.15)' }}
             >
-              <span className="text-3xl">{tip.icon}</span>
-              <p className="text-white text-sm font-medium leading-relaxed">{tip.text}</p>
+              {tip && <>
+                <span className="text-3xl">{tip.icon}</span>
+                <p className="text-white text-sm font-medium leading-relaxed">{tip.text}</p>
+              </>}
             </div>
 
             {/* Controls */}
