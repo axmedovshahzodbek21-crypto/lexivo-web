@@ -28,7 +28,7 @@ const S = {
   plan:        { en: 'Plan', uz: 'Reja', ru: 'План' },
   lastUnit:    { en: 'Last unit: {d}', uz: 'Oxirgi unit: {d}', ru: 'Последний юнит: {d}' },
   nothingLeft: { en: 'Every unit is already assigned.', uz: 'Hamma unitlar allaqachon berilgan.', ru: 'Все юниты уже назначены.' },
-  holdNote:    { en: 'If fewer than half the class finished the previous units, that day is skipped.', uz: "Agar sinfning yarmidan kami oldingi unitlarni tugatmagan bo'lsa, o'sha kun yangi unit berilmaydi.", ru: 'Если меньше половины класса закончили прошлые юниты, день пропускается.' },
+  holdNote:    { en: 'In classes of more than 5 students, if fewer than half finished the previous units, that day is skipped.', uz: "5 tadan ko'p o'quvchili sinflarda, agar yarmidan kami oldingi unitlarni tugatgan bo'lsa, o'sha kun yangi unit berilmaydi.", ru: 'В классах больше 5 учеников: если меньше половины закончили прошлые юниты, день пропускается.' },
   save:        { en: 'Save', uz: 'Saqlash', ru: 'Сохранить' },
   cancel:      { en: 'Cancel', uz: 'Bekor qilish', ru: 'Отмена' },
   pause:       { en: 'Pause', uz: 'Pauza', ru: 'Пауза' },
