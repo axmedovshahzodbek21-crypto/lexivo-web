@@ -140,7 +140,8 @@ export function parseAiImportOutput(text: string): AiParseResult {
       // "example1:" / "partOfSpeech:" key styles both parse.
       let key = line.slice(0, colon).trim().toLowerCase().replace(/[*_`#\s]/g, '');
       if (key === 'uzbekdefinition') key = 'definitionuz';
-      const val = line.slice(colon + 1).trim().replace(/[*_`]/g, '');
+      // Trim after stripping: "**word:** enormous" leaves "** enormous" → " enormous".
+      const val = line.slice(colon + 1).replace(/[*_`]/g, '').trim();
       fields[key] = val;
     }
 
