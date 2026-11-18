@@ -39,6 +39,9 @@ function parsePlainList(text: string) {
   for (const raw of text.split('\n')) {
     const line = raw.trim().replace(/^\d+[.)]\s*/, '');
     if (!line) continue;
+    // Two+ separators = several pairs flattened onto one line (paste lost
+    // its line breaks). Would otherwise import as one garbage word.
+    if ((line.match(/\s[-–—]\s/g)?.length ?? 0) > 1 || (line.match(/\t+/g)?.length ?? 0) > 1) { bad++; continue; }
     const m = line.match(/^(.+?)\t+(.+)$/) ?? line.match(/^(.+?)\s+[-–—]\s+(.+)$/) ?? line.match(/^([^-]+)-([^-]+)$/);
     if (m && m[1].trim() && m[2].trim()) words.push({ word: m[1].trim(), translation: m[2].trim() });
     else bad++;
