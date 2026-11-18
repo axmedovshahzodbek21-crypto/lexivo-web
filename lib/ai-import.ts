@@ -95,6 +95,17 @@ ${wordsLabel}
 ${words}`;
 }
 
+// Some phone copy/paste flows drop the AI reply's line breaks, leaving
+// "word: x translation: y example1: ..." on one line — which parsed as 0
+// words. Put each known field back on its own line. (?<!\d) keeps the old
+// "Example 1 Translation:" key style in one piece.
+function restoreFieldLineBreaks(text: string): string {
+  return text.replace(
+    /(?<!\d)[ \t]+(?=[*_`]*(?:word|part\s*of\s*speech|partofspeech|pronunciation|translation|definitionuz|uzbek\s*definition|definition|example\s*\d+(?:\s*translation)?)[*_`]*\s*:)/gi,
+    '\n',
+  );
+}
+
 function splitIntoBlocks(text: string): string[] {
   // Primary: split by --- separator.
   if (/---+/.test(text)) {
@@ -125,7 +136,7 @@ function splitIntoBlocks(text: string): string[] {
 export function parseAiImportOutput(text: string): AiParseResult {
   if (!text.trim()) return { words: [], totalBlocks: 0, errors: [] };
 
-  const blocks = splitIntoBlocks(text);
+  const blocks = splitIntoBlocks(restoreFieldLineBreaks(text));
   const words: AiParsedWord[] = [];
   const errors: AiParseResult['errors'] = [];
 
