@@ -67,7 +67,12 @@ export default function PrivacyPage() {
           <ul className="list-disc pl-5 space-y-1">
             <li>You can edit or delete your profile information from within the app&apos;s settings.</li>
             <li>You can disable push notifications at any time from your device or app settings.</li>
-            <li>To request full deletion of your account and associated data, contact us using the details below.</li>
+            <li>
+              You can delete your account and all associated data at any time from Settings in
+              the app or website. See{' '}
+              <a href="/delete-account" className="text-[var(--primary)] underline">how to delete your account</a>{' '}
+              (including without the app).
+            </li>
           </ul>
         </div>
 
