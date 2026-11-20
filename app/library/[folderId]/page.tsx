@@ -11,11 +11,14 @@ import { folderCache as _cache } from '@/lib/teacher-library-cache';
 import { CopyFolderWordListButton } from '@/components/CopyWordList';
 import BulkImportModal, { bulkT } from '@/components/BulkImportModal';
 import { selectInChunks } from '@/lib/fetch-in-chunks';
+import CoverPicker, { CoverTile } from '@/components/CoverPicker';
+import { coverT, deleteCoverImage } from '@/lib/folder-cover';
 
 interface Unit {
   id: string;
   name: string;
   word_count: number;
+  cover: string | null;
 }
 
 const CARD_COLORS = [
@@ -23,15 +26,6 @@ const CARD_COLORS = [
   '#A78BFA','#FF9F43','#F72585','#4ECDC4',
   '#3D8BFF','#FF5E57','#00C9A7','#FFC75F',
 ];
-
-const darken = (hex: string, amt = 0.45) => {
-  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
-  return `rgb(${Math.round(r*(1-amt))},${Math.round(g*(1-amt))},${Math.round(b*(1-amt))})`;
-};
-const lighten = (hex: string, amt = 0.3) => {
-  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
-  return `rgb(${Math.round(r+(255-r)*amt)},${Math.round(g+(255-g)*amt)},${Math.round(b+(255-b)*amt)})`;
-};
 
 export default function FolderPage() {
   const t = useTranslation();
@@ -50,6 +44,9 @@ export default function FolderPage() {
   const [creating, setCreating] = useState(false);
   const [renameId, setRenameId] = useState<string | null>(null);
   const [renameName, setRenameName] = useState('');
+  // Units without their own cover show the folder's.
+  const [folderCover, setFolderCover] = useState<string | null>(cached?.cover ?? null);
+  const [coverFor, setCoverFor] = useState<Unit | null>(null);
   const loadIdRef = useRef(0);
 
   useEffect(() => {
@@ -65,8 +62,8 @@ export default function FolderPage() {
     // this page's state with outdated data.
     const myLoadId = ++loadIdRef.current;
     const [folderRes, unitsRes] = await Promise.all([
-      supabase.from('teacher_folders').select('name, teacher_id').eq('id', folderId).maybeSingle(),
-      supabase.from('teacher_units').select('id, name, teacher_unit_words(count)').eq('folder_id', folderId).order('position').order('created_at'),
+      supabase.from('teacher_folders').select('name, teacher_id, cover').eq('id', folderId).maybeSingle(),
+      supabase.from('teacher_units').select('id, name, cover, teacher_unit_words(count)').eq('folder_id', folderId).order('position').order('created_at'),
     ]);
     if (loadIdRef.current !== myLoadId) return;
     // Defense-in-depth: RLS is the real backstop, but confirm this folder
@@ -76,13 +73,16 @@ export default function FolderPage() {
       return;
     }
     const name = folderRes.data.name;
+    const cover = (folderRes.data.cover as string | null) ?? null;
     const result = (unitsRes.data ?? []).map((u: any) => ({
       id: u.id,
       name: u.name,
       word_count: u.teacher_unit_words?.[0]?.count ?? 0,
+      cover: (u.cover as string | null) ?? null,
     }));
-    _cache[folderId] = { name, units: result };
+    _cache[folderId] = { name, cover, units: result };
     setFolderName(name);
+    setFolderCover(cover);
     setUnits(result);
     setLoading(false);
   }
@@ -126,6 +126,18 @@ export default function FolderPage() {
       alert(t.libraryPage.failedToDeleteUnit(e instanceof Error ? e.message : String(e)));
       return;
     }
+    deleteCoverImage(units.find(u => u.id === id)?.cover, user.id);
+    load();
+  }
+
+  // '' = no own cover, so the unit shows the folder's again.
+  async function saveCover(unit: Unit, next: string) {
+    setCoverFor(null);
+    if (!user || next === (unit.cover ?? '')) return;
+    const { error } = await supabase.from('teacher_units')
+      .update({ cover: next || null }).eq('id', unit.id).eq('teacher_id', user.id);
+    if (error) { alert(`${coverT('saveFailed')}: ${error.message}`); return; }
+    deleteCoverImage(unit.cover, user.id);
     load();
   }
 
@@ -226,6 +238,10 @@ export default function FolderPage() {
         </div>
       )}
 
+      {coverFor && (
+        <CoverPicker current={coverFor.cover} isUnit onClose={() => setCoverFor(null)} onPick={c => saveCover(coverFor, c)} />
+      )}
+
       {/* Empty state */}
       {units.length === 0 ? (
         <div className="text-center py-20">
@@ -241,18 +257,14 @@ export default function FolderPage() {
             return (
               <div key={unit.id} className="relative group">
                 <Link href={`/library/${folderId}/${unit.id}`}>
-                  <div
-                    className="rounded-2xl cursor-pointer animate-heartbeat hover:-translate-y-1 transition-all duration-200 relative overflow-hidden"
-                    style={{ background: `linear-gradient(135deg, ${lighten(color)}, ${color})`, boxShadow: `0 12px 0 ${darken(color)}, 0 16px 32px ${color}99`, minHeight: '120px' }}
-                  >
-                    <div className="p-4 text-2xl">📖</div>
-                    <div className="absolute bottom-0 left-0 right-0 px-4 py-3" style={{ background: 'rgba(0,0,0,0.18)', backdropFilter: 'blur(8px)' }}>
-                      <p className="text-white font-bold text-sm leading-tight line-clamp-2" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>{unit.name}</p>
-                      <p className="text-white/70 text-xs mt-0.5">{t.libraryPage.wordsCount(unit.word_count)}</p>
-                    </div>
-                  </div>
+                  <CoverTile cover={unit.cover ?? folderCover} color={color} icon="📖" name={unit.name} subtitle={t.libraryPage.wordsCount(unit.word_count)} />
                 </Link>
                 <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                  <button
+                    onClick={e => { e.preventDefault(); setCoverFor(unit); }}
+                    className="w-6 h-6 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-white text-xs backdrop-blur"
+                    title={coverT('cover')}
+                  >🖼</button>
                   <button
                     onClick={e => { e.preventDefault(); setRenameId(unit.id); setRenameName(unit.name); }}
                     className="w-6 h-6 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-white text-xs backdrop-blur"

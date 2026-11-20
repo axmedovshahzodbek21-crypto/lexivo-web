@@ -6,6 +6,8 @@ import type { WordCollection } from '@/lib/types';
 import { useTranslation } from '@/lib/useTranslation';
 import type { Translations } from '@/lib/i18n';
 import { isPhraseCollection } from '@/lib/phrases';
+import { coverBackground, parseCover } from '@/lib/folder-cover';
+import { CoverEmoji } from '@/components/CoverPicker';
 
 // Looks up one of the six built-in word collections by its exact display
 // name, as stored in class_homework.collection_name. Previously
@@ -76,6 +78,8 @@ export interface AssignedUnit {
   wordCount: number;
   modes: string[];
   dueDate: string | null;
+  // The teacher's cover for this unit (or its folder's), shown as a banner.
+  cover?: string | null;
 }
 
 export function AssignedUnitCard({
@@ -83,6 +87,7 @@ export function AssignedUnitCard({
 }: { classId: string; unit: AssignedUnit; completed: Set<string> }) {
   const t = useTranslation();
   const allDone = isHomeworkDone(unit.modes, completed);
+  const cover = parseCover(unit.cover);
   const due = dueLabel(unit.dueDate, t);
   const nonMatchModes = unit.modes.filter(m => m !== 'match');
   const hasMatch = unit.modes.includes('match');
@@ -104,10 +109,16 @@ export function AssignedUnitCard({
           : '0 4px 16px rgba(0,0,0,0.08)',
       }}
     >
-      <div
-        className="h-1.5"
-        style={{ background: allDone ? '#22c55e' : 'linear-gradient(135deg, var(--primary) 0%, color-mix(in srgb, var(--primary) 75%, transparent) 100%)' }}
-      />
+      {cover ? (
+        <div className="relative h-14" style={coverBackground(cover)}>
+          <CoverEmoji cover={cover} size={30} />
+        </div>
+      ) : (
+        <div
+          className="h-1.5"
+          style={{ background: allDone ? '#22c55e' : 'linear-gradient(135deg, var(--primary) 0%, color-mix(in srgb, var(--primary) 75%, transparent) 100%)' }}
+        />
+      )}
 
       <div className="p-4 flex flex-col gap-3 flex-1">
         <div className="flex-1 min-w-0">

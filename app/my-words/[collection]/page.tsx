@@ -4,7 +4,10 @@ import { useEffect, useState, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/lib/useTranslation';
-import { deleteImportedFolder, getCollectionsByFolder, getMyUnitProgress, getMyActivityPendingNewWords, getImportedWordsByCollection, isMyFolderLocked, setMyFolderLocked } from '@/lib/storage';
+import { deleteImportedFolder, getCollectionsByFolder, getMyUnitProgress, getMyActivityPendingNewWords, getImportedWordsByCollection, isMyFolderLocked, setMyFolderLocked, getMyFolderCovers, myCoverKey, setMyCovers } from '@/lib/storage';
+import { useAuth } from '@/lib/auth-context';
+import CoverPicker, { CoverEmoji } from '@/components/CoverPicker';
+import { coverBackground, coverColor, coverT, deleteCoverImage, parseCover } from '@/lib/folder-cover';
 import { CopyFolderWordListButton, CopyWordListButton } from '@/components/CopyWordList';
 import { UnitCardFrame, ModeButton } from '@/components/UnitStudyCard';
 import { pushLists, pullAll } from '@/lib/sync';
@@ -58,11 +61,18 @@ export default function FolderPage({ params }: Props) {
   const [toast, setToast] = useState<string | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState('');
+  const { user } = useAuth();
+  const [covers, setCovers] = useState(() => getMyFolderCovers());
+  // undefined = picker closed, null = the folder's cover, string = that unit's.
+  const [coverFor, setCoverFor] = useState<string | null | undefined>(undefined);
+  const coverOf = (key: string) => covers[key]?.cover || null;
+  const folderCover = coverOf(myCoverKey(folder));
 
   useEffect(() => {
     const load = () => {
       setUnits(loadRows(folder));
       setLocked(isMyFolderLocked(folder));
+      setCovers(getMyFolderCovers());
     };
     load();
     pullAll().then(load);
@@ -88,6 +98,18 @@ export default function FolderPage({ params }: Props) {
     setTimeout(() => setToast(null), 2000);
   }
 
+  // A unit without its own cover shows the folder's.
+  function saveCover(unit: string | null, next: string) {
+    setCoverFor(undefined);
+    const key = myCoverKey(folder, unit ?? undefined);
+    const old = coverOf(key);
+    if (next === (old ?? '')) return;
+    setMyCovers({ [key]: next });
+    pushLists();
+    deleteCoverImage(old, user?.id);
+    setCovers(getMyFolderCovers());
+  }
+
   async function handleDeleteFolder() {
     if (!(await appConfirm(t.extra.deleteEntireFolderConfirm(folder)))) return;
     deleteImportedFolder(folder);
@@ -106,12 +128,28 @@ export default function FolderPage({ params }: Props) {
   }
 
   const heroIconBtn = 'w-9 h-9 rounded-full bg-black/20 hover:bg-black/30 flex items-center justify-center text-base transition-colors';
+  const heroCover = parseCover(folderCover);
 
   return (
     <div className="flex flex-col min-h-screen pb-24 animate-fade-in">
 
+      {coverFor !== undefined && (
+        <CoverPicker
+          current={coverFor === null ? folderCover : coverOf(myCoverKey(folder, coverFor))}
+          isUnit={coverFor !== null}
+          onClose={() => setCoverFor(undefined)}
+          onPick={c => saveCover(coverFor, c)}
+        />
+      )}
+
       {/* ── Hero banner ── */}
-      <div className="relative px-5 pt-5 pb-8" style={{ background: HERO.gradient, boxShadow: `0 8px 32px ${HERO.glow}` }}>
+      <div
+        className="relative px-5 pt-5 pb-8 overflow-hidden"
+        style={heroCover
+          ? { ...coverBackground(heroCover), boxShadow: `0 8px 32px ${coverColor(heroCover)}73` }
+          : { background: HERO.gradient, boxShadow: `0 8px 32px ${HERO.glow}` }}
+      >
+        <CoverEmoji cover={heroCover} size={72} />
         <div className="flex items-center justify-between gap-2 mb-4">
           <Link href="/my-words" className="flex items-center gap-1.5 text-sm text-white/80 hover:text-white transition-colors">
             ← {t.myWords.title}
@@ -167,6 +205,10 @@ export default function FolderPage({ params }: Props) {
             aria-pressed={locked}
             className={`px-3.5 py-2 rounded-xl text-sm font-bold transition-colors ${locked ? 'bg-black/35 text-white' : 'bg-white/15 text-white/90 hover:bg-white/25'}`}
           >{locked ? `🔒 ${t.myWords.orderLocked}` : `🔓 ${t.myWords.orderFree}`}</button>
+          <button
+            onClick={() => setCoverFor(null)}
+            className="px-3.5 py-2 rounded-xl text-sm font-bold bg-white/15 text-white/90 hover:bg-white/25 transition-colors"
+          >🖼 {coverT('cover')}</button>
         </div>
       </div>
 
@@ -205,7 +247,11 @@ export default function FolderPage({ params }: Props) {
       ) : (
         <div className="p-3 grid gap-3" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))' }}>
           {units.map((unit, i) => (
-            <MyUnitCard key={unit.name} unit={unit} index={i} folder={folder} folderLocked={locked} />
+            <MyUnitCard
+              key={unit.name} unit={unit} index={i} folder={folder} folderLocked={locked}
+              cover={coverOf(myCoverKey(folder, unit.name)) ?? folderCover}
+              onCover={() => setCoverFor(unit.name)}
+            />
           ))}
         </div>
       )}
@@ -219,8 +265,9 @@ export default function FolderPage({ params }: Props) {
   );
 }
 
-function MyUnitCard({ unit, index, folder, folderLocked }: {
+function MyUnitCard({ unit, index, folder, folderLocked, cover, onCover }: {
   unit: UnitRow; index: number; folder: string; folderLocked: boolean;
+  cover: string | null; onCover: () => void;
 }) {
   const t = useTranslation();
   const { learnDone, flashcardDone, quizDone, matchDone } = unit.progress;
@@ -242,6 +289,7 @@ function MyUnitCard({ unit, index, folder, folderLocked }: {
       badge={t.collections.unit(index + 1)}
       isComplete={isComplete}
       accent={HERO.gradient}
+      cover={cover}
       progressPct={(done / 4) * 100}
       badges={<>
         <span className="text-[10px] text-[var(--text-muted)]">{t.collections.unitWordsLabel(unit.words.length)}</span>
@@ -253,6 +301,7 @@ function MyUnitCard({ unit, index, folder, folderLocked }: {
         </Link>
       }
       actions={<>
+        <button onClick={onCover} title={coverT('cover')} aria-label={coverT('cover')} className="text-sm opacity-50 hover:opacity-90 transition-opacity">🖼</button>
         <CopyWordListButton words={unit.words} className="text-sm opacity-50 hover:opacity-90 transition-opacity" />
         <Link
           href={unitHref}

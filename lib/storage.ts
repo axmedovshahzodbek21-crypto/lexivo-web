@@ -62,6 +62,7 @@ const KEYS = {
   myUnitProgress:    'lexivo_my_unit_progress',
   myWordsLearnSeen:  'lexivo_my_words_learn_seen',
   myFolderLocks:     'lexivo_my_folder_locks',
+  myFolderCovers:    'lexivo_my_folder_covers',
   focusDays:         'lexivo_focus_days',
   focusUpdatedAt:    'lexivo_focus_updated_at',
   structuresSrs:            'lexivo_structures_srs',
@@ -1225,6 +1226,37 @@ export function setMyFolderLocked(folderName: string, locked: boolean) {
   set(KEYS.myFolderLocks, { ...getMyFolderLocks(), [folderName]: { locked, at: Date.now() } });
 }
 
+// ─── My Words folder / unit covers ────────────────────────────────────────────
+// { key: { cover, at } }, key = folder, or folder + "\n" + unit. cover is a
+// lib/folder-cover.ts string, '' = removed (kept as a tombstone so the
+// removal syncs). Per-key last-write-wins in sync.ts, same shape as Flutter.
+
+export type MyFolderCover = { cover: string; at: number };
+
+export const myCoverKey = (folder: string, unit?: string) => unit === undefined ? folder : `${folder}\n${unit}`;
+
+export function getMyFolderCovers(): Record<string, MyFolderCover> {
+  return get<Record<string, MyFolderCover>>(KEYS.myFolderCovers, {});
+}
+
+export function getMyCover(key: string): string | null {
+  return getMyFolderCovers()[key]?.cover || null;
+}
+
+export function setMyCovers(covers: Record<string, string>) {
+  const now = Date.now();
+  const all = getMyFolderCovers();
+  for (const [k, cover] of Object.entries(covers)) all[k] = { cover, at: now };
+  set(KEYS.myFolderCovers, all);
+}
+
+// A new folder/unit reusing a deleted one's name shouldn't inherit its cover.
+function clearMyCovers(match: (key: string) => boolean) {
+  const all = getMyFolderCovers();
+  const keys = Object.keys(all).filter(k => match(k) && all[k].cover);
+  if (keys.length) setMyCovers(Object.fromEntries(keys.map(k => [k, ''])));
+}
+
 // ─── My Words flat-list Learn rotation ────────────────────────────────────────
 // The aggregate "My Words" list (no specific unit selected) has no per-unit
 // progress record to hang "already learned" tracking off of, so Learn always
@@ -1756,6 +1788,10 @@ export function deleteImportedCollection(collectionName: string, folderName?: st
       ? { ...w, deletedAt: now }
       : w
   ));
+  if (folderName !== undefined) {
+    const key = myCoverKey(folderName, collectionName);
+    clearMyCovers(k => k === key);
+  }
 }
 
 export function deleteImportedFolder(folderName: string) {
@@ -1763,6 +1799,7 @@ export function deleteImportedFolder(folderName: string) {
   set(IMPORTED_KEY, getImportedWordsRaw().map(w => w.folderName === folderName ? { ...w, deletedAt: now } : w));
   // A new folder reusing this name later shouldn't inherit the lock.
   if (isMyFolderLocked(folderName)) setMyFolderLocked(folderName, false);
+  clearMyCovers(k => k === folderName || k.startsWith(`${folderName}\n`));
 }
 
 export function saveImportedWords(words: ImportedWord[]) {

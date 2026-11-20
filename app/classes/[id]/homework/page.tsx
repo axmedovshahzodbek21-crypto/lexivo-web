@@ -9,6 +9,7 @@ import { readingPassages } from '@/lib/reading-data';
 import { isHomeworkDone, dueLabel, fetchCollectionByName, MODE_ICON } from './_shared';
 import { selectInChunks } from '@/lib/fetch-in-chunks';
 import { useClassColors } from '@/lib/class-colors';
+import { coverBackground, parseCover } from '@/lib/folder-cover';
 
 interface FolderUnit {
   id: string;
@@ -22,6 +23,7 @@ interface FolderUnit {
 interface AssignedFolder {
   id: string;
   name: string;
+  cover?: string | null;
   units: FolderUnit[];
 }
 
@@ -133,7 +135,7 @@ export default function ClassHomeworkPage() {
     const userId = user!.id;
 
     const [assignsRes, cwUnitRes, hwRes] = await Promise.all([
-      supabase.from('class_library_assignments').select('id, folder_id, teacher_folders(id, name)').eq('class_id', id),
+      supabase.from('class_library_assignments').select('id, folder_id, teacher_folders(id, name, cover)').eq('class_id', id),
       supabase.from('class_word_units').select('id, name, class_words(count)').eq('class_id', id).order('created_at'),
       supabase.from('class_homework').select('id, unit_id, class_unit_id, collection_name, day_number, passage_id, modes, due_date, student_ids').eq('class_id', id),
     ]);
@@ -204,7 +206,7 @@ export default function ClassHomeworkPage() {
             hwDue: hw?.due_date ?? null,
           };
         });
-      return { id: folder.id, name: folder.name, units };
+      return { id: folder.id, name: folder.name, cover: folder.cover ?? null, units };
     });
 
     // Class word units (assigned homework only shown)
@@ -385,6 +387,7 @@ export default function ClassHomeworkPage() {
                 return isHomeworkDone(u.hwModes ?? [], completedModes[u.homeworkId!] ?? new Set());
               }).length;
               const allDone = assignedUnits.length > 0 && doneCount === assignedUnits.length;
+              const cover = parseCover(folder.cover);
 
               return (
                 <button
@@ -396,14 +399,17 @@ export default function ClassHomeworkPage() {
                       : 'bg-[var(--surface)] border-[var(--border)] shadow-sm'
                   }`}
                 >
-                  <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 text-lg ${
-                    allDone ? 'bg-green-100 dark:bg-green-900/50' : 'bg-[var(--primary-bg)]'
-                  }`}>
+                  <div
+                    className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 text-lg overflow-hidden ${
+                      allDone ? 'bg-green-100 dark:bg-green-900/50' : cover ? '' : 'bg-[var(--primary-bg)]'
+                    }`}
+                    style={!allDone && cover ? coverBackground(cover) : undefined}
+                  >
                     {allDone ? (
                       <svg className="w-6 h-6 text-green-500" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                       </svg>
-                    ) : <span>📁</span>}
+                    ) : cover ? <span>{cover.imageUrl ? '' : cover.emoji ?? ''}</span> : <span>📁</span>}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className={`text-sm font-bold truncate ${allDone ? 'text-green-700 dark:text-green-400' : 'text-[var(--text)]'}`}>

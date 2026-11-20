@@ -9,7 +9,7 @@
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const folderListCache: Record<string, any[]> = {};
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const folderCache: Record<string, { name: string; units: any[] }> = {};
+export const folderCache: Record<string, { name: string; cover?: string | null; units: any[] }> = {};
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const unitCache: Record<string, { unitName: string; folderName: string; words: any[] }> = {};
 

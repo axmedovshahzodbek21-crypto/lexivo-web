@@ -9,11 +9,14 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { folderListCache as _cache } from '@/lib/teacher-library-cache';
 import BackButton from '@/components/BackButton';
+import CoverPicker, { CoverTile } from '@/components/CoverPicker';
+import { coverT, deleteCoverImage } from '@/lib/folder-cover';
 
 interface Folder {
   id: string;
   name: string;
   unit_count: number;
+  cover: string | null;
 }
 
 const CARD_COLORS = [
@@ -77,6 +80,7 @@ export default function LibraryPage() {
   const [showCreate, setShowCreate] = useState(false);
   const [renameId, setRenameId] = useState<string | null>(null);
   const [renameName, setRenameName] = useState('');
+  const [coverFor, setCoverFor] = useState<Folder | null>(null);
   const loadIdRef = useRef(0);
 
   useEffect(() => {
@@ -93,7 +97,7 @@ export default function LibraryPage() {
     const myLoadId = ++loadIdRef.current;
     const { data } = await supabase
       .from('teacher_folders')
-      .select('id, name, teacher_units(count)')
+      .select('id, name, cover, teacher_units(count)')
       .eq('teacher_id', user.id)
       .order('position')
       .order('created_at');
@@ -102,6 +106,7 @@ export default function LibraryPage() {
       id: f.id,
       name: f.name,
       unit_count: f.teacher_units?.[0]?.count ?? 0,
+      cover: (f.cover as string | null) ?? null,
     }));
     if (result.length === 0 && await seedExampleFolder(user.id)) { await load(); return; }
     _cache[user.id] = result;
@@ -143,6 +148,18 @@ export default function LibraryPage() {
       alert(t.libraryPage.deleteFolderFailed(e instanceof Error ? e.message : String(e)));
       return;
     }
+    deleteCoverImage(folders.find(f => f.id === id)?.cover, user.id);
+    load();
+  }
+
+  // Students in classes this folder is assigned to see the same cover.
+  async function saveCover(folder: Folder, next: string) {
+    setCoverFor(null);
+    if (!user || next === (folder.cover ?? '')) return;
+    const { error } = await supabase.from('teacher_folders')
+      .update({ cover: next || null }).eq('id', folder.id).eq('teacher_id', user.id);
+    if (error) { alert(`${coverT('saveFailed')}: ${error.message}`); return; }
+    deleteCoverImage(folder.cover, user.id);
     load();
   }
 
@@ -213,6 +230,10 @@ export default function LibraryPage() {
         </div>
       )}
 
+      {coverFor && (
+        <CoverPicker current={coverFor.cover} onClose={() => setCoverFor(null)} onPick={c => saveCover(coverFor, c)} />
+      )}
+
       {/* Empty state */}
       {folders.length === 0 ? (
         <div className="text-center py-12">
@@ -260,19 +281,15 @@ export default function LibraryPage() {
             return (
               <div key={folder.id} className="relative group">
                 <Link href={`/library/${folder.id}`}>
-                  <div
-                    className="rounded-2xl cursor-pointer animate-heartbeat hover:-translate-y-1 transition-all duration-200 relative overflow-hidden"
-                    style={{ background: `linear-gradient(135deg, ${lighten(color)}, ${color})`, boxShadow: `0 12px 0 ${darken(color)}, 0 16px 32px ${color}99`, minHeight: '120px' }}
-                  >
-                    <div className="p-4 text-2xl">📁</div>
-                    <div className="absolute bottom-0 left-0 right-0 px-4 py-3" style={{ background: 'rgba(0,0,0,0.18)', backdropFilter: 'blur(8px)' }}>
-                      <p className="text-white font-bold text-sm leading-tight line-clamp-2" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>{folder.name}</p>
-                      <p className="text-white/70 text-xs mt-0.5">{t.libraryPage.unitCount(folder.unit_count)}</p>
-                    </div>
-                  </div>
+                  <CoverTile cover={folder.cover} color={color} icon="📁" name={folder.name} subtitle={t.libraryPage.unitCount(folder.unit_count)} />
                 </Link>
                 {/* Action dots */}
                 <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                  <button
+                    onClick={e => { e.preventDefault(); setCoverFor(folder); }}
+                    className="w-6 h-6 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-white text-xs backdrop-blur"
+                    title={coverT('cover')}
+                  >🖼</button>
                   <button
                     onClick={e => { e.preventDefault(); setRenameId(folder.id); setRenameName(folder.name); }}
                     className="w-6 h-6 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-white text-xs backdrop-blur"

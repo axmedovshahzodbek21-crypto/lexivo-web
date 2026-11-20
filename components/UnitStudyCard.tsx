@@ -1,12 +1,14 @@
 'use client';
 import type { ReactNode } from 'react';
 import Link from 'next/link';
+import { coverBackground, parseCover } from '@/lib/folder-cover';
+import { CoverEmoji } from '@/components/CoverPicker';
 
 // The unit card shared by pre-built collections (app/collections/[name]) and
 // My Words folders (app/my-words/[collection]): accent strip, UNIT N badge,
 // title, progress bar, then whatever study buttons the page puts inside.
 export function UnitCardFrame({
-  badge, badges, title, actions, isComplete, accent, progressPct, children,
+  badge, badges, title, actions, isComplete, accent, progressPct, children, cover,
 }: {
   badge: string;
   badges?: ReactNode;
@@ -16,7 +18,11 @@ export function UnitCardFrame({
   accent: string;
   progressPct: number;
   children: ReactNode;
+  // My Words: the unit's (or its folder's) cover, shown as a banner instead
+  // of the accent strip (lib/folder-cover.ts).
+  cover?: string | null;
 }) {
+  const coverSpec = parseCover(cover);
   return (
     <div
       className="rounded-2xl overflow-hidden flex flex-col"
@@ -28,8 +34,14 @@ export function UnitCardFrame({
           : '0 4px 16px rgba(0,0,0,0.08)',
       }}
     >
-      {/* Colored top accent strip */}
-      <div className="h-1.5" style={{ background: isComplete ? '#22c55e' : accent }} />
+      {coverSpec ? (
+        <div className="relative h-14" style={coverBackground(coverSpec)}>
+          <CoverEmoji cover={coverSpec} size={30} />
+        </div>
+      ) : (
+        /* Colored top accent strip */
+        <div className="h-1.5" style={{ background: isComplete ? '#22c55e' : accent }} />
+      )}
 
       <div className="p-4 flex flex-col gap-3 flex-1">
         {/* Unit header */}

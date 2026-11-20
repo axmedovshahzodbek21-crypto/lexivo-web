@@ -4,7 +4,8 @@ import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/lib/useTranslation';
-import { getImportedFolders, getImportedCollections, addImportedWords, generateImportedWordId, getCollectionsByFolder, getMyUnitProgress, resetMyWordsProgress } from '@/lib/storage';
+import { getImportedFolders, getImportedCollections, addImportedWords, generateImportedWordId, getCollectionsByFolder, getMyUnitProgress, resetMyWordsProgress, getMyCover, myCoverKey } from '@/lib/storage';
+import { CoverTile } from '@/components/CoverPicker';
 import { pushLists, pullAll } from '@/lib/sync';
 import type { ImportedFolder, ImportedCollection } from '@/lib/types';
 import BackButton from '@/components/BackButton';
@@ -55,25 +56,12 @@ const darken = (hex: string, amt = 0.45) => {
   const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
   return `rgb(${Math.round(r*(1-amt))},${Math.round(g*(1-amt))},${Math.round(b*(1-amt))})`;
 };
-const lighten = (hex: string, amt = 0.3) => {
-  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
-  return `rgb(${Math.round(r+(255-r)*amt)},${Math.round(g+(255-g)*amt)},${Math.round(b+(255-b)*amt)})`;
-};
 
 // Same card as the Library page's folders (app/library/page.tsx).
-function FolderCard({ href, color, icon, name, subtitle }: { href: string; color: string; icon: string; name: string; subtitle: string }) {
+function FolderCard({ href, color, icon, name, subtitle, cover }: { href: string; color: string; icon: string; name: string; subtitle: string; cover?: string | null }) {
   return (
     <Link href={href}>
-      <div
-        className="rounded-2xl cursor-pointer animate-heartbeat hover:-translate-y-1 transition-all duration-200 relative overflow-hidden"
-        style={{ background: `linear-gradient(135deg, ${lighten(color)}, ${color})`, boxShadow: `0 12px 0 ${darken(color)}, 0 16px 32px ${color}99`, minHeight: '120px' }}
-      >
-        <div className="p-4 text-2xl">{icon}</div>
-        <div className="absolute bottom-0 left-0 right-0 px-4 py-3" style={{ background: 'rgba(0,0,0,0.18)', backdropFilter: 'blur(8px)' }}>
-          <p className="text-white font-bold text-sm leading-tight line-clamp-2" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>{name}</p>
-          <p className="text-white/70 text-xs mt-0.5">{subtitle}</p>
-        </div>
-      </div>
+      <CoverTile cover={cover} color={color} icon={icon} name={name} subtitle={subtitle} />
     </Link>
   );
 }
@@ -228,6 +216,7 @@ export default function MyWordsPage() {
                     href={`/my-words/${encodeURIComponent(folder.name)}`}
                     color={cardColor(i)}
                     icon="📁"
+                    cover={getMyCover(myCoverKey(folder.name))}
                     name={folder.name}
                     subtitle={t.libraryPage.unitCount(folder.collectionCount) + (done > 0 ? ` · ✅ ${done}/${folder.collectionCount}` : '')}
                   />

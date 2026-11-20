@@ -7,6 +7,8 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { selectInChunks } from '@/lib/fetch-in-chunks';
 import { AssignedUnitCard, UnassignedUnitCard, isHomeworkDone, type AssignedUnit } from '../../_shared';
+import { coverBackground, parseCover } from '@/lib/folder-cover';
+import { CoverEmoji } from '@/components/CoverPicker';
 
 interface UnassignedUnit {
   id: string;
@@ -23,6 +25,7 @@ export default function ClassFolderHomeworkPage() {
 
   const [loading, setLoading] = useState(true);
   const [folderName, setFolderName] = useState('');
+  const [folderCover, setFolderCover] = useState<string | null>(null);
   const [className, setClassName] = useState('');
   const [assigned, setAssigned] = useState<AssignedUnit[]>([]);
   const [unassigned, setUnassigned] = useState<UnassignedUnit[]>([]);
@@ -40,8 +43,8 @@ export default function ClassFolderHomeworkPage() {
     const myLoadId = ++loadIdRef.current;
     setLoadError(null);
     const [folderRes, unitsRes, classRes] = await Promise.all([
-      supabase.from('teacher_folders').select('id, name').eq('id', folderId).maybeSingle(),
-      supabase.from('teacher_units').select('id, name, teacher_unit_words(count)').eq('folder_id', folderId).order('position').order('created_at'),
+      supabase.from('teacher_folders').select('id, name, cover').eq('id', folderId).maybeSingle(),
+      supabase.from('teacher_units').select('id, name, cover, teacher_unit_words(count)').eq('folder_id', folderId).order('position').order('created_at'),
       supabase.from('classes').select('name').eq('id', classId).maybeSingle(),
     ]);
     if (loadIdRef.current !== myLoadId) return;
@@ -86,6 +89,7 @@ export default function ClassFolderHomeworkPage() {
       }
     }
 
+    const fCover = ((folderRes.data as any)?.cover as string | null) ?? null;
     const builtAssigned: AssignedUnit[] = [];
     const builtUnassigned: UnassignedUnit[] = [];
     unitRows.forEach((u, i) => {
@@ -101,6 +105,7 @@ export default function ClassFolderHomeworkPage() {
           wordCount,
           modes: (hw.modes as string[]) ?? [],
           dueDate: (hw.due_date as string | null) ?? null,
+          cover: (u.cover as string | null) ?? fCover,
         });
       } else {
         builtUnassigned.push({ id: u.id as string, badge, title: u.name as string, wordCount });
@@ -109,6 +114,7 @@ export default function ClassFolderHomeworkPage() {
 
     if (loadIdRef.current !== myLoadId) return;
     setFolderName((folderRes.data as any)?.name ?? 'Folder');
+    setFolderCover(fCover);
     setClassName((classRes.data as any)?.name ?? '');
     setAssigned(builtAssigned);
     setUnassigned(builtUnassigned);
@@ -139,16 +145,20 @@ export default function ClassFolderHomeworkPage() {
     isHomeworkDone(u.modes, completedModes[u.hwId] ?? new Set())
   ).length;
   const progressPct = assigned.length > 0 ? (doneCount / assigned.length) * 100 : 0;
+  const heroCover = parseCover(folderCover);
 
   return (
     <div className="flex flex-col min-h-screen animate-fade-in pb-24">
       <div
-        className="relative px-5 pt-5 pb-8"
-        style={{
-          background: 'linear-gradient(135deg, var(--primary) 0%, color-mix(in srgb, var(--primary) 75%, transparent) 100%)',
-          boxShadow: '0 8px 32px rgba(79,70,229,0.35)',
-        }}
+        className="relative px-5 pt-5 pb-8 overflow-hidden"
+        style={heroCover
+          ? { ...coverBackground(heroCover), boxShadow: '0 8px 32px rgba(79,70,229,0.35)' }
+          : {
+              background: 'linear-gradient(135deg, var(--primary) 0%, color-mix(in srgb, var(--primary) 75%, transparent) 100%)',
+              boxShadow: '0 8px 32px rgba(79,70,229,0.35)',
+            }}
       >
+        <CoverEmoji cover={heroCover} size={72} />
         <BackButton className="mb-4" />
 
         {className && (
