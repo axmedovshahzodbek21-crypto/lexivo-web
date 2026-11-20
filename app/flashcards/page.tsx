@@ -305,8 +305,9 @@ function FlashcardsInner() {
       newAchievements.forEach(pushAchievement);
     }
     if (index + 1 >= deck.length) {
-      const finalUnknown = wasKnown ? unknownWords.length : unknownWords.length + 1;
-      if (!sourceClassHW && !sourceClass && collectionName && dayNumber !== undefined && finalUnknown === 0) {
+      // XP is for finishing the session, Hard marks or not (same as the
+      // Flutter app) — still once per unit.
+      if (!sourceClassHW && !sourceClass && collectionName && dayNumber !== undefined) {
         if (!hasFlashcardXPAwarded(collectionName, dayNumber)) {
           const xpAmount = Math.round(originalWordCount.current * 3);
           const result = addXP(xpAmount, 'Flashcard', `Unit ${dayNumber} · ${collectionName}`);
@@ -314,7 +315,7 @@ function FlashcardsInner() {
           setSessionXP(xpAmount);
           if (result.leveledUp) setPendingLevelUp({ level: result.newLevel, xp: result.newXp });
         }
-      } else if (!sourceClassHW && !sourceClass && sourceMyWords && myCollection && finalUnknown === 0) {
+      } else if (!sourceClassHW && !sourceClass && sourceMyWords && myCollection) {
         if (!hasMyWordsXPAwarded('flashcard', myFolder, myCollection)) {
           const xpAmount = Math.round(originalWordCount.current * 3);
           const result = addXP(xpAmount, 'Flashcard', `${myCollection}`);

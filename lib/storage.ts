@@ -43,7 +43,6 @@ const KEYS = {
   xpByDate: 'lexivo_xp_by_date',
   xpUpdatedAt:       'lexivo_xp_updated_at',
   streakBonusDate:   'lexivo_streak_bonus_date',
-  lastCompleteDay:   'lexivo_last_complete_day',
   settingsUpdatedAt: 'lexivo_settings_updated_at',
   hardWords:         'lexivo_hard_words',
   flashTotalDays:    'lexivo_flash_total_days',
@@ -69,6 +68,7 @@ const KEYS = {
   structuresSentenceProgress: 'lexivo_structures_sentence_progress',
   structuresNewDate:        'lexivo_structures_new_date',
   structuresNewCount:       'lexivo_structures_new_count',
+  structuresXpDays:         'lexivo_structures_xp_days',
 };
 
 // The exact set of localStorage keys Reset Progress clears — shared between
@@ -696,6 +696,17 @@ export function structureReviewXP(interval: number): number {
   return Math.min(2 + Math.floor(interval / 3), 10);
 }
 
+// Structures Detective and Flashcards pay XP once per day each (replaying
+// them used to pay every time). Returns true — and records today — only for
+// the first claim of the day. Same rule as the Flutter app.
+export function claimStructurePracticeXP(activity: 'detective' | 'flashcards'): boolean {
+  const today = localDateStr();
+  const days = get<Record<string, string>>(KEYS.structuresXpDays, {});
+  if (days[activity] === today) return false;
+  set(KEYS.structuresXpDays, { ...days, [activity]: today });
+  return true;
+}
+
 // ─── Structures translation-practice pacing ────────────────────────────────
 // Sentences within a unit are always served in order and never revisited out
 // of sequence, so a single "how many served so far" counter per unit is all
@@ -732,16 +743,15 @@ export function getStreak(): number {
   const stored = get<number>(KEYS.streak, 0);
   if (stored <= 0) return 0;
 
-  // Validate: reset if no complete day (both tasks done) in the last 2 days
+  // Any study day keeps the streak alive (same as the Flutter app). One
+  // missed day is covered while a freeze is held.
+  const last = get<string>(KEYS.lastStudy, '');
   const today = localDateStr();
   const yesterday = localDateStr(new Date(Date.now() - 86400000));
   const twoDaysAgo = localDateStr(new Date(Date.now() - 86400000 * 2));
-  const reviewSet = new Set(getReviewDays());
-  const wordSet   = new Set(getWordGoalDays());
-  const isComplete = (d: string) => reviewSet.has(d) && wordSet.has(d);
 
-  if (isComplete(today) || isComplete(yesterday)) return stored;
-  if (isComplete(twoDaysAgo) && get<number>(KEYS.freezes, 0) > 0) return stored;
+  if (last === today || last === yesterday) return stored;
+  if (last === twoDaysAgo && get<number>(KEYS.freezes, 0) > 0) return stored;
 
   set(KEYS.streak, 0);
   return 0;
@@ -810,36 +820,25 @@ export function recordStudySession(): { freezeUsed: boolean } {
   set(KEYS.lastStudy, today);
   set(KEYS.totalDays, get<number>(KEYS.totalDays, 0) + 1);
 
-  return { freezeUsed: false };
-}
-
-// Called from recordReviewDay() and recordWordGoalDay() — only fires once per day
-// when BOTH tasks are complete (review done + word goal met).
-function checkAndUpdateStreak() {
-  const today = localDateStr();
-  if (get<string>(KEYS.lastCompleteDay, '') === today) return;
-
-  const reviewDaysArr = get<string[]>(KEYS.reviewDays, []);
-  const wordGoalDaysArr = get<string[]>(KEYS.wordGoalDays, []);
-  if (!reviewDaysArr.includes(today) || !wordGoalDaysArr.includes(today)) return;
-
-  set(KEYS.lastCompleteDay, today);
-
+  // Streak: any study day counts (same as the Flutter app's
+  // recordStudySession). One missed day is bridged by a freeze.
   const yesterday = localDateStr(new Date(Date.now() - 86400000));
   const twoDaysAgo = localDateStr(new Date(Date.now() - 86400000 * 2));
-  const reviewSet = new Set(reviewDaysArr);
-  const wordSet   = new Set(wordGoalDaysArr);
-  const isComplete = (d: string) => reviewSet.has(d) && wordSet.has(d);
-
   let streak = get<number>(KEYS.streak, 0);
-
-  if (isComplete(yesterday)) {
-    streak += 1;
-  } else if (isComplete(twoDaysAgo) && get<number>(KEYS.freezes, 0) > 0) {
-    set(KEYS.freezes, get<number>(KEYS.freezes, 0) - 1);
+  let freezeUsed = false;
+  if (!last) {
+    streak = 1;
+  } else if (last === yesterday) {
     streak += 1;
   } else {
-    streak = 1;
+    checkAndGrantWeeklyFreeze();
+    if (last === twoDaysAgo && get<number>(KEYS.freezes, 0) > 0) {
+      set(KEYS.freezes, get<number>(KEYS.freezes, 0) - 1);
+      streak += 1;
+      freezeUsed = true;
+    } else {
+      streak = 1;
+    }
   }
 
   set(KEYS.streak, streak);
@@ -857,6 +856,8 @@ function checkAndUpdateStreak() {
       set(KEYS.streakBonusDate, today);
     }
   }
+
+  return { freezeUsed };
 }
 
 export function getTotalStudyDays(): number {
@@ -879,7 +880,6 @@ export function recordReviewDay() {
   const today = localDateStr();
   const days = getReviewDays();
   if (!days.includes(today)) { days.push(today); set(KEYS.reviewDays, days); }
-  checkAndUpdateStreak();
 }
 
 export function getWordGoalDays(): string[] { return get<string[]>(KEYS.wordGoalDays, []); }
@@ -888,7 +888,6 @@ export function recordWordGoalDay() {
   const today = localDateStr();
   const days = getWordGoalDays();
   if (!days.includes(today)) { days.push(today); set(KEYS.wordGoalDays, days); }
-  checkAndUpdateStreak();
 }
 
 
@@ -970,7 +969,7 @@ export function displayXP(raw: number): string {
 // Returns the XP to store (×10) based on how many words the user has ever learned
 export function getLearnXPAmount(): number {
   const total = getLearnedWords().length;
-  return (LEARN_XP_TIERS.find(t => total < t.maxWords) ?? LEARN_XP_TIERS[LEARN_XP_TIERS.length - 1]).xp;
+  return (LEARN_XP_TIERS.find(t => total <= t.maxWords) ?? LEARN_XP_TIERS[LEARN_XP_TIERS.length - 1]).xp;
 }
 
 function _pushXpEntryAsync(entry: XpEntry): void {
@@ -1435,10 +1434,10 @@ export function markMatchXPAwarded(collectionName: string, dayNumber: number): v
 function _myWordsUnitKey(activity: string, folderName: string | undefined, collectionName: string) {
   return `${activity}_${folderName ?? ''}_${collectionName}`;
 }
-export function hasMyWordsXPAwarded(activity: 'flashcard' | 'quiz' | 'match', folderName: string | undefined, collectionName: string): boolean {
+export function hasMyWordsXPAwarded(activity: 'flashcard' | 'quiz' | 'quiz_perfect' | 'match', folderName: string | undefined, collectionName: string): boolean {
   return get<string[]>(KEYS.myWordsXpUnits, []).includes(_myWordsUnitKey(activity, folderName, collectionName));
 }
-export function markMyWordsXPAwarded(activity: 'flashcard' | 'quiz' | 'match', folderName: string | undefined, collectionName: string): void {
+export function markMyWordsXPAwarded(activity: 'flashcard' | 'quiz' | 'quiz_perfect' | 'match', folderName: string | undefined, collectionName: string): void {
   const list = get<string[]>(KEYS.myWordsXpUnits, []);
   const k = _myWordsUnitKey(activity, folderName, collectionName);
   if (!list.includes(k)) { list.push(k); set(KEYS.myWordsXpUnits, list); }

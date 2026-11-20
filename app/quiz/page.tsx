@@ -322,12 +322,20 @@ function QuizInner() {
           const p = getUnitProgress(collectionName, qDayNumber);
           if (p.learnDone && p.flashcardDone && p.quizDone) fireConfetti();
         } else if (sourceMyWords && myCollection) {
+          const base = questions.length * 5;
           if (!hasMyWordsXPAwarded('quiz', myFolder, myCollection)) {
-            const xpAmount = questions.length * 5;
-            const result = addXP(xpAmount, 'Quiz', `${myCollection}`);
+            const result = addXP(base, 'Quiz', `${myCollection}`);
             markMyWordsXPAwarded('quiz', myFolder, myCollection);
-            setSessionXP(xpAmount);
+            setSessionXP(base);
             if (result.leveledUp) setPendingLevelUp({ level: result.newLevel, xp: result.newXp });
+          }
+          // Same +25% perfect-run bonus as Library units, own once-per-unit gate.
+          if (isPerfect && !hasMyWordsXPAwarded('quiz_perfect', myFolder, myCollection)) {
+            const bonus = Math.round(base * 0.25);
+            const r = addXP(bonus, 'Quiz (perfect)', `${myCollection}`);
+            markMyWordsXPAwarded('quiz_perfect', myFolder, myCollection);
+            setSessionXP(prev => prev + bonus);
+            if (r.leveledUp) setPendingLevelUp({ level: r.newLevel, xp: r.newXp });
           }
           if (markMyQuizComplete(myFolder, myCollection)) { setMyUnitCompleted(true); fireConfetti(); }
         }

@@ -4,7 +4,7 @@ import { use, useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { UNIT_SLUGS } from '@/lib/structures-data';
-import { getStructuresSRS, addXP, displayXP } from '@/lib/storage';
+import { getStructuresSRS, addXP, displayXP, claimStructurePracticeXP } from '@/lib/storage';
 import type { SRSStructure } from '@/lib/types';
 
 type CardSide = 'front' | 'back';
@@ -42,7 +42,7 @@ export default function UnitFlashcardsPage({ params }: { params: Promise<{ unit:
     if (wasKnown) setKnown(k => k + 1); else setUnknown(u => u + 1);
     if (index + 1 >= deck.length) {
       const finalKnown = wasKnown ? known + 1 : known;
-      if (finalKnown === deck.length) {
+      if (finalKnown === deck.length && claimStructurePracticeXP('flashcards')) {
         const xpAmount = Math.round(deck.length * 3);
         addXP(xpAmount, 'Structure', 'Flashcards');
         setSessionXP(xpAmount);

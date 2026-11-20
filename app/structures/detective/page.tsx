@@ -3,7 +3,7 @@ import { useTranslation } from '@/lib/useTranslation';
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { getStructuresSRS, addXP, displayXP } from '@/lib/storage';
+import { getStructuresSRS, addXP, displayXP, claimStructurePracticeXP } from '@/lib/storage';
 import { STRUCTURES } from '@/lib/structures-data';
 import type { SRSStructure } from '@/lib/types';
 
@@ -54,7 +54,7 @@ export default function StructuresDetectivePage() {
   }, [current, deck]);
 
   const finish = useCallback((finalCorrect: number) => {
-    if (finalCorrect > 0) {
+    if (finalCorrect > 0 && claimStructurePracticeXP('detective')) {
       const xpAmount = finalCorrect * 3;
       addXP(xpAmount, 'Structure', 'Detective');
       setSessionXP(xpAmount);
