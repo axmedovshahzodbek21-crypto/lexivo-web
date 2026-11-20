@@ -4,9 +4,10 @@
 import { useRef, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import {
-  COVER_EMOJIS, COVER_GRADIENTS, coverBackground, coverColor, coverT, encodeCover, parseCover, uploadCoverImage,
-  type CoverSpec,
+  COVER_GRADIENTS, COVER_ICON_GROUPS, coverBackground, coverColor, coverT, encodeCover, parseCover, searchCoverIcons,
+  uploadCoverImage, type CoverSpec,
 } from '@/lib/folder-cover';
+import { getUILanguage } from '@/lib/storage';
 
 const darken = (hex: string, amt = 0.45) => {
   const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
@@ -69,8 +70,14 @@ export default function CoverPicker({ current, isUnit = false, onClose, onPick }
   const [gradient, setGradient] = useState(start?.gradient ?? 0);
   const [emoji, setEmoji] = useState<string | undefined>(start?.emoji);
   const [uploading, setUploading] = useState(false);
+  const [query, setQuery] = useState('');
+  // Open on the tab holding the current icon, else the first.
+  const [group, setGroup] = useState(() =>
+    Math.max(0, COVER_ICON_GROUPS.findIndex(g => g.icons.some(([e]) => e === start?.emoji))));
   const fileRef = useRef<HTMLInputElement>(null);
   const preview: CoverSpec = { gradient, emoji };
+  const lang = (['uz', 'ru'].includes(getUILanguage()) ? getUILanguage() : 'en') as 'en' | 'uz' | 'ru';
+  const shown = query.trim() ? searchCoverIcons(query) : COVER_ICON_GROUPS[group].icons.map(([e]) => e);
 
   async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -120,8 +127,29 @@ export default function CoverPicker({ current, isUnit = false, onClose, onPick }
         </div>
 
         <p className={label}>{coverT('icon')}</p>
+        <input
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          placeholder={coverT('search')}
+          className="w-full px-3 py-2 rounded-xl bg-[var(--surface-2)] text-[var(--text)] text-sm border border-[var(--border)] outline-none focus:border-[var(--primary)] mb-2"
+        />
+        {!query.trim() && (
+          <div className="flex gap-1.5 overflow-x-auto pb-2 mb-1 -mx-1 px-1">
+            {COVER_ICON_GROUPS.map((g, i) => (
+              <button
+                key={g.label.en}
+                onClick={() => setGroup(i)}
+                className="shrink-0 px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap"
+                style={group === i
+                  ? { background: 'var(--primary)', color: '#fff' }
+                  : { background: 'var(--surface-2)', color: 'var(--text-muted)' }}
+              >{g.icons[0][0]} {g.label[lang]}</button>
+            ))}
+          </div>
+        )}
+        {shown.length === 0 && <p className="text-xs text-[var(--text-muted)] py-3 text-center">{coverT('noResults')}</p>}
         <div className="flex flex-wrap gap-1.5">
-          {COVER_EMOJIS.map(e => (
+          {shown.map(e => (
             <button
               key={e}
               onClick={() => setEmoji(emoji === e ? undefined : e)}
