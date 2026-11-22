@@ -47,8 +47,9 @@ export async function loadClassSummaries(
       .eq('class_id', classId).gte('created_at', new Date(Date.now() - 60 * 86400_000).toISOString())
       .order('created_at', { ascending: false }).range(from, to)),
     supabase.from('class_members').select('student_id, joined_at').eq('class_id', classId).then(r => (r.data ?? []) as { student_id: string; joined_at: string | null }[]),
-    Promise.all(ids.map(id => supabase.rpc('get_student_xp_history', { p_class_id: classId, p_student_id: id })
-      .then(r => [id, (r.data ?? []) as HistoryEntry[]] as const))),
+    Promise.all(ids.map(id => paged<HistoryEntry>((from, to) => supabase.rpc('get_student_xp_history', { p_class_id: classId, p_student_id: id }).range(from, to))
+      .catch(() => [] as HistoryEntry[])
+      .then(rows => [id, rows] as const))),
   ]);
   const today = localDateStr();
   const now = Date.now();

@@ -12,7 +12,7 @@ import { MessageComposer } from './insights/InsightPopup';
 import { MissedHomeworkRows } from './MissedHomework';
 import { loadHomeworkRecords, missedFromRecords, type HomeworkRecord } from '@/lib/homework-deadlines';
 import { buildStudentSummary, type SentNote, type ReviewAnswer, type ClassAnswer } from '@/lib/student-summary';
-import { loadClassAnswers } from '@/lib/class-summaries';
+import { loadClassAnswers, paged } from '@/lib/class-summaries';
 import { translations } from '@/lib/i18n';
 import StudentSummary from './StudentSummary';
 
@@ -142,15 +142,18 @@ export default function ClassXpHistoryModal({ classId, userId, xp, studentName, 
       setLoading(true);
       const isSelf = user?.id === userId;
       const today = localDateStr();
-      const [{ data }, { data: srs }, { data: member }] = await Promise.all([
-        isSelf
-          ? supabase.from('class_xp_history').select('id, amount, reason, created_at').eq('user_id', userId).eq('class_id', classId).order('created_at', { ascending: false })
-          : supabase.rpc('get_student_xp_history', { p_class_id: classId, p_student_id: userId }),
+      // Paged: one response stops at 1000 rows, and Review/Learn write a row
+      // per word. Teacher and student must see the same full history.
+      const [data, { data: srs }, { data: member }] = await Promise.all([
+        paged<XpEntry>((from, to) => isSelf
+          ? supabase.from('class_xp_history').select('id, amount, reason, created_at').eq('user_id', userId).eq('class_id', classId)
+              .order('created_at', { ascending: false }).order('id').range(from, to)
+          : supabase.rpc('get_student_xp_history', { p_class_id: classId, p_student_id: userId }).range(from, to)).catch(() => [] as XpEntry[]),
         supabase.from('class_srs_states').select('stage, next_due').eq('user_id', userId).eq('class_id', classId).lte('next_due', today),
         supabase.from('class_members').select('joined_at').eq('class_id', classId).eq('student_id', userId).maybeSingle(),
       ]);
       if (!cancelled) {
-        setHistory((data ?? []) as XpEntry[]);
+        setHistory(data);
         const joinedAt = (member as { joined_at: string | null } | null)?.joined_at;
         setJoinDate(joinedAt ? localDateStr(new Date(joinedAt)) : null);
         const pending = ((srs ?? []) as { stage: number; next_due: string }[]).filter(r => r.stage < 5);
