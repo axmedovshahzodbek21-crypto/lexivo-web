@@ -20,7 +20,6 @@ interface ClassRow {
 interface Note { id: string; class_id: string; message: string; created_at: string; read_at: string | null; }
 interface Target { id: string; class_id: string; title: string; due_date: string | null; completed_at: string | null; created_at: string; }
 interface LeaderboardRow { student_id: string; name: string; avatar_url: string | null; xp: number; streak: number; total_words: number; }
-interface Announcement { id: string; class_id: string; message: string; created_at: string; }
 
 type T = ReturnType<typeof useTranslation>;
 
@@ -52,7 +51,6 @@ type Cache = {
   teacherProfiles: Record<string, { name: string; avatar_url: string | null }>;
   classNotes: Record<string, Note[]>;
   classTargets: Record<string, Target[]>;
-  classAnnouncements: Record<string, Announcement[]>;
   membershipStatus: Record<string, string>;
 };
 const _cache = new Map<string, Cache>();
@@ -66,7 +64,6 @@ export default function JoinedClassesPage() {
   const [teacherProfiles, setTeacherProfiles] = useState<Record<string, { name: string; avatar_url: string | null }>>({});
   const [classNotes, setClassNotes] = useState<Record<string, Note[]>>({});
   const [classTargets, setClassTargets] = useState<Record<string, Target[]>>({});
-  const [classAnnouncements, setClassAnnouncements] = useState<Record<string, Announcement[]>>({});
   const [membershipStatus, setMembershipStatus] = useState<Record<string, string>>({});
   const [classLeaderboards, setClassLeaderboards] = useState<Record<string, LeaderboardRow[]>>({});
   const [expandedLeaderboard, setExpandedLeaderboard] = useState<string | null>(null);
@@ -82,7 +79,6 @@ export default function JoinedClassesPage() {
     setTeacherProfiles(c.teacherProfiles);
     setClassNotes(c.classNotes);
     setClassTargets(c.classTargets);
-    setClassAnnouncements(c.classAnnouncements);
     setMembershipStatus(c.membershipStatus);
   };
 
@@ -107,35 +103,26 @@ export default function JoinedClassesPage() {
     let newTeacherProfiles: Record<string, { name: string; avatar_url: string | null }> = {};
     let newNotes: Record<string, Note[]> = {};
     let newTargets: Record<string, Target[]> = {};
-    let newAnnouncements: Record<string, Announcement[]> = {};
 
     if (newJoined.length > 0) {
       const teacherIds = [...new Set(newJoined.map((c: ClassRow) => c.teacher_id))];
       const joinedIds = newJoined.map((c: ClassRow) => c.id);
 
-      const [{ data: teachers }, { data: notesData }, { data: targetsData }, { data: announcementsData }] = await Promise.all([
+      // Announcements and notes are read inside the class (class home), not
+      // on this list. Only unread notes are fetched, for the "N new" badge;
+      // they're left unread so class home still shows them as new.
+      const [{ data: teachers }, { data: notesData }, { data: targetsData }] = await Promise.all([
         supabase.from('profiles').select('id, name, avatar_url').in('id', teacherIds),
-        supabase.from('class_notes').select('id, class_id, message, created_at, read_at').eq('student_id', user.id).order('created_at', { ascending: false }),
+        supabase.from('class_notes').select('id, class_id, message, created_at, read_at').eq('student_id', user.id).is('read_at', null).in('class_id', joinedIds),
         supabase.from('class_targets').select('id, class_id, title, due_date, completed_at, created_at').eq('student_id', user.id).order('created_at', { ascending: false }),
-        supabase.from('class_announcements').select('id, class_id, message, created_at').in('class_id', joinedIds).order('created_at', { ascending: false }),
       ]);
 
       for (const t of teachers ?? []) newTeacherProfiles[t.id] = { name: t.name, avatar_url: t.avatar_url };
-      // Mark read per class via the RPC (a plain student UPDATE is refused —
-      // see migration 20261019000002); the old update is the fallback.
-      const unread = (notesData ?? []).filter((n: Note) => !n.read_at) as (Note & { class_id: string })[];
-      for (const classId of new Set(unread.map(n => n.class_id))) {
-        void supabase.rpc('mark_class_notes_read', { p_class_id: classId }).then(({ error }) => {
-          if (error) supabase.from('class_notes').update({ read_at: new Date().toISOString() })
-            .in('id', unread.filter(n => n.class_id === classId).map(n => n.id)).then(() => {});
-        });
-      }
       for (const n of notesData ?? []) { if (!newNotes[n.class_id]) newNotes[n.class_id] = []; newNotes[n.class_id].push(n); }
       for (const t of targetsData ?? []) { if (!newTargets[t.class_id]) newTargets[t.class_id] = []; newTargets[t.class_id].push(t); }
-      for (const a of announcementsData ?? []) { if (!newAnnouncements[a.class_id]) newAnnouncements[a.class_id] = []; newAnnouncements[a.class_id].push(a); }
     }
 
-    const fresh: Cache = { joinedClasses: newJoined, teacherProfiles: newTeacherProfiles, classNotes: newNotes, classTargets: newTargets, classAnnouncements: newAnnouncements, membershipStatus: newMembershipStatus };
+    const fresh: Cache = { joinedClasses: newJoined, teacherProfiles: newTeacherProfiles, classNotes: newNotes, classTargets: newTargets, membershipStatus: newMembershipStatus };
     _cache.set(user.id, fresh);
     applyCache(fresh);
     setLoading(false);
@@ -270,27 +257,6 @@ export default function JoinedClassesPage() {
               </div>
 
               <div className="bg-[var(--surface)] divide-y divide-[var(--border)]">
-                {(classAnnouncements[cls.id] ?? []).length > 0 && (
-                  <div className="px-4 pt-3 pb-3 space-y-2">
-                    <p className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-wide">{t.classesPage.announcementsLabel}</p>
-                    {(classAnnouncements[cls.id] ?? []).map(a => {
-                      const isNew = Date.now() - new Date(a.created_at).getTime() < 24 * 3600000;
-                      return (
-                        <div key={a.id} className="rounded-xl px-3 py-2.5"
-                          style={{ background: isNew ? 'var(--primary-bg)' : 'var(--surface-2)', borderLeft: isNew ? '3px solid var(--primary)' : 'none' }}>
-                          <div className="flex items-start gap-2">
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm text-[var(--text)] leading-snug">{a.message}</p>
-                              <p className="text-[10px] text-[var(--text-muted)] mt-1">{timeAgo(a.created_at, t)}</p>
-                            </div>
-                            {isNew && <span className="text-[10px] font-bold text-[var(--primary)] shrink-0 mt-0.5">{t.classesPage.new}</span>}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-
                 {expandedLeaderboard === cls.id && (
                   <div className="px-4 pt-3 pb-3 space-y-2">
                     <p className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-wide">{t.classesPage.classLeaderboardLabel}</p>
@@ -337,24 +303,6 @@ export default function JoinedClassesPage() {
                         </button>
                       );
                     })}
-                  </div>
-                )}
-
-                {notes.length > 0 && (
-                  <div className="px-4 pt-3 pb-3 space-y-2">
-                    <p className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-wide">{t.classesPage.notesFromTeacherLabel}</p>
-                    {notes.map(note => (
-                      <div key={note.id} className="rounded-xl px-3 py-2.5 text-sm"
-                        style={{ background: note.read_at ? 'var(--surface-2)' : 'var(--primary-bg)', borderLeft: note.read_at ? 'none' : '3px solid var(--primary)' }}>
-                        <div className="flex items-start gap-2">
-                          <div className="flex-1 min-w-0">
-                            <p className="text-[var(--text)] leading-snug">{note.message || `📷 ${t.classChat.photo}`}</p>
-                            <p className="text-[10px] text-[var(--text-muted)] mt-1">{timeAgo(note.created_at, t)}</p>
-                          </div>
-                          {!note.read_at && <span className="text-[10px] font-bold text-[var(--primary)] shrink-0 mt-0.5">{t.classesPage.new}</span>}
-                        </div>
-                      </div>
-                    ))}
                   </div>
                 )}
 
