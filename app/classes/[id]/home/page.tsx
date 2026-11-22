@@ -85,6 +85,8 @@ const [memberCount, setMemberCount] = useState(0);
   const [readCounts, setReadCounts] = useState<Record<string, number>>({});
   const [myClassXp, setMyClassXp] = useState(0);
   const [myClassStreak, setMyClassStreak] = useState(0);
+  const [myStudyDays, setMyStudyDays] = useState<string[]>([]);
+  const [myLearned, setMyLearned] = useState<number | null>(null);
   const [pendingMembers, setPendingMembers] = useState<{ student_id: string; name: string; avatar_url: string | null }[]>([]);
 
   useEffect(() => {
@@ -263,6 +265,11 @@ const [memberCount, setMemberCount] = useState(0);
           setPendingHwCount(myHw.filter(h => !h.modes.every((m: string) => doneMap[h.id]?.has(m))).length);
         })();
 
+        // Student: words learned in this class (one SRS row per word) for the progress card
+        supabase.from('class_srs_states').select('stage', { count: 'exact', head: true })
+          .eq('user_id', user.id).eq('class_id', id)
+          .then(({ count }) => { if (!cancelled) setMyLearned(count ?? 0); });
+
         // Student: async class streak computation
         (async () => {
           const { data: streakRows, error: streakErr } = await supabase
@@ -275,6 +282,7 @@ const [memberCount, setMemberCount] = useState(0);
           const days = ((streakRows ?? []) as { study_date: string }[])
             .map(r => r.study_date)
             .sort();
+          setMyStudyDays(days);
           if (!days.length) return;
           const set = new Set(days);
           // Plain local midnight, matching localDateStr() everywhere else
@@ -674,6 +682,48 @@ const [memberCount, setMemberCount] = useState(0);
       </div>
 
       <div className="flex-1 p-4 space-y-5">
+
+        {/* My progress (student): words learned, streak, last 30 study days.
+            Days come from class_study_days — the same record as the streak. */}
+        {!isTeacher && myLearned !== null && (() => {
+          const today = localDateStr();
+          const studied = new Set(myStudyDays);
+          return (
+            <button
+              onClick={() => router.push(`/classes/${id}/progress`)}
+              className="card w-full text-left space-y-3 hover:opacity-90 transition-opacity active:scale-[0.99]"
+            >
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-bold uppercase tracking-widest text-[var(--text-muted)]">📊 {tx.classesPage.myProgress}</p>
+                <span className="text-sm text-[var(--text-muted)]">›</span>
+              </div>
+              <div className="flex items-end gap-5">
+                <div>
+                  <p className="text-2xl font-black leading-none" style={{ color: classAccent }}>{myLearned}</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-[var(--text-muted)] mt-1">{tx.classesPage.learned}</p>
+                </div>
+                <p className="text-sm font-bold text-[var(--text)] pb-0.5">🔥 {tx.classesPage.dayStreakCount(myClassStreak)}</p>
+              </div>
+              <div>
+                <div className="grid gap-[3px]" style={{ gridTemplateColumns: 'repeat(30, 1fr)' }}>
+                  {Array.from({ length: 30 }, (_, i) => addDaysToDateStr(today, i - 29)).map(day => (
+                    <div
+                      key={day}
+                      title={day}
+                      className="h-4 rounded-[3px]"
+                      style={{
+                        background: studied.has(day) ? classAccent : 'var(--surface-2)',
+                        outline: day === today ? `1.5px solid ${classAccent}` : 'none',
+                        outlineOffset: 1,
+                      }}
+                    />
+                  ))}
+                </div>
+                <p className="text-[10px] text-[var(--text-muted)] mt-1.5">{tx.classesPage.studyCalendar30d}</p>
+              </div>
+            </button>
+          );
+        })()}
 
         {/* Spotlight banner (teacher only) */}
         {isTeacher && needsAttention > 0 && (

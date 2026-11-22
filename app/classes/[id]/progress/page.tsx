@@ -33,7 +33,7 @@ export default function ProgressPage() {
   const [entries, setEntries] = useState<ClassSRSEntry[]>([]);
   const [starredCount, setStarredCount] = useState(0);
   const [hardCount, setHardCount] = useState(0);
-  const [totalWords, setTotalWords] = useState(0);
+  const [studyDays, setStudyDays] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
 
   const STAGE_LABELS = [
@@ -48,18 +48,18 @@ export default function ProgressPage() {
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const [{ data: cls }, all, starred, hard, { count }] = await Promise.all([
+      const [{ data: cls }, all, starred, hard, { data: dayRows }] = await Promise.all([
         supabase.from('classes').select('name').eq('id', id).single(),
         getClassSRSAll(user.id, id),
         getClassStarredWordIds(user.id, id),
         getClassHardWordIds(user.id, id),
-        supabase.from('class_words').select('id', { count: 'exact', head: true }).eq('class_id', id),
+        supabase.from('class_study_days').select('study_date').eq('student_id', user.id).eq('class_id', id),
       ]);
       setClassName((cls as { name: string } | null)?.name ?? '');
       setEntries(all);
       setStarredCount(starred.size);
       setHardCount(hard.size);
-      setTotalWords(count ?? 0);
+      setStudyDays(new Set(((dayRows ?? []) as { study_date: string }[]).map(r => r.study_date)));
       setLoading(false);
     })();
   }, [user, id]);
@@ -68,14 +68,9 @@ export default function ProgressPage() {
   const learnedCount = entries.length;
   const dueCount = entries.filter(e => e.next_due <= todayStr() && e.stage < 5).length;
 
-  // Calendar: set of dates with any review activity. last_reviewed comes
-  // back from Supabase as a UTC timestamp — slicing the string directly (as
-  // before) read the UTC calendar date, not the local one, so a late-night
-  // review could land on the wrong day cell in the local-dated 30-day
-  // calendar below. Parsing through localDateStr() fixes that.
-  const reviewDates = new Set(
-    entries.map(e => e.last_reviewed ? localDateStr(new Date(e.last_reviewed)) : null).filter(Boolean) as string[],
-  );
+  // Calendar: the class study-day record (same as the streak). It used to be
+  // built from each word's last_reviewed, which moves forward on every review
+  // and erased earlier days, so most study days never showed.
   const days = last30Days();
 
   if (loading) {
@@ -109,7 +104,9 @@ export default function ProgressPage() {
         {/* Summary stats */}
         <div className="grid grid-cols-3 gap-2">
           {[
-            { value: `${learnedCount}/${totalWords}`, label: t.classesPage.learned, color: 'var(--primary)' },
+            // Just the count: class_words is only the Words-tab list, so
+            // "/total" read "/0" for classes taught through homework.
+            { value: learnedCount, label: t.classesPage.learned, color: 'var(--primary)' },
             { value: dueCount,                        label: t.classesPage.dueToday, color: dueCount > 0 ? '#f59e0b' : '#10B981' },
             { value: starredCount,                    label: t.classesPage.starred,   color: '#f59e0b' },
           ].map(({ value, label, color }) => (
@@ -164,7 +161,7 @@ export default function ProgressPage() {
           <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-widest">{t.classesPage.studyCalendar30d}</p>
           <div className="grid gap-1.5" style={{ gridTemplateColumns: 'repeat(10, 1fr)' }}>
             {days.map(day => {
-              const studied = reviewDates.has(day);
+              const studied = studyDays.has(day);
               const isToday = day === todayStr();
               return (
                 <div
