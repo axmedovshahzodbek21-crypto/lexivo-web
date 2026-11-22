@@ -90,14 +90,13 @@ export default function ClassStreakPage() {
         const { data: membership } = await supabase.from('class_members').select('id').eq('class_id', id).eq('student_id', user.id).maybeSingle();
         if (!membership) { setNotMember(true); setLoading(false); return; }
       }
-      // ?userId= lets a teacher open a specific student's calendar from the
-      // roster — previously accepted with no verification at all, so any
-      // signed-in user could view any other student's day-by-day study
-      // calendar for any class just by crafting the URL. Only a teacher of
-      // this class may view someone else's calendar, and only for a student
-      // who's actually a member of this class.
+      // ?userId= opens someone else's calendar — the teacher from the roster,
+      // or a classmate from the leaderboard (same as the app). The viewer must
+      // be in this class (checked above) and so must the student viewed. The
+      // real boundary is RLS on class_study_days: only this class's teacher
+      // and approved members can read its rows, so a crafted URL for another
+      // class returns nothing.
       if (viewUserId && viewUserId !== user.id) {
-        if (!isTeacher) { setNotMember(true); setLoading(false); return; }
         const { data: targetMembership } = await supabase.from('class_members').select('id').eq('class_id', id).eq('student_id', viewUserId).maybeSingle();
         if (!targetMembership) { setNotMember(true); setLoading(false); return; }
       }
