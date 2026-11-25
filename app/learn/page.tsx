@@ -25,6 +25,7 @@ import type { Accent } from '@/lib/speech';
 import { checkAchievements } from '@/lib/gamification';
 import { fireConfetti } from '@/lib/confetti';
 import { shuffleArray } from '@/lib/shuffleArray';
+import { shareWord } from '@/lib/share';
 import type { WordItem, WordCollection } from '@/lib/types';
 import { getImportedWords, getImportedWordsByCollection, importedWordExampleFields, getMyActivityPendingNewWords, markMyLearnComplete, getMyWordsPendingLearnWords, addMyWordsLearnSeenWords } from '@/lib/storage';
 import Link from 'next/link';
@@ -624,6 +625,22 @@ function LearnInner() {
   }, [sourceClassHW]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const current = words[index];
+
+  // Only built-in words have a public /word/<word> page to share.
+  const builtInWords = useMemo(() => {
+    const s = new Set<string>();
+    for (const c of collections) for (const d of c.days) for (const w of d.words) s.add(w.word.toLowerCase());
+    return s;
+  }, [collections]);
+  const canShare = !!current && builtInWords.has(current.word.toLowerCase());
+  const [linkCopied, setLinkCopied] = useState(false);
+  const handleShare = async () => {
+    if (!current) return;
+    if (await shareWord(current.word, current.translation) === 'copied') {
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
+    }
+  };
 
   const applyResume = (p: NonNullable<typeof resumePrompt>) => {
     const tooHardSet = new Set(p.tooHard);
@@ -1229,6 +1246,14 @@ function LearnInner() {
           <button onClick={handleStar} className="btn-icon text-lg" aria-label={starred ? t.extra.removeFromStarred : t.extra.addToStarred}>
             {starred ? '⭐' : '☆'}
           </button>
+          {canShare && (
+            <button onClick={handleShare} className="btn-icon text-base" aria-label={t.wordPage.share} title={t.wordPage.share}>🔗</button>
+          )}
+          {linkCopied && (
+            <div className="fixed bottom-24 sm:bottom-8 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-[var(--text)] text-[var(--surface)] text-sm font-semibold shadow-lg animate-fade-in">
+              {t.wordPage.linkCopied}
+            </div>
+          )}
           <button onClick={() => setFocusMode(!focusMode)} className="btn-icon text-base phone-hide" aria-label={focusMode ? t.extra.exitFocusMode : t.extra.enterFocusMode}>
             {focusMode ? '⊠' : '⛶'}
           </button>

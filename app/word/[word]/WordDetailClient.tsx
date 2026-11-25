@@ -4,6 +4,7 @@ import { fmtMonthDayYear } from '@/lib/i18n';
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
+import { shareWord } from '@/lib/share';
 import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
 import { speak } from '@/lib/speech';
@@ -69,17 +70,10 @@ export default function WordDetailClient({ wordText }: { wordText: string }) {
 
   const handleShare = async () => {
     if (!word) return;
-    const url = `${window.location.origin}/word/${encodeURIComponent(word.word)}`;
-    const text = `${word.word} — ${word.translation}`;
-    if (navigator.share) {
-      try { await navigator.share({ title: `${word.word} · Lexivo`, text, url }); } catch { /* cancelled */ }
-      return;
-    }
-    try {
-      await navigator.clipboard.writeText(url);
+    if (await shareWord(word.word, word.translation) === 'copied') {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch { /* clipboard blocked */ }
+    }
   };
 
   // A shared link opens with no history, so Back would do nothing.
