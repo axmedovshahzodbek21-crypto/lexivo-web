@@ -1,368 +1,58 @@
-﻿'use client';
-import { useTranslation } from '@/lib/useTranslation';
-import { fmtMonthDayYear } from '@/lib/i18n';
-import { PageLoader } from '@/components/Loader';
-import { use, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { useAppStore } from '@/lib/store';
-import { speak } from '@/lib/speech';
-import {
-  toggleStarred, isStarred, addHardWord, removeHardWord, getHardWords,
-  getLearnedWords, getSRSWords, getCustomLists, addWordToList, removeWordFromList, isWordInList,
-  saveCustomList, getReviewLog, addDaysToDateStr, getSRSLastReview,
-} from '@/lib/storage';
-import { pushLists } from '@/lib/sync';
-import { SRS_INTERVALS } from '@/lib/types';
-import { stageLabel, stageColor } from '@/lib/srs';
-import type { WordCollection, CustomList } from '@/lib/types';
+import type { Metadata } from 'next';
+import { headers } from 'next/headers';
+import { readFile } from 'fs/promises';
+import path from 'path';
+import WordDetailClient from './WordDetailClient';
+import type { WordCollection } from '@/lib/types';
 
-interface FullWord {
-  word: string;
-  partOfSpeech: string;
-  pronunciation: string;
-  translation: string;
-  definition: string;
-  example1: string;
-  example1Situation: string;
-  example2: string;
-  example2Situation: string;
-  example3: string;
-  example3Translation: string;
-  example3Situation: string;
-  collectionName: string;
-  topic: string;
-  dayNumber: number;
+// Server-side lookup so a shared /word/<word> link gets a Telegram/WhatsApp
+// preview card (title + translation). The page itself stays client-side.
+const DATA_FILES = ['word_data.json', 'a1_collection.json', 'a2_collection.json', 'b1_collection.json', 'advanced_collection.json'];
+
+type PreviewWord = { word: string; translation: string; definition: string; partOfSpeech: string };
+let index: Map<string, PreviewWord> | null = null;
+
+async function getIndex(): Promise<Map<string, PreviewWord>> {
+  if (index) return index;
+  const map = new Map<string, PreviewWord>();
+  for (const file of DATA_FILES) {
+    try {
+      const raw = JSON.parse(await readFile(path.join(process.cwd(), 'public', 'data', file), 'utf8'));
+      const cols: WordCollection[] = Array.isArray(raw) ? raw : [raw];
+      for (const col of cols) for (const day of col.days) for (const w of day.words) {
+        const key = w.word.toLowerCase();
+        if (!map.has(key)) map.set(key, { word: w.word, translation: w.translation, definition: w.definition, partOfSpeech: w.partOfSpeech });
+      }
+    } catch { /* missing file → just no preview for those words */ }
+  }
+  index = map;
+  return map;
 }
 
-function findWord(collections: WordCollection[], wordText: string): FullWord | null {
-  for (const col of collections) {
-    for (const day of col.days) {
-      for (const w of day.words) {
-        if (w.word.toLowerCase() === wordText.toLowerCase()) {
-          return { ...w, collectionName: col.name, topic: day.topic, dayNumber: day.dayNumber };
-        }
-      }
-    }
-  }
-  return null;
+const strip = (s: string | undefined) => (s ?? '').replace(/<[^>]*>/g, '');
+
+export async function generateMetadata({ params }: { params: Promise<{ word: string }> }): Promise<Metadata> {
+  const wordText = decodeURIComponent((await params).word);
+  const h = await headers();
+  const host = h.get('x-forwarded-host') ?? h.get('host') ?? 'localhost:3000';
+  const proto = h.get('x-forwarded-proto') ?? 'https';
+  const origin = `${proto}://${host}`;
+
+  const w = (await getIndex()).get(wordText.toLowerCase());
+  if (!w) return { title: `${wordText} · Lexivo` };
+
+  const title = `${strip(w.word)} — ${strip(w.translation)}`;
+  const description = strip(w.definition) || 'Ingliz so\'zlarini o\'zbekcha tarjimasi bilan bepul o\'rganing.';
+  const url = `${origin}/word/${encodeURIComponent(w.word)}`;
+  return {
+    title: `${title} · Lexivo`,
+    description,
+    openGraph: { title, description, url, siteName: 'Lexivo', type: 'website', images: [`${origin}/icon-512.png`] },
+    twitter: { card: 'summary', title, description },
+  };
 }
 
-export default function WordDetailPage({ params }: { params: Promise<{ word: string }> }) {
-  const t = useTranslation();
-  const { word: encodedWord } = use(params);
-  const wordText = decodeURIComponent(encodedWord);
-  const router = useRouter();
-  const { collections, collectionsLoaded } = useAppStore();
-
-  const [word, setWord] = useState<FullWord | null>(null);
-  const [starred, setStarred] = useState(false);
-  const [isHard, setIsHard] = useState(false);
-  const [learnedAt, setLearnedAt] = useState<string | null>(null);
-  const [srsInfo, setSrsInfo] = useState<{ completedCount: number; nextReview: string } | null>(null);
-  const [customLists, setCustomLists] = useState<CustomList[]>([]);
-  const [listPanelOpen, setListPanelOpen] = useState(false);
-
-  useEffect(() => {
-    if (!collectionsLoaded) return;
-    const found = findWord(collections, wordText);
-    setWord(found);
-    if (found) {
-      setStarred(isStarred(found.word));
-      setIsHard(getHardWords().includes(found.word));
-      const learned = getLearnedWords().find(l => l.word === found.word);
-      setLearnedAt(learned?.learnedAt ?? null);
-      const srs = getSRSWords().find(s => s.word === found.word);
-      if (srs) {
-        const completed = getReviewLog()[srs.id] ?? [];
-        const nextInterval = SRS_INTERVALS.find(i => !completed.includes(i));
-        const lr = getSRSLastReview()[srs.id];
-        const baseDate = lr && lr > srs.learnedAt ? lr : srs.learnedAt; // clamp >= learnedAt (matches getDueWords / Flutter)
-        const nextReview = nextInterval ? addDaysToDateStr(baseDate, nextInterval) : t.wordPage.graduated;
-        setSrsInfo({ completedCount: completed.length, nextReview });
-      }
-    }
-  }, [collectionsLoaded, collections, wordText]);
-
-  const handleStar = () => {
-    if (!word) return;
-    setStarred(toggleStarred(word.word));
-    pushLists();
-  };
-
-  const handleHardToggle = () => {
-    if (!word) return;
-    if (isHard) { removeHardWord(word.word); setIsHard(false); }
-    else { addHardWord(word.word); setIsHard(true); }
-    pushLists();
-  };
-
-  const reloadLists = () => setCustomLists(getCustomLists());
-  useEffect(() => {
-    reloadLists();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const handleListToggle = (listId: string) => {
-    if (!word) return;
-    if (isWordInList(listId, word.word)) removeWordFromList(listId, word.word);
-    else addWordToList(listId, word.word);
-    reloadLists();
-  };
-
-  const handleCreateAndAdd = () => {
-    if (!word) return;
-    const name = prompt(t.wordPage.newListNamePrompt);
-    if (!name?.trim()) return;
-    const list: CustomList = {
-      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-      name: name.trim(),
-      createdAt: new Date().toISOString(),
-      words: [word.word],
-    };
-    saveCustomList(list);
-    reloadLists();
-  };
-
-  if (!collectionsLoaded) {
-    return <div className="flex items-center justify-center min-h-screen"><div className="text-4xl animate-bounce">📖</div></div>;
-  }
-
-  if (!word) {
-    return (
-      <div className="p-6 text-center">
-        <div className="text-5xl mb-4">🔍</div>
-        <h2 className="font-bold text-xl mb-2">{t.wordPage.notFound}</h2>
-        <p className="text-[var(--text-muted)] text-sm mb-4">{t.wordPage.notInAnyCollection.replace('{word}', wordText)}</p>
-        <Link href="/search" className="btn-primary inline-block">{t.wordPage.searchWords}</Link>
-      </div>
-    );
-  }
-
-  const enc = encodeURIComponent(word.collectionName);
-  const learnUrl  = `/learn?collection=${enc}&day=${word.dayNumber}`;
-  const flashUrl  = `/flashcards?collection=${enc}&day=${word.dayNumber}`;
-  const unitUrl   = `/collections/${enc}`;
-
-  return (
-    <div className="flex flex-col min-h-screen animate-fade-in pb-8">
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-[var(--border)]">
-        <button onClick={() => router.back()} className="btn-icon text-lg" aria-label={t.wordPage.goBack}>←</button>
-        <span className="badge">{word.topic}</span>
-        <div className="flex gap-2">
-          <button
-            onClick={handleStar}
-            className="btn-icon text-lg"
-            aria-label={starred ? t.extra.removeFromStarred : t.extra.addToStarred}
-          >{starred ? '⭐' : '☆'}</button>
-        </div>
-      </div>
-
-      <div className="p-4 space-y-4">
-        {/* Word hero */}
-        <div className="card">
-          <div className="flex items-start justify-between gap-3 mb-4">
-            <div className="flex-1">
-              <h1 className="text-4xl font-black text-[var(--text)] mb-1">{word.word}</h1>
-              <p className="text-sm text-[var(--text-muted)]">
-                <span className="italic">{word.partOfSpeech}</span>
-                <span className="mx-2">·</span>
-                <span>{word.pronunciation}</span>
-              </p>
-            </div>
-            <div className="flex flex-col gap-2">
-              <button
-                onClick={() => speak(word.word)}
-                className="w-10 h-10 rounded-full bg-[var(--primary-bg)] flex items-center justify-center text-lg hover:bg-[var(--primary)] hover:text-white transition-colors"
-                aria-label={t.wordPage.listenNormal}
-              >🔊</button>
-              <button
-                onClick={() => speak(word.word, 0.6)}
-                className="w-10 h-10 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-base hover:bg-[var(--primary-bg)] transition-colors"
-                aria-label={t.wordPage.listenSlow}
-              >🐌</button>
-            </div>
-          </div>
-
-          {/* Translation */}
-          <div className="bg-[var(--primary-bg)] rounded-2xl p-4">
-            <p className="text-xs font-semibold text-[var(--primary)] mb-1">🇺🇿 O'zbek tarjimasi</p>
-            <p className="text-2xl font-bold text-[var(--primary)]">{word.translation}</p>
-          </div>
-        </div>
-
-        {/* Definition */}
-        <div className="card">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] mb-2">{t.wordPage.definitionHeading}</h2>
-          <p className="text-[var(--text)] leading-relaxed">{word.definition}</p>
-        </div>
-
-        {/* Examples */}
-        <div className="card space-y-3">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">{t.wordPage.examplesHeading}</h2>
-          {[
-            { text: word.example1, situation: word.example1Situation, translation: null },
-            { text: word.example2, situation: word.example2Situation, translation: null },
-            { text: word.example3, situation: word.example3Situation, translation: word.example3Translation },
-          ].filter(e => e.text).map((ex, i) => (
-            <div key={i} className="space-y-1">
-              <div className="bg-[var(--surface-2)] rounded-xl p-3">
-                <p className="text-xs text-[var(--text-muted)] mb-1">{t.wordPage.example.replace("{n}", String(i + 1))}</p>
-                <p className="text-sm italic text-[var(--text)]">"{ex.text}"</p>
-                {ex.translation && (
-                  <p className="text-xs text-[var(--primary)] mt-1">{ex.translation}</p>
-                )}
-              </div>
-              {ex.situation && (
-                <div className="bg-amber-50 rounded-xl p-3">
-                  <p className="text-xs text-amber-600 mb-0.5">🗺️ Holat {i + 1} (O'zbek)</p>
-                  <p className="text-xs text-amber-900">{ex.situation}</p>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-
-        {/* Status cards row */}
-        <div className="grid grid-cols-2 gap-3">
-          {/* Learned status */}
-          <div className="card py-3 text-center">
-            {learnedAt ? (
-              <>
-                <div className="text-2xl mb-1">✅</div>
-                <div className="text-xs font-semibold text-[var(--success)]">{t.wordPage.learned}</div>
-                <div className="text-xs text-[var(--text-muted)] mt-0.5">
-                  {fmtMonthDayYear(t, new Date(learnedAt))}
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="text-2xl mb-1">📚</div>
-                <div className="text-xs font-semibold text-[var(--text-muted)]">{t.wordPage.notLearned}</div>
-              </>
-            )}
-          </div>
-
-          {/* SRS status */}
-          <div className="card py-3 text-center">
-            {srsInfo ? (
-              <>
-                <div className="text-2xl mb-1">🔄</div>
-                <div
-                  className="text-xs font-semibold"
-                  style={{ color: stageColor(srsInfo.completedCount) }}
-                >{stageLabel(srsInfo.completedCount, t.progress.srsStageLabels)}</div>
-                <div className="text-xs text-[var(--text-muted)] mt-0.5">
-                  {t.wordPage.reviewLabel.replace('{nextReview}', srsInfo.nextReview)}
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="text-2xl mb-1">💤</div>
-                <div className="text-xs font-semibold text-[var(--text-muted)]">{t.wordPage.notInSrs}</div>
-              </>
-            )}
-          </div>
-        </div>
-
-        {/* Source */}
-        <div className="card flex items-center justify-between">
-          <div>
-            <p className="text-xs text-[var(--text-muted)]">{t.wordPage.fromCollection}</p>
-            <p className="font-semibold text-sm text-[var(--text)]">{word.collectionName}</p>
-            <p className="text-xs text-[var(--text-muted)]">{t.wordPage.unitTopic.replace("{n}", String(word.dayNumber)).replace("{topic}", word.topic)}</p>
-          </div>
-          <Link href={unitUrl} className="text-[var(--primary)] text-sm font-medium hover:underline">
-            {t.wordPage.viewUnit}
-          </Link>
-        </div>
-
-        {/* Hard word toggle */}
-        <button
-          onClick={handleHardToggle}
-          className={`w-full py-3 rounded-xl border-2 text-sm font-semibold transition-colors ${
-            isHard
-              ? 'border-[var(--danger)] bg-red-50 text-[var(--danger)]'
-              : 'border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--danger)] hover:text-[var(--danger)]'
-          }`}
-        >
-          {isHard ? t.wordPage.inHardWordsList : t.wordPage.addToHardWords}
-        </button>
-
-        {/* Add to list */}
-        <div className="rounded-2xl border border-[var(--border)] overflow-hidden">
-          <button
-            onClick={() => setListPanelOpen(o => !o)}
-            className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[var(--surface-2)] transition-colors"
-          >
-            <span className="text-lg">📋</span>
-            <span className="font-semibold text-[var(--text)] text-sm flex-1">{t.wordPage.addToList}</span>
-            {customLists.filter(l => isWordInList(l.id, word.word)).length > 0 && (
-              <span className="text-xs bg-[var(--primary-bg)] text-[var(--primary)] px-2 py-0.5 rounded-full font-semibold">
-                {customLists.filter(l => isWordInList(l.id, word.word)).length}
-              </span>
-            )}
-            <span className="text-xs text-[var(--text-muted)]">{listPanelOpen ? '▲' : '▼'}</span>
-          </button>
-
-          {listPanelOpen && (
-            <div className="border-t border-[var(--border)] p-3 space-y-2 animate-fade-in">
-              {customLists.length === 0 ? (
-                <p className="text-xs text-[var(--text-muted)] text-center py-1">{t.wordPage.noLists}</p>
-              ) : (
-                customLists.map(list => {
-                  const inList = isWordInList(list.id, word.word);
-                  return (
-                    <button
-                      key={list.id}
-                      onClick={() => handleListToggle(list.id)}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all ${
-                        inList
-                          ? 'bg-green-50 border border-[var(--success)]'
-                          : 'bg-[var(--surface-2)] hover:bg-[var(--primary-bg)]'
-                      }`}
-                    >
-                      <span className={`text-base flex-shrink-0 ${inList ? 'text-[var(--success)]' : 'text-[var(--text-muted)]'}`}>
-                        {inList ? '✓' : '○'}
-                      </span>
-                      <span className={`flex-1 text-left font-medium truncate ${inList ? 'text-[var(--success)]' : 'text-[var(--text)]'}`}>
-                        {list.name}
-                      </span>
-                      <span className="text-xs text-[var(--text-muted)] flex-shrink-0">
-                        {t.wordPage.wordCount.replace('{n}', String(list.words.length)).replace('{s}', list.words.length !== 1 ? 's' : '')}
-                      </span>
-                    </button>
-                  );
-                })
-              )}
-              <button
-                onClick={handleCreateAndAdd}
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-[var(--primary)] font-semibold hover:bg-[var(--primary-bg)] transition-colors border border-dashed border-[var(--primary)]"
-              >
-                <span>+</span>
-                <span>{t.wordPage.createAndAdd}</span>
-              </button>
-              <Link
-                href="/lists"
-                className="block text-center text-xs text-[var(--text-muted)] hover:text-[var(--primary)] transition-colors pt-1"
-              >
-                {t.wordPage.manageAllLists}
-              </Link>
-            </div>
-          )}
-        </div>
-
-        {/* Practice buttons */}
-        <div className="grid grid-cols-3 gap-2">
-          <Link href={learnUrl} className="flex flex-col items-center gap-1 py-3 rounded-xl bg-[var(--primary-bg)] text-[var(--primary)] text-xs font-semibold hover:bg-[var(--primary)] hover:text-white transition-colors">
-            <span className="text-lg">📖</span>{t.nav.learn}
-          </Link>
-          <Link href={flashUrl} className="flex flex-col items-center gap-1 py-3 rounded-xl bg-[var(--primary-bg)] text-[var(--primary)] text-xs font-semibold hover:bg-[var(--primary)] hover:text-white transition-colors">
-            <span className="text-lg">🃏</span>{t.wordPage.cards}
-          </Link>
-        </div>
-      </div>
-    </div>
-  );
+export default async function WordPage({ params }: { params: Promise<{ word: string }> }) {
+  const wordText = decodeURIComponent((await params).word);
+  return <WordDetailClient wordText={wordText} />;
 }

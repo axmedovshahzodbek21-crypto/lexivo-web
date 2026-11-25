@@ -42,6 +42,10 @@ const nextConfig: NextConfig = {
   devIndicators: {
     position: 'bottom-right',
   },
+  // /word/[word] reads these on the server for shared-link preview cards.
+  outputFileTracingIncludes: {
+    '/word/[word]': ['./public/data/*.json'],
+  },
   async headers() {
     return [
       {
