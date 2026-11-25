@@ -170,7 +170,7 @@ export default function WordDetailClient({ wordText }: { wordText: string }) {
   const enc = encodeURIComponent(word.collectionName);
   const learnUrl  = `/learn?collection=${enc}&day=${word.dayNumber}`;
   const flashUrl  = `/flashcards?collection=${enc}&day=${word.dayNumber}`;
-  const unitUrl   = `/collections/${enc}`;
+  const unitUrl   = `/collections/${enc}/${word.dayNumber}`;
 
   return (
     <div className="flex flex-col min-h-screen animate-fade-in pb-8">
