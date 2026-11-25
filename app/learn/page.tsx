@@ -25,7 +25,7 @@ import type { Accent } from '@/lib/speech';
 import { checkAchievements } from '@/lib/gamification';
 import { fireConfetti } from '@/lib/confetti';
 import { shuffleArray } from '@/lib/shuffleArray';
-import { shareWord } from '@/lib/share';
+import { shareWord, wordKey } from '@/lib/share';
 import type { WordItem, WordCollection } from '@/lib/types';
 import { getImportedWords, getImportedWordsByCollection, importedWordExampleFields, getMyActivityPendingNewWords, markMyLearnComplete, getMyWordsPendingLearnWords, addMyWordsLearnSeenWords } from '@/lib/storage';
 import Link from 'next/link';
@@ -629,10 +629,10 @@ function LearnInner() {
   // Only built-in words have a public /word/<word> page to share.
   const builtInWords = useMemo(() => {
     const s = new Set<string>();
-    for (const c of collections) for (const d of c.days) for (const w of d.words) s.add(w.word.toLowerCase());
+    for (const c of collections) for (const d of c.days) for (const w of d.words) s.add(wordKey(w.word));
     return s;
   }, [collections]);
-  const canShare = !!current && builtInWords.has(current.word.toLowerCase());
+  const canShare = !!current && builtInWords.has(wordKey(current.word));
   const [linkCopied, setLinkCopied] = useState(false);
   const handleShare = async () => {
     if (!current) return;

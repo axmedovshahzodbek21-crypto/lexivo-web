@@ -4,7 +4,7 @@ import { fmtMonthDayYear } from '@/lib/i18n';
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
-import { shareWord } from '@/lib/share';
+import { shareWord, wordKey } from '@/lib/share';
 import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
 import { speak } from '@/lib/speech';
@@ -37,10 +37,11 @@ interface FullWord {
 }
 
 function findWord(collections: WordCollection[], wordText: string): FullWord | null {
+  const key = wordKey(wordText);
   for (const col of collections) {
     for (const day of col.days) {
       for (const w of day.words) {
-        if (w.word.toLowerCase() === wordText.toLowerCase()) {
+        if (wordKey(w.word) === key) {
           return { ...w, collectionName: col.name, topic: day.topic, dayNumber: day.dayNumber };
         }
       }
