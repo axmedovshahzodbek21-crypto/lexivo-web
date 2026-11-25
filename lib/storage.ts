@@ -69,6 +69,7 @@ const KEYS = {
   structuresNewDate:        'lexivo_structures_new_date',
   structuresNewCount:       'lexivo_structures_new_count',
   structuresXpDays:         'lexivo_structures_xp_days',
+  wordFormsMastered:        'lexivo_word_forms_mastered',
 };
 
 // The exact set of localStorage keys Reset Progress clears — shared between
@@ -93,7 +94,7 @@ export const PROGRESS_RESET_KEYS = [
   'lexivo_sync_stat_ts', 'lexivo_sync_settings_ts', 'lexivo_sync_lists_ts',
   'lexivo_achievements', 'lexivo_achievement_dates',
   'lexivo_structures_srs', 'lexivo_structures_new_date', 'lexivo_structures_new_count',
-  'lexivo_structures_sentence_progress',
+  'lexivo_structures_sentence_progress', 'lexivo_word_forms_mastered',
 ];
 
 export const PROGRESS_RESET_PREFIXES = ['lexivo_unit_progress_'];
@@ -699,7 +700,20 @@ export function structureReviewXP(interval: number): number {
 // Structures Detective and Flashcards pay XP once per day each (replaying
 // them used to pay every time). Returns true — and records today — only for
 // the first claim of the day. Same rule as the Flutter app.
-export function claimStructurePracticeXP(activity: 'detective' | 'flashcards'): boolean {
+// Word Forms ids answered correctly at least once (device-local, like the
+// Structures daily XP gate). Drives the "x/y mastered" counts and puts
+// unmastered items first in a session.
+export function getWordFormsMastered(): string[] {
+  return get<string[]>(KEYS.wordFormsMastered, []);
+}
+
+export function markWordFormsMastered(ids: string[]): void {
+  if (ids.length === 0) return;
+  set(KEYS.wordFormsMastered, [...new Set([...getWordFormsMastered(), ...ids])]);
+}
+
+// Also gates Word Forms XP: one paid session per section per day.
+export function claimStructurePracticeXP(activity: 'detective' | 'flashcards' | `word-forms-${string}`): boolean {
   const today = localDateStr();
   const days = get<Record<string, string>>(KEYS.structuresXpDays, {});
   if (days[activity] === today) return false;

@@ -47,6 +47,7 @@ export default function MorePage() {
         { label: t.hub.items.real_english.title,  sub: t.more.realEnglishSub,  href: '/real-english',  icon: '🗣️', gradient: 'linear-gradient(135deg, #0e7490, #06b6d4)', edge: '#164e63', glow: 'rgba(14,116,144,0.4)' },
         { label: t.hub.items.grammar.title,       sub: t.more.grammarSub,      href: '/grammar-tips',  icon: '📚', gradient: 'linear-gradient(135deg, #1a9a50, #2ECC71)', edge: '#0f6634', glow: 'rgba(46,204,113,0.4)' },
         { label: t.hub.items.structures.title,    sub: t.more.structuresSub,   href: '/structures',    icon: '🧩', gradient: 'linear-gradient(135deg, #7c2d92, #c026d3)', edge: '#581c62', glow: 'rgba(192,38,211,0.4)' },
+        { label: t.wordForms.title,               sub: t.wordForms.moreSub,    href: '/word-forms',    icon: '🔀', gradient: 'linear-gradient(135deg, #6d28d9, #8b5cf6)', edge: '#4c1d95', glow: 'rgba(109,40,217,0.4)' },
       ],
     },
     {
