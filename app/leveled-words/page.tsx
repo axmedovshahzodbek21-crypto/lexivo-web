@@ -56,7 +56,7 @@ export default function LeveledWordsPage() {
 
           {/* Advanced — B2 · C1 · C2 */}
           <Link
-            href="/collections/Advanced"
+            href="/leveled-words/advanced"
             className="group relative rounded-3xl p-5 flex flex-col justify-between min-h-[168px] transition-all duration-200 hover:-translate-y-1"
             style={{
               background: 'linear-gradient(135deg, #6d28d9, #a855f7)',
