@@ -198,7 +198,11 @@ export default function ClassFolderHomeworkPage() {
       ) : (
         <>
           <div className="flex-1 p-3 grid gap-3" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))' }}>
-            {assigned.map(unit => (
+            {/* Unfinished units first; unit order kept within each group (stable sort). */}
+            {[...assigned].sort((a, b) =>
+              Number(isHomeworkDone(a.modes, completedModes[a.hwId] ?? new Set())) -
+              Number(isHomeworkDone(b.modes, completedModes[b.hwId] ?? new Set()))
+            ).map(unit => (
               <AssignedUnitCard key={unit.hwId} classId={classId} unit={unit} completed={completedModes[unit.hwId] ?? new Set()} />
             ))}
             {showAll && unassigned.map(unit => (
