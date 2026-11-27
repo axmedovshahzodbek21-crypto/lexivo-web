@@ -457,12 +457,23 @@ export default function PomodoroWidget() {
             <span style={{ fontSize: 18 }}>🎯</span>
             <span style={{ color: '#fff', fontWeight: 800, fontSize: 14, letterSpacing: '-0.3px' }}>{t.pomodoro.focusMode}</span>
           </div>
-          <button
-            onPointerDown={e => e.stopPropagation()}
-            onClick={e => { e.stopPropagation(); hidePomodoroSetup(); }}
-            style={{ width: 24, height: 24, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', border: 'none', color: 'rgba(255,255,255,0.6)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-            aria-label={t.pomodoro.closeLabel}
-          >✕</button>
+          <div style={{ display: 'flex', gap: 6 }}>
+            {/* Focus-time stats — also reachable from inside classes, where
+                this widget is the only Pomodoro entry point. */}
+            <button
+              onPointerDown={e => e.stopPropagation()}
+              onClick={e => { e.stopPropagation(); hidePomodoroSetup(); router.push('/pomodoro/stats'); }}
+              style={{ width: 24, height: 24, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', border: 'none', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              aria-label={t.extra.focusTime}
+              title={t.extra.focusTime}
+            >📊</button>
+            <button
+              onPointerDown={e => e.stopPropagation()}
+              onClick={e => { e.stopPropagation(); hidePomodoroSetup(); }}
+              style={{ width: 24, height: 24, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', border: 'none', color: 'rgba(255,255,255,0.6)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              aria-label={t.pomodoro.closeLabel}
+            >✕</button>
+          </div>
         </div>
 
         {/* Time display */}
