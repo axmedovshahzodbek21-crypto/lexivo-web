@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import type { WordCollection } from '@/lib/types';
 import { readingPassages } from '@/lib/reading-data';
-import { isHomeworkDone, dueLabel, fetchCollectionByName, MODE_ICON } from './_shared';
+import { isHomeworkDone, dueLabel, fetchCollectionByName, MODE_ICON, requiredDoneCount } from './_shared';
 import { selectInChunks } from '@/lib/fetch-in-chunks';
 import { useClassColors } from '@/lib/class-colors';
 import { coverBackground, parseCover } from '@/lib/folder-cover';
@@ -460,7 +460,7 @@ export default function ClassHomeworkPage() {
                         </svg>
                       ) : (
                         <span className="text-sm font-black text-amber-500">
-                          {completed.size}/{modes.length}
+                          {requiredDoneCount(modes, completed)}/{modes.length}
                         </span>
                       )}
                     </div>

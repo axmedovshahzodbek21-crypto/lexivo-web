@@ -872,8 +872,10 @@ const HW_MODE_COLOR: Record<string, string> = { learn: '#3B82F6', flashcard: '#8
 function hwModeLabel(tt: ReturnType<typeof useTranslation>, mode: string): string {
   return ({ learn: tt.nav.learn, flashcard: tt.classesPage.hwModeCards, quiz: tt.nav.quiz, match: tt.classesPage.hwModeMatch, read: tt.classesPage.hwModeRead } as Record<string, string>)[mode] ?? mode;
 }
-const REQUIRED_MODES = ['learn', 'flashcard', 'quiz'];
-const OPTIONAL_MODES = ['match'];
+// Learn is always required; the teacher picks which practice modes count.
+// Unpicked ones still show to students as optional extras.
+const REQUIRED_MODES = ['learn'];
+const OPTIONAL_MODES = ['flashcard', 'quiz', 'match'];
 
 const COLLECTION_META = [
   { name: '30 Days of Powerful Words', emoji: '🔥', totalDays: 30 },
@@ -1105,13 +1107,15 @@ function CurriculumTab({
     if (!user || (!hwUnit && !hwCollectionName && !hwPassage)) return;
     if (hwWho !== 'class' && hwStudentIds.size === 0) return;
     setHwSaving(true);
+    // Canonical order (Set order follows toggling), so "next step" is stable.
+    const modes = [...REQUIRED_MODES, ...OPTIONAL_MODES].filter(m => hwModes.has(m));
     const { error } = await supabase.from('class_homework').insert({
       class_id: classId,
       ...(hwPassage
         ? { passage_id: hwPassage.id, modes: ['read'] }
         : hwCollectionName
-          ? { collection_name: hwCollectionName, day_number: hwDayNumber, modes: [...hwModes] }
-          : hwUnit!.isClassWords ? { class_unit_id: hwUnit!.id, modes: [...hwModes] } : { unit_id: hwUnit!.id, modes: [...hwModes] }),
+          ? { collection_name: hwCollectionName, day_number: hwDayNumber, modes }
+          : hwUnit!.isClassWords ? { class_unit_id: hwUnit!.id, modes } : { unit_id: hwUnit!.id, modes }),
       due_date: hwDueDate || null,
       student_ids: hwWho === 'class' ? null : [...hwStudentIds],
     });

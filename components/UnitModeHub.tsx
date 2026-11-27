@@ -13,13 +13,14 @@ type ModeProps = {
 };
 
 export function UnitModeButtons({
-  modes, completed, busyMode, disabled, isLocked, onStart,
-}: ModeProps & { modes: string[]; completed: Set<string> }) {
+  modes, completed, busyMode, disabled, isLocked, onStart, isOptional,
+}: ModeProps & { modes: string[]; completed: Set<string>; isOptional?: (mode: string) => boolean }) {
   const nonMatch = modes.filter(m => m !== 'match');
   const tile = (mode: string, wide?: boolean) => (
     <ModeTile
       key={mode}
       mode={mode}
+      optional={isOptional?.(mode) ?? false}
       done={completed.has(mode)}
       busy={busyMode === mode}
       disabled={!!disabled}
@@ -85,14 +86,14 @@ export function UnitNextStep({
 }
 
 function ModeTile({
-  mode, done, busy, disabled, onClick, wide, locked,
+  mode, done, busy, disabled, onClick, wide, locked, optional,
 }: {
-  mode: string; done: boolean; busy: boolean; disabled: boolean; onClick: () => void; wide?: boolean; locked?: boolean;
+  mode: string; done: boolean; busy: boolean; disabled: boolean; onClick: () => void; wide?: boolean; locked?: boolean; optional?: boolean;
 }) {
   const t = useTranslation();
   const color = MODE_COLOR[mode] ?? 'var(--primary)';
   const icon = MODE_ICON[mode] ?? '📖';
-  const label = modeLabel(t, mode);
+  const label = optional ? `${modeLabel(t, mode)} · ${t.classesPage.optionalTagLower}` : modeLabel(t, mode);
   const base = `flex items-center justify-center ${wide ? 'flex-row gap-1.5 py-2 px-3' : 'flex-col gap-1 py-2'} rounded-lg text-[11px] font-bold transition-all disabled:opacity-60`;
 
   if (locked) {
@@ -119,6 +120,23 @@ function ModeTile({
           <div className="w-3.5 h-3.5 border-2 border-green-500 border-t-transparent rounded-full animate-spin" />
         ) : (
           <span className={wide ? 'text-sm' : 'text-base'}>✓</span>
+        )}
+        <span>{label}</span>
+      </button>
+    );
+  }
+  if (optional) {
+    return (
+      <button
+        onClick={onClick}
+        disabled={disabled}
+        className={`${base} active:scale-95 hover:opacity-90`}
+        style={{ background: 'var(--surface-2)', border: `1.5px dashed ${color}`, color }}
+      >
+        {busy ? (
+          <div className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+        ) : (
+          <span className={wide ? 'text-sm' : 'text-base'}>{icon}</span>
         )}
         <span>{label}</span>
       </button>

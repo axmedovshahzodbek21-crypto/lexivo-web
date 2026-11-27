@@ -57,6 +57,20 @@ export function isHomeworkDone(modes: string[], completed: Set<string>): boolean
   return modes.length > 0 && modes.every(m => completed.has(m));
 }
 
+// Word homework always offers every practice mode. The teacher's `modes`
+// are the required ones (they decide "done"); the rest show as optional
+// extras the student may do for class XP. Reading homework is unchanged.
+const PRACTICE_MODES = ['learn', 'flashcard', 'quiz', 'match'];
+export function shownHomeworkModes(modes: string[]): string[] {
+  if (modes.includes('read')) return modes;
+  return PRACTICE_MODES.filter(m => m !== 'learn' || modes.includes(m));
+}
+
+// How many of the required modes are done (optional extras don't count).
+export function requiredDoneCount(modes: string[], completed: Set<string>): number {
+  return modes.filter(m => completed.has(m)).length;
+}
+
 // `t` is optional so this still compiles for callers outside this file's
 // own components (e.g. homework/[hwId]/page.tsx) that aren't in scope for
 // this translation pass — they keep getting the English fallback text.
@@ -89,8 +103,10 @@ export function AssignedUnitCard({
   const allDone = isHomeworkDone(unit.modes, completed);
   const cover = parseCover(unit.cover);
   const due = dueLabel(unit.dueDate, t);
-  const nonMatchModes = unit.modes.filter(m => m !== 'match');
-  const hasMatch = unit.modes.includes('match');
+  const shown = shownHomeworkModes(unit.modes);
+  const nonMatchModes = shown.filter(m => m !== 'match');
+  const hasMatch = shown.includes('match');
+  const isOptional = (mode: string) => !unit.modes.includes(mode);
   const learnAssigned = unit.modes.includes('learn');
   const learnDone = completed.has('learn');
   const gatedByLearn = (mode: string) => mode !== 'learn' && learnAssigned && !learnDone;
@@ -160,6 +176,7 @@ export function AssignedUnitCard({
                 mode={mode}
                 done={completed.has(mode)}
                 locked={gatedByLearn(mode)}
+                optional={isOptional(mode)}
               />
             ))}
           </div>
@@ -171,6 +188,7 @@ export function AssignedUnitCard({
             mode="match"
             done={completed.has('match')}
             locked={gatedByLearn('match')}
+            optional={isOptional('match')}
             wide
           />
         )}
@@ -199,12 +217,12 @@ export function UnassignedUnitCard({ badge, title, wordCount }: { badge: string;
 }
 
 function GridModeButton({
-  classId, hwId, mode, done, locked, wide,
-}: { classId: string; hwId: string; mode: string; done: boolean; locked?: boolean; wide?: boolean }) {
+  classId, hwId, mode, done, locked, wide, optional,
+}: { classId: string; hwId: string; mode: string; done: boolean; locked?: boolean; wide?: boolean; optional?: boolean }) {
   const t = useTranslation();
   const color = MODE_COLOR[mode] ?? 'var(--primary)';
   const icon = MODE_ICON[mode] ?? '📖';
-  const label = modeLabel(t, mode);
+  const label = optional ? `${modeLabel(t, mode)} · ${t.classesPage.optionalTagLower}` : modeLabel(t, mode);
   const base = `flex items-center justify-center ${wide ? 'flex-row gap-2 py-2.5 px-4' : 'flex-col gap-1.5 py-3'} rounded-xl text-xs font-bold transition-all`;
 
   if (locked) {
@@ -227,6 +245,18 @@ function GridModeButton({
         style={{ background: 'rgba(34,197,94,0.12)', border: '1.5px solid rgba(34,197,94,0.35)', color: '#16a34a' }}
       >
         <span className={wide ? 'text-base' : 'text-xl'}>✓</span>
+        <span>{label}</span>
+      </Link>
+    );
+  }
+  if (optional) {
+    return (
+      <Link
+        href={`/classes/${classId}/homework/${hwId}?mode=${mode}`}
+        className={`${base} active:scale-95 hover:opacity-90`}
+        style={{ background: 'var(--surface-2)', border: `1.5px dashed ${color}`, color }}
+      >
+        <span className={wide ? 'text-base' : 'text-xl'}>{icon}</span>
         <span>{label}</span>
       </Link>
     );

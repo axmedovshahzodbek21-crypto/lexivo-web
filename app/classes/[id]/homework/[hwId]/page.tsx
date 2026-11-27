@@ -7,7 +7,7 @@ import { useAuth } from '@/lib/auth-context';
 import { saveClassHWTemp } from '@/lib/storage';
 import type { ClassHWWord } from '@/lib/storage';
 import { readingPassages, type ReadingPassage } from '@/lib/reading-data';
-import { dueLabel, isHomeworkDone, fetchCollectionByName } from '../_shared';
+import { dueLabel, isHomeworkDone, fetchCollectionByName, shownHomeworkModes, requiredDoneCount } from '../_shared';
 import { UnitModeButtons, UnitNextStep } from '@/components/UnitModeHub';
 
 interface UnitWord {
@@ -57,7 +57,7 @@ export default function UnitStudyHubPage() {
   useEffect(() => {
     if (loading || autoStartedRef.current || words.length === 0) return;
     const autoMode = searchParams.get('mode');
-    if (autoMode && modes.includes(autoMode)) {
+    if (autoMode && shownHomeworkModes(modes).includes(autoMode)) {
       autoStartedRef.current = true;
       router.replace(`/classes/${classId}/homework/${hwId}`);
       startMode(autoMode);
@@ -419,7 +419,8 @@ export default function UnitStudyHubPage() {
 
   const allDone = isHomeworkDone(modes, completedModes);
   const due = dueLabel(dueDate);
-  const progressPct = modes.length > 0 ? (completedModes.size / modes.length) * 100 : 0;
+  const requiredDone = requiredDoneCount(modes, completedModes);
+  const progressPct = modes.length > 0 ? (requiredDone / modes.length) * 100 : 0;
   const learnAssigned = modes.includes('learn');
   const learnDone = completedModes.has('learn');
   const gatedByLearn = (mode: string) => mode !== 'learn' && learnAssigned && !learnDone;
@@ -493,11 +494,12 @@ export default function UnitStudyHubPage() {
                 }}
               />
             </div>
-            <p className="text-[9px] text-[var(--text-muted)] -mt-1.5">{t.classesPage.modesDone(completedModes.size, modes.length)}</p>
+            <p className="text-[9px] text-[var(--text-muted)] -mt-1.5">{t.classesPage.modesDone(requiredDone, modes.length)}</p>
 
-            {/* Mode buttons */}
+            {/* Mode buttons — required ones plus optional extras */}
             <UnitModeButtons
-              modes={modes}
+              modes={shownHomeworkModes(modes)}
+              isOptional={m => !modes.includes(m)}
               completed={completedModes}
               busyMode={navigating}
               disabled={!!navigating}
@@ -519,7 +521,7 @@ export default function UnitStudyHubPage() {
         )}
 
         {/* Recommended next step */}
-        {!allDone && nextMode && completedModes.size > 0 && (
+        {!allDone && nextMode && requiredDone > 0 && (
           <UnitNextStep
             nextMode={nextMode}
             skipMode={skipMode}
