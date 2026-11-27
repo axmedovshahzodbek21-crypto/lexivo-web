@@ -96,6 +96,7 @@ interface AppState {
   resetPomodoro: () => void;
   skipPomodoro: () => void;
   tickPomodoro: () => void;
+  syncPomFromStorage: () => void;
   setPomSettings: (workMins: number, breakMins: number) => void;
 }
 
@@ -104,6 +105,13 @@ export const useAppStore = create<AppState>((set, get) => {
   // pomodoro action below. Never called during module init/SSR (all call
   // sites are store actions, only ever invoked client-side from user
   // interaction or a client-only effect).
+  // savedAt of this tab's own last write. Every open tab runs its own timer
+  // and saves every second, so a stop (✕) in one tab used to be overwritten
+  // by another tab's next tick and the timer came back on reload. A tick now
+  // first checks whether someone else wrote since — if so it adopts that
+  // state instead of overwriting it (see syncPomFromStorage).
+  let lastPersistAt = 0;
+
   function persistPom() {
     const s = get();
     const snap: PomSnapshot = {
@@ -111,7 +119,35 @@ export const useAppStore = create<AppState>((set, get) => {
       workMins: s.pomWorkMins, breakMins: s.pomBreakMins, sessions: s.pomSessions,
       visible: s.pomVisible, savedAt: Date.now(),
     };
+    lastPersistAt = snap.savedAt;
     try { localStorage.setItem(POM_STORAGE_KEY, JSON.stringify(snap)); } catch {}
+  }
+
+  function readPom(): PomSnapshot | null {
+    try {
+      const raw = localStorage.getItem(POM_STORAGE_KEY);
+      return raw ? (JSON.parse(raw) as PomSnapshot) : null;
+    } catch { return null; }
+  }
+
+  // Takes another tab's saved state as-is. No focus-seconds credit here —
+  // the tab that wrote it already credited that time.
+  function adoptPom(snap: PomSnapshot) {
+    lastPersistAt = snap.savedAt;
+    if (snap.phase === 'idle') {
+      set({ pomPhase: 'idle', pomRunning: false, pomVisible: snap.visible, pomSessions: 0,
+            pomWorkMins: snap.workMins, pomBreakMins: snap.breakMins,
+            pomSecondsLeft: snap.workMins * 60, pomLastTickAt: null });
+      return;
+    }
+    const elapsed = snap.running ? Math.max(0, Math.floor((Date.now() - snap.savedAt) / 1000)) : 0;
+    const next = advancePhase(snap.phase, snap.secondsLeft, snap.sessions, snap.workMins, snap.breakMins, elapsed);
+    set({
+      pomPhase: next.phase, pomSecondsLeft: next.secondsLeft, pomRunning: snap.running,
+      pomWorkMins: snap.workMins, pomBreakMins: snap.breakMins,
+      pomSessions: next.sessions, pomVisible: snap.visible,
+      pomLastTickAt: snap.running ? Date.now() : null,
+    });
   }
 
   return {
@@ -228,7 +264,16 @@ export const useAppStore = create<AppState>((set, get) => {
     persistPom();
   },
 
+  syncPomFromStorage: () => {
+    const stored = readPom();
+    if (stored && stored.savedAt !== lastPersistAt) adoptPom(stored);
+  },
+
   tickPomodoro: () => {
+    // Another tab stopped/paused/changed the timer since our last write —
+    // follow it rather than overwrite it.
+    const stored = readPom();
+    if (stored && lastPersistAt && stored.savedAt !== lastPersistAt) { adoptPom(stored); return; }
     const s = get();
     if (!s.pomRunning || s.pomPhase === 'idle') return;
     const now = Date.now();

@@ -200,6 +200,16 @@ export default function PomodoroWidget() {
   // regardless of pomVisible, so this runs once on every app load.
   useEffect(() => { hydratePomodoro(); }, [hydratePomodoro]);
 
+  // Follow start/stop/pause made in another tab or the installed app window
+  // right away (the `storage` event only fires in the OTHER tabs).
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === 'lexivo_pomodoro_state') useAppStore.getState().syncPomFromStorage();
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
+
   // Initialise widget position
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
