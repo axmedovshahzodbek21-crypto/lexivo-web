@@ -115,6 +115,10 @@ export default function AutoHomeworkModal({
   const wd = WEEKDAYS[lang] ?? WEEKDAYS.en;
   const [perDay, setPerDay] = useState(existing?.units_per_day ?? 1);
   const [weekdays, setWeekdays] = useState<Set<number>>(new Set(existing?.weekdays ?? [1, 2, 3, 4, 5, 6]));
+  // Learn is always required; the practice modes are the teacher's pick
+  // (unpicked ones still show to students as optional extras).
+  const [cards, setCards] = useState(existing?.modes.includes('flashcard') ?? true);
+  const [quiz, setQuiz] = useState(existing?.modes.includes('quiz') ?? true);
   const [match, setMatch] = useState(existing?.modes.includes('match') ?? false);
   const [dueDays, setDueDays] = useState<number | null>(existing ? existing.due_days : 1);
   const [randomOrder, setRandomOrder] = useState(existing?.random_order ?? false);
@@ -154,7 +158,7 @@ export default function AutoHomeworkModal({
   const settings = () => ({
     units_per_day: perDay,
     weekdays: [...weekdays].sort(),
-    modes: ['learn', 'flashcard', 'quiz', ...(match ? ['match'] : [])],
+    modes: ['learn', ...(cards ? ['flashcard'] : []), ...(quiz ? ['quiz'] : []), ...(match ? ['match'] : [])],
     due_days: dueDays,
     random_order: randomOrder,
     ...(collectionName ? { day_numbers: dayNumbers } : {}),
@@ -236,8 +240,8 @@ export default function AutoHomeworkModal({
         {label(autoT('modes'))}
         <div className="flex flex-wrap gap-1.5">
           {chip(`📖 ${tt.nav.learn} *`, true, () => {})}
-          {chip(`🃏 ${tt.classesPage.hwModeCards} *`, true, () => {})}
-          {chip(`🧠 ${tt.nav.quiz} *`, true, () => {})}
+          {chip(`🃏 ${tt.classesPage.hwModeCards}`, cards, () => setCards(c => !c))}
+          {chip(`🧠 ${tt.nav.quiz}`, quiz, () => setQuiz(q => !q))}
           {chip(`🎯 ${tt.classesPage.hwModeMatch}`, match, () => setMatch(m => !m))}
         </div>
 
