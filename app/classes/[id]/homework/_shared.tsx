@@ -24,7 +24,10 @@ export async function fetchCollectionByName(name: string): Promise<WordCollectio
     const collections = await loadCollections();
     return collections.find(c => c.name === name) ?? null;
   }
-  const lvl = ({ A1: 'a1', A2: 'a2', B1: 'b1' } as Record<string, 'a1'|'a2'|'b1'>)[name];
+  const lvl = ({
+    A1: 'a1', A2: 'a2', B1: 'b1',
+    'Advanced B2+': 'advanced_b2', 'Advanced C1': 'advanced_c1', 'Advanced C2': 'advanced_c2',
+  } as Record<string, Parameters<typeof loadCEFRCollection>[0]>)[name];
   return lvl ? loadCEFRCollection(lvl) : null;
 }
 

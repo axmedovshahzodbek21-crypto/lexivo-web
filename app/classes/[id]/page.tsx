@@ -890,6 +890,9 @@ const COLLECTION_META = [
   { name: 'Phrases B2',                emoji: '💬', totalDays: 24 },
   { name: 'Phrases C1',                emoji: '💬', totalDays: 15 },
   { name: 'Phrases C2',                emoji: '💬', totalDays: 16 },
+  { name: 'Advanced B2+',              emoji: '🎓', totalDays: 16 },
+  { name: 'Advanced C1',               emoji: '🎓', totalDays: 19 },
+  { name: 'Advanced C2',               emoji: '🎓', totalDays: 20 },
 ];
 
 function CurriculumTab({
@@ -2055,7 +2058,7 @@ const _classCache = new Map<string, CachedClass>();
 async function fetchTopics(collectionName: string): Promise<Record<number, string>> {
   if (_topicsCache[collectionName]) return _topicsCache[collectionName];
   try {
-    const fileMap: Record<string, string> = { A1: '/data/a1_collection.json', A2: '/data/a2_collection.json', B1: '/data/b1_collection.json', Advanced: '/data/advanced_collection.json' };
+    const fileMap: Record<string, string> = { A1: '/data/a1_collection.json', A2: '/data/a2_collection.json', B1: '/data/b1_collection.json', 'Advanced B2+': '/data/advanced_b2.json', 'Advanced C1': '/data/advanced_c1.json', 'Advanced C2': '/data/advanced_c2.json' };
     let result: Record<number, string>;
     if (fileMap[collectionName]) {
       const data = await (await fetch(fileMap[collectionName])).json();
