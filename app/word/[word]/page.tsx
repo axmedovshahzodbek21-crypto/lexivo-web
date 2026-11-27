@@ -8,7 +8,7 @@ import type { WordCollection } from '@/lib/types';
 
 // Server-side lookup so a shared /word/<word> link gets a Telegram/WhatsApp
 // preview card (title + translation). The page itself stays client-side.
-const DATA_FILES = ['word_data.json', 'a1_collection.json', 'a2_collection.json', 'b1_collection.json', 'advanced_collection.json'];
+const DATA_FILES = ['word_data.json', 'a1_collection.json', 'a2_collection.json', 'b1_collection.json', 'advanced_b2.json', 'advanced_c1.json', 'advanced_c2.json'];
 
 type PreviewWord = { word: string; translation: string; definition: string; partOfSpeech: string };
 let index: Map<string, PreviewWord> | null = null;

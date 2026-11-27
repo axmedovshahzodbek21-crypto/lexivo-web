@@ -8,7 +8,7 @@ import type { WordCollection, UnitProgress } from '@/lib/types';
 import { useTranslation } from '@/lib/useTranslation';
 import { supabase } from '@/lib/supabase';
 import { PHRASE_LEVELS, phraseCollectionName, isPhraseCollection } from '@/lib/phrases';
-import { advancedLevelRange } from '@/lib/advanced-levels';
+import { ADVANCED_LEVELS, advancedCollectionName } from '@/lib/advanced-levels';
 import { CopyFolderWordListButton } from '@/components/CopyWordList';
 import { UnitCardFrame } from '@/components/UnitStudyCard';
 
@@ -52,6 +52,11 @@ const KNOWN_DESCRIPTIONS: Record<string, (t: ReturnType<typeof useTranslation>) 
     phraseCollectionName(l),
     (t: ReturnType<typeof useTranslation>) => `${l} — ${t.collectionsPage.phrasesLevels[l]}`,
   ])),
+  ...Object.fromEntries(ADVANCED_LEVELS.map(l => [
+    advancedCollectionName(l),
+    (t: ReturnType<typeof useTranslation>) =>
+      `${l} — ${t.advancedPage[l === 'B2+' ? 'levelB2Desc' : l === 'C1' ? 'levelC1Desc' : 'levelC2Desc']}`,
+  ])),
 };
 
 interface UnitRow {
@@ -68,7 +73,6 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
   const router = useRouter();
   const sp = useSearchParams();
   const doneOnly = sp.get('doneOnly') === 'true';
-  const level = sp.get('level');
   const t = useTranslation();
   const { collections, collectionsLoaded } = useAppStore();
 
@@ -99,14 +103,8 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
 
   useEffect(() => {
     if (!collectionsLoaded) return;
-    const full = collections.find(c => c.name === collectionName);
-    if (!full) return;
-    // Advanced opens per level folder (/collections/Advanced?level=C1): same
-    // collection name and unit numbers, so progress/SRS keys don't change.
-    const range = collectionName === 'Advanced' ? advancedLevelRange(level) : undefined;
-    const found = range
-      ? { ...full, days: full.days.filter(d => d.dayNumber >= range.first && d.dayNumber <= range.last) }
-      : full;
+    const found = collections.find(c => c.name === collectionName);
+    if (!found) return;
     setCollection(found);
     // Units with no words yet are unfinished content, not real units —
     // showing them lets a click crash Flashcards/Quiz on an empty word list.
@@ -123,7 +121,7 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
       ? allRows.filter(r => r.progress.learnDone && r.progress.flashcardDone && r.progress.quizDone)
       : allRows;
     setUnits(rows);
-  }, [collectionsLoaded, collections, collectionName, doneOnly, level]);
+  }, [collectionsLoaded, collections, collectionName, doneOnly]);
 
   useEffect(() => {
     if (!collection) return;
@@ -231,7 +229,7 @@ export default function CollectionPage({ params }: { params: Promise<{ name: str
           className="text-2xl font-black text-white leading-tight mb-1"
           style={{ textShadow: '0 2px 8px rgba(0,0,0,0.3)' }}
         >
-          {collection.name}{collectionName === 'Advanced' && advancedLevelRange(level) ? ` · ${level}` : ''}
+          {collection.name}
         </h1>
         {collection.description && (
           <p

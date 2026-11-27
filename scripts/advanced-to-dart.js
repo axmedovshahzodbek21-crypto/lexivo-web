@@ -1,65 +1,70 @@
 #!/usr/bin/env node
-// Builds the "Advanced" collection (IELTS Reading bank, B2+ / C1 / C2) from
-// scripts/advanced-data/*.txt and writes BOTH outputs:
-//   - lexivo/lib/data/advanced_collection.dart   (bundled in the app)
-//   - lexivo-web/public/data/advanced_collection.json (web + app live fetch)
-// Never hand-edit those two files — edit the .txt data and re-run:
+// Builds the Advanced IELTS Reading bank — three separate collections,
+// "Advanced B2+", "Advanced C1", "Advanced C2" — from scripts/advanced-data/*.txt
+// and writes BOTH outputs:
+//   - lexivo/lib/data/advanced_collection.dart  (bundled in the app)
+//   - lexivo-web/public/data/advanced_<b2|c1|c2>.json  (one file per level)
+// Never hand-edit those files — edit the .txt data and re-run:
 //   node scripts/advanced-to-dart.js
 //
 // Data format (UTF-8, one card per line, fields separated by "|"):
 //   word|pos|pronunciation|translation|definition|paraphrases|definitionUz|ex1|ex1Tr|ex2|ex2Tr|ex3|ex3Tr
 //   "# Full topic|Short unit name" starts a topic; "@ B2+" / "@ C1" / "@ C2" starts a level.
-// Each level is cut into units of 20 in file order; a unit is named after the
-// topics that fill at least 5 of its cards. Unit numbers run on across levels
-// and MUST match ADVANCED_LEVELS (lib/advanced-levels.ts, Flutter
-// advancedLevels in leveled_words_screen.dart): B2+ 1–16, C1 17–35, C2 36–55.
+// Each level is cut into units of 20 in file order, numbered from 1; a unit is
+// named after the topics that fill at least 5 of its cards. A level with no
+// cards yet is written with no units (shown as "coming soon").
+//
+// public/data/advanced_collection.json (the old single "Advanced") is frozen
+// for app versions released before the split — don't regenerate or delete it.
 
 const fs = require('fs');
 const path = require('path');
 
 const dataDir = path.join(__dirname, 'advanced-data');
 const dartOut = 'C:/Users/User/lexivo/lib/data/advanced_collection.dart';
-const jsonOut = path.join(__dirname, '..', 'public', 'data', 'advanced_collection.json');
+const jsonDir = path.join(__dirname, '..', 'public', 'data');
 const UNIT = 20;
-const RANGES = { 'B2+': [1, 16], C1: [17, 35], C2: [36, 55] };
+const LEVELS = ['B2+', 'C1', 'C2'];
+const fileKey = lv => (lv === 'B2+' ? 'b2' : lv.toLowerCase());
+const DESCRIPTIONS = {
+  'B2+': 'IELTS Reading vocabulary, strong B2',
+  C1: 'IELTS Reading vocabulary, C1',
+  C2: 'IELTS Reading vocabulary, C2',
+};
 
-const files = fs.readdirSync(dataDir).filter(f => f.endsWith('.txt')).sort();
-const levels = []; // { level, cards: [{topicShort, fields}] }
+const cardsByLevel = Object.fromEntries(LEVELS.map(l => [l, []]));
 let level = null, topicShort = '';
-for (const f of files) {
+for (const f of fs.readdirSync(dataDir).filter(f => f.endsWith('.txt')).sort()) {
   const lines = fs.readFileSync(path.join(dataDir, f), 'utf8').replace(/^\uFEFF/, '').split(/\r?\n/);
   lines.forEach((raw, i) => {
     const line = raw.trim();
     if (!line) return;
     if (line.startsWith('@')) {
-      const name = line.slice(1).trim();
-      level = levels.find(l => l.level === name);
-      if (!level) { level = { level: name, cards: [] }; levels.push(level); }
+      level = line.slice(1).trim();
+      if (!LEVELS.includes(level)) throw new Error(`${f}:${i + 1}: unknown level "${level}"`);
       return;
     }
     if (line.startsWith('#')) { topicShort = line.slice(1).split('|').pop().trim(); return; }
     const p = line.split('|').map(s => s.trim());
     if (p.length !== 13) throw new Error(`${f}:${i + 1}: expected 13 fields, got ${p.length}: ${line.slice(0, 60)}`);
     if (!level) throw new Error(`${f}:${i + 1}: card before any "@ level" line`);
-    level.cards.push({ topicShort, p });
+    cardsByLevel[level].push({ topicShort, p });
   });
 }
 
 const seen = new Set();
-const days = [];
-let dayNumber = 0;
-for (const { level: lv, cards } of levels) {
-  const start = dayNumber + 1;
+const collections = LEVELS.map(lv => {
+  const cards = cardsByLevel[lv];
+  const days = [];
   for (let i = 0; i < cards.length; i += UNIT) {
     const chunk = cards.slice(i, i + UNIT);
     const counts = new Map();
     for (const c of chunk) counts.set(c.topicShort, (counts.get(c.topicShort) || 0) + 1);
     let names = [...counts].filter(([, n]) => n >= 5).map(([t]) => t);
     if (!names.length) names = [chunk[0].topicShort];
-    dayNumber++;
     days.push({
-      dayNumber,
-      topic: `${lv} · ${names.join(' · ')}`,
+      dayNumber: days.length + 1,
+      topic: names.join(' · '),
       words: chunk.map(({ p }) => {
         const key = p[0].toLowerCase();
         if (seen.has(key)) throw new Error(`duplicate card: ${p[0]}`);
@@ -76,29 +81,36 @@ for (const { level: lv, cards } of levels) {
       }),
     });
   }
-  const [a, b] = RANGES[lv] || [];
-  if (a !== undefined && (start !== a || dayNumber > b)) {
-    console.warn(`WARNING: ${lv} is units ${start}–${dayNumber}, expected ${a}–${b}`);
-  }
-}
+  return { level: lv, col: { name: `Advanced ${lv}`, description: DESCRIPTIONS[lv], days } };
+});
 
-const col = { name: 'Advanced', description: 'B2+ · C1 · C2 — IELTS Reading vocabulary', days };
-fs.writeFileSync(jsonOut, JSON.stringify(col, null, 0));
+for (const { level: lv, col } of collections) {
+  fs.writeFileSync(path.join(jsonDir, `advanced_${fileKey(lv)}.json`), JSON.stringify(col, null, 0));
+}
 
 const q = s => "'" + s.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\$/g, '\\$') + "'";
 let dart = `// GENERATED by lexivo-web/scripts/advanced-to-dart.js — do not edit by hand.
 // Source: lexivo-web/scripts/advanced-data/*.txt
 import 'word_data.dart';
 
-final WordCollection advancedCollection = WordCollection(
+/// Advanced (IELTS Reading bank) levels, in order. Each is its own collection
+/// named "Advanced B2+" / "Advanced C1" / "Advanced C2"; a level with no units yet shows "coming soon".
+const advancedLevels = [${LEVELS.map(q).join(', ')}];
+
+final Map<String, WordCollection> advancedByLevel = {
+${collections.map(({ level: lv }) => `  ${q(lv)}: advanced${fileKey(lv).toUpperCase()}Collection,`).join('\n')}
+};
+`;
+for (const { level: lv, col } of collections) {
+  dart += `\nfinal WordCollection advanced${fileKey(lv).toUpperCase()}Collection = WordCollection(
   name: ${q(col.name)},
   description: ${q(col.description)},
   days: [
 `;
-for (const d of days) {
-  dart += `    WordDay(\n      dayNumber: ${d.dayNumber},\n      topic: ${q(d.topic)},\n      words: [\n`;
-  for (const w of d.words) {
-    dart += `        WordItem(
+  for (const d of col.days) {
+    dart += `    WordDay(\n      dayNumber: ${d.dayNumber},\n      topic: ${q(d.topic)},\n      words: [\n`;
+    for (const w of d.words) {
+      dart += `        WordItem(
           word: ${q(w.word)},
           partOfSpeech: ${q(w.partOfSpeech)},
           pronunciation: ${q(w.pronunciation)},
@@ -113,11 +125,14 @@ for (const d of days) {
           example3Translation: ${q(w.example3Translation)},
         ),
 `;
+    }
+    dart += `      ],\n    ),\n`;
   }
-  dart += `      ],\n    ),\n`;
+  dart += `  ],\n);\n`;
 }
-dart += `  ],\n);\n`;
 fs.writeFileSync(dartOut, dart);
 
-for (const { level: lv, cards } of levels) console.log(`${lv}: ${cards.length} cards`);
-console.log(`${days.length} units -> advanced_collection.dart + advanced_collection.json`);
+for (const { level: lv, col } of collections) {
+  console.log(`${col.name}: ${col.days.length} units, ${cardsByLevel[lv].length} cards -> advanced_${fileKey(lv)}.json`);
+}
+console.log('-> lexivo/lib/data/advanced_collection.dart');

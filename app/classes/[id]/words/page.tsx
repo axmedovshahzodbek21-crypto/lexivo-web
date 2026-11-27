@@ -22,7 +22,9 @@ const BUILT_IN_COLLECTIONS = [
   { name: 'A1 Starter',       emoji: '🌱', file: '/data/a1_collection.json' },
   { name: 'A2 Elementary',    emoji: '📗', file: '/data/a2_collection.json' },
   { name: 'B1 Intermediate',  emoji: '📘', file: '/data/b1_collection.json' },
-  { name: 'B2+ Advanced',     emoji: '📕', file: '/data/advanced_collection.json' },
+  { name: 'Advanced B2+',     emoji: '📕', file: '/data/advanced_b2.json' },
+  { name: 'Advanced C1',      emoji: '📕', file: '/data/advanced_c1.json' },
+  { name: 'Advanced C2',      emoji: '📕', file: '/data/advanced_c2.json' },
 ];
 
 type WordExample = { sentence: string; translation: string };

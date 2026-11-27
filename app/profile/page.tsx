@@ -17,6 +17,7 @@ import { useRef } from 'react';
 import XpModal from '@/components/XpModal';
 import TiltCard from '@/components/TiltCard';
 import { useTranslation } from '@/lib/useTranslation';
+import { isAdvancedCollection } from '@/lib/advanced-levels';
 import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/lib/supabase';
 
@@ -191,7 +192,7 @@ export default function ProfilePage() {
   // Per-collection unit progress
   const collectionStats = collectionsLoaded
     ? collections
-        .filter(c => !['A1', 'A2', 'B1', 'Advanced'].includes(c.name) && !c.youtubeUrl)
+        .filter(c => !['A1', 'A2', 'B1', 'Advanced'].includes(c.name) && !isAdvancedCollection(c.name) && !c.youtubeUrl)
         .map(col => {
           const total = col.days.length;
           const learnDone    = col.days.filter(d => getUnitProgress(col.name, d.dayNumber).learnDone).length;

@@ -3,7 +3,7 @@ import { useTranslation } from '@/lib/useTranslation';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
-import { ADVANCED_LEVELS } from '@/lib/advanced-levels';
+import { ADVANCED_LEVELS, advancedCollectionName } from '@/lib/advanced-levels';
 
 const STYLE = {
   'B2+': { labelKey: 'levelB2', descKey: 'levelB2Desc', emoji: '📖', gradient: 'linear-gradient(135deg, #7c3aed, #a855f7)', edge: '#4c1d95', glow: 'rgba(124,58,237,0.4)' },
@@ -15,7 +15,6 @@ export default function AdvancedPage() {
   const t = useTranslation();
   const router = useRouter();
   const { collections } = useAppStore();
-  const advanced = collections.find(c => c.name === 'Advanced');
 
   return (
     <div className="flex flex-col min-h-screen animate-fade-in">
@@ -27,9 +26,10 @@ export default function AdvancedPage() {
       </div>
 
       <div className="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {ADVANCED_LEVELS.map(({ level, first, last }) => {
+        {ADVANCED_LEVELS.map(level => {
           const s = STYLE[level];
-          const days = advanced?.days.filter(d => d.dayNumber >= first && d.dayNumber <= last && d.words.length > 0) ?? [];
+          const name = advancedCollectionName(level);
+          const days = collections.find(c => c.name === name)?.days.filter(d => d.words.length > 0) ?? [];
           const wordCount = days.reduce((a, d) => a + d.words.length, 0);
           const ready = days.length > 0;
           const body = (
@@ -53,7 +53,7 @@ export default function AdvancedPage() {
           const style = { background: s.gradient, boxShadow: `0 10px 0 ${s.edge}, 0 18px 40px ${s.glow}`, textShadow: '0 1px 3px rgba(0,0,0,0.35)' };
 
           return ready ? (
-            <Link key={level} href={`/collections/Advanced?level=${encodeURIComponent(level)}`} className={`${className} hover:-translate-y-1`} style={style}>
+            <Link key={level} href={`/collections/${encodeURIComponent(name)}`} className={`${className} hover:-translate-y-1`} style={style}>
               {body}
               <span className="absolute bottom-5 right-5 text-lg font-black text-white opacity-0 group-hover:opacity-100 transition-opacity">→</span>
             </Link>

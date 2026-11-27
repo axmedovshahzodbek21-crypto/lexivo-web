@@ -7,6 +7,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { getImportedWords } from '@/lib/storage';
 import { useEffect, useState } from 'react';
 import { isPhraseCollection } from '@/lib/phrases';
+import { isAdvancedCollection } from '@/lib/advanced-levels';
 
 function collectionMeta(t: ReturnType<typeof useTranslation>): Record<string, { icon: string; gradient: string; edge: string; glow: string; desc: string }> {
   return {
@@ -79,7 +80,7 @@ export default function CollectionsPage() {
 
   const CURATED_ORDER = ['30 Days of Powerful Words', '24 Vocabulary Challenge', 'Word Mastery'];
   const mainCollections = collections
-    .filter(c => !LEVELED_NAMES.has(c.name) && !c.youtubeUrl && !isPhraseCollection(c.name))
+    .filter(c => !LEVELED_NAMES.has(c.name) && !c.youtubeUrl && !isPhraseCollection(c.name) && !isAdvancedCollection(c.name))
     .sort((a, b) => {
       const ai = CURATED_ORDER.indexOf(a.name);
       const bi = CURATED_ORDER.indexOf(b.name);
