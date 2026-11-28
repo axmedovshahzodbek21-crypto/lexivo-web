@@ -91,6 +91,8 @@ ${EXAMPLE_FORMAT_BLOCK}
 
 Important: the example above uses English/Uzbek only to show the format. In your actual response, write the definition, part of speech, and examples in ${wordLang}, the translations and definitionUz in ${translationLang}.
 
+The words in my list are learned together, so where it fits naturally, use other words from my list inside the example sentences — that way the words appear in each other's examples and get repeated while studying. Each example must still clearly show the meaning of the word it belongs to. Don't force it: if no other word fits, write a normal sentence.
+
 ${wordsLabel}
 ${words}`;
 }
